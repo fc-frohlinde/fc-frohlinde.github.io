@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>FC Frohlinde 1949 e.V. – Anwesenheitsliste</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bd:#0d3b7c;--bm:#1659b8;--bl:#2e7de4;
+  --wh:#fff;--ow:#f4f7fc;--gl:#e2e9f4;--gm:#a8b8d4;--gd:#4a5d78;
+  --ac:#e8c840;--cp:#27ae60;--ca:#e74c3c;--ce:#f39c12;
+  --mc1:#b03000;--mc2:#8a2000;
+  --sl0:30px;--sl1:145px;--sl2:52px;
+  --hdr-h:78px;
+}
+html,body{height:100%;margin:0;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Barlow',sans-serif;background:linear-gradient(140deg,#071a3e 0%,#1659b8 55%,#071a3e 100%);min-height:100vh;padding:8px;display:flex;flex-direction:column;}
+.page{flex:1;display:flex;flex-direction:column;background:var(--wh);border-radius:14px;overflow:hidden;box-shadow:0 6px 30px rgba(0,0,0,.3);min-height:0;}
+
+/* ── HEADER ── */
+.header{background:linear-gradient(135deg,#071e48 0%,#1659b8 58%,#0a2d6e 100%);color:#fff;padding:12px 22px;display:flex;align-items:center;gap:16px;flex-shrink:0;position:relative;overflow:hidden;transition:all .25s;}
+.header.collapsed{padding:6px 22px;}
+.header::before{content:'';position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.04);}
+
+/* Logo – screen blend removes black background */
+.logo-wrap{flex-shrink:0;width:68px;height:68px;z-index:1;transition:all .25s;}
+.header.collapsed .logo-wrap{width:36px;height:36px;}
+.logo-wrap img{width:100%;height:100%;object-fit:contain;display:block;mix-blend-mode:screen;filter:saturate(1.1) brightness(1.05);}
+
+.htext{z-index:1;transition:all .25s;}
+.htext .club{font-family:'Bebas Neue',sans-serif;font-size:1.75rem;letter-spacing:2.5px;line-height:1;transition:all .25s;}
+.header.collapsed .htext .club{font-size:1.1rem;}
+.htext .sub{font-size:.72rem;font-weight:300;letter-spacing:3.5px;color:var(--ac);margin-top:2px;text-transform:uppercase;transition:all .25s;}
+.header.collapsed .htext .sub{font-size:.6rem;margin-top:0;}
+.htext .meta{margin-top:3px;font-size:.64rem;color:var(--gm);transition:all .25s;}
+.header.collapsed .htext .meta{display:none;}
+.hright{margin-left:auto;text-align:right;z-index:1;}
+.hright .hl{font-size:.56rem;letter-spacing:1.5px;color:var(--gm);text-transform:uppercase;}
+.season-v{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;color:var(--ac);}
+.tc-wrap{display:flex;flex-wrap:wrap;gap:3px;justify-content:flex-end;margin-top:4px;max-width:200px;}
+.tc{padding:1px 6px;background:rgba(232,200,64,.13);border:1px solid rgba(232,200,64,.28);border-radius:20px;font-size:.6rem;font-weight:600;color:rgba(255,255,255,.85);}
+.header.collapsed .hright .hl,.header.collapsed .tc-wrap{display:none;}
+
+/* ── TEAM TABS ── */
+.team-bar{background:#07132e;padding:0 22px;display:flex;align-items:stretch;border-bottom:3px solid var(--ac);overflow-x:auto;flex-shrink:0;transition:all .25s;}
+.team-bar.collapsed{display:none;}
+.ttab{padding:7px 12px;font-family:'Barlow',sans-serif;font-weight:700;font-size:.71rem;letter-spacing:.7px;color:rgba(255,255,255,.4);cursor:pointer;border:none;background:none;text-transform:uppercase;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-3px;transition:all .13s;display:flex;align-items:center;gap:4px;}
+.ttab:hover{color:#fff;background:rgba(255,255,255,.06);}
+.ttab.active{color:var(--ac);border-bottom-color:var(--ac);}
+.ttab-add{padding:7px 10px;font-size:.9rem;color:rgba(255,255,255,.24);cursor:pointer;border:none;background:none;align-self:center;}
+.ttab-add:hover{color:var(--ac);}
+.tdelt{font-size:.53rem;color:rgba(255,255,255,.16);cursor:pointer;padding:1px 3px;border-radius:3px;transition:all .12s;}
+.tdelt:hover{background:rgba(231,76,60,.4);color:#fff;}
+
+/* ── BARS ── */
+.season-bar{background:#edf2fb;border-bottom:1px solid var(--gl);padding:5px 22px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;flex-shrink:0;transition:all .25s;}
+.season-bar.collapsed{display:none;}
+.season-bar label{font-size:.62rem;font-weight:700;letter-spacing:1px;color:var(--gd);text-transform:uppercase;}
+.ssel{padding:4px 8px;border:1.5px solid var(--gl);border-radius:6px;font-family:'Barlow',sans-serif;font-size:.76rem;font-weight:600;color:var(--bd);background:#fff;cursor:pointer;outline:none;}
+.ssel:focus{border-color:var(--bm);}
+.bsm{padding:4px 9px;border-radius:6px;border:none;cursor:pointer;font-family:'Barlow',sans-serif;font-size:.68rem;font-weight:600;transition:all .13s;}
+.bsm-p{background:var(--ac);color:var(--bd);}.bsm-p:hover{background:#f0d050;}
+.bsm-o{background:transparent;color:var(--bm);border:1.5px solid var(--gl);}.bsm-o:hover{border-color:var(--bm);background:rgba(22,89,184,.06);}
+.bsm-d{background:transparent;color:var(--ca);border:1.5px solid rgba(231,76,60,.22);}.bsm-d:hover{background:rgba(231,76,60,.08);}
+
+/* ── TOOLBARS (two rows) ── */
+/* Row 1: Team management */
+.toolbar-team{background:linear-gradient(to right,#0c2450,#1a4fa0);padding:5px 22px;display:flex;gap:5px;flex-wrap:wrap;align-items:center;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.08);transition:all .25s;}
+.toolbar-team.collapsed{display:none;}
+/* Row 2: Utility */
+.toolbar-util{background:linear-gradient(to right,#091e3e,#0e3577);padding:5px 22px;display:flex;gap:5px;flex-wrap:wrap;align-items:center;flex-shrink:0;transition:all .25s;}
+.toolbar-util.collapsed{display:none;}
+
+.btn{padding:5px 10px;border-radius:6px;border:none;cursor:pointer;font-family:'Barlow',sans-serif;font-size:.7rem;font-weight:600;transition:all .13s;display:flex;align-items:center;gap:4px;}
+.btn-p{background:var(--ac);color:var(--bd);}.btn-p:hover{background:#f0d050;}
+.btn-s{background:rgba(255,255,255,.09);color:#fff;border:1px solid rgba(255,255,255,.17);}.btn-s:hover{background:rgba(255,255,255,.18);}
+.btn-d{background:rgba(231,76,60,.11);color:#ff8a80;border:1px solid rgba(231,76,60,.24);}.btn-d:hover{background:rgba(231,76,60,.24);}
+.btn-sh{background:rgba(46,204,113,.09);color:#6dffa4;border:1px solid rgba(46,204,113,.22);}.btn-sh:hover{background:rgba(46,204,113,.2);}
+.btn-m{background:rgba(176,48,0,.14);color:#ffb38a;border:1px solid rgba(176,48,0,.28);}.btn-m:hover{background:rgba(176,48,0,.28);}
+.btn-team{background:rgba(232,200,64,.11);color:var(--ac);border:1px solid rgba(232,200,64,.25);}.btn-team:hover{background:rgba(232,200,64,.2);}
+.btn-cfg{background:rgba(255,255,255,.07);color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.13);}.btn-cfg:hover{background:rgba(255,255,255,.15);}
+.btn-view{background:rgba(46,204,113,.11);color:#6dffa4;border:1px solid rgba(46,204,113,.22);}.btn-view:hover{background:rgba(46,204,113,.2);}
+.tsep{width:1px;height:20px;background:rgba(255,255,255,.11);margin:0 1px;}
+.saved{font-size:.64rem;color:#7ec8a0;margin-left:auto;opacity:0;transition:opacity .4s;}
+.saved.show{opacity:1;}
+
+/* Zoom */
+.zoom-group{display:flex;align-items:center;gap:2px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);border-radius:6px;padding:2px 4px;}
+.z-btn{background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:.78rem;font-weight:700;padding:1px 4px;border-radius:4px;transition:all .12s;}
+.z-btn:hover{background:rgba(255,255,255,.14);color:#fff;}
+.z-lbl{font-size:.64rem;font-weight:700;color:rgba(255,255,255,.7);min-width:30px;text-align:center;}
+
+/* Collapse controls */
+.collapse-bar{background:#071430;padding:2px 22px;display:flex;align-items:center;gap:6px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.05);}
+.cbar-btn{background:none;border:none;color:rgba(255,255,255,.35);cursor:pointer;font-size:.62rem;font-weight:600;padding:2px 8px;border-radius:4px;transition:all .13s;letter-spacing:.3px;}
+.cbar-btn:hover{color:#fff;background:rgba(255,255,255,.08);}
+.cbar-btn.active{color:var(--ac);}
+.cbar-sep{width:1px;height:12px;background:rgba(255,255,255,.1);}
+.cbar-label{font-size:.58rem;color:rgba(255,255,255,.25);margin-right:4px;}
+
+/* ── LEGEND ── */
+.legend-bar{background:#edf2fb;border-bottom:2px solid var(--gl);padding:5px 22px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;flex-shrink:0;transition:all .25s;}
+.legend-bar.collapsed{display:none;}
+.legend-bar .lbl{font-size:.61rem;font-weight:700;letter-spacing:1px;color:var(--gd);text-transform:uppercase;}
+.li{display:flex;align-items:center;gap:3px;font-size:.67rem;color:var(--gd);font-weight:500;}
+.ldot{width:11px;height:11px;border-radius:3px;display:inline-block;flex-shrink:0;}
+.lda{background:var(--cp);}.ldf{background:var(--ca);}.lde{background:var(--ce);}.ldq{background:#d5d5d5;border:1px solid var(--gm);}
+.lhint{margin-left:auto;font-size:.62rem;color:var(--gm);font-style:italic;}
+
+/* ── TABLE ── */
+.table-wrap{flex:1;overflow:auto;min-height:0;position:relative;}
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:.74rem;}
+
+/* sticky left */
+.sl0,.sl1,.sl2{position:sticky;z-index:3;}
+.sl0{left:0;width:var(--sl0);min-width:var(--sl0);background:#fff;}
+.sl1{left:var(--sl0);min-width:var(--sl1);width:var(--sl1);background:#fff;}
+.sl2{left:calc(var(--sl0) + var(--sl1));width:var(--sl2);min-width:var(--sl2);background:#fff;}
+tbody tr:nth-child(even) .sl0,tbody tr:nth-child(even) .sl1,tbody tr:nth-child(even) .sl2{background:#f6f9fe;}
+tbody tr:hover .sl0,tbody tr:hover .sl1,tbody tr:hover .sl2{background:#d8eaff !important;}
+
+/* thead */
+thead tr:first-child th{background:var(--bd);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:.73rem;letter-spacing:1.5px;padding:8px 3px;text-align:center;white-space:nowrap;position:sticky;top:0;z-index:10;}
+thead tr:first-child th.thp{text-align:left;padding-left:7px;}
+thead tr:nth-child(2) th{background:var(--bm);color:#fff;font-size:.6rem;font-weight:600;padding:4px 3px;text-align:center;white-space:nowrap;border-bottom:3px solid var(--ac);position:sticky;top:35px;z-index:10;}
+thead tr:nth-child(2) th.thp{text-align:left;padding-left:7px;}
+thead th.sl0,thead th.sl1,thead th.sl2{z-index:14 !important;}
+.mg-hdr-match{background:var(--mc2)!important;}
+thead tr:nth-child(2) .mg-hdr-match{background:var(--mc1)!important;}
+
+/* tfoot */
+tfoot td{background:#0d2d5e;color:#fff;font-weight:600;font-size:.69rem;padding:6px 3px;text-align:center;border-top:3px solid var(--ac);position:sticky;bottom:0;z-index:10;white-space:nowrap;}
+tfoot td.tdl{text-align:left;padding-left:7px;}
+tfoot td.sl0,tfoot td.sl1,tfoot td.sl2{z-index:14!important;background:#0a2550!important;}
+tfoot td.mg-hdr-match{background:#4a1000!important;}
+
+/* Month borders */
+.mg-start{border-left:2px solid rgba(22,89,184,.22)!important;}
+.mg-start-match{border-left:2px solid rgba(176,48,0,.28)!important;}
+thead th.mg-start{border-left:2px solid rgba(255,255,255,.16)!important;}
+tfoot td.mg-start{border-left:2px solid rgba(232,200,64,.18)!important;}
+
+/* Body rows */
+tbody tr:nth-child(odd){background:#fff;}
+tbody tr:nth-child(even){background:#f6f9fe;}
+tbody tr:hover{background:#d8eaff;}
+tbody td{padding:6px 3px;text-align:center;border-bottom:1px solid var(--gl);color:#2c3e50;font-weight:500;}
+tbody td.tdl{text-align:left;padding-left:7px;}
+
+.nri{width:22px;background:transparent;border:none;outline:none;font-weight:700;color:var(--bm);font-size:.74rem;text-align:center;cursor:text;}
+.ncell{cursor:pointer;display:flex;align-items:center;gap:3px;}
+.ncell .nm{font-weight:600;color:var(--bd);font-size:.74rem;transition:color .12s;}
+.ncell .ni{font-size:.61rem;color:var(--gm);opacity:0;transition:opacity .12s;}
+tbody td:hover .ncell .nm{color:var(--bm);}
+tbody td:hover .ncell .ni{opacity:1;}
+
+/* Positions */
+.pw{position:relative;display:inline-block;}
+.pb{display:inline-block;padding:1px 4px;border-radius:10px;font-size:.56rem;font-weight:700;cursor:pointer;user-select:none;white-space:nowrap;}
+.pb-TW{background:#ffeaa7;color:#7a5a00;}.pb-RV{background:#cce5ff;color:#004080;}
+.pb-IV{background:#b0cce0;color:#003060;}.pb-LV{background:#cce5ff;color:#004080;}
+.pb-6er{background:#c3e6cb;color:#155724;}.pb-8er{background:#a0d8a8;color:#0d4020;}
+.pb-10er{background:#7cc884;color:#083010;}.pb-RF{background:#ffe0b0;color:#7a3a00;}
+.pb-LF{background:#ffd0b0;color:#7a3a00;}.pb-ST{background:#ffd6d6;color:#8a0000;}
+.pmenu{display:none;position:absolute;top:20px;left:0;z-index:30;background:#fff;border:1px solid var(--gl);border-radius:7px;box-shadow:0 4px 14px rgba(0,0,0,.14);overflow:hidden;min-width:165px;}
+.pmenu.open{display:block;}
+.pmi{padding:4px 8px;cursor:pointer;font-size:.66rem;font-weight:600;white-space:nowrap;display:flex;align-items:center;gap:5px;}
+.pmi:hover{background:var(--ow);}
+
+/* Status cells */
+.cs{cursor:pointer;border-radius:4px;user-select:none;transition:transform .1s;font-weight:700;min-width:20px;font-size:.68rem;}
+.cs:hover{transform:scale(1.3);}
+.csa{background:var(--cp)!important;color:#fff!important;}
+.csf{background:var(--ca)!important;color:#fff!important;}
+.cse{background:var(--ce)!important;color:#fff!important;}
+.csq{background:#e0e0e0!important;color:#999!important;font-size:.62rem;}
+
+/* Date header */
+.dth{position:relative;cursor:pointer;user-select:none;}
+.dth:hover{filter:brightness(1.15);}
+.d-text{display:block;font-size:.59rem;font-weight:700;color:#fff;text-align:center;padding:0 2px;white-space:nowrap;}
+.d-focus{display:block;font-size:.5rem;color:rgba(255,255,255,.62);text-align:center;margin-top:1px;white-space:nowrap;max-width:46px;overflow:hidden;text-overflow:ellipsis;}
+.dcb{display:none;position:absolute;top:0;right:0;background:rgba(231,76,60,.85);color:#fff;border:none;border-radius:2px;cursor:pointer;font-size:.48rem;padding:1px 3px;line-height:1.4;z-index:1;}
+.dth:hover .dcb{display:block;}
+.drb{background:none;border:none;cursor:pointer;color:transparent;font-size:.77rem;padding:2px 3px;border-radius:3px;transition:all .12s;}
+tbody tr:hover .drb{color:var(--gm);}
+.drb:hover{background:rgba(231,76,60,.1);color:var(--ca)!important;}
+.mhdr-lbl{font-size:.61rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;}
+
+/* FOOTER */
+.footer{background:#edf2fb;border-top:2px solid var(--gl);padding:7px 22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;flex-shrink:0;}
+.fstats{display:flex;gap:11px;}
+.si .v{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;color:var(--bd);line-height:1;}
+.si .k{font-size:.57rem;font-weight:600;letter-spacing:1px;color:var(--gd);text-transform:uppercase;}
+.footer .sign{font-size:.63rem;color:var(--gm);}
+.footer .sign span{color:var(--bm);font-weight:600;}
+.empty{padding:28px;text-align:center;color:var(--gm);}
+
+/* ══ MODALS ══ */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(2px);}
+.mo.open{display:flex;}
+.mob{background:#fff;border-radius:14px;padding:18px 22px;max-width:96vw;box-shadow:0 10px 44px rgba(0,0,0,.25);max-height:92vh;overflow-y:auto;}
+.mob h3{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--bd);letter-spacing:2px;margin-bottom:11px;}
+.mob label{display:block;font-size:.66rem;font-weight:700;color:var(--gd);margin-bottom:3px;text-transform:uppercase;letter-spacing:.4px;}
+.mob input,.mob select,.mob textarea{width:100%;padding:7px 10px;border:1.5px solid var(--gl);border-radius:7px;font-family:'Barlow',sans-serif;font-size:.8rem;margin-bottom:9px;outline:none;color:#2c3e50;transition:border-color .13s;}
+.mob input:focus,.mob select:focus,.mob textarea:focus{border-color:var(--bm);}
+.mob .note{font-size:.66rem;color:var(--gm);margin-bottom:8px;line-height:1.5;}
+.mob-btns{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;}
+.mob-btns .btn{flex:1;justify-content:center;min-width:84px;}
+.mob-hr{border:none;border-top:1px solid var(--gl);margin:9px 0;}
+.radio-group{display:flex;gap:7px;margin-bottom:9px;}
+.radio-opt{display:flex;align-items:center;gap:5px;padding:5px 11px;border:1.5px solid var(--gl);border-radius:7px;cursor:pointer;font-size:.76rem;font-weight:600;color:var(--gd);transition:all .13s;}
+.radio-opt.sel-m{border-color:var(--mc1);background:rgba(176,48,0,.07);color:var(--mc1);}
+.dow-grid{display:flex;gap:4px;margin-bottom:9px;flex-wrap:wrap;}
+.dow-btn{padding:4px 8px;border:1.5px solid var(--gl);border-radius:6px;cursor:pointer;font-family:'Barlow',sans-serif;font-size:.69rem;font-weight:700;color:var(--gd);background:#fff;transition:all .13s;user-select:none;}
+.dow-btn.sel{border-color:var(--bm);background:rgba(22,89,184,.1);color:var(--bm);}
+.dow-btn.sel-m{border-color:var(--mc1);background:rgba(176,48,0,.08);color:var(--mc1);}
+.team-checks{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px;}
+.tcheck{display:flex;align-items:center;gap:4px;padding:4px 9px;border:1.5px solid var(--gl);border-radius:6px;cursor:pointer;font-size:.7rem;font-weight:600;color:var(--gd);transition:all .13s;user-select:none;}
+.tcheck.sel{border-color:var(--bm);background:rgba(22,89,184,.09);color:var(--bm);}
+.tab-bar{display:flex;gap:0;border-bottom:2px solid var(--gl);margin-bottom:11px;}
+.tab-btn{padding:6px 14px;font-family:'Barlow',sans-serif;font-weight:700;font-size:.71rem;letter-spacing:.5px;color:var(--gm);cursor:pointer;border:none;background:none;text-transform:uppercase;border-bottom:2.5px solid transparent;margin-bottom:-2px;transition:all .13s;}
+.tab-btn:hover{color:var(--bm);}
+.tab-btn.active{color:var(--bm);border-bottom-color:var(--bm);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* Player/Session stats */
+.ps-cards{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap;}
+.ps-card{flex:1;min-width:100px;background:var(--ow);border-radius:8px;padding:9px 11px;border:1px solid var(--gl);}
+.ps-card .ct{font-size:.58rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gm);margin-bottom:3px;}
+.ps-card .cv{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;line-height:1;}
+.ps-card .ca2{font-size:.66rem;color:var(--gm);margin-bottom:5px;}
+.cbw{background:var(--gl);border-radius:3px;height:6px;}
+.cbar{height:6px;border-radius:3px;}
+.focus-row{display:flex;align-items:center;gap:6px;margin-bottom:5px;font-size:.7rem;}
+.fr-name{width:80px;color:var(--gd);font-weight:600;font-size:.65rem;}
+.fr-bw{flex:1;background:var(--gl);border-radius:3px;height:5px;}
+.fr-bar{height:5px;border-radius:3px;background:var(--bm);}
+.fr-val{width:38px;text-align:right;font-weight:700;color:var(--bd);}
+.sess-list{max-height:150px;overflow-y:auto;border:1px solid var(--gl);border-radius:7px;margin-bottom:11px;}
+.sr{display:flex;align-items:center;gap:6px;padding:5px 9px;border-bottom:1px solid var(--gl);font-size:.7rem;}
+.sr:last-child{border-bottom:none;}
+.sr:nth-child(even){background:#f8fafd;}
+.sr-date{width:52px;color:var(--gd);font-weight:600;}
+.sr-type{padding:1px 5px;border-radius:9px;font-size:.56rem;font-weight:700;}
+.srt-t{background:rgba(22,89,184,.11);color:var(--bm);}
+.srt-m{background:rgba(176,48,0,.12);color:var(--mc1);}
+.sr-st{margin-left:auto;padding:2px 6px;border-radius:4px;font-size:.62rem;font-weight:700;}
+.ss-a{background:var(--cp);color:#fff;}.ss-f{background:var(--ca);color:#fff;}
+.ss-e{background:var(--ce);color:#fff;}.ss-q{background:#e0e0e0;color:#888;}
+.sess-att-list{max-height:280px;overflow-y:auto;border:1px solid var(--gl);border-radius:7px;margin-bottom:10px;}
+.sat-row{display:flex;align-items:center;gap:6px;padding:5px 9px;border-bottom:1px solid var(--gl);font-size:.71rem;}
+.sat-row:last-child{border-bottom:none;}
+.sat-row:nth-child(even){background:#f8fafd;}
+.sat-nr{width:22px;font-weight:700;color:var(--bm);text-align:center;}
+.sat-name{flex:1;font-weight:600;color:var(--bd);}
+.sat-pos{width:34px;}
+.sat-st{padding:2px 8px;border-radius:4px;font-size:.63rem;font-weight:700;cursor:pointer;transition:transform .1s;}
+.sat-st:hover{transform:scale(1.1);}
+.rkrow{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--gl);font-size:.71rem;}
+.rkrow:last-child{border-bottom:none;}
+.rk-i{width:15px;font-family:'Bebas Neue',sans-serif;font-size:.8rem;color:var(--gm);}
+.rk-n{flex:1;font-weight:600;color:var(--bd);}
+.rk-bw{width:66px;background:var(--gl);border-radius:3px;height:5px;}
+.rk-bar{height:5px;border-radius:3px;}
+.rk-pct{width:32px;text-align:right;font-weight:700;}
+.full-table{width:100%;font-size:.71rem;border-collapse:separate;border-spacing:0;}
+.full-table th{background:var(--bd);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:.72rem;padding:6px 7px;text-align:center;cursor:pointer;user-select:none;white-space:nowrap;}
+.full-table th:hover{background:var(--bm);}
+.full-table td{padding:5px 7px;border-bottom:1px solid var(--gl);text-align:center;color:#2c3e50;}
+.full-table tr:nth-child(even) td{background:#f6f9fe;}
+.full-table tr:hover td{background:#ddeeff;}
+.tr-row{display:flex;align-items:center;gap:7px;padding:6px 9px;background:var(--ow);border-radius:7px;margin-bottom:5px;}
+.tr-name{flex:1;font-weight:600;color:var(--bd);font-size:.76rem;}
+.tr-teams{font-size:.63rem;color:var(--gm);}
+.tr-del{background:none;border:none;cursor:pointer;color:var(--gm);font-size:.82rem;padding:2px 3px;border-radius:3px;transition:all .13s;}
+.tr-del:hover{background:rgba(231,76,60,.1);color:var(--ca);}
+.focus-item{display:flex;align-items:center;gap:7px;padding:6px 9px;background:var(--ow);border-radius:7px;margin-bottom:5px;}
+.fi-name{flex:1;font-weight:600;color:var(--bd);font-size:.76rem;}
+.fi-del{background:none;border:none;cursor:pointer;color:var(--gm);font-size:.82rem;padding:2px 3px;border-radius:3px;transition:all .13s;}
+.fi-del:hover{background:rgba(231,76,60,.1);color:var(--ca);}
+.pl-row{display:flex;align-items:center;gap:7px;padding:6px 9px;border-bottom:1px solid var(--gl);font-size:.72rem;}
+.pl-row:last-child{border-bottom:none;}
+.pl-row:nth-child(even){background:#f8fafd;}
+.pl-nr{width:25px;text-align:center;font-weight:700;color:var(--bm);}
+.pl-name{flex:1;font-weight:600;color:var(--bd);}
+.pl-pos{width:38px;}
+.pl-btns{display:flex;gap:3px;}
+.pl-btn{padding:3px 6px;border-radius:5px;border:none;cursor:pointer;font-size:.63rem;font-weight:600;transition:all .12s;}
+.pl-btn-e{background:rgba(22,89,184,.1);color:var(--bm);}.pl-btn-e:hover{background:rgba(22,89,184,.2);}
+.pl-btn-d{background:rgba(231,76,60,.1);color:var(--ca);}.pl-btn-d:hover{background:rgba(231,76,60,.2);}
+.sec-title{font-size:.64rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gd);margin-bottom:6px;}
+.sc-box{font-family:monospace;font-size:.61rem;background:#f0f4fc;border:1px solid var(--gl);border-radius:6px;padding:6px;word-break:break-all;max-height:62px;overflow-y:auto;color:#334;margin-bottom:6px;}
+.sm-btns{display:flex;gap:5px;margin-bottom:7px;}
+.smode{padding:4px 10px;border-radius:5px;border:1.5px solid var(--gl);background:transparent;cursor:pointer;font-family:'Barlow',sans-serif;font-size:.68rem;font-weight:600;color:var(--gd);transition:all .13s;}
+.smode.active{border-color:var(--bm);background:rgba(22,89,184,.08);color:var(--bm);}
+
+@media print{
+  body{background:#fff;padding:0;height:auto;display:block;}
+  .page{height:auto;overflow:visible;border-radius:0;box-shadow:none;}
+  .collapse-bar,.toolbar-team,.toolbar-util,.season-bar .bsm,.mo{display:none!important;}
+  .table-wrap{max-height:none!important;overflow:visible!important;flex:none;}
+  .sl0,.sl1,.sl2{position:static!important;}
+  tfoot td,thead th{position:static!important;}
+}
+</style>
+</head>
+<body>
+<div class="page" id="mainPage">
+
+<!-- HEADER -->
+<div class="header" id="hdrEl">
+  <div class="logo-wrap"><img id="clogo" alt="FC Frohlinde 1949"/></div>
+  <div class="htext">
+    <div class="club">FC Frohlinde 1949 e.V.</div>
+    <div class="sub" id="hSub">U19 · Junioren</div>
+    <div class="meta">Anwesenheits- &amp; Spielerliste</div>
+  </div>
+  <div class="hright">
+    <div class="hl">Saison</div>
+    <div class="season-v" id="hSeason">2025/26</div>
+    <div class="hl" style="margin-top:5px;">Trainer</div>
+    <div class="tc-wrap" id="hTrainers"></div>
+  </div>
+</div>
+
+<!-- TEAM TABS -->
+<div class="team-bar" id="teamBarEl"></div>
+
+<!-- SEASON BAR -->
+<div class="season-bar" id="seasonBarEl">
+  <label>Saison:</label>
+  <select class="ssel" id="seasonSel" onchange="switchSeason(this.value)"></select>
+  <button class="bsm bsm-p" onclick="openM('moSeason')">＋</button>
+  <button class="bsm bsm-d" onclick="deleteSeason()">✕ Saison</button>
+  <div style="margin-left:auto;"><button class="bsm bsm-o" onclick="openM('moGenSch')">📅 Plan generieren</button></div>
+</div>
+
+<!-- COLLAPSE BAR -->
+<div class="collapse-bar">
+  <span class="cbar-label">ANSICHT:</span>
+  <button class="cbar-btn active" id="cb-hdr" onclick="toggleSection('hdr')" title="Header">⬆ Header</button>
+  <div class="cbar-sep"></div>
+  <button class="cbar-btn active" id="cb-tabs" onclick="toggleSection('tabs')" title="Tabs">Tabs</button>
+  <div class="cbar-sep"></div>
+  <button class="cbar-btn active" id="cb-tools" onclick="toggleSection('tools')" title="Werkzeuge">Werkzeuge</button>
+  <div class="cbar-sep"></div>
+  <button class="cbar-btn active" id="cb-legend" onclick="toggleSection('legend')" title="Legende">Legende</button>
+  <div class="cbar-sep"></div>
+  <button class="cbar-btn" id="cb-all" onclick="toggleAllOff()" title="Alles ausblenden">📋 Tabellenansicht</button>
+  <div class="cbar-sep"></div>
+  <button class="cbar-btn" onclick="resetCollapse()" title="Alles einblenden">↺ Standard</button>
+</div>
+
+<!-- TOOLBAR ROW 1: Team management -->
+<div class="toolbar-team" id="toolbarTeamEl">
+  <button class="btn btn-p" onclick="openM('moAddPlayer')">＋ Spieler</button>
+  <button class="btn btn-s" onclick="openM('moSession')">＋ Einheit</button>
+  <button class="btn btn-m" onclick="openM('moMatch')">⚽ Spiel</button>
+  <div class="tsep"></div>
+  <button class="btn btn-team" onclick="openTeamMgr('spieler')">👥 Mannschaft</button>
+  <button class="btn btn-cfg" onclick="openM('moSettings')" title="Einstellungen (Schwerpunkte, Trainer)">⚙ Einstellungen</button>
+  <div class="tsep"></div>
+  <button class="btn btn-d" onclick="resetTeam()" title="Daten zurücksetzen">↺ Reset</button>
+  <span class="saved" id="savedBadge">✓ Gespeichert</span>
+</div>
+
+<!-- TOOLBAR ROW 2: Utility -->
+<div class="toolbar-util" id="toolbarUtilEl">
+  <button class="btn btn-sh" onclick="openM('moShare')">🔗 Teilen</button>
+  <div class="tsep"></div>
+  <button class="btn btn-s" onclick="window.print()">🖨 Drucken</button>
+  <button class="btn btn-s" onclick="exportCSV()">⬇ CSV</button>
+  <div class="tsep"></div>
+  <div class="zoom-group">
+    <button class="z-btn" onclick="changeZoom(-10)">−</button>
+    <span class="z-lbl" id="zoomLbl">100%</span>
+    <button class="z-btn" onclick="changeZoom(10)">＋</button>
+    <button class="z-btn" onclick="changeZoom(0)" style="font-size:.58rem;" title="Reset">⟳</button>
+  </div>
+</div>
+
+<!-- LEGEND -->
+<div class="legend-bar" id="legendEl">
+  <span class="lbl">Legende:</span>
+  <span class="li"><span class="ldot lda"></span>Anwesend (A)</span>
+  <span class="li"><span class="ldot ldf"></span>Fehlend (F)</span>
+  <span class="li"><span class="ldot lde"></span>Entschuldigt (E)</span>
+  <span class="li"><span class="ldot ldq"></span>Ausstehend (?)</span>
+  <span class="lhint">💡 Name / Datum = Details &nbsp;|&nbsp; Pos. = ändern &nbsp;|&nbsp; Zelle = Status</span>
+</div>
+
+<!-- TABLE -->
+<div class="table-wrap" id="tableWrap">
+  <table><thead id="tHead"></thead><tbody id="tBody"></tbody><tfoot id="tFoot"></tfoot></table>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="fstats" id="fStats"></div>
+  <div class="sign"><span id="fTeam">–</span> &nbsp;|&nbsp; Stand: <span id="fDate"></span></div>
+</div>
+</div>
+
+<!-- ═════════ MODALS ═════════ -->
+
+<!-- Player Stats -->
+<div class="mo" id="moPlayerStats"><div class="mob" style="width:500px;">
+  <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:13px;">
+    <div style="flex:1;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--bd);letter-spacing:2px;line-height:1;" id="ps-name">–</div>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:.9rem;color:var(--gm);" id="ps-nr">#–</span>
+        <span id="ps-pos-badge"></span>
+        <span id="ps-team-badge" style="font-size:.6rem;font-weight:600;color:var(--gm);margin-left:4px;"></span>
+      </div>
+    </div>
+    <button class="btn btn-s" onclick="closeM('moPlayerStats')">✕</button>
+  </div>
+  <div class="ps-cards" id="ps-cards"></div>
+  <div class="sec-title">📅 Monatliche Übersicht</div>
+  <div id="ps-months" style="margin-bottom:11px;"></div>
+  <div class="sec-title">🎯 Schwerpunkte</div>
+  <div id="ps-focuses" style="margin-bottom:11px;"></div>
+  <div class="sec-title">📋 Alle Einheiten</div>
+  <div class="sess-list" id="ps-sessions"></div>
+  <div style="background:var(--ow);border-radius:8px;padding:9px;border:1px solid var(--gl);">
+    <div class="sec-title" style="margin-bottom:7px;">✎ Bearbeiten</div>
+    <div style="display:flex;gap:6px;align-items:center;">
+      <input type="number" id="ps-edit-nr" placeholder="Nr" min="1" max="99" style="width:56px;flex:none;margin-bottom:0;"/>
+      <input type="text" id="ps-edit-name" placeholder="Name" style="flex:1;margin-bottom:0;"/>
+      <select id="ps-edit-pos" style="width:76px;flex:none;margin-bottom:0;">
+        <option value="TW">TW</option><option value="RV">RV</option><option value="IV">IV</option>
+        <option value="LV">LV</option><option value="6er">6er</option><option value="8er">8er</option>
+        <option value="10er">10er</option><option value="RF">RF</option><option value="LF">LF</option>
+        <option value="ST">ST</option>
+      </select>
+      <button class="btn btn-p" onclick="savePlayerEdit()" style="flex:none;">OK</button>
+    </div>
+    <div style="margin-top:7px;">
+      <button class="btn btn-d" onclick="deleteCurrentPlayer()">🗑 Löschen</button>
+    </div>
+  </div>
+</div></div>
+
+<!-- Session Stats -->
+<div class="mo" id="moSessStats"><div class="mob" style="width:480px;">
+  <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:13px;">
+    <div style="flex:1;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.35rem;color:var(--bd);letter-spacing:2px;line-height:1;" id="ss-title">–</div>
+      <div id="ss-meta" style="font-size:.71rem;color:var(--gm);margin-top:3px;"></div>
+    </div>
+    <button class="btn btn-s" onclick="closeM('moSessStats')">✕</button>
+  </div>
+  <div style="background:var(--ow);border-radius:8px;padding:9px 11px;border:1px solid var(--gl);margin-bottom:11px;" id="ss-edit-area"></div>
+  <div class="ps-cards" id="ss-cards"></div>
+  <div class="sec-title">Anwesenheit</div>
+  <div class="sess-att-list" id="ss-att-list"></div>
+  <div style="display:flex;gap:7px;">
+    <button class="btn btn-d" onclick="deleteCurrSess()">🗑 Einheit löschen</button>
+    <button class="btn btn-s" onclick="closeM('moSessStats')" style="margin-left:auto;">Schließen</button>
+  </div>
+</div></div>
+
+<!-- Add Player -->
+<div class="mo" id="moAddPlayer"><div class="mob" style="width:330px;">
+  <h3>Spieler hinzufügen</h3>
+  <label>Trikotnummer</label><input type="number" id="newNr" placeholder="21" min="1" max="99"/>
+  <label>Name</label><input type="text" id="newName" placeholder="Vorname Nachname"/>
+  <label>Position</label>
+  <select id="newPos">
+    <option value="TW">TW – Torwart</option><option value="RV">RV – Rechter Verteidiger</option>
+    <option value="IV">IV – Innenverteidiger</option><option value="LV">LV – Linker Verteidiger</option>
+    <option value="6er">6er – Def. Mittelfeld</option><option value="8er" selected>8er – Zentr. Mittelfeld</option>
+    <option value="10er">10er – Off. Mittelfeld</option><option value="RF">RF – Rechter Flügel</option>
+    <option value="LF">LF – Linker Flügel</option><option value="ST">ST – Stürmer</option>
+  </select>
+  <div class="mob-btns">
+    <button class="btn btn-p" onclick="addPlayer()">Hinzufügen</button>
+    <button class="btn btn-s" onclick="closeM('moAddPlayer')">Abbrechen</button>
+  </div>
+</div></div>
+
+<!-- Add Training -->
+<div class="mo" id="moSession"><div class="mob" style="width:350px;">
+  <h3>Training hinzufügen</h3>
+  <label>Datum (z.B. Di 07.04)</label>
+  <input type="text" id="newDate" placeholder="Di 07.04" maxlength="9"/>
+  <label>Schwerpunkt</label>
+  <select id="newFocus"><option value="">– Kein –</option></select>
+  <p class="note">Monat wird automatisch erkannt. Chronologisch einsortiert.</p>
+  <div class="mob-btns">
+    <button class="btn btn-p" onclick="addTraining()">Hinzufügen</button>
+    <button class="btn btn-s" onclick="closeM('moSession')">Abbrechen</button>
+  </div>
+</div></div>
+
+<!-- Add Match -->
+<div class="mo" id="moMatch"><div class="mob" style="width:360px;">
+  <h3>⚽ Spiel hinzufügen</h3>
+  <label>Datum (z.B. So 06.04)</label>
+  <input type="text" id="newMatchDate" placeholder="So 06.04" maxlength="9"/>
+  <label>Gegner</label>
+  <input type="text" id="newMatchLabel" placeholder="z.B. FC Westfalia Herne"/>
+  <label>Heim / Auswärts</label>
+  <div class="radio-group">
+    <div class="radio-opt sel-m" id="ha-home" onclick="setHA('home')">🏠 Heim</div>
+    <div class="radio-opt" id="ha-away" onclick="setHA('away')">✈ Auswärts</div>
+  </div>
+  <div class="mob-btns">
+    <button class="btn btn-m" onclick="addMatch()">⚽ Eintragen</button>
+    <button class="btn btn-s" onclick="closeM('moMatch')">Abbrechen</button>
+  </div>
+</div></div>
+
+<!-- Add Team -->
+<div class="mo" id="moNewTeam"><div class="mob" style="width:310px;">
+  <h3>Mannschaft hinzufügen</h3>
+  <label>Bezeichnung</label><input type="text" id="newTeam" placeholder="z.B. U12, Herren..."/>
+  <div class="mob-btns">
+    <button class="btn btn-p" onclick="addTeam()">Hinzufügen</button>
+    <button class="btn btn-s" onclick="closeM('moNewTeam')">Abbrechen</button>
+  </div>
+</div></div>
+
+<!-- Add Season -->
+<div class="mo" id="moSeason"><div class="mob" style="width:330px;">
+  <h3>Saison hinzufügen</h3>
+  <label>Saison (z.B. 2026/27)</label><input type="text" id="newSeason" placeholder="2026/27" maxlength="10"/>
+  <p class="note">Spielerlisten werden übernommen, Anwesenheiten auf ? zurückgesetzt.</p>
+  <div class="mob-btns">
+    <button class="btn btn-p" onclick="addSeason()">Erstellen</button>
+    <button class="btn btn-s" onclick="closeM('moSeason')">Abbrechen</button>
+  </div>
+</div></div>
+
+<!-- Gen Schedule -->
+<div class="mo" id="moGenSch"><div class="mob" style="width:390px;">
+  <h3>📅 Trainingsplan generieren</h3>
+  <label>Trainingstage</label>
+  <div class="dow-grid" id="dowTr">
+    <div class="dow-btn" data-d="1">Mo</div><div class="dow-btn sel" data-d="2">Di</div>
+    <div class="dow-btn" data-d="3">Mi</div><div class="dow-btn sel" data-d="4">Do</div>
+    <div class="dow-btn" data-d="5">Fr</div><div class="dow-btn" data-d="6">Sa</div><div class="dow-btn" data-d="0">So</div>
+  </div>
+  <label>Spieltage (optional)</label>
+  <div class="dow-grid" id="dowMa">
+    <div class="dow-btn" data-d="1">Mo</div><div class="dow-btn" data-d="2">Di</div>
+    <div class="dow-btn" data-d="3">Mi</div><div class="dow-btn" data-d="4">Do</div>
+    <div class="dow-btn" data-d="5">Fr</div><div class="dow-btn" data-d="6">Sa</div>
+    <div class="dow-btn sel-m" data-d="0">So</div>
+  </div>
+  <label>Startdatum (TT.MM.JJJJ)</label><input type="text" id="genS" value="24.03.2026" maxlength="10"/>
+  <label>Enddatum (TT.MM.JJJJ)</label><input type="text" id="genE" value="30.06.2026" maxlength="10"/>
+  <div class="mob-btns">
+    <button class="btn btn-p" onclick="doGen()">Generieren</button>
+    <button class="btn btn-s" onclick="closeM('moGenSch')">Abbrechen</button>
+  </div>
+</div></div>
+
+<!-- Team Manager -->
+<div class="mo" id="moTeamMgr"><div class="mob" style="width:530px;">
+  <h3 id="tmgr-h">Mannschaft verwalten</h3>
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('spieler')">👥 Spieler</button>
+    <button class="tab-btn" onclick="switchTab('trainer')">🎽 Trainer</button>
+    <button class="tab-btn" onclick="switchTab('statistik')">📊 Statistik</button>
+  </div>
+  <div class="tab-panel active" id="tab-spieler">
+    <div style="border:1px solid var(--gl);border-radius:7px;max-height:260px;overflow-y:auto;margin-bottom:9px;" id="tmgr-pl-list"></div>
+    <div class="mob-btns">
+      <button class="btn btn-p" onclick="closeM('moTeamMgr');openM('moAddPlayer');">＋ Spieler</button>
+      <button class="btn btn-s" onclick="closeM('moTeamMgr')">Schließen</button>
+    </div>
+  </div>
+  <div class="tab-panel" id="tab-trainer">
+    <p class="note" style="margin-bottom:7px;">Trainer für <strong id="tmgr-team-lbl">–</strong></p>
+    <div id="tmgr-tr-list" style="margin-bottom:9px;"></div>
+    <hr class="mob-hr"/>
+    <label>Name</label><input type="text" id="tNewName" placeholder="Vorname Nachname"/>
+    <label>Mannschaft(en)</label>
+    <div class="team-checks" id="tTeamChecks"></div>
+    <div class="mob-btns">
+      <button class="btn btn-p" onclick="addTrainer()">Hinzufügen</button>
+      <button class="btn btn-s" onclick="closeM('moTeamMgr')">Schließen</button>
+    </div>
+  </div>
+  <div class="tab-panel" id="tab-statistik">
+    <div id="tmgr-stats"></div>
+    <div class="mob-btns" style="margin-top:9px;">
+      <button class="btn btn-s" onclick="closeM('moTeamMgr')">Schließen</button>
+    </div>
+  </div>
+</div></div>
+
+<!-- Settings (Focuses per team + all trainers) -->
+<div class="mo" id="moSettings"><div class="mob" style="width:450px;">
+  <h3>⚙ Einstellungen</h3>
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchSettingsTab('focuses')">🎯 Schwerpunkte</button>
+    <button class="tab-btn" onclick="switchSettingsTab('all-trainers')">🎽 Alle Trainer</button>
+  </div>
+  <div class="tab-panel active" id="stab-focuses">
+    <p class="note">Schwerpunkte für <strong id="focus-team-lbl">–</strong> (jede Mannschaft hat eigene).</p>
+    <div id="focus-list" style="margin-bottom:9px;"></div>
+    <div style="display:flex;gap:6px;">
+      <input type="text" id="newFocusName" placeholder="Neuer Schwerpunkt..." style="flex:1;margin-bottom:0;"/>
+      <button class="btn btn-p" onclick="addFocus()" style="flex:none;">＋</button>
+    </div>
+  </div>
+  <div class="tab-panel" id="stab-all-trainers">
+    <p class="note">Übersicht aller Trainer.</p>
+    <div id="all-trainers-list" style="margin-bottom:9px;"></div>
+    <hr class="mob-hr"/>
+    <label>Name</label><input type="text" id="atNewName" placeholder="Vorname Nachname"/>
+    <label>Mannschaft(en)</label>
+    <div class="team-checks" id="atTeamChecks"></div>
+    <div class="mob-btns">
+      <button class="btn btn-p" onclick="addTrainerGlobal()">Hinzufügen</button>
+      <button class="btn btn-s" onclick="closeM('moSettings')">Schließen</button>
+    </div>
+  </div>
+</div></div>
+
+<!-- Share -->
+<div class="mo" id="moShare"><div class="mob" style="width:390px;">
+  <h3>🔗 Teilen</h3>
+  <p class="note"><strong id="shareTeamLbl">–</strong> · <strong id="shareSeasonLbl">–</strong></p>
+  <div class="sm-btns">
+    <button class="smode active" id="smE" onclick="setShareMode('edit')">✏️ Bearbeiten</button>
+    <button class="smode" id="smV" onclick="setShareMode('view')">👁 Nur ansehen</button>
+  </div>
+  <div class="sc-box" id="shareBox">–</div>
+  <div style="display:flex;gap:6px;margin-bottom:11px;flex-wrap:wrap;">
+    <button class="btn btn-p" onclick="copyCode()">📋 Kopieren</button>
+    <button class="btn btn-s" onclick="dlHTML()">⬇ HTML</button>
+  </div>
+  <hr class="mob-hr"/>
+  <label>Code importieren</label>
+  <textarea id="importBox" placeholder="Code hier einfügen..." rows="3"></textarea>
+  <div class="mob-btns">
+    <button class="btn btn-p" onclick="importCode()">Importieren</button>
+    <button class="btn btn-s" onclick="closeM('moShare')">Schließen</button>
+  </div>
+</div></div>
+
+<script>
+// ══ LOGO ══
+document.getElementById('clogo').src='data:image/jpeg;base64,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';
+
+// ══ CONSTANTS ══
+const SK='fcfrohlinde_v10';
+const POS_LIST=['TW','RV','IV','LV','6er','8er','10er','RF','LF','ST'];
+const POS_LBL={TW:'Torwart',RV:'Rechter Verteidiger',IV:'Innenverteidiger',LV:'Linker Verteidiger',
+  '6er':'Def. Mittelfeld','8er':'Zentr. Mittelfeld','10er':'Off. Mittelfeld',
+  RF:'Rechter Flügel',LF:'Linker Flügel',ST:'Stürmer'};
+const SC=[3,1,0,2];
+const SYM={1:'A',0:'F',2:'E',3:'?'};
+const CLS={1:'csa',0:'csf',2:'cse',3:'csq'};
+const DEM={1:'Januar',2:'Februar',3:'März',4:'April',5:'Mai',6:'Juni',
+  7:'Juli',8:'August',9:'September',10:'Oktober',11:'November',12:'Dezember'};
+const DOW_LBL=['So','Mo','Di','Mi','Do','Fr','Sa'];
+const DEF_FOCUSES=['Physisch','Taktisch','Technik','Spielform','Standards'];
+const DEF_TEAMS=['U14','U15','U16','U17','U19'];
+
+let shareMode='edit', currentPI=-1, currentSI=-1, newMatchHA='home';
+let zoomLevel=100;
+
+// ══ COLLAPSE LOGIC ══
+const colState={hdr:true,tabs:true,tools:true,legend:true};
+const colMap={
+  hdr:['hdrEl','teamBarEl'],
+  tabs:['teamBarEl'],
+  tools:['toolbarTeamEl','toolbarUtilEl','seasonBarEl'],
+  legend:['legendEl']
+};
+function toggleSection(key){
+  colState[key]=!colState[key];
+  document.getElementById('cb-'+key).classList.toggle('active',colState[key]);
+  applyCollapseState();
+}
+function applyCollapseState(){
+  document.getElementById('hdrEl').classList.toggle('collapsed',!colState.hdr);
+  document.getElementById('teamBarEl').classList.toggle('collapsed',!colState.tabs);
+  document.getElementById('toolbarTeamEl').classList.toggle('collapsed',!colState.tools);
+  document.getElementById('toolbarUtilEl').classList.toggle('collapsed',!colState.tools);
+  document.getElementById('seasonBarEl').classList.toggle('collapsed',!colState.tools);
+  document.getElementById('legendEl').classList.toggle('collapsed',!colState.legend);
+}
+function toggleAllOff(){
+  ['hdr','tabs','tools','legend'].forEach(k=>{colState[k]=false;document.getElementById('cb-'+k).classList.remove('active');});
+  applyCollapseState();
+}
+function resetCollapse(){
+  ['hdr','tabs','tools','legend'].forEach(k=>{colState[k]=true;document.getElementById('cb-'+k).classList.add('active');});
+  applyCollapseState();
+}
+
+// ══ ZOOM ══
+function changeZoom(d){
+  zoomLevel=d===0?100:Math.min(150,Math.max(50,zoomLevel+d));
+  document.getElementById('tableWrap').style.zoom=zoomLevel/100;
+  document.getElementById('zoomLbl').textContent=zoomLevel+'%';
+}
+function setHA(v){
+  newMatchHA=v;
+  document.getElementById('ha-home').classList.toggle('sel-m',v==='home');
+  document.getElementById('ha-away').classList.toggle('sel-m',v==='away');
+}
+
+// ══ DATE UTILS ══
+function getMonthFromDate(d){
+  const m=d.match(/(\d{2})\.(\d{2})/);
+  return m?DEM[parseInt(m[2])]||'?':'?';
+}
+function dateToSortKey(d){
+  const m=d.match(/(\d{2})\.(\d{2})/);
+  if(!m)return 99999999;
+  const day=parseInt(m[1]),mo=parseInt(m[2]);
+  const y1=parseInt((G?G.currentSeason:'2025/26').split('/')[0]);
+  return(mo>=7?y1:y1+1)*10000+mo*100+day;
+}
+function insertSorted(D,sess){
+  const k=dateToSortKey(sess.date);
+  let at=D.sessions.length;
+  for(let i=0;i<D.sessions.length;i++){if(dateToSortKey(D.sessions[i].date)>k){at=i;break;}}
+  D.sessions.splice(at,0,sess);
+  D.players.forEach(p=>p.s.splice(at,0,3));
+}
+
+// ══ SCHEDULE GEN ══
+function genRange(s1,s2,tD,mD){
+  const p=s=>{const[d,m,y]=s.split('.');return new Date(+y,+m-1,+d);};
+  const res=[],start=p(s1),end=p(s2);
+  let d=new Date(start);
+  while(d<=end){
+    const dw=d.getDay(),dd=String(d.getDate()).padStart(2,'0'),mm=String(d.getMonth()+1).padStart(2,'0');
+    const lbl=DOW_LBL[dw]+' '+dd+'.'+mm,mo=DEM[d.getMonth()+1];
+    if(tD.includes(dw))res.push({date:lbl,month:mo,type:'training',focus:''});
+    if(mD.includes(dw))res.push({date:lbl,month:mo,type:'match',homeAway:'home',label:''});
+    d.setDate(d.getDate()+1);
+  }
+  return res;
+}
+
+// ══ DEFAULT DATA ══
+const DEF_PLAYERS={
+  U19:[{nr:1,name:'Luca Hoffmann',pos:'TW'},{nr:2,name:'Tim Schreiber',pos:'RV'},
+    {nr:3,name:'Jonas Weber',pos:'IV'},{nr:4,name:'Ben Krämer',pos:'IV'},
+    {nr:5,name:'Niklas Schulz',pos:'LV'},{nr:6,name:'Felix Brandt',pos:'6er'},
+    {nr:7,name:'Paul Zimmermann',pos:'8er'},{nr:8,name:'Max Fischer',pos:'8er'},
+    {nr:9,name:'Elias Koch',pos:'10er'},{nr:10,name:'Finn Neumann',pos:'RF'},
+    {nr:11,name:'Leon Bauer',pos:'LF'},{nr:12,name:'Tobias Braun',pos:'TW'},
+    {nr:13,name:'Moritz Klein',pos:'IV'},{nr:14,name:'Simon Wolf',pos:'6er'},
+    {nr:15,name:'David Richter',pos:'ST'}],
+  U17:[{nr:1,name:'Karl Berger',pos:'TW'},{nr:2,name:'Noah Müller',pos:'RV'},
+    {nr:3,name:'Fabian Lenz',pos:'IV'},{nr:4,name:'Oscar Roth',pos:'IV'},
+    {nr:5,name:'Luis Engel',pos:'LV'},{nr:6,name:'Erik Haas',pos:'6er'},
+    {nr:7,name:'Tom Becker',pos:'8er'},{nr:8,name:'Kai Wagner',pos:'10er'},
+    {nr:9,name:'Sven Groß',pos:'RF'},{nr:10,name:'Mats Schulte',pos:'ST'}],
+  U16:[{nr:1,name:'Ben Müller',pos:'TW'},{nr:2,name:'Finn Wagner',pos:'RV'},
+    {nr:3,name:'Leo Braun',pos:'IV'},{nr:4,name:'Max Koch',pos:'IV'},
+    {nr:5,name:'Jan Bauer',pos:'LV'},{nr:6,name:'Tim Roth',pos:'8er'},
+    {nr:7,name:'Nico Lange',pos:'10er'},{nr:8,name:'Simon Wolf',pos:'ST'}],
+  U15:[{nr:1,name:'Felix Arndt',pos:'TW'},{nr:2,name:'Lukas Dorn',pos:'RV'},
+    {nr:3,name:'Ben Fuchs',pos:'IV'},{nr:4,name:'Finn Gerber',pos:'IV'},
+    {nr:5,name:'Tim Hahn',pos:'LV'},{nr:6,name:'Emil Jung',pos:'8er'},
+    {nr:7,name:'Paul Kaiser',pos:'10er'},{nr:8,name:'Max Ott',pos:'ST'}],
+  U14:[{nr:1,name:'Arne Berg',pos:'TW'},{nr:2,name:'Sven Holt',pos:'RV'},
+    {nr:3,name:'Kai Lenz',pos:'IV'},{nr:4,name:'Tom Merz',pos:'IV'},
+    {nr:5,name:'Luca Feld',pos:'LV'},{nr:6,name:'Jonas Rau',pos:'8er'},
+    {nr:7,name:'Felix Stern',pos:'10er'},{nr:8,name:'Marc Hase',pos:'ST'}],
+};
+function mkPlayers(team,n){return(DEF_PLAYERS[team]||[]).map(p=>({...p,s:new Array(n).fill(3)}));}
+function defaultSessions(){return genRange('24.03.2026','30.06.2026',[2,4],[0]).sort((a,b)=>dateToSortKey(a.date)-dateToSortKey(b.date));}
+
+// ══ STORAGE ══
+let G;
+function initData(){
+  try{G=JSON.parse(localStorage.getItem(SK));}catch(e){G=null;}
+  if(!G||!G.version||G.version<10){
+    const sess=defaultSessions();
+    G={version:10,currentTeam:'U19',currentSeason:'2025/26',
+      teamList:[...DEF_TEAMS],seasonList:['2025/26'],
+      trainers:[
+        {id:'t1',name:'Max Mustermann',teams:['U19']},
+        {id:'t2',name:'Hans Schmidt',teams:['U17','U16']},
+        {id:'t3',name:'Klaus Berger',teams:['U15','U14']},
+      ],
+      db:{}};
+    // Per-team focuses stored IN the team db key under a special entry
+    G.teamList.forEach(t=>{
+      G.db[t+'__2025/26']={sessions:JSON.parse(JSON.stringify(sess)),players:mkPlayers(t,sess.length)};
+      G.db[t+'__focuses']=[...DEF_FOCUSES]; // per-team focuses, season-independent
+    });
+  }
+  // Ensure focuses exist for all teams
+  G.teamList.forEach(t=>{if(!G.db[t+'__focuses'])G.db[t+'__focuses']=[...DEF_FOCUSES];});
+  save(false);
+}
+function save(badge=true){
+  localStorage.setItem(SK,JSON.stringify(G));
+  if(badge){const b=document.getElementById('savedBadge');b.classList.add('show');clearTimeout(b._t);b._t=setTimeout(()=>b.classList.remove('show'),1700);}
+}
+function ck(){return G.currentTeam+'__'+G.currentSeason;}
+function cd(){if(!G.db[ck()])G.db[ck()]={sessions:[],players:[]};return G.db[ck()];}
+function teamFocuses(t){t=t||G.currentTeam;if(!G.db[t+'__focuses'])G.db[t+'__focuses']=[...DEF_FOCUSES];return G.db[t+'__focuses'];}
+
+// ══ RENDER ══
+function render(){renderTeamBar();renderSeasonSel();renderHeaderInfo();renderHead();renderBody();renderTfoot();renderFooter();populateFocusSelect();}
+
+function renderHeaderInfo(){
+  document.getElementById('hSeason').textContent=G.currentSeason;
+  document.getElementById('hSub').textContent=G.currentTeam+' · Junioren';
+  document.getElementById('fDate').textContent=new Date().toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const tr=G.trainers.filter(t=>t.teams.includes(G.currentTeam));
+  document.getElementById('hTrainers').innerHTML=tr.length?tr.map(t=>`<span class="tc">${t.name}</span>`).join(''):`<span class="tc" style="opacity:.4;">–</span>`;
+}
+function renderTeamBar(){
+  document.getElementById('teamBarEl').innerHTML=
+    G.teamList.map(t=>`<button class="ttab${t===G.currentTeam?' active':''}" onclick="switchTeam('${t}')">
+      ${t}<span class="tdelt" onclick="event.stopPropagation();delTeam('${t}')">✕</span>
+    </button>`).join('')+`<button class="ttab-add" onclick="openM('moNewTeam')">＋</button>`;
+}
+function renderSeasonSel(){
+  document.getElementById('seasonSel').innerHTML=G.seasonList.map(s=>
+    `<option value="${s}"${s===G.currentSeason?' selected':''}>${s}</option>`).join('');
+}
+
+function buildMeta(ss){
+  let curMo=null;
+  return ss.map(s=>{const mo=getMonthFromDate(s.date);const first=mo!==curMo;if(first)curMo=mo;return{mo,first};});
+}
+
+function renderHead(){
+  const D=cd(),ss=D.sessions,meta=buildMeta(ss);
+  const grps=[];
+  ss.forEach((s,i)=>{if(meta[i].first)grps.push({mo:meta[i].mo,count:1});else grps[grps.length-1].count++;});
+  let r1=`<tr>
+    <th rowspan="2" class="thp sl0" style="background:var(--bd);">#</th>
+    <th rowspan="2" class="thp sl1" style="background:var(--bd);">Spieler</th>
+    <th rowspan="2" class="thp sl2" style="background:var(--bd);">Pos.</th>`;
+  grps.forEach((g,gi)=>{r1+=`<th colspan="${g.count}" ${gi%2===1?'style="background:#0a2d6e;"':''}><span class="mhdr-lbl">${g.mo}</span></th>`;});
+  if(!ss.length)r1+='<th></th>';
+  r1+=`<th rowspan="2" style="width:20px;background:var(--bd);"></th></tr>`;
+  let r2='<tr>';
+  ss.forEach((s,i)=>{
+    const isMat=s.type==='match';
+    const sc=meta[i].first?(isMat?'mg-start-match':'mg-start'):'';
+    const sub=isMat?(s.homeAway==='home'?'🏠':'✈'):(s.focus||'');
+    r2+=`<th class="dth ${isMat?'mg-hdr-match':''} ${sc}" onclick="openSessStats(${i})">
+      <span class="d-text">${s.date}</span>
+      ${sub?`<span class="d-focus">${sub}</span>`:''}
+      <button class="dcb" onclick="event.stopPropagation();delSess(${i})">✕</button>
+    </th>`;
+  });
+  if(!ss.length)r2+='<th style="background:var(--bm);"></th>';
+  r2+='</tr>';
+  document.getElementById('tHead').innerHTML=r1+r2;
+}
+
+function renderBody(){
+  const D=cd(),tbody=document.getElementById('tBody');
+  const ss=D.sessions,meta=buildMeta(ss);
+  if(!D.players.length){
+    tbody.innerHTML=`<tr><td colspan="${ss.length+4}" class="empty"><div style="font-size:1.8rem;margin-bottom:5px;">👥</div><p>Keine Spieler vorhanden.</p></td></tr>`;
+    return;
+  }
+  tbody.innerHTML='';
+  D.players.forEach((p,pi)=>{
+    const cells=p.s.map((v,si)=>{
+      const isMat=ss[si].type==='match';
+      const sc=meta[si].first?(isMat?'mg-start-match':'mg-start'):'';
+      return `<td class="cs ${CLS[v]} ${sc}" data-pi="${pi}" data-si="${si}" onclick="cycSt(${pi},${si})">${SYM[v]}</td>`;
+    }).join('');
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td class="tdl sl0"><input class="nri" value="${p.nr}" onchange="updNr(${pi},this.value)"/></td>
+      <td class="tdl sl1" onclick="openPlayerStats(${pi})" style="cursor:pointer;">
+        <div class="ncell"><span class="nm">${p.name}</span><span class="ni">›</span></div>
+      </td>
+      <td class="sl2"><div class="pw">
+        <span class="pb pb-${p.pos}" onclick="togPos(${pi},event)">${p.pos}</span>
+        <div class="pmenu" id="pm${pi}">${POS_LIST.map(pos=>`<div class="pmi" onclick="setPos(${pi},'${pos}')"><span class="pb pb-${pos}" style="pointer-events:none;">${pos}</span>${POS_LBL[pos]}</div>`).join('')}</div>
+      </div></td>
+      ${cells}
+      <td><button class="drb" onclick="delPlayer(${pi})">✕</button></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderTfoot(){
+  const D=cd(),ss=D.sessions,meta=buildMeta(ss);
+  if(!ss.length||!D.players.length){document.getElementById('tFoot').innerHTML='';return;}
+  const cells=ss.map((_,si)=>{
+    const c=D.players.filter(p=>p.s[si]===1).length;
+    const pct=D.players.length?Math.round((c/D.players.length)*100):0;
+    const isMat=ss[si].type==='match';
+    const sc=meta[si].first?(isMat?'mg-start-match':'mg-start'):'';
+    return `<td class="${isMat?'mg-hdr-match':''} ${sc}">
+      <span style="font-weight:700;color:${isMat?'#ffb38a':'var(--ac)'};">${c}</span>
+      <span style="display:block;font-size:.54rem;opacity:.65;">${pct}%</span>
+    </td>`;
+  }).join('');
+  let totA=0,totPl=0;
+  D.players.forEach(p=>{totA+=p.s.filter(v=>v===1).length;totPl+=p.s.filter(v=>v!==3).length;});
+  const avg=totPl?Math.round((totA/totPl)*100):0;
+  document.getElementById('tFoot').innerHTML=`<tr>
+    <td class="tdl sl0" style="font-family:'Bebas Neue';letter-spacing:1px;">∑</td>
+    <td class="tdl sl1" style="font-size:.66rem;opacity:.75;">${D.players.length} Spieler · Ø ${avg}%</td>
+    <td class="sl2"></td>${cells}<td></td>
+  </tr>`;
+}
+
+function renderFooter(){
+  const D=cd();
+  const tS=D.sessions.filter(s=>s.type==='training').length,mS=D.sessions.filter(s=>s.type==='match').length;
+  let totA=0,totPl=0;
+  D.players.forEach(p=>{totA+=p.s.filter(v=>v===1).length;totPl+=p.s.filter(v=>v!==3).length;});
+  const avg=totPl?Math.round((totA/totPl)*100):0;
+  document.getElementById('fStats').innerHTML=`
+    <div class="si"><div class="v">${D.players.length}</div><div class="k">Spieler</div></div>
+    <div class="si"><div class="v">${tS}</div><div class="k">Trainings</div></div>
+    <div class="si"><div class="v">${mS}</div><div class="k">Spiele</div></div>
+    <div class="si"><div class="v">${avg}%</div><div class="k">Ø-Quote</div></div>`;
+  document.getElementById('fTeam').textContent=G.currentTeam+' · Saison '+G.currentSeason;
+}
+
+// ══ PLAYER STATS ══
+function openPlayerStats(pi){
+  currentPI=pi;
+  const D=cd(),p=D.players[pi],ss=D.sessions,foc=teamFocuses();
+  document.getElementById('ps-name').textContent=p.name;
+  document.getElementById('ps-nr').textContent='#'+p.nr;
+  document.getElementById('ps-pos-badge').innerHTML=`<span class="pb pb-${p.pos}">${p.pos} – ${POS_LBL[p.pos]}</span>`;
+  document.getElementById('ps-team-badge').textContent=G.currentTeam+' · '+G.currentSeason;
+  document.getElementById('ps-edit-nr').value=p.nr;
+  document.getElementById('ps-edit-name').value=p.name;
+  document.getElementById('ps-edit-pos').value=p.pos;
+  const tIdx=ss.map((s,i)=>s.type==='training'?i:-1).filter(i=>i>=0);
+  const mIdx=ss.map((s,i)=>s.type==='match'?i:-1).filter(i=>i>=0);
+  const tA=tIdx.filter(i=>p.s[i]===1).length,tPl=tIdx.filter(i=>p.s[i]!==3).length;
+  const mA=mIdx.filter(i=>p.s[i]===1).length,mPl=mIdx.filter(i=>p.s[i]!==3).length;
+  const tPct=tPl?Math.round((tA/tPl)*100):0,mPct=mPl?Math.round((mA/mPl)*100):0;
+  const tBc=tPct>=80?'var(--cp)':tPct>=60?'var(--ce)':'var(--ca)';
+  const mBc=mPct>=80?'var(--cp)':mPct>=60?'var(--ce)':'var(--ca)';
+  document.getElementById('ps-cards').innerHTML=`
+    <div class="ps-card"><div class="ct">Training</div><div class="cv" style="color:${tBc};">${tPl?tPct+'%':'–'}</div><div class="ca2">${tA}/${tPl}</div><div class="cbw"><div class="cbar" style="width:${Math.min(tPct,100)}%;background:${tBc};"></div></div></div>
+    ${mPl?`<div class="ps-card"><div class="ct" style="color:var(--mc1);">⚽ Spiele</div><div class="cv" style="color:${mBc};">${mPct}%</div><div class="ca2">${mA}/${mPl}</div><div class="cbw"><div class="cbar" style="width:${Math.min(mPct,100)}%;background:${mBc};"></div></div></div>`:''}`;
+  // Monthly
+  const moMap={};
+  ss.forEach((s,i)=>{const mo=getMonthFromDate(s.date);if(!moMap[mo])moMap[mo]={tA:0,tPl:0,mA:0,mPl:0};const v=p.s[i];if(s.type==='training'){if(v!==3)moMap[mo].tPl++;if(v===1)moMap[mo].tA++;}else{if(v!==3)moMap[mo].mPl++;if(v===1)moMap[mo].mA++;}});
+  document.getElementById('ps-months').innerHTML=Object.entries(moMap).map(([mo,st])=>{
+    const pct=st.tPl?Math.round((st.tA/st.tPl)*100):null;
+    const bc=pct!==null?(pct>=80?'var(--cp)':pct>=60?'var(--ce)':'var(--ca)'):'#ccc';
+    return `<div class="focus-row"><div class="fr-name">${mo}</div><div class="fr-bw"><div class="fr-bar" style="width:${Math.min(pct||0,100)}%;background:${bc};"></div></div><div class="fr-val" style="color:${bc};">${pct!==null?pct+'%':'–'}</div><div style="width:50px;text-align:right;font-size:.61rem;color:var(--gm);">${st.tA}/${st.tPl}${st.mPl?' ⚽'+st.mA+'/'+st.mPl:''}</div></div>`;
+  }).join('')||'<p style="font-size:.7rem;color:var(--gm);">Keine Daten.</p>';
+  // Focuses
+  const focMap={};foc.forEach(f=>focMap[f]={a:0,pl:0});
+  tIdx.forEach(i=>{const f=ss[i].focus;if(f&&focMap[f]){if(p.s[i]!==3)focMap[f].pl++;if(p.s[i]===1)focMap[f].a++;}});
+  document.getElementById('ps-focuses').innerHTML=foc.filter(f=>focMap[f]&&focMap[f].pl>0).map(f=>{
+    const pct=focMap[f].pl?Math.round((focMap[f].a/focMap[f].pl)*100):0;
+    return `<div class="focus-row"><div class="fr-name">${f}</div><div class="fr-bw"><div class="fr-bar" style="width:${pct}%;"></div></div><div class="fr-val">${focMap[f].a}/${focMap[f].pl}</div><div style="width:32px;text-align:right;font-size:.61rem;color:var(--gm);">${pct}%</div></div>`;
+  }).join('')||'<p style="font-size:.7rem;color:var(--gm);">Noch keine Schwerpunkte erfasst.</p>';
+  // Sessions
+  document.getElementById('ps-sessions').innerHTML=ss.map((s,i)=>{
+    const v=p.s[i];const ssb={1:'ss-a',0:'ss-f',2:'ss-e',3:'ss-q'}[v];const ssl={1:'Anwesend',0:'Fehlend',2:'Entschuldigt',3:'Ausstehend'}[v];
+    const isMat=s.type==='match';const lbl=isMat?(s.label||''):(s.focus?`<em>${s.focus}</em>`:'');
+    return `<div class="sr"><span class="sr-date">${s.date}</span><span class="sr-type ${isMat?'srt-m':'srt-t'}">${isMat?'⚽':''} ${isMat?'Spiel':'Training'}</span>${lbl?`<span style="font-size:.63rem;color:var(--gm);">${lbl}${isMat&&s.homeAway?(s.homeAway==='home'?' 🏠':' ✈'):''}</span>`:''}<span class="sr-st ${ssb}" style="margin-left:auto;">${ssl}</span></div>`;
+  }).join('')||'<p style="padding:9px;font-size:.7rem;color:var(--gm);">Keine Einheiten.</p>';
+  openM('moPlayerStats');
+}
+function savePlayerEdit(){
+  const p=cd().players[currentPI];if(!p)return;
+  p.nr=parseInt(document.getElementById('ps-edit-nr').value)||p.nr;
+  p.name=document.getElementById('ps-edit-name').value.trim()||p.name;
+  p.pos=document.getElementById('ps-edit-pos').value;
+  save();renderBody();renderTfoot();
+  document.getElementById('ps-name').textContent=p.name;
+  document.getElementById('ps-nr').textContent='#'+p.nr;
+  document.getElementById('ps-pos-badge').innerHTML=`<span class="pb pb-${p.pos}">${p.pos} – ${POS_LBL[p.pos]}</span>`;
+}
+function deleteCurrentPlayer(){
+  const p=cd().players[currentPI];
+  if(!p||!confirm(`"${p.name}" löschen?`))return;
+  cd().players.splice(currentPI,1);save();render();closeM('moPlayerStats');
+}
+
+// ══ SESSION STATS ══
+function openSessStats(si){
+  currentSI=si;
+  const D=cd(),s=D.sessions[si],isMat=s.type==='match';
+  const foc=teamFocuses();
+  document.getElementById('ss-title').textContent=s.date+(isMat&&s.label?' – '+s.label:s.focus?' · '+s.focus:'');
+  document.getElementById('ss-meta').innerHTML=isMat?`⚽ Spiel &nbsp;·&nbsp; ${s.homeAway==='home'?'🏠 Heim':'✈ Auswärts'}${s.label?' &nbsp;·&nbsp; '+s.label:''}`:`Training${s.focus?' &nbsp;·&nbsp; 🎯 '+s.focus:''}`;
+  const focOpts=foc.map(f=>`<option value="${f}" ${f===s.focus?'selected':''}>${f}</option>`).join('');
+  document.getElementById('ss-edit-area').innerHTML=isMat?`
+    <div class="sec-title" style="margin-bottom:7px;">✎ Bearbeiten</div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:90px;"><label style="font-size:.62rem;font-weight:700;color:var(--gd);text-transform:uppercase;">Datum</label>
+        <input type="text" id="ss-e-date" value="${s.date}" style="width:100%;padding:5px;border:1.5px solid var(--gl);border-radius:6px;font-size:.78rem;outline:none;" oninput="updSessDate(${si},this.value)"/></div>
+      <div style="flex:2;min-width:130px;"><label style="font-size:.62rem;font-weight:700;color:var(--gd);text-transform:uppercase;">Gegner</label>
+        <input type="text" id="ss-e-lbl" value="${s.label||''}" style="width:100%;padding:5px;border:1.5px solid var(--gl);border-radius:6px;font-size:.78rem;outline:none;" oninput="updSessLabel(${si},this.value)"/></div>
+      <div style="flex:1;min-width:110px;"><label style="font-size:.62rem;font-weight:700;color:var(--gd);text-transform:uppercase;">Heim/Auswärts</label>
+        <select id="ss-e-ha" style="width:100%;padding:5px;border:1.5px solid var(--gl);border-radius:6px;font-size:.78rem;outline:none;" onchange="updSessHA(${si},this.value)">
+          <option value="home" ${s.homeAway==='home'?'selected':''}>🏠 Heim</option>
+          <option value="away" ${s.homeAway==='away'?'selected':''}>✈ Auswärts</option>
+        </select></div>
+    </div>`:`
+    <div class="sec-title" style="margin-bottom:7px;">✎ Bearbeiten</div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:90px;"><label style="font-size:.62rem;font-weight:700;color:var(--gd);text-transform:uppercase;">Datum</label>
+        <input type="text" id="ss-e-date" value="${s.date}" style="width:100%;padding:5px;border:1.5px solid var(--gl);border-radius:6px;font-size:.78rem;outline:none;" oninput="updSessDate(${si},this.value)"/></div>
+      <div style="flex:1;min-width:120px;"><label style="font-size:.62rem;font-weight:700;color:var(--gd);text-transform:uppercase;">Schwerpunkt</label>
+        <select id="ss-e-focus" style="width:100%;padding:5px;border:1.5px solid var(--gl);border-radius:6px;font-size:.78rem;outline:none;" onchange="updSessFocus(${si},this.value)">
+          <option value="">– Kein –</option>${focOpts}
+        </select></div>
+    </div>`;
+  refreshSessStats(si);
+  openM('moSessStats');
+}
+function refreshSessStats(si){
+  const D=cd();
+  const pres=D.players.filter(p=>p.s[si]===1).length,abs=D.players.filter(p=>p.s[si]===0||p.s[si]===2).length,unk=D.players.filter(p=>p.s[si]===3).length;
+  const total=D.players.length,pct=total?Math.round((pres/total)*100):0;
+  document.getElementById('ss-cards').innerHTML=`
+    <div class="ps-card"><div class="ct">Anwesend</div><div class="cv" style="color:var(--cp);">${pres}</div><div class="ca2">${pct}%</div></div>
+    <div class="ps-card"><div class="ct">Fehlend</div><div class="cv" style="color:var(--ca);">${abs}</div></div>
+    <div class="ps-card"><div class="ct">Ausstehend</div><div class="cv" style="color:var(--gm);">${unk}</div></div>`;
+  document.getElementById('ss-att-list').innerHTML=D.players.map((p,pi)=>{
+    const v=p.s[si];const ssb={1:'ss-a',0:'ss-f',2:'ss-e',3:'ss-q'}[v];const ssl={1:'A – Anwesend',0:'F – Fehlend',2:'E – Entschuldigt',3:'? – Ausstehend'}[v];
+    return `<div class="sat-row"><div class="sat-nr">${p.nr}</div><div class="sat-name">${p.name}</div><div class="sat-pos"><span class="pb pb-${p.pos}">${p.pos}</span></div><span class="sat-st ${ssb}" onclick="cycSt(${pi},${si});refreshSessStats(${si});">${ssl}</span></div>`;
+  }).join('')||'<p style="padding:10px;font-size:.7rem;color:var(--gm);">Keine Spieler.</p>';
+}
+function updSessDate(si,v){const D=cd();D.sessions[si].date=v;D.sessions[si].month=getMonthFromDate(v);save();renderHead();renderTfoot();}
+function updSessLabel(si,v){cd().sessions[si].label=v;save();}
+function updSessHA(si,v){cd().sessions[si].homeAway=v;save();renderHead();}
+function updSessFocus(si,v){cd().sessions[si].focus=v;save();renderHead();}
+function deleteCurrSess(){
+  if(currentSI<0)return;
+  if(!confirm(`"${cd().sessions[currentSI].date}" löschen?`))return;
+  cd().sessions.splice(currentSI,1);cd().players.forEach(p=>p.s.splice(currentSI,1));
+  save();render();closeM('moSessStats');
+}
+
+// ══ LIVE STATUS ══
+function cycSt(pi,si){
+  const p=cd().players[pi],ss=cd().sessions;
+  p.s[si]=SC[(SC.indexOf(p.s[si])+1)%SC.length];
+  const meta=buildMeta(ss);
+  const cell=document.querySelector(`[data-pi="${pi}"][data-si="${si}"]`);
+  if(cell){const isMat=ss[si].type==='match';const sc=meta[si].first?(isMat?'mg-start-match':'mg-start'):'';cell.className=`cs ${CLS[p.s[si]]} ${sc}`;cell.textContent=SYM[p.s[si]];}
+  renderTfoot();renderFooter();save();
+}
+
+// ══ TEAM MANAGER ══
+function openTeamMgr(tab){openM('moTeamMgr');switchTab(tab||'spieler');}
+function switchTab(t){
+  ['spieler','trainer','statistik'].forEach((n,i)=>{
+    document.querySelectorAll('#moTeamMgr .tab-btn')[i]?.classList.toggle('active',n===t);
+    document.getElementById('tab-'+n)?.classList.toggle('active',n===t);
+  });
+  document.getElementById('tmgr-h').textContent={spieler:'👥 Spieler',trainer:'🎽 Trainer',statistik:'📊 Statistik'}[t]||'–';
+  if(t==='spieler')renderTmgrPlayers();
+  if(t==='trainer'){document.getElementById('tmgr-team-lbl').textContent=G.currentTeam;renderTmgrTrainers();renderTeamChecks('tTeamChecks');}
+  if(t==='statistik')renderTmgrStats();
+}
+function renderTmgrPlayers(){
+  const D=cd();
+  document.getElementById('tmgr-pl-list').innerHTML=D.players.length?
+    D.players.map((p,i)=>`<div class="pl-row"><div class="pl-nr">${p.nr}</div><div class="pl-name">${p.name}</div><div class="pl-pos"><span class="pb pb-${p.pos}">${p.pos}</span></div><div class="pl-btns"><button class="pl-btn pl-btn-e" onclick="closeM('moTeamMgr');openPlayerStats(${i});">✎</button><button class="pl-btn pl-btn-d" onclick="tmgrDelP(${i})">✕</button></div></div>`).join('')
+    :'<p style="padding:13px;font-size:.72rem;color:var(--gm);">Keine Spieler.</p>';
+}
+function tmgrDelP(pi){const p=cd().players[pi];if(!p||!confirm(`"${p.name}" löschen?`))return;cd().players.splice(pi,1);save();renderTmgrPlayers();render();}
+function renderTmgrTrainers(){
+  const myT=G.trainers.filter(t=>t.teams.includes(G.currentTeam));
+  document.getElementById('tmgr-tr-list').innerHTML=myT.length?
+    myT.map(t=>{const gi=G.trainers.indexOf(t);return`<div class="tr-row"><div><div class="tr-name">${t.name}</div><div class="tr-teams">${t.teams.join(', ')}</div></div><button class="tr-del" onclick="delTrainer(${gi})">✕</button></div>`;}).join('')
+    :'<p style="font-size:.71rem;color:var(--gm);">Kein Trainer für diese Mannschaft.</p>';
+}
+function renderTeamChecks(containerId){
+  const c=document.getElementById(containerId);if(!c)return;
+  c.innerHTML=G.teamList.map(t=>`<div class="tcheck${t===G.currentTeam?' sel':''}" data-t="${t}" onclick="this.classList.toggle('sel')">${t}</div>`).join('');
+}
+function getCheckedTeams(cid){return[...document.querySelectorAll('#'+cid+' .tcheck.sel')].map(c=>c.dataset.t);}
+function addTrainer(){
+  const name=document.getElementById('tNewName').value.trim();const teams=getCheckedTeams('tTeamChecks');
+  if(!name)return alert('Name eingeben.');
+  G.trainers.push({id:'t'+Date.now(),name,teams});save();renderTmgrTrainers();renderHeaderInfo();
+  document.getElementById('tNewName').value='';
+}
+function delTrainer(i){if(!confirm(`"${G.trainers[i].name}" entfernen?`))return;G.trainers.splice(i,1);save();renderTmgrTrainers();renderHeaderInfo();}
+
+let statsSort={col:'pct',asc:false};
+function renderTmgrStats(){
+  const D=cd(),ss=D.sessions;
+  const tS=ss.filter(s=>s.type==='training').length,mS=ss.filter(s=>s.type==='match').length;
+  let totA=0,totPl=0;D.players.forEach(p=>{totA+=p.s.filter(v=>v===1).length;totPl+=p.s.filter(v=>v!==3).length;});
+  const avg=totPl?Math.round((totA/totPl)*100):0;
+  const rows=D.players.map(p=>{
+    const tIdx=ss.map((s,i)=>s.type==='training'?i:-1).filter(i=>i>=0);
+    const mIdx=ss.map((s,i)=>s.type==='match'?i:-1).filter(i=>i>=0);
+    const tA=tIdx.filter(i=>p.s[i]===1).length,tPl=tIdx.filter(i=>p.s[i]!==3).length;
+    const mA=mIdx.filter(i=>p.s[i]===1).length,mPl=mIdx.filter(i=>p.s[i]!==3).length;
+    const tPct=tPl?Math.round((tA/tPl)*100):0,mPct=mPl?Math.round((mA/mPl)*100):0;
+    return{nr:p.nr,name:p.name,pos:p.pos,tA,tPl,tPct,mA,mPl,mPct,pct:tPct};
+  });
+  rows.sort((a,b)=>{const v=statsSort.col;const r=typeof a[v]==='string'?a[v].localeCompare(b[v]):a[v]-b[v];return statsSort.asc?r:-r;});
+  const sa=c=>statsSort.col===c?(statsSort.asc?'↑':'↓'):'';
+  const th=(c,l)=>`<th onclick="sortStats('${c}')">${l} ${sa(c)}</th>`;
+  document.getElementById('tmgr-stats').innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:12px;">
+      <div class="ps-card"><div class="ct">Spieler</div><div class="cv">${D.players.length}</div></div>
+      <div class="ps-card"><div class="ct">Trainings</div><div class="cv">${tS}</div></div>
+      <div class="ps-card"><div class="ct">Spiele</div><div class="cv">${mS}</div></div>
+      <div class="ps-card"><div class="ct">Ø-Quote</div><div class="cv" style="color:${avg>=80?'var(--cp)':avg>=60?'var(--ce)':'var(--ca)'};">${avg}%</div></div>
+    </div>
+    <div style="max-height:280px;overflow-y:auto;border:1px solid var(--gl);border-radius:7px;">
+    <table class="full-table"><thead><tr>${th('nr','#')}${th('name','Spieler')}${th('pos','Pos.')}${th('tPct','T%')}${th('tA','T-A')}${th('tPl','T-∑')}${mS?th('mPct','S%')+th('mA','S-A')+th('mPl','S-∑'):''}</tr></thead>
+    <tbody>${rows.map(r=>{const bc=r.tPct>=80?'var(--cp)':r.tPct>=60?'var(--ce)':'var(--ca)';return`<tr>
+      <td>${r.nr}</td>
+      <td style="text-align:left;cursor:pointer;" onclick="closeM('moTeamMgr');openPlayerStats(${D.players.findIndex(p=>p.name===r.name)});">${r.name}</td>
+      <td><span class="pb pb-${r.pos}">${r.pos}</span></td>
+      <td style="font-weight:700;color:${bc};">${r.tPl?r.tPct+'%':'–'}</td>
+      <td>${r.tA}</td><td>${r.tPl}</td>
+      ${mS?`<td style="font-weight:700;color:${r.mPct>=80?'var(--cp)':r.mPct>=60?'var(--ce)':'var(--ca)'};">${r.mPl?r.mPct+'%':'–'}</td><td>${r.mA}</td><td>${r.mPl}</td>`:''}
+    </tr>`;}).join('')}</tbody></table></div>`;
+}
+function sortStats(col){if(statsSort.col===col)statsSort.asc=!statsSort.asc;else{statsSort.col=col;statsSort.asc=false;}renderTmgrStats();}
+
+// ══ SETTINGS (focuses per team + all trainers) ══
+function switchSettingsTab(t){
+  document.querySelectorAll('#moSettings .tab-btn').forEach((b,i)=>{const tabs=['focuses','all-trainers'];b.classList.toggle('active',tabs[i]===t);});
+  document.getElementById('stab-focuses').classList.toggle('active',t==='focuses');
+  document.getElementById('stab-all-trainers').classList.toggle('active',t==='all-trainers');
+  if(t==='focuses')renderFocusList();
+  if(t==='all-trainers'){renderAllTrainers();renderTeamChecks('atTeamChecks');}
+}
+function renderFocusList(){
+  document.getElementById('focus-team-lbl').textContent=G.currentTeam;
+  const foc=teamFocuses();
+  document.getElementById('focus-list').innerHTML=foc.length?
+    foc.map((f,i)=>`<div class="focus-item"><div class="fi-name">🎯 ${f}</div><button class="fi-del" onclick="delFocus(${i})">✕</button></div>`).join('')
+    :'<p style="font-size:.71rem;color:var(--gm);">Noch keine Schwerpunkte.</p>';
+  populateFocusSelect();
+}
+function addFocus(){
+  const n=document.getElementById('newFocusName').value.trim();
+  if(!n)return alert('Name eingeben.');
+  const foc=teamFocuses();if(foc.includes(n))return alert('Bereits vorhanden.');
+  foc.push(n);save();renderFocusList();
+  document.getElementById('newFocusName').value='';
+}
+function delFocus(i){
+  const foc=teamFocuses();if(!confirm(`"${foc[i]}" löschen?`))return;
+  foc.splice(i,1);save();renderFocusList();
+}
+function populateFocusSelect(){
+  const el=document.getElementById('newFocus');if(!el)return;
+  const cur=el.value,foc=teamFocuses();
+  el.innerHTML='<option value="">– Kein –</option>'+foc.map(f=>`<option value="${f}"${f===cur?' selected':''}>${f}</option>`).join('');
+}
+function renderAllTrainers(){
+  document.getElementById('all-trainers-list').innerHTML=G.trainers.length?
+    G.trainers.map((t,i)=>`<div class="tr-row"><div><div class="tr-name">${t.name}</div><div class="tr-teams">${t.teams.join(', ')||'–'}</div></div><button class="tr-del" onclick="delTrainer(${i});renderAllTrainers();">✕</button></div>`).join('')
+    :'<p style="font-size:.71rem;color:var(--gm);">Keine Trainer.</p>';
+}
+function addTrainerGlobal(){
+  const name=document.getElementById('atNewName').value.trim(),teams=getCheckedTeams('atTeamChecks');
+  if(!name)return alert('Name eingeben.');
+  G.trainers.push({id:'t'+Date.now(),name,teams});save();renderAllTrainers();renderHeaderInfo();renderTeamChecks('atTeamChecks');
+  document.getElementById('atNewName').value='';
+}
+
+// ══ TEAM / SEASON ACTIONS ══
+function switchTeam(t){G.currentTeam=t;save();render();}
+function switchSeason(s){G.currentSeason=s;save();render();}
+function addTeam(){
+  const n=document.getElementById('newTeam').value.trim();
+  if(!n)return alert('Bezeichnung eingeben.');if(G.teamList.includes(n))return alert('Bereits vorhanden.');
+  G.teamList.push(n);
+  const sess=defaultSessions();
+  G.seasonList.forEach(s=>{G.db[n+'__'+s]={sessions:JSON.parse(JSON.stringify(sess)),players:[]};});
+  G.db[n+'__focuses']=[...DEF_FOCUSES];
+  G.currentTeam=n;save();render();closeM('moNewTeam');document.getElementById('newTeam').value='';
+}
+function delTeam(t){
+  if(G.teamList.length<=1)return alert('Mindestens eine Mannschaft erforderlich.');
+  if(!confirm(`"${t}" löschen?`))return;
+  G.teamList=G.teamList.filter(x=>x!==t);
+  G.seasonList.forEach(s=>delete G.db[t+'__'+s]);
+  delete G.db[t+'__focuses'];
+  if(G.currentTeam===t)G.currentTeam=G.teamList[0];
+  save();render();
+}
+function addSeason(){
+  const n=document.getElementById('newSeason').value.trim();
+  if(!n)return alert('Saison eingeben.');if(G.seasonList.includes(n))return alert('Bereits vorhanden.');
+  G.seasonList.push(n);
+  G.teamList.forEach(t=>{const prev=G.db[t+'__'+G.currentSeason];G.db[t+'__'+n]={sessions:[],players:prev?prev.players.map(p=>({...p,s:[]})):[]};});
+  G.currentSeason=n;save();render();closeM('moSeason');document.getElementById('newSeason').value='';
+}
+function deleteSeason(){
+  if(G.seasonList.length<=1)return alert('Mindestens eine Saison erforderlich.');
+  if(!confirm(`"${G.currentSeason}" löschen?`))return;
+  const s=G.currentSeason;G.seasonList=G.seasonList.filter(x=>x!==s);
+  G.teamList.forEach(t=>delete G.db[t+'__'+s]);
+  G.currentSeason=G.seasonList[G.seasonList.length-1];save();render();
+}
+function addTraining(){
+  const date=document.getElementById('newDate').value.trim();
+  if(!date)return alert('Datum eingeben.');
+  const focus=document.getElementById('newFocus').value;
+  insertSorted(cd(),{date,month:getMonthFromDate(date),type:'training',focus});
+  save();render();closeM('moSession');document.getElementById('newDate').value='';
+}
+function addMatch(){
+  const date=document.getElementById('newMatchDate').value.trim(),label=document.getElementById('newMatchLabel').value.trim();
+  if(!date)return alert('Datum eingeben.');
+  insertSorted(cd(),{date,month:getMonthFromDate(date),type:'match',homeAway:newMatchHA,label});
+  save();render();closeM('moMatch');
+  document.getElementById('newMatchDate').value='';document.getElementById('newMatchLabel').value='';
+}
+function delSess(si){
+  if(!confirm(`"${cd().sessions[si].date}" löschen?`))return;
+  cd().sessions.splice(si,1);cd().players.forEach(p=>p.s.splice(si,1));save();render();
+}
+function doGen(){
+  const s=document.getElementById('genS').value.trim(),e=document.getElementById('genE').value.trim();
+  if(!/\d{2}\.\d{2}\.\d{4}/.test(s)||!/\d{2}\.\d{2}\.\d{4}/.test(e))return alert('Format: TT.MM.JJJJ');
+  const tD=[...document.querySelectorAll('#dowTr .dow-btn.sel')].map(b=>+b.dataset.d);
+  const mD=[...document.querySelectorAll('#dowMa .dow-btn.sel-m')].map(b=>+b.dataset.d);
+  const D=cd(),exist=new Set(D.sessions.map(x=>x.date));
+  const ns=genRange(s,e,tD,mD).filter(x=>!exist.has(x.date));
+  ns.forEach(x=>insertSorted(D,x));save();render();closeM('moGenSch');
+  alert(ns.length?`${ns.length} Einheit(en) hinzugefügt.`:'Keine neuen Einheiten.');
+}
+
+// ══ PLAYER ACTIONS ══
+function addPlayer(){
+  const nr=parseInt(document.getElementById('newNr').value)||cd().players.length+1;
+  const name=document.getElementById('newName').value.trim(),pos=document.getElementById('newPos').value;
+  if(!name)return alert('Name eingeben.');
+  cd().players.push({nr,name,pos,s:new Array(cd().sessions.length).fill(3)});
+  save();render();closeM('moAddPlayer');document.getElementById('newNr').value='';document.getElementById('newName').value='';
+}
+function delPlayer(pi){const p=cd().players[pi];if(!p||!confirm(`"${p.name}" löschen?`))return;cd().players.splice(pi,1);save();render();}
+function updNr(pi,v){cd().players[pi].nr=parseInt(v)||pi+1;save();}
+function togPos(pi,e){
+  e.stopPropagation();document.querySelectorAll('.pmenu').forEach((m,i)=>{if(i!==pi)m.classList.remove('open');});
+  document.getElementById('pm'+pi).classList.toggle('open');
+}
+function setPos(pi,pos){cd().players[pi].pos=pos;document.getElementById('pm'+pi).classList.remove('open');save();renderBody();}
+document.addEventListener('click',()=>document.querySelectorAll('.pmenu').forEach(m=>m.classList.remove('open')));
+
+// ══ SHARE ══
+function refreshShare(){
+  const D=cd();const payload=JSON.stringify({team:G.currentTeam,season:G.currentSeason,mode:shareMode,sessions:D.sessions,players:D.players,trainers:G.trainers});
+  document.getElementById('shareBox').textContent=btoa(unescape(encodeURIComponent(payload)));
+  document.getElementById('shareTeamLbl').textContent=G.currentTeam;
+  document.getElementById('shareSeasonLbl').textContent=G.currentSeason;
+}
+function setShareMode(m){shareMode=m;document.getElementById('smE').classList.toggle('active',m==='edit');document.getElementById('smV').classList.toggle('active',m==='view');refreshShare();}
+function copyCode(){navigator.clipboard.writeText(document.getElementById('shareBox').textContent).then(()=>alert('Code kopiert!'));}
+function importCode(){
+  const raw=document.getElementById('importBox').value.trim();if(!raw)return alert('Code einfügen.');
+  try{
+    const p=JSON.parse(decodeURIComponent(escape(atob(raw))));
+    if(!p.team||!p.season||!p.sessions||!p.players)throw 0;
+    if(!G.teamList.includes(p.team))G.teamList.push(p.team);
+    if(!G.seasonList.includes(p.season))G.seasonList.push(p.season);
+    G.db[p.team+'__'+p.season]={sessions:p.sessions,players:p.players};
+    if(p.trainers)G.trainers=p.trainers;
+    G.currentTeam=p.team;G.currentSeason=p.season;save();render();closeM('moShare');alert(`${p.team} (${p.season}) importiert!`);
+  }catch(e){alert('Ungültiger Code.');}
+}
+function dlHTML(){
+  const code=document.getElementById('shareBox').textContent;
+  const b=new Blob([`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>FC Frohlinde 1949 Teamcode</title></head><body style="font-family:sans-serif;padding:22px;max-width:600px;"><h2 style="color:#0d3b7c;">FC Frohlinde 1949 – Teamcode</h2><p>Öffne die Anwesenheitsliste → 🔗 Teilen → Importieren:</p><textarea style="width:100%;height:120px;font-family:monospace;font-size:11px;padding:7px;border:1px solid #ccc;border-radius:6px;">${code}</textarea></body></html>`],{type:'text/html;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`FC_${G.currentTeam}_${G.currentSeason.replace('/','_')}_share.html`;a.click();
+}
+function exportCSV(){
+  const D=cd(),sym={1:'A',0:'F',2:'E',3:'?'};
+  let csv=['#,Name,Position,'+D.sessions.map(s=>`${s.date}[${s.type==='match'?'Spiel':'T'}${s.focus?'-'+s.focus:''}]`).join(',')];
+  D.players.forEach(p=>csv.push(`${p.nr},"${p.name}",${p.pos},${p.s.map(v=>sym[v]).join(',')}`));
+  const b=new Blob(['\uFEFF'+csv.join('\n')],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`Anwesenheit_${G.currentTeam}_${G.currentSeason.replace('/','_')}.csv`;a.click();
+}
+function resetTeam(){if(!confirm(`${G.currentTeam} (${G.currentSeason}) zurücksetzen?`))return;const sess=defaultSessions();G.db[ck()]={sessions:sess,players:mkPlayers(G.currentTeam,sess.length)};save();render();}
+
+// ══ MODALS ══
+function openM(id){
+  document.getElementById(id).classList.add('open');
+  if(id==='moShare')refreshShare();
+  if(id==='moSettings'){renderFocusList();renderTeamChecks('atTeamChecks');}
+}
+function closeM(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.mo').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+
+// ══ DOW PICKERS ══
+document.querySelectorAll('#dowTr .dow-btn').forEach(b=>b.addEventListener('click',()=>b.classList.toggle('sel')));
+document.querySelectorAll('#dowMa .dow-btn').forEach(b=>b.addEventListener('click',()=>b.classList.toggle('sel-m')));
+
+// ══ INIT ══
+initData();render();
+</script>
+</body>
+</html>
