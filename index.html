@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>FC Frohlinde 1949</title>
+<title>FC Frohlinde 1949 e.V.</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -11,7 +11,7 @@
   --wh:#fff;--ow:#f0f4fc;--gl:#dde6f5;--gm:#8fa8cc;--gd:#3d5272;
   --ac:#e8c840;--cp:#27ae60;--ca:#e74c3c;--ce:#f39c12;
   --mc1:#b03000;--mc2:#8a2000;
-  --c0:34px;--c1:164px;--c2:70px;
+  --c0:34px;--c1:164px;--c2:100px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;font-family:'Barlow',sans-serif;font-size:16px;}
@@ -75,15 +75,21 @@ body{background:linear-gradient(140deg,#071a3e 0%,#1659b8 55%,#071a3e 100%);min-
 .tdelt{font-size:.52rem;color:rgba(255,255,255,.16);cursor:pointer;padding:1px 3px;border-radius:3px;}
 .tdelt:hover{background:rgba(231,76,60,.4);color:#fff;}
 /* Trainer chips on right of tab bar */
-.trainer-strip{display:flex;align-items:center;gap:4px;padding:0 12px;border-left:1px solid rgba(255,255,255,.1);flex-shrink:0;}
+.trainer-strip{display:none;}
 .trainer-chip{padding:2px 8px;background:rgba(232,200,64,.13);border:1px solid rgba(232,200,64,.28);border-radius:14px;font-size:.66rem;font-weight:600;color:rgba(255,255,255,.85);white-space:nowrap;}
 
 /* COLLAPSE BAR */
-.cbar{background:#07193a;padding:5px 20px;display:flex;align-items:center;gap:5px;flex-shrink:0;border-bottom:2px solid rgba(255,255,255,.06);flex-wrap:wrap;min-height:28px;position:relative;z-index:1;}
-.cbar-btn{background:none;border:none;color:rgba(255,255,255,.35);cursor:pointer;font-size:.74rem;font-weight:600;padding:4px 9px;border-radius:4px;transition:all .12s;white-space:nowrap;}
-.cbar-btn:hover{color:#fff;background:rgba(255,255,255,.07);}
-.cbar-btn.active{color:var(--ac);}
-.cbar-sep{width:1px;height:10px;background:rgba(255,255,255,.1);}
+/* View dropdown */
+.view-menu-wrap{position:relative;display:inline-flex;}
+.view-menu-btn{padding:5px 12px;border-radius:7px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.09);color:rgba(255,255,255,.75);cursor:pointer;font-size:.78rem;font-weight:600;font-family:'Barlow',sans-serif;display:flex;align-items:center;gap:5px;white-space:nowrap;transition:all .12s;}
+.view-menu-btn:hover{background:rgba(255,255,255,.18);color:#fff;}
+.view-dropdown{display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:300;background:#1a3a6e;border:1px solid rgba(255,255,255,.15);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.4);overflow:hidden;min-width:180px;}
+.view-dropdown.open{display:block;}
+.vd-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px;font-family:'Barlow',sans-serif;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.75);cursor:pointer;transition:background .12s;}
+.vd-item:hover{background:rgba(255,255,255,.08);}
+.vd-check{width:18px;height:18px;border-radius:4px;border:1.5px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:.7rem;flex-shrink:0;transition:all .12s;}
+.vd-check.on{background:var(--ac);border-color:var(--ac);color:var(--bd);}
+.vd-sep{height:1px;background:rgba(255,255,255,.1);margin:3px 0;}
 
 /* TOOLBAR */
 .toolbar{background:linear-gradient(to right,#0c2450,#1a4fa0);padding:5px 20px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;flex-shrink:0;}
@@ -114,33 +120,27 @@ body{background:linear-gradient(140deg,#071a3e 0%,#1659b8 55%,#071a3e 100%);min-
 .lhint{margin-left:auto;font-size:.66rem;color:var(--gm);font-style:italic;}
 
 /* ══════ TABLE ══════ */
-.table-wrap{flex:1;overflow:auto;min-height:0;position:relative;}
+.table-wrap{flex:1;overflow-x:auto;overflow-y:auto;min-height:0;position:relative;}
 
-table{width:100%;border-collapse:collapse;font-size:.9rem;}
+table{width:100%;border-collapse:collapse;font-size:.9rem;border-spacing:0;}
 
 /* STICKY LEFT - must have explicit z-index & solid bg */
-.c0{position:sticky;left:0;width:var(--c0);min-width:var(--c0);z-index:4;}
-.c1{position:sticky;left:var(--c0);width:var(--c1);min-width:var(--c1);z-index:4;}
-.c2{position:sticky;left:calc(var(--c0) + var(--c1));width:var(--c2);min-width:var(--c2);z-index:4;box-shadow:2px 0 4px rgba(0,0,0,.08);}
+.c0{position:sticky;left:0;width:var(--c0);min-width:var(--c0);max-width:var(--c0);z-index:4;background:#fff;}
+.c1{position:sticky;left:var(--c0);width:var(--c1);min-width:var(--c1);max-width:var(--c1);z-index:4;background:#fff;}
+.c2{position:sticky;left:calc(var(--c0) + var(--c1));width:var(--c2);min-width:var(--c2);max-width:var(--c2);z-index:4;box-shadow:2px 0 4px rgba(0,0,0,.1);}
 
 /* Backgrounds for sticky left by row state */
 thead .c0,thead .c1,thead .c2{background:var(--bd) !important;z-index:8 !important;}
 tbody tr:nth-child(odd) .c0,tbody tr:nth-child(odd) .c1,tbody tr:nth-child(odd) .c2{background:#fff !important;}
 tbody tr:nth-child(even) .c0,tbody tr:nth-child(even) .c1,tbody tr:nth-child(even) .c2{background:#f4f8fe !important;}
 tbody tr:hover .c0,tbody tr:hover .c1,tbody tr:hover .c2{background:#cfe2ff !important;}
-tfoot .c0,tfoot .c1,tfoot .c2{background:#0a2550 !important;z-index:8 !important;}
+tfoot .c0,tfoot .c1,tfoot .c2{background:#0a2550 !important;z-index:10 !important;}
 
 /* THEAD */
-thead th{
-  background:var(--bd);color:#fff;
-  position:sticky;top:0;z-index:6;
-  padding:0;
-  border-bottom:3px solid var(--ac);
-  white-space:nowrap;
-}
+thead th{background:var(--bd);color:#fff;position:sticky;top:0;z-index:6;padding:0;border-bottom:3px solid var(--ac);white-space:nowrap;will-change:transform;}
 /* Sticky-left headers on top */
-thead .c0,thead .c1{text-align:left;padding:8px 6px;font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:1.2px;}
-thead .c2{text-align:left;padding:8px 4px;font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:1.2px;}
+thead .c0,thead .c1{text-align:left;padding:8px 6px;font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:1.2px;z-index:10 !important;background:var(--bd) !important;}
+thead .c2{text-align:left;padding:8px 4px;font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:1.2px;z-index:10 !important;background:var(--bd) !important;}
 
 /* DATE COLUMN headers */
 .dth{cursor:pointer;padding:5px 3px !important;min-width:46px;max-width:54px;text-align:center;vertical-align:middle;position:relative;}
@@ -152,18 +152,13 @@ thead .c2{text-align:left;padding:8px 4px;font-family:'Bebas Neue',sans-serif;fo
 .dth:hover .dcb{display:block;}
 
 /* NEXT SESSION */
-thead th.next-col{background:#165c2a !important;}
-tfoot td.next-col{background:#112240 !important;color:#7dffa0 !important;}
+thead th.next-col{background:rgba(0,100,30,.08) !important;}
+tfoot td.next-col{background:#0e3020 !important;color:#7dffa0 !important;}
 tbody td.next-col.csq{background:#c4e8cf !important;color:#145228 !important;}
 tbody td.next-col:not([class*="cs"]){background:#dbf0e3 !important;}
 
 /* TFOOT */
-tfoot td{font-size:.84rem !important;
-  background:#0d2d5e;color:#fff;font-weight:700;
-  font-size:.8rem;padding:7px 4px;text-align:center;
-  border-top:3px solid var(--ac);
-  position:sticky;bottom:0;z-index:6;white-space:nowrap;
-}
+tfoot td{background:#0d2d5e;color:#fff;font-weight:700;font-size:.86rem;padding:7px 4px;text-align:center;border-top:3px solid var(--ac);position:sticky;bottom:0;z-index:6;white-space:nowrap;will-change:transform;}
 tfoot td.tdl{text-align:left;padding-left:8px;}
 
 tfoot td.match-col{background:#3a0e00 !important;}
@@ -186,7 +181,7 @@ td:hover .ncell .nm{color:var(--bm);}
 td:hover .ncell .ni{opacity:1;}
 
 /* POSITION BADGES */
-.pb{display:inline-block;padding:2px 7px;border-radius:10px;font-size:.68rem;font-weight:700;white-space:nowrap;}
+.pb{display:inline-flex;align-items:center;justify-content:center;padding:2px 0;border-radius:10px;font-size:.68rem;font-weight:700;white-space:nowrap;min-width:36px;text-align:center;}
 .pb-TW{background:#ffeaa7;color:#7a5a00;}.pb-RV{background:#cce5ff;color:#004080;}
 .pb-IV{background:#b0cce0;color:#003060;}.pb-LV{background:#cce5ff;color:#004080;}
 .pb-6er{background:#c3e6cb;color:#155724;}.pb-8er{background:#a0d8a8;color:#0d4020;}
@@ -194,25 +189,25 @@ td:hover .ncell .ni{opacity:1;}
 .pb-LF{background:#ffd0b0;color:#7a3a00;}.pb-ST{background:#ffd6d6;color:#8a0000;}
 /* Pos cell in table: left-aligned, first badge has fixed width */
 .pos-wrap{display:flex;align-items:center;gap:3px;justify-content:flex-start;padding:0 4px;}
-.pb-primary{min-width:34px;text-align:left;}
+.pb-primary{min-width:36px;}
 
 /* STATUS CELLS */
-.cs{cursor:pointer;border-radius:4px;user-select:none;font-weight:700;min-width:22px;font-size:.78rem;transition:transform .1s;}
-.cs:hover{transform:scale(1.28);}
-.cs.ro{cursor:default;}.cs.ro:hover{transform:none;}
+.cs{border-radius:4px;user-select:none;font-weight:700;min-width:22px;font-size:.78rem;transition:transform .1s;}
+.cs:not(.ro):not(.past-locked){cursor:pointer;}
+.cs:not(.ro):not(.past-locked):hover{transform:scale(1.28);}
+.cs.ro{cursor:default !important;pointer-events:none;}
+.cs.past-locked{opacity:.7;}
+.cs.ro:hover{transform:none !important;}
 .csa{background:var(--cp) !important;color:#fff !important;}
 .csf{background:var(--ca) !important;color:#fff !important;}
 .cse{background:var(--ce) !important;color:#fff !important;}
 .csq{background:#ddd !important;color:#777 !important;font-size:.72rem;}
 
-.past-locked{cursor:default !important;opacity:.72;}
-.past-locked:hover{transform:none !important;}
-/* row hover should not recolor locked cells */
-tbody tr:hover td.past-locked{background:inherit !important;}
-tbody tr:hover td.csq.past-locked{background:#ddd !important;}
+.past-locked{cursor:default !important;opacity:.65;}
 tbody tr:hover td.csa.past-locked{background:var(--cp) !important;}
 tbody tr:hover td.csf.past-locked{background:var(--ca) !important;}
 tbody tr:hover td.cse.past-locked{background:var(--ce) !important;}
+tbody tr:hover td.csq.past-locked{background:#ddd !important;}
 .drb{background:none;border:none;cursor:pointer;color:transparent;font-size:.8rem;padding:2px 3px;border-radius:3px;transition:all .12s;}
 tr:hover .drb{color:var(--gm);}
 .drb:hover{background:rgba(231,76,60,.1);color:var(--ca) !important;}
@@ -228,7 +223,7 @@ tr:hover .drb{color:var(--gm);}
 .footer-r{display:flex;align-items:center;gap:10px;}
 .fsign{font-size:.78rem;color:var(--gd);font-weight:500;}
 .fsign span{color:var(--bm);font-weight:700;}
-.zoom-grp{display:flex;align-items:center;gap:3px;background:var(--bd);border-radius:7px;padding:4px 8px;}
+.zoom-grp{display:none;}
 .zb{background:none;border:none;color:rgba(255,255,255,.75);cursor:pointer;font-size:.85rem;font-weight:700;padding:1px 5px;border-radius:4px;transition:all .12s;}
 .zb:hover{background:rgba(255,255,255,.15);color:#fff;}
 .zlbl{font-size:.72rem;font-weight:700;color:rgba(255,255,255,.85);min-width:34px;text-align:center;}
@@ -275,10 +270,10 @@ input[type="date"]{cursor:pointer;}
 .ps-card .ca{font-size:.68rem;color:var(--gm);margin-bottom:4px;}
 .cbw{background:var(--gl);border-radius:3px;height:5px;}
 .cbar{height:5px;border-radius:3px;}
-.fr{display:flex;align-items:center;gap:6px;margin-bottom:5px;font-size:.73rem;}
-.fr-nm{width:80px;color:var(--gd);font-weight:600;font-size:.69rem;}
+.fr{display:flex;align-items:center;gap:6px;margin-bottom:6px;font-size:.73rem;}
+.fr-nm{width:76px;color:var(--gd);font-weight:600;font-size:.69rem;flex-shrink:0;}
 .fr-bw{flex:1;background:var(--gl);border-radius:3px;height:5px;}
-.fr-bar{height:5px;border-radius:3px;background:var(--bm);}
+.fr-bar{height:5px;border-radius:3px;background:var(--bm);flex-shrink:0;}
 .fr-val{width:36px;text-align:right;font-weight:700;color:var(--bd);}
 .sess-list{max-height:148px;overflow-y:auto;border:1px solid var(--gl);border-radius:7px;margin-bottom:12px;}
 .sr{display:flex;align-items:center;gap:6px;padding:5px 10px;border-bottom:1px solid var(--gl);font-size:.74rem;cursor:pointer;transition:background .12s;}
@@ -290,7 +285,7 @@ input[type="date"]{cursor:pointer;}
 .sr-type{padding:1px 5px;border-radius:9px;font-size:.59rem;font-weight:700;}
 .srt-t{background:rgba(22,89,184,.11);color:var(--bm);}
 .srt-m{background:rgba(176,48,0,.12);color:var(--mc1);}
-.sr-st{margin-left:auto;padding:2px 6px;border-radius:4px;font-size:.64rem;font-weight:700;}
+.sr-st{margin-left:auto;padding:2px 4px;border-radius:4px;font-size:.64rem;font-weight:700;min-width:88px;text-align:center;display:inline-flex;align-items:center;justify-content:center;}
 .ss-a{background:var(--cp);color:#fff;}.ss-f{background:var(--ca);color:#fff;}
 .ss-e{background:var(--ce);color:#fff;}.ss-q{background:#ddd;color:#888;}
 
@@ -301,13 +296,13 @@ input[type="date"]{cursor:pointer;}
 .agt-f{background:rgba(231,76,60,.12);color:#9a2020;}
 .agt-e{background:rgba(243,156,18,.12);color:#7a5500;}
 .agt-q{background:rgba(170,170,170,.12);color:#555;}
-.att-row{display:flex;align-items:center;gap:6px;padding:5px 10px;border-bottom:1px solid var(--gl);font-size:.76rem;cursor:pointer;transition:background .12s;}
+.att-row{display:flex;align-items:center;gap:6px;padding:4px 10px;border-bottom:1px solid var(--gl);font-size:.76rem;cursor:pointer;transition:background .12s;}
 .att-row:hover{background:var(--ow);}
 .att-row:last-child{border-bottom:none;}
 .att-row:nth-child(even){background:#f8fafd;}
 .att-row:nth-child(even):hover{background:var(--ow);}
 .att-nr{width:24px;font-weight:700;color:var(--bm);text-align:center;}
-.att-name{flex:1;font-weight:600;color:var(--bd);}
+.att-name{flex:1;font-weight:600;color:var(--bd);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .att-pos{width:70px;display:flex;gap:2px;}
 .att-st{padding:2px 7px;border-radius:4px;font-size:.67rem;font-weight:700;cursor:pointer;transition:transform .1s;}
 .att-st.ro{cursor:default;}
@@ -384,7 +379,7 @@ input[type="date"]{cursor:pointer;}
 <div class="header" id="hdrEl">
   <div class="logo-ring"><img id="clogo" alt="FC Frohlinde"/></div>
   <div class="htext">
-    <div class="hclub">FC Frohlinde</div>
+    <div class="hclub">FC Frohlinde 1949 e.V.</div>
     <div class="hsub" id="hSub">U19 · Junioren</div>
     <div class="hmeta">Anwesenheits- & Spielerliste</div>
   </div>
@@ -404,22 +399,8 @@ input[type="date"]{cursor:pointer;}
 
 <div class="team-bar-wrap" id="teamBarWrap">
   <div class="team-tabs" id="teamTabs"></div>
-  <div class="trainer-strip" id="trainerStrip"></div>
 </div>
 
-<div class="cbar">
-  <button class="cbar-btn active" id="cb-hdr" onclick="toggleSec('hdr')">⬆ Header</button>
-  <div class="cbar-sep"></div>
-  <button class="cbar-btn active" id="cb-tabs" onclick="toggleSec('tabs')">Tabs</button>
-  <div class="cbar-sep"></div>
-  <button class="cbar-btn active" id="cb-tools" onclick="toggleSec('tools')">Werkzeuge</button>
-  <div class="cbar-sep"></div>
-  <button class="cbar-btn active" id="cb-legend" onclick="toggleSec('legend')">Legende</button>
-  <div class="cbar-sep"></div>
-  <button class="cbar-btn" onclick="collapseAll()">📋 Tabelle</button>
-  <div class="cbar-sep"></div>
-  <button class="cbar-btn" onclick="resetCollapse()">↺</button>
-</div>
 
 <div class="toolbar" id="toolbarEl">
   <div class="toolbar-l">
@@ -430,7 +411,6 @@ input[type="date"]{cursor:pointer;}
     <div class="tsep"></div>
     <button class="btn bs" id="btn-plan" onclick="openGenSch()" style="display:none;">📅 Plan</button>
     <div class="tsep"></div>
-    <button class="btn bp" id="btn-addPl" onclick="openM('moAddPlayer')" style="display:none;">＋ Spieler</button>
     <button class="btn bs" id="btn-addSess" onclick="openM('moSession')" style="display:none;">＋ Training</button>
     <button class="btn bm" id="btn-addMatch" onclick="openM('moMatch')" style="display:none;">⚽ Spiel</button>
   </div>
@@ -467,14 +447,30 @@ input[type="date"]{cursor:pointer;}
     <span class="next-dot"></span><span id="nextTxt"></span>
   </button>
   <div class="footer-r">
-    <div class="fsign"><span id="fTeam">–</span> &nbsp;|&nbsp; <span id="fDate"></span></div>
-    <div class="zoom-grp">
-      <button class="zb" onclick="zoom(-10)">−</button>
-      <span class="zlbl" id="zoomLbl">100%</span>
-      <button class="zb" onclick="zoom(10)">＋</button>
-      <button class="zb" onclick="zoom(0)" style="font-size:.6rem;">⟳</button>
+      <div class="fsign"><span id="fTeam">–</span> &nbsp;|&nbsp; <span id="fDate"></span></div>
+      <div class="view-menu-wrap" id="viewMenuWrap2">
+        <button class="view-menu-btn" onclick="toggleViewMenu2(event)" style="background:var(--bd);color:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.22);font-size:.78rem;padding:5px 12px;">⊞ Ansicht ▾</button>
+        <div class="view-dropdown" id="viewDropdown2" style="bottom:calc(100% + 5px);top:auto;left:auto;right:0;">
+          <div class="vd-item" onclick="event.stopPropagation();toggleSec('hdr')"><span>Header</span><div class="vd-check on" id="vd2-hdr">✓</div></div>
+          <div class="vd-item" onclick="event.stopPropagation();toggleSec('tabs')"><span>Tabs</span><div class="vd-check on" id="vd2-tabs">✓</div></div>
+          <div class="vd-item" onclick="event.stopPropagation();toggleSec('tools')"><span>Werkzeuge</span><div class="vd-check on" id="vd2-tools">✓</div></div>
+          <div class="vd-item" onclick="event.stopPropagation();toggleSec('legend')"><span>Legende</span><div class="vd-check on" id="vd2-legend">✓</div></div>
+          <div class="vd-sep"></div>
+          <div class="vd-item" onclick="event.stopPropagation();collapseAll()"><span>Nur Tabelle</span></div>
+          <div class="vd-item" onclick="event.stopPropagation();resetCollapse()"><span>↺ Alles</span></div>
+          <div class="vd-sep"></div>
+          <div class="vd-item" style="cursor:default;" onclick="event.stopPropagation()">
+            <span style="font-size:.76rem;">Tabellengröße</span>
+            <div style="display:flex;align-items:center;gap:3px;">
+              <button onclick="event.stopPropagation();zoom(-10)" style="padding:2px 7px;border-radius:4px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;cursor:pointer;font-size:.8rem;font-weight:700;">−</button>
+              <span id="zoomLbl2" style="font-size:.73rem;min-width:34px;text-align:center;color:rgba(255,255,255,.8);">100%</span>
+              <button onclick="event.stopPropagation();zoom(10)" style="padding:2px 7px;border-radius:4px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;cursor:pointer;font-size:.8rem;font-weight:700;">＋</button>
+              <button onclick="event.stopPropagation();zoom(0)" style="padding:2px 7px;border-radius:4px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;cursor:pointer;font-size:.72rem;">⟳</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
 </div>
 </div>
 
@@ -603,7 +599,7 @@ input[type="date"]{cursor:pointer;}
     <div class="dow-btn" data-d="3">Mi</div><div class="dow-btn sel" data-d="4">Do</div>
     <div class="dow-btn" data-d="5">Fr</div><div class="dow-btn" data-d="6">Sa</div><div class="dow-btn" data-d="0">So</div>
   </div>
-  <label>Spieltage (optional)</label>
+  <label>Spieltage</label>
   <div class="dow-grid" id="dowMa">
     <div class="dow-btn" data-d="1">Mo</div><div class="dow-btn" data-d="2">Di</div>
     <div class="dow-btn" data-d="3">Mi</div><div class="dow-btn" data-d="4">Do</div>
@@ -628,6 +624,8 @@ input[type="date"]{cursor:pointer;}
     <button class="tbtn" onclick="switchTab('trainer')">🎽 Trainer</button>
     <button class="tbtn" onclick="switchTab('schwerpunkte')">🎯 Schwerpunkte</button>
     <button class="tbtn" onclick="switchTab('statistik')">📊 Statistik</button>
+    <button class="tbtn" onclick="switchTab('trainings')">📅 Trainings</button>
+    <button class="tbtn" onclick="switchTab('spiele')">⚽ Spiele</button>
   </div>
   <div class="tpanel active" id="tab-spieler">
     <div style="border:1px solid var(--gl);border-radius:8px;max-height:280px;overflow-y:auto;margin-bottom:10px;" id="tmgr-pl-list"></div>
@@ -663,6 +661,18 @@ input[type="date"]{cursor:pointer;}
   </div>
   <div class="tpanel" id="tab-statistik">
     <div id="tmgr-stats"></div>
+    <div class="mob-btns" style="margin-top:10px;">
+      <button class="btn bs" onclick="closeM('moTeamMgr')">Schließen</button>
+    </div>
+  </div>
+  <div class="tpanel" id="tab-trainings">
+    <div style="border:1px solid var(--gl);border-radius:8px;max-height:340px;overflow-y:auto;" id="tmgr-sess-list"></div>
+    <div class="mob-btns" style="margin-top:10px;">
+      <button class="btn bs" onclick="closeM('moTeamMgr')">Schließen</button>
+    </div>
+  </div>
+  <div class="tpanel" id="tab-spiele">
+    <div style="border:1px solid var(--gl);border-radius:8px;max-height:340px;overflow-y:auto;" id="tmgr-match-list"></div>
     <div class="mob-btns" style="margin-top:10px;">
       <button class="btn bs" onclick="closeM('moTeamMgr')">Schließen</button>
     </div>
@@ -948,6 +958,7 @@ function showApp(){
   const vs=localStorage.getItem(VIEW_SK);
   if(vs)try{const v=JSON.parse(vs);if(v.colState)Object.assign(colState,v.colState);if(v.zl)zoomLvl=v.zl;}catch(e){}
   applyCollapse();
+  updateViewChecks();
   applyZoom();
   applyRoleUI();
   initTabDrag();
@@ -975,7 +986,7 @@ function renderUserPill(){
 
 function applyRoleUI(){
   const edit=canEdit(),admin=isAdmin();
-  ['btn-addPl','btn-addSess','btn-addMatch','btn-mgr-addpl'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=edit?'':'none';});
+  ['btn-addSess','btn-addMatch','btn-mgr-addpl'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=edit?'':'none';});
   ['btn-addSeas','btn-delSeas','btn-plan'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=admin?'':'none';});
   const ba=document.getElementById('btn-admin');if(ba)ba.style.display=admin?'':'none';
   // Trainer add section in team manager only for admin
@@ -1007,7 +1018,25 @@ document.addEventListener('keydown',e=>{
 //  VIEW STATE
 // ══════════════════════════════
 function saveVS(){localStorage.setItem(VIEW_SK,JSON.stringify({colState,zl:zoomLvl}));}
-function toggleSec(k){colState[k]=!colState[k];applyCollapse();saveVS();}
+function toggleSec(k){colState[k]=!colState[k];applyCollapse();saveVS();updateViewChecks();}
+function toggleViewMenu2(e){e.stopPropagation();document.getElementById('viewDropdown2').classList.toggle('open');}
+document.addEventListener('click',e=>{
+  const wrap=document.getElementById('viewMenuWrap2');
+  if(wrap&&!wrap.contains(e.target))document.getElementById('viewDropdown2')?.classList.remove('open');
+});
+function updateViewChecks(){
+  const lbl2=document.getElementById('zoomLbl2');if(lbl2)lbl2.textContent=zoomLvl+'%';
+  ['hdr','tabs','tools','legend'].forEach(k=>{
+    const el=document.getElementById('vd-'+k);
+    if(el){el.classList.toggle('on',colState[k]);el.textContent=colState[k]?'✓':'';}
+  });
+}
+function toggleViewMenu(e){
+  e.stopPropagation();
+  document.getElementById('viewDropdown').classList.toggle('open');
+}
+// Close dropdown on outside click
+document.addEventListener('click',()=>document.getElementById('viewDropdown')?.classList.remove('open'));
 function applyCollapse(){
   document.getElementById('hdrEl').classList.toggle('collapsed',!colState.hdr);
   document.getElementById('teamBarWrap').classList.toggle('hidden',!colState.tabs);
@@ -1015,10 +1044,10 @@ function applyCollapse(){
   document.getElementById('legendEl').classList.toggle('hidden',!colState.legend);
   ['hdr','tabs','tools','legend'].forEach(k=>document.getElementById('cb-'+k)?.classList.toggle('active',colState[k]));
 }
-function collapseAll(){['hdr','tabs','tools','legend'].forEach(k=>colState[k]=false);applyCollapse();saveVS();}
-function resetCollapse(){['hdr','tabs','tools','legend'].forEach(k=>colState[k]=true);applyCollapse();saveVS();}
-function zoom(d){zoomLvl=d===0?100:Math.min(150,Math.max(50,zoomLvl+d));applyZoom();saveVS();}
-function applyZoom(){document.getElementById('tableWrap').style.zoom=zoomLvl/100;document.getElementById('zoomLbl').textContent=zoomLvl+'%';}
+function collapseAll(){['hdr','tabs','tools','legend'].forEach(k=>colState[k]=false);applyCollapse();saveVS();updateViewChecks();}
+function resetCollapse(){['hdr','tabs','tools','legend'].forEach(k=>colState[k]=true);applyCollapse();saveVS();updateViewChecks();}
+function zoom(d){zoomLvl=d===0?100:Math.min(150,Math.max(50,zoomLvl+d));applyZoom();saveVS();const l2=document.getElementById('zoomLbl2');if(l2)l2.textContent=zoomLvl+'%';}
+function applyZoom(){document.getElementById('tableWrap').style.zoom=zoomLvl/100;const l=document.getElementById('zoomLbl');if(l)l.textContent=zoomLvl+'%';const l2=document.getElementById('zoomLbl2');if(l2)l2.textContent=zoomLvl+'%';}
 function setHA(v){newMatchHA=v;document.getElementById('ha-home').classList.toggle('sel',v==='home');document.getElementById('ha-away').classList.toggle('sel',v==='away');}
 
 // ══════════════════════════════
@@ -1038,8 +1067,24 @@ function pctColor(pct){return pct>=80?'var(--cp)':pct>=60?'var(--ce)':'var(--ca)
 // ══════════════════════════════
 //  MAIN RENDER
 // ══════════════════════════════
+
+// Auto-convert Ausstehend→Fehlend for past sessions
+function autoConvertPast(){
+  const D=cd(),today=todaySK();
+  let changed=false;
+  D.sessions.forEach((s,si)=>{
+    if(dispToSortKey(s.date)<today){
+      D.players.forEach(p=>{
+        if(p.s&&si<p.s.length&&p.s[si]===3){p.s[si]=0;changed=true;}
+      });
+    }
+  });
+  if(changed)saveG(false);
+}
+
 function render(){
   try{
+    autoConvertPast();
     nextIdx=findNext();
     renderTeamBar();
     renderSeasonSel();
@@ -1077,9 +1122,7 @@ function renderTeamBar(){
     (isAdmin()?`<button class="ttab-add" onclick="openM('moNewTeam')">＋</button>`:'');
   // Trainer chips on right
   const trainers=G.trainers.filter(t=>t.teams.includes(G.currentTeam));
-  const strip=document.getElementById('trainerStrip');
-  strip.innerHTML=trainers.length?trainers.map(t=>`<span class="trainer-chip">${t.name}</span>`).join(''):
-    '<span style="font-size:.62rem;color:rgba(255,255,255,.25);padding:0 8px;">–</span>';
+  // trainer strip removed
 }
 
 function renderSeasonSel(){
@@ -1145,8 +1188,9 @@ function renderBody(){
       const v=(p.s&&si<p.s.length)?p.s[si]:3;
       const isMat=ss[si].type==='match';
       const isNext=si===nextIdx;
-      const cls=`cs ${CLS[v]}${isNext?' next-col':''}${ro?' ro':''}`;
-      cells+=`<td class="${cls}" data-pi="${pi}" data-si="${si}" ${!ro?`onclick="cycSt(${pi},${si})"`:''}">${SYM[v]}</td>`;
+      const isPast=isSessPast(si);
+      const cls=`cs ${CLS[v]}${isNext?' next-col':''}${ro?' ro':''}${isPast?' past-locked':''}`;
+      cells+=`<td class="${cls}" data-pi="${pi}" data-si="${si}" ${!ro?`onclick="cycSt(${pi},${si})"`:''}>${SYM[v]}</td>`;
     }
 
     rows.push(`<tr>
@@ -1222,6 +1266,35 @@ function openNextSess(){if(nextIdx>=0)openSessStats(nextIdx);}
 // ══════════════════════════════
 //  LIVE STATUS
 // ══════════════════════════════
+function togAttMenu(id,pi,si,v){
+  // Close all other att menus
+  document.querySelectorAll('[id^="am_"]').forEach(m=>{if(m.id!==id)m.style.display='none';});
+  const m=document.getElementById(id);if(!m)return;
+  if(m.style.display==='block'){m.style.display='none';return;}
+  // Position the menu near the button
+  const btn=m.previousElementSibling;if(!btn)return;
+  const r=btn.getBoundingClientRect();
+  m.style.left=r.left+'px';
+  m.style.top=(r.bottom+3)+'px';
+  m.style.display='block';
+}
+document.addEventListener('click',()=>document.querySelectorAll('[id^="am_"]').forEach(m=>m.style.display='none'));
+function cycStPlayer(pi,si){
+  if(!canEdit())return;
+  const D=cd(),p=D.players[pi];if(!p||!p.s)return;
+  const past=isSessPast(si);
+  let cycle=past?SC.filter(v=>v!==3):SC;
+  let cur=cycle.indexOf(p.s[si]);if(cur<0)cur=0;
+  p.s[si]=cycle[(cur+1)%cycle.length];
+  snap();saveG();
+  // Refresh the player stats modal
+  openPlayerStats(pi);
+}
+function setSessPlayerStatus(pi,si,val){
+  if(!canEdit())return;
+  const D=cd();if(!D.players[pi]||!D.players[pi].s)return;
+  snap();D.players[pi].s[si]=val;saveG();
+}
 function cycStForce(pi,si){
   // Bypass past lock - allowed in session detail modal
   if(!canEdit())return;
@@ -1243,11 +1316,13 @@ function isSessPast(si){
 }
 function cycSt(pi,si){
   if(!canEdit())return;
-  if(isSessPast(si))return; // past sessions locked on main table
   const D=cd();if(!D.players[pi]||!D.players[pi].s)return;
   snap();
   const p=D.players[pi];
-  p.s[si]=SC[(SC.indexOf(p.s[si])+1)%SC.length];
+  const past=isSessPast(si);
+  let cycle=past?SC.filter(v=>v!==3):SC;
+  let curIdx=cycle.indexOf(p.s[si]);if(curIdx<0)curIdx=0;
+  p.s[si]=cycle[(curIdx+1)%cycle.length];
   // Update cell in DOM directly
   const cell=document.querySelector(`[data-pi="${pi}"][data-si="${si}"]`);
   if(cell){
@@ -1308,7 +1383,7 @@ function openPlayerStats(pi){
       <span class="sr-date">${s.date}</span>
       <span class="sr-type ${isMat?'srt-m':'srt-t'}">${isMat?'⚽ Spiel':'Training'}</span>
       ${lbl?`<span style="font-size:.64rem;color:var(--gm);">${lbl}${isMat&&s.homeAway?(s.homeAway==='home'?' 🏠':' 🚌'):''}</span>`:''}
-      <span class="sr-st ${STCLS[v]}" style="margin-left:auto;">${STLBL[v]}</span>
+      <span class="sr-st ${STCLS[v]}" style="margin-left:auto;cursor:${canEdit()?'pointer':'default'};" onclick="${canEdit()?`event.stopPropagation();cycStPlayer(${currentPI},${i})`:''}">${SYM[v]}</span>
     </div>`;
   }).join('')||'<p style="padding:9px;font-size:.72rem;color:var(--gm);">Keine Einheiten.</p>';
   openM('moPlayer');
@@ -1392,7 +1467,15 @@ function buildSessAtt(si){
         <div class="att-nr">${p.nr||''}</div>
         <div class="att-name">${p.name||''}</div>
         <div class="att-pos">${pbHtml(p)}</div>
-        <span class="att-st ${STCLS[v]} ${ro}" onclick="if(event)event.stopPropagation();${canEdit()?`cycStForce(${pi},${si});buildSessAtt(${si});renderTfoot();renderFooter();`:''}">${SYM[v]}</span>
+        <div style="position:relative;display:inline-block;">
+          <button class="att-st ${STCLS[v]}" style="cursor:${canEdit()?'pointer':'default'};border:none;padding:3px 6px;border-radius:4px;font-size:.72rem;font-weight:700;min-width:26px;display:inline-flex;align-items:center;justify-content:center;" onclick="${canEdit()?`event.stopPropagation();togAttMenu('am_${pi}_${si}',${pi},${si},${v})`:'event.stopPropagation()'}">${SYM[v]}</button>
+          <div id="am_${pi}_${si}" style="display:none;position:fixed;z-index:600;background:#1a3a6e;border:1px solid rgba(255,255,255,.2);border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.4);overflow:hidden;min-width:150px;">
+            ${!isSessPast(si)?`<div onclick="event.stopPropagation();setSessPlayerStatus(${pi},${si},3);buildSessAtt(${si});renderBody();renderTfoot();renderFooter();" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.8);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">❓ <span>Ausstehend</span></div>`:''}
+            <div onclick="event.stopPropagation();setSessPlayerStatus(${pi},${si},1);buildSessAtt(${si});renderBody();renderTfoot();renderFooter();" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.8);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">✅ <span>Anwesend</span></div>
+            <div onclick="event.stopPropagation();setSessPlayerStatus(${pi},${si},0);buildSessAtt(${si});renderBody();renderTfoot();renderFooter();" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.8);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">❌ <span>Fehlend</span></div>
+            <div onclick="event.stopPropagation();setSessPlayerStatus(${pi},${si},2);buildSessAtt(${si});renderBody();renderTfoot();renderFooter();" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.8);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">📋 <span>Entschuldigt</span></div>
+          </div>
+        </div>
       </div>`;
     });
     html+='</div>';
@@ -1414,38 +1497,63 @@ function delCurrSess(){
 // ══════════════════════════════
 //  POSITION SELECT GRIDS
 // ══════════════════════════════
-function buildPosGrid(cid,cur,fn,allowNone=false){
+function buildPosGrid(cid,cur,fn,allowNone=false,exclude=null){
   const c=document.getElementById(cid);if(!c)return;
   let html='';
   if(allowNone)html+=`<div class="pos-opt${!cur?' sel':''}" onclick="${fn}('')" style="grid-column:1/-1;"><span style="font-size:.76rem;color:var(--gm);">– Keine zweite Position –</span></div>`;
   POS.forEach(pos=>{
+    if(exclude&&pos===exclude)return;
     html+=`<div class="pos-opt${cur===pos?' sel':''}" onclick="${fn}('${pos}')">
       <span class="pb pb-${pos}">${pos}</span><span style="font-size:.74rem;">${POS_LBL[pos]}</span>
     </div>`;
   });
   c.innerHTML=html;
 }
-function initAddPos(){selP1='8er';selP2='';buildPosGrid('add-pos1','8er','setAP1',false);buildPosGrid('add-pos2','','setAP2',true);}
-function setAP1(v){selP1=v;buildPosGrid('add-pos1',v,'setAP1',false);}
-function setAP2(v){selP2=v;buildPosGrid('add-pos2',v,'setAP2',true);}
-function initEditPos(p1,p2){editP1=p1;editP2=p2;buildPosGrid('pe-pos1',p1,'setEP1',false);buildPosGrid('pe-pos2',p2,'setEP2',true);}
-function setEP1(v){editP1=v;buildPosGrid('pe-pos1',v,'setEP1',false);}
-function setEP2(v){editP2=v;buildPosGrid('pe-pos2',v,'setEP2',true);}
+function initAddPos(){selP1='8er';selP2='';buildPosGrid('add-pos1','8er','setAP1',false);buildPosGrid('add-pos2','','setAP2',true,selP1);}
+function setAP1(v){selP1=v;buildPosGrid('add-pos1',v,'setAP1',false);buildPosGrid('add-pos2',selP2!==v?selP2:'','setAP2',true,v);if(selP2===v)selP2='';}
+function setAP2(v){selP2=v;buildPosGrid('add-pos2',v,'setAP2',true,selP1);}
+function initEditPos(p1,p2){editP1=p1;editP2=p2;buildPosGrid('pe-pos1',p1,'setEP1',false);buildPosGrid('pe-pos2',p2!==p1?p2:'','setEP2',true,p1);}
+function setEP1(v){editP1=v;buildPosGrid('pe-pos1',v,'setEP1',false);buildPosGrid('pe-pos2',editP2!==v?editP2:'','setEP2',true,v);if(editP2===v)editP2='';}
+function setEP2(v){editP2=v;buildPosGrid('pe-pos2',v,'setEP2',true,editP1);}
 
 // ══════════════════════════════
 //  TEAM MANAGER
 // ══════════════════════════════
 function openTeamMgr(tab){openM('moTeamMgr');switchTab(tab||'spieler');}
+
+function renderMgrSessions(type){
+  const D=cd(),ss=D.sessions.filter(s=>s.type===type);
+  const listId=type==='training'?'tmgr-sess-list':'tmgr-match-list';
+  const el=document.getElementById(listId);if(!el)return;
+  if(!ss.length){el.innerHTML='<p style="padding:14px;font-size:.8rem;color:var(--gm);">Keine Einheiten.</p>';return;}
+  el.innerHTML=ss.map((s,i)=>{
+    const origIdx=D.sessions.indexOf(s);
+    const pres=D.players.filter(p=>p.s&&p.s[origIdx]===1).length;
+    const total=D.players.length;
+    const pct=total?Math.round((pres/total)*100):0;
+    const bc=pct>=80?'var(--cp)':pct>=60?'var(--ce)':'var(--ca)';
+    const extra=type==='match'?(s.label?' – '+s.label:''):(s.focus?' · '+s.focus:'');
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--gl);font-size:.8rem;cursor:pointer;" onclick="closeM('moTeamMgr');openSessStats(${origIdx})">
+      <div style="font-weight:600;color:var(--bd);width:72px;">${s.date}</div>
+      ${type==='match'?`<div style="font-size:.68rem;padding:1px 6px;border-radius:6px;background:rgba(176,48,0,.1);color:var(--mc1);">${s.homeAway==='home'?'🏠':'🚌'}</div>`:''}
+      <div style="flex:1;color:var(--gd);">${extra}</div>
+      ${s.time?`<div style="font-size:.72rem;color:var(--gm);">⏰ ${s.time}</div>`:''}
+      <div style="font-weight:700;color:${bc};min-width:36px;text-align:right;">${pres}/${total}</div>
+    </div>`;
+  }).join('');
+}
 function switchTab(t){
-  ['spieler','trainer','schwerpunkte','statistik'].forEach((n,i)=>{
+  ['spieler','trainer','schwerpunkte','statistik','trainings','spiele'].forEach((n,i)=>{
     document.querySelectorAll('#moTeamMgr .tbtn')[i]?.classList.toggle('active',n===t);
     document.getElementById('tab-'+n)?.classList.toggle('active',n===t);
   });
-  document.getElementById('tmgr-h').textContent={spieler:'👥 Spieler',trainer:'🎽 Trainer',schwerpunkte:'🎯 Schwerpunkte',statistik:'📊 Statistik'}[t]||'Mannschaft';
+  document.getElementById('tmgr-h').textContent={spieler:'👥 Spieler',trainer:'🎽 Trainer',schwerpunkte:'🎯 Schwerpunkte',statistik:'📊 Statistik',trainings:'📅 Trainingseinheiten',spiele:'⚽ Spiele'}[t]||'Mannschaft';
   if(t==='spieler')renderMgrPlayers();
   if(t==='trainer'){document.getElementById('mgr-team-lbl').textContent=G.currentTeam;renderMgrTrainers();buildTeamChecks('tTeamChecks');}
   if(t==='schwerpunkte')renderFocList();
   if(t==='statistik')renderMgrStats();
+  if(t==='trainings')renderMgrSessions('training');
+  if(t==='spiele')renderMgrSessions('match');
 }
 
 function renderMgrPlayers(){
@@ -1631,21 +1739,33 @@ function autoSetGenDates(){
   if(!m)return;
   const y1=parseInt(m[1]),y2=y1+1;
   const todayISO=new Date().toISOString().slice(0,10);
-  const sStart=`${y1}-08-01`,sEnd=`${y2}-06-30`;
+  const sStart=`${y1}-07-01`,sEnd=`${y2}-06-30`;
   const inSeason=todayISO>=sStart&&todayISO<=sEnd;
-  document.getElementById('genS').value=inSeason?todayISO:sStart;
-  document.getElementById('genE').value=sEnd;
+  const gs=document.getElementById('genS'),ge=document.getElementById('genE');
+  gs.min=sStart;gs.max=sEnd;ge.min=sStart;ge.max=sEnd;
+  gs.value=inSeason?todayISO:sStart;ge.value=sEnd;
 }
 function doGen(){
   const sIso=document.getElementById('genS').value,eIso=document.getElementById('genE').value;
   if(!sIso||!eIso)return alert('Datum auswählen.');
+  if(sIso>=eIso)return alert('Startdatum muss vor dem Enddatum liegen.');
   const tD=[...document.querySelectorAll('#dowTr .dow-btn.sel')].map(b=>+b.dataset.d);
   const mD=[...document.querySelectorAll('#dowMa .dow-btn.sel-m')].map(b=>+b.dataset.d);
   const tTime=document.getElementById('genTimeT').value,mTime=document.getElementById('genTimeM').value;
-  const D=cd(),exist=new Set(D.sessions.map(x=>x.date));
-  const ns=genRange(new Date(sIso),new Date(eIso),tD,mD,tTime,mTime).filter(x=>!exist.has(x.date));
+  const D=cd();
+  // Remove sessions within the date window
+  const startKey=isoToSortKey(sIso),endKey=isoToSortKey(eIso);
+  const toRemove=[];
+  D.sessions.forEach((s,i)=>{const k=dispToSortKey(s.date);if(k>=startKey&&k<=endKey)toRemove.push(i);});
+  // Remove in reverse order
+  toRemove.reverse().forEach(i=>{D.sessions.splice(i,1);D.players.forEach(p=>{if(p.s)p.s.splice(i,1);});});
+  // Prevent same day for training AND match
+  const tSet=new Set(tD),mSet=new Set(mD);
+  const overlap=[...tSet].filter(d=>mSet.has(d));
+  if(overlap.length){alert('Achtung: Einige Wochentage sind sowohl als Training als auch als Spiel ausgewählt. Bitte auswählen, nicht überlappen.');return;}
+  const ns=genRange(new Date(sIso),new Date(eIso),tD,mD,tTime,mTime);
   snap();ns.forEach(x=>insertSorted(D,x));saveG();render();closeM('moGenSch');
-  alert(ns.length?`${ns.length} Einheit(en) hinzugefügt.`:'Keine neuen Einheiten.');
+  alert(`${ns.length} Einheit(en) generiert (${toRemove.length} alte ersetzt).`);
 }
 
 // ══════════════════════════════
@@ -1718,15 +1838,29 @@ function openM(id){
     const opts=[];
     for(let y=yr-1;y<=yr+6;y++){const s=y+'/'+(y+1).toString().slice(-2);if(!G.seasonList.includes(s))opts.push(s);}
     document.getElementById('newSeasonSel').innerHTML=`<option value="">-- wählen --</option>`+
-      opts.sort((a,b)=>{const ya=+a.split('/')[0],yb=+b.split('/')[0];return yb-ya;}).map(s=>`<option value="${s}">${s}</option>`).join('');
+      opts.sort((a,b)=>{const ya=+a.split('/')[0],yb=+b.split('/')[0];return ya-yb;}).map(s=>`<option value="${s}">${s}</option>`).join('');
   }
   if(id==='moAdmin'){switchAdminTab('trainers');}
   if(id==='moTeamMgr')switchTab('spieler');
 }
 function closeM(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.mo').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
-document.querySelectorAll('#dowTr .dow-btn').forEach(b=>b.addEventListener('click',()=>b.classList.toggle('sel')));
-document.querySelectorAll('#dowMa .dow-btn').forEach(b=>b.addEventListener('click',()=>b.classList.toggle('sel-m')));
+document.querySelectorAll('#dowTr .dow-btn').forEach(b=>b.addEventListener('click',()=>{
+  b.classList.toggle('sel');
+  // If now selected as training, deselect from match days
+  if(b.classList.contains('sel')){
+    const d=b.dataset.d;
+    document.querySelectorAll('#dowMa .dow-btn').forEach(mb=>{if(mb.dataset.d===d)mb.classList.remove('sel-m');});
+  }
+}));
+document.querySelectorAll('#dowMa .dow-btn').forEach(b=>b.addEventListener('click',()=>{
+  b.classList.toggle('sel-m');
+  // If now selected as match, deselect from training days
+  if(b.classList.contains('sel-m')){
+    const d=b.dataset.d;
+    document.querySelectorAll('#dowTr .dow-btn').forEach(tb=>{if(tb.dataset.d===d)tb.classList.remove('sel');});
+  }
+}));
 // Enter key support for modal inputs
 document.addEventListener('keydown',e=>{
   if(e.key!=='Enter')return;
