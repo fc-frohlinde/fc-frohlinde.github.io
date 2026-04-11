@@ -35,10 +35,10 @@ body{background:linear-gradient(140deg,#071a3e 0%,#1659b8 55%,#071a3e 100%);min-
 .auth-err{color:var(--ca);font-size:.82rem;margin-top:10px;min-height:18px;}
 
 /* PAGE */
-.page{flex:1;display:flex;flex-direction:column;background:#fff;border-radius:12px;box-shadow:0 6px 28px rgba(0,0,0,.3);min-height:0;overflow:clip;overflow-clip-margin:content-box;}
+.page{flex:1;display:flex;flex-direction:column;background:#fff;border-radius:12px;box-shadow:0 6px 28px rgba(0,0,0,.3);min-height:0;overflow:visible;}
 
 /* HEADER */
-.header{background:linear-gradient(135deg,#071e48 0%,#1659b8 60%,#0a2d6e 100%);color:#fff;padding:10px 20px;display:flex;align-items:center;gap:14px;flex-shrink:0;position:relative;overflow:hidden;transition:padding .2s;}
+.header{background:linear-gradient(135deg,#071e48 0%,#1659b8 60%,#0a2d6e 100%);color:#fff;padding:10px 20px;display:flex;align-items:center;gap:14px;flex-shrink:0;position:relative;overflow:hidden;transition:padding .2s;border-top-left-radius:12px;border-top-right-radius:12px;}
 .header.collapsed{padding:5px 20px;}
 /* Decorative circle */
 .header::before{content:'';position:absolute;right:-50px;top:-50px;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.06);pointer-events:none;}
@@ -122,7 +122,7 @@ body{background:linear-gradient(140deg,#071a3e 0%,#1659b8 55%,#071a3e 100%);min-
 .lhint{margin-left:auto;font-size:.66rem;color:var(--gm);font-style:italic;}
 
 /* ══════ TABLE ══════ */
-.table-wrap{flex:1;overflow:auto;min-height:0;}
+.table-wrap{flex:1;overflow:auto;min-height:0;border-bottom-left-radius:12px;border-bottom-right-radius:12px;}
 
 table{width:100%;border-collapse:separate;border-spacing:0;font-size:.9rem;}
 
@@ -132,7 +132,7 @@ table{width:100%;border-collapse:separate;border-spacing:0;font-size:.9rem;}
 .c2{position:sticky;left:calc(var(--c0) + var(--c1));width:var(--c2);min-width:var(--c2);max-width:var(--c2);z-index:4;box-shadow:2px 0 4px rgba(0,0,0,.1);}
 
 /* Backgrounds for sticky left by row state */
-thead .c0,thead .c1,thead .c2{background:var(--bd) !important;z-index:8 !important;}
+thead .c0,thead .c1,thead .c2{background:var(--bd) !important;z-index:6 !important;}
 tbody tr:nth-child(odd) .c0,tbody tr:nth-child(odd) .c1,tbody tr:nth-child(odd) .c2{background:#fff !important;}
 tbody tr:nth-child(even) .c0,tbody tr:nth-child(even) .c1,tbody tr:nth-child(even) .c2{background:#f4f8fe !important;}
 tbody tr:hover .c0,tbody tr:hover .c1,tbody tr:hover .c2{background:#cfe2ff !important;}
@@ -145,7 +145,7 @@ thead .c0,thead .c1{text-align:left;padding:8px 6px;font-family:'Bebas Neue',san
 thead .c2{text-align:left;padding:8px 4px;font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:1.2px;z-index:12 !important;background:var(--bd) !important;}
 
 /* DATE COLUMN headers */
-.dth{cursor:pointer;padding:5px 3px !important;min-width:46px;max-width:54px;text-align:center;vertical-align:middle;position:relative;}
+.dth{cursor:pointer;padding:5px 3px !important;min-width:46px;max-width:54px;text-align:center;vertical-align:middle;position:sticky;}
 .dth:hover{filter:brightness(1.15);}
 .ddow{display:block;font-size:.65rem;font-weight:500;color:rgba(255,255,255,.65);line-height:1;margin-bottom:2px;}
 .dnum{display:block;font-size:.84rem;font-weight:700;color:#fff;line-height:1;}
@@ -305,7 +305,7 @@ input[type="date"]{cursor:pointer;}
 .att-row:nth-child(even):hover{background:var(--ow);}
 .att-nr{width:24px;font-weight:700;color:var(--bm);text-align:center;}
 .att-name{flex:1;font-weight:600;color:var(--bd);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.att-pos{min-width:80px;display:flex;gap:2px;padding-right:8px;align-items:center;justify-content:flex-start;}
+.att-pos{min-width:80px;display:flex;gap:2px;padding-right:8px;align-items:center;justify-content:flex-start;flex-wrap:nowrap;}
 .att-pos .pb:first-child{min-width:36px;text-align:center;}
 .att-st{padding:2px 7px;border-radius:4px;font-size:.67rem;font-weight:700;cursor:pointer;transition:transform .1s;}
 .att-st.ro{cursor:default;}
@@ -1150,7 +1150,7 @@ function renderHead(){
     const isNext=i===nextIdx;
     const parts=s.date.split(' ');
     const dow=parts[0]||'';const dm=parts[1]||s.date;
-    r+=`<th class="dth${isMat?' match-col':''}${isNext?' next-col':''}" onclick="openSessStats(${i})">`;
+    r+=`<th class="dth${isMat?' match-col':''}${isNext?' next-col':''}" onclick="openSessFromMain(${i})">`;
     r+=`<span class="ddow">${isMat?'⚽':''} ${dow}</span>`;
     r+=`<span class="dnum">${dm}</span>`;
     if(!ro)r+=`<button class="dcb" onclick="event.stopPropagation();delSess(${i})">✕</button>`;
@@ -1201,7 +1201,7 @@ function renderBody(){
 
     rows.push(`<tr>
       <td class="tdl c0">${!ro?`<input class="nri" value="${p.nr||''}" onchange="updNr(${pi},this.value)"/>`:`<span style="font-weight:700;color:var(--bm);">${p.nr||''}</span>`}</td>
-      <td class="tdl c1" onclick="openPlayerStats(${pi})" style="cursor:pointer;">
+      <td class="tdl c1" onclick="openPlayerFromMain(${pi})" style="cursor:pointer;">
         <div class="ncell"><span class="nm">${p.name||''}</span><span class="ni">›</span></div>
       </td>
       <td class="c2" style="padding:4px;">${pcHtml(p)}</td>
@@ -1740,16 +1740,28 @@ function delSess(si){
 function openGenSch(){
   autoSetGenDates();openM('moGenSch');
 }
-function autoSetGenDates(){
+function getSeasonBounds(){
   const m=G.currentSeason.match(/^(\d{4})\/(\d{2})$/);
-  if(!m)return;
+  if(!m)return{min:'2025-07-01',max:'2026-06-30'};
   const y1=parseInt(m[1]),y2=y1+1;
+  return{min:`${y1}-07-01`,max:`${y2}-06-30`};
+}
+function setSeasonDateBounds(inputId){
+  const el=document.getElementById(inputId);if(!el)return;
+  const b=getSeasonBounds();
+  el.min=b.min;el.max=b.max;
+  // Default to today if in season, else season start
+  const today=new Date().toISOString().slice(0,10);
+  if(today>=b.min&&today<=b.max){if(!el.value||el.value<b.min||el.value>b.max)el.value=today;}
+  else{if(!el.value||el.value<b.min||el.value>b.max)el.value=b.min;}
+}
+function autoSetGenDates(){
+  const b=getSeasonBounds();
   const todayISO=new Date().toISOString().slice(0,10);
-  const sStart=`${y1}-07-01`,sEnd=`${y2}-06-30`;
-  const inSeason=todayISO>=sStart&&todayISO<=sEnd;
+  const inSeason=todayISO>=b.min&&todayISO<=b.max;
   const gs=document.getElementById('genS'),ge=document.getElementById('genE');
-  gs.min=sStart;gs.max=sEnd;ge.min=sStart;ge.max=sEnd;
-  gs.value=inSeason?todayISO:sStart;ge.value=sEnd;
+  if(gs){gs.min=b.min;gs.max=b.max;gs.value=inSeason?todayISO:b.min;}
+  if(ge){ge.min=b.min;ge.max=b.max;ge.value=b.max;}
 }
 function doGen(){
   const sIso=document.getElementById('genS').value,eIso=document.getElementById('genE').value;
@@ -1838,7 +1850,8 @@ function exportData(){const b=new Blob([JSON.stringify(G,null,2)],{type:'applica
 function openM(id){
   document.getElementById(id).classList.add('open');
   if(id==='moAddPlayer')initAddPos();
-  if(id==='moSession')populateFocSel();
+  if(id==='moSession'){populateFocSel();setSeasonDateBounds('newDate');}
+  if(id==='moMatch'){setSeasonDateBounds('newMatchDate');}
   if(id==='moSeason'){
     const yr=new Date().getFullYear();
     const opts=[];
@@ -1895,10 +1908,33 @@ function initTabDrag(){
 
 
 // Navigation stack for modals
-const _modalPrev={player:null,session:null};
-function openPlayerFromSession(si,pi){_modalPrev.player='session';_modalPrev._si=si;closeM('moSession2');openPlayerStats(pi);}
-function playerGoBack(){closeM('moPlayer');if(_modalPrev.player==='session')openSessStats(_modalPrev._si);}
-function sessGoBack(){closeM('moSession2');}
+const _navStack=[];
+function navPush(fromId){_navStack.push(fromId);}
+function navBack(currentId){
+  closeM(currentId);
+  const prev=_navStack.pop();
+  if(prev){
+    if(prev.id==='moSession2')openSessStats(prev.si);
+    else if(prev.id==='moPlayer')openPlayerStats(prev.pi);
+    else if(prev.id==='moTeamMgr')openTeamMgr(prev.tab||'spieler');
+    else openM(prev.id);
+  }
+}
+function openPlayerFromSession(si,pi){
+  navPush({id:'moSession2',si});
+  closeM('moSession2');openPlayerStats(pi);
+}
+function openPlayerFromMain(pi){
+  navPush({id:'main'});
+  openPlayerStats(pi);
+}
+function openSessFromMain(si){
+  navPush({id:'main'});
+  openSessStats(si);
+}
+function playerGoBack(){navBack('moPlayer');}
+function sessGoBack(){navBack('moSession2');}
+function clearNav(){_navStack.length=0;}
 
 // Store player data at edit start for cancel
 let _playerEditSnap=null;
