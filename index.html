@@ -305,8 +305,8 @@ input[type="date"]{cursor:pointer;}
 .att-row:nth-child(even):hover{background:var(--ow);}
 .att-nr{width:24px;font-weight:700;color:var(--bm);text-align:center;}
 .att-name{flex:1;font-weight:600;color:var(--bd);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.att-pos{min-width:80px;display:flex;gap:2px;padding-right:8px;align-items:center;justify-content:flex-start;flex-wrap:nowrap;}
-.att-pos .pb:first-child{min-width:36px;text-align:center;}
+.att-pos{width:80px;min-width:80px;max-width:80px;display:flex;gap:2px;padding-right:8px;align-items:center;justify-content:flex-start;flex-wrap:nowrap;}
+.att-pos .pb:first-child{width:36px;min-width:36px;max-width:36px;text-align:center;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
 .att-st{padding:2px 7px;border-radius:4px;font-size:.67rem;font-weight:700;cursor:pointer;transition:transform .1s;}
 .att-st.ro{cursor:default;}
 .att-st:not(.ro):hover{transform:scale(1.1);}
@@ -621,7 +621,11 @@ input[type="date"]{cursor:pointer;}
 
 <!-- Team Manager -->
 <div class="mo" id="moTeamMgr"><div class="mob" style="width:560px;">
-  <h3 id="tmgr-h">Mannschaft</h3>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+    <h3 id="tmgr-h" style="margin:0;flex:1;">Mannschaft</h3>
+    <button class="btn" style="font-size:.76rem;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" onclick="teamMgrGoBack()">← Zurück</button>
+    <button class="btn bs" onclick="closeM('moTeamMgr')">✕</button>
+  </div>
   <div class="tbar">
     <button class="tbtn active" onclick="switchTab('spieler')">👥 Spieler</button>
     <button class="tbtn" onclick="switchTab('trainer')">🎽 Trainer</button>
@@ -781,10 +785,19 @@ function isoToDisp(iso){
   const dt=new Date(+y,+m-1,+d);
   return DOW[dt.getDay()]+' '+d.replace(/^0/,'')+'.'+m;
 }
+function getSeasonYears(){
+  // Returns {y1, y2} for the current season e.g. 2025/26 -> {y1:2025, y2:2026}
+  const m=G&&G.currentSeason?G.currentSeason.match(/^(\d{4})\/(\d{2})$/):null;
+  if(!m)return{y1:2025,y2:2026};
+  const y1=parseInt(m[1]);
+  return{y1,y2:y1+1};
+}
 function dispToSortKey(s){
   const m=s.match(/(\d+)\.(\d+)/);
   if(!m)return 99999999;
-  const d=+m[1],mo=+m[2],yr=(mo>=7?2025:2026);
+  const d=+m[1],mo=+m[2];
+  const sy=getSeasonYears();
+  const yr=mo>=7?sy.y1:sy.y2;
   return yr*10000+mo*100+d;
 }
 function isoToSortKey(iso){
@@ -797,7 +810,8 @@ function moFromDisp(s){const m=s.match(/(\d+)\.(\d+)/);return m?DEM[+m[2]]||'?':
 function dispToISO(s){
   const m=s.match(/(\d+)\.(\d+)/);if(!m)return'';
   const d=String(+m[1]).padStart(2,'0'),mo=String(+m[2]).padStart(2,'0');
-  const yr=+m[2]>=7?'2025':'2026';
+  const sy=getSeasonYears();
+  const yr=+m[2]>=7?String(sy.y1):String(sy.y2);
   return yr+'-'+mo+'-'+d;
 }
 function insertSorted(D,sess){
@@ -1385,7 +1399,7 @@ function openPlayerStats(pi){
   // Session list – clickable
   document.getElementById('ps-sessions').innerHTML=ss.map((s,i)=>{
     const v=p.s?p.s[i]:3;const isMat=s.type==='match';const lbl=isMat?(s.label||''):(s.focus||'');
-    return `<div class="sr" onclick="closeM('moPlayer');openSessStats(${i})">
+    return `<div class="sr" onclick="navPush({id:'moPlayer',pi:currentPI});closeM('moPlayer');openSessStats(${i})">
       <span class="sr-date">${s.date}</span>
       <span class="sr-type ${isMat?'srt-m':'srt-t'}">${isMat?'⚽ Spiel':'Training'}</span>
       ${lbl?`<span style="font-size:.64rem;color:var(--gm);">${lbl}${isMat&&s.homeAway?(s.homeAway==='home'?' 🏠':' 🚌'):''}</span>`:''}
@@ -1525,7 +1539,11 @@ function setEP2(v){editP2=v;buildPosGrid('pe-pos2',v,'setEP2',true,editP1);}
 // ══════════════════════════════
 //  TEAM MANAGER
 // ══════════════════════════════
-function openTeamMgr(tab){openM('moTeamMgr');switchTab(tab||'spieler');}
+function openTeamMgr(tab,fromId){
+  if(fromId)navPush({id:fromId});
+  else navPush({id:'main'});
+  openM('moTeamMgr');switchTab(tab||'spieler');
+}
 
 function renderMgrSessions(type){
   const D=cd(),ss=D.sessions.filter(s=>s.type===type);
@@ -1539,7 +1557,7 @@ function renderMgrSessions(type){
     const pct=total?Math.round((pres/total)*100):0;
     const bc=pct>=80?'var(--cp)':pct>=60?'var(--ce)':'var(--ca)';
     const extra=type==='match'?(s.label?' – '+s.label:''):(s.focus?' · '+s.focus:'');
-    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--gl);font-size:.8rem;cursor:pointer;" onclick="closeM('moTeamMgr');openSessStats(${origIdx})">
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--gl);font-size:.8rem;cursor:pointer;" onclick="navPush({id:'moTeamMgr',tab:'${type==='training'?'trainings':'spiele'}'}); closeM('moTeamMgr');openSessStats(${origIdx})">
       <div style="font-weight:600;color:var(--bd);width:72px;">${s.date}</div>
       ${type==='match'?`<div style="font-size:.68rem;padding:1px 6px;border-radius:6px;background:rgba(176,48,0,.1);color:var(--mc1);">${s.homeAway==='home'?'🏠':'🚌'}</div>`:''}
       <div style="flex:1;color:var(--gd);">${extra}</div>
@@ -1653,7 +1671,7 @@ function renderMgrStats(){
       <div class="ps-card"><div class="ct">Ø</div><div class="cv" style="color:${pctColor(avg)};">${avg}%</div></div>
     </div>
     <div class="sec" style="margin-bottom:8px;">📅 Monatlich</div>
-    ${Object.entries(moMap).map(([mo,st])=>{const pct=st.tPl?Math.round((st.tA/st.tPl)*100):null;const bc=pct!==null?pctColor(pct):'#ccc';return`<div class="fr"><div class="fr-nm">${mo}</div><div class="fr-bw"><div class="fr-bar" style="width:${Math.min(pct||0,100)}%;background:${bc};"></div></div><div class="fr-val" style="color:${bc};">${pct!==null?pct+'%':'–'}</div><div style="flex-shrink:0;font-size:.62rem;color:var(--gm);text-align:right;white-space:nowrap;overflow:hidden;">${st.tA}/${st.tPl}</div></div>`;}).join('')}
+    ${Object.entries(moMap).map(([mo,st])=>{const pct=st.tPl?Math.round((st.tA/st.tPl)*100):null;const bc=pct!==null?pctColor(pct):'#ccc';return`<div class="fr"><div class="fr-nm">${mo}</div><div class="fr-bw"><div class="fr-bar" style="width:${Math.min(pct||0,100)}%;background:${bc};"></div></div><div class="fr-val" style="color:${bc};">${pct!==null?pct+'%':'–'}</div><div style="flex-shrink:0;font-size:.62rem;color:var(--gm);text-align:right;white-space:nowrap;min-width:52px;">${st.tA}/${st.tPl}${st.mPl?' ⚽'+st.mA+'/'+st.mPl:''}</div></div>`;}).join('')}
     <div class="sec" style="margin-top:12px;margin-bottom:8px;">🏆 Alle Spieler</div>
     <div style="max-height:240px;overflow-y:auto;border:1px solid var(--gl);border-radius:8px;">
     <table class="full-table"><thead><tr>
@@ -1917,6 +1935,7 @@ function navBack(currentId){
     if(prev.id==='moSession2')openSessStats(prev.si);
     else if(prev.id==='moPlayer')openPlayerStats(prev.pi);
     else if(prev.id==='moTeamMgr')openTeamMgr(prev.tab||'spieler');
+    else if(prev.id==='main'){/* just close, already done */}
     else openM(prev.id);
   }
 }
