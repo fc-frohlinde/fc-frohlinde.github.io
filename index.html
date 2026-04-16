@@ -359,6 +359,9 @@ input[type="date"]{cursor:pointer;}
 .pos-td{text-align:left !important;padding-left:6px !important;}
 .pos-td .pos-wrap{justify-content:flex-start;}
 </style>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 </head>
 <body>
 
@@ -421,6 +424,7 @@ input[type="date"]{cursor:pointer;}
     <button class="btn bundo" id="undoBtn" onclick="undo()" disabled title="Rückgängig Ctrl+Z">↩</button>
     <button class="btn bundo" id="redoBtn" onclick="redo()" disabled title="Wiederholen Ctrl+Y">↪</button>
     <span class="saved" id="savedBadge">✓</span>
+    <span id="syncStatus" style="font-size:.72rem;font-weight:600;color:var(--gm);white-space:nowrap;">⚫ Lokal</span>
     <div class="tsep"></div>
     <button class="btn bteam" onclick="openTeamMgr('spieler')">🏆 Mannschaft</button>
     <button class="btn bcfg" id="btn-admin" onclick="openM('moAdmin')" style="display:none;">⚙ Admin</button>
@@ -703,6 +707,7 @@ input[type="date"]{cursor:pointer;}
     <button class="tbtn active" onclick="switchAdminTab('trainers')">🎽 Trainer</button>
     <button class="tbtn" onclick="switchAdminTab('teams')">👥 Teams</button>
     <button class="tbtn" onclick="switchAdminTab('data')">💾 Daten</button>
+    <button class="tbtn" onclick="switchAdminTab('firebase')">🌐 Online-Sync</button>
   </div>
   <div class="tpanel active" id="atab-trainers">
     <div id="all-tr-list" style="margin-bottom:10px;"></div>
@@ -739,6 +744,35 @@ input[type="date"]{cursor:pointer;}
       <button class="btn" style="background:var(--cp);color:#fff;" onclick="hardResetTest()">🧪 Testmodus laden</button>
     </div>
     <div class="mob-btns" style="margin-top:10px;">
+      <button class="btn bs" onclick="closeM('moAdmin')">Schließen</button>
+    </div>
+  </div>
+  <div class="tpanel" id="atab-firebase">
+    <div id="fb-status-box" style="border-radius:9px;padding:10px 12px;border:1px solid var(--gl);background:var(--ow);margin-bottom:12px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <span id="fb-status-dot" style="font-size:1.1rem;">⚫</span>
+        <strong id="fb-status-text" style="font-size:.82rem;color:var(--gd);">Nicht verbunden – lokaler Speicher</strong>
+      </div>
+      <p class="note" style="margin:0;">Verbinde mit Firebase, damit alle Geräte dieselben Daten sehen.</p>
+    </div>
+    <div style="background:#e8f4fd;border:1px solid #90caf9;border-radius:9px;padding:10px 12px;margin-bottom:12px;font-size:.74rem;color:#1565c0;line-height:1.7;">
+      <strong>Einrichtung (5 Min):</strong><br>
+      1. <b>console.firebase.google.com</b> → Neues Projekt<br>
+      2. Build → Realtime Database → Testmodus aktivieren<br>
+      3. Projekteinstellungen ⚙ → Web-App &lt;/&gt; → Konfiguration kopieren<br>
+      4. Felder unten ausfüllen → <b>Verbinden</b>
+    </div>
+    <label>Database URL</label>
+    <input type="url" id="fb-dbUrl" placeholder="https://PROJEKT-default-rtdb.europe-west1.firebasedatabase.app" style="font-size:.76rem;"/>
+    <label>API Key</label>
+    <input type="text" id="fb-apiKey" placeholder="AIzaSy..."/>
+    <label>Project ID</label>
+    <input type="text" id="fb-projectId" placeholder="mein-fcf-projekt"/>
+    <label>App ID (optional)</label>
+    <input type="text" id="fb-appId" placeholder="1:123:web:abc..."/>
+    <div class="mob-btns" style="margin-top:4px;">
+      <button class="btn bp" onclick="saveFbConfig()">🌐 Verbinden</button>
+      <button class="btn bd" onclick="disconnectFb()">✕ Trennen</button>
       <button class="btn bs" onclick="closeM('moAdmin')">Schließen</button>
     </div>
   </div>
@@ -905,14 +939,105 @@ function buildTestDef(){
     G.db[t+'__focuses']=[...DEF_FOCUSES];
   });
 }
+// ── FIREBASE SYNC ────────────────────────────────────────────
+const FB_CFG_KEY='fcf_fb_config';
+let fbApp=null,fbDb=null,fbRef=null,fbListening=false,_fbSaving=false,_fbDebounce=null;
+
+function loadFbConfig(){try{return JSON.parse(localStorage.getItem(FB_CFG_KEY));}catch(e){return null;}}
+
+function initFirebase(cfg){
+  if(!cfg||!cfg.databaseURL||!cfg.apiKey)return;
+  try{
+    if(!fbApp)fbApp=firebase.initializeApp(cfg,'fcf');
+    fbDb=firebase.database(fbApp);
+    fbRef=fbDb.ref('fcf_data');
+    startFbListener();
+    setFbStatus('connecting');
+  }catch(e){console.error('FB init:',e);setFbStatus('error');}
+}
+
+function startFbListener(){
+  if(!fbRef||fbListening)return;
+  fbListening=true;
+  fbRef.on('value',(snap)=>{
+    if(_fbSaving)return;
+    const data=snap.val();
+    if(data&&data.version>=14){
+      G=data;
+      G.teamList.forEach(t=>{if(!G.db[t+'__focuses'])G.db[t+'__focuses']=[...DEF_FOCUSES];});
+      render();
+      setFbStatus('connected');
+    } else if(!data){
+      // Database empty – push local data
+      fbRef.set(G).catch(e=>console.error('FB push:',e));
+      setFbStatus('connected');
+    }
+  },(err)=>{console.error('FB listener:',err);setFbStatus('error');});
+}
+
+function setFbStatus(s){
+  const dot=document.getElementById('fb-status-dot');
+  const txt=document.getElementById('fb-status-text');
+  const syncEl=document.getElementById('syncStatus');
+  const map={connected:['🟢','Verbunden – Echtzeit-Sync aktiv','🟢 Online','var(--cp)'],
+    connecting:['🟡','Verbinde...','🟡 Verbinde...','var(--ce)'],
+    error:['🔴','Verbindungsfehler – prüfe die Konfiguration','🔴 Fehler','var(--ca)'],
+    offline:['⚫','Nicht verbunden – lokaler Speicher','⚫ Lokal','var(--gm)']};
+  const v=map[s]||map.offline;
+  if(dot)dot.textContent=v[0];
+  if(txt)txt.textContent=v[1];
+  if(syncEl){syncEl.textContent=v[2];syncEl.style.color=v[3];}
+}
+
+function saveFbConfig(){
+  const cfg={
+    apiKey:document.getElementById('fb-apiKey').value.trim(),
+    databaseURL:document.getElementById('fb-dbUrl').value.trim(),
+    projectId:document.getElementById('fb-projectId').value.trim(),
+    appId:document.getElementById('fb-appId').value.trim()||undefined,
+    authDomain:(document.getElementById('fb-projectId').value.trim()||'')+'.firebaseapp.com',
+  };
+  if(!cfg.apiKey||!cfg.databaseURL||!cfg.projectId)return alert('Bitte API Key, Database URL und Project ID eingeben.');
+  localStorage.setItem(FB_CFG_KEY,JSON.stringify(cfg));
+  // Reload page so Firebase initializes cleanly
+  location.reload();
+}
+
+function disconnectFb(){
+  if(!confirm('Firebase-Verbindung trennen? Daten bleiben lokal gespeichert.'))return;
+  localStorage.removeItem(FB_CFG_KEY);
+  location.reload();
+}
+
+function loadFbConfigFields(){
+  const cfg=loadFbConfig();
+  if(!cfg)return;
+  const f=v=>document.getElementById(v);
+  if(f('fb-dbUrl'))f('fb-dbUrl').value=cfg.databaseURL||'';
+  if(f('fb-apiKey'))f('fb-apiKey').value=cfg.apiKey||'';
+  if(f('fb-projectId'))f('fb-projectId').value=cfg.projectId||'';
+  if(f('fb-appId'))f('fb-appId').value=cfg.appId||'';
+}
+
+// ── DATA ──────────────────────────────────────────────────────
 function loadG(){
   try{const d=JSON.parse(localStorage.getItem(SK));if(d&&d.version>=14)G=d;}catch(e){G=null;}
   if(!G)buildDef();
   G.teamList.forEach(t=>{if(!G.db[t+'__focuses'])G.db[t+'__focuses']=[...DEF_FOCUSES];});
 }
+
 function saveG(badge=true){
   localStorage.setItem(SK,JSON.stringify(G));
   if(badge){const b=document.getElementById('savedBadge');b.classList.add('show');clearTimeout(b._t);b._t=setTimeout(()=>b.classList.remove('show'),1600);}
+  // Firebase: debounce writes (max 1 per 800ms)
+  if(fbRef){
+    clearTimeout(_fbDebounce);
+    _fbDebounce=setTimeout(()=>{
+      _fbSaving=true;
+      fbRef.set(G).then(()=>{_fbSaving=false;setFbStatus('connected');})
+        .catch(e=>{_fbSaving=false;console.error('FB save:',e);setFbStatus('error');});
+    },800);
+  }
   updateUndoBtns();
 }
 function ck(){return G.currentTeam+'__'+G.currentSeason;}
@@ -986,6 +1111,10 @@ function switchUser(){
 }
 
 function showApp(){
+  // Attempt Firebase connection on load
+  const cfg=loadFbConfig();
+  if(cfg)initFirebase(cfg);
+  else setFbStatus('offline');
   renderUserPill();
   const vs=localStorage.getItem(VIEW_SK);
   if(vs)try{const v=JSON.parse(vs);if(v.colState)Object.assign(colState,v.colState);if(v.zl)zoomLvl=v.zl;}catch(e){}
@@ -1836,12 +1965,13 @@ function updNr(pi,v){snap();cd().players[pi].nr=parseInt(v)||pi+1;saveG();}
 //  ADMIN
 // ══════════════════════════════
 function switchAdminTab(t){
-  ['trainers','teams','data'].forEach((n,i)=>{
+  ['trainers','teams','data','firebase'].forEach((n,i)=>{
     document.querySelectorAll('#moAdmin .tbtn')[i]?.classList.toggle('active',n===t);
     document.getElementById('atab-'+n)?.classList.toggle('active',n===t);
   });
   if(t==='trainers'){renderAllTr();buildTeamChecks('atTeamChecks');}
   if(t==='teams')renderAdminTeams();
+  if(t==='firebase'){loadFbConfigFields();setFbStatus(fbRef?'connected':'offline');}
 }
 function renderAllTr(){
   document.getElementById('all-tr-list').innerHTML=G.trainers.length?
