@@ -982,8 +982,12 @@ function fbEncodeValue(val){
 function fbDecodeValue(val){
   if(val===null||val===undefined)return null;
   if(typeof val==='object'&&!Array.isArray(val)){
-    if(val.__arr===1&&Array.isArray(val.v)){
-      return val.v.map(x=>fbDecodeValue(x));
+    // __arr marker: v may be a real JS array OR a Firebase-converted object {0:x,1:y,...}
+    if(val.__arr===1&&val.v!==undefined&&val.v!==null){
+      const arr=Array.isArray(val.v)
+        ? val.v
+        : Object.keys(val.v).sort((a,b)=>+a-+b).map(k=>val.v[k]);
+      return arr.map(x=>fbDecodeValue(x));
     }
     const out={};
     for(const k of Object.keys(val)){
