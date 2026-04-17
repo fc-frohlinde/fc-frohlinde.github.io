@@ -956,34 +956,51 @@ function initFirebase(cfg){
   }catch(e){console.error('FB init:',e);setFbStatus('error');}
 }
 
-// Encode/decode db keys: Firebase forbids / . # $ [ ] in keys
-function encodeForFb(obj){
-  if(typeof obj!=='object'||obj===null||Array.isArray(obj))return obj;
-  const out={};
-  for(const k of Object.keys(obj)){
-    const ek=k.replace(/\//g,'__SL__').replace(/\./g,'__DOT__').replace(/#/g,'__HASH__');
-    out[ek]=encodeForFb(obj[k]);
+// ── Firebase key/value encoding ──────────────────────────────
+// Firebase forbids / . # $ [ ] in keys, and rejects undefined values.
+// Arrays are preserved using {__arr:1, v:[...]} wrapper so they survive round-trip.
+function fbEncodeValue(val){
+  if(val===undefined||val===null)return null;
+  if(Array.isArray(val)){
+    // Preserve array as tagged object
+    return{__arr:1,v:val.map(x=>fbEncodeValue(x))};
   }
-  return out;
+  if(typeof val==='object'){
+    const out={};
+    for(const k of Object.keys(val)){
+      const v=fbEncodeValue(val[k]);
+      if(v===undefined)continue; // strip undefined
+      const ek=k.replace(/\//g,'__SL__').replace(/\./g,'__DOT__')
+                 .replace(/#/g,'__HASH__').replace(/\[/g,'__LB__').replace(/\]/g,'__RB__');
+      out[ek]=v;
+    }
+    return out;
+  }
+  return val;
 }
-function decodeFromFb(obj){
-  if(typeof obj!=='object'||obj===null||Array.isArray(obj))return obj;
-  const out={};
-  for(const k of Object.keys(obj)){
-    const dk=k.replace(/__SL__/g,'/').replace(/__DOT__/g,'.').replace(/__HASH__/g,'#');
-    out[dk]=decodeFromFb(obj[dk]);
+function fbDecodeValue(val){
+  if(val===null||val===undefined)return null;
+  if(typeof val==='object'&&!Array.isArray(val)){
+    if(val.__arr===1&&Array.isArray(val.v)){
+      return val.v.map(x=>fbDecodeValue(x));
+    }
+    const out={};
+    for(const k of Object.keys(val)){
+      const dk=k.replace(/__SL__/g,'/').replace(/__DOT__/g,'.').replace(/__HASH__/g,'#')
+                 .replace(/__LB__/g,'[').replace(/__RB__/g,']');
+      out[dk]=fbDecodeValue(val[k]);
+    }
+    return out;
   }
-  return out;
+  return val;
 }
 function fbEncode(g){
-  // Only encode the db keys (they contain seasons like "2025/26")
-  if(!g||!g.db)return g;
-  const copy={...g,db:encodeForFb(g.db)};
-  return copy;
+  // Deep encode entire G object
+  return fbEncodeValue(g);
 }
 function fbDecode(d){
-  if(!d||!d.db)return d;
-  return{...d,db:decodeFromFb(d.db)};
+  // Deep decode entire response
+  return fbDecodeValue(d);
 }
 
 function startFbListener(){
@@ -995,6 +1012,13 @@ function startFbListener(){
     const data=raw?fbDecode(raw):null;
     if(data&&data.version>=14){
       G=data;
+      // Ensure arrays are real JS arrays (safety check)
+      if(G.db){Object.keys(G.db).forEach(k=>{
+        const d=G.db[k];
+        if(d&&!Array.isArray(d.sessions)&&d.sessions)d.sessions=Object.values(d.sessions);
+        if(d&&Array.isArray(d.players))d.players.forEach(p=>{if(p&&!Array.isArray(p.s)&&p.s)p.s=Object.values(p.s);});
+        if(!Array.isArray(d?.sessions))G.db[k]={sessions:[],players:[],...(d||{})};
+      });}
       G.teamList.forEach(t=>{if(!G.db[t+'__focuses'])G.db[t+'__focuses']=[...DEF_FOCUSES];});
       render();
       setFbStatus('connected');
