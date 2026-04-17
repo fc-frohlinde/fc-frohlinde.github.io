@@ -956,20 +956,50 @@ function initFirebase(cfg){
   }catch(e){console.error('FB init:',e);setFbStatus('error');}
 }
 
+// Encode/decode db keys: Firebase forbids / . # $ [ ] in keys
+function encodeForFb(obj){
+  if(typeof obj!=='object'||obj===null||Array.isArray(obj))return obj;
+  const out={};
+  for(const k of Object.keys(obj)){
+    const ek=k.replace(/\//g,'__SL__').replace(/\./g,'__DOT__').replace(/#/g,'__HASH__');
+    out[ek]=encodeForFb(obj[k]);
+  }
+  return out;
+}
+function decodeFromFb(obj){
+  if(typeof obj!=='object'||obj===null||Array.isArray(obj))return obj;
+  const out={};
+  for(const k of Object.keys(obj)){
+    const dk=k.replace(/__SL__/g,'/').replace(/__DOT__/g,'.').replace(/__HASH__/g,'#');
+    out[dk]=decodeFromFb(obj[dk]);
+  }
+  return out;
+}
+function fbEncode(g){
+  // Only encode the db keys (they contain seasons like "2025/26")
+  if(!g||!g.db)return g;
+  const copy={...g,db:encodeForFb(g.db)};
+  return copy;
+}
+function fbDecode(d){
+  if(!d||!d.db)return d;
+  return{...d,db:decodeFromFb(d.db)};
+}
+
 function startFbListener(){
   if(!fbRef||fbListening)return;
   fbListening=true;
   fbRef.on('value',(snap)=>{
     if(_fbSaving)return;
-    const data=snap.val();
+    const raw=snap.val();
+    const data=raw?fbDecode(raw):null;
     if(data&&data.version>=14){
       G=data;
       G.teamList.forEach(t=>{if(!G.db[t+'__focuses'])G.db[t+'__focuses']=[...DEF_FOCUSES];});
       render();
       setFbStatus('connected');
     } else if(!data){
-      // Database empty – push local data
-      fbRef.set(G).catch(e=>console.error('FB push:',e));
+      fbRef.set(fbEncode(G)).catch(e=>console.error('FB push:',e));
       setFbStatus('connected');
     }
   },(err)=>{console.error('FB listener:',err);setFbStatus('error');});
@@ -1034,7 +1064,7 @@ function saveG(badge=true){
     clearTimeout(_fbDebounce);
     _fbDebounce=setTimeout(()=>{
       _fbSaving=true;
-      fbRef.set(G).then(()=>{_fbSaving=false;setFbStatus('connected');})
+      fbRef.set(fbEncode(G)).then(()=>{_fbSaving=false;setFbStatus('connected');})
         .catch(e=>{_fbSaving=false;console.error('FB save:',e);setFbStatus('error');});
     },800);
   }
