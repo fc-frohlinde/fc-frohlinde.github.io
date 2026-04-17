@@ -1016,7 +1016,8 @@ function startFbListener(){
       // Ensure arrays are real JS arrays (safety check)
       if(G.db){Object.keys(G.db).forEach(k=>{
         const d=G.db[k];
-        if(!d||typeof d!=='object')return;
+        // Skip non-object entries (e.g. focuses arrays like ['Physisch',...])
+        if(!d||typeof d!=='object'||Array.isArray(d))return;
         // Restore sessions array
         if(!Array.isArray(d.sessions)){
           d.sessions=d.sessions?Object.values(d.sessions).filter(Boolean):[];
@@ -1035,7 +1036,7 @@ function startFbListener(){
           if(!Array.isArray(p.s)){
             p.s=p.s?Object.values(p.s):[];
           }
-          p.s=p.s.map(v=>v===null||v===undefined?3:v);
+          p.s=(p.s||[]).map(v=>v===null||v===undefined?3:v);
         });
         // Validate each session has a date
         d.sessions=d.sessions.filter(s=>s&&s.date);
@@ -1044,7 +1045,10 @@ function startFbListener(){
       render();
       setFbStatus('connected');
     } else if(!data){
-      fbRef.set(fbEncode(G)).catch(e=>console.error('FB push:',e));
+      _fbSaving=true;
+      fbRef.set(fbEncode(G))
+        .then(()=>{setTimeout(()=>{_fbSaving=false;},500);setFbStatus('connected');})
+        .catch(e=>{_fbSaving=false;console.error('FB push:',e);});
       setFbStatus('connected');
     }
   },(err)=>{console.error('FB listener:',err);setFbStatus('error');});
