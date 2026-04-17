@@ -828,6 +828,7 @@ function getSeasonYears(){
   return{y1,y2:y1+1};
 }
 function dispToSortKey(s){
+  if(!s||typeof s!=='string')return 99999999;
   const m=s.match(/(\d+)\.(\d+)/);
   if(!m)return 99999999;
   const d=+m[1],mo=+m[2];
@@ -857,7 +858,7 @@ function insertSorted(D,sess){
 }
 function findNext(){
   const D=cd(),t=todaySK();
-  for(let i=0;i<D.sessions.length;i++)if(dispToSortKey(D.sessions[i].date)>=t)return i;
+  for(let i=0;i<D.sessions.length;i++)if(D.sessions[i]&&D.sessions[i].date&&dispToSortKey(D.sessions[i].date)>=t)return i;
   return -1;
 }
 
@@ -962,8 +963,8 @@ function initFirebase(cfg){
 function fbEncodeValue(val){
   if(val===undefined||val===null)return null;
   if(Array.isArray(val)){
-    // Preserve array as tagged object
-    return{__arr:1,v:val.map(x=>fbEncodeValue(x))};
+    // Preserve array as tagged object; replace undefined/null with null
+    return{__arr:1,v:val.map(x=>(x===undefined?null:fbEncodeValue(x)))};
   }
   if(typeof val==='object'){
     const out={};
@@ -1015,9 +1016,29 @@ function startFbListener(){
       // Ensure arrays are real JS arrays (safety check)
       if(G.db){Object.keys(G.db).forEach(k=>{
         const d=G.db[k];
-        if(d&&!Array.isArray(d.sessions)&&d.sessions)d.sessions=Object.values(d.sessions);
-        if(d&&Array.isArray(d.players))d.players.forEach(p=>{if(p&&!Array.isArray(p.s)&&p.s)p.s=Object.values(p.s);});
-        if(!Array.isArray(d?.sessions))G.db[k]={sessions:[],players:[],...(d||{})};
+        if(!d||typeof d!=='object')return;
+        // Restore sessions array
+        if(!Array.isArray(d.sessions)){
+          d.sessions=d.sessions?Object.values(d.sessions).filter(Boolean):[];
+        } else {
+          d.sessions=d.sessions.filter(Boolean);
+        }
+        // Restore players array
+        if(!Array.isArray(d.players)){
+          d.players=d.players?Object.values(d.players).filter(Boolean):[];
+        } else {
+          d.players=d.players.filter(Boolean);
+        }
+        // Restore each player's s array
+        d.players.forEach(p=>{
+          if(!p)return;
+          if(!Array.isArray(p.s)){
+            p.s=p.s?Object.values(p.s):[];
+          }
+          p.s=p.s.map(v=>v===null||v===undefined?3:v);
+        });
+        // Validate each session has a date
+        d.sessions=d.sessions.filter(s=>s&&s.date);
       });}
       G.teamList.forEach(t=>{if(!G.db[t+'__focuses'])G.db[t+'__focuses']=[...DEF_FOCUSES];});
       render();
@@ -1291,6 +1312,7 @@ function autoConvertPast(){
   const D=cd(),today=todaySK();
   let changed=false;
   D.sessions.forEach((s,si)=>{
+    if(!s||!s.date)return;
     if(dispToSortKey(s.date)<today){
       D.players.forEach(p=>{
         if(p.s&&si<p.s.length&&p.s[si]===3){p.s[si]=0;changed=true;}
@@ -1350,7 +1372,9 @@ function renderSeasonSel(){
 
 // ══ TABLE HEAD ══
 function renderHead(){
-  const D=cd(),ss=D.sessions;
+  const D=cd();
+  if(!D||!Array.isArray(D.sessions))return;
+  const ss=D.sessions.filter(s=>s&&s.date);
   const ro=!canEdit();
   let r='<tr>';
   r+=`<th class="c0" style="width:var(--c0);padding:8px 6px;text-align:left;font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:1.2px;">№</th>`;
@@ -1385,7 +1409,8 @@ function renderHead(){
 // ══ TABLE BODY ══
 function renderBody(){
   const D=cd(),tbody=document.getElementById('tBody');
-  const ss=D.sessions;
+  if(!D||!Array.isArray(D.sessions)||!Array.isArray(D.players)){if(tbody)tbody.innerHTML='';return;}
+  const ss=D.sessions.filter(s=>s&&s.date);
   const ro=!canEdit();
 
   if(!D.players||!D.players.length){
