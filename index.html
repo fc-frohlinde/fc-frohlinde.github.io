@@ -362,6 +362,7 @@ input[type="date"]{cursor:pointer;}
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
 </head>
 <body>
 
@@ -756,11 +757,7 @@ input[type="date"]{cursor:pointer;}
       <p class="note" style="margin:0;">Verbinde mit Firebase, damit alle Geräte dieselben Daten sehen.</p>
     </div>
     <div style="background:#e8f4fd;border:1px solid #90caf9;border-radius:9px;padding:10px 12px;margin-bottom:12px;font-size:.74rem;color:#1565c0;line-height:1.7;">
-      <strong>Einrichtung (5 Min):</strong><br>
-      1. <b>console.firebase.google.com</b> → Neues Projekt<br>
-      2. Build → Realtime Database → Testmodus aktivieren<br>
-      3. Projekteinstellungen ⚙ → Web-App &lt;/&gt; → Konfiguration kopieren<br>
-      4. Felder unten ausfüllen → <b>Verbinden</b>
+      Die Standard-Konfiguration ist bereits voreingestellt. Nur ändern, falls ein eigenes Firebase-Projekt verwendet werden soll.
     </div>
     <label>Database URL</label>
     <input type="url" id="fb-dbUrl" placeholder="https://PROJEKT-default-rtdb.europe-west1.firebasedatabase.app" style="font-size:.76rem;"/>
@@ -771,10 +768,11 @@ input[type="date"]{cursor:pointer;}
     <label>App ID (optional)</label>
     <input type="text" id="fb-appId" placeholder="1:123:web:abc..."/>
     <div class="mob-btns" style="margin-top:4px;">
-      <button class="btn bp" onclick="saveFbConfig()">🌐 Verbinden</button>
+      <button class="btn bp" onclick="saveFbConfig()">🌐 Verbinden & Speichern</button>
       <button class="btn bd" onclick="disconnectFb()">✕ Trennen</button>
       <button class="btn bs" onclick="closeM('moAdmin')">Schließen</button>
     </div>
+
   </div>
 </div></div>
 
@@ -802,7 +800,7 @@ const DOW=['So','Mo','Di','Mi','Do','Fr','Sa'];
 const DEM={1:'Januar',2:'Februar',3:'März',4:'April',5:'Mai',6:'Juni',
   7:'Juli',8:'August',9:'September',10:'Oktober',11:'November',12:'Dezember'};
 const DEF_TEAMS=['U14','U15','U16','U17','U19'];
-const DEF_FOCUSES=['Physisch','Taktisch','Technik','Spielform','Standards'];
+const DEF_FOCUSES=['Zone 1','Zone 2','Zone 3','Umschalten','Standards'];
 
 let G=null, CU=null;
 let zoomLvl=100, nextIdx=-1, newMatchHA='home';
@@ -915,8 +913,25 @@ function mkPl(team,n){return(DEF_PL[team]||[]).map(p=>({...p,s:new Array(n).fill
 // ══════════════════════════════
 //  DATA / STORAGE
 // ══════════════════════════════
+function genAutoSessions(season){
+  // Generate sessions from today to end of season: Di(2)+Do(4) 18:30, So(0) 15:00
+  const m=season.match(/^(\d{4})\/(\d{2})$/);
+  if(!m)return [];
+  const y1=parseInt(m[1]),y2=y1+1;
+  const today=new Date();today.setHours(0,0,0,0);
+  const end=new Date(y2+'-06-30');
+  const sessions=[];
+  for(let d=new Date(today);d<=end;d.setDate(d.getDate()+1)){
+    const dw=d.getDay();
+    const iso=d.toISOString().slice(0,10);
+    const disp=isoToDisp(iso);
+    const mo=moFromDisp(disp);
+    if(dw===2||dw===4)sessions.push({date:disp,month:mo,type:'training',focus:'',time:'18:30'});
+    if(dw===0)sessions.push({date:disp,month:mo,type:'match',homeAway:'home',label:'',time:'15:00'});
+  }
+  return sessions;
+}
 function buildDef(){
-  // Default: single empty U19 team, no players, no sessions, no trainers
   const curYear=new Date().getFullYear();
   const mo=new Date().getMonth()+1;
   const y1=mo>=7?curYear:curYear-1;
@@ -925,26 +940,36 @@ function buildDef(){
     teamList:['U19'],seasonList:[season],
     trainers:[],
     db:{}};
-  G.db['U19__'+season]={sessions:[],players:[]};
+  const sess=genAutoSessions(season);
+  G.db['U19__'+season]={sessions:sess,players:[]};
   G.db['U19__focuses']=[...DEF_FOCUSES];
 }
 function buildTestDef(){
   // Test data: full default with teams, players, sessions, trainers
-  const sess=defSessions();
-  G={version:14,currentTeam:'U19',currentSeason:'2025/26',
-    teamList:[...DEF_TEAMS],seasonList:['2025/26'],
-    trainers:[{id:'t1',name:'Max Mustermann',teams:['U19']},{id:'t2',name:'Hans Schmidt',teams:['U17','U16']},{id:'t3',name:'Klaus Berger',teams:['U15','U14']}],
+  const season='2025/26';
+  const sess=genAutoSessions(season);
+  G={version:14,currentTeam:'U19',currentSeason:season,
+    teamList:['U19'],seasonList:[season],
+    trainers:[{id:'t1',name:'Thomas Hoffmann',teams:['U19']},{id:'t2',name:'Artem Horbachov',teams:['U19']}],
     db:{}};
-  G.teamList.forEach(t=>{
-    G.db[t+'__2025/26']={sessions:JSON.parse(JSON.stringify(sess)),players:mkPl(t,sess.length)};
-    G.db[t+'__focuses']=[...DEF_FOCUSES];
-  });
+  G.db['U19__'+season]={sessions:JSON.parse(JSON.stringify(sess)),players:mkPl('U19',sess.length)};
+  G.db['U19__focuses']=[...DEF_FOCUSES];
 }
 // ── FIREBASE SYNC ────────────────────────────────────────────
 const FB_CFG_KEY='fcf_fb_config';
 let fbApp=null,fbDb=null,fbRef=null,fbListening=false,_fbSaving=false,_fbDebounce=null;
 
-function loadFbConfig(){try{return JSON.parse(localStorage.getItem(FB_CFG_KEY));}catch(e){return null;}}
+const DEFAULT_FB_CONFIG={
+  apiKey:'AIzaSyANvxDo9idsZSq7syZwmCHDvbVguIjKtsY',
+  databaseURL:'https://fc-frohlinde-ea23f-default-rtdb.europe-west1.firebasedatabase.app',
+  projectId:'fc-frohlinde-ea23f',
+  appId:'1:765150260941:web:42da53f86f8bbcbed8c384',
+  authDomain:'fc-frohlinde-ea23f.firebaseapp.com'
+};
+function loadFbConfig(){
+  try{const lc=JSON.parse(localStorage.getItem(FB_CFG_KEY));if(lc&&lc.apiKey)return lc;}catch(e){}
+  return DEFAULT_FB_CONFIG;
+}
 
 function initFirebase(cfg){
   if(!cfg||!cfg.databaseURL||!cfg.apiKey)return;
@@ -983,7 +1008,8 @@ function fbDecodeValue(val){
   if(val===null||val===undefined)return null;
   if(typeof val==='object'&&!Array.isArray(val)){
     // __arr marker: v may be a real JS array OR a Firebase-converted object {0:x,1:y,...}
-    if(val.__arr===1&&val.v!==undefined&&val.v!==null){
+    if(val.__arr===1){
+      if(!val.v)return []; // empty array stored as null
       const arr=Array.isArray(val.v)
         ? val.v
         : Object.keys(val.v).sort((a,b)=>+a-+b).map(k=>val.v[k]);
@@ -1032,7 +1058,7 @@ function startFbListener(){
         if(!Array.isArray(d.players)){
           d.players=d.players?Object.values(d.players).filter(Boolean):[];
         } else {
-          d.players=d.players.filter(Boolean);
+          d.players=d.players.filter(p=>p&&typeof p==='object'&&p.name!==undefined&&p.name!==null);
         }
         // Restore each player's s array
         d.players.forEach(p=>{
@@ -1081,8 +1107,8 @@ function saveFbConfig(){
     authDomain:(document.getElementById('fb-projectId').value.trim()||'')+'.firebaseapp.com',
   };
   if(!cfg.apiKey||!cfg.databaseURL||!cfg.projectId)return alert('Bitte API Key, Database URL und Project ID eingeben.');
+  Object.keys(cfg).forEach(k=>{if(cfg[k]===undefined)delete cfg[k];});
   localStorage.setItem(FB_CFG_KEY,JSON.stringify(cfg));
-  // Reload page so Firebase initializes cleanly
   location.reload();
 }
 
@@ -1093,7 +1119,7 @@ function disconnectFb(){
 }
 
 function loadFbConfigFields(){
-  const cfg=loadFbConfig();
+  const cfg=loadFbConfig()||DEFAULT_FB_CONFIG;
   if(!cfg)return;
   const f=v=>document.getElementById(v);
   if(f('fb-dbUrl'))f('fb-dbUrl').value=cfg.databaseURL||'';
@@ -1125,7 +1151,7 @@ function saveG(badge=true){
 }
 function ck(){return G.currentTeam+'__'+G.currentSeason;}
 function cd(){if(!G.db[ck()])G.db[ck()]={sessions:[],players:[]};return G.db[ck()];}
-function teamFoc(t){t=t||G.currentTeam;if(!G.db[t+'__focuses'])G.db[t+'__focuses']=[...DEF_FOCUSES];return G.db[t+'__focuses'];}
+function teamFoc(t){t=t||G.currentTeam;const f=G.db[t+'__focuses'];if(!Array.isArray(f)||f===null)G.db[t+'__focuses']=[...DEF_FOCUSES];return G.db[t+'__focuses'];}
 
 // ══════════════════════════════
 //  AUTH
@@ -1247,8 +1273,8 @@ function snap(){
   if(undoStack.length>40)undoStack.shift();
   redoStack.length=0;updateUndoBtns();
 }
-function undo(){if(!undoStack.length)return;redoStack.push(JSON.stringify(G));G=JSON.parse(undoStack.pop());localStorage.setItem(SK,JSON.stringify(G));render();updateUndoBtns();}
-function redo(){if(!redoStack.length)return;undoStack.push(JSON.stringify(G));G=JSON.parse(redoStack.pop());localStorage.setItem(SK,JSON.stringify(G));render();updateUndoBtns();}
+function undo(){if(!undoStack.length)return;redoStack.push(JSON.stringify(G));G=JSON.parse(undoStack.pop());localStorage.setItem(SK,JSON.stringify(G));if(fbRef){clearTimeout(_fbDebounce);_fbDebounce=setTimeout(()=>{_fbSaving=true;fbRef.set(fbEncode(G)).then(()=>{_fbSaving=false;}).catch(e=>{_fbSaving=false;});},800);}render();updateUndoBtns();}
+function redo(){if(!redoStack.length)return;undoStack.push(JSON.stringify(G));G=JSON.parse(redoStack.pop());localStorage.setItem(SK,JSON.stringify(G));if(fbRef){clearTimeout(_fbDebounce);_fbDebounce=setTimeout(()=>{_fbSaving=true;fbRef.set(fbEncode(G)).then(()=>{_fbSaving=false;}).catch(e=>{_fbSaving=false;});},800);}render();updateUndoBtns();}
 function updateUndoBtns(){
   const u=document.getElementById('undoBtn'),r=document.getElementById('redoBtn');
   if(u)u.disabled=!undoStack.length;if(r)r.disabled=!redoStack.length;
@@ -1349,6 +1375,10 @@ function render(){
 }
 
 function renderHdrInfo(){
+  if(!G)return;
+  if(!Array.isArray(G.trainers))G.trainers=[];
+  if(!Array.isArray(G.teamList))G.teamList=['U19'];
+  if(!Array.isArray(G.seasonList))G.seasonList=[G.currentSeason||'2025/26'];
   document.getElementById('hSeason').textContent=G.currentSeason;
   document.getElementById('hSub').textContent=G.currentTeam+' · Junioren';
   document.getElementById('fDate').textContent=new Date().toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});
@@ -1360,6 +1390,7 @@ function renderHdrInfo(){
 }
 
 function renderTeamBar(){
+  if(!G||!Array.isArray(G.teamList))return;
   renderHdrInfo();
   // Team tabs
   const tabs=document.getElementById('teamTabs');
@@ -1771,8 +1802,7 @@ function setEP2(v){editP2=v;buildPosGrid('pe-pos2',v,'setEP2',true,editP1);}
 //  TEAM MANAGER
 // ══════════════════════════════
 function openTeamMgr(tab,fromId){
-  if(fromId)navPush({id:fromId});
-  else navPush({id:'main'});
+  navPush({id:fromId||'main'});
   openM('moTeamMgr');switchTab(tab||'spieler');
 }
 
@@ -2183,6 +2213,7 @@ function initTabDrag(){
 // Navigation stack for modals
 const _navStack=[];
 function navPush(fromId){_navStack.push(fromId);}
+function teamMgrGoBack(){navBack('moTeamMgr');}
 function navBack(currentId){
   closeM(currentId);
   const prev=_navStack.pop();
@@ -2190,8 +2221,7 @@ function navBack(currentId){
     if(prev.id==='moSession2')openSessStats(prev.si);
     else if(prev.id==='moPlayer')openPlayerStats(prev.pi);
     else if(prev.id==='moTeamMgr')openTeamMgr(prev.tab||'spieler');
-    else if(prev.id==='main'){/* just close, already done */}
-    else openM(prev.id);
+    else if(prev.id!=='main')openM(prev.id);
   }
 }
 function openPlayerFromSession(si,pi){
