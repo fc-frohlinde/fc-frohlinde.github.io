@@ -374,7 +374,7 @@ input[type="date"]{cursor:pointer;}
   <div class="auth-sub">Anwesenheitsverwaltung</div>
   <span class="auth-label">Name eingeben</span>
   <input class="auth-input" id="authInput" type="text" placeholder="Name" autocomplete="off" onkeydown="if(event.key==='Enter')doAuth()"/>
-  <label class="auth-remember"><input type="checkbox" id="rememberMe"/> Angemeldet bleiben</label>
+  <label class="auth-remember"><input type="checkbox" id="rememberMe" checked/> Angemeldet bleiben</label>
   <button class="auth-btn" onclick="doAuth()">Anmelden</button>
   <div class="auth-err" id="authErr"></div>
 </div>
@@ -464,6 +464,8 @@ input[type="date"]{cursor:pointer;}
           <div class="vd-item" onclick="event.stopPropagation();toggleSec('tools')"><span>Werkzeuge</span><div class="vd-check on" id="vd2-tools">✓</div></div>
           <div class="vd-item" onclick="event.stopPropagation();toggleSec('legend')"><span>Legende</span><div class="vd-check on" id="vd2-legend">✓</div></div>
           <div class="vd-sep"></div>
+          <div class="vd-item" onclick="event.stopPropagation();toggleHidePast()" id="vd2-hidepast"><span>Vergangene ausblenden</span></div>
+          <div class="vd-sep"></div>
           <div class="vd-item" onclick="event.stopPropagation();collapseAll()"><span>Nur Tabelle</span></div>
           <div class="vd-item" onclick="event.stopPropagation();resetCollapse()"><span>↺ Alles</span></div>
           <div class="vd-sep"></div>
@@ -494,6 +496,7 @@ input[type="date"]{cursor:pointer;}
         <span id="ps-pos-badge"></span>
         <span id="ps-ctx" style="font-size:.65rem;color:var(--gm);margin-left:4px;"></span>
       </div>
+      <div id="ps-note-display" style="margin-top:5px;font-size:.78rem;color:var(--gd);font-style:italic;display:none;"></div>
     </div>
     <div style="display:flex;gap:6px;"><button class="btn" style="font-size:.76rem;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" onclick="playerGoBack()">← Zurück</button><button class="btn bs" onclick="closeM('moPlayer')">✕</button></div>
   </div>
@@ -504,19 +507,23 @@ input[type="date"]{cursor:pointer;}
   <div id="ps-focuses" style="margin-bottom:12px;"></div>
   <div class="sec" style="margin-bottom:6px;">📋 Alle Einheiten</div>
   <div class="sess-list" id="ps-sessions"></div>
-  <div id="ps-edit" style="background:var(--ow);border-radius:9px;padding:10px 12px;border:1px solid var(--gl);">
-    <div class="sec" style="margin-bottom:8px;">✎ Bearbeiten</div>
-    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:8px;">
-      <div style="width:58px;flex:none;"><label>Nr.</label><input type="number" id="pe-nr" min="1" max="99" style="margin-bottom:0;"/></div>
-      <div style="flex:1;min-width:110px;"><label>Name</label><input type="text" id="pe-name" style="margin-bottom:0;"/></div>
-    </div>
-    <div class="sec" style="margin-bottom:6px;">Position 1</div>
-    <div class="pos-grid" id="pe-pos1"></div>
-    <div class="sec" style="margin-bottom:6px;">Position 2 (optional)</div>
-    <div class="pos-grid" id="pe-pos2"></div>
-    <div style="display:flex;gap:7px;margin-top:7px;flex-wrap:wrap;">
-      <button class="btn bp" onclick="savePlayerAndClose()">✓ Speichern</button>
-      <button class="btn" onclick="cancelPlayerEdit()" style="background:#f0f4fc;color:var(--gd);border:1.5px solid var(--gl);">✕ Abbrechen</button>
+  <div id="ps-edit-wrap">
+    <button class="btn" id="ps-edit-toggle" onclick="togglePlayerEdit()" style="width:100%;justify-content:center;background:var(--ow);color:var(--gd);border:1.5px solid var(--gl);margin-bottom:6px;">✎ Bearbeiten</button>
+    <div id="ps-edit" style="display:none;background:var(--ow);border-radius:9px;padding:10px 12px;border:1px solid var(--gl);">
+      <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:8px;">
+        <div style="width:58px;flex:none;"><label>Nr.</label><input type="number" id="pe-nr" min="1" max="99" style="margin-bottom:0;"/></div>
+        <div style="flex:1;min-width:110px;"><label>Name</label><input type="text" id="pe-name" style="margin-bottom:0;"/></div>
+      </div>
+      <div class="sec" style="margin-bottom:6px;">Position 1</div>
+      <div class="pos-grid" id="pe-pos1"></div>
+      <div class="sec" style="margin-bottom:6px;">Position 2 (optional)</div>
+      <div class="pos-grid" id="pe-pos2"></div>
+      <div class="sec" style="margin-bottom:6px;">📝 Zusatzinfo (Kommentar)</div>
+      <textarea id="pe-note" rows="2" placeholder="z.B. Verletzt bis KW 20, Schulnoten, ..." style="width:100%;padding:7px;border:1.5px solid var(--gl);border-radius:7px;font-family:'Barlow',sans-serif;font-size:.8rem;resize:vertical;margin-bottom:8px;"></textarea>
+      <div style="display:flex;gap:7px;flex-wrap:wrap;">
+        <button class="btn bp" onclick="savePlayerEdit()">✓ Speichern</button>
+        <button class="btn" onclick="closeM('moPlayer')" style="background:#f0f4fc;color:var(--gd);border:1.5px solid var(--gl);">✕ Abbrechen</button>
+      </div>
     </div>
   </div>
 </div></div>
@@ -527,6 +534,7 @@ input[type="date"]{cursor:pointer;}
     <div style="flex:1;">
       <div id="ss-title" style="font-family:'Bebas Neue',sans-serif;font-size:1.35rem;color:var(--bd);letter-spacing:2px;line-height:1;">–</div>
       <div id="ss-meta" style="font-size:.76rem;color:var(--gm);margin-top:4px;"></div>
+      <div id="ss-plan-link" style="display:none;font-size:.78rem;margin-top:5px;"></div>
     </div>
     <div style="display:flex;gap:6px;"><button class="btn" style="font-size:.76rem;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" onclick="sessGoBack()">← Zurück</button><button class="btn bs" onclick="closeM('moSession2')">✕</button></div>
   </div>
@@ -806,7 +814,7 @@ let G=null, CU=null;
 let zoomLvl=100, nextIdx=-1, newMatchHA='home';
 let selP1='8er', selP2='', editP1='', editP2='';
 let currentPI=-1, currentSI=-1;
-const colState={hdr:true,tabs:true,tools:true,legend:true};
+const colState={hdr:true,tabs:true,tools:true,legend:true,hidePast:false};
 const undoStack=[], redoStack=[];
 
 // ══════════════════════════════
@@ -1034,6 +1042,31 @@ function fbDecode(d){
   return fbDecodeValue(d);
 }
 
+function sanitizeG(data){
+  if(!data)return null;
+  // Ensure top-level arrays
+  if(!Array.isArray(data.trainers))data.trainers=data.trainers?Object.values(data.trainers).filter(Boolean):[];
+  if(!Array.isArray(data.teamList))data.teamList=data.teamList?Object.values(data.teamList):['U19'];
+  if(!Array.isArray(data.seasonList))data.seasonList=data.seasonList?Object.values(data.seasonList):[data.currentSeason||'2025/26'];
+  // Sanitize db entries
+  if(data.db){Object.keys(data.db).forEach(k=>{
+    const d=data.db[k];
+    if(!d||typeof d!=='object'||Array.isArray(d))return;
+    if(!Array.isArray(d.sessions))d.sessions=d.sessions?Object.values(d.sessions).filter(Boolean):[];
+    else d.sessions=d.sessions.filter(Boolean);
+    if(!Array.isArray(d.players))d.players=d.players?Object.values(d.players).filter(Boolean):[];
+    else d.players=d.players.filter(Boolean);
+    d.players=d.players.filter(p=>p&&typeof p==='object'&&p.name!==undefined&&p.name!==null);
+    d.players.forEach(p=>{
+      if(!p)return;
+      if(!Array.isArray(p.s))p.s=p.s?Object.values(p.s):[];
+      p.s=(p.s||[]).map(v=>v===null||v===undefined?3:v);
+    });
+    d.sessions=d.sessions.filter(s=>s&&s.date);
+  });}
+  data.teamList.forEach(t=>{if(!data.db[t+'__focuses']||!Array.isArray(data.db[t+'__focuses']))data.db[t+'__focuses']=[...DEF_FOCUSES];});
+  return data;
+}
 function startFbListener(){
   if(!fbRef||fbListening)return;
   fbListening=true;
@@ -1042,36 +1075,12 @@ function startFbListener(){
     const raw=snap.val();
     const data=raw?fbDecode(raw):null;
     if(data&&data.version>=14){
-      G=data;
-      // Ensure arrays are real JS arrays (safety check)
-      if(G.db){Object.keys(G.db).forEach(k=>{
-        const d=G.db[k];
-        // Skip non-object entries (e.g. focuses arrays like ['Physisch',...])
-        if(!d||typeof d!=='object'||Array.isArray(d))return;
-        // Restore sessions array
-        if(!Array.isArray(d.sessions)){
-          d.sessions=d.sessions?Object.values(d.sessions).filter(Boolean):[];
-        } else {
-          d.sessions=d.sessions.filter(Boolean);
-        }
-        // Restore players array
-        if(!Array.isArray(d.players)){
-          d.players=d.players?Object.values(d.players).filter(Boolean):[];
-        } else {
-          d.players=d.players.filter(p=>p&&typeof p==='object'&&p.name!==undefined&&p.name!==null);
-        }
-        // Restore each player's s array
-        d.players.forEach(p=>{
-          if(!p)return;
-          if(!Array.isArray(p.s)){
-            p.s=p.s?Object.values(p.s):[];
-          }
-          p.s=(p.s||[]).map(v=>v===null||v===undefined?3:v);
-        });
-        // Validate each session has a date
-        d.sessions=d.sessions.filter(s=>s&&s.date);
-      });}
-      G.teamList.forEach(t=>{if(!G.db[t+'__focuses'])G.db[t+'__focuses']=[...DEF_FOCUSES];});
+      G=sanitizeG(data);
+      // Restore per-user local navigation state
+      const localTeam=localStorage.getItem('fcf_currentTeam');
+      const localSeason=localStorage.getItem('fcf_currentSeason');
+      if(localTeam&&Array.isArray(G.teamList)&&G.teamList.includes(localTeam))G.currentTeam=localTeam;
+      if(localSeason&&Array.isArray(G.seasonList)&&G.seasonList.includes(localSeason))G.currentSeason=localSeason;
       render();
       setFbStatus('connected');
     } else if(!data){
@@ -1157,6 +1166,24 @@ function teamFoc(t){t=t||G.currentTeam;const f=G.db[t+'__focuses'];if(!Array.isA
 //  AUTH
 // ══════════════════════════════
 function initAuth(){
+  // Init Firebase early so we can fetch trainer list for auth
+  const fbCfg=loadFbConfig();
+  if(fbCfg&&!fbApp){
+    try{
+      fbApp=firebase.initializeApp(fbCfg,'fcf');
+      fbDb=firebase.database(fbApp);
+      fbRef=fbDb.ref('fcf_data');
+      // Try to get latest data from Firebase for auth (one-time fetch)
+      fbRef.once('value').then(snap=>{
+        const raw=snap.val();
+        const data=raw?fbDecode(raw):null;
+        if(data&&data.version>=14){
+          G=sanitizeG(data);
+          localStorage.setItem(SK,JSON.stringify(G));
+        }
+      }).catch(()=>{});
+    }catch(e){}
+  }
   loadG();
   // localStorage = persistent (remember me), sessionStorage = tab-only (survives F5 but not new tab)
   // We use a page-reload flag to detect actual reload vs tab restore
@@ -1220,6 +1247,9 @@ function switchUser(){
 }
 
 function showApp(){
+  // Save initial currentTeam/currentSeason to localStorage if not already set
+  if(!localStorage.getItem('fcf_currentTeam'))localStorage.setItem('fcf_currentTeam',G.currentTeam||'U19');
+  if(!localStorage.getItem('fcf_currentSeason'))localStorage.setItem('fcf_currentSeason',G.currentSeason||'2025/26');
   // Attempt Firebase connection on load
   const cfg=loadFbConfig();
   if(cfg)initFirebase(cfg);
@@ -1289,6 +1319,10 @@ document.addEventListener('keydown',e=>{
 // ══════════════════════════════
 function saveVS(){localStorage.setItem(VIEW_SK,JSON.stringify({colState,zl:zoomLvl}));}
 function toggleSec(k){colState[k]=!colState[k];applyCollapse();saveVS();updateViewChecks();}
+function toggleHidePast(){colState.hidePast=!colState.hidePast;saveVS();render();
+  const el=document.getElementById('vd2-hidepast');
+  if(el)el.style.fontWeight=colState.hidePast?'700':'600',el.style.color=colState.hidePast?'var(--ac)':'rgba(255,255,255,.65)';
+}
 function toggleViewMenu2(e){e.stopPropagation();document.getElementById('viewDropdown2').classList.toggle('open');}
 document.addEventListener('click',e=>{
   const wrap=document.getElementById('viewMenuWrap2');
@@ -1413,7 +1447,8 @@ function renderSeasonSel(){
 function renderHead(){
   const D=cd();
   if(!D||!Array.isArray(D.sessions))return;
-  const ss=D.sessions.filter(s=>s&&s.date);
+  const today=todaySK();
+  const ss=D.sessions.filter(s=>s&&s.date&&(!colState.hidePast||dispToSortKey(s.date)>=today));
   const ro=!canEdit();
   let r='<tr>';
   r+=`<th class="c0" style="width:var(--c0);padding:8px 6px;text-align:left;font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:1.2px;">№</th>`;
@@ -1449,7 +1484,8 @@ function renderHead(){
 function renderBody(){
   const D=cd(),tbody=document.getElementById('tBody');
   if(!D||!Array.isArray(D.sessions)||!Array.isArray(D.players)){if(tbody)tbody.innerHTML='';return;}
-  const ss=D.sessions.filter(s=>s&&s.date);
+  const today2=todaySK();
+  const ss=D.sessions.filter(s=>s&&s.date&&(!colState.hidePast||dispToSortKey(s.date)>=today2));
   const ro=!canEdit();
 
   if(!D.players||!D.players.length){
@@ -1490,7 +1526,9 @@ function renderBody(){
 
 // ══ TABLE FOOT ══
 function renderTfoot(){
-  const D=cd(),ss=D.sessions;
+  const D=cd();
+  const today3=todaySK();
+  const ss=(D.sessions||[]).filter(s=>s&&s.date&&(!colState.hidePast||dispToSortKey(s.date)>=today3));
   const tFoot=document.getElementById('tFoot');
   if(!ss.length||!D.players||!D.players.length){tFoot.innerHTML='';return;}
 
@@ -1627,10 +1665,18 @@ function openPlayerStats(pi){
   document.getElementById('ps-nr').textContent='#'+(p.nr||'?');
   document.getElementById('ps-pos-badge').innerHTML=pbHtml(p);
   document.getElementById('ps-ctx').textContent=G.currentTeam+' · '+G.currentSeason;
-  document.getElementById('ps-edit').style.display=canEdit()?'block':'none';
+  const noteEl=document.getElementById('ps-note-display');
+  if(noteEl){if(p.note){noteEl.textContent='📝 '+p.note;noteEl.style.display='block';}else{noteEl.style.display='none';}}
+  // Reset edit section
+  const editBox=document.getElementById('ps-edit');
+  if(editBox)editBox.style.display='none';
+  const editBtn=document.getElementById('ps-edit-toggle');
+  if(editBtn)editBtn.textContent='✎ Bearbeiten';
+  document.getElementById('ps-edit-wrap').style.display=canEdit()?'block':'none';
   
   if(canEdit()){
     document.getElementById('pe-nr').value=p.nr||'';
+    document.getElementById('pe-note').value=p.note||'';
     document.getElementById('pe-name').value=p.name||'';
     initEditPos(p.pos||'8er',p.pos2||'');
   }
@@ -1671,14 +1717,28 @@ function openPlayerStats(pi){
   openM('moPlayer');
 }
 
-function savePlayerAndClose(){
+function togglePlayerEdit(){
+  const box=document.getElementById('ps-edit');
+  const btn=document.getElementById('ps-edit-toggle');
+  const open=box.style.display==='none';
+  box.style.display=open?'block':'none';
+  btn.textContent=open?'▲ Bearbeiten schließen':'✎ Bearbeiten';
+}
+function savePlayerEdit(){
   const D=cd(),p=D.players[currentPI];if(!p)return;
   snap();
   p.nr=parseInt(document.getElementById('pe-nr').value)||p.nr;
   p.name=document.getElementById('pe-name').value.trim()||p.name;
   p.pos=editP1;p.pos2=editP2||'';
-  saveG();renderBody();renderTfoot();closeM('moPlayer');
+  p.note=document.getElementById('pe-note').value.trim();
+  saveG();renderBody();renderTfoot();
+  // Collapse edit section after save
+  document.getElementById('ps-edit').style.display='none';
+  document.getElementById('ps-edit-toggle').textContent='✎ Bearbeiten';
+  // Refresh the modal content
+  openPlayerStats(currentPI);
 }
+function savePlayerAndClose(){savePlayerEdit();}
 function delCurrentPlayer(){
   const D=cd(),p=D.players[currentPI];
   if(!p||!confirm(`"${p.name}" löschen?`))return;
@@ -1718,6 +1778,7 @@ function openSessStats(si){
             <select id="ss-e-foc" style="width:100%;padding:6px;border:1.5px solid var(--gl);border-radius:6px;font-size:.8rem;outline:none;margin-bottom:0;" onchange="updSessFoc(${si},this.value)">
               <option value="">– Kein –</option>${focOpts}
             </select></div>`}
+      <div style="width:100%;margin-top:7px;"><label style="font-size:.61rem;font-weight:700;color:var(--gd);text-transform:uppercase;">🔗 ${isMat?'Spielbericht-Link':'Trainingsplan-Link'}</label><input type="url" id="ss-e-link" value="${s.planLink||''}" placeholder="https://..." style="width:100%;padding:6px;border:1.5px solid var(--gl);border-radius:6px;font-size:.8rem;outline:none;margin-bottom:0;" oninput="updSessLink(${si},this.value)"/></div>
       </div>`;
   }else{ssDelBtn.style.display='none';ssEdit.style.display='none';}
   buildSessAtt(si);
@@ -1731,6 +1792,10 @@ function buildSessAtt(si){
   const exc=D.players.filter(p=>p.s&&p.s[si]===2).length;
   const unk=D.players.filter(p=>p.s&&p.s[si]===3).length;
   const total=D.players.length,pct=total?Math.round((pres/total)*100):0;
+  // Show plan link if exists
+  const sl=D.sessions[si]?.planLink;
+  const slEl=document.getElementById('ss-plan-link');
+  if(slEl){if(sl){slEl.innerHTML=`🔗 <a href="${sl}" target="_blank" rel="noopener" style="color:var(--bm);font-weight:600;">Trainingsplan öffnen</a>`;slEl.style.display='block';}else{slEl.style.display='none';}}
   document.getElementById('ss-cards').innerHTML=`
     <div class="ps-card"><div class="ct">Anwesend</div><div class="cv" style="color:var(--cp);">${pres}</div><div class="ca">${pct}%</div><div class="cbw"><div class="cbar" style="width:${pct}%;background:var(--cp);"></div></div></div>
     <div class="ps-card"><div class="ct">Fehlend</div><div class="cv" style="color:var(--ca);">${abs}</div></div>
@@ -1769,6 +1834,7 @@ function updSessDate(si,iso){if(!iso)return;const disp=isoToDisp(iso);snap();cd(
 function updSessTime(si,v){cd().sessions[si].time=v;saveG();}
 function updSessLabel(si,v){cd().sessions[si].label=v;saveG();}
 function updSessHA(si,v){cd().sessions[si].homeAway=v;saveG();}
+function updSessLink(si,v){cd().sessions[si].planLink=v.trim();saveG();}
 function updSessFoc(si,v){snap();cd().sessions[si].focus=v;saveG();renderHead();}
 function delCurrSess(){
   if(currentSI<0)return;if(!confirm('Einheit löschen?'))return;
@@ -1954,8 +2020,8 @@ function sortStats(col){if(statsSort.col===col)statsSort.asc=!statsSort.asc;else
 // ══════════════════════════════
 //  TEAM / SEASON
 // ══════════════════════════════
-function switchTeam(t){G.currentTeam=t;saveG(false);render();}
-function switchSeason(s){G.currentSeason=s;saveG(false);render();}
+function switchTeam(t){G.currentTeam=t;localStorage.setItem('fcf_currentTeam',t);saveG(false);render();}
+function switchSeason(s){G.currentSeason=s;localStorage.setItem('fcf_currentSeason',s);saveG(false);render();}
 
 function addSeason(){
   const n=document.getElementById('newSeasonSel').value;
