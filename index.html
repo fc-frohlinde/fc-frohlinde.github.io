@@ -534,11 +534,15 @@ input[type="date"]{cursor:pointer;}
     <div style="flex:1;">
       <div id="ss-title" style="font-family:'Bebas Neue',sans-serif;font-size:1.35rem;color:var(--bd);letter-spacing:2px;line-height:1;">–</div>
       <div id="ss-meta" style="font-size:.76rem;color:var(--gm);margin-top:4px;"></div>
+      <div id="ss-note-display" style="font-size:.78rem;color:var(--gd);font-style:italic;margin-top:4px;display:none;"></div>
       <div id="ss-plan-link" style="display:none;font-size:.78rem;margin-top:5px;"></div>
     </div>
     <div style="display:flex;gap:6px;"><button class="btn" style="font-size:.76rem;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" onclick="sessGoBack()">← Zurück</button><button class="btn bs" onclick="closeM('moSession2')">✕</button></div>
   </div>
-  <div id="ss-edit" style="background:var(--ow);border-radius:8px;padding:10px 12px;border:1px solid var(--gl);margin-bottom:12px;"></div>
+  <div id="ss-edit-wrap" style="margin-bottom:12px;">
+    <button class="btn" id="ss-edit-toggle" style="width:100%;justify-content:center;background:var(--ow);color:var(--gd);border:1.5px solid var(--gl);margin-bottom:6px;display:none;" onclick="toggleSessEdit()">✎ Bearbeiten</button>
+    <div id="ss-edit" style="display:none;background:var(--ow);border-radius:8px;padding:10px 12px;border:1px solid var(--gl);"></div>
+  </div>
   <div class="ps-cards" id="ss-cards"></div>
   <div class="sec" style="margin-bottom:6px;">Anwesenheit</div>
   <div id="ss-att"></div>
@@ -776,7 +780,7 @@ input[type="date"]{cursor:pointer;}
     <label>App ID (optional)</label>
     <input type="text" id="fb-appId" placeholder="1:123:web:abc..."/>
     <div class="mob-btns" style="margin-top:4px;">
-      <button class="btn bp" onclick="saveFbConfig()">🌐 Verbinden & Speichern</button>
+      <button class="btn bp" onclick="saveFbConfig()">🌐 Verbinden</button>
       <button class="btn bd" onclick="disconnectFb()">✕ Trennen</button>
       <button class="btn bs" onclick="closeM('moAdmin')">Schließen</button>
     </div>
@@ -811,6 +815,8 @@ const DEF_TEAMS=['U14','U15','U16','U17','U19'];
 const DEF_FOCUSES=['Zone 1','Zone 2','Zone 3','Umschalten','Standards'];
 
 let G=null, CU=null;
+let tableSort={col:'nr',asc:true}; // nr, name, pos
+let mgrSort={col:'nr',asc:true};
 let zoomLvl=100, nextIdx=-1, newMatchHA='home';
 let selP1='8er', selP2='', editP1='', editP2='';
 let currentPI=-1, currentSI=-1;
@@ -1451,8 +1457,8 @@ function renderHead(){
   const ss=D.sessions.filter(s=>s&&s.date&&(!colState.hidePast||dispToSortKey(s.date)>=today));
   const ro=!canEdit();
   let r='<tr>';
-  r+=`<th class="c0" style="width:var(--c0);padding:8px 6px;text-align:left;font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:1.2px;">№</th>`;
-  r+=`<th class="c1" style="width:var(--c1);padding:8px 6px;text-align:left;font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:1.2px;">Spieler</th>`;
+  r+=`<th class="c0" style="width:var(--c0);padding:8px 6px;text-align:left;font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:1.2px;cursor:pointer;user-select:none;" onclick="sortTable('nr')">№${tableSort.col==='nr'?(tableSort.asc?'▲':'▼'):''}</th>`;
+  r+=`<th class="c1" style="width:var(--c1);padding:8px 6px;text-align:left;font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:1.2px;cursor:pointer;user-select:none;" onclick="sortTable('name')">Spieler${tableSort.col==='name'?(tableSort.asc?'▲':'▼'):''}</th>`;
   r+=`<th class="c2" style="width:var(--c2);padding:8px 4px;text-align:left;font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:1.2px;border-right:2px solid rgba(255,255,255,.15);">Pos.</th>`;
   for(let i=0;i<ss.length;i++){
     const s=ss[i];
@@ -1496,9 +1502,11 @@ function renderBody(){
     return;
   }
 
+  const sortedPlayers=sortPlayers(D.players);
   const rows=[];
-  for(let pi=0;pi<D.players.length;pi++){
-    const p=D.players[pi];
+  for(let pi=0;pi<sortedPlayers.length;pi++){
+    const p=sortedPlayers[pi];
+    const origPi=D.players.indexOf(p);
     const isEven=(pi+1)%2===0;
 
     let cells='';
@@ -1508,17 +1516,17 @@ function renderBody(){
       const isNext=si===nextIdx;
       const isPast=isSessPast(si);
       const cls=`cs ${CLS[v]}${isNext?' next-col':''}${ro?' ro':''}${isPast?' past-locked':''}`;
-      cells+=`<td class="${cls}" data-pi="${pi}" data-si="${si}" ${!ro?`onclick="cycSt(${pi},${si})"`:''}>${SYM[v]}</td>`;
+      cells+=`<td class="${cls}" data-pi="${origPi}" data-si="${si}" ${!ro?`onclick="cycSt(${origPi},${si})"`:''}>${SYM[v]}</td>`;
     }
 
     rows.push(`<tr>
-      <td class="tdl c0">${!ro?`<input class="nri" value="${p.nr||''}" onchange="updNr(${pi},this.value)"/>`:`<span style="font-weight:700;color:var(--bm);">${p.nr||''}</span>`}</td>
-      <td class="tdl c1" onclick="openPlayerFromMain(${pi})" style="cursor:pointer;">
+      <td class="tdl c0">${!ro?`<input class="nri" value="${p.nr||''}" onchange="updNr(${origPi},this.value)"/>`:`<span style="font-weight:700;color:var(--bm);">${p.nr||''}</span>`}</td>
+      <td class="tdl c1" onclick="openPlayerFromMain(${origPi})" style="cursor:pointer;">
         <div class="ncell"><span class="nm">${p.name||''}</span><span class="ni">›</span></div>
       </td>
       <td class="c2" style="padding:4px;">${pcHtml(p)}</td>
       ${cells}
-      <td>${!ro?`<button class="drb" onclick="delPlayer(${pi})">✕</button>`:''}</td>
+      <td>${!ro?`<button class="drb" onclick="delPlayer(${origPi})">✕</button>`:''}</td>
     </tr>`);
   }
   tbody.innerHTML=rows.join('');
@@ -1757,8 +1765,16 @@ function openSessStats(si){
   document.getElementById('ss-title').textContent=s.date+(isMat&&s.label?' – '+s.label:s.focus?' · '+s.focus:'');
   document.getElementById('ss-meta').innerHTML=isMat?`⚽ Spiel &nbsp;·&nbsp; ${s.homeAway==='home'?'🏠 Heim':'🚌 Auswärts'}${s.label?' &nbsp;·&nbsp; '+s.label:''}${s.time?' &nbsp;·&nbsp; ⏰ '+s.time:''}`:`Training${s.focus?' &nbsp;·&nbsp; 🎯 '+s.focus:''}${s.time?' &nbsp;·&nbsp; ⏰ '+s.time:''}`;
   const ssDelBtn=document.getElementById('ss-del');const ssEdit=document.getElementById('ss-edit');
+  // Note display
+  const noteEl=document.getElementById('ss-note-display');
+  if(noteEl){const sn=s.note;if(sn){noteEl.textContent='📝 '+sn;noteEl.style.display='block';}else{noteEl.style.display='none';}}
+  // Reset edit section
+  const ssEditBox=document.getElementById('ss-edit');
+  const ssToggleBtn=document.getElementById('ss-edit-toggle');
+  if(ssEditBox)ssEditBox.style.display='none';
+  if(ssToggleBtn){ssToggleBtn.style.display=canEdit()?'':'none';ssToggleBtn.textContent='✎ Bearbeiten';}
   if(canEdit()){
-    ssDelBtn.style.display='';ssEdit.style.display='block';
+    ssDelBtn.style.display='';
     const focOpts=foc.map(f=>`<option value="${f}" ${f===s.focus?'selected':''}>${f}</option>`).join('');
     ssEdit.innerHTML=`<div class="sec" style="margin-bottom:7px;">✎ Bearbeiten</div>
       <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:flex-end;">
@@ -1779,8 +1795,9 @@ function openSessStats(si){
               <option value="">– Kein –</option>${focOpts}
             </select></div>`}
       <div style="width:100%;margin-top:7px;"><label style="font-size:.61rem;font-weight:700;color:var(--gd);text-transform:uppercase;">🔗 ${isMat?'Spielbericht-Link':'Trainingsplan-Link'}</label><input type="url" id="ss-e-link" value="${s.planLink||''}" placeholder="https://..." style="width:100%;padding:6px;border:1.5px solid var(--gl);border-radius:6px;font-size:.8rem;outline:none;margin-bottom:0;" oninput="updSessLink(${si},this.value)"/></div>
+      <div style="margin-top:7px;"><label style="font-size:.61rem;font-weight:700;color:var(--gd);text-transform:uppercase;">📝 Kommentar</label><textarea id="ss-e-note" rows="2" style="width:100%;padding:6px;border:1.5px solid var(--gl);border-radius:6px;font-family:'Barlow',sans-serif;font-size:.8rem;resize:vertical;margin-bottom:0;" placeholder="z.B. Verletzungsstand, Besonderheiten..." oninput="updSessNote(${si},this.value)">${s.note||''}</textarea></div>
       </div>`;
-  }else{ssDelBtn.style.display='none';ssEdit.style.display='none';}
+  }else{ssDelBtn.style.display='none';if(document.getElementById('ss-edit-toggle'))document.getElementById('ss-edit-toggle').style.display='none';}
   buildSessAtt(si);
   openM('moSession2');
 }
@@ -1795,7 +1812,8 @@ function buildSessAtt(si){
   // Show plan link if exists
   const sl=D.sessions[si]?.planLink;
   const slEl=document.getElementById('ss-plan-link');
-  if(slEl){if(sl){slEl.innerHTML=`🔗 <a href="${sl}" target="_blank" rel="noopener" style="color:var(--bm);font-weight:600;">Trainingsplan öffnen</a>`;slEl.style.display='block';}else{slEl.style.display='none';}}
+  if(slEl){if(sl){const linkLabel=D.sessions[si]?.type==='match'?'Spielbericht öffnen':'Trainingsplan öffnen';
+  slEl.innerHTML=`🔗 <a href="${sl}" target="_blank" rel="noopener" style="color:var(--bm);font-weight:600;">${linkLabel}</a>`;slEl.style.display='block';}else{slEl.style.display='none';}}
   document.getElementById('ss-cards').innerHTML=`
     <div class="ps-card"><div class="ct">Anwesend</div><div class="cv" style="color:var(--cp);">${pres}</div><div class="ca">${pct}%</div><div class="cbw"><div class="cbar" style="width:${pct}%;background:var(--cp);"></div></div></div>
     <div class="ps-card"><div class="ct">Fehlend</div><div class="cv" style="color:var(--ca);">${abs}</div></div>
@@ -1835,6 +1853,14 @@ function updSessTime(si,v){cd().sessions[si].time=v;saveG();}
 function updSessLabel(si,v){cd().sessions[si].label=v;saveG();}
 function updSessHA(si,v){cd().sessions[si].homeAway=v;saveG();}
 function updSessLink(si,v){cd().sessions[si].planLink=v.trim();saveG();}
+function updSessNote(si,v){cd().sessions[si].note=v;saveG();}
+function toggleSessEdit(){
+  const box=document.getElementById('ss-edit');
+  const btn=document.getElementById('ss-edit-toggle');
+  const open=box.style.display==='none';
+  box.style.display=open?'block':'none';
+  btn.textContent=open?'▲ Bearbeiten schließen':'✎ Bearbeiten';
+}
 function updSessFoc(si,v){snap();cd().sessions[si].focus=v;saveG();renderHead();}
 function delCurrSess(){
   if(currentSI<0)return;if(!confirm('Einheit löschen?'))return;
@@ -1884,10 +1910,12 @@ function renderMgrSessions(type){
     const pct=total?Math.round((pres/total)*100):0;
     const bc=pct>=80?'var(--cp)':pct>=60?'var(--ce)':'var(--ca)';
     const extra=type==='match'?(s.label?' – '+s.label:''):(s.focus?' · '+s.focus:'');
+    const linkHtml=s.planLink?`<a href="${s.planLink}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="font-size:.68rem;color:var(--bm);flex-shrink:0;">🔗</a>`:'';
     return `<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--gl);font-size:.8rem;cursor:pointer;" onclick="navPush({id:'moTeamMgr',tab:'${type==='training'?'trainings':'spiele'}'}); closeM('moTeamMgr');openSessStats(${origIdx})">
       <div style="font-weight:600;color:var(--bd);width:72px;">${s.date}</div>
       ${type==='match'?`<div style="font-size:.68rem;padding:1px 6px;border-radius:6px;background:rgba(176,48,0,.1);color:var(--mc1);">${s.homeAway==='home'?'🏠':'🚌'}</div>`:''}
       <div style="flex:1;color:var(--gd);">${extra}</div>
+      ${linkHtml}
       ${s.time?`<div style="font-size:.72rem;color:var(--gm);">⏰ ${s.time}</div>`:''}
       <div style="font-weight:700;color:${bc};min-width:36px;text-align:right;">${pres}/${total}</div>
     </div>`;
@@ -1909,8 +1937,16 @@ function switchTab(t){
 
 function renderMgrPlayers(){
   const D=cd();
-  document.getElementById('tmgr-pl-list').innerHTML=(D.players&&D.players.length)?
-    D.players.map((p,i)=>`<div class="pl-row">
+  const sortedP=sortMgrPlayers(D.players||[]);
+  // Add sort buttons to header
+  const sortHdr=`<div style="display:flex;gap:4px;padding:4px 10px;background:var(--bd);border-radius:7px 7px 0 0;">
+    <div style="width:26px;font-size:.65rem;font-weight:700;color:rgba(255,255,255,.6);cursor:pointer;" onclick="sortMgr('nr')">№${mgrSort.col==='nr'?(mgrSort.asc?'▲':'▼'):''}</div>
+    <div style="flex:1;font-size:.65rem;font-weight:700;color:rgba(255,255,255,.6);cursor:pointer;" onclick="sortMgr('name')">Spieler${mgrSort.col==='name'?(mgrSort.asc?'▲':'▼'):''}</div>
+    <div style="min-width:82px;font-size:.65rem;font-weight:700;color:rgba(255,255,255,.6);cursor:pointer;" onclick="sortMgr('pos')">Pos.${mgrSort.col==='pos'?(mgrSort.asc?'▲':'▼'):''}</div>
+    <div style="width:60px;"></div>
+  </div>`;
+  document.getElementById('tmgr-pl-list').innerHTML=(sortedP.length)?
+    sortHdr+sortedP.map((p)=>{const i=D.players.indexOf(p);return`<div class="pl-row">
       <div class="pl-nr">${p.nr||''}</div>
       <div class="pl-name" onclick="closeM('moTeamMgr');openPlayerStats(${i});">${p.name||''}</div>
       <div class="pl-pos">${pbHtml(p)}</div>
@@ -1918,7 +1954,7 @@ function renderMgrPlayers(){
         <button class="pl-btn pl-btn-e" onclick="closeM('moTeamMgr');openPlayerStats(${i});">✎</button>
         ${canEdit()?`<button class="pl-btn pl-btn-d" onclick="mgrDelPl(${i})">✕</button>`:''}
       </div>
-    </div>`).join('')
+    </div>`;}).join('')
     :'<p style="padding:14px;font-size:.76rem;color:var(--gm);">Keine Spieler.</p>';
   document.getElementById('btn-mgr-addpl').style.display=canEdit()?'':'none';
 }
@@ -2014,6 +2050,32 @@ function renderMgrStats(){
       ${mS?`<td style="font-weight:700;color:${pctColor(r.mPct)};">${r.mPl?r.mPct+'%':'–'}</td><td>${r.mA}</td><td>${r.mPl}</td>`:''}
     </tr>`;}).join('')}
     </tbody></table></div>`;
+}
+function sortTable(col){
+  if(tableSort.col===col)tableSort.asc=!tableSort.asc;
+  else{tableSort.col=col;tableSort.asc=true;}
+  renderHead();renderBody();
+}
+function sortMgr(col){
+  if(mgrSort.col===col)mgrSort.asc=!mgrSort.asc;
+  else{mgrSort.col=col;mgrSort.asc=true;}
+  renderMgrPlayers();
+}
+function sortPlayers(players){
+  const {col,asc}=tableSort;
+  return [...players].sort((a,b)=>{
+    let va=a[col]||'',vb=b[col]||'';
+    if(col==='nr'){va=+a.nr||999;vb=+b.nr||999;return asc?va-vb:vb-va;}
+    return asc?String(va).localeCompare(String(vb)):String(vb).localeCompare(String(va));
+  });
+}
+function sortMgrPlayers(players){
+  const {col,asc}=mgrSort;
+  return [...players].sort((a,b)=>{
+    let va=a[col]||'',vb=b[col]||'';
+    if(col==='nr'){va=+a.nr||999;vb=+b.nr||999;return asc?va-vb:vb-va;}
+    return asc?String(va).localeCompare(String(vb)):String(vb).localeCompare(String(va));
+  });
 }
 function sortStats(col){if(statsSort.col===col)statsSort.asc=!statsSort.asc;else{statsSort.col=col;statsSort.asc=false;}renderMgrStats();}
 
