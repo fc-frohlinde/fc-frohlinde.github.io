@@ -558,7 +558,25 @@ input[type="date"]{cursor:pointer;}
       <div class="pos-grid" id="pe-pos1"></div>
       <div class="sec" style="margin-bottom:6px;">Position 2 (optional)</div>
       <div class="pos-grid" id="pe-pos2"></div>
-      <div class="sec" style="margin-bottom:6px;">📝 Zusatzinfo (Kommentar)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px;">
+        <div>
+          <label>🎫 Spieler-Passnummer</label>
+          <input type="text" id="pe-passnr" placeholder="z.B. 12345678" style="margin-bottom:0;"/>
+        </div>
+        <div>
+          <label>🎂 Geburtsdatum</label>
+          <input type="date" id="pe-birthdate" style="margin-bottom:0;"/>
+        </div>
+      </div>
+      <div style="margin-bottom:8px;">
+        <label>🦵 Bevorzugter Fuß</label>
+        <div style="display:flex;gap:6px;margin-top:4px;">
+          <div class="radio-opt" id="foot-right" onclick="setFoot('right')" style="flex:1;justify-content:center;">Rechts</div>
+          <div class="radio-opt" id="foot-left" onclick="setFoot('left')" style="flex:1;justify-content:center;">Links</div>
+          <div class="radio-opt" id="foot-both" onclick="setFoot('both')" style="flex:1;justify-content:center;">Beidfüßig</div>
+        </div>
+      </div>
+      <div class="sec" style="margin-bottom:6px;">📝 Kommentar</div>
       <textarea id="pe-note" rows="2" placeholder="z.B. Verletzt bis KW 20, Schulnoten, ..." style="width:100%;padding:7px;border:1.5px solid var(--gl);border-radius:7px;font-family:'Barlow',sans-serif;font-size:.8rem;resize:vertical;margin-bottom:8px;"></textarea>
       <div style="display:flex;gap:7px;flex-wrap:wrap;">
         <button class="btn bp" onclick="savePlayerEdit()">✓ Speichern</button>
@@ -1808,7 +1826,15 @@ function openPlayerStats(pi){
   document.getElementById('ps-pos-badge').innerHTML=pbHtml(p);
   document.getElementById('ps-ctx').textContent=UI.currentTeam+' · '+UI.currentSeason;
   const noteEl=document.getElementById('ps-note-display');
-  if(noteEl){if(p.note){noteEl.textContent='📝 '+p.note;noteEl.style.display='block';}else{noteEl.style.display='none';}}
+  if(noteEl){
+    let info=[];
+    if(p.note)info.push('📝 '+p.note);
+    if(p.passnr)info.push('🎫 '+p.passnr);
+    if(p.birthdate)info.push('🎂 '+new Date(p.birthdate).toLocaleDateString('de-DE'));
+    if(p.foot)info.push('🦵 '+(p.foot==='right'?'Rechts':p.foot==='left'?'Links':'Beidfüßig'));
+    if(info.length){noteEl.innerHTML=info.join(' &nbsp;·&nbsp; ');noteEl.style.display='block';}
+    else{noteEl.style.display='none';}
+  }
   // Reset edit section
   const editBox=document.getElementById('ps-edit');
   if(editBox)editBox.style.display='none';
@@ -1819,6 +1845,10 @@ function openPlayerStats(pi){
   if(canEdit()){
     document.getElementById('pe-nr').value=p.nr||'';
     document.getElementById('pe-note').value=p.note||'';
+    document.getElementById('pe-passnr').value=p.passnr||'';
+    document.getElementById('pe-birthdate').value=p.birthdate||'';
+    _currentFoot=p.foot||'right';
+    setFoot(_currentFoot);
     document.getElementById('pe-name').value=p.name||'';
     initEditPos(p.pos||'8er',p.pos2||'');
   }
@@ -1859,6 +1889,14 @@ function openPlayerStats(pi){
   openM('moPlayer');
 }
 
+let _currentFoot='right';
+function setFoot(v){
+  _currentFoot=v;
+  ['right','left','both'].forEach(f=>{
+    const el=document.getElementById('foot-'+f);
+    if(el)el.classList.toggle('sel',f===v);
+  });
+}
 function togglePlayerEdit(){
   const box=document.getElementById('ps-edit');
   const btn=document.getElementById('ps-edit-toggle');
@@ -1873,6 +1911,9 @@ function savePlayerEdit(){
   p.name=document.getElementById('pe-name').value.trim()||p.name;
   p.pos=editP1;p.pos2=editP2||'';
   p.note=document.getElementById('pe-note').value.trim();
+  p.passnr=document.getElementById('pe-passnr').value.trim();
+  p.birthdate=document.getElementById('pe-birthdate').value;
+  p.foot=_currentFoot;
   saveG();renderBody();renderTfoot();
   // Collapse edit section after save
   document.getElementById('ps-edit').style.display='none';
@@ -2134,8 +2175,33 @@ function delTrainer(i){if(!confirm(`"${G.trainers[i].name}" entfernen?`))return;
 function renderFocList(){
   document.getElementById('foc-team-lbl').textContent=UI.currentTeam;
   const foc=teamFoc();
+  const D=cd();
+  // Build stats per focus
+  const focStats={};
+  foc.forEach(f=>focStats[f]={a:0,pl:0});
+  if(D&&Array.isArray(D.sessions)&&Array.isArray(D.players)){
+    D.sessions.forEach((s,si)=>{
+      if(s.type!=='training'||!s.focus||!focStats[s.focus])return;
+      D.players.forEach(p=>{
+        if(!p.s||si>=p.s.length)return;
+        if(p.s[si]===3)return;
+        focStats[s.focus].pl++;
+        if(p.s[si]===1)focStats[s.focus].a++;
+      });
+    });
+  }
   document.getElementById('foc-list').innerHTML=foc.length?
-    foc.map((f,i)=>`<div class="fi-row"><div class="fi-nm">🎯 ${f}</div>${canEdit()?`<button class="fi-del" onclick="delFoc(${i})">✕</button>`:''}</div>`).join('')
+    foc.map((f,i)=>{
+      const st=focStats[f]||{a:0,pl:0};
+      const pct=st.pl?Math.round((st.a/st.pl)*100):null;
+      const bc=pct!==null?(pct>=80?'var(--cp)':pct>=60?'var(--ce)':'var(--ca)'):'#ccc';
+      const bar=pct!==null?`<div style="flex:1;background:var(--gl);border-radius:3px;height:5px;margin:0 8px;overflow:hidden;"><div style="width:${pct}%;height:100%;background:${bc};border-radius:3px;"></div></div><span style="font-size:.68rem;font-weight:700;color:${bc};min-width:32px;">${pct}%</span>`:'<div style="flex:1;"></div>';
+      return `<div class="fi-row" style="align-items:center;">
+        <div class="fi-nm" style="flex:none;min-width:90px;">🎯 ${f}</div>
+        ${bar}
+        ${canEdit()?`<button class="fi-del" onclick="delFoc(${i})">✕</button>`:''}
+      </div>`;
+    }).join('')
     :'<p style="font-size:.76rem;color:var(--gm);">Noch keine Schwerpunkte.</p>';
   document.getElementById('foc-add-row').style.display=canEdit()?'flex':'none';
   populateFocSel();
@@ -2332,14 +2398,23 @@ function doGen(){
   // Remove sessions within the date window
   const startKey=isoToSortKey(sIso),endKey=isoToSortKey(eIso);
   const toRemove=[];
-  D.sessions.forEach((s,i)=>{const k=dispToSortKey(s.date);if(k>=startKey&&k<=endKey)toRemove.push(i);});
+  D.sessions.forEach((s,i)=>{
+    const k=dispToSortKey(s.date);
+    if(k>=startKey&&k<=endKey){
+      // Keep matches that already have a named opponent
+      if(s.type==='match'&&s.label&&s.label.trim())return;
+      toRemove.push(i);
+    }
+  });
   // Remove in reverse order
   toRemove.reverse().forEach(i=>{D.sessions.splice(i,1);D.players.forEach(p=>{if(p.s)p.s.splice(i,1);});});
   // Prevent same day for training AND match
   const tSet=new Set(tD),mSet=new Set(mD);
   const overlap=[...tSet].filter(d=>mSet.has(d));
   if(overlap.length){alert('Achtung: Einige Wochentage sind sowohl als Training als auch als Spiel ausgewählt. Bitte auswählen, nicht überlappen.');return;}
-  const ns=genRange(new Date(sIso),new Date(eIso),tD,mD,tTime,mTime);
+  // Don't generate on dates already occupied by named matches
+  const namedMatchDates=new Set(D.sessions.filter(s=>s.type==='match'&&s.label&&s.label.trim()).map(s=>s.date));
+  const ns=genRange(new Date(sIso),new Date(eIso),tD,mD,tTime,mTime).filter(x=>!(x.type==='match'&&namedMatchDates.has(x.date)));
   snap();ns.forEach(x=>insertSorted(D,x));saveG();render();closeM('moGenSch');
   alert(`${ns.length} Einheit(en) generiert (${toRemove.length} alte ersetzt).`);
 }
