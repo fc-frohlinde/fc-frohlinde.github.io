@@ -857,6 +857,19 @@ const DEF_TEAMS=['U14','U15','U16','U17','U19'];
 const DEF_FOCUSES=['Zone 1','Zone 2','Zone 3','Umschalten','Standards'];
 
 let G=null, CU=null;
+// Per-user UI state (never synced to Firebase)
+const UI={currentTeam:null,currentSeason:null};
+function saveUI(){
+  if(UI.currentTeam)localStorage.setItem('fcf_currentTeam',UI.currentTeam);
+  if(UI.currentSeason)localStorage.setItem('fcf_currentSeason',UI.currentSeason);
+}
+function initUI(){
+  const lt=localStorage.getItem('fcf_currentTeam');
+  const ls=localStorage.getItem('fcf_currentSeason');
+  UI.currentTeam=(lt&&Array.isArray(G.teamList)&&G.teamList.includes(lt))?lt:(G.teamList?.[0]||null);
+  UI.currentSeason=(ls&&Array.isArray(G.seasonList)&&G.seasonList.includes(ls))?ls:(G.seasonList?.[G.seasonList.length-1]||null);
+  saveUI();
+}
 let tableSort={col:'nr',asc:true}; // nr, name, pos
 let mgrSort={col:'nr',asc:true};
 let attSort={col:'nr',asc:true};
@@ -877,7 +890,7 @@ function isoToDisp(iso){
 }
 function getSeasonYears(){
   // Returns {y1, y2} for the current season e.g. 2025/26 -> {y1:2025, y2:2026}
-  const m=G&&G.currentSeason?G.currentSeason.match(/^(\d{4})\/(\d{2})$/):null;
+  const m=G&&UI.currentSeason?UI.currentSeason.match(/^(\d{4})\/(\d{2})$/):null;
   if(!m)return{y1:2025,y2:2026};
   const y1=parseInt(m[1]);
   return{y1,y2:y1+1};
@@ -993,10 +1006,7 @@ function buildDef(){
   const mo=new Date().getMonth()+1;
   const y1=mo>=7?curYear:curYear-1;
   const season=y1+'/'+(y1+1).toString().slice(-2);
-  G={version:14,currentTeam:'U19',currentSeason:season,
-    teamList:['U19'],seasonList:[season],
-    trainers:[],
-    db:{}};
+  G={version:14,teamList:['U19'],seasonList:[season],trainers:[],db:{}};
   const sess=genAutoSessions(season);
   G.db['U19__'+season]={sessions:sess,players:[]};
   G.db['U19__focuses']=[...DEF_FOCUSES];
@@ -1005,10 +1015,7 @@ function buildTestDef(){
   // Test data: full default with teams, players, sessions, trainers
   const season='2025/26';
   const sess=genAutoSessions(season);
-  G={version:14,currentTeam:'U19',currentSeason:season,
-    teamList:['U19'],seasonList:[season],
-    trainers:[{id:'t1',name:'Thomas Hoffmann',teams:['U19']},{id:'t2',name:'Artem Horbachov',teams:['U19']}],
-    db:{}};
+  G={version:14,teamList:['U19'],seasonList:[season],trainers:[{id:'t1',name:'Thomas Hoffmann',teams:['U19']},{id:'t2',name:'Artem Horbachov',teams:['U19']}],db:{}};
   G.db['U19__'+season]={sessions:JSON.parse(JSON.stringify(sess)),players:mkPl('U19',sess.length)};
   G.db['U19__focuses']=[...DEF_FOCUSES];
 }
@@ -1087,7 +1094,8 @@ function fbEncode(g){
   const encoded=fbEncodeValue(g);
   // Remove per-user fields from encoded result
   if(encoded&&typeof encoded==='object'){
-
+    delete encoded.currentTeam;
+    delete encoded.currentSeason;
   }
   return encoded;
 }
@@ -1119,6 +1127,9 @@ function sanitizeG(data){
     d.sessions=d.sessions.filter(s=>s&&s.date);
   });}
   data.teamList.forEach(t=>{if(!data.db[t+'__focuses']||!Array.isArray(data.db[t+'__focuses']))data.db[t+'__focuses']=[...DEF_FOCUSES];});
+  // Never set currentTeam/currentSeason in G - those are UI state
+  delete data.currentTeam;
+  delete data.currentSeason;
   return data;
 }
 function startFbListener(){
@@ -1130,23 +1141,7 @@ function startFbListener(){
     const data=raw?fbDecode(raw):null;
     if(data&&data.version>=14){
       G=sanitizeG(data);
-      // Restore per-user local navigation state
-      const localTeam=localStorage.getItem('fcf_currentTeam');
-      const localSeason=localStorage.getItem('fcf_currentSeason');
-      // Restore currentTeam
-      if(localTeam&&Array.isArray(G.teamList)&&G.teamList.includes(localTeam)){
-        G.currentTeam=localTeam;
-      }else if(Array.isArray(G.teamList)&&G.teamList.length){
-        G.currentTeam=G.teamList[0];
-        localStorage.setItem('fcf_currentTeam',G.currentTeam);
-      }
-      // Restore currentSeason
-      if(localSeason&&Array.isArray(G.seasonList)&&G.seasonList.includes(localSeason)){
-        G.currentSeason=localSeason;
-      }else if(Array.isArray(G.seasonList)&&G.seasonList.length){
-        G.currentSeason=G.seasonList[G.seasonList.length-1]; // latest season
-        localStorage.setItem('fcf_currentSeason',G.currentSeason);
-      }
+      initUI(); // restore per-user navigation state
       render();
       setFbStatus('connected');
     } else if(!data){
@@ -1208,13 +1203,7 @@ function loadG(){
   try{const d=JSON.parse(localStorage.getItem(SK));if(d&&d.version>=14)G=d;}catch(e){G=null;}
   if(!G)buildDef();
   G.teamList.forEach(t=>{if(!G.db[t+'__focuses']||!Array.isArray(G.db[t+'__focuses']))G.db[t+'__focuses']=[...DEF_FOCUSES];});
-  // Restore per-user navigation state from localStorage
-  const lt=localStorage.getItem('fcf_currentTeam');
-  const ls=localStorage.getItem('fcf_currentSeason');
-  if(lt&&Array.isArray(G.teamList)&&G.teamList.includes(lt))G.currentTeam=lt;
-  else if(Array.isArray(G.teamList)&&G.teamList.length){G.currentTeam=G.teamList[0];localStorage.setItem('fcf_currentTeam',G.currentTeam);}
-  if(ls&&Array.isArray(G.seasonList)&&G.seasonList.includes(ls))G.currentSeason=ls;
-  else if(Array.isArray(G.seasonList)&&G.seasonList.length){G.currentSeason=G.seasonList[G.seasonList.length-1];localStorage.setItem('fcf_currentSeason',G.currentSeason);}
+  initUI();
 }
 
 function saveG(badge=true){
@@ -1231,9 +1220,22 @@ function saveG(badge=true){
   }
   updateUndoBtns();
 }
-function ck(){return G.currentTeam+'__'+G.currentSeason;}
-function cd(){if(!G.db[ck()])G.db[ck()]={sessions:[],players:[]};return G.db[ck()];}
-function teamFoc(t){t=t||G.currentTeam;const f=G.db[t+'__focuses'];if(!Array.isArray(f)||f===null)G.db[t+'__focuses']=[...DEF_FOCUSES];return G.db[t+'__focuses'];}
+function ck(){
+  if(!UI.currentTeam||!UI.currentSeason)return null;
+  return UI.currentTeam+'__'+UI.currentSeason;
+}
+function cd(){
+  const key=ck();
+  if(!key||!G.db)return null;
+  return G.db[key]||null;
+}
+function ensureCd(){
+  const key=ck();
+  if(!key)return null;
+  if(!G.db[key])G.db[key]={sessions:[],players:[]};
+  return G.db[key];
+}
+function teamFoc(t){t=t||UI.currentTeam;const f=G.db[t+'__focuses'];if(!Array.isArray(f)||f===null)G.db[t+'__focuses']=[...DEF_FOCUSES];return G.db[t+'__focuses'];}
 
 // ══════════════════════════════
 //  AUTH
@@ -1372,8 +1374,8 @@ function manualSyncLoad(){
     if(!data||data.version<14)return alert('Keine Daten in Firebase.');
     G=sanitizeG(data);
     const lt=localStorage.getItem('fcf_currentTeam'),ls=localStorage.getItem('fcf_currentSeason');
-    if(lt&&G.teamList?.includes(lt))G.currentTeam=lt;
-    if(ls&&G.seasonList?.includes(ls))G.currentSeason=ls;
+    if(lt&&G.teamList?.includes(lt))UI.currentTeam=lt;
+    if(ls&&G.seasonList?.includes(ls))UI.currentSeason=ls;
     saveG(false);render();alert('✅ Daten geladen.');
   }).catch(e=>alert('Fehler: '+e.message));
 }
@@ -1381,8 +1383,8 @@ function switchUser(){confirmLogout();}
 
 function showApp(){
   // Save initial currentTeam/currentSeason to localStorage if not already set
-  if(!localStorage.getItem('fcf_currentTeam'))localStorage.setItem('fcf_currentTeam',G.currentTeam||'U19');
-  if(!localStorage.getItem('fcf_currentSeason'))localStorage.setItem('fcf_currentSeason',G.currentSeason||'2025/26');
+  if(!localStorage.getItem('fcf_currentTeam'))localStorage.setItem('fcf_currentTeam',UI.currentTeam||'U19');
+  if(!localStorage.getItem('fcf_currentSeason'))localStorage.setItem('fcf_currentSeason',UI.currentSeason||'2025/26');
   // Attempt Firebase connection on load
   const cfg=loadFbConfig();
   if(cfg)initFirebase(cfg);
@@ -1401,7 +1403,7 @@ function showApp(){
 function canEdit(){
   if(!CU)return false;
   if(CU.role==='admin')return true;
-  if(CU.role==='trainer')return CU.teams.includes(G.currentTeam);
+  if(CU.role==='trainer')return CU.teams.includes(UI.currentTeam);
   return false;
 }
 function isAdmin(){return CU?.role==='admin';}
@@ -1511,7 +1513,8 @@ function pctColor(pct){return pct>=80?'var(--cp)':pct>=60?'var(--ce)':'var(--ca)
 
 // Auto-convert Ausstehend→Fehlend for past sessions
 function autoConvertPast(){
-  const D=cd(),today=todaySK();
+  const D=cd();if(!D)return;
+  const today=todaySK();
   let changed=false;
   D.sessions.forEach((s,si)=>{
     if(!s||!s.date)return;
@@ -1546,13 +1549,13 @@ function renderHdrInfo(){
   if(!G)return;
   if(!Array.isArray(G.trainers))G.trainers=[];
   if(!Array.isArray(G.teamList))G.teamList=['U19'];
-  if(!Array.isArray(G.seasonList))G.seasonList=[G.currentSeason||'2025/26'];
-  document.getElementById('hSeason').textContent=G.currentSeason;
-  document.getElementById('hSub').textContent=G.currentTeam+' · Junioren';
+  if(!Array.isArray(G.seasonList))G.seasonList=[UI.currentSeason||'2025/26'];
+  document.getElementById('hSeason').textContent=UI.currentSeason;
+  document.getElementById('hSub').textContent=UI.currentTeam+' · Junioren';
   document.getElementById('fDate').textContent=new Date().toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});
-  document.getElementById('fTeam').textContent=G.currentTeam+' · Saison '+G.currentSeason;
+  document.getElementById('fTeam').textContent=UI.currentTeam+' · Saison '+UI.currentSeason;
   // Trainer chips in header
-  const tr=G.trainers.filter(t=>t.teams.includes(G.currentTeam));
+  const tr=G.trainers.filter(t=>t.teams.includes(UI.currentTeam));
   const htr=document.getElementById('hTrainers');
   if(htr)htr.innerHTML=tr.length?tr.map(t=>`<span class="trainer-chip">${t.name}</span>`).join(''):'';
 }
@@ -1563,24 +1566,24 @@ function renderTeamBar(){
   // Team tabs
   const tabs=document.getElementById('teamTabs');
   tabs.innerHTML=G.teamList.map(t=>`
-    <button class="ttab${t===G.currentTeam?' active':''}" data-team="${t}" draggable="true" onclick="switchTeam('${t}')">
+    <button class="ttab${t===UI.currentTeam?' active':''}" data-team="${t}" draggable="true" onclick="switchTeam('${t}')">
       ${t}${isAdmin()?`<span class="tdelt" onclick="event.stopPropagation();delTeam('${t}')">✕</span>`:''}
     </button>`).join('')+
     (isAdmin()?`<button class="ttab-add" onclick="openM('moNewTeam')">＋</button>`:'');
   // Trainer chips on right
-  const trainers=G.trainers.filter(t=>t.teams.includes(G.currentTeam));
+  const trainers=G.trainers.filter(t=>t.teams.includes(UI.currentTeam));
   // trainer strip removed
 }
 
 function renderSeasonSel(){
   const sorted=[...G.seasonList].sort((a,b)=>{const ya=+a.split('/')[0],yb=+b.split('/')[0];return yb-ya;});
-  document.getElementById('seasonSel').innerHTML=sorted.map(s=>`<option value="${s}"${s===G.currentSeason?' selected':''}>${s}</option>`).join('');
+  document.getElementById('seasonSel').innerHTML=sorted.map(s=>`<option value="${s}"${s===UI.currentSeason?' selected':''}>${s}</option>`).join('');
 }
 
 // ══ TABLE HEAD ══
 function renderHead(){
   const D=cd();
-  if(!D||!Array.isArray(D.sessions))return;
+  if(!D||!Array.isArray(D.sessions)){document.getElementById('tHead').innerHTML='';return;}
   const today=todaySK();
   const ss=D.sessions.filter(s=>s&&s.date&&(!colState.hidePast||dispToSortKey(s.date)>=today));
   const ro=!canEdit();
@@ -1617,8 +1620,8 @@ function renderHead(){
 
 // ══ TABLE BODY ══
 function renderBody(){
-  const D=cd(),tbody=document.getElementById('tBody');
-  if(!D||!Array.isArray(D.sessions)||!Array.isArray(D.players)){if(tbody)tbody.innerHTML='';return;}
+  const D=cd();const tbody=document.getElementById('tBody');
+  if(!D||!Array.isArray(D.sessions)||!Array.isArray(D.players)){if(tbody)tbody.innerHTML='<tr><td colspan="10" style="padding:30px;text-align:center;color:var(--gm);">Keine Daten</td></tr>';return;}
   const today2=todaySK();
   const ss=D.sessions.filter(s=>s&&s.date&&(!colState.hidePast||dispToSortKey(s.date)>=today2));
   const ro=!canEdit();
@@ -1664,7 +1667,7 @@ function renderBody(){
 
 // ══ TABLE FOOT ══
 function renderTfoot(){
-  const D=cd();
+  const D=cd();if(!D){document.getElementById('tFoot').innerHTML='';return;}
   const today3=todaySK();
   const ss=(D.sessions||[]).filter(s=>s&&s.date&&(!colState.hidePast||dispToSortKey(s.date)>=today3));
   const tFoot=document.getElementById('tFoot');
@@ -1697,7 +1700,7 @@ function renderTfoot(){
 }
 
 function renderFooter(){
-  const D=cd();
+  const D=cd();if(!D)return;
   const tS=(D.sessions||[]).filter(s=>s.type==='training').length;
   const mS=(D.sessions||[]).filter(s=>s.type==='match').length;
   let totA=0,totPl=0;
@@ -1803,7 +1806,7 @@ function openPlayerStats(pi){
   document.getElementById('ps-name').textContent=p.name||'–';
   document.getElementById('ps-nr').textContent='#'+(p.nr||'?');
   document.getElementById('ps-pos-badge').innerHTML=pbHtml(p);
-  document.getElementById('ps-ctx').textContent=G.currentTeam+' · '+G.currentSeason;
+  document.getElementById('ps-ctx').textContent=UI.currentTeam+' · '+UI.currentSeason;
   const noteEl=document.getElementById('ps-note-display');
   if(noteEl){if(p.note){noteEl.textContent='📝 '+p.note;noteEl.style.display='block';}else{noteEl.style.display='none';}}
   // Reset edit section
@@ -2076,7 +2079,7 @@ function switchTab(t){
   });
   document.getElementById('tmgr-h').textContent={spieler:'👥 Spieler',trainer:'🎽 Trainer',schwerpunkte:'🎯 Schwerpunkte',statistik:'📊 Statistik',trainings:'📅 Trainingseinheiten',spiele:'⚽ Spiele'}[t]||'Mannschaft';
   if(t==='spieler')renderMgrPlayers();
-  if(t==='trainer'){document.getElementById('mgr-team-lbl').textContent=G.currentTeam;renderMgrTrainers();buildTeamChecks('tTeamChecks');}
+  if(t==='trainer'){document.getElementById('mgr-team-lbl').textContent=UI.currentTeam;renderMgrTrainers();buildTeamChecks('tTeamChecks');}
   if(t==='schwerpunkte')renderFocList();
   if(t==='statistik')renderMgrStats();
   if(t==='trainings')renderMgrSessions('training');
@@ -2109,14 +2112,14 @@ function renderMgrPlayers(){
 function mgrDelPl(pi){const p=cd().players[pi];if(!p||!confirm(`"${p.name}" löschen?`))return;snap();cd().players.splice(pi,1);saveG();renderMgrPlayers();render();}
 
 function renderMgrTrainers(){
-  const myT=G.trainers.filter(t=>t.teams.includes(G.currentTeam));
+  const myT=G.trainers.filter(t=>t.teams.includes(UI.currentTeam));
   document.getElementById('mgr-tr-list').innerHTML=myT.length?
     myT.map(t=>{const gi=G.trainers.indexOf(t);return`<div class="tr-row"><div><div class="tr-nm">${t.name}</div><div class="tr-teams">${t.teams.join(', ')}</div></div>${isAdmin()?`<button class="tr-del" onclick="delTrainer(${gi})">✕</button>`:''}</div>`;}).join('')
     :'<p style="font-size:.76rem;color:var(--gm);">Kein Trainer für dieses Team.</p>';
 }
 function buildTeamChecks(cid){
   const c=document.getElementById(cid);if(!c)return;
-  c.innerHTML=G.teamList.map(t=>`<div class="tcheck${t===G.currentTeam?' sel':''}" data-t="${t}" onclick="this.classList.toggle('sel')">${t}</div>`).join('');
+  c.innerHTML=G.teamList.map(t=>`<div class="tcheck${t===UI.currentTeam?' sel':''}" data-t="${t}" onclick="this.classList.toggle('sel')">${t}</div>`).join('');
 }
 function getChecked(cid){return[...document.querySelectorAll('#'+cid+' .tcheck.sel')].map(c=>c.dataset.t);}
 function addTrainer(){
@@ -2129,7 +2132,7 @@ function delTrainer(i){if(!confirm(`"${G.trainers[i].name}" entfernen?`))return;
 
 // Focuses
 function renderFocList(){
-  document.getElementById('foc-team-lbl').textContent=G.currentTeam;
+  document.getElementById('foc-team-lbl').textContent=UI.currentTeam;
   const foc=teamFoc();
   document.getElementById('foc-list').innerHTML=foc.length?
     foc.map((f,i)=>`<div class="fi-row"><div class="fi-nm">🎯 ${f}</div>${canEdit()?`<button class="fi-del" onclick="delFoc(${i})">✕</button>`:''}</div>`).join('')
@@ -2230,8 +2233,8 @@ function sortStats(col){if(statsSort.col===col)statsSort.asc=!statsSort.asc;else
 // ══════════════════════════════
 //  TEAM / SEASON
 // ══════════════════════════════
-function switchTeam(t){G.currentTeam=t;localStorage.setItem('fcf_currentTeam',t);saveG(false);render();}
-function switchSeason(s){G.currentSeason=s;localStorage.setItem('fcf_currentSeason',s);saveG(false);render();}
+function switchTeam(t){UI.currentTeam=t;saveUI();render();}
+function switchSeason(s){UI.currentSeason=s;saveUI();render();}
 
 function addSeason(){
   const n=document.getElementById('newSeasonSel').value;
@@ -2239,20 +2242,20 @@ function addSeason(){
   snap();G.seasonList.push(n);
   // Copy roster from current season for each team
   G.teamList.forEach(t=>{
-    const prev=G.db[t+'__'+G.currentSeason];
+    const prev=G.db[t+'__'+UI.currentSeason];
     const players=prev?prev.players.map(p=>({...p,s:[]})):[];
     G.db[t+'__'+n]={sessions:[],players};
   });
-  G.currentSeason=n;saveG();render();closeM('moSeason');
+  UI.currentSeason=n;saveG();render();closeM('moSeason');
 }
 
 function deleteSeason(){
   if(!isAdmin())return;
   if(G.seasonList.length<=1)return alert('Mindestens eine Saison erforderlich.');
-  if(!confirm(`"${G.currentSeason}" löschen?`))return;
-  snap();const s=G.currentSeason;G.seasonList=G.seasonList.filter(x=>x!==s);
+  if(!confirm(`"${UI.currentSeason}" löschen?`))return;
+  snap();const s=UI.currentSeason;G.seasonList=G.seasonList.filter(x=>x!==s);
   G.teamList.forEach(t=>delete G.db[t+'__'+s]);
-  G.currentSeason=G.seasonList.sort((a,b)=>{const ya=+a.split('/')[0],yb=+b.split('/')[0];return yb-ya;})[0];
+  UI.currentSeason=G.seasonList.sort((a,b)=>{const ya=+a.split('/')[0],yb=+b.split('/')[0];return yb-ya;})[0];
   saveG();render();
 }
 
@@ -2262,13 +2265,13 @@ function addTeam(){
   snap();G.teamList.push(n);
   G.seasonList.forEach(s=>{G.db[n+'__'+s]={sessions:[],players:[]};});
   G.db[n+'__focuses']=[...DEF_FOCUSES];
-  G.currentTeam=n;saveG();render();closeM('moNewTeam');document.getElementById('newTeam').value='';
+  UI.currentTeam=n;saveG();render();closeM('moNewTeam');document.getElementById('newTeam').value='';
 }
 function delTeam(t){
   if(G.teamList.length<=1)return alert('Mindestens eine Mannschaft.');
   if(!confirm(`"${t}" löschen?`))return;
   snap();G.teamList=G.teamList.filter(x=>x!==t);G.seasonList.forEach(s=>delete G.db[t+'__'+s]);delete G.db[t+'__focuses'];
-  if(G.currentTeam===t)G.currentTeam=G.teamList[0];saveG();render();
+  if(UI.currentTeam===t)UI.currentTeam=G.teamList[0];saveG();render();
 }
 
 // ══════════════════════════════
@@ -2277,14 +2280,14 @@ function delTeam(t){
 function addTraining(){
   const iso=document.getElementById('newDate').value;if(!iso)return alert('Datum auswählen.');
   const disp=isoToDisp(iso);const time=document.getElementById('newTime').value;const focus=document.getElementById('newFocus').value;
-  snap();insertSorted(cd(),{date:disp,month:moFromDisp(disp),type:'training',focus,time:time||'18:30'});
+  snap();insertSorted(ensureCd(),{date:disp,month:moFromDisp(disp),type:'training',focus,time:time||'18:30'});
   saveG();render();closeM('moSession');document.getElementById('newDate').value='';
 }
 function addMatch(){
   const iso=document.getElementById('newMatchDate').value;const label=document.getElementById('newMatchLabel').value.trim();
   if(!iso)return alert('Datum auswählen.');
   const disp=isoToDisp(iso);const time=document.getElementById('newMatchTime').value;
-  snap();insertSorted(cd(),{date:disp,month:moFromDisp(disp),type:'match',homeAway:newMatchHA,label,time:time||'15:00'});
+  snap();insertSorted(ensureCd(),{date:disp,month:moFromDisp(disp),type:'match',homeAway:newMatchHA,label,time:time||'15:00'});
   saveG();render();closeM('moMatch');document.getElementById('newMatchDate').value='';document.getElementById('newMatchLabel').value='';
 }
 function delSess(si){
@@ -2296,7 +2299,7 @@ function openGenSch(){
   autoSetGenDates();openM('moGenSch');
 }
 function getSeasonBounds(){
-  const m=G.currentSeason.match(/^(\d{4})\/(\d{2})$/);
+  const m=UI.currentSeason.match(/^(\d{4})\/(\d{2})$/);
   if(!m)return{min:'2025-07-01',max:'2026-06-30'};
   const y1=parseInt(m[1]),y2=y1+1;
   return{min:`${y1}-07-01`,max:`${y2}-06-30`};
@@ -2348,7 +2351,7 @@ function addPlayer(){
   const nr=parseInt(document.getElementById('newNr').value)||cd().players.length+1;
   const name=document.getElementById('newName').value.trim();
   if(!name)return alert('Name eingeben.');
-  snap();cd().players.push({nr,name,pos:selP1||'8er',pos2:selP2||'',s:new Array(cd().sessions.length).fill(3)});
+  snap();ensureCd().players.push({nr,name,pos:selP1||'8er',pos2:selP2||'',s:new Array(cd().sessions.length).fill(3)});
   saveG();render();closeM('moAddPlayer');document.getElementById('newNr').value='';document.getElementById('newName').value='';
 }
 function delPlayer(pi){const p=cd().players[pi];if(!p||!confirm(`"${p.name}" löschen?`))return;snap();cd().players.splice(pi,1);saveG();render();}
@@ -2401,7 +2404,7 @@ function adminRenameTeam(old){
   if(G.db[old+'__focuses']){G.db[newName+'__focuses']=G.db[old+'__focuses'];delete G.db[old+'__focuses'];}
   // Update trainers
   G.trainers.forEach(t=>{t.teams=t.teams.map(x=>x===old?newName:x);});
-  if(G.currentTeam===old)G.currentTeam=newName;
+  if(UI.currentTeam===old)UI.currentTeam=newName;
   saveG();render();renderAdminTeams();
 }
 function addTeamAdmin(){
@@ -2410,14 +2413,14 @@ function addTeamAdmin(){
   snap();G.teamList.push(n);
   G.seasonList.forEach(s=>{G.db[n+'__'+s]={sessions:[],players:[]};});
   G.db[n+'__focuses']=[...DEF_FOCUSES];
-  G.currentTeam=n;saveG();render();renderAdminTeams();
+  UI.currentTeam=n;saveG();render();renderAdminTeams();
   document.getElementById('adminNewTeam').value='';
 }
 function adminDelTeam(t){
   if(G.teamList.length<=1)return alert('Mindestens eine Mannschaft.');
   if(!confirm(`"${t}" löschen?`))return;
   snap();G.teamList=G.teamList.filter(x=>x!==t);G.seasonList.forEach(s=>delete G.db[t+'__'+s]);delete G.db[t+'__focuses'];
-  if(G.currentTeam===t)G.currentTeam=G.teamList[0];saveG();render();renderAdminTeams();
+  if(UI.currentTeam===t)UI.currentTeam=G.teamList[0];saveG();render();renderAdminTeams();
 }
 function hardReset(){if(!confirm('Auf leeren Stand zurücksetzen? (nicht umkehrbar)'))return;localStorage.removeItem(SK);undoStack.length=0;redoStack.length=0;buildDef();saveG(false);render();closeM('moAdmin');}
 function hardResetTest(){if(!confirm('Testdaten laden? Aktuelle Daten werden überschrieben.'))return;localStorage.removeItem(SK);undoStack.length=0;redoStack.length=0;buildTestDef();saveG(false);render();closeM('moAdmin');}
