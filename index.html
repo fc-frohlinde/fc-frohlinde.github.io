@@ -124,7 +124,14 @@ body{background:linear-gradient(140deg,#071a3e 0%,#1659b8 55%,#071a3e 100%);heig
 .ssel option{color:#000;background:#fff;}
 .btn{padding:6px 13px;border-radius:7px;border:none;cursor:pointer;font-family:'Barlow',sans-serif;font-size:.82rem;font-weight:600;transition:all .12s;display:flex;align-items:center;gap:5px;white-space:nowrap;}
 .bp{background:var(--ac);color:var(--bd);}.bp:hover{background:#f0d050;}
-.bs{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);}.bs:hover{background:rgba(255,255,255,.2);}
+.bs{background:#f0f4fc;color:var(--gd);border:1.5px solid var(--gl);}
+.bs:hover{background:#e3eaf6;}
+/* Toolbar has dark bg - .bs there needs light-on-dark style */
+.toolbar .bs{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);}
+.toolbar .bs:hover{background:rgba(255,255,255,.18);}
+/* dark variant for use on dark backgrounds */
+.bs-dark{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);}
+.bs-dark:hover{background:rgba(255,255,255,.18);}.bs:hover{background:rgba(255,255,255,.2);}
 .bd{background:rgba(231,76,60,.13);color:#ff9080;border:1px solid rgba(231,76,60,.27);}.bd:hover{background:rgba(231,76,60,.27);}
 .bm{background:rgba(176,48,0,.15);color:#ffc0a0;border:1px solid rgba(176,48,0,.3);}.bm:hover{background:rgba(176,48,0,.3);}
 .bteam{background:rgba(232,200,64,.11);color:var(--ac);border:1px solid rgba(232,200,64,.25);}.bteam:hover{background:rgba(232,200,64,.22);}
@@ -379,6 +386,146 @@ input[type="date"]{cursor:pointer;}
 /* pos alignment in tables */
 .pos-td{text-align:left !important;padding-left:6px !important;}
 .pos-td .pos-wrap{justify-content:flex-start;}
+
+.mob::-webkit-scrollbar{width:8px;}
+.mob::-webkit-scrollbar-track{background:transparent;border-radius:0 14px 14px 0;}
+.mob::-webkit-scrollbar-thumb{background:rgba(13,59,124,.2);border-radius:4px;}
+.mob::-webkit-scrollbar-thumb:hover{background:rgba(13,59,124,.4);}
+.mob{scrollbar-gutter:stable;}
+
+/* ══ LINEUP PLANNER ══════════════════════════════════════════ */
+
+.lp-save-flash{position:fixed;top:60px;left:50%;transform:translateX(-50%);background:rgba(39,174,96,.95);color:#fff;padding:8px 18px;border-radius:20px;font-family:'Barlow',sans-serif;font-size:.82rem;font-weight:700;box-shadow:0 4px 16px rgba(0,0,0,.5);z-index:99999;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;}
+.lp-save-flash.show{opacity:1;transform:translateX(-50%) translateY(6px);}
+
+.lp-overlay{position:fixed;inset:0;z-index:800;background:linear-gradient(160deg,#061628 0%,#0d3060 50%,#061628 100%);display:none;flex-direction:column;overflow:hidden;}
+.lp-overlay.open{display:flex;}
+.lp-topbar{display:flex;align-items:center;gap:10px;padding:10px 20px;background:rgba(0,0,0,.4);border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0;flex-wrap:wrap;}
+.lp-logo{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:3px;color:#e8c840;}
+.lp-sub{font-size:.62rem;color:rgba(255,255,255,.7);letter-spacing:2.5px;text-transform:uppercase;margin-top:1px;}
+.lp-spacer{flex:1;}
+.lp-fmt-btn{padding:4px 13px;border-radius:20px;border:1.5px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:rgba(255,255,255,.92);font-family:'Barlow',sans-serif;font-size:.76rem;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.lp-fmt-btn.active{background:var(--ac);color:#071e48;border-color:var(--ac);}
+.lp-fmt-btn:hover:not(.active){background:rgba(255,255,255,.13);}
+select.lp-fmt-btn{appearance:none;-webkit-appearance:none;-moz-appearance:none;background-image:linear-gradient(45deg,transparent 50%,rgba(255,255,255,.5) 50%),linear-gradient(135deg,rgba(255,255,255,.5) 50%,transparent 50%);background-position:calc(100% - 14px) 50%,calc(100% - 9px) 50%;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:24px;}
+select.lp-fmt-btn option{background:#1a3568;color:#fff;padding:8px;}
+select.lp-fmt-btn option:checked{background:var(--ac);color:#071e48;}
+.lp-body{flex:1;display:flex;min-height:0;overflow:hidden;}
+.lp-pitch-col{flex:1;display:flex;align-items:center;justify-content:center;padding:12px 8px 8px;position:relative;min-width:0;}
+.lp-pitch-svg{height:100%;max-height:calc(100vh - 110px);width:auto;}
+.lp-slot-g circle{transition:all .2s;stroke-width:2;}
+.lp-slot-g.empty circle{fill:rgba(255,255,255,.08);stroke:rgba(255,255,255,.35);stroke-dasharray:4 3;}
+.lp-slot-g.filled circle{fill:rgba(7,30,72,.75);stroke:rgba(255,255,255,.6);}
+.lp-slot-g.selected circle{fill:rgba(232,200,64,.22);stroke:#e8c840;stroke-width:2.5;filter:drop-shadow(0 0 6px rgba(232,200,64,.5));}
+.lp-slot-g.target circle{fill:rgba(39,174,96,.2);stroke:#27ae60;stroke-width:2.5;filter:drop-shadow(0 0 8px rgba(39,174,96,.6));}
+.lp-slot-g{cursor:pointer;}
+.lp-slot-g:hover circle{opacity:.85;}
+.lp-sidebar{width:230px;flex-shrink:0;display:flex;flex-direction:column;background:rgba(0,0,0,.35);border-left:1px solid rgba(255,255,255,.07);overflow:hidden;}
+.lp-sb-top{padding:12px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;}
+.lp-sb-label{font-size:.58rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.75);margin-bottom:7px;}
+.lp-name-row{display:flex;gap:5px;margin-bottom:8px;}
+.lp-name-inp{flex:1;min-width:0;padding:5px 9px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);border-radius:7px;font-family:'Barlow',sans-serif;font-size:.76rem;color:#fff;outline:none;}
+.lp-name-inp::placeholder{color:rgba(255,255,255,.25);}
+.lp-name-inp:focus{border-color:rgba(232,200,64,.4);}
+.lp-save-btn{padding:5px 10px;background:var(--ac);color:#071e48;border:none;border-radius:7px;font-family:'Barlow',sans-serif;font-size:.74rem;font-weight:700;cursor:pointer;}
+.lp-save-btn:hover{background:#f0d050;}
+.lp-chips{display:flex;flex-wrap:wrap;gap:4px;max-height:68px;overflow-y:auto;}
+.lp-chip{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:11px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.11);font-size:.67rem;font-weight:600;color:rgba(255,255,255,.85);cursor:pointer;transition:all .12s;}
+.lp-chip.active{background:rgba(232,200,64,.18);border-color:rgba(232,200,64,.5);color:#e8c840;}
+.lp-chip:hover:not(.active){color:#fff;border-color:rgba(255,255,255,.25);}
+.lp-chip-x{color:rgba(255,255,255,.5);margin-left:1px;font-size:.65rem;}
+.lp-chip-x:hover{color:var(--ca);}
+.lp-sb-label2{font-size:.58rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.75);padding:10px 12px 5px;flex-shrink:0;}
+.lp-players-list{flex:1;overflow-y:auto;padding:0 8px 8px;}
+.lp-player-card{display:flex;align-items:center;gap:7px;padding:6px 8px;margin-bottom:3px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:8px;cursor:pointer;transition:all .15s;}
+.lp-player-card:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.18);}
+.lp-player-card.suitable{border-color:rgba(39,174,96,.25);background:rgba(39,174,96,.05);}
+.lp-player-card.suitable:hover{background:rgba(39,174,96,.12);}
+.lp-player-card.selected{border-color:#e8c840;background:rgba(232,200,64,.1);}
+.lp-player-card.assigned{opacity:.3;pointer-events:none;}
+.lp-card-nr{width:20px;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:#e8c840;flex-shrink:0;line-height:1;}
+.lp-card-name{flex:1;font-size:.76rem;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.lp-card-badges{display:flex;gap:2px;}
+.lp-card-pos1{font-size:.55rem;font-weight:700;padding:1px 4px;border-radius:7px;min-width:30px;text-align:center;display:inline-block;}
+.lp-statsbar{display:flex;align-items:center;gap:6px;padding:7px 12px;background:rgba(0,0,0,.25);border-top:1px solid rgba(255,255,255,.06);flex-shrink:0;}
+.lp-stat{display:flex;flex-direction:column;align-items:center;}
+.lp-stat .sv{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;line-height:1;color:#fff;}
+.lp-stat .sk{font-size:.55rem;color:rgba(255,255,255,.75);text-transform:uppercase;letter-spacing:.5px;}
+.lp-close-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.92);border-radius:8px;padding:5px 14px;font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .12s;}
+.lp-close-btn:hover{background:rgba(231,76,60,.3);color:#fff;border-color:rgba(231,76,60,.5);}
+.lp-hint{font-size:.68rem;color:rgba(255,255,255,.65);padding:4px 0;font-style:italic;}
+
+
+.lp-drag-ghost{position:fixed;pointer-events:none;z-index:99999;width:54px;height:54px;border-radius:50%;background:rgba(7,30,72,.95);border:2.5px solid #e8c840;box-shadow:0 6px 20px rgba(0,0,0,.6);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:'Barlow',sans-serif;font-size:.65rem;font-weight:700;line-height:1.05;transform:translate(-50%,-50%);}
+.lp-drag-ghost .gn{font-family:'Bebas Neue';color:#e8c840;font-size:.9rem;}
+.lp-slot-g.drag-source{opacity:.3;}
+.lp-slot-g.drop-target circle{stroke:#27ae60;stroke-width:3;filter:drop-shadow(0 0 8px rgba(39,174,96,.7));}
+
+/* ══ SEASON LINEUP PLANNER ══════════════════════════════════ */
+.slp-overlay{position:fixed;inset:0;z-index:801;background:linear-gradient(160deg,#061628 0%,#0d3060 50%,#061628 100%);display:none;flex-direction:column;overflow:hidden;}
+.slp-overlay.open{display:flex;}
+.slp-topbar{display:flex;align-items:center;gap:10px;padding:10px 18px;background:rgba(0,0,0,.45);border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0;flex-wrap:wrap;}
+.slp-logo{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:3px;color:#e8c840;}
+.slp-sub{font-size:.6rem;color:rgba(255,255,255,.7);letter-spacing:2px;text-transform:uppercase;margin-top:1px;}
+.slp-body{flex:1;display:flex;min-height:0;overflow:hidden;}
+.slp-pitch-col{flex:1;display:flex;align-items:center;justify-content:center;padding:10px 8px;position:relative;min-width:0;}
+.slp-pitch-svg{height:100%;max-height:calc(100vh - 105px);width:auto;}
+/* Slot popup */
+.slp-slot-g{cursor:pointer;}
+.slp-slot-g circle{transition:all .18s;}
+.slp-slot-g.empty circle{fill:rgba(255,255,255,.06);stroke:rgba(255,255,255,.3);stroke-dasharray:4 3;stroke-width:1.5;}
+.slp-slot-g.has-players circle{fill:rgba(7,30,72,.8);stroke:rgba(255,255,255,.55);stroke-width:2;}
+.slp-slot-g.selected circle{fill:rgba(232,200,64,.2);stroke:#e8c840;stroke-width:2.5;filter:drop-shadow(0 0 7px rgba(232,200,64,.45));}
+.slp-slot-g:hover circle{opacity:.8;}
+/* Popup dropdown */
+.slp-popup{position:fixed;z-index:5000;background:#0d2645;border:1px solid rgba(255,255,255,.15);border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.7);padding:10px;min-width:220px;max-width:280px;}
+.slp-popup-title{font-size:.6rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.75);margin-bottom:8px;}
+.slp-assigned{margin-bottom:8px;}
+.slp-assigned-row{display:flex;align-items:center;gap:6px;padding:4px 6px;background:rgba(255,255,255,.06);border-radius:7px;margin-bottom:3px;font-size:.76rem;}
+.slp-assigned-row .nr{font-family:'Bebas Neue';color:#e8c840;width:20px;text-align:center;}
+.slp-assigned-row .name{flex:1;color:#fff;font-weight:600;}
+.slp-assigned-row .prio{font-size:.62rem;color:rgba(255,255,255,.7);}
+.slp-assigned-row .del-btn{color:rgba(255,255,255,.25);cursor:pointer;font-size:.75rem;padding:1px 4px;}
+.slp-assigned-row .del-btn:hover{color:var(--ca);}
+.slp-assigned-row .up-btn{color:rgba(255,255,255,.3);cursor:pointer;font-size:.7rem;padding:1px 3px;}
+.slp-assigned-row .up-btn:hover{color:var(--ac);}
+.slp-player-picker{max-height:180px;overflow-y:auto;}
+.slp-pick-item{display:flex;align-items:center;gap:6px;padding:5px 7px;border-radius:7px;cursor:pointer;transition:background .12s;}
+.slp-pick-item:hover{background:rgba(255,255,255,.08);}
+.slp-pick-item.best{background:rgba(39,174,96,.07);}
+.slp-pick-item .nr{font-family:'Bebas Neue';color:#e8c840;width:22px;text-align:center;font-size:.9rem;}
+.slp-pick-item .name{flex:1;font-size:.76rem;font-weight:600;color:#fff;}
+.slp-pick-item .pos-b{font-size:.55rem;font-weight:700;padding:1px 4px;border-radius:7px;min-width:30px;text-align:center;display:inline-block;}
+.slp-pick-item.assigned-already{opacity:.35;pointer-events:none;}
+.slp-popup-close{width:100%;margin-top:8px;padding:4px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:7px;color:rgba(255,255,255,.85);font-family:'Barlow',sans-serif;font-size:.73rem;cursor:pointer;}
+.slp-popup-close:hover{background:rgba(255,255,255,.12);color:#fff;}
+/* Sidebar */
+.slp-sidebar{width:220px;flex-shrink:0;display:flex;flex-direction:column;background:rgba(0,0,0,.3);border-left:1px solid rgba(255,255,255,.07);overflow:hidden;}
+.slp-sb-top{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;}
+.slp-sb-label{font-size:.58rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.75);margin-bottom:7px;}
+.slp-name-row{display:flex;gap:5px;margin-bottom:8px;}
+.slp-name-inp{flex:1;min-width:0;padding:5px 9px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:7px;font-family:'Barlow',sans-serif;font-size:.76rem;color:#fff;outline:none;}
+.slp-name-inp::placeholder{color:rgba(255,255,255,.25);}
+.slp-name-inp:focus{border-color:rgba(232,200,64,.4);}
+.slp-save-btn{padding:5px 10px;background:var(--ac);color:#071e48;border:none;border-radius:7px;font-family:'Barlow',sans-serif;font-size:.73rem;font-weight:700;cursor:pointer;white-space:nowrap;}
+.slp-chips{display:flex;flex-wrap:wrap;gap:4px;max-height:72px;overflow-y:auto;}
+.slp-chip{display:inline-flex;align-items:center;gap:3px;padding:2px 9px;border-radius:11px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);font-size:.66rem;font-weight:600;color:rgba(255,255,255,.85);cursor:pointer;transition:all .12s;}
+.slp-chip.active{background:rgba(232,200,64,.18);border-color:rgba(232,200,64,.4);color:#e8c840;}
+.slp-chip:hover:not(.active){color:#fff;border-color:rgba(255,255,255,.25);}
+.slp-chip-x{color:rgba(255,255,255,.5);font-size:.65rem;margin-left:2px;}
+.slp-chip-x:hover{color:var(--ca);}
+.slp-legend{flex:1;overflow-y:auto;padding:10px 12px;}
+.slp-legend-row{display:flex;align-items:center;gap:7px;padding:4px 0;font-size:.73rem;color:rgba(255,255,255,.85);}
+.slp-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.slp-close-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.65);border-radius:8px;padding:5px 14px;font-family:'Barlow',sans-serif;font-size:.77rem;font-weight:600;cursor:pointer;}
+.slp-close-btn:hover{background:rgba(231,76,60,.3);color:#fff;}
+.slp-fmt-btn{padding:4px 12px;border-radius:18px;border:1.5px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:rgba(255,255,255,.92);font-family:'Barlow',sans-serif;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.slp-fmt-btn.active{background:var(--ac);color:#071e48;border-color:var(--ac);}
+.slp-fmt-btn:hover:not(.active){background:rgba(255,255,255,.12);}
+select.slp-fmt-btn{appearance:none;-webkit-appearance:none;-moz-appearance:none;background-image:linear-gradient(45deg,transparent 50%,rgba(255,255,255,.5) 50%),linear-gradient(135deg,rgba(255,255,255,.5) 50%,transparent 50%);background-position:calc(100% - 14px) 50%,calc(100% - 9px) 50%;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:24px;}
+select.slp-fmt-btn option{background:#1a3568;color:#fff;padding:8px;}
+select.slp-fmt-btn option:checked{background:var(--ac);color:#071e48;}
+
 </style>
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -452,6 +599,7 @@ input[type="date"]{cursor:pointer;}
     <span class="saved" id="savedBadge">✓</span>
     <span id="syncStatus" style="font-size:.72rem;font-weight:600;color:var(--gm);white-space:nowrap;">⚫ Lokal</span>
     <div class="tsep"></div>
+    <button class="btn" id="btn-slp" style="background:rgba(232,200,64,.12);color:#c8a820;border:1px solid rgba(232,200,64,.3);" onclick="openSeasonLineup()">📋 Saisonkader</button>
     <button class="btn bteam" onclick="openTeamMgr('spieler')">🏆 Mannschaft</button>
     <div class="view-menu-wrap" id="linksMenuWrap">
       <button class="btn bcfg" onclick="toggleLinksMenu(event)" title="Nützliche Links">🔗 Links ▾</button>
@@ -503,6 +651,7 @@ input[type="date"]{cursor:pointer;}
           <div class="vd-item" onclick="event.stopPropagation();toggleSec('tabs')"><span>Tabs</span><div class="vd-check on" id="vd2-tabs">✓</div></div>
           <div class="vd-item" onclick="event.stopPropagation();toggleSec('tools')"><span>Werkzeuge</span><div class="vd-check on" id="vd2-tools">✓</div></div>
           <div class="vd-item" onclick="event.stopPropagation();toggleSec('legend')"><span>Legende</span><div class="vd-check on" id="vd2-legend">✓</div></div>
+          <div class="vd-item" onclick="event.stopPropagation();toggleSlpBtn()"><span>Saisonkader-Button</span><div class="vd-check on" id="vd2-slpbtn">✓</div></div>
           <div class="vd-sep"></div>
           <div class="vd-item" onclick="event.stopPropagation();toggleHidePast()" id="vd2-hidepast"><span>Vergangene ausblenden</span></div>
           <div class="vd-sep"></div>
@@ -550,9 +699,10 @@ input[type="date"]{cursor:pointer;}
   <div id="ps-edit-wrap">
     <button class="btn" id="ps-edit-toggle" onclick="togglePlayerEdit()" style="width:100%;justify-content:center;background:var(--ow);color:var(--gd);border:1.5px solid var(--gl);margin-bottom:6px;">✎ Bearbeiten</button>
     <div id="ps-edit" style="display:none;background:var(--ow);border-radius:9px;padding:10px 12px;border:1px solid var(--gl);">
-      <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:8px;">
+      <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:8px;align-items:flex-end;">
         <div style="width:58px;flex:none;"><label>Nr.</label><input type="number" id="pe-nr" min="1" max="99" style="margin-bottom:0;"/></div>
-        <div style="flex:1;min-width:110px;"><label>Name</label><input type="text" id="pe-name" style="margin-bottom:0;"/></div>
+        <div style="flex:2;min-width:110px;"><label>Name</label><input type="text" id="pe-name" style="margin-bottom:0;"/></div>
+        <div style="flex:1;min-width:90px;"><label>Kurzname</label><input type="text" id="pe-shortname" placeholder="z.B. Maxi" style="margin-bottom:0;"/></div>
       </div>
       <div class="sec" style="margin-bottom:6px;">Position 1</div>
       <div class="pos-grid" id="pe-pos1"></div>
@@ -594,6 +744,9 @@ input[type="date"]{cursor:pointer;}
       <div id="ss-meta" style="font-size:.76rem;color:var(--gm);margin-top:4px;"></div>
       <div id="ss-note-display" style="font-size:.78rem;color:var(--gd);font-style:italic;margin-top:4px;display:none;"></div>
       <div id="ss-plan-link" style="display:none;font-size:.78rem;margin-top:5px;"></div>
+      <div id="ss-lineup-btn-wrap" style="display:none;margin-top:8px;">
+        <button class="btn" style="background:rgba(39,174,96,.15);color:#1a7a40;border:1.5px solid rgba(39,174,96,.4);font-size:.78rem;" onclick="openLineupForSess()">⚽ Aufstellung planen</button>
+      </div>
     </div>
     <div style="display:flex;gap:6px;"><button class="btn" style="font-size:.76rem;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" onclick="sessGoBack()">← Zurück</button><button class="btn bs" onclick="closeM('moSession2')">✕</button></div>
   </div>
@@ -894,7 +1047,7 @@ let attSort={col:'nr',asc:true};
 let zoomLvl=100, nextIdx=-1, newMatchHA='home';
 let selP1='8er', selP2='', editP1='', editP2='';
 let currentPI=-1, currentSI=-1;
-const colState={hdr:true,tabs:true,tools:true,legend:true,hidePast:false};
+const colState={hdr:true,tabs:true,tools:true,legend:true,hidePast:false,slpBtn:true};
 const undoStack=[], redoStack=[];
 
 // ══════════════════════════════
@@ -1148,6 +1301,20 @@ function sanitizeG(data){
   // Never set currentTeam/currentSeason in G - those are UI state
   delete data.currentTeam;
   delete data.currentSeason;
+  if(!Array.isArray(data.lineups))data.lineups=data.lineups?Object.values(data.lineups):[];
+  if(!Array.isArray(data.seasonLineups))data.seasonLineups=data.seasonLineups?Object.values(data.seasonLineups):[];
+  // Migrate old plans without teamSeason - assign to first team+season
+  if(Array.isArray(data.seasonLineups)){
+    data.seasonLineups.forEach(p=>{
+      if(!p.teamSeason){
+        const t=Array.isArray(data.teamList)?data.teamList[0]:'U19';
+        const s=Array.isArray(data.seasonList)?data.seasonList[0]:'2025/26';
+        p.teamSeason=t+'__'+s;
+      }
+    });
+  }
+  if(!data.matchLineups||typeof data.matchLineups!=='object'||Array.isArray(data.matchLineups))data.matchLineups={};
+  if(!data.slpConfirmations||typeof data.slpConfirmations!=='object'||Array.isArray(data.slpConfirmations))data.slpConfirmations={};
   return data;
 }
 function startFbListener(){
@@ -1472,6 +1639,10 @@ document.addEventListener('keydown',e=>{
 //  VIEW STATE
 // ══════════════════════════════
 function saveVS(){localStorage.setItem(VIEW_SK,JSON.stringify({colState,zl:zoomLvl}));}
+function toggleSlpBtn(){
+  colState.slpBtn=!colState.slpBtn;
+  saveVS();updateViewChecks();applyCollapse();
+}
 function toggleSec(k){colState[k]=!colState[k];applyCollapse();saveVS();updateViewChecks();}
 function toggleHidePast(){colState.hidePast=!colState.hidePast;saveVS();render();
   const el=document.getElementById('vd2-hidepast');
@@ -1484,13 +1655,18 @@ document.addEventListener('click',e=>{
 });
 function updateViewChecks(){
   const lbl2=document.getElementById('zoomLbl2');if(lbl2)lbl2.textContent=zoomLvl+'%';
-  ['hdr','tabs','tools','legend'].forEach(k=>{
-    // Handle both vd- and vd2- prefixed elements
+  ['hdr','tabs','tools','legend','slpBtn'].forEach(k=>{
     ['vd-','vd2-'].forEach(pfx=>{
-      const el=document.getElementById(pfx+k);
+      const eid=pfx+(k==='slpBtn'?'slpbtn':k);
+      const el=document.getElementById(eid);
       if(el){el.classList.toggle('on',colState[k]);el.textContent=colState[k]?'✓':'–';const item=el.closest('.vd-item');if(item)item.classList.toggle('vd-active',colState[k]);}
     });
   });
+  // Vergangene ausblenden
+  const hp=document.getElementById('vd2-hidepast');
+  if(hp){hp.style.fontWeight=colState.hidePast?'700':'600';hp.style.color=colState.hidePast?'var(--ac)':'rgba(255,255,255,.65)';
+    const item=hp.closest('.vd-item');if(item)item.classList.toggle('vd-active',colState.hidePast);
+  }
 }
 function toggleViewMenu(e){
   e.stopPropagation();
@@ -1503,6 +1679,8 @@ function applyCollapse(){
   document.getElementById('teamBarWrap').classList.toggle('hidden',!colState.tabs);
   document.getElementById('toolbarEl').classList.toggle('hidden',!colState.tools);
   document.getElementById('legendEl').classList.toggle('hidden',!colState.legend);
+  const slpBtn=document.getElementById('btn-slp');
+  if(slpBtn)slpBtn.style.display=colState.slpBtn?'':'none';
   ['hdr','tabs','tools','legend'].forEach(k=>document.getElementById('cb-'+k)?.classList.toggle('active',colState[k]));
 }
 function collapseAll(){['hdr','tabs','tools','legend'].forEach(k=>colState[k]=false);applyCollapse();saveVS();updateViewChecks();}
@@ -1637,7 +1815,29 @@ function renderHead(){
 }
 
 // ══ TABLE BODY ══
+function updateC1Width(){
+  // Auto-size Spieler column based on longest displayed name
+  const D=cd();
+  if(!D||!Array.isArray(D.players))return;
+  // Measure widest name using a hidden canvas
+  if(!updateC1Width._canvas){updateC1Width._canvas=document.createElement('canvas');}
+  const ctx=updateC1Width._canvas.getContext('2d');
+  ctx.font='600 0.82rem Barlow, sans-serif';
+  let max=0;
+  D.players.forEach(p=>{
+    const nm=getDisplayName(p)||'';
+    const w=ctx.measureText(nm).width;
+    if(w>max)max=w;
+  });
+  // Add padding for cell + arrow ›
+  const cellPadding=14+18; // 14 for name padding, 18 for arrow ›
+  const calculated=Math.ceil(max+cellPadding);
+  // Clamp: min 130, max 240
+  const final=Math.max(130,Math.min(240,calculated));
+  document.documentElement.style.setProperty('--c1',final+'px');
+}
 function renderBody(){
+  updateC1Width();
   const D=cd();const tbody=document.getElementById('tBody');
   if(!D||!Array.isArray(D.sessions)||!Array.isArray(D.players)){if(tbody)tbody.innerHTML='<tr><td colspan="10" style="padding:30px;text-align:center;color:var(--gm);">Keine Daten</td></tr>';return;}
   const today2=todaySK();
@@ -1673,7 +1873,7 @@ function renderBody(){
     rows.push(`<tr>
       <td class="tdl c0">${!ro?`<input class="nri" value="${p.nr||''}" onchange="updNr(${origPi},this.value)"/>`:`<span style="font-weight:700;color:var(--bm);">${p.nr||''}</span>`}</td>
       <td class="tdl c1" onclick="openPlayerFromMain(${origPi})" style="cursor:pointer;">
-        <div class="ncell"><span class="nm">${p.name||''}</span><span class="ni">›</span></div>
+        <div class="ncell"><span class="nm">${getDisplayName(p)||''}</span><span class="ni">›</span></div>
       </td>
       <td class="c2" style="padding:4px;">${pcHtml(p)}</td>
       ${cells}
@@ -1845,6 +2045,7 @@ function openPlayerStats(pi){
   if(canEdit()){
     document.getElementById('pe-nr').value=p.nr||'';
     document.getElementById('pe-note').value=p.note||'';
+    document.getElementById('pe-shortname').value=p.shortname||'';
     document.getElementById('pe-passnr').value=p.passnr||'';
     document.getElementById('pe-birthdate').value=p.birthdate||'';
     _currentFoot=p.foot||'right';
@@ -1911,6 +2112,7 @@ function savePlayerEdit(){
   p.name=document.getElementById('pe-name').value.trim()||p.name;
   p.pos=editP1;p.pos2=editP2||'';
   p.note=document.getElementById('pe-note').value.trim();
+  p.shortname=document.getElementById('pe-shortname').value.trim();
   p.passnr=document.getElementById('pe-passnr').value.trim();
   p.birthdate=document.getElementById('pe-birthdate').value;
   p.foot=_currentFoot;
@@ -1932,6 +2134,7 @@ function delCurrentPlayer(){
 //  SESSION STATS
 // ══════════════════════════════
 function openSessStats(si){
+  _currentSessIdx=si;
   currentSI=si;
   const D=cd(),s=D.sessions[si],foc=teamFoc();
   if(!s)return;
@@ -1942,6 +2145,9 @@ function openSessStats(si){
   const ssDelBtn=document.getElementById('ss-del');const ssEdit=document.getElementById('ss-edit');
   // Note display
   const noteEl=document.getElementById('ss-note-display');
+  // Show lineup button only for matches
+  const lbw=document.getElementById('ss-lineup-btn-wrap');
+  if(lbw)lbw.style.display=(s.type==='match'?'block':'none');
   if(noteEl){const sn=s.note;if(sn){noteEl.textContent='📝 '+sn;noteEl.style.display='block';}else{noteEl.style.display='none';}}
   // Reset edit section
   const ssEditBox=document.getElementById('ss-edit');
@@ -1964,13 +2170,19 @@ function openSessStats(si){
             <select id="ss-e-ha" style="padding:6px;border:1.5px solid var(--gl);border-radius:6px;font-size:.8rem;outline:none;margin-bottom:0;" onchange="updSessHA(${si},this.value)">
               <option value="home" ${s.homeAway==='home'?'selected':''}>🏠 Heim</option>
               <option value="away" ${s.homeAway==='away'?'selected':''}>🚌 Auswärts</option>
-            </select></div>`
+            </select></div>
+          <div style="flex:2;min-width:160px;"><label style="font-size:.61rem;font-weight:700;color:var(--gd);text-transform:uppercase;">🔗 Spielbericht-Link</label>
+            <input type="url" id="ss-e-link" value="${s.planLink||''}" placeholder="https://..." style="width:100%;padding:6px;border:1.5px solid var(--gl);border-radius:6px;font-size:.8rem;outline:none;margin-bottom:0;" oninput="updSessLink(${si},this.value)"/></div>`
         :`<div style="flex:1;min-width:120px;"><label style="font-size:.61rem;font-weight:700;color:var(--gd);text-transform:uppercase;">Schwerpunkt</label>
             <select id="ss-e-foc" style="width:100%;padding:6px;border:1.5px solid var(--gl);border-radius:6px;font-size:.8rem;outline:none;margin-bottom:0;" onchange="updSessFoc(${si},this.value)">
               <option value="">– Kein –</option>${focOpts}
-            </select></div>`}
-      <div style="width:100%;margin-top:7px;"><label style="font-size:.61rem;font-weight:700;color:var(--gd);text-transform:uppercase;">🔗 ${isMat?'Spielbericht-Link':'Trainingsplan-Link'}</label><input type="url" id="ss-e-link" value="${s.planLink||''}" placeholder="https://..." style="width:100%;padding:6px;border:1.5px solid var(--gl);border-radius:6px;font-size:.8rem;outline:none;margin-bottom:0;" oninput="updSessLink(${si},this.value)"/></div>
-      <div style="margin-top:7px;"><label style="font-size:.61rem;font-weight:700;color:var(--gd);text-transform:uppercase;">📝 Kommentar</label><textarea id="ss-e-note" rows="2" style="width:100%;padding:6px;border:1.5px solid var(--gl);border-radius:6px;font-family:'Barlow',sans-serif;font-size:.8rem;resize:vertical;margin-bottom:0;" placeholder="z.B. Verletzungsstand, Besonderheiten..." oninput="updSessNote(${si},this.value)">${s.note||''}</textarea></div>
+            </select></div>
+          <div style="flex:2;min-width:160px;"><label style="font-size:.61rem;font-weight:700;color:var(--gd);text-transform:uppercase;">🔗 Trainingsplan-Link</label>
+            <input type="url" id="ss-e-link" value="${s.planLink||''}" placeholder="https://..." style="width:100%;padding:6px;border:1.5px solid var(--gl);border-radius:6px;font-size:.8rem;outline:none;margin-bottom:0;" oninput="updSessLink(${si},this.value)"/></div>`}
+      </div>
+      <div style="margin-top:10px;">
+        <label style="font-size:.61rem;font-weight:700;color:var(--gd);text-transform:uppercase;display:block;margin-bottom:4px;">📝 Kommentar</label>
+        <textarea id="ss-e-note" rows="3" style="width:100%;padding:6px;border:1.5px solid var(--gl);border-radius:6px;font-family:'Barlow',sans-serif;font-size:.8rem;resize:vertical;outline:none;box-sizing:border-box;margin-bottom:0;" placeholder="z.B. Verletzungsstand, Besonderheiten..." oninput="updSessNote(${si},this.value)">${s.note||''}</textarea>
       </div>`;
   }else{ssDelBtn.style.display='none';if(document.getElementById('ss-edit-toggle'))document.getElementById('ss-edit-toggle').style.display='none';}
   buildSessAtt(si);
@@ -2022,7 +2234,7 @@ function buildSessAtt(si){
       const p=D.players[pi];const v=p.s?p.s[si]:3;const ro=!canEdit()?'ro':'';
       html+=`<div class="att-row">
         <div class="att-nr">${p.nr||''}</div>
-        <div class="att-name" style="cursor:pointer;" onclick="openPlayerFromSession(${si},${pi})">${p.name||''}</div>
+        <div class="att-name" style="cursor:pointer;" onclick="openPlayerFromSession(${si},${pi})">${getDisplayName(p)||''}</div>
         <div class="att-pos">${pbHtml(p)}</div>
         <div style="position:relative;display:inline-block;">
           <button class="att-st ${STCLS[v]}" style="cursor:${canEdit()?'pointer':'default'};border:none;padding:3px 6px;border-radius:4px;font-size:.72rem;font-weight:700;min-width:26px;display:inline-flex;align-items:center;justify-content:center;" onclick="${canEdit()?`event.stopPropagation();togAttMenu('am_${pi}_${si}',${pi},${si},${v})`:'event.stopPropagation()'}">${SYM[v]}</button>
@@ -2190,15 +2402,29 @@ function renderFocList(){
       });
     });
   }
+  // Count training sessions per focus (past + planned)
+  const sessCount={};
+  foc.forEach(f=>sessCount[f]={total:0,past:0});
+  const today=todaySK();
+  if(D&&Array.isArray(D.sessions)){
+    D.sessions.forEach(s=>{
+      if(s.type!=='training'||!s.focus||!sessCount[s.focus])return;
+      sessCount[s.focus].total++;
+      if(dispToSortKey(s.date)<today)sessCount[s.focus].past++;
+    });
+  }
   document.getElementById('foc-list').innerHTML=foc.length?
     foc.map((f,i)=>{
       const st=focStats[f]||{a:0,pl:0};
+      const sc=sessCount[f]||{total:0,past:0};
       const pct=st.pl?Math.round((st.a/st.pl)*100):null;
       const bc=pct!==null?(pct>=80?'var(--cp)':pct>=60?'var(--ce)':'var(--ca)'):'#ccc';
       const bar=pct!==null?`<div style="flex:1;background:var(--gl);border-radius:3px;height:5px;margin:0 8px;overflow:hidden;"><div style="width:${pct}%;height:100%;background:${bc};border-radius:3px;"></div></div><span style="font-size:.68rem;font-weight:700;color:${bc};min-width:32px;">${pct}%</span>`:'<div style="flex:1;"></div>';
+      const cnt=`<span style="font-size:.66rem;color:var(--gm);font-weight:600;min-width:78px;text-align:right;">${sc.past}/${sc.total} Tr.</span>`;
       return `<div class="fi-row" style="align-items:center;">
         <div class="fi-nm" style="flex:none;min-width:90px;">🎯 ${f}</div>
         ${bar}
+        ${cnt}
         ${canEdit()?`<button class="fi-del" onclick="delFoc(${i})">✕</button>`:''}
       </div>`;
     }).join('')
@@ -2238,7 +2464,7 @@ function renderMgrStats(){
     const tA=tIdx.filter(i=>p.s&&p.s[i]===1).length,tPl=tIdx.filter(i=>p.s&&p.s[i]!==3).length;
     const mA=mIdx.filter(i=>p.s&&p.s[i]===1).length,mPl=mIdx.filter(i=>p.s&&p.s[i]!==3).length;
     const tPct=tPl?Math.round((tA/tPl)*100):0,mPct=mPl?Math.round((mA/mPl)*100):0;
-    return{pi:D.players.indexOf(p),nr:p.nr,name:p.name,pos:p.pos,pos2:p.pos2||'',tA,tPl,tPct,mA,mPl,mPct,pct:tPct};
+    return{pi:D.players.indexOf(p),nr:p.nr,name:p.name,shortname:p.shortname,pos:p.pos,pos2:p.pos2||'',tA,tPl,tPct,mA,mPl,mPct,pct:tPct};
   });
   rows.sort((a,b)=>{const v=statsSort.col;const r=typeof a[v]==='string'?a[v].localeCompare(b[v]):a[v]-b[v];return statsSort.asc?r:-r;});
   const sa=c=>statsSort.col===c?(statsSort.asc?'↑':'↓'):'';
@@ -2260,7 +2486,7 @@ function renderMgrStats(){
     </tr></thead><tbody>
     ${rows.map(r=>{const bc=pctColor(r.tPct);return`<tr>
       <td>${r.nr}</td>
-      <td style="text-align:left;cursor:pointer;" onclick="navPush({id:'moTeamMgr',tab:'statistik'});closeM('moTeamMgr');openPlayerStats(${r.pi});">${r.name}</td>
+      <td style="text-align:left;cursor:pointer;" onclick="navPush({id:'moTeamMgr',tab:'statistik'});closeM('moTeamMgr');openPlayerStats(${r.pi});">${getDisplayName(r)}</td>
       <td class="pos-td"><div class="pos-wrap">${pbHtml(r)}</div></td>
       <td style="font-weight:700;color:${bc};">${r.tPl?r.tPct+'%':'–'}</td>
       <td>${r.tA}</td><td>${r.tPl}</td>
@@ -2299,8 +2525,8 @@ function sortStats(col){if(statsSort.col===col)statsSort.asc=!statsSort.asc;else
 // ══════════════════════════════
 //  TEAM / SEASON
 // ══════════════════════════════
-function switchTeam(t){UI.currentTeam=t;saveUI();render();}
-function switchSeason(s){UI.currentSeason=s;saveUI();render();}
+function switchTeam(t){UI.currentTeam=t;saveUI();slpState.currentId=null;slpState.slots={};render();}
+function switchSeason(s){UI.currentSeason=s;saveUI();slpState.currentId=null;slpState.slots={};render();}
 
 function addSeason(){
   const n=document.getElementById('newSeasonSel').value;
@@ -2721,6 +2947,1409 @@ function checkAutoBackup(){
   if(last!==today){createBackup(true);localStorage.setItem('fcf_last_auto_bk',today);}
 }
 
+
+// ══ LINEUP PLANNER ═══════════════════════════════════════════
+const FORMATIONS={
+  '4-2-3-1':[
+    {id:'gk',lbl:'TW',pos:['TW'],x:170,y:460},
+    {id:'rb',lbl:'RV',pos:['RV'],x:285,y:380},{id:'cb1',lbl:'IV',pos:['IV'],x:215,y:400},
+    {id:'cb2',lbl:'IV',pos:['IV'],x:125,y:400},{id:'lb',lbl:'LV',pos:['LV'],x:55,y:380},
+    {id:'dm1',lbl:'6er',pos:['6er'],x:215,y:320},{id:'dm2',lbl:'6er',pos:['6er'],x:125,y:320},
+    {id:'mr',lbl:'RF',pos:['RF','10er'],x:290,y:160},{id:'mc',lbl:'10er',pos:['10er','8er'],x:170,y:160},
+    {id:'ml',lbl:'LF',pos:['LF','10er'],x:50,y:160},{id:'st',lbl:'ST',pos:['ST'],x:170,y:60}
+  ],
+  'Grund-Formation':[
+    {id:'gk',lbl:'TW',pos:['TW'],x:170,y:460},
+    {id:'rb',lbl:'RV',pos:['RV'],x:285,y:380},{id:'cb1',lbl:'IV',pos:['IV'],x:215,y:400},
+    {id:'cb2',lbl:'IV',pos:['IV'],x:125,y:400},{id:'lb',lbl:'LV',pos:['LV'],x:55,y:380},
+    {id:'dm',lbl:'6er',pos:['6er'],x:215,y:320},{id:'cm',lbl:'8er',pos:['8er','6er'],x:125,y:280},
+    {id:'mr',lbl:'RF',pos:['RF','10er'],x:290,y:160},{id:'mc',lbl:'10er',pos:['10er','8er'],x:170,y:160},
+    {id:'ml',lbl:'LF',pos:['LF','10er'],x:50,y:160},{id:'st',lbl:'ST',pos:['ST'],x:170,y:60}
+  ],
+  '4-3-3':[
+    {id:'gk',lbl:'TW',pos:['TW'],x:170,y:460},
+    {id:'rb',lbl:'RV',pos:['RV'],x:285,y:380},{id:'cb1',lbl:'IV',pos:['IV'],x:215,y:400},
+    {id:'cb2',lbl:'IV',pos:['IV'],x:125,y:400},{id:'lb',lbl:'LV',pos:['LV'],x:55,y:380},
+    {id:'dm',lbl:'6er',pos:['6er'],x:170,y:320},
+    {id:'rm',lbl:'RF',pos:['RF','8er'],x:290,y:160},{id:'cm1',lbl:'8er',pos:['8er'],x:215,y:240},
+    {id:'cm2',lbl:'8er',pos:['8er'],x:125,y:240},{id:'lm',lbl:'LF',pos:['LF','8er'],x:50,y:160},
+    {id:'st',lbl:'ST',pos:['ST'],x:170,y:60}
+  ],
+  '4-3-1-2':[
+    {id:'gk',lbl:'TW',pos:['TW'],x:170,y:460},
+    {id:'rb',lbl:'RV',pos:['RV'],x:285,y:380},{id:'cb1',lbl:'IV',pos:['IV'],x:215,y:400},
+    {id:'cb2',lbl:'IV',pos:['IV'],x:125,y:400},{id:'lb',lbl:'LV',pos:['LV'],x:55,y:380},
+    {id:'dm',lbl:'6er',pos:['6er'],x:170,y:320},
+    {id:'cm1',lbl:'8er',pos:['8er'],x:240,y:240},{id:'cm2',lbl:'8er',pos:['8er'],x:100,y:240},
+    {id:'am',lbl:'10er',pos:['10er'],x:170,y:160},
+    {id:'st1',lbl:'ST',pos:['ST'],x:215,y:60},{id:'st2',lbl:'ST',pos:['ST'],x:125,y:60}
+  ],
+  '4-2-2-2':[
+    {id:'gk',lbl:'TW',pos:['TW'],x:170,y:460},
+    {id:'rb',lbl:'RV',pos:['RV'],x:285,y:380},{id:'cb1',lbl:'IV',pos:['IV'],x:215,y:400},
+    {id:'cb2',lbl:'IV',pos:['IV'],x:125,y:400},{id:'lb',lbl:'LV',pos:['LV'],x:55,y:380},
+    {id:'dm1',lbl:'6er',pos:['6er'],x:215,y:300},{id:'dm2',lbl:'6er',pos:['6er'],x:125,y:300},
+    {id:'cm1',lbl:'8er',pos:['8er'],x:215,y:200},{id:'cm2',lbl:'8er',pos:['8er'],x:125,y:200},
+    {id:'st1',lbl:'ST',pos:['ST'],x:215,y:60},{id:'st2',lbl:'ST',pos:['ST'],x:125,y:60}
+  ],
+  '4-4-2':[
+    {id:'gk',lbl:'TW',pos:['TW'],x:170,y:460},
+    {id:'rb',lbl:'RV',pos:['RV'],x:285,y:380},{id:'cb1',lbl:'IV',pos:['IV'],x:215,y:400},
+    {id:'cb2',lbl:'IV',pos:['IV'],x:125,y:400},{id:'lb',lbl:'LV',pos:['LV'],x:55,y:380},
+    {id:'rf',lbl:'RF',pos:['RF'],x:290,y:160},{id:'cm1',lbl:'8er',pos:['8er','6er'],x:215,y:240},
+    {id:'cm2',lbl:'8er',pos:['8er','6er'],x:125,y:240},{id:'lf',lbl:'LF',pos:['LF'],x:50,y:160},
+    {id:'st1',lbl:'ST',pos:['ST'],x:215,y:60},{id:'st2',lbl:'ST',pos:['ST'],x:125,y:60}
+  ],
+  '3-4-1-2':[
+    {id:'gk',lbl:'TW',pos:['TW'],x:170,y:460},
+    {id:'cb1',lbl:'IV',pos:['IV'],x:240,y:400},{id:'cb2',lbl:'IV',pos:['IV'],x:170,y:400},
+    {id:'cb3',lbl:'IV',pos:['IV'],x:100,y:400},
+    {id:'rwb',lbl:'RV',pos:['RV','RF'],x:300,y:280},{id:'cm1',lbl:'6er',pos:['6er'],x:215,y:320},
+    {id:'cm2',lbl:'6er',pos:['6er'],x:125,y:320},{id:'lwb',lbl:'LV',pos:['LV','LF'],x:40,y:280},
+    {id:'am',lbl:'10er',pos:['10er'],x:170,y:160},
+    {id:'st1',lbl:'ST',pos:['ST'],x:215,y:60},{id:'st2',lbl:'ST',pos:['ST'],x:125,y:60}
+  ],
+  '3-4-3':[
+    {id:'gk',lbl:'TW',pos:['TW'],x:170,y:460},
+    {id:'cb1',lbl:'IV',pos:['IV'],x:240,y:400},{id:'cb2',lbl:'IV',pos:['IV'],x:170,y:400},
+    {id:'cb3',lbl:'IV',pos:['IV'],x:100,y:400},
+    {id:'lwb',lbl:'LV',pos:['LV','LF'],x:40,y:280},{id:'cm1',lbl:'8er',pos:['8er'],x:215,y:240},
+    {id:'cm2',lbl:'8er',pos:['8er'],x:125,y:240},{id:'rwb',lbl:'RV',pos:['RV','RF'],x:300,y:280},
+    {id:'lf',lbl:'LF',pos:['LF'],x:50,y:120},{id:'st',lbl:'ST',pos:['ST'],x:170,y:60},
+    {id:'rf',lbl:'RF',pos:['RF'],x:290,y:120}
+  ],
+  '3-3-2-2':[
+    {id:'gk',lbl:'TW',pos:['TW'],x:170,y:460},
+    {id:'cb1',lbl:'IV',pos:['IV'],x:240,y:400},{id:'cb2',lbl:'IV',pos:['IV'],x:170,y:400},
+    {id:'cb3',lbl:'IV',pos:['IV'],x:100,y:400},
+    {id:'lwb',lbl:'LV',pos:['LV','LF'],x:40,y:300},{id:'dm',lbl:'6er',pos:['6er'],x:170,y:320},
+    {id:'rwb',lbl:'RV',pos:['RV','RF'],x:300,y:300},
+    {id:'cm1',lbl:'8er',pos:['8er'],x:215,y:200},{id:'cm2',lbl:'8er',pos:['8er'],x:125,y:200},
+    {id:'st1',lbl:'ST',pos:['ST'],x:215,y:60},{id:'st2',lbl:'ST',pos:['ST'],x:125,y:60}
+  ],
+  '3-3-1-3':[
+    {id:'gk',lbl:'TW',pos:['TW'],x:170,y:460},
+    {id:'cb1',lbl:'IV',pos:['IV'],x:240,y:400},{id:'cb2',lbl:'IV',pos:['IV'],x:170,y:400},
+    {id:'cb3',lbl:'IV',pos:['IV'],x:100,y:400},
+    {id:'lwb',lbl:'LV',pos:['LV','LF'],x:40,y:300},{id:'dm',lbl:'6er',pos:['6er'],x:170,y:320},
+    {id:'rwb',lbl:'RV',pos:['RV','RF'],x:300,y:300},
+    {id:'am',lbl:'10er',pos:['10er'],x:170,y:180},
+    {id:'lf',lbl:'LF',pos:['LF'],x:50,y:80},{id:'st',lbl:'ST',pos:['ST'],x:170,y:50},
+    {id:'rf',lbl:'RF',pos:['RF'],x:290,y:80}
+  ],
+  '3-3-4':[
+    {id:'gk',lbl:'TW',pos:['TW'],x:170,y:460},
+    {id:'cb1',lbl:'IV',pos:['IV'],x:240,y:400},{id:'cb2',lbl:'IV',pos:['IV'],x:170,y:400},
+    {id:'cb3',lbl:'IV',pos:['IV'],x:100,y:400},
+    {id:'lwb',lbl:'LV',pos:['LV','LF'],x:40,y:280},{id:'dm',lbl:'6er',pos:['6er'],x:170,y:300},
+    {id:'rwb',lbl:'RV',pos:['RV','RF'],x:300,y:280},
+    {id:'lf',lbl:'LF',pos:['LF'],x:50,y:120},{id:'st1',lbl:'ST',pos:['ST'],x:215,y:60},
+    {id:'st2',lbl:'ST',pos:['ST'],x:125,y:60},{id:'rf',lbl:'RF',pos:['RF'],x:290,y:120}
+  ]
+};
+
+const PB_COLORS={
+  TW:'#ffeaa7;color:#7a5a00',RV:'#cce5ff;color:#004080',IV:'#b0cce0;color:#003060',
+  LV:'#cce5ff;color:#004080','6er':'#c3e6cb;color:#155724','8er':'#a0d8a8;color:#0d4020',
+  '10er':'#7cc884;color:#083010',RF:'#ffe0b0;color:#7a3a00',LF:'#ffd0b0;color:#7a3a00',
+  ST:'#ffd6d6;color:#8a0000'
+};
+
+const FORMATION_CATEGORIES={
+  'Viererkette':['4-2-3-1','4-3-3','4-3-1-2','4-2-2-2','4-4-2'],
+  'Dreierkette':['3-4-1-2','3-4-3','3-3-2-2','3-3-1-3','3-3-4']
+};
+const BASE_FORMATION='Grund-Formation';
+
+function renderFmtBtns(targetId,currentFmt,onSelect){
+  const el=document.getElementById(targetId);
+  if(!el)return;
+  const isSlp=targetId.startsWith('slp');
+  const cls=isSlp?'slp-fmt-btn':'lp-fmt-btn';
+  let html='';
+  // Base formation pill (first)
+  if(currentFmt!==BASE_FORMATION){
+    html+=`<button class="${cls}" onclick="${onSelect}('${BASE_FORMATION}')" title="Grund-Formation laden">⌂ Grund</button>`;
+  } else {
+    html+=`<span class="${cls} active" style="cursor:default;" title="Grund-Formation aktiv">⌂ Grund</span>`;
+  }
+  // Dropdowns
+  Object.keys(FORMATION_CATEGORIES).forEach(catName=>{
+    const opts=FORMATION_CATEGORIES[catName].map(f=>`<option value="${f}">${f}</option>`).join('');
+    html+=`<select class="${cls}" onchange="if(this.value){${onSelect}(this.value);this.selectedIndex=0;}">
+      <option value="" selected>${catName} ▾</option>${opts}
+    </select>`;
+  });
+  // Current formation pill (just before Edit button)
+  html+=`<span class="${cls} active" style="cursor:default;">${currentFmt}</span>`;
+  // Edit button
+  const editFn=isSlp?'slpToggleEdit()':'lpToggleEdit()';
+  const editing=isSlp?(typeof slpState!=='undefined'&&slpState.editing===true):(typeof lpState!=='undefined'&&lpState.editing===true);
+  html+=`<button class="${cls}${editing?' active':''}" onclick="${editFn}" title="Formation bearbeiten">${editing?'✓ Fertig':'✎ Bearbeiten'}</button>`;
+  el.innerHTML=html;
+}
+
+
+// Get slots for a formation, optionally with custom position overrides
+function fmtSlots(fmtName,customSlots){
+  const base=FORMATIONS[fmtName]||[];
+  if(!customSlots||typeof customSlots!=='object')return base;
+  return base.map(s=>{
+    const cs=customSlots[s.id];
+    if(cs&&typeof cs.x==='number'&&typeof cs.y==='number'){
+      return {...s,x:cs.x,y:cs.y};
+    }
+    return s;
+  });
+}
+let lpState={formation:'4-2-3-1',slots:{},subs:[],guests:[],selectedSlot:null,selectedBench:null,currentLineupId:null,sessIdx:null,editing:false};
+
+
+function openLineupForSess(){
+  openLineupPlanner(_currentSessIdx);
+}
+
+function showSaveFlash(text){
+  let el=document.getElementById('lp-save-flash');
+  if(!el){
+    el=document.createElement('div');
+    el.id='lp-save-flash';
+    el.className='lp-save-flash';
+    document.body.appendChild(el);
+  }
+  el.textContent=text||'✓ Gespeichert';
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t=setTimeout(()=>el.classList.remove('show'),1500);
+}
+
+function openLineupPlanner(sessIdx){
+  const el=document.getElementById('moLineup');
+  if(!el)return;
+  lpState.openSlot=null;lpState.selectedSlot=null;lpState.selectedBench=null;
+  lpState.editing=false;
+  lpState.sessIdx=(sessIdx!==undefined&&sessIdx!==null)?sessIdx:null;
+  lpClosePopup();
+  // Load session-specific lineup if applicable
+  if(lpState.sessIdx!==null){
+    if(!G.matchLineups)G.matchLineups={};
+    const key=UI.currentTeam+'__'+lpState.sessIdx;
+    const saved=G.matchLineups[key];
+    if(saved){
+      lpState.formation=saved.formation||'4-2-3-1';
+      lpState.slots={...(saved.slots||{})};
+      lpState.subs=[...(saved.subs||[])];
+      lpState.guests=[...(saved.guests||[])];
+      lpState.customSlots=saved.customSlots?{...saved.customSlots}:null;
+      lpState.currentLineupId=key;
+    } else {
+      lpState.slots={};lpState.subs=[];lpState.guests=[];lpState.customSlots=null;lpState.currentLineupId=null;
+    }
+  }
+  el.classList.add('open');
+  // Update context info
+  const ctxEl=document.getElementById('lp-context-info');
+  if(ctxEl){
+    if(lpState.sessIdx!==null){
+      const D=cd();const s=D&&D.sessions[lpState.sessIdx];
+      const opp=s&&s.label?s.label:'unbekannter Gegner';
+      const ha=s&&s.homeAway==='home'?'🏠 Heim':'🚌 Auswärts';
+      ctxEl.innerHTML=`${UI.currentTeam} · ${s?s.date:''} · ${ha} vs ${opp}`;
+    } else {
+      ctxEl.textContent=`${UI.currentTeam} · Saison ${UI.currentSeason}`;
+    }
+  }
+  renderFmtBtns('lp-fmt-btns',lpState.formation,'lpSetFormation');
+  lpRenderSaves();
+  lpRender();
+}
+
+function closeLineupPlanner(){
+  const el=document.getElementById('moLineup');
+  if(el)el.classList.remove('open');
+}
+
+function lpGetLineups(){if(!G.lineups)G.lineups=[];return G.lineups;}
+
+function lpSetFormation(f){
+  const oldSlots=FORMATIONS[lpState.formation]||[];
+  const oldAssign={...lpState.slots};
+  lpState.formation=f;
+  lpState.customSlots=null; // Reset custom positions on formation change
+  renderFmtBtns('lp-fmt-btns',f,'lpSetFormation');
+  const newSlots=FORMATIONS[f]||[];
+  // Preserve players by slot index: oldSlots[i] → newSlots[i]
+  // Always keep TW (idx 0) in new TW slot, then map remaining players in original order
+  const newAssign={};
+  // Collect old assignments in slot order (pid by slot index)
+  const oldOrdered=oldSlots.map(s=>oldAssign[s.id]).filter(v=>v!==undefined);
+  // Place into new slots by index (up to min length)
+  const limit=Math.min(oldOrdered.length,newSlots.length);
+  for(let i=0;i<limit;i++){
+    newAssign[newSlots[i].id]=oldOrdered[i];
+  }
+  // Any leftover old players (if new formation has fewer slots) → bench
+  for(let i=limit;i<oldOrdered.length;i++){
+    const pid=oldOrdered[i];
+    if(!lpState.subs.includes(pid))lpState.subs.push(pid);
+  }
+  lpState.slots=newAssign;
+  lpRender();
+}
+
+function lpRender(){
+  const D=cd();
+  const slots=fmtSlots(lpState.formation,lpState.customSlots);
+  const players=(D&&D.players)||[];
+  const usedInSlots=new Set(Object.values(lpState.slots).filter(v=>v!==undefined));
+  const svg=document.getElementById('lp-slots');
+  if(!svg)return;
+  const R=26;
+
+  svg.innerHTML=slots.map(slot=>{
+    const pid=lpState.slots[slot.id];
+    const player=lpResolvePlayer(pid);
+    const isSel=lpState.openSlot===slot.id;
+    const fillColor=player?'rgba(7,30,72,.82)':'rgba(255,255,255,.07)';
+    const strokeColor=isSel?'#e8c840':player?'rgba(255,255,255,.65)':'rgba(255,255,255,.3)';
+    const strokeW=isSel?'2.5':'1.8';
+    const dashArr=!player?'stroke-dasharray="4 3"':'';
+    const gFilter=isSel?'filter="url(#glowGold)"':'';
+
+    let inner='';
+    if(player){
+      const fullNm=lpFullName(player,11);
+      inner=`<text y="${-R+12}" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="8" fill="rgba(255,255,255,.38)" letter-spacing="1">${slot.lbl}</text>
+        <text y="3" text-anchor="middle" font-family="'Barlow',sans-serif" font-size="9.5" font-weight="700" fill="#fff">${fullNm}</text>
+        <text y="15" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="12" fill="#e8c840">${player.nr||'–'}</text>`;
+    } else {
+      inner=`<text y="-4" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="9" fill="rgba(255,255,255,.4)" letter-spacing="1">${slot.lbl}</text>
+        <text y="10" text-anchor="middle" font-family="'Barlow',sans-serif" font-size="14" fill="rgba(255,255,255,.22)">+</text>`;
+    }
+
+    return `<g class="lp-slot-g${player?' filled':''}${isSel?' selected':''}"
+        data-slot="${slot.id}" onclick="lpClickSlot(event,'${slot.id}')"
+        transform="translate(${slot.x},${slot.y})" style="cursor:pointer;"
+        onpointerdown="lpPointerDown(event,'${slot.id}')"
+        onpointerenter="lpPointerEnter(event,'${slot.id}')"
+        ${gFilter}>
+      <circle r="${isSel?R+2:R}" style="fill:${fillColor};stroke:${strokeColor};stroke-width:${strokeW};" ${dashArr}/>
+      ${inner}
+    </g>`;
+  }).join('');
+
+  // Update stats: gesetzt = main + subs; Spieler = visible (available) count + guests
+  const placed=Object.values(lpState.slots).filter(v=>v!==undefined).length+lpState.subs.filter(s=>s!==undefined).length;
+  const sessIdxStat=lpState.sessIdx;
+  const isUnavailStat=(pi)=>{
+    if(sessIdxStat===null||sessIdxStat===undefined)return false;
+    const pp=players[pi];if(!pp||!pp.s)return false;
+    const st=pp.s[sessIdxStat];return st===0||st===2;
+  };
+  const visibleCount=players.filter((_,i)=>!isUnavailStat(i)).length+(lpState.guests||[]).length;
+  const el1=document.getElementById('lp-st-placed');
+  const el2=document.getElementById('lp-st-total');
+  if(el1)el1.textContent=placed;
+  if(el2)el2.textContent=visibleCount;
+
+  // Render popup if open
+  if(lpState.openSlot)lpRenderPopup(lpState.openSlot);
+  lpRenderSubs();
+}
+
+function lpRenderPopup(slotId){
+  const D=cd();
+  const players=(D&&D.players)||[];
+  const slot=(FORMATIONS[lpState.formation]||[]).find(s=>s.id===slotId);
+  if(!slot)return;
+  const popup=document.getElementById('lp-popup');
+  if(!popup||popup.style.display==='none')return;
+
+  const currentPid=lpState.slots[slotId];
+  const usedIds=new Set(Object.values(lpState.slots).filter(v=>v!==undefined));
+  const allUsed=new Set([...usedIds,...lpState.subs]);
+
+  // Current player
+  const curEl=document.getElementById('lp-popup-current');
+  if(curEl){
+    const cur=lpResolvePlayer(currentPid);
+    if(cur){
+      const p=cur;
+      curEl.innerHTML=`<div style="display:flex;align-items:center;gap:7px;padding:5px 7px;background:rgba(232,200,64,.1);border:1px solid rgba(232,200,64,.3);border-radius:7px;margin-bottom:6px;">
+        <span style="font-family:'Bebas Neue';color:#e8c840;font-size:.9rem;width:20px;">${p.nr||'–'}</span>
+        <span style="font-size:.78rem;font-weight:700;color:#fff;flex:1;">${getDisplayName(p)}</span>
+        <span onclick="lpRemoveFromSlot('${slotId}')" style="color:rgba(255,255,255,.3);cursor:pointer;font-size:.75rem;">✕</span>
+      </div>`;
+    } else {
+      curEl.innerHTML='<div style="font-size:.7rem;color:rgba(255,255,255,.3);padding:3px 0 6px;font-style:italic;">Kein Spieler</div>';
+    }
+  }
+
+  // Picker list
+  const pickerEl=document.getElementById('lp-popup-picker');
+  if(!pickerEl)return;
+  const suitablePos=slot.pos;
+
+  // For session lineup: filter out unavailable players (Fehlend=0 or Entschuldigt=2)
+  const sessIdx=lpState.sessIdx;
+  const D2=cd();
+  const isUnavailable=(pi)=>{
+    if(sessIdx===null||sessIdx===undefined||!D2)return false;
+    const p2=D2.players[pi];if(!p2||!p2.s)return false;
+    const st=p2.s[sessIdx];
+    return st===0||st===2; // Fehlend or Entschuldigt
+  };
+  const rows=[...players.keys()].map(i=>{
+    const p=players[i];if(!p)return null;
+    if(isUnavailable(i)&&i!==currentPid)return null;
+    const isAssigned=allUsed.has(i)&&i!==currentPid;
+    const isBest=suitablePos[0]===p.pos;
+    const isFit=suitablePos.includes(p.pos)||suitablePos.includes(p.pos2);
+    const bcol=PB_COLORS[p.pos]||'#ddd;color:#333';
+    return {i,p,isAssigned,isBest,isFit,bcol};
+  }).filter(Boolean).sort((a,b)=>{
+    // Available (not yet assigned) ALWAYS comes first
+    if(!a.isAssigned&&b.isAssigned)return -1;
+    if(a.isAssigned&&!b.isAssigned)return 1;
+    if(a.isBest&&!b.isBest)return -1;if(!a.isBest&&b.isBest)return 1;
+    if(a.isFit&&!b.isFit)return -1;if(!a.isFit&&b.isFit)return 1;
+    return (+a.p.nr||99)-(+b.p.nr||99);
+  });
+
+  pickerEl.innerHTML=rows.map(({i,p,isAssigned,isBest,isFit,bcol})=>`
+    <div class="slp-pick-item${isBest?' best':''}${isAssigned?' assigned-already':''}" onclick="lpAssignToSlot('${slotId}',${i})">
+      <span class="nr">${p.nr||'–'}</span>
+      <span class="name">${getDisplayName(p)}</span>
+      <span class="pos-b" style="background:${bcol.split(';')[0]};${bcol.split(';')[1]}">${p.pos}</span>
+      ${isBest?'<span style="color:#e8c840;font-size:.7rem;">★</span>':''}
+    </div>`).join('')+`
+    <div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.1);">
+      <div style="font-size:.6rem;color:rgba(255,255,255,.45);margin-bottom:4px;font-weight:700;">+ Gastspieler hinzufügen</div>
+      <input type="text" id="lp-guest-input" placeholder="Name (z.B. Müller)" onclick="event.stopPropagation()" style="width:100%;padding:5px 8px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);border-radius:6px;color:#fff;font-size:.74rem;font-family:'Barlow';outline:none;margin-bottom:4px;"/>
+      <button onclick="event.stopPropagation();lpAddGuest('${slotId}')" style="width:100%;padding:4px;background:rgba(232,200,64,.15);border:1px solid rgba(232,200,64,.3);color:#e8c840;border-radius:6px;font-family:'Barlow',sans-serif;font-size:.7rem;font-weight:700;cursor:pointer;">＋ Hinzufügen</button>
+    </div>`;
+}
+
+function lpClickSlot(e,slotId){
+  e.stopPropagation();
+  if(lpState.editing)return; // edit mode: clicks don't open popup
+  const popup=document.getElementById('lp-popup');
+  if(!popup)return;
+
+  if(lpState.openSlot===slotId){
+    lpClosePopup();return;
+  }
+  lpState.openSlot=slotId;
+
+  // Position popup near click
+  const svgEl=document.getElementById('lp-pitch');
+  const svgRect=svgEl.getBoundingClientRect();
+  const vb=svgEl.viewBox.baseVal;
+  const slots=fmtSlots(lpState.formation,lpState.customSlots);
+  const slot=slots.find(s=>s.id===slotId);
+  if(!slot)return;
+  const scaleX=svgRect.width/vb.width;
+  const scaleY=svgRect.height/vb.height;
+  const px=svgRect.left+slot.x*scaleX;
+  const py=svgRect.top+slot.y*scaleY;
+  const pw=240,ph=340;
+  let left=px+32;
+  let top=py-60;
+  if(left+pw>window.innerWidth-10)left=px-pw-24;
+  if(top+ph>window.innerHeight-10)top=window.innerHeight-ph-10;
+  if(top<55)top=55;
+  popup.style.left=Math.max(8,left)+'px';
+  popup.style.top=top+'px';
+  popup.style.display='block';
+
+  const titleEl=document.getElementById('lp-popup-title');
+  if(titleEl)titleEl.textContent=slot.lbl+' – Spieler wählen';
+  lpRender();
+}
+
+function lpAssignToSlot(slotId,pi){
+  Object.keys(lpState.slots).forEach(k=>{if(lpState.slots[k]===pi)delete lpState.slots[k];});
+  lpState.subs=lpState.subs.filter(s=>s!==pi);
+  lpState.slots[slotId]=pi;
+  lpClosePopup();
+}
+
+function lpRemoveFromSlot(slotId){
+  const pid=lpState.slots[slotId];
+  delete lpState.slots[slotId];
+  if(typeof pid==='string')lpRemoveGuest(pid);
+  lpRender();
+}
+
+// Drag & drop via pointer events with visual ghost
+let _lpDragSlot=null,_lpDragging=false,_lpDragGhost=null,_lpDragTimeout=null,_lpDragHover=null;
+
+function _lpGetSlotPlayer(slotId){
+  if(slotId.startsWith('sub_')){
+    const idx=+slotId.slice(4);
+    return lpResolvePlayer(lpState.subs[idx]);
+  }
+  return lpResolvePlayer(lpState.slots[slotId]);
+}
+function _lpSetSlotPlayer(slotId,pid){
+  if(slotId.startsWith('sub_')){
+    const idx=+slotId.slice(4);
+    if(pid===null||pid===undefined){
+      // Remove from this sub position
+      if(idx<lpState.subs.length)lpState.subs.splice(idx,1);
+    } else {
+      // Pad if needed and place at idx
+      while(lpState.subs.length<idx)lpState.subs.push(undefined);
+      lpState.subs[idx]=pid;
+      // Compact undefineds
+      lpState.subs=lpState.subs.filter(s=>s!==undefined);
+    }
+  } else {
+    if(pid===null||pid===undefined)delete lpState.slots[slotId];
+    else lpState.slots[slotId]=pid;
+  }
+}
+
+function lpPointerDown(e,slotId){
+  // Formation edit mode → drag slot, not player
+  if(lpState.editing){
+    fmtDragStart(e,'lp',slotId);
+    return;
+  }
+  const p=_lpGetSlotPlayer(slotId);
+  if(!p)return;// empty slot
+  e.preventDefault();
+  _lpDragSlot=slotId;_lpDragging=false;
+  if(_lpDragTimeout)clearTimeout(_lpDragTimeout);
+  _lpDragTimeout=setTimeout(()=>{
+    _lpDragging=true;
+    document.body.style.cursor='grabbing';
+    document.body.style.userSelect='none';
+    // Create ghost
+    _lpDragGhost=document.createElement('div');
+    _lpDragGhost.className='lp-drag-ghost';
+    _lpDragGhost.innerHTML=`<div>${lpFullName(p,8)}</div><div class="gn">${p.nr||'–'}</div>`;
+    document.body.appendChild(_lpDragGhost);
+    _lpDragGhost.style.left=e.clientX+'px';
+    _lpDragGhost.style.top=e.clientY+'px';
+    // Mark source slot
+    document.querySelectorAll('.lp-slot-g, .lp-sub-circle').forEach(el=>el.classList.remove('drag-source','drop-target'));
+    const srcEl=document.querySelector(`[data-slot="${_lpDragSlot}"]`);
+    if(srcEl)srcEl.classList.add('drag-source');
+    lpClosePopup();
+  },180);
+}
+
+document.addEventListener('pointermove',(e)=>{
+  if(_lpDragGhost){
+    _lpDragGhost.style.left=e.clientX+'px';
+    _lpDragGhost.style.top=e.clientY+'px';
+    // Detect hover target
+    const elem=document.elementFromPoint(e.clientX,e.clientY);
+    if(!elem){_lpDragHover=null;return;}
+    let target=elem.closest('.lp-slot-g, .lp-sub-circle');
+    document.querySelectorAll('.drop-target').forEach(el=>el.classList.remove('drop-target'));
+    if(target){
+      const sid=target.getAttribute('data-slot');
+      if(sid&&sid!==_lpDragSlot){target.classList.add('drop-target');_lpDragHover=sid;}
+      else _lpDragHover=null;
+    } else _lpDragHover=null;
+  }
+});
+
+document.addEventListener('pointerup',(e)=>{
+  if(_lpDragTimeout){clearTimeout(_lpDragTimeout);_lpDragTimeout=null;}
+  if(_lpDragging&&_lpDragSlot){
+    if(_lpDragHover&&_lpDragHover!==_lpDragSlot){
+      // Swap players between slots (handles real players AND guest refs)
+      const fromP=_lpGetSlotPlayer(_lpDragSlot);
+      const toP=_lpGetSlotPlayer(_lpDragHover);
+      const D=cd();const players=(D&&D.players)||[];
+      // Resolve fromP/toP back to their reference (idx or guest-ref string)
+      const fromVal=fromP?(fromP.isGuest?fromP.ref:players.indexOf(fromP)):null;
+      const toVal=toP?(toP.isGuest?toP.ref:players.indexOf(toP)):null;
+      const fromOK=fromVal!==null&&fromVal!==-1;
+      const toOK=toVal!==null&&toVal!==-1;
+      _lpSetSlotPlayer(_lpDragHover,fromOK?fromVal:null);
+      _lpSetSlotPlayer(_lpDragSlot,toOK?toVal:null);
+    }
+    if(_lpDragGhost){_lpDragGhost.remove();_lpDragGhost=null;}
+    document.body.style.cursor='';
+    document.body.style.userSelect='';
+    document.querySelectorAll('.drag-source,.drop-target').forEach(el=>el.classList.remove('drag-source','drop-target'));
+    _lpDragging=false;_lpDragSlot=null;_lpDragHover=null;
+    lpRender();
+  } else {
+    _lpDragSlot=null;_lpDragHover=null;
+  }
+});
+
+function lpPointerEnter(e,targetSlot){/* legacy - no-op now, drag handled in move */}
+
+function lpClosePopup(){
+  const p=document.getElementById('lp-popup');
+  if(p)p.style.display='none';
+  lpState.openSlot=null;
+  lpRender();
+}
+
+function lpRenderSubs(){
+  const D=cd();
+  const players=(D&&D.players)||[];
+  const usedInSlots=new Set(Object.values(lpState.slots).filter(v=>v!==undefined));
+  const usedInSubs=new Set(lpState.subs);
+  const allUsed=new Set([...usedInSlots,...usedInSubs]);
+
+  // Render sub circles (clickable like positions)
+  const circlesEl=document.getElementById('lp-subs-circles');
+  if(circlesEl){
+    const MAX_SUBS=7;
+    const subSlots=[];
+    for(let i=0;i<MAX_SUBS;i++){
+      const pi=lpState.subs[i];
+      const p=lpResolvePlayer(pi);
+      const isSel=lpState.openSlot==='sub_'+i;
+      subSlots.push(`<div class="lp-sub-circle${p?' filled':''}${isSel?' selected':''}" data-slot="sub_${i}" onclick="lpClickSubSlot(event,${i})"
+        onpointerdown="lpPointerDown(event,'sub_${i}')"
+        onpointerenter="lpPointerEnter(event,'sub_${i}')"
+        style="position:relative;width:54px;height:54px;border-radius:50%;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;${p?'background:rgba(7,30,72,.85);border:1.8px solid rgba(255,255,255,.55);':'background:rgba(255,255,255,.05);border:1.5px dashed rgba(255,255,255,.25);'}${isSel?'box-shadow:0 0 0 2px #e8c840;':''}">
+        ${p?`<div style="font-size:.62rem;font-weight:700;color:#fff;line-height:1;">${lpFullName(p,9)}</div>
+              <div style="font-family:'Bebas Neue';color:#e8c840;font-size:.85rem;line-height:1.1;">${p.nr||'–'}</div>`
+            :`<div style="font-size:.55rem;color:rgba(255,255,255,.35);font-weight:700;letter-spacing:1px;">SUB ${i+1}</div>`}
+      </div>`);
+    }
+    circlesEl.innerHTML=subSlots.join('');
+  }
+
+  // Render full kader list - includes real players + guests; hide unavailable
+  const kaderEl=document.getElementById('lp-kader-list');
+  if(kaderEl){
+    const sessIdx=lpState.sessIdx;
+    const isUnavail=(pi)=>{
+      if(sessIdx===null||sessIdx===undefined)return false;
+      const pp=players[pi];if(!pp||!pp.s)return false;
+      const st=pp.s[sessIdx];return st===0||st===2;
+    };
+    const slotsArr=FORMATIONS[lpState.formation]||[];
+    const slotIndexById={};
+    slotsArr.forEach((s,idx)=>{slotIndexById[s.id]=idx;});
+    // Build entries: real players + guests (guests use ref string id)
+    const entries=[];
+    [...players.keys()].forEach(i=>{
+      if(!isUnavail(i))entries.push({id:i,p:players[i],isGuest:false});
+    });
+    (lpState.guests||[]).forEach(g=>{
+      entries.push({id:g.ref,p:g,isGuest:true});
+    });
+    if(!entries.length){kaderEl.innerHTML='<div style="padding:10px;font-size:.72rem;color:rgba(255,255,255,.6);">Keine Spieler im Kader</div>';return;}
+    const getEntrySortKey=(entry)=>{
+      const id=entry.id;
+      const slotEntry=Object.entries(lpState.slots).find(([k,v])=>v===id);
+      if(slotEntry){const si=slotIndexById[slotEntry[0]];return [0, si!==undefined?si:99];}
+      const subIdx=lpState.subs.indexOf(id);
+      if(subIdx>=0){return [1, subIdx];}
+      return [2, posRank(entry.p)];
+    };
+    const sorted=entries.sort((a,b)=>{
+      const ka=getEntrySortKey(a);
+      const kb=getEntrySortKey(b);
+      if(ka[0]!==kb[0])return ka[0]-kb[0];
+      return ka[1]-kb[1];
+    });
+    kaderEl.innerHTML=sorted.map(({id,p,isGuest})=>{
+      let status='';let bg='rgba(255,255,255,.04)';
+      const inSlot=Object.entries(lpState.slots).find(([k,v])=>v===id);
+      const inSub=lpState.subs.indexOf(id);
+      if(inSlot){
+        const slotInfo=(FORMATIONS[lpState.formation]||[]).find(s=>s.id===inSlot[0]);
+        status=`<span style="font-size:.6rem;color:#7dffa0;font-weight:700;">⚽ ${slotInfo?slotInfo.lbl:''}</span>`;
+        bg='rgba(39,174,96,.08)';
+      } else if(inSub>=0){
+        status=`<span style="font-size:.6rem;color:#e8c840;font-weight:700;">🔄 SUB ${inSub+1}</span>`;
+        bg='rgba(232,200,64,.08)';
+      } else if(isGuest){
+        status=`<span style="font-size:.6rem;color:#ff9080;font-weight:700;">👤 GAST</span>`;
+        bg='rgba(231,76,60,.06)';
+      }
+      const bcol=PB_COLORS[p.pos]||'#ddd;color:#333';
+      const guestBadge=isGuest?`<span style="font-size:.55rem;background:rgba(232,200,64,.2);color:#e8c840;padding:1px 5px;border-radius:7px;font-weight:700;">GAST</span>`:'';
+      return `<div style="display:flex;align-items:center;gap:6px;padding:5px 8px;background:${bg};border:1px solid rgba(255,255,255,.07);border-radius:7px;margin-bottom:3px;">
+        <span style="font-family:'Bebas Neue';color:#e8c840;font-size:.85rem;width:18px;text-align:center;">${p.nr||'–'}</span>
+        <span style="font-size:.72rem;font-weight:600;color:#fff;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${getDisplayName(p)}</span>
+        ${guestBadge}
+        <span class="lp-card-pos1" style="background:${bcol.split(';')[0]};${bcol.split(';')[1]};font-size:.55rem;font-weight:700;padding:1px 5px;border-radius:7px;">${p.pos}</span>
+        ${status}
+      </div>`;
+    }).join('');
+  }
+}
+
+function lpClickSubSlot(e,subIdx){
+  e.stopPropagation();
+  const slotKey='sub_'+subIdx;
+  if(lpState.openSlot===slotKey){lpClosePopup();return;}
+  lpState.openSlot=slotKey;
+  // Position popup
+  const popup=document.getElementById('lp-popup');
+  if(!popup)return;
+  const rect=e.currentTarget.getBoundingClientRect();
+  let left=rect.left-260;
+  let top=rect.top-30;
+  if(left<8)left=rect.right+10;
+  if(top+340>window.innerHeight)top=window.innerHeight-350;
+  if(top<55)top=55;
+  popup.style.left=Math.max(8,left)+'px';
+  popup.style.top=top+'px';
+  popup.style.display='block';
+  const titleEl=document.getElementById('lp-popup-title');
+  if(titleEl)titleEl.textContent='Auswechselspieler '+(subIdx+1);
+  lpRender();
+  lpRenderSubPopup(subIdx);
+}
+
+function lpRenderSubPopup(subIdx){
+  const D=cd();
+  const players=(D&&D.players)||[];
+  const currentPid=lpState.subs[subIdx];
+  const usedIds=new Set([...Object.values(lpState.slots).filter(v=>v!==undefined),...lpState.subs.filter((_,i)=>i!==subIdx)]);
+
+  const curEl=document.getElementById('lp-popup-current');
+  if(curEl){
+    const cur=lpResolvePlayer(currentPid);
+    if(cur){
+      const p=cur;
+      curEl.innerHTML=`<div style="display:flex;align-items:center;gap:7px;padding:5px 7px;background:rgba(232,200,64,.1);border:1px solid rgba(232,200,64,.3);border-radius:7px;margin-bottom:6px;">
+        <span style="font-family:'Bebas Neue';color:#e8c840;font-size:.9rem;width:20px;">${p.nr||'–'}</span>
+        <span style="font-size:.78rem;font-weight:700;color:#fff;flex:1;">${getDisplayName(p)}</span>
+        <span onclick="lpRemoveSubAt(${subIdx})" style="color:rgba(255,255,255,.3);cursor:pointer;font-size:.75rem;">✕</span>
+      </div>`;
+    } else {
+      curEl.innerHTML='<div style="font-size:.7rem;color:rgba(255,255,255,.3);padding:3px 0 6px;font-style:italic;">Kein Spieler</div>';
+    }
+  }
+  const pickerEl=document.getElementById('lp-popup-picker');
+  if(!pickerEl)return;
+  const sessIdx2=lpState.sessIdx;
+  const D3=cd();
+  const isUnavail=(pi)=>{
+    if(sessIdx2===null||sessIdx2===undefined||!D3)return false;
+    const p2=D3.players[pi];if(!p2||!p2.s)return false;
+    const st=p2.s[sessIdx2];
+    return st===0||st===2;
+  };
+  const rows=[...players.keys()].map(i=>{
+    const p=players[i];if(!p)return null;
+    if(isUnavail(i)&&i!==currentPid)return null;
+    const isAssigned=usedIds.has(i)&&i!==currentPid;
+    const bcol=PB_COLORS[p.pos]||'#ddd;color:#333';
+    return {i,p,isAssigned,bcol};
+  }).filter(Boolean).sort((a,b)=>{
+    if(!a.isAssigned&&b.isAssigned)return -1;
+    if(a.isAssigned&&!b.isAssigned)return 1;
+    return (+a.p.nr||99)-(+b.p.nr||99);
+  });
+  pickerEl.innerHTML=rows.map(({i,p,isAssigned,bcol})=>`
+    <div class="slp-pick-item${isAssigned?' assigned-already':''}" onclick="lpAssignToSub(${subIdx},${i})">
+      <span class="nr">${p.nr||'–'}</span>
+      <span class="name">${getDisplayName(p)}</span>
+      <span class="pos-b" style="background:${bcol.split(';')[0]};${bcol.split(';')[1]}">${p.pos}</span>
+    </div>`).join('');
+}
+
+
+function lpMaybeRemoveGuest(pid){
+  if(pid===undefined||pid===null)return;
+  const D=cd();if(!D||!D.players[pid])return;
+  const p=D.players[pid];
+  if(!p.isGuest)return;
+  // Check if guest is still used somewhere
+  const usedSlots=Object.values(lpState.slots).includes(pid);
+  const usedSubs=lpState.subs.includes(pid);
+  if(usedSlots||usedSubs)return;
+  // Remove guest from team
+  D.players.splice(pid,1);
+  // Update all references >pid in slots and subs
+  Object.keys(lpState.slots).forEach(k=>{if(lpState.slots[k]>pid)lpState.slots[k]--;});
+  lpState.subs=lpState.subs.map(s=>s>pid?s-1:s);
+  saveG();
+}
+function lpAddGuest(slotId){
+  const inp=document.getElementById('lp-guest-input');
+  if(!inp)return;
+  const name=inp.value.trim();
+  if(!name)return;
+  if(!Array.isArray(lpState.guests))lpState.guests=[];
+  // Find unused nr (across team + existing guests)
+  const D=cd();
+  const teamNrs=new Set((D&&D.players||[]).map(p=>+p.nr).filter(n=>n>0));
+  const guestNrs=new Set(lpState.guests.map(g=>+g.nr));
+  let newNr=1;
+  while(teamNrs.has(newNr)||guestNrs.has(newNr))newNr++;
+  const slot=(FORMATIONS[lpState.formation]||[]).find(s=>s.id===slotId);
+  const pos=slot?slot.pos[0]:'ST';
+  const guestRef='g_'+Date.now()+'_'+Math.floor(Math.random()*1000);
+  lpState.guests.push({ref:guestRef,nr:newNr,name,pos,pos2:'',isGuest:true});
+  if(slotId.startsWith('sub_')){
+    const subIdx=+slotId.slice(4);
+    while(lpState.subs.length<=subIdx)lpState.subs.push(undefined);
+    lpState.subs[subIdx]=guestRef;
+    lpState.subs=lpState.subs.filter(s=>s!==undefined);
+  } else {
+    lpState.slots[slotId]=guestRef;
+  }
+  lpClosePopup();
+}
+// Resolve player by index OR guest ref string
+function lpResolvePlayer(idxOrRef){
+  if(idxOrRef===undefined||idxOrRef===null)return null;
+  const D=cd();const players=(D&&D.players)||[];
+  if(typeof idxOrRef==='string'&&idxOrRef.startsWith('g_')){
+    return (lpState.guests||[]).find(g=>g.ref===idxOrRef)||null;
+  }
+  return players[idxOrRef]||null;
+}
+function lpRemoveGuest(ref){
+  if(!ref||typeof ref!=='string'||!ref.startsWith('g_'))return;
+  if(!Array.isArray(lpState.guests))return;
+  // Check if still in use
+  const inSlots=Object.values(lpState.slots).includes(ref);
+  const inSubs=lpState.subs.includes(ref);
+  if(inSlots||inSubs)return;
+  lpState.guests=lpState.guests.filter(g=>g.ref!==ref);
+}
+
+function lpAssignToSub(subIdx,pi){
+  // Remove from any slot
+  Object.keys(lpState.slots).forEach(k=>{if(lpState.slots[k]===pi)delete lpState.slots[k];});
+  // Remove from other sub positions
+  lpState.subs=lpState.subs.map((s,i)=>(s===pi&&i!==subIdx)?undefined:s);
+  // Set in this sub slot
+  while(lpState.subs.length<=subIdx)lpState.subs.push(undefined);
+  lpState.subs[subIdx]=pi;
+  // Compact: keep array dense
+  lpState.subs=lpState.subs.filter(s=>s!==undefined);
+  // Re-place at correct index
+  const newSubs=[];
+  for(let i=0;i<7;i++){
+    if(i===subIdx)newSubs[i]=pi;
+    else{
+      const next=lpState.subs.find(s=>!newSubs.includes(s)&&s!==pi);
+      if(next!==undefined)newSubs[i]=next;
+    }
+  }
+  lpState.subs=newSubs.filter(s=>s!==undefined);
+  // Simpler: just put pi at subIdx, keep others
+  if(!lpState.subs.includes(pi))lpState.subs.push(pi);
+  lpClosePopup();
+}
+
+function lpRemoveSubAt(subIdx){
+  const pid=lpState.subs[subIdx];
+  lpState.subs.splice(subIdx,1);
+  if(typeof pid==='string')lpRemoveGuest(pid);
+  lpRender();
+}
+
+
+function lpAddSub(pi){
+  if(!lpState.subs.includes(pi)&&lpState.subs.length<7){lpState.subs.push(pi);lpRender();}
+}
+function lpRemoveSub(si){lpState.subs.splice(si,1);lpRender();}
+function lpClearAll(){
+  if(!confirm('Alle Positionen leeren?'))return;
+  lpState.slots={};lpState.subs=[];lpState.selectedSlot=null;lpState.selectedBench=null;lpClosePopup();
+  lpRender();
+}
+
+function lpSave(){
+  snap();
+  if(lpState.sessIdx!==null&&lpState.sessIdx!==undefined){
+    // Save per-session lineup
+    if(!G.matchLineups)G.matchLineups={};
+    const key=UI.currentTeam+'__'+lpState.sessIdx;
+    G.matchLineups[key]={formation:lpState.formation,slots:{...lpState.slots},subs:[...lpState.subs],guests:[...lpState.guests],customSlots:lpState.customSlots?{...lpState.customSlots}:null,savedAt:Date.now()};
+    saveG();lpRenderSaves();showSaveFlash('✓ Aufstellung gespeichert');
+  } else {
+    const name='Aufstellung '+new Date().toLocaleDateString('de-DE');
+    const lus=lpGetLineups();
+    const lu={id:lpState.currentLineupId||('lu_'+Date.now()),name,formation:lpState.formation,slots:{...lpState.slots},subs:[...lpState.subs],customSlots:lpState.customSlots?{...lpState.customSlots}:null,savedAt:Date.now()};
+    const ex=lus.findIndex(l=>l.id===lu.id);
+    if(ex>=0)lus[ex]=lu;else lus.unshift(lu);
+    if(lus.length>20)lus.length=20;
+    lpState.currentLineupId=lu.id;
+    saveG();lpRenderSaves();showSaveFlash('✓ Aufstellung gespeichert');
+  }
+}
+
+function lpRenderSaves(){
+  const el=document.getElementById('lp-saves-list');if(!el)return;
+  // Session mode: per-match lineup
+  if(lpState.sessIdx!==null&&lpState.sessIdx!==undefined){
+    const saved=G.matchLineups&&G.matchLineups[UI.currentTeam+'__'+lpState.sessIdx];
+    if(saved&&saved.savedAt){
+      const t=new Date(saved.savedAt).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+      el.innerHTML=`✓ Zuletzt gespeichert: ${t}`;
+    } else {
+      el.innerHTML='Noch nicht gespeichert';
+    }
+    return;
+  }
+  // Standalone mode
+  const lus=lpGetLineups();
+  const cur=lus.find(l=>l.id===lpState.currentLineupId);
+  if(cur&&cur.savedAt){
+    const t=new Date(cur.savedAt).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+    el.innerHTML=`✓ Zuletzt gespeichert: ${t}`;
+  } else {
+    el.innerHTML='Noch nicht gespeichert';
+  }
+}
+
+function lpLoad(id){
+  const l=lpGetLineups().find(x=>x.id===id);if(!l)return;
+  lpState.currentLineupId=l.id;lpState.formation=l.formation;
+  lpState.slots={...l.slots};lpState.subs=[...(l.subs||[])];lpState.selectedSlot=null;lpState.selectedBench=null;
+
+  renderFmtBtns('lp-fmt-btns',l.formation,'lpSetFormation');
+  lpRender();lpRenderSaves();
+}
+
+function lpDelete(id){
+  if(!confirm('Aufstellung löschen?'))return;
+  snap();G.lineups=lpGetLineups().filter(l=>l.id!==id);
+  if(lpState.currentLineupId===id){lpState.currentLineupId=null;lpState.slots={};lpState.subs=[];}
+  saveG();lpRenderSaves();lpRender();
+}
+
+
+
+
+
+// ── SAISONKADER CONFIRMATIONS ────────────────────────────────
+function slpConfKey(){return UI.currentTeam+'__'+UI.currentSeason;}
+function slpGetConf(){
+  if(!G.slpConfirmations)G.slpConfirmations={};
+  const k=slpConfKey();
+  if(!G.slpConfirmations[k])G.slpConfirmations[k]={enabled:false,confirmed:{}};
+  // Always ensure confirmed object exists (Firebase may strip empty objects)
+  if(!G.slpConfirmations[k].confirmed||typeof G.slpConfirmations[k].confirmed!=='object')G.slpConfirmations[k].confirmed={};
+  return G.slpConfirmations[k];
+}
+function slpIsConfEnabled(){
+  return slpGetConf().enabled===true;
+}
+function slpIsPlayerConfirmed(pi){
+  return !!slpGetConf().confirmed[pi];
+}
+function slpToggleConfirmations(enabled){
+  const c=slpGetConf();
+  c.enabled=enabled;
+  snap();saveG();
+  // Sync checkbox + show/hide manage button
+  const t=document.getElementById('slp-conf-toggle');
+  if(t)t.checked=enabled;
+  const btn=document.getElementById('slp-conf-btn');
+  if(btn)btn.style.display=enabled?'':'none';
+  slpRender();
+}
+function slpToggleConf(pi){
+  const c=slpGetConf();
+  if(c.confirmed[pi])delete c.confirmed[pi];
+  else c.confirmed[pi]=true;
+  snap();saveG();
+  slpRenderConfList();
+  slpRender();
+}
+function slpOpenConfirmList(){
+  slpRenderConfList();
+  openM('moSlpConf');
+}
+function slpRenderConfList(){
+  const D=cd();
+  const players=(D&&D.players)||[];
+  const c=slpGetConf();
+  const sortedPis=[...players.keys()].sort((a,b)=>{
+    const pa=players[a],pb=players[b];
+    return posRank(pa)-posRank(pb)||(+pa.nr||99)-(+pb.nr||99);
+  });
+  const el=document.getElementById('slp-conf-list');
+  if(!el)return;
+  if(!players.length){el.innerHTML='<p style="padding:14px;color:var(--gm);text-align:center;">Keine Spieler im Kader.</p>';return;}
+  el.innerHTML=sortedPis.map(pi=>{
+    const p=players[pi];
+    const conf=!!c.confirmed[pi];
+    const bcol1=(PB_COLORS[p.pos]||'#ddd;color:#333').split(';');
+    const bcol2=p.pos2?(PB_COLORS[p.pos2]||'#ddd;color:#333').split(';'):null;
+    return `<div style="display:flex;align-items:center;gap:9px;padding:7px 12px;border-bottom:1px solid var(--gl);cursor:pointer;background:${conf?'rgba(39,174,96,.06)':'transparent'};" onclick="slpToggleConf(${pi})">
+      <input type="checkbox" ${conf?'checked':''} onchange="slpToggleConf(${pi})" onclick="event.stopPropagation()" style="width:18px;height:18px;cursor:pointer;accent-color:var(--cp);"/>
+      <span style="font-family:'Bebas Neue';color:var(--bd);width:24px;text-align:center;">${p.nr||'–'}</span>
+      <span style="flex:1;font-weight:600;color:var(--gd);">${getDisplayName(p)}</span>
+      <span class="lp-card-pos1" style="background:${bcol1[0]};${bcol1[1]};font-size:.6rem;">${p.pos}</span>
+      ${bcol2?`<span class="lp-card-pos1" style="background:${bcol2[0]};${bcol2[1]};font-size:.6rem;">${p.pos2}</span>`:''}
+    </div>`;
+  }).join('');
+  // Stats
+  const total=players.length;
+  const confCount=players.filter((_,i)=>c.confirmed[i]).length;
+  const stEl=document.getElementById('slp-conf-stats');
+  if(stEl)stEl.textContent=`${confCount} / ${total} bestätigt`;
+}
+
+// ══ SEASON LINEUP PLANNER ════════════════════════════════════
+let slpState={formation:'4-2-3-1',slots:{},currentId:null,openSlot:null,editing:false};
+// slots: { slotId: [playerIdx, playerIdx, ...] }  priority order
+
+function lpFullName(p,maxLen){
+  if(!p)return'';
+  // 1. Use shortname if set
+  if(p.shortname&&p.shortname.trim()){
+    return p.shortname.trim().substring(0,maxLen||16);
+  }
+  // 2. Otherwise use Vorname only; add Nachname-Initial only if duplicate Vorname exists
+  const parts=p.name.trim().split(' ').filter(Boolean);
+  if(!parts.length)return'';
+  const firstName=parts[0];
+  const lastName=parts.length>1?parts[parts.length-1]:'';
+  // Check for duplicates in current team
+  const D=cd();
+  let hasDuplicate=false;
+  if(D&&Array.isArray(D.players)){
+    const sameFirstCount=D.players.filter(other=>{
+      if(!other||other===p)return false;
+      if(other.shortname&&other.shortname.trim())return false;
+      const op=other.name.trim().split(' ').filter(Boolean);
+      return op[0]===firstName;
+    }).length;
+    hasDuplicate=sameFirstCount>0;
+  }
+  if(hasDuplicate&&lastName){
+    return (firstName+' '+lastName.charAt(0)+'.').substring(0,maxLen||16);
+  }
+  return firstName.substring(0,maxLen||14);
+}
+function getDisplayName(p){
+  // Smart name: shortname → Vorname → "Vorname N." (if duplicate)
+  if(!p)return'';
+  if(p.shortname&&p.shortname.trim())return p.shortname.trim();
+  const parts=(p.name||'').trim().split(' ').filter(Boolean);
+  if(!parts.length)return p.name||'';
+  const fn=parts[0];
+  const ln=parts.length>1?parts[parts.length-1]:'';
+  // Check duplicates in current team
+  const D=cd();
+  let hasDup=false;
+  if(D&&Array.isArray(D.players)){
+    hasDup=D.players.some(o=>{
+      if(!o||o===p)return false;
+      if(o.shortname&&o.shortname.trim())return false;
+      const op=(o.name||'').trim().split(' ').filter(Boolean);
+      return op[0]===fn;
+    });
+  }
+  return hasDup&&ln?(fn+' '+ln.charAt(0)+'.'):fn;
+}
+function lpCircleColor(count){
+  return count>=2?'#27ae60':count>=1?'#e8c840':'rgba(255,255,255,.65)';
+}
+function openSeasonLineup(){
+  slpState.openSlot=null;
+  slpClosePopup();
+  // Sync confirmation checkbox + manage button state
+  const _c=slpGetConf();
+  const _t=document.getElementById('slp-conf-toggle');
+  if(_t)_t.checked=_c.enabled;
+  const _b=document.getElementById('slp-conf-btn');
+  if(_b)_b.style.display=_c.enabled?'':'none';
+  // Update context info
+  const ctxEl=document.getElementById('slp-context-info');
+  if(ctxEl)ctxEl.textContent=`${UI.currentTeam} · Saison ${UI.currentSeason}`;
+  // ALWAYS reload last saved plan on open (discard unsaved changes)
+  const plans=slpGetPlans();
+  if(plans.length){
+    const last=plans[0];
+    if(last&&last.slots){
+      slpState.currentId=last.id;
+      slpState.formation=last.formation||'4-2-3-1';
+      try{slpState.slots=JSON.parse(JSON.stringify(last.slots));}catch(e){slpState.slots={};}
+      slpState.customSlots=last.customSlots?{...last.customSlots}:null;
+    }
+  } else {
+    slpState.currentId=null;
+    slpState.slots={};
+    slpState.formation='4-2-3-1';
+    slpState.customSlots=null;
+  }
+  // Reset edit mode
+  slpState.editing=false;
+  const el=document.getElementById('moSeasonLineup');
+  if(!el)return;
+  el.classList.add('open');
+  renderFmtBtns('slp-fmt-btns',slpState.formation,'slpSetFormation');
+  slpRenderSaves();
+  slpRender();
+}
+
+function closeSeasonLineup(){
+  slpClosePopup();
+  const el=document.getElementById('moSeasonLineup');
+  if(el)el.classList.remove('open');
+}
+
+function slpGetPlans(){
+  if(!G.seasonLineups)G.seasonLineups=[];
+  // Filter by current team+season
+  const key=UI.currentTeam+'__'+UI.currentSeason;
+  return G.seasonLineups.filter(p=>p.teamSeason===key);
+}
+function slpAllPlans(){if(!G.seasonLineups)G.seasonLineups=[];return G.seasonLineups;}
+
+function slpSetFormation(f){
+  const oldSlots=FORMATIONS[slpState.formation]||[];
+  const oldAssign={...slpState.slots};
+  slpState.formation=f;
+  slpState.customSlots=null; // Reset custom positions on formation change
+  slpClosePopup();
+  renderFmtBtns('slp-fmt-btns',f,'slpSetFormation');
+  const newSlots=FORMATIONS[f]||[];
+  // Preserve players by slot index: oldSlots[i] → newSlots[i]
+  // Each slot can hold an array of pids in season planner
+  const newAssign={};
+  const oldOrdered=oldSlots.map(s=>oldAssign[s.id]).filter(v=>Array.isArray(v)&&v.length);
+  const limit=Math.min(oldOrdered.length,newSlots.length);
+  for(let i=0;i<limit;i++){
+    newAssign[newSlots[i].id]=[...oldOrdered[i]];
+  }
+  // Leftover slots (extra) → distribute to last new slot or drop
+  if(oldOrdered.length>limit){
+    const lastIdx=newSlots.length-1;
+    if(lastIdx>=0){
+      if(!newAssign[newSlots[lastIdx].id])newAssign[newSlots[lastIdx].id]=[];
+      for(let i=limit;i<oldOrdered.length;i++){
+        oldOrdered[i].forEach(pid=>{
+          if(!newAssign[newSlots[lastIdx].id].includes(pid))newAssign[newSlots[lastIdx].id].push(pid);
+        });
+      }
+    }
+  }
+  slpState.slots=newAssign;
+  slpRender();
+}
+
+function slpRender(){
+  const D=cd();
+  const slots=fmtSlots(slpState.formation,slpState.customSlots);
+  const players=(D&&D.players)||[];
+  const assigned_total=new Set(Object.values(slpState.slots).flat()).size;
+  const total=players.length;
+  const svg=document.getElementById('slp-slots');
+  if(!svg)return;
+  const R=14; // smaller circle - position label only
+
+  svg.innerHTML=slots.map(slot=>{
+    const assigned=slpState.slots[slot.id]||[];
+    const count=assigned.length;
+    const isSel=slpState.openSlot===slot.id;
+    const ringColor=count===0?'rgba(255,255,255,.3)':lpCircleColor(count);
+    const fillColor=count===0?'rgba(255,255,255,.05)':'rgba(7,30,72,.85)';
+    const dashArr=count===0?'stroke-dasharray="4 3"':'';
+    const gFilter=isSel?'filter="url(#glowGold)"':'';
+
+    // Names always BELOW circle - one shared backdrop panel for all names
+    const confEnabled=slpIsConfEnabled();
+    const visible=assigned.slice(0,4).map(pi=>players[pi]).filter(Boolean);
+    let backdropHtml='';
+    if(visible.length){
+      // Calculate panel size - widest name determines width
+      let maxW=0;
+      visible.forEach((p,i)=>{
+        const fs=i===0?13:12;
+        const nm=lpFullName(p,14);
+        const prefix=confEnabled?'✓ ':'';
+        const w=(prefix+nm).length*(fs*0.55);
+        if(w>maxW)maxW=w;
+      });
+      const panelW=maxW+12;
+      const fs0=13;
+      const topY=R+18-fs0+1;
+      const bottomY=R+18+(visible.length-1)*14+3;
+      const panelH=bottomY-topY+1;
+      backdropHtml=`<rect x="${-panelW/2}" y="${topY}" width="${panelW}" height="${panelH}" fill="rgba(7,15,35,.4)" rx="4"/>`;
+    }
+    const nameLines=visible.map((p,i)=>{
+      const nm=lpFullName(p,14);
+      const pi=assigned[i];
+      const col=i===0?'#fff':'rgba(255,255,255,.85)';
+      const fw=i===0?'700':'600';
+      const fs=i===0?13:12;
+      const yPos=R+18+i*14;
+      const confirmed=confEnabled?slpIsPlayerConfirmed(pi):false;
+      const prefix=confEnabled?(confirmed?'✓ ':'○ '):'';
+      const textColor=confirmed?'#7dffa0':col;
+      return `<text x="0" y="${yPos}" text-anchor="middle" font-family="'Barlow',sans-serif" font-size="${fs}" font-weight="${fw}" fill="${textColor}">${prefix}${nm}</text>`;
+    }).join('');
+
+    return `<g class="slp-slot-g" onclick="slpClickSlot(event,'${slot.id}')" onpointerdown="fmtDragStart(event,'slp','${slot.id}')" transform="translate(${slot.x},${slot.y})" style="cursor:${slpState.editing?'move':'pointer'};" ${gFilter}>
+      <circle r="${isSel?R+2:R}" style="fill:${fillColor};stroke:${ringColor};stroke-width:${isSel?'2.5':'1.8'};" ${dashArr}/>
+      <text y="3" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="10" fill="${count>0?'#fff':'rgba(255,255,255,.55)'}" letter-spacing="1">${slot.lbl}</text>
+      ${backdropHtml}
+      ${nameLines}
+    </g>`;
+  }).join('');
+
+  // Update stats in sidebar
+  const statsEl=document.getElementById('slp-kader-stats');
+  if(statsEl)statsEl.textContent=`${assigned_total} / ${total} Spieler eingeteilt`;
+}
+
+// ── FORMATION EDIT MODE ─────────────────────────────────────
+let _fmtDrag=null; // {planner:'lp'|'slp', slotId, startX, startY, slotEl}
+
+function slpToggleEdit(){
+  slpState.editing=!slpState.editing;
+  slpClosePopup();
+  renderFmtBtns('slp-fmt-btns',slpState.formation,'slpSetFormation');
+  slpRender();
+}
+function lpToggleEdit(){
+  lpState.editing=!lpState.editing;
+  lpClosePopup&&lpClosePopup();
+  renderFmtBtns('lp-fmt-btns',lpState.formation,'lpSetFormation');
+  lpRender();
+}
+function fmtDragStart(e,planner,slotId){
+  if(planner==='slp'&&!slpState.editing)return;
+  if(planner==='lp'&&!lpState.editing)return;
+  e.preventDefault();e.stopPropagation();
+  const svgId=planner==='slp'?'slp-pitch':'lp-pitch';
+  const svg=document.getElementById(svgId);
+  if(!svg)return;
+  const rect=svg.getBoundingClientRect();
+  const vb=svg.viewBox.baseVal;
+  _fmtDrag={planner,slotId,svg,rect,vb};
+  document.addEventListener('pointermove',fmtDragMove);
+  document.addEventListener('pointerup',fmtDragEnd,{once:true});
+}
+function fmtDragMove(e){
+  if(!_fmtDrag)return;
+  const {planner,slotId,rect,vb}=_fmtDrag;
+  const x=Math.max(15,Math.min(vb.width-15,(e.clientX-rect.left)/rect.width*vb.width));
+  const y=Math.max(20,Math.min(vb.height-20,(e.clientY-rect.top)/rect.height*vb.height));
+  const state=planner==='slp'?slpState:lpState;
+  if(!state.customSlots||typeof state.customSlots!=='object')state.customSlots={};
+  state.customSlots[slotId]={x:Math.round(x),y:Math.round(y)};
+  if(planner==='slp')slpRender();else lpRender();
+}
+function fmtDragEnd(){
+  if(_fmtDrag){
+    document.removeEventListener('pointermove',fmtDragMove);
+    // Auto-save changes (per-game or per-season-plan)
+    const planner=_fmtDrag.planner;
+    if(planner==='lp'){lpSave&&lpSave();}
+    else{slpSave&&slpSave();}
+  }
+  _fmtDrag=null;
+}
+
+function slpClickSlot(e,slotId){
+  e.stopPropagation();
+  if(slpState.editing)return; // edit mode: clicks don't open popup
+  if(slpState.openSlot===slotId){slpClosePopup();return;}
+  slpState.openSlot=slotId;
+  slpRender();
+  // Position popup near the slot
+  const svgEl=document.getElementById('slp-pitch');
+  const popup=document.getElementById('slp-popup');
+  if(!popup||!svgEl)return;
+  const svgRect=svgEl.getBoundingClientRect();
+  const vb=svgEl.viewBox.baseVal;
+  const slots=fmtSlots(slpState.formation,slpState.customSlots);
+  const slot=slots.find(s=>s.id===slotId);
+  if(!slot)return;
+  const scaleX=svgRect.width/vb.width;
+  const scaleY=svgRect.height/vb.height;
+  const px=svgRect.left+slot.x*scaleX;
+  const py=svgRect.top+slot.y*scaleY;
+  // Clamp popup to screen
+  const pw=240,ph=320;
+  let left=px+30;
+  let top=py-50;
+  if(left+pw>window.innerWidth-10)left=px-pw-20;
+  if(top+ph>window.innerHeight-10)top=window.innerHeight-ph-10;
+  if(top<60)top=60;
+  popup.style.left=Math.max(8,left)+'px';
+  popup.style.top=top+'px';
+  popup.style.display='block';
+  slpRenderPopup(slotId);
+}
+
+function slpRenderPopup(slotId){
+  const D=cd();
+  const players=(D&&D.players)||[];
+  const slot=(FORMATIONS[slpState.formation]||[]).find(s=>s.id===slotId);
+  if(!slot)return;
+  const assigned=slpState.slots[slotId]||[];
+  const allAssigned=new Set(Object.values(slpState.slots).flat());
+  
+  const titleEl=document.getElementById('slp-popup-title');
+  if(titleEl)titleEl.textContent=slot.lbl+' – Spieler zuweisen';
+  
+  // Assigned players (priority order)
+  const assignedEl=document.getElementById('slp-popup-assigned');
+  if(assignedEl){
+    if(!assigned.length){
+      assignedEl.innerHTML='<div style="font-size:.7rem;color:rgba(255,255,255,.6);padding:3px 0 6px;font-style:italic;">Noch keine Spieler</div>';
+    } else {
+      assignedEl.innerHTML=assigned.map((pi,i)=>{
+        const p=players[pi];if(!p)return'';
+        return `<div class="slp-assigned-row">
+          <span class="nr">${p.nr||'–'}</span>
+          <span class="name">${getDisplayName(p)}</span>
+          <span class="prio">#${i+1}</span>
+          ${i>0?`<span class="up-btn" onclick="slpMovePrio('${slotId}',${i},-1)" title="Priorität erhöhen">▲</span>`:'<span style="width:18px"></span>'}
+          ${i<assigned.length-1?`<span class="up-btn" onclick="slpMovePrio('${slotId}',${i},1)" title="Priorität senken">▼</span>`:'<span style="width:18px"></span>'}
+          <span class="del-btn" onclick="slpRemoveFromSlot('${slotId}',${i})">✕</span>
+        </div>`;
+      }).join('');
+    }
+  }
+  
+  // Player picker - show all players sorted by suitability
+  const pickerEl=document.getElementById('slp-popup-picker');
+  if(pickerEl){
+    const suitable=[];const other=[];
+    [...players.keys()].forEach(i=>{
+      const p=players[i];if(!p)return;
+      if(assigned.includes(i))return;// already assigned to this slot
+      const isAssignedElsewhere=allAssigned.has(i)&&!assigned.includes(i);
+      const isBest=slot.pos[0]===p.pos;
+      const isFit=slot.pos.includes(p.pos)||slot.pos.includes(p.pos2);
+      if(isFit)suitable.push({i,p,isBest,isAssignedElsewhere});
+      else other.push({i,p,isBest:false,isAssignedElsewhere});
+    });
+    // Available first within each group
+    const sortGroup=(arr)=>arr.sort((a,b)=>{
+      if(!a.isAssignedElsewhere&&b.isAssignedElsewhere)return -1;
+      if(a.isAssignedElsewhere&&!b.isAssignedElsewhere)return 1;
+      return (b.isBest?1:0)-(a.isBest?1:0);
+    });
+    const all=[...sortGroup(suitable),...sortGroup(other)];
+    if(!all.length){pickerEl.innerHTML='<div style="font-size:.7rem;color:rgba(255,255,255,.3);padding:4px;">Alle Spieler bereits zugewiesen</div>';return;}
+    pickerEl.innerHTML=all.map(({i,p,isBest,isAssignedElsewhere})=>{
+      const bcol=PB_COLORS[p.pos]||'#ddd;color:#333';
+      const cls=`slp-pick-item${isBest?' best':''}${isAssignedElsewhere?' assigned-already':''}`;
+      return `<div class="${cls}" onclick="slpAddToSlot('${slotId}',${i})">
+        <span class="nr">${p.nr||'–'}</span>
+        <span class="name">${getDisplayName(p)}</span>
+        <span class="pos-b" style="background:${bcol.split(';')[0]};${bcol.split(';')[1]}">${p.pos}</span>
+        ${isBest?'<span style="color:#e8c840;font-size:.7rem;">★</span>':''}
+      </div>`;
+    }).join('');
+  }
+}
+
+function slpAddToSlot(slotId,pi){
+  if(!slpState.slots[slotId])slpState.slots[slotId]=[];
+  if(!slpState.slots[slotId].includes(pi)){
+    slpState.slots[slotId].push(pi);
+    slpRender();slpRenderPopup(slotId);
+  }
+}
+
+function slpRemoveFromSlot(slotId,idx){
+  if(slpState.slots[slotId]){
+    slpState.slots[slotId].splice(idx,1);
+    if(!slpState.slots[slotId].length)delete slpState.slots[slotId];
+    slpRender();slpRenderPopup(slotId);
+  }
+}
+
+function slpMovePrio(slotId,idx,dir){
+  const arr=slpState.slots[slotId];
+  if(!arr)return;
+  const ni=idx+dir;
+  if(ni<0||ni>=arr.length)return;
+  [arr[idx],arr[ni]]=[arr[ni],arr[idx]];
+  slpRender();slpRenderPopup(slotId);
+}
+
+function slpClosePopup(){
+  const p=document.getElementById('slp-popup');
+  if(p)p.style.display='none';
+  slpState.openSlot=null;
+  slpRender();
+}
+
+function slpSave(){
+  const teamSeason=UI.currentTeam+'__'+UI.currentSeason;
+  const name='Kaderplan '+new Date().toLocaleDateString('de-DE');
+  const allPlans=slpAllPlans();
+  const plan={id:slpState.currentId||('slp_'+Date.now()),teamSeason,name,formation:slpState.formation,slots:JSON.parse(JSON.stringify(slpState.slots)),customSlots:slpState.customSlots?{...slpState.customSlots}:null,savedAt:Date.now()};
+  const ex=allPlans.findIndex(p=>p.id===plan.id);
+  if(ex>=0)allPlans[ex]=plan;else allPlans.unshift(plan);
+  // Keep max 15 per team+season
+  const sameTSCount=allPlans.filter(p=>p.teamSeason===teamSeason).length;
+  if(sameTSCount>15){
+    // Remove oldest of this team+season
+    let removed=0;
+    for(let i=allPlans.length-1;i>=0&&sameTSCount-removed>15;i--){
+      if(allPlans[i].teamSeason===teamSeason){allPlans.splice(i,1);removed++;}
+    }
+  }
+  slpState.currentId=plan.id;
+  snap();saveG();slpRenderSaves();showSaveFlash('✓ Kaderplan gespeichert');
+}
+
+function slpRenderSaves(){
+  const el=document.getElementById('slp-saves-list');if(!el)return;
+  const plans=slpGetPlans();
+  const cur=plans.find(p=>p.id===slpState.currentId);
+  if(cur){
+    const t=new Date(cur.savedAt).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+    el.innerHTML=`✓ Zuletzt gespeichert: ${t}`;
+  } else if(!plans.length){
+    el.innerHTML='Noch nicht gespeichert';
+  } else {
+    el.innerHTML='Aktueller Plan';
+  }
+}
+
+function slpLoad(id){
+  const p=slpGetPlans().find(x=>x.id===id);if(!p)return;
+  slpState.currentId=p.id;slpState.formation=p.formation;
+  slpState.slots=JSON.parse(JSON.stringify(p.slots));slpState.openSlot=null;
+  document.getElementById('slp-lineup-name').value=p.name;
+  renderFmtBtns('slp-fmt-btns',p.formation,'slpSetFormation');
+  slpClosePopup();slpRenderSaves();slpRender();
+}
+
+function slpClearAll(){
+  if(!confirm('Alle Positionen leeren?'))return;
+  slpState.slots={};slpState.openSlot=null;
+  slpClosePopup();slpRender();
+}
+function slpDelete(id){
+  if(!confirm('Plan löschen?'))return;
+  snap();G.seasonLineups=slpAllPlans().filter(p=>p.id!==id);
+  if(slpState.currentId===id){slpState.currentId=null;slpState.slots={};}
+  saveG();slpRenderSaves();slpRender();
+}
+
+// Close popups when clicking outside
+document.addEventListener('click',(e)=>{
+  // SLP popup
+  const spopup=document.getElementById('slp-popup');
+  if(spopup&&spopup.style.display!=='none'&&!spopup.contains(e.target)){
+    const svg=document.getElementById('slp-slots');
+    if(!svg||!svg.contains(e.target))slpClosePopup();
+  }
+  // LP popup
+  const lpopup=document.getElementById('lp-popup');
+  if(lpopup&&lpopup.style.display!=='none'&&!lpopup.contains(e.target)){
+    const svg2=document.getElementById('lp-slots');
+    if(!svg2||!svg2.contains(e.target))lpClosePopup();
+  }
+});
+
 // ══════════════════════════════
 //  INIT
 // ══════════════════════════════
@@ -2758,5 +4387,288 @@ checkAutoBackup();
   <div class="ud-sep"></div>
   <div class="ud-item" onclick="closeUserMenu();confirmLogout()" style="color:#ff9080;">🚪 Abmelden</div>
 </div>
+
+<!-- Lineup Planner Fullscreen -->
+<div class="lp-overlay" id="moLineup">
+  <!-- Topbar -->
+  <div class="lp-topbar">
+    <div><div class="lp-logo">⚽ Aufstellungsplaner</div><div class="lp-sub" id="lp-context-info">FC Frohlinde 1949</div></div>
+    <div id="lp-fmt-btns" style="display:flex;gap:5px;flex-wrap:wrap;margin-left:8px;"></div>
+    <div class="lp-spacer"></div>
+    <div class="lp-hint" id="lp-hint">Slot wählen → Spieler klicken</div>
+    <button class="lp-close-btn" onclick="closeLineupPlanner()">✕ Schließen</button>
+  </div>
+  <!-- Body -->
+  <!-- Match planner popup -->
+  <div class="slp-popup" id="lp-popup" style="display:none;z-index:900;" onclick="event.stopPropagation()">
+    <div class="slp-popup-title" id="lp-popup-title">Position</div>
+    <div id="lp-popup-current"></div>
+    <div class="slp-sb-label" style="font-size:.57rem;margin-bottom:5px;">Anderen Spieler wählen:</div>
+    <div class="slp-player-picker" id="lp-popup-picker"></div>
+    <button class="slp-popup-close" onclick="lpClosePopup()">Schließen</button>
+  </div>
+  <div class="lp-body">
+    <!-- Pitch SVG (vertical, attack top) -->
+    <div class="lp-pitch-col" style="flex:1;">
+      <svg id="lp-pitch" class="lp-pitch-svg" viewBox="0 0 340 525" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <linearGradient id="lpGrass" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#1a5e29"/><stop offset="20%" stop-color="#1f6e30"/>
+            <stop offset="40%" stop-color="#1a5e29"/><stop offset="60%" stop-color="#1f6e30"/>
+            <stop offset="80%" stop-color="#1a5e29"/><stop offset="100%" stop-color="#1f6e30"/>
+          </linearGradient>
+          <filter id="glowGold"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <filter id="glowGreen"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+                        <rect width="340" height="525" fill="url(#lpGrass)" rx="6"/>
+        <!-- Outer pitch boundary -->
+        <rect x="5" y="5" width="330" height="515" rx="2" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
+        <!-- Halfway line -->
+        <line x1="5" y1="262.5" x2="335" y2="262.5" stroke="rgba(255,255,255,.45)" stroke-width="1.7"/>
+        <!-- Center circle (9.15m = 44px) -->
+        <circle cx="170" cy="262.5" r="44" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.5"/>
+        <circle cx="170" cy="262.5" r="2.5" fill="rgba(255,255,255,.6)"/>
+        
+        <!-- TOP penalty area (40.32m × 16.5m = 196 × 80) -->
+        <rect x="72" y="5" width="196" height="80" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.5"/>
+        <!-- TOP 6-yard box (18.32m × 5.5m = 89 × 27) -->
+        <rect x="125.5" y="5" width="89" height="27" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.3"/>
+        <!-- TOP penalty spot (11m from goal = 53px) -->
+        <circle cx="170" cy="58" r="2" fill="rgba(255,255,255,.55)"/>
+        <!-- TOP penalty arc (r=9.15m=44, around spot at 170,58) - only the part outside box (y>85) -->
+        <path d="M 131.95,85 A 44 44 0 0 0 208.05,85" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.3"/>
+        <!-- TOP goal line ticks (goal 7.32m=35 wide, depth 2.44m=12) -->
+        <rect x="152.5" y="-1" width="35" height="6" fill="rgba(255,255,255,.18)" stroke="rgba(255,255,255,.65)" stroke-width="1.3"/>
+        
+        <!-- BOTTOM penalty area -->
+        <rect x="72" y="440" width="196" height="80" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.5"/>
+        <!-- BOTTOM 6-yard box -->
+        <rect x="125.5" y="493" width="89" height="27" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.3"/>
+        <!-- BOTTOM penalty spot -->
+        <circle cx="170" cy="467" r="2" fill="rgba(255,255,255,.55)"/>
+        <!-- BOTTOM penalty arc -->
+        <path d="M 131.95,440 A 44 44 0 0 1 208.05,440" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.3"/>
+        <!-- BOTTOM goal -->
+        <rect x="152.5" y="520" width="35" height="6" fill="rgba(255,255,255,.18)" stroke="rgba(255,255,255,.65)" stroke-width="1.3"/>
+        
+        <!-- Corner arcs (1m radius = 5px) -->
+        <path d="M 5,10 A 5 5 0 0 1 10,5" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.3"/>
+        <path d="M 330,5 A 5 5 0 0 1 335,10" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.3"/>
+        <path d="M 5,515 A 5 5 0 0 0 10,520" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.3"/>
+        <path d="M 335,515 A 5 5 0 0 0 330,520" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.3"/>
+        <g id="lp-slots"></g>
+      </svg>
+    </div>
+    <!-- Substitutes column (circles next to pitch) -->
+    <div id="lp-subs-col" style="width:130px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding:12px 5px;background:rgba(0,0,0,.18);border-left:1px solid rgba(255,255,255,.05);overflow-y:auto;">
+      <div style="font-size:.6rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.75);margin-bottom:10px;">🔄 Bank</div>
+      <div id="lp-subs-circles" style="display:flex;flex-direction:column;gap:8px;align-items:center;width:100%;"></div>
+    </div>
+    <!-- Sidebar -->
+    <div class="lp-sidebar">
+      <div class="lp-sb-top">
+        <div class="lp-sb-label">Gespeicherte Aufstellungen</div>
+        <button class="lp-save-btn" style="width:100%;margin-bottom:8px;padding:7px;" onclick="lpSave()">💾 Aufstellung speichern</button>
+        <div id="lp-saves-list" style="font-size:.65rem;color:rgba(255,255,255,.7);text-align:center;padding:4px 0;"></div>
+      </div>
+      <div class="lp-sb-label2">🧑‍🤝‍🧑 Kader-Übersicht</div>
+      <div id="lp-kader-list" style="padding:0 8px 6px;flex:1;overflow-y:auto;"></div>
+      <div class="lp-sb-label2" style="padding:6px 12px 3px;font-size:.58rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.75);">🧑‍🤝‍🧑 Kader-Übersicht</div>
+      <div id="lp-subs-area" style="padding:0 8px 4px;max-height:100px;overflow-y:auto;"></div>
+      <div style="padding:6px 10px;border-top:1px solid rgba(255,255,255,.07);">
+        <button onclick="lpClearAll()" style="width:100%;background:rgba(231,76,60,.12);border:1px solid rgba(231,76,60,.25);color:#ff9080;border-radius:7px;padding:5px;font-family:'Barlow',sans-serif;font-size:.73rem;font-weight:600;cursor:pointer;">🗑 Aufstellung leeren</button>
+      </div>
+      <div class="lp-statsbar">
+        <div class="lp-stat"><span class="sv" id="lp-st-placed">0</span><span class="sk">gesetzt</span></div>
+        <div style="width:1px;height:24px;background:rgba(255,255,255,.1);margin:0 3px;"></div>
+        <div class="lp-stat"><span class="sv" id="lp-st-total">0</span><span class="sk">Spieler</span></div>
+        <div style="flex:1;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Backup Modal (Admin only) -->
+<div class="mo" id="moBackup"><div class="mob" style="width:480px;">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+    <h3 style="flex:1;margin:0;">💾 Daten-Backups</h3>
+    <button class="btn bs" onclick="closeM('moBackup')">✕</button>
+  </div>
+  <div style="display:flex;gap:7px;margin-bottom:12px;">
+    <button class="btn" onclick="createBackup()" style="background:var(--bm);color:#fff;">💾 Backup erstellen</button>
+    <p class="note" style="flex:1;margin:0;align-self:center;">Max. 3 Backups. Älteste werden automatisch gelöscht.</p>
+  </div>
+  <div id="backup-list" style="border:1px solid var(--gl);border-radius:8px;min-height:60px;max-height:280px;overflow-y:auto;"></div>
+  <div class="mob-btns" style="margin-top:10px;">
+    <button class="btn bs" onclick="closeM('moBackup')">Schließen</button>
+  </div>
+</div></div>
+
+<!-- User dropdown portal (positioned via JS) -->
+<div class="user-dropdown" id="userDropdown" style="z-index:99999;">
+  <div id="ud-manual-btns" style="display:none;">
+    <div class="ud-item" onclick="manualSyncSave()">☁️ Jetzt speichern</div>
+    <div class="ud-item" onclick="manualSyncLoad()">⬇️ Jetzt laden</div>
+    <div class="ud-sep"></div>
+  </div>
+  <div class="ud-toggle" onclick="toggleAutoSync()">
+    <span>🔄 Auto-Sync</span>
+    <div class="ud-switch" id="ud-autosync-sw"></div>
+  </div>
+  <div class="ud-sep"></div>
+  <div class="ud-item" onclick="closeUserMenu();confirmLogout()" style="color:#ff9080;">🚪 Abmelden</div>
+</div>
+
+<!-- Lineup Planner -->
+<div class="mo" id="moLineup"><div class="mob">
+  <div class="lp-header">
+    <div class="lp-title">⚽ Aufstellungsplaner</div>
+    <select class="lp-formation-sel" id="lp-formation" onchange="lpSetFormation(this.value)">
+      <option value="4-2-3-1">4-2-3-1</option>
+      <option value="4-3-3">4-3-3</option>
+      <option value="4-4-2">4-4-2</option>
+      <option value="3-5-2">3-5-2</option>
+      <option value="5-3-2">5-3-2</option>
+      <option value="4-1-4-1">4-1-4-1</option>
+    </select>
+    <input type="text" id="lp-lineup-name" placeholder="Aufstellungsname..." style="padding:5px 10px;border:1.5px solid var(--gl);border-radius:8px;font-size:.82rem;width:160px;outline:none;"/>
+    <button class="btn bp" onclick="lpSave()" style="font-size:.76rem;">💾 Speichern</button>
+    <button class="btn bs" onclick="closeM('moLineup')">✕</button>
+  </div>
+  <div class="lp-saves" id="lp-saves-list"></div>
+  <div class="pitch-wrap">
+    <svg id="lp-pitch" class="pitch-svg" viewBox="0 0 600 420" xmlns="http://www.w3.org/2000/svg">
+      <!-- Pitch markings -->
+      <rect x="10" y="10" width="580" height="400" rx="4" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.5"/>
+      <line x1="10" y1="210" x2="590" y2="210" stroke="rgba(255,255,255,.3)" stroke-width="1"/>
+      <circle cx="300" cy="210" r="46" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1"/>
+      <circle cx="300" cy="210" r="3" fill="rgba(255,255,255,.5)"/>
+      <rect x="10" y="130" width="88" height="160" rx="2" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1"/>
+      <rect x="502" y="130" width="88" height="160" rx="2" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1"/>
+      <rect x="10" y="165" width="40" height="90" rx="2" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="1"/>
+      <rect x="550" y="165" width="40" height="90" rx="2" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="1"/>
+      <!-- Position slots rendered by JS -->
+      <g id="lp-slots"></g>
+    </svg>
+  </div>
+  <div class="lp-bench">
+    <div class="lp-bench-title">🪑 Bank & Verfügbar — klick zum Zuweisen</div>
+    <div id="lp-bench-players"></div>
+  </div>
+  <div style="margin-top:8px;font-size:.72rem;color:var(--gm);">
+    💡 Positionsslot anklicken → Spieler aus der Bank wählen. Erneut klicken zum Entfernen.
+  </div>
+</div></div>
+
+
+<!-- Season Lineup Planner -->
+<div class="slp-overlay" id="moSeasonLineup">
+  <div class="slp-topbar">
+    <div><div class="slp-logo">📋 Saisonkader-Planer</div><div class="slp-sub" id="slp-context-info">Mehrere Spieler pro Position</div></div>
+    <div id="slp-fmt-btns" style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-left:8px;"></div>
+    <div style="flex:1;"></div>
+    <div id="slp-hint" style="font-size:.68rem;color:rgba(255,255,255,.65);font-style:italic;margin-right:6px;">Position klicken → Spieler wählen</div>
+    <input type="checkbox" id="slp-conf-toggle" onchange="slpToggleConfirmations(this.checked)" style="cursor:pointer;margin:0 4px 0 0;width:14px;height:14px;vertical-align:middle;"/>
+    <span style="font-size:.75rem;color:rgba(255,255,255,.95);font-weight:600;margin-right:6px;user-select:none;cursor:pointer;" onclick="const _t=document.getElementById('slp-conf-toggle');_t.checked=!_t.checked;slpToggleConfirmations(_t.checked);">Bestätigungen</span>
+    <button class="slp-close-btn" id="slp-conf-btn" onclick="slpOpenConfirmList()" style="display:none;background:rgba(232,200,64,.15);border-color:rgba(232,200,64,.4);color:#e8c840;">✓ Bestätigungen verwalten</button>
+    <button class="slp-close-btn" onclick="closeSeasonLineup()">✕ Schließen</button>
+  </div>
+  <div class="slp-body">
+    <div class="slp-pitch-col">
+      <svg id="slp-pitch" class="slp-pitch-svg" viewBox="0 0 340 525" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <linearGradient id="slpGrass2" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#1a5e29"/><stop offset="20%" stop-color="#1f6e30"/>
+            <stop offset="40%" stop-color="#1a5e29"/><stop offset="60%" stop-color="#1f6e30"/>
+            <stop offset="80%" stop-color="#1a5e29"/><stop offset="100%" stop-color="#1f6e30"/>
+          </linearGradient>
+          <filter id="glowGold"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <filter id="glowGreen"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+                        <rect width="340" height="525" fill="url(#slpGrass2)" rx="6"/>
+        <!-- Outer pitch boundary -->
+        <rect x="5" y="5" width="330" height="515" rx="2" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
+        <!-- Halfway line -->
+        <line x1="5" y1="262.5" x2="335" y2="262.5" stroke="rgba(255,255,255,.45)" stroke-width="1.7"/>
+        <!-- Center circle (9.15m = 44px) -->
+        <circle cx="170" cy="262.5" r="44" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.5"/>
+        <circle cx="170" cy="262.5" r="2.5" fill="rgba(255,255,255,.6)"/>
+        
+        <!-- TOP penalty area (40.32m × 16.5m = 196 × 80) -->
+        <rect x="72" y="5" width="196" height="80" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.5"/>
+        <!-- TOP 6-yard box (18.32m × 5.5m = 89 × 27) -->
+        <rect x="125.5" y="5" width="89" height="27" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.3"/>
+        <!-- TOP penalty spot (11m from goal = 53px) -->
+        <circle cx="170" cy="58" r="2" fill="rgba(255,255,255,.55)"/>
+        <!-- TOP penalty arc (r=9.15m=44, around spot at 170,58) - only the part outside box (y>85) -->
+        <path d="M 131.95,85 A 44 44 0 0 0 208.05,85" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.3"/>
+        <!-- TOP goal line ticks (goal 7.32m=35 wide, depth 2.44m=12) -->
+        <rect x="152.5" y="-1" width="35" height="6" fill="rgba(255,255,255,.18)" stroke="rgba(255,255,255,.65)" stroke-width="1.3"/>
+        
+        <!-- BOTTOM penalty area -->
+        <rect x="72" y="440" width="196" height="80" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="1.5"/>
+        <!-- BOTTOM 6-yard box -->
+        <rect x="125.5" y="493" width="89" height="27" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.3"/>
+        <!-- BOTTOM penalty spot -->
+        <circle cx="170" cy="467" r="2" fill="rgba(255,255,255,.55)"/>
+        <!-- BOTTOM penalty arc -->
+        <path d="M 131.95,440 A 44 44 0 0 1 208.05,440" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.3"/>
+        <!-- BOTTOM goal -->
+        <rect x="152.5" y="520" width="35" height="6" fill="rgba(255,255,255,.18)" stroke="rgba(255,255,255,.65)" stroke-width="1.3"/>
+        
+        <!-- Corner arcs (1m radius = 5px) -->
+        <path d="M 5,10 A 5 5 0 0 1 10,5" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.3"/>
+        <path d="M 330,5 A 5 5 0 0 1 335,10" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.3"/>
+        <path d="M 5,515 A 5 5 0 0 0 10,520" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.3"/>
+        <path d="M 335,515 A 5 5 0 0 0 330,520" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.3"/>
+        <g id="slp-slots"></g>
+      </svg>
+    </div>
+    <div class="slp-sidebar">
+      <div class="slp-sb-top">
+        <div class="slp-sb-label">Gespeicherte Kaderpläne</div>
+        <button class="slp-save-btn" style="width:100%;margin-bottom:8px;padding:7px;" onclick="slpSave()">💾 Kaderplan speichern</button>
+        <div id="slp-saves-list" style="font-size:.65rem;color:rgba(255,255,255,.7);text-align:center;padding:4px 0;"></div>
+      </div>
+      <div class="slp-legend">
+        <div id="slp-kader-stats" style="font-size:.76rem;font-weight:700;color:var(--ac);margin-bottom:8px;">0 / 0 Spieler eingeteilt</div>
+        <div class="slp-sb-label" style="margin-bottom:10px;">Legende</div>
+        <div class="slp-legend-row"><div class="slp-legend-dot" style="border:2px dashed rgba(255,255,255,.3);background:transparent;"></div> Keine Spieler</div>
+        <div class="slp-legend-row"><div class="slp-legend-dot" style="background:rgba(7,30,72,.85);border:2px solid #e8c840;"></div> 1 Spieler</div>
+        <div class="slp-legend-row"><div class="slp-legend-dot" style="background:rgba(7,30,72,.85);border:2px solid #27ae60;"></div> 2+ Spieler</div>
+        <div style="margin-top:14px;font-size:.7rem;color:rgba(255,255,255,.7);line-height:1.6;">
+          Klicke auf einen Slot → Popup öffnet sich → Spieler hinzufügen oder Reihenfolge ändern.<br><br>
+          Zahlen auf dem Slot = Anzahl der zugeteilten Spieler.
+        </div>
+        <button onclick="slpClearAll()" style="width:100%;margin-top:14px;background:rgba(231,76,60,.12);border:1px solid rgba(231,76,60,.25);color:#ff9080;border-radius:7px;padding:5px;font-family:'Barlow',sans-serif;font-size:.73rem;font-weight:600;cursor:pointer;">🗑 Gesamten Plan leeren</button>
+      </div>
+    </div>
+
+  </div>
+  <!-- Slot popup (positioned by JS) -->
+  <div class="slp-popup" id="slp-popup" style="display:none;" onclick="event.stopPropagation()">
+    <div class="slp-popup-title" id="slp-popup-title">Position</div>
+    <div class="slp-assigned" id="slp-popup-assigned"></div>
+    <div class="slp-sb-label" style="font-size:.57rem;margin-bottom:5px;">Hinzufügen:</div>
+    <div class="slp-player-picker" id="slp-popup-picker"></div>
+    <button class="slp-popup-close" onclick="slpClosePopup()">Schließen</button>
+  </div>
+</div>
+
+
+<!-- Saisonkader Confirmation List -->
+<div class="mo" id="moSlpConf" style="z-index:850;"><div class="mob" style="width:520px;max-width:95vw;">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+    <h3 style="flex:1;margin:0;color:var(--bd);">✓ Bestätigungen für die Saison</h3>
+    <button class="btn bs" onclick="closeM('moSlpConf')">✕</button>
+  </div>
+  <div id="slp-conf-mode-row" style="display:none;"></div>
+  <p class="note" style="margin-bottom:12px;">Setze ein Häkchen, wenn ein Spieler seine Teilnahme an der Saison bestätigt hat.</p>
+  <div id="slp-conf-list" style="max-height:60vh;overflow-y:auto;border:1px solid var(--gl);border-radius:8px;"></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-size:.78rem;color:var(--gm);">
+    <span id="slp-conf-stats"></span>
+    <button class="btn bs" onclick="closeM('moSlpConf')">Schließen</button>
+  </div>
+</div></div>
 </body>
 </html>
