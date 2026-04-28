@@ -1192,7 +1192,7 @@ function buildTestDef(){
 }
 // ── FIREBASE SYNC ────────────────────────────────────────────
 const FB_CFG_KEY='fcf_fb_config';
-let fbApp=null,fbDb=null,fbRef=null,fbListening=false,_fbSaving=false,_fbDebounce=null;
+let fbApp=null,fbDb=null,fbRef=null,fbListening=false,_fbSaving=false,_fbDebounce=null,_fbInitialLoaded=false,_pendingSave=false;
 
 const DEFAULT_FB_CONFIG={
   apiKey:'AIzaSyANvxDo9idsZSq7syZwmCHDvbVguIjKtsY',
@@ -1326,8 +1326,13 @@ function startFbListener(){
     const data=raw?fbDecode(raw):null;
     if(data&&data.version>=14){
       G=sanitizeG(data);
-      initUI(); // restore per-user navigation state
-      render();
+      // If user is actively typing in an input/textarea, skip the render to not steal focus / overwrite their input
+      const ae=document.activeElement;
+      const isTyping=ae&&(ae.tagName==='INPUT'||ae.tagName==='TEXTAREA'||ae.isContentEditable);
+      if(!isTyping){
+        initUI();
+        render();
+      }
       setFbStatus('connected');
     } else if(!data){
       _fbSaving=true;
@@ -1335,6 +1340,14 @@ function startFbListener(){
         .then(()=>{setTimeout(()=>{_fbSaving=false;},500);setFbStatus('connected');})
         .catch(e=>{_fbSaving=false;console.error('FB push:',e);});
       setFbStatus('connected');
+    }
+    // First load complete - allow saves to flow to Firebase now
+    if(!_fbInitialLoaded){
+      _fbInitialLoaded=true;
+      if(_pendingSave){
+        _pendingSave=false;
+        setTimeout(()=>saveG(false),50);
+      }
     }
   },(err)=>{console.error('FB listener:',err);setFbStatus('error');});
 }
@@ -1395,7 +1408,12 @@ function saveG(badge=true){
   localStorage.setItem(SK,JSON.stringify(G));
   if(badge){const b=document.getElementById('savedBadge');b.classList.add('show');clearTimeout(b._t);b._t=setTimeout(()=>b.classList.remove('show'),1600);}
   // Firebase: debounce writes (max 1 per 800ms)
+  // BUT: don't write until we've completed the first read - otherwise we may overwrite fresh remote data with stale local data
   if(fbRef&&getUserPref('autoSync',true)){
+    if(!_fbInitialLoaded){
+      _pendingSave=true; // mark that we want to save once initial load completes
+      return;
+    }
     clearTimeout(_fbDebounce);
     _fbDebounce=setTimeout(()=>{
       _fbSaving=true;
@@ -1438,11 +1456,26 @@ function initAuth(){
         const raw=snap.val();
         const data=raw?fbDecode(raw):null;
         if(data&&data.version>=14){
-          G=sanitizeG(data);
-          localStorage.setItem(SK,JSON.stringify(G));
+          // Only adopt remote if user hasn't made local changes yet
+          if(!_pendingSave){
+            G=sanitizeG(data);
+            localStorage.setItem(SK,JSON.stringify(G));
+            // If app is already showing, re-render with fresh data
+            if(CU&&typeof render==='function')render();
+          }
         }
-      }).catch(()=>{});
-    }catch(e){}
+        // Allow saves to flow
+        _fbInitialLoaded=true;
+        if(_pendingSave){_pendingSave=false;setTimeout(()=>saveG(false),50);}
+      }).catch(()=>{
+        // Even on error, unblock saves so the UI doesn't lock up forever
+        _fbInitialLoaded=true;
+        if(_pendingSave){_pendingSave=false;setTimeout(()=>saveG(false),50);}
+      });
+    }catch(e){_fbInitialLoaded=true;}
+  } else if(!fbCfg){
+    // No Firebase configured - saves are local only
+    _fbInitialLoaded=true;
   }
   loadG();
   // localStorage = persistent (remember me), sessionStorage = tab-only (survives F5 but not new tab)
@@ -1624,8 +1657,8 @@ function snap(){
   if(undoStack.length>40)undoStack.shift();
   redoStack.length=0;updateUndoBtns();
 }
-function undo(){if(!undoStack.length)return;redoStack.push(JSON.stringify(G));G=JSON.parse(undoStack.pop());localStorage.setItem(SK,JSON.stringify(G));if(fbRef){clearTimeout(_fbDebounce);_fbDebounce=setTimeout(()=>{_fbSaving=true;fbRef.set(fbEncode(G)).then(()=>{_fbSaving=false;}).catch(e=>{_fbSaving=false;});},800);}render();updateUndoBtns();}
-function redo(){if(!redoStack.length)return;undoStack.push(JSON.stringify(G));G=JSON.parse(redoStack.pop());localStorage.setItem(SK,JSON.stringify(G));if(fbRef){clearTimeout(_fbDebounce);_fbDebounce=setTimeout(()=>{_fbSaving=true;fbRef.set(fbEncode(G)).then(()=>{_fbSaving=false;}).catch(e=>{_fbSaving=false;});},800);}render();updateUndoBtns();}
+function undo(){if(!undoStack.length)return;redoStack.push(JSON.stringify(G));G=JSON.parse(undoStack.pop());localStorage.setItem(SK,JSON.stringify(G));if(fbRef&&_fbInitialLoaded){clearTimeout(_fbDebounce);_fbDebounce=setTimeout(()=>{_fbSaving=true;fbRef.set(fbEncode(G)).then(()=>{_fbSaving=false;}).catch(e=>{_fbSaving=false;});},800);}render();updateUndoBtns();}
+function redo(){if(!redoStack.length)return;undoStack.push(JSON.stringify(G));G=JSON.parse(redoStack.pop());localStorage.setItem(SK,JSON.stringify(G));if(fbRef&&_fbInitialLoaded){clearTimeout(_fbDebounce);_fbDebounce=setTimeout(()=>{_fbSaving=true;fbRef.set(fbEncode(G)).then(()=>{_fbSaving=false;}).catch(e=>{_fbSaving=false;});},800);}render();updateUndoBtns();}
 function updateUndoBtns(){
   const u=document.getElementById('undoBtn'),r=document.getElementById('redoBtn');
   if(u)u.disabled=!undoStack.length;if(r)r.disabled=!redoStack.length;
