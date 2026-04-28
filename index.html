@@ -42,8 +42,8 @@ body{background:linear-gradient(140deg,#071a3e 0%,#1659b8 55%,#071a3e 100%);heig
 .header{background:linear-gradient(135deg,#071e48 0%,#1659b8 60%,#0a2d6e 100%);color:#fff;padding:10px 20px;display:flex;align-items:center;gap:14px;flex-shrink:0;position:relative;overflow:hidden;transition:padding .2s;border-top-left-radius:12px;border-top-right-radius:12px;}
 .header.collapsed{padding:5px 20px;}
 /* Decorative circle */
-.header::before{content:'';position:absolute;right:-50px;top:-50px;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.06);pointer-events:none;}
-.header::after{content:'';position:absolute;right:60px;bottom:-90px;width:210px;height:210px;border-radius:50%;background:rgba(232,200,64,.05);pointer-events:none;}
+.header::before{content:'';position:absolute;right:-80px;top:-80px;width:380px;height:380px;border-radius:50%;background:rgba(255,255,255,.06);pointer-events:none;}
+.header::after{content:'';position:absolute;right:80px;bottom:-130px;width:300px;height:300px;border-radius:50%;background:rgba(232,200,64,.05);pointer-events:none;}
 /* Logo circular in header */
 .logo-ring{flex-shrink:0;width:66px;height:66px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2.5px var(--ac),0 0 0 5px rgba(255,255,255,.12),0 6px 20px rgba(0,0,0,.4);z-index:1;transition:all .2s;overflow:hidden;padding:4px;}
 .header.collapsed .logo-ring{width:36px;height:36px;padding:2px;}
@@ -54,7 +54,7 @@ body{background:linear-gradient(140deg,#071a3e 0%,#1659b8 55%,#071a3e 100%);heig
 .hsub{font-size:.76rem;font-weight:300;letter-spacing:3.5px;color:var(--ac);margin-top:2px;text-transform:uppercase;}
 .header.collapsed .hsub,.header.collapsed .hmeta{display:none;}
 .hmeta{margin-top:3px;font-size:.7rem;color:rgba(255,255,255,.45);}
-.hright{margin-left:auto;display:flex;align-items:center;gap:10px;z-index:2;flex-shrink:0;max-width:280px;}
+.hright{margin-left:auto;display:flex;align-items:center;gap:10px;z-index:2;flex-shrink:1;min-width:0;max-width:calc(100% - 280px);}
 
 /* User pill dropdown */
 .user-menu-wrap{position:relative;}
@@ -92,7 +92,8 @@ body{background:linear-gradient(140deg,#071a3e 0%,#1659b8 55%,#071a3e 100%);heig
 .tdelt:hover{background:rgba(231,76,60,.4);color:#fff;}
 /* Trainer chips on right of tab bar */
 .trainer-strip{display:none;}
-.trainer-chip{padding:2px 8px;background:rgba(232,200,64,.13);border:1px solid rgba(232,200,64,.28);border-radius:14px;font-size:.66rem;font-weight:600;color:rgba(255,255,255,.85);white-space:nowrap;}
+.trainer-chip{padding:2px 8px;background:rgba(232,200,64,.13);border:1px solid rgba(232,200,64,.28);border-radius:14px;font-size:.66rem;font-weight:600;color:rgba(255,255,255,.85);white-space:nowrap;flex-shrink:0;}
+#hTrainers::-webkit-scrollbar{display:none;}
 
 /* COLLAPSE BAR */
 /* View dropdown */
@@ -571,7 +572,10 @@ select.slp-fmt-btn option:checked{background:var(--ac);color:#071e48;}
 
         </div>
       </div>
-      <div id="hTrainers" style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;max-width:240px;"></div>
+      <div id="hTrainersWrap" style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;max-width:100%;">
+        <span id="hTrainersLbl" style="font-size:.55rem;font-weight:400;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.45);"></span>
+        <div id="hTrainers" style="display:flex;gap:4px;flex-wrap:nowrap;justify-content:flex-end;overflow-x:auto;overflow-y:hidden;max-width:340px;scrollbar-width:none;"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -1787,6 +1791,10 @@ function renderHdrInfo(){
   const tr=G.trainers.filter(t=>t.teams.includes(UI.currentTeam));
   const htr=document.getElementById('hTrainers');
   if(htr)htr.innerHTML=tr.length?tr.map(t=>`<span class="trainer-chip">${t.name}</span>`).join(''):'';
+  const lbl=document.getElementById('hTrainersLbl');
+  const wrap=document.getElementById('hTrainersWrap');
+  if(lbl)lbl.textContent=tr.length===1?'Trainer':(tr.length>1?'Trainerteam':'');
+  if(wrap)wrap.style.display=tr.length?'flex':'none';
 }
 
 function renderTeamBar(){
@@ -3863,21 +3871,21 @@ function slpConfKey(){return UI.currentTeam+'__'+UI.currentSeason;}
 function slpGetConf(){
   if(!G.slpConfirmations)G.slpConfirmations={};
   const k=slpConfKey();
-  if(!G.slpConfirmations[k])G.slpConfirmations[k]={enabled:false,confirmed:{}};
+  if(!G.slpConfirmations[k])G.slpConfirmations[k]={confirmed:{}};
   // Always ensure confirmed object exists (Firebase may strip empty objects)
   if(!G.slpConfirmations[k].confirmed||typeof G.slpConfirmations[k].confirmed!=='object')G.slpConfirmations[k].confirmed={};
   return G.slpConfirmations[k];
 }
 function slpIsConfEnabled(){
-  return slpGetConf().enabled===true;
+  // Per-user setting, stored in user prefs (localStorage), not in G
+  return getUserPref('slpConfEnabled_'+slpConfKey(),false)===true;
 }
 function slpIsPlayerConfirmed(pi){
   return !!slpGetConf().confirmed[pi];
 }
 function slpToggleConfirmations(enabled){
-  const c=slpGetConf();
-  c.enabled=enabled;
-  snap();saveG();
+  // Per-user setting - no snap/saveG (doesn't affect shared data)
+  setUserPref('slpConfEnabled_'+slpConfKey(),enabled);
   // Sync checkbox + show/hide manage button
   const t=document.getElementById('slp-conf-toggle');
   if(t)t.checked=enabled;
@@ -3987,12 +3995,12 @@ function lpCircleColor(count){
 function openSeasonLineup(){
   slpState.openSlot=null;
   slpClosePopup();
-  // Sync confirmation checkbox + manage button state
-  const _c=slpGetConf();
+  // Sync confirmation checkbox + manage button state (per-user)
+  const _enabled=slpIsConfEnabled();
   const _t=document.getElementById('slp-conf-toggle');
-  if(_t)_t.checked=_c.enabled;
+  if(_t)_t.checked=_enabled;
   const _b=document.getElementById('slp-conf-btn');
-  if(_b)_b.style.display=_c.enabled?'':'none';
+  if(_b)_b.style.display=_enabled?'':'none';
   // Update context info
   const ctxEl=document.getElementById('slp-context-info');
   if(ctxEl)ctxEl.textContent=`${UI.currentTeam} · Saison ${UI.currentSeason}`;
