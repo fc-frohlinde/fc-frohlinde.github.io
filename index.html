@@ -3992,15 +3992,28 @@ function getDisplayName(p){
 function lpCircleColor(count){
   return count>=2?'#27ae60':count>=1?'#e8c840':'rgba(255,255,255,.65)';
 }
+function slpSeasonStarted(){
+  // Returns true if any session date is today or in the past
+  const D=cd();
+  if(!D||!Array.isArray(D.sessions)||!D.sessions.length)return false;
+  const today=todaySK();
+  return D.sessions.some(s=>s&&s.date&&dispToSortKey(s.date)<=today);
+}
 function openSeasonLineup(){
   slpState.openSlot=null;
   slpClosePopup();
-  // Sync confirmation checkbox + manage button state (per-user)
-  const _enabled=slpIsConfEnabled();
-  const _t=document.getElementById('slp-conf-toggle');
-  if(_t)_t.checked=_enabled;
+  // Hide/show Bestätigungen toggle based on season state
+  const seasonStarted=slpSeasonStarted();
+  const t=document.getElementById('slp-conf-toggle');
+  const lbl=document.getElementById('slp-conf-toggle-lbl');
+  if(t){t.style.display=seasonStarted?'none':'';}
+  if(lbl){lbl.style.display=seasonStarted?'none':'';}
+  // If season started, force-disable confirmations mode
+  let _enabled=slpIsConfEnabled();
+  if(seasonStarted&&_enabled){_enabled=false;}
+  if(t)t.checked=_enabled;
   const _b=document.getElementById('slp-conf-btn');
-  if(_b)_b.style.display=_enabled?'':'none';
+  if(_b)_b.style.display=(_enabled&&!seasonStarted)?'':'none';
   // Update context info
   const ctxEl=document.getElementById('slp-context-info');
   if(ctxEl)ctxEl.textContent=`${UI.currentTeam} · Saison ${UI.currentSeason}`;
@@ -4096,7 +4109,7 @@ function slpRender(){
     const gFilter=isSel?'filter="url(#glowGold)"':'';
 
     // Names always BELOW circle - one shared backdrop panel for all names
-    const confEnabled=slpIsConfEnabled();
+    const confEnabled=slpIsConfEnabled()&&!slpSeasonStarted();
     const visible=assigned.slice(0,4).map(pi=>players[pi]).filter(Boolean);
     let backdropHtml='';
     if(visible.length){
@@ -4124,7 +4137,7 @@ function slpRender(){
       const fs=i===0?13:12;
       const yPos=R+18+i*14;
       const confirmed=confEnabled?slpIsPlayerConfirmed(pi):false;
-      const prefix=confEnabled?(confirmed?'✓ ':'○ '):'';
+      const prefix=confEnabled&&confirmed?'✓ ':'';
       const textColor=confirmed?'#7dffa0':col;
       return `<text x="0" y="${yPos}" text-anchor="middle" font-family="'Barlow',sans-serif" font-size="${fs}" font-weight="${fw}" fill="${textColor}">${prefix}${nm}</text>`;
     }).join('');
@@ -4610,7 +4623,7 @@ checkAutoBackup();
     <div style="flex:1;"></div>
     <div id="slp-hint" style="font-size:.68rem;color:rgba(255,255,255,.65);font-style:italic;margin-right:6px;">Position klicken → Spieler wählen</div>
     <input type="checkbox" id="slp-conf-toggle" onchange="slpToggleConfirmations(this.checked)" style="cursor:pointer;margin:0 4px 0 0;width:14px;height:14px;vertical-align:middle;"/>
-    <span style="font-size:.75rem;color:rgba(255,255,255,.95);font-weight:600;margin-right:6px;user-select:none;cursor:pointer;" onclick="const _t=document.getElementById('slp-conf-toggle');_t.checked=!_t.checked;slpToggleConfirmations(_t.checked);">Bestätigungen</span>
+    <span id="slp-conf-toggle-lbl" style="font-size:.75rem;color:rgba(255,255,255,.95);font-weight:600;margin-right:6px;user-select:none;cursor:pointer;" onclick="const _t=document.getElementById('slp-conf-toggle');_t.checked=!_t.checked;slpToggleConfirmations(_t.checked);">Bestätigungen</span>
     <button class="slp-close-btn" id="slp-conf-btn" onclick="slpOpenConfirmList()" style="display:none;background:rgba(232,200,64,.15);border-color:rgba(232,200,64,.4);color:#e8c840;">✓ Bestätigungen verwalten</button>
     <button class="slp-close-btn" onclick="closeSeasonLineup()">✕ Schließen</button>
   </div>
