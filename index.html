@@ -2999,14 +2999,6 @@ const FORMATIONS={
     {id:'mr',lbl:'RF',pos:['RF','10er'],x:290,y:160},{id:'mc',lbl:'10er',pos:['10er','8er'],x:170,y:160},
     {id:'ml',lbl:'LF',pos:['LF','10er'],x:50,y:160},{id:'st',lbl:'ST',pos:['ST'],x:170,y:60}
   ],
-  'Grund-Formation':[
-    {id:'gk',lbl:'TW',pos:['TW'],x:170,y:460},
-    {id:'rb',lbl:'RV',pos:['RV'],x:285,y:380},{id:'cb1',lbl:'IV',pos:['IV'],x:215,y:400},
-    {id:'cb2',lbl:'IV',pos:['IV'],x:125,y:400},{id:'lb',lbl:'LV',pos:['LV'],x:55,y:380},
-    {id:'dm',lbl:'6er',pos:['6er'],x:215,y:320},{id:'cm',lbl:'8er',pos:['8er','6er'],x:125,y:280},
-    {id:'mr',lbl:'RF',pos:['RF','10er'],x:290,y:160},{id:'mc',lbl:'10er',pos:['10er','8er'],x:170,y:160},
-    {id:'ml',lbl:'LF',pos:['LF','10er'],x:50,y:160},{id:'st',lbl:'ST',pos:['ST'],x:170,y:60}
-  ],
   '4-3-3':[
     {id:'gk',lbl:'TW',pos:['TW'],x:170,y:460},
     {id:'rb',lbl:'RV',pos:['RV'],x:285,y:380},{id:'cb1',lbl:'IV',pos:['IV'],x:215,y:400},
@@ -3100,7 +3092,6 @@ const FORMATION_CATEGORIES={
   'Viererkette':['4-2-3-1','4-3-3','4-3-1-2','4-2-2-2','4-4-2'],
   'Dreierkette':['3-4-1-2','3-4-3','3-3-2-2','3-3-1-3','3-3-4']
 };
-const BASE_FORMATION='Grund-Formation';
 
 function renderFmtBtns(targetId,currentFmt,onSelect){
   const el=document.getElementById(targetId);
@@ -3108,12 +3099,6 @@ function renderFmtBtns(targetId,currentFmt,onSelect){
   const isSlp=targetId.startsWith('slp');
   const cls=isSlp?'slp-fmt-btn':'lp-fmt-btn';
   let html='';
-  // Base formation pill (first)
-  if(currentFmt!==BASE_FORMATION){
-    html+=`<button class="${cls}" onclick="${onSelect}('${BASE_FORMATION}')" title="Grund-Formation laden">⌂ Grund</button>`;
-  } else {
-    html+=`<span class="${cls} active" style="cursor:default;" title="Grund-Formation aktiv">⌂ Grund</span>`;
-  }
   // Dropdowns
   Object.keys(FORMATION_CATEGORIES).forEach(catName=>{
     const opts=FORMATION_CATEGORIES[catName].map(f=>`<option value="${f}">${f}</option>`).join('');
@@ -3137,10 +3122,13 @@ function fmtSlots(fmtName,customSlots){
   if(!customSlots||typeof customSlots!=='object')return base;
   return base.map(s=>{
     const cs=customSlots[s.id];
-    if(cs&&typeof cs.x==='number'&&typeof cs.y==='number'){
-      return {...s,x:cs.x,y:cs.y};
-    }
-    return s;
+    if(!cs)return s;
+    const out={...s};
+    if(typeof cs.x==='number')out.x=cs.x;
+    if(typeof cs.y==='number')out.y=cs.y;
+    if(cs.lbl)out.lbl=cs.lbl;
+    if(Array.isArray(cs.pos)&&cs.pos.length)out.pos=cs.pos;
+    return out;
   });
 }
 let lpState={formation:'4-2-3-1',slots:{},subs:[],guests:[],selectedSlot:null,selectedBench:null,currentLineupId:null,sessIdx:null,editing:false};
@@ -3273,6 +3261,7 @@ function lpRender(){
         transform="translate(${slot.x},${slot.y})" style="cursor:pointer;"
         onpointerdown="lpPointerDown(event,'${slot.id}')"
         onpointerenter="lpPointerEnter(event,'${slot.id}')"
+        oncontextmenu="fmtContextMenu(event,'lp','${slot.id}')"
         ${gFilter}>
       <circle r="${isSel?R+2:R}" style="fill:${fillColor};stroke:${strokeColor};stroke-width:${strokeW};" ${dashArr}/>
       ${inner}
@@ -3824,6 +3813,9 @@ function lpSave(){
 
 function lpRenderSaves(){
   const el=document.getElementById('lp-saves-list');if(!el)return;
+  // Only admin sees save timestamp
+  if(!isAdmin()){el.innerHTML='';el.style.display='none';return;}
+  el.style.display='';
   // Session mode: per-match lineup
   if(lpState.sessIdx!==null&&lpState.sessIdx!==undefined){
     const saved=G.matchLineups&&G.matchLineups[UI.currentTeam+'__'+lpState.sessIdx];
@@ -3938,6 +3930,7 @@ function slpRenderConfList(){
 
 // ══ SEASON LINEUP PLANNER ════════════════════════════════════
 let slpState={formation:'4-2-3-1',slots:{},currentId:null,openSlot:null,editing:false};
+let _slpMeasureCtx=null;
 // slots: { slotId: [playerIdx, playerIdx, ...] }  priority order
 
 function lpFullName(p,maxLen){
@@ -4112,22 +4105,34 @@ function slpRender(){
     const confEnabled=slpIsConfEnabled()&&!slpSeasonStarted();
     const visible=assigned.slice(0,4).map(pi=>players[pi]).filter(Boolean);
     let backdropHtml='';
+    const sidePad=6;
+    const checkSpace=confEnabled?11:0;
+    // Measure text widths accurately using canvas
+    if(!_slpMeasureCtx){
+      const c=document.createElement('canvas');
+      _slpMeasureCtx=c.getContext('2d');
+    }
+    const measure=(txt,fs,fw)=>{
+      _slpMeasureCtx.font=`${fw} ${fs}px Barlow,sans-serif`;
+      return _slpMeasureCtx.measureText(txt).width;
+    };
+    let maxNameW=0;
+    visible.forEach((p,i)=>{
+      const fs=i===0?13:12;
+      const fw=i===0?700:600;
+      const nm=lpFullName(p,14);
+      const w=measure(nm,fs,fw);
+      if(w>maxNameW)maxNameW=w;
+    });
+    const totalW=sidePad+checkSpace+maxNameW+sidePad;
+    const panelLeft=-totalW/2;
+    const nameStartX=panelLeft+sidePad+checkSpace;
     if(visible.length){
-      // Calculate panel size - widest name determines width
-      let maxW=0;
-      visible.forEach((p,i)=>{
-        const fs=i===0?13:12;
-        const nm=lpFullName(p,14);
-        const prefix=confEnabled?'✓ ':'';
-        const w=(prefix+nm).length*(fs*0.55);
-        if(w>maxW)maxW=w;
-      });
-      const panelW=maxW+12;
       const fs0=13;
       const topY=R+18-fs0+1;
       const bottomY=R+18+(visible.length-1)*14+3;
       const panelH=bottomY-topY+1;
-      backdropHtml=`<rect x="${-panelW/2}" y="${topY}" width="${panelW}" height="${panelH}" fill="rgba(7,15,35,.4)" rx="4"/>`;
+      backdropHtml=`<rect x="${panelLeft}" y="${topY}" width="${totalW}" height="${panelH}" fill="rgba(7,15,35,.4)" rx="4"/>`;
     }
     const nameLines=visible.map((p,i)=>{
       const nm=lpFullName(p,14);
@@ -4137,12 +4142,24 @@ function slpRender(){
       const fs=i===0?13:12;
       const yPos=R+18+i*14;
       const confirmed=confEnabled?slpIsPlayerConfirmed(pi):false;
-      const prefix=confEnabled&&confirmed?'✓ ':'';
       const textColor=confirmed?'#7dffa0':col;
-      return `<text x="0" y="${yPos}" text-anchor="middle" font-family="'Barlow',sans-serif" font-size="${fs}" font-weight="${fw}" fill="${textColor}">${prefix}${nm}</text>`;
+      // When conf mode disabled - center align; when enabled - left align with reserved check space
+      let nameTxt;
+      if(confEnabled){
+        nameTxt=`<text x="${nameStartX}" y="${yPos}" text-anchor="start" font-family="'Barlow',sans-serif" font-size="${fs}" font-weight="${fw}" fill="${textColor}">${nm}</text>`;
+      } else {
+        nameTxt=`<text x="0" y="${yPos}" text-anchor="middle" font-family="'Barlow',sans-serif" font-size="${fs}" font-weight="${fw}" fill="${textColor}">${nm}</text>`;
+      }
+      // Check mark - placed in the reserved space to the LEFT of name
+      let checkTxt='';
+      if(confirmed){
+        const checkX=nameStartX-3;
+        checkTxt=`<text x="${checkX}" y="${yPos}" text-anchor="end" font-family="'Barlow',sans-serif" font-size="${fs}" font-weight="700" fill="#7dffa0">✓</text>`;
+      }
+      return nameTxt+checkTxt;
     }).join('');
 
-    return `<g class="slp-slot-g" onclick="slpClickSlot(event,'${slot.id}')" onpointerdown="fmtDragStart(event,'slp','${slot.id}')" transform="translate(${slot.x},${slot.y})" style="cursor:${slpState.editing?'move':'pointer'};" ${gFilter}>
+    return `<g class="slp-slot-g" onclick="slpClickSlot(event,'${slot.id}')" onpointerdown="fmtDragStart(event,'slp','${slot.id}')" oncontextmenu="fmtContextMenu(event,'slp','${slot.id}')" transform="translate(${slot.x},${slot.y})" style="cursor:${slpState.editing?'move':'pointer'};" ${gFilter}>
       <circle r="${isSel?R+2:R}" style="fill:${fillColor};stroke:${ringColor};stroke-width:${isSel?'2.5':'1.8'};" ${dashArr}/>
       <text y="3" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="10" fill="${count>0?'#fff':'rgba(255,255,255,.55)'}" letter-spacing="1">${slot.lbl}</text>
       ${backdropHtml}
@@ -4190,18 +4207,73 @@ function fmtDragMove(e){
   const y=Math.max(20,Math.min(vb.height-20,(e.clientY-rect.top)/rect.height*vb.height));
   const state=planner==='slp'?slpState:lpState;
   if(!state.customSlots||typeof state.customSlots!=='object')state.customSlots={};
-  state.customSlots[slotId]={x:Math.round(x),y:Math.round(y)};
+  if(!state.customSlots[slotId])state.customSlots[slotId]={};
+  state.customSlots[slotId].x=Math.round(x);
+  state.customSlots[slotId].y=Math.round(y);
   if(planner==='slp')slpRender();else lpRender();
 }
 function fmtDragEnd(){
   if(_fmtDrag){
     document.removeEventListener('pointermove',fmtDragMove);
-    // Auto-save changes (per-game or per-season-plan)
-    const planner=_fmtDrag.planner;
-    if(planner==='lp'){lpSave&&lpSave();}
-    else{slpSave&&slpSave();}
   }
   _fmtDrag=null;
+}
+
+// Right-click on slot in edit mode → show position picker
+const POS_OPTIONS=['TW','RV','LV','IV','6er','8er','10er','RF','LF','ST'];
+function fmtContextMenu(e,planner,slotId){
+  if(planner==='slp'&&!slpState.editing)return;
+  if(planner==='lp'&&!lpState.editing)return;
+  e.preventDefault();e.stopPropagation();
+  // Remove any existing menu
+  const old=document.getElementById('fmt-pos-menu');
+  if(old)old.remove();
+  const fmt=planner==='slp'?slpState.formation:lpState.formation;
+  const slots=FORMATIONS[fmt];
+  if(!slots)return;
+  const slot=slots.find(s=>s.id===slotId);
+  if(!slot)return;
+  const menu=document.createElement('div');
+  menu.id='fmt-pos-menu';
+  menu.style.cssText='position:fixed;z-index:99999;background:#0d2645;border:1px solid rgba(255,255,255,.18);border-radius:8px;box-shadow:0 8px 28px rgba(0,0,0,.55);padding:5px 0;min-width:120px;';
+  menu.innerHTML='<div style="padding:6px 12px;font-size:.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.5);border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:4px;">Position wählen</div>'+
+    POS_OPTIONS.map(p=>{
+      const bcol=PB_COLORS[p]||'#ddd;color:#333';
+      const isCur=p===slot.lbl;
+      return `<div onclick="fmtSetPos('${planner}','${slotId}','${p}')" style="display:flex;align-items:center;gap:8px;padding:6px 12px;cursor:pointer;font-size:.78rem;color:#fff;${isCur?'background:rgba(255,255,255,.08);':''}" onmouseenter="this.style.background='rgba(255,255,255,.12)'" onmouseleave="this.style.background='${isCur?'rgba(255,255,255,.08)':'transparent'}'">
+        <span style="display:inline-block;min-width:30px;padding:1px 4px;border-radius:6px;font-size:.55rem;font-weight:700;text-align:center;background:${bcol.split(';')[0]};${bcol.split(';')[1]};">${p}</span>
+        ${isCur?'<span style="margin-left:auto;color:#7dffa0;font-size:.7rem;">✓</span>':''}
+      </div>`;
+    }).join('');
+  document.body.appendChild(menu);
+  // Position menu near cursor, but constrained to viewport
+  const mw=140,mh=POS_OPTIONS.length*32+30;
+  let x=e.clientX,y=e.clientY;
+  if(x+mw>window.innerWidth)x=window.innerWidth-mw-10;
+  if(y+mh>window.innerHeight)y=window.innerHeight-mh-10;
+  menu.style.left=x+'px';
+  menu.style.top=y+'px';
+  // Close menu on any click outside
+  setTimeout(()=>{
+    const close=(ev)=>{
+      if(!menu.contains(ev.target)){menu.remove();document.removeEventListener('click',close);document.removeEventListener('contextmenu',close);}
+    };
+    document.addEventListener('click',close);
+    document.addEventListener('contextmenu',close);
+  },10);
+}
+function fmtSetPos(planner,slotId,newPos){
+  const state=planner==='slp'?slpState:lpState;
+  if(!state.customSlots||typeof state.customSlots!=='object')state.customSlots={};
+  if(!state.customSlots[slotId])state.customSlots[slotId]={};
+  state.customSlots[slotId].lbl=newPos;
+  state.customSlots[slotId].pos=[newPos];
+  // Close menu
+  const menu=document.getElementById('fmt-pos-menu');
+  if(menu)menu.remove();
+  // Re-render only (save happens on save button)
+  if(planner==='slp')slpRender();
+  else lpRender();
 }
 
 function slpClickSlot(e,slotId){
@@ -4355,6 +4427,9 @@ function slpSave(){
 
 function slpRenderSaves(){
   const el=document.getElementById('slp-saves-list');if(!el)return;
+  // Only admin sees save timestamp
+  if(!isAdmin()){el.innerHTML='';el.style.display='none';return;}
+  el.style.display='';
   const plans=slpGetPlans();
   const cur=plans.find(p=>p.id===slpState.currentId);
   if(cur){
@@ -4527,7 +4602,6 @@ checkAutoBackup();
       </div>
       <div class="lp-sb-label2">🧑‍🤝‍🧑 Kader-Übersicht</div>
       <div id="lp-kader-list" style="padding:0 8px 6px;flex:1;overflow-y:auto;"></div>
-      <div class="lp-sb-label2" style="padding:6px 12px 3px;font-size:.58rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.75);">🧑‍🤝‍🧑 Kader-Übersicht</div>
       <div id="lp-subs-area" style="padding:0 8px 4px;max-height:100px;overflow-y:auto;"></div>
       <div style="padding:6px 10px;border-top:1px solid rgba(255,255,255,.07);">
         <button onclick="lpClearAll()" style="width:100%;background:rgba(231,76,60,.12);border:1px solid rgba(231,76,60,.25);color:#ff9080;border-radius:7px;padding:5px;font-family:'Barlow',sans-serif;font-size:.73rem;font-weight:600;cursor:pointer;">🗑 Aufstellung leeren</button>
