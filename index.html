@@ -261,6 +261,33 @@ tr:hover .drb{color:var(--gm);}
 
 /* MODALS */
 .mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(2px);}
+
+/* Calendar */
+.cal-wrap{display:flex;flex-direction:column;gap:14px;}
+.cal-month{background:linear-gradient(180deg,rgba(255,255,255,.96),#f5f8fc);border:1px solid var(--gl);border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04);}
+.cal-month-hdr{background:linear-gradient(135deg,#0c2450 0%,#1a4fa0 100%);color:#fff;padding:8px 14px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--gl);}
+.cal-dow{background:#eef2f8;color:#456;font-size:.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-align:center;padding:6px 2px;}
+.cal-day{background:#fff;min-height:90px;padding:5px 6px;display:flex;flex-direction:column;gap:3px;position:relative;font-family:'Barlow',sans-serif;}
+.cal-day.empty{background:#f7f9fc;}
+.cal-day.weekend{background:#f9fafd;}
+.cal-day.today{background:linear-gradient(180deg,#fff8e1,#fff);box-shadow:inset 0 0 0 2px var(--ac);}
+.cal-day.past{opacity:.55;}
+.cal-day-num{font-size:.72rem;font-weight:700;color:#234;align-self:flex-start;}
+.cal-day.today .cal-day-num{color:#7a5a00;background:var(--ac);border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:.7rem;}
+.cal-evt{font-size:.62rem;line-height:1.2;padding:2px 4px;border-radius:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;font-weight:600;}
+.cal-evt-m{background:#ffe0b0;color:#7a3a00;border-left:2px solid #d97a00;}
+.cal-evt-t{background:#cce5ff;color:#003d80;border-left:2px solid #0066cc;}
+.cal-evt-b{background:#ffd6e6;color:#80004d;border-left:2px solid #c71585;font-style:italic;}
+.cal-evt:hover{filter:brightness(.95);}
+.cal-legend{display:flex;gap:14px;flex-wrap:wrap;padding:8px 12px;font-size:.72rem;color:#456;background:#f7f9fc;border-radius:8px;}
+.cal-legend-item{display:flex;align-items:center;gap:5px;}
+.cal-legend-sw{width:16px;height:10px;border-radius:2px;}
+@media (max-width:680px){
+  .cal-day{min-height:55px;padding:2px 3px;}
+  .cal-day-num{font-size:.65rem;}
+  .cal-evt{font-size:.56rem;padding:1px 3px;}
+}
 .mo.open{display:flex;}
 .mob{background:#fff;border-radius:14px;padding:20px 24px;max-width:96vw;box-shadow:0 10px 44px rgba(0,0,0,.25);max-height:92vh;overflow-y:auto;}
 .mob h3{font-family:'Bebas Neue',sans-serif;font-size:1.28rem;color:var(--bd);letter-spacing:2px;margin-bottom:12px;}
@@ -592,7 +619,8 @@ select.slp-fmt-btn option:checked{background:var(--ac);color:#071e48;}
     <button class="btn bs" id="btn-addSeas" onclick="openM('moSeason')" style="display:none;">＋</button>
     <button class="btn bd" id="btn-delSeas" onclick="deleteSeason()" style="display:none;">✕</button>
     <div class="tsep"></div>
-    <button class="btn bs" id="btn-plan" onclick="openGenSch()" style="display:none;">📅 Plan</button>
+    <button class="btn bs" onclick="openCalendar()" title="Kalender">📅 Kalender</button>
+    <button class="btn bs" id="btn-plan" onclick="openGenSch()" style="display:none;" title="Saisonplan generieren">⚙️ Plan</button>
     <div class="tsep"></div>
     <button class="btn bs" id="btn-addSess" onclick="openM('moSession')" style="display:none;">＋ Training</button>
     <button class="btn bm" id="btn-addMatch" onclick="openM('moMatch')" style="display:none;">⚽ Spiel</button>
@@ -827,7 +855,7 @@ select.slp-fmt-btn option:checked{background:var(--ac);color:#071e48;}
 
 <!-- Gen Plan -->
 <div class="mo" id="moGenSch"><div class="mob" style="width:410px;">
-  <h3>📅 Trainingsplan generieren</h3>
+  <h3>⚙️ Trainingsplan generieren</h3>
   <label>Trainingstage</label>
   <div class="dow-grid" id="dowTr">
     <div class="dow-btn" data-d="1">Mo</div><div class="dow-btn sel" data-d="2">Di</div>
@@ -2334,6 +2362,164 @@ function setAP2(v){selP2=v;buildPosGrid('add-pos2',v,'setAP2',true,selP1);}
 function initEditPos(p1,p2){editP1=p1;editP2=p2;buildPosGrid('pe-pos1',p1,'setEP1',false);buildPosGrid('pe-pos2',p2!==p1?p2:'','setEP2',true,p1);}
 function setEP1(v){editP1=v;buildPosGrid('pe-pos1',v,'setEP1',false);buildPosGrid('pe-pos2',editP2!==v?editP2:'','setEP2',true,v);if(editP2===v)editP2='';}
 function setEP2(v){editP2=v;buildPosGrid('pe-pos2',v,'setEP2',true,editP1);}
+
+// ══════════════════════════════
+// ══════════════════════════════
+//  CALENDAR
+// ══════════════════════════════
+let _calCur={y:null,m:null}; // current viewed month
+
+function openCalendar(){
+  const ctx=document.getElementById('cal-ctx');
+  if(ctx)ctx.textContent=`${UI.currentTeam} · Saison ${UI.currentSeason}`;
+  // Set initial month: first session of season, or current month
+  const D=cd();
+  let initY=null,initM=null;
+  if(D&&Array.isArray(D.sessions)){
+    let earliestK=null;
+    let nextK=null;
+    const today=todaySK();
+    D.sessions.forEach(s=>{
+      if(!s||!s.date)return;
+      const k=dispToSortKey(s.date);
+      if(k>=99999999)return;
+      if(earliestK===null||k<earliestK)earliestK=k;
+      if(k>=today&&(nextK===null||k<nextK))nextK=k;
+    });
+    const useK=nextK||earliestK;
+    if(useK){initY=Math.floor(useK/10000);initM=Math.floor((useK%10000)/100);}
+  }
+  if(initY===null){
+    const n=new Date();initY=n.getFullYear();initM=n.getMonth()+1;
+  }
+  _calCur={y:initY,m:initM};
+  renderCalendar();
+  openM('moCalendar');
+}
+
+function calNavMonth(delta){
+  let y=_calCur.y,m=_calCur.m+delta;
+  while(m<1){m+=12;y--;}
+  while(m>12){m-=12;y++;}
+  _calCur={y,m};
+  renderCalendar();
+}
+function calGoToday(){
+  const n=new Date();
+  _calCur={y:n.getFullYear(),m:n.getMonth()+1};
+  renderCalendar();
+}
+
+function renderCalendar(){
+  const el=document.getElementById('cal-content');
+  if(!el)return;
+  const D=cd();
+  const monthNames=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  const dowNames=['Mo','Di','Mi','Do','Fr','Sa','So'];
+  // Build sessions index by sortKey for quick lookup
+  const sessByKey={};
+  if(D&&Array.isArray(D.sessions)){
+    D.sessions.forEach((s,si)=>{
+      if(!s||!s.date)return;
+      const k=dispToSortKey(s.date);
+      if(k>=99999999)return;
+      if(!sessByKey[k])sessByKey[k]=[];
+      sessByKey[k].push({...s,_idx:si});
+    });
+  }
+  // Build birthdays index by month-day (MM-DD)
+  const bdayByMD={};
+  if(D&&Array.isArray(D.players)){
+    D.players.forEach((p,pi)=>{
+      if(!p||!p.birthdate)return;
+      let mo=null,da=null,yr=null;
+      if(/^\d{4}-\d{2}-\d{2}/.test(p.birthdate)){
+        mo=parseInt(p.birthdate.slice(5,7));da=parseInt(p.birthdate.slice(8,10));yr=parseInt(p.birthdate.slice(0,4));
+      } else if(/^\d{2}\.\d{2}\.\d{4}/.test(p.birthdate)){
+        da=parseInt(p.birthdate.slice(0,2));mo=parseInt(p.birthdate.slice(3,5));yr=parseInt(p.birthdate.slice(6,10));
+      }
+      if(!mo||!da)return;
+      const key=String(mo).padStart(2,'0')+'-'+String(da).padStart(2,'0');
+      if(!bdayByMD[key])bdayByMD[key]=[];
+      bdayByMD[key].push({p,yr,pi});
+    });
+  }
+  const today=todaySK();
+  const y=_calCur.y,m=_calCur.m;
+  // Header with navigation
+  let html=`<div class="cal-nav" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px;">
+    <button class="btn bs" style="font-size:1rem;padding:4px 12px;" onclick="calNavMonth(-1)" title="Vorheriger Monat">◀</button>
+    <div style="min-width:180px;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;color:var(--bd);">${monthNames[m-1]} ${y}</div>
+    <button class="btn bs" style="font-size:1rem;padding:4px 12px;" onclick="calNavMonth(1)" title="Nächster Monat">▶</button>
+    <button class="btn bs" style="margin-left:10px;font-size:.78rem;" onclick="calGoToday()" title="Zum aktuellen Monat springen">Heute</button>
+  </div>`;
+  html+=renderCalendarMonth(y,m,monthNames,dowNames,sessByKey,bdayByMD,today);
+  el.innerHTML=html;
+}
+
+function renderCalendarMonth(y,m,monthNames,dowNames,sessByKey,bdayByMD,today){
+  const firstDay=new Date(y,m-1,1);
+  const daysInMonth=new Date(y,m,0).getDate();
+  let startDow=(firstDay.getDay()+6)%7;
+  let html=`<div class="cal-month">
+    <div class="cal-grid">`;
+  dowNames.forEach(d=>{html+=`<div class="cal-dow">${d}</div>`;});
+  for(let i=0;i<startDow;i++)html+='<div class="cal-day empty"></div>';
+  for(let d=1;d<=daysInMonth;d++){
+    const dateK=y*10000+m*100+d;
+    const isToday=dateK===today;
+    const isPast=dateK<today;
+    const dow=(new Date(y,m-1,d).getDay()+6)%7;
+    const weekend=(dow===5||dow===6);
+    let cls='cal-day';
+    if(isToday)cls+=' today';
+    else if(isPast)cls+=' past';
+    if(weekend)cls+=' weekend';
+    let evts='';
+    const sList=sessByKey[dateK]||[];
+    sList.forEach(s=>{
+      const isMatch=s.type==='match';
+      const lbl=isMatch?(s.label||'Spiel'):'Training';
+      const time=s.time?`${s.time} `:'';
+      const tip=`${time}${lbl}`.replace(/"/g,'&quot;');
+      const ec=isMatch?'cal-evt-m':'cal-evt-t';
+      const icon=isMatch?'⚽':'🏃';
+      evts+=`<div class="cal-evt ${ec}" title="${tip}" onclick="closeM('moCalendar');jumpToSession(${s._idx});">${icon} ${time}${lbl}</div>`;
+    });
+    const md=String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const bList=bdayByMD[md]||[];
+    bList.forEach(b=>{
+      const age=b.yr?(y-b.yr):null;
+      const ageStr=age!==null?` (${age})`:'';
+      const nm=getDisplayName?getDisplayName(b.p):b.p.name;
+      const tip=`Geburtstag: ${b.p.name}${ageStr}`.replace(/"/g,'&quot;');
+      evts+=`<div class="cal-evt cal-evt-b" title="${tip}" onclick="closeM('moCalendar');jumpToPlayer(${b.pi});">🎂 ${nm}${ageStr}</div>`;
+    });
+    html+=`<div class="${cls}">
+      <div class="cal-day-num">${d}</div>
+      ${evts}
+    </div>`;
+  }
+  const totalCells=startDow+daysInMonth;
+  const trailing=(7-(totalCells%7))%7;
+  for(let i=0;i<trailing;i++)html+='<div class="cal-day empty"></div>';
+  html+='</div></div>';
+  return html;
+}
+
+// Jump to a specific session profile from the calendar
+function jumpToSession(sessIdx){
+  if(typeof openSessFromMain==='function'){
+    openSessFromMain(sessIdx);
+  } else if(typeof openSessStats==='function'){
+    openSessStats(sessIdx);
+  }
+}
+function jumpToPlayer(pi){
+  if(typeof openPlayerStats==='function'){
+    openPlayerStats(pi);
+  }
+}
 
 // ══════════════════════════════
 //  TEAM MANAGER
@@ -4783,6 +4969,21 @@ checkAutoBackup();
   </div>
 </div>
 
+
+<!-- Calendar -->
+<div class="mo" id="moCalendar"><div class="mob" style="width:880px;max-width:96vw;max-height:92vh;display:flex;flex-direction:column;">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-shrink:0;">
+    <h3 style="flex:1;margin:0;color:var(--bd);">📅 Kalender</h3>
+    <span id="cal-ctx" style="font-size:.78rem;color:var(--gm);"></span>
+    <button class="btn bs" onclick="closeM('moCalendar')">✕</button>
+  </div>
+  <div class="cal-legend">
+    <div class="cal-legend-item"><div class="cal-legend-sw" style="background:#ffe0b0;border-left:2px solid #d97a00;"></div>Spiel</div>
+    <div class="cal-legend-item"><div class="cal-legend-sw" style="background:#cce5ff;border-left:2px solid #0066cc;"></div>Training</div>
+    <div class="cal-legend-item"><div class="cal-legend-sw" style="background:#ffd6e6;border-left:2px solid #c71585;"></div>🎂 Geburtstag</div>
+  </div>
+  <div id="cal-content" class="cal-wrap" style="overflow-y:auto;flex:1;margin-top:12px;padding-right:4px;"></div>
+</div></div>
 
 <!-- Saisonkader Confirmation List -->
 <div class="mo" id="moSlpConf" style="z-index:850;"><div class="mob" style="width:520px;max-width:95vw;">
