@@ -279,6 +279,7 @@ tr:hover .drb{color:var(--gm);}
 .cal-evt-m{background:#ffe0b0;color:#7a3a00;border-left:2px solid #d97a00;}
 .cal-evt-t{background:#cce5ff;color:#003d80;border-left:2px solid #0066cc;}
 .cal-evt-b{background:#ffd6e6;color:#80004d;border-left:2px solid #c71585;font-style:italic;}
+.cal-evt-e{background:#d4f4e0;color:#0a4d2c;border-left:2px solid #1a8c4a;}
 .cal-evt:hover{filter:brightness(.95);}
 .cal-legend{display:flex;gap:14px;flex-wrap:wrap;padding:8px 12px;font-size:.72rem;color:#456;background:#f7f9fc;border-radius:8px;}
 .cal-legend-item{display:flex;align-items:center;gap:5px;}
@@ -2364,6 +2365,202 @@ function setEP1(v){editP1=v;buildPosGrid('pe-pos1',v,'setEP1',false);buildPosGri
 function setEP2(v){editP2=v;buildPosGrid('pe-pos2',v,'setEP2',true,editP1);}
 
 // ══════════════════════════════
+// ── Custom calendar events ─────────────────────────────────
+let _cevCurrent=null;
+function calEventsKey(){return UI.currentTeam+'__'+UI.currentSeason;}
+function getCalEvents(){
+  if(!G.calEvents)G.calEvents={};
+  const k=calEventsKey();
+  if(!Array.isArray(G.calEvents[k]))G.calEvents[k]=[];
+  return G.calEvents[k];
+}
+
+let _ceSelected=new Set(); // currently selected player indices in form
+let _ceSortKey='nr'; // 'nr' | 'name' | 'pos'
+let _ceSortDir=1;     // 1 asc, -1 desc
+
+function ceSortBy(key){
+  // Capture current checkbox state first (in case user toggled)
+  document.querySelectorAll('#ceTeilnList input[type="checkbox"]').forEach(cb=>{
+    const pi=parseInt(cb.getAttribute('data-pi'));
+    if(isNaN(pi))return;
+    if(cb.checked)_ceSelected.add(pi);
+    else _ceSelected.delete(pi);
+  });
+  if(_ceSortKey===key)_ceSortDir=-_ceSortDir;
+  else{_ceSortKey=key;_ceSortDir=1;}
+  renderCeTeilnList();
+}
+
+function renderCeTeilnList(){
+  const D=cd();
+  const tl=document.getElementById('ceTeilnList');
+  if(!tl)return;
+  if(!D||!Array.isArray(D.players)||!D.players.length){
+    tl.innerHTML='<div style="padding:8px;text-align:center;color:var(--gm);font-size:.75rem;">Keine Spieler in der Mannschaft.</div>';
+    return;
+  }
+  // Update sort indicators in header
+  document.querySelectorAll('#ceTeilnHdr [data-sort]').forEach(el=>{
+    const k=el.getAttribute('data-sort');
+    const baseTxt=k==='nr'?'Nr':(k==='name'?'Name':'Pos');
+    el.textContent=baseTxt+(_ceSortKey===k?(_ceSortDir>0?' ▲':' ▼'):'');
+    el.style.color=_ceSortKey===k?'var(--bd)':'#456';
+  });
+  // Build sortable list
+  const list=D.players.map((p,pi)=>({p,pi}));
+  const posOrder=['TW','RV','LV','IV','6er','8er','10er','RF','LF','ST'];
+  const posRank=p=>{const i=posOrder.indexOf(p&&p.pos);return i<0?99:i;};
+  const cmp=(a,b)=>{
+    if(_ceSortKey==='nr'){
+      const an=parseInt(a.p.nr),bn=parseInt(b.p.nr);
+      if(isNaN(an)&&isNaN(bn))return 0;
+      if(isNaN(an))return 1;
+      if(isNaN(bn))return -1;
+      return (an-bn)*_ceSortDir;
+    }
+    if(_ceSortKey==='name'){
+      return (a.p.name||'').localeCompare(b.p.name||'','de')*_ceSortDir;
+    }
+    if(_ceSortKey==='pos'){
+      const r=posRank(a.p)-posRank(b.p);
+      if(r!==0)return r*_ceSortDir;
+      const an=parseInt(a.p.nr),bn=parseInt(b.p.nr);
+      return (isNaN(an)?999:an)-(isNaN(bn)?999:bn);
+    }
+    return 0;
+  };
+  list.sort(cmp);
+  tl.innerHTML=list.map(({p,pi})=>{
+    const checked=_ceSelected.has(pi)?'checked':'';
+    const nm=getDisplayName?getDisplayName(p):p.name;
+    const pos=p.pos||'';
+    return `<label style="display:flex;align-items:center;gap:8px;padding:5px 8px;cursor:pointer;font-size:.78rem;border-radius:5px;" onmouseenter="this.style.background='#f0f4fc'" onmouseleave="this.style.background='transparent'">
+      <input type="checkbox" data-pi="${pi}" ${checked} onchange="if(this.checked)_ceSelected.add(${pi});else _ceSelected.delete(${pi});" style="margin:0;cursor:pointer;flex-shrink:0;width:16px;"/>
+      <span style="width:32px;text-align:left;font-family:'Bebas Neue';color:#7a5a00;font-size:.9rem;flex-shrink:0;">${p.nr||'–'}</span>
+      <span style="flex:1;text-align:left;">${nm}</span>
+      <span style="display:inline-block;min-width:50px;text-align:center;font-size:.6rem;font-weight:700;color:#456;background:#eef2f8;padding:2px 6px;border-radius:8px;flex-shrink:0;">${pos||'–'}</span>
+    </label>`;
+  }).join('');
+}
+
+function openCalEvent(eventId,defaultDateK){
+  // Show editor for new (eventId=null) or existing event
+  document.getElementById('ceId').value=eventId||'';
+  document.getElementById('ceDelBtn').style.display=eventId?'':'none';
+  document.getElementById('ceEditTitle').textContent=eventId?'📌 Termin bearbeiten':'📌 Neuer Termin';
+  let date='',name='',note='',players=[];
+  if(eventId){
+    const ev=getCalEvents().find(e=>e.id===eventId);
+    if(ev){
+      date=ev.date?(typeof dispToISO==='function'?dispToISO(ev.date):''):'';
+      name=ev.name||'';note=ev.note||'';players=Array.isArray(ev.players)?ev.players.slice():[];
+    }
+  } else if(defaultDateK){
+    const y=Math.floor(defaultDateK/10000);
+    const m=Math.floor((defaultDateK%10000)/100);
+    const d=defaultDateK%100;
+    date=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+  }
+  document.getElementById('ceDate').value=date;
+  document.getElementById('ceName').value=name;
+  document.getElementById('ceNote').value=note;
+  // Init selection state
+  _ceSelected=new Set(players);
+  // Reset sort to default
+  _ceSortKey='nr';_ceSortDir=1;
+  renderCeTeilnList();
+  openM('moCalEvent');
+  setTimeout(()=>{document.getElementById('ceName').focus();},50);
+}
+
+function saveCalEvent(){
+  const id=document.getElementById('ceId').value;
+  const dateIso=document.getElementById('ceDate').value;
+  const name=document.getElementById('ceName').value.trim();
+  const note=document.getElementById('ceNote').value.trim();
+  if(!dateIso){alert('Bitte ein Datum auswählen.');return;}
+  if(!name){alert('Bitte einen Namen eingeben.');return;}
+  const disp=typeof isoToDisp==='function'?isoToDisp(dateIso):dateIso;
+  // Read final selection state from DOM
+  document.querySelectorAll('#ceTeilnList input[type="checkbox"]').forEach(cb=>{
+    const pi=parseInt(cb.getAttribute('data-pi'));
+    if(isNaN(pi))return;
+    if(cb.checked)_ceSelected.add(pi);
+    else _ceSelected.delete(pi);
+  });
+  const players=Array.from(_ceSelected).sort((a,b)=>a-b);
+  snap();
+  const list=getCalEvents();
+  if(id){
+    const ev=list.find(e=>e.id===id);
+    if(ev){ev.date=disp;ev.name=name;ev.note=note;ev.players=players;ev.updatedAt=Date.now();}
+  } else {
+    list.push({id:'cev_'+Date.now()+'_'+Math.floor(Math.random()*999),date:disp,name,note,players,createdAt:Date.now()});
+  }
+  saveG();
+  closeM('moCalEvent');
+  renderCalendar();
+}
+
+function deleteCalEvent(){
+  const id=document.getElementById('ceId').value;
+  if(!id)return;
+  if(!confirm('Diesen Termin wirklich löschen?'))return;
+  snap();
+  const list=getCalEvents();
+  const idx=list.findIndex(e=>e.id===id);
+  if(idx>=0){list.splice(idx,1);saveG();}
+  closeM('moCalEvent');
+  closeM('moCalEventView');
+  renderCalendar();
+}
+
+function viewCalEvent(eventId){
+  const ev=getCalEvents().find(e=>e.id===eventId);
+  if(!ev)return;
+  _cevCurrent=eventId;
+  document.getElementById('cevTitle').textContent='📌 '+(ev.name||'Termin');
+  document.getElementById('cevDate').textContent=ev.date||'';
+  // Note
+  const noteWrap=document.getElementById('cevNoteWrap');
+  const noteEl=document.getElementById('cevNote');
+  if(ev.note){noteEl.textContent=ev.note;noteWrap.style.display='';}
+  else noteWrap.style.display='none';
+  // Players
+  const teilnWrap=document.getElementById('cevTeilnWrap');
+  const teilnList=document.getElementById('cevTeilnList');
+  const teilnCount=document.getElementById('cevTeilnCount');
+  if(Array.isArray(ev.players)&&ev.players.length){
+    const D=cd();
+    const html=ev.players.map(pi=>{
+      const p=D&&D.players?D.players[pi]:null;
+      if(!p)return '';
+      const nm=getDisplayName?getDisplayName(p):p.name;
+      return `<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 9px;background:#eef4fc;border:1px solid var(--gl);border-radius:14px;font-size:.74rem;font-weight:600;color:var(--gd);cursor:pointer;" onclick="closeM('moCalEventView');closeM('moCalendar');jumpToPlayer(${pi});">
+        <span style="font-family:'Bebas Neue';color:#7a5a00;">${p.nr||'–'}</span>
+        ${nm}
+      </span>`;
+    }).filter(Boolean).join('');
+    teilnList.innerHTML=html;
+    teilnCount.textContent=ev.players.length;
+    teilnWrap.style.display='';
+  } else {
+    teilnWrap.style.display='none';
+  }
+  // Show edit/delete only if user is admin or trainer
+  const editBtn=document.getElementById('cevEditBtn');
+  if(editBtn)editBtn.style.display=canEdit&&canEdit()?'':'none';
+  openM('moCalEventView');
+}
+
+function editCurrentCalEvent(){
+  if(_cevCurrent){
+    closeM('moCalEventView');
+    openCalEvent(_cevCurrent);
+  }
+}
+
 // ══════════════════════════════
 //  CALENDAR
 // ══════════════════════════════
@@ -2372,6 +2569,8 @@ let _calCur={y:null,m:null}; // current viewed month
 function openCalendar(){
   const ctx=document.getElementById('cal-ctx');
   if(ctx)ctx.textContent=`${UI.currentTeam} · Saison ${UI.currentSeason}`;
+  const addBtn=document.getElementById('cal-add-btn');
+  if(addBtn)addBtn.style.display=canEdit&&canEdit()?'':'none';
   // Set initial month: first session of season, or current month
   const D=cd();
   let initY=null,initM=null;
@@ -2427,6 +2626,15 @@ function renderCalendar(){
       sessByKey[k].push({...s,_idx:si});
     });
   }
+  // Build custom events index by sortKey
+  const eventsByKey={};
+  getCalEvents().forEach(ev=>{
+    if(!ev||!ev.date)return;
+    const k=dispToSortKey(ev.date);
+    if(k>=99999999)return;
+    if(!eventsByKey[k])eventsByKey[k]=[];
+    eventsByKey[k].push(ev);
+  });
   // Build birthdays index by month-day (MM-DD)
   const bdayByMD={};
   if(D&&Array.isArray(D.players)){
@@ -2453,11 +2661,11 @@ function renderCalendar(){
     <button class="btn bs" style="font-size:1rem;padding:4px 12px;" onclick="calNavMonth(1)" title="Nächster Monat">▶</button>
     <button class="btn bs" style="margin-left:10px;font-size:.78rem;" onclick="calGoToday()" title="Zum aktuellen Monat springen">Heute</button>
   </div>`;
-  html+=renderCalendarMonth(y,m,monthNames,dowNames,sessByKey,bdayByMD,today);
+  html+=renderCalendarMonth(y,m,monthNames,dowNames,sessByKey,eventsByKey,bdayByMD,today);
   el.innerHTML=html;
 }
 
-function renderCalendarMonth(y,m,monthNames,dowNames,sessByKey,bdayByMD,today){
+function renderCalendarMonth(y,m,monthNames,dowNames,sessByKey,eventsByKey,bdayByMD,today){
   const firstDay=new Date(y,m-1,1);
   const daysInMonth=new Date(y,m,0).getDate();
   let startDow=(firstDay.getDay()+6)%7;
@@ -2484,7 +2692,13 @@ function renderCalendarMonth(y,m,monthNames,dowNames,sessByKey,bdayByMD,today){
       const tip=`${time}${lbl}`.replace(/"/g,'&quot;');
       const ec=isMatch?'cal-evt-m':'cal-evt-t';
       const icon=isMatch?'⚽':'🏃';
-      evts+=`<div class="cal-evt ${ec}" title="${tip}" onclick="closeM('moCalendar');jumpToSession(${s._idx});">${icon} ${time}${lbl}</div>`;
+      evts+=`<div class="cal-evt ${ec}" title="${tip}" onclick="event.stopPropagation();closeM('moCalendar');jumpToSession(${s._idx});">${icon} ${time}${lbl}</div>`;
+    });
+    // Custom events
+    const eList=eventsByKey[dateK]||[];
+    eList.forEach(ev=>{
+      const tip=ev.name.replace(/"/g,'&quot;');
+      evts+=`<div class="cal-evt cal-evt-e" title="${tip}" onclick="event.stopPropagation();viewCalEvent('${ev.id}');">📌 ${ev.name}</div>`;
     });
     const md=String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');
     const bList=bdayByMD[md]||[];
@@ -2493,9 +2707,12 @@ function renderCalendarMonth(y,m,monthNames,dowNames,sessByKey,bdayByMD,today){
       const ageStr=age!==null?` (${age})`:'';
       const nm=getDisplayName?getDisplayName(b.p):b.p.name;
       const tip=`Geburtstag: ${b.p.name}${ageStr}`.replace(/"/g,'&quot;');
-      evts+=`<div class="cal-evt cal-evt-b" title="${tip}" onclick="closeM('moCalendar');jumpToPlayer(${b.pi});">🎂 ${nm}${ageStr}</div>`;
+      evts+=`<div class="cal-evt cal-evt-b" title="${tip}" onclick="event.stopPropagation();closeM('moCalendar');jumpToPlayer(${b.pi});">🎂 ${nm}${ageStr}</div>`;
     });
-    html+=`<div class="${cls}">
+    // Click on empty area in day → quick-add event
+    const canAdd=canEdit&&canEdit();
+    const dayClick=canAdd?` onclick="openCalEvent(null,${dateK});" style="cursor:pointer;"`:'';
+    html+=`<div class="${cls}"${dayClick}>
       <div class="cal-day-num">${d}</div>
       ${evts}
     </div>`;
@@ -4881,7 +5098,7 @@ checkAutoBackup();
     <div><div class="slp-logo">📋 Saisonkader-Planer</div><div class="slp-sub" id="slp-context-info">Mehrere Spieler pro Position</div></div>
     <div id="slp-fmt-btns" style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-left:8px;"></div>
     <div style="flex:1;"></div>
-    <div id="slp-hint" style="font-size:.68rem;color:rgba(255,255,255,.65);font-style:italic;margin-right:6px;">Position klicken → Spieler wählen</div>
+    <div id="slp-hint" style="display:none;"></div>
     <input type="checkbox" id="slp-conf-toggle" onchange="slpToggleConfirmations(this.checked)" style="cursor:pointer;margin:0 4px 0 0;width:14px;height:14px;vertical-align:middle;"/>
     <span id="slp-conf-toggle-lbl" style="font-size:.75rem;color:rgba(255,255,255,.95);font-weight:600;margin-right:6px;user-select:none;cursor:pointer;" onclick="const _t=document.getElementById('slp-conf-toggle');_t.checked=!_t.checked;slpToggleConfirmations(_t.checked);">Bestätigungen</span>
     <button class="slp-close-btn" id="slp-conf-btn" onclick="slpOpenConfirmList()" style="display:none;background:rgba(232,200,64,.15);border-color:rgba(232,200,64,.4);color:#e8c840;">✓ Bestätigungen verwalten</button>
@@ -4975,14 +5192,63 @@ checkAutoBackup();
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-shrink:0;">
     <h3 style="flex:1;margin:0;color:var(--bd);">📅 Kalender</h3>
     <span id="cal-ctx" style="font-size:.78rem;color:var(--gm);"></span>
+    <button class="btn bs" id="cal-add-btn" onclick="openCalEvent(null)" style="background:rgba(26,140,74,.12);color:#0a4d2c;border-color:rgba(26,140,74,.35);">＋ Termin</button>
     <button class="btn bs" onclick="closeM('moCalendar')">✕</button>
   </div>
   <div class="cal-legend">
     <div class="cal-legend-item"><div class="cal-legend-sw" style="background:#ffe0b0;border-left:2px solid #d97a00;"></div>Spiel</div>
     <div class="cal-legend-item"><div class="cal-legend-sw" style="background:#cce5ff;border-left:2px solid #0066cc;"></div>Training</div>
+    <div class="cal-legend-item"><div class="cal-legend-sw" style="background:#d4f4e0;border-left:2px solid #1a8c4a;"></div>📌 Termin</div>
     <div class="cal-legend-item"><div class="cal-legend-sw" style="background:#ffd6e6;border-left:2px solid #c71585;"></div>🎂 Geburtstag</div>
   </div>
   <div id="cal-content" class="cal-wrap" style="overflow-y:auto;flex:1;margin-top:12px;padding-right:4px;"></div>
+</div></div>
+
+<!-- Calendar Event Editor -->
+<div class="mo" id="moCalEvent" style="z-index:860;"><div class="mob" style="width:520px;max-width:95vw;">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+    <h3 id="ceEditTitle" style="flex:1;margin:0;color:var(--bd);">📌 Neuer Termin</h3>
+    <button class="btn bs" onclick="closeM('moCalEvent')">✕</button>
+  </div>
+  <input type="hidden" id="ceId"/>
+  <label style="font-size:.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gm);">Datum*</label>
+  <input type="date" id="ceDate" class="inp" style="margin:4px 0 12px;"/>
+  <label style="font-size:.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gm);">Name*</label>
+  <input type="text" id="ceName" class="inp" placeholder="z.B. Mannschaftsabend, Turnier, Trainerbesprechung" style="margin:4px 0 12px;" maxlength="80"/>
+  <label style="font-size:.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gm);">Kommentar (optional)</label>
+  <textarea id="ceNote" class="inp" rows="3" placeholder="Zusätzliche Infos..." style="margin:4px 0 12px;resize:vertical;"></textarea>
+  <label style="font-size:.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gm);">Teilnehmer (optional)</label>
+  <div id="ceTeilnHdr" style="display:flex;align-items:center;gap:8px;padding:6px 8px;background:#eef2f8;border:1px solid var(--gl);border-bottom:none;border-radius:8px 8px 0 0;font-size:.6rem;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#456;margin:6px 0 0;user-select:none;">
+    <span style="width:16px;flex-shrink:0;"></span>
+    <span data-sort="nr" onclick="ceSortBy('nr')" style="width:32px;text-align:left;cursor:pointer;flex-shrink:0;">Nr</span>
+    <span data-sort="name" onclick="ceSortBy('name')" style="flex:1;text-align:left;cursor:pointer;">Name</span>
+    <span data-sort="pos" onclick="ceSortBy('pos')" style="min-width:50px;text-align:center;cursor:pointer;flex-shrink:0;">Pos</span>
+  </div>
+  <div id="ceTeilnList" style="margin:0 0 12px;max-height:220px;overflow-y:auto;border:1px solid var(--gl);border-radius:0 0 8px 8px;padding:4px;"></div>
+  <div style="display:flex;justify-content:space-between;gap:8px;margin-top:8px;">
+    <button class="btn bd" id="ceDelBtn" onclick="deleteCalEvent()" style="display:none;">🗑 Löschen</button>
+    <span style="flex:1;"></span>
+    <button class="btn bs" onclick="closeM('moCalEvent')">Abbrechen</button>
+    <button class="btn bp" onclick="saveCalEvent()">Speichern</button>
+  </div>
+</div></div>
+
+<!-- Calendar Event Profile -->
+<div class="mo" id="moCalEventView" style="z-index:855;"><div class="mob" style="width:520px;max-width:95vw;">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+    <h3 id="cevTitle" style="flex:1;margin:0;color:var(--bd);">📌 Termin</h3>
+    <button class="btn bs" id="cevEditBtn" onclick="editCurrentCalEvent()">✎ Bearbeiten</button>
+    <button class="btn bs" onclick="closeM('moCalEventView')">✕</button>
+  </div>
+  <div style="font-size:.86rem;color:var(--gd);margin-bottom:8px;"><strong id="cevDate"></strong></div>
+  <div id="cevNoteWrap" style="display:none;background:#f7f9fc;border-left:3px solid var(--ac);padding:10px 12px;border-radius:6px;margin-bottom:14px;">
+    <div style="font-size:.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gm);margin-bottom:4px;">Kommentar</div>
+    <div id="cevNote" style="font-size:.85rem;color:var(--gd);white-space:pre-wrap;"></div>
+  </div>
+  <div id="cevTeilnWrap" style="display:none;">
+    <div style="font-size:.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gm);margin-bottom:6px;">Teilnehmer (<span id="cevTeilnCount">0</span>)</div>
+    <div id="cevTeilnList" style="display:flex;flex-wrap:wrap;gap:5px;"></div>
+  </div>
 </div></div>
 
 <!-- Saisonkader Confirmation List -->
