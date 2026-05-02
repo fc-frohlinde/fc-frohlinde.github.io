@@ -218,6 +218,37 @@ td:hover .ncell .ni{opacity:1;}
 .pb-6er{background:#c3e6cb;color:#155724;}.pb-8er{background:#a0d8a8;color:#0d4020;}
 .pb-10er{background:#7cc884;color:#083010;}.pb-RF{background:#ffe0b0;color:#7a3a00;}
 .pb-LF{background:#ffd0b0;color:#7a3a00;}.pb-ST{background:#ffd6d6;color:#8a0000;}
+
+/* Player avatar */
+.player-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#dde5f0,#f0f4fc);border:2.5px solid var(--ac);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--bd);overflow:hidden;flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,.08);transition:transform .15s,box-shadow .15s;}
+.player-avatar:hover{transform:scale(1.04);box-shadow:0 4px 14px rgba(0,0,0,.18);}
+.player-avatar img{width:100%;height:100%;object-fit:cover;}
+
+/* Photo cropper */
+.crop-stage{position:relative;width:100%;aspect-ratio:1/1;background:#0a1430;border-radius:10px;overflow:hidden;touch-action:none;user-select:none;cursor:move;}
+.crop-img{position:absolute;left:0;top:0;transform-origin:0 0;pointer-events:none;-webkit-user-drag:none;}
+.crop-mask{position:absolute;inset:0;pointer-events:none;}
+.crop-controls{display:flex;align-items:center;gap:10px;margin:10px 0;}
+.crop-controls input[type=range]{flex:1;}
+.player-avatar.no-edit{cursor:default;}
+.player-avatar.no-edit:hover{transform:none;box-shadow:0 2px 6px rgba(0,0,0,.08);}
+
+/* Custom position dropdown */
+.pos-dd{position:relative;font-family:'Barlow',sans-serif;}
+.pos-dd-btn{display:flex;align-items:center;gap:8px;width:100%;min-height:36px;padding:7px 28px 7px 8px;border:1.5px solid var(--gl);border-radius:7px;background:#fff;cursor:pointer;font-size:.8rem;color:var(--gd);font-family:inherit;text-align:left;position:relative;transition:border-color .12s;overflow:hidden;box-sizing:border-box;}
+.pos-dd-btn>span:not(.pb){overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;}
+
+
+.pos-dd-btn:hover{border-color:var(--bl);}
+.pos-dd-btn::after{content:'';position:absolute;right:10px;top:50%;width:6px;height:6px;border-right:2px solid var(--gm);border-bottom:2px solid var(--gm);transform:translateY(-65%) rotate(45deg);}
+.pos-dd.open .pos-dd-btn{border-color:var(--bl);}
+.pos-dd-list{display:none;position:absolute;top:100%;left:0;right:0;margin-top:3px;background:#fff;border:1.5px solid var(--gl);border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.12);z-index:100;max-height:280px;overflow-y:auto;padding:4px;}
+.pos-dd.open .pos-dd-list{display:block;}
+.pos-dd-opt{display:flex;align-items:center;gap:8px;min-height:30px;padding:6px 8px;border-radius:5px;cursor:pointer;font-size:.78rem;color:var(--gd);box-sizing:border-box;}
+.pos-dd-opt:hover{background:#f0f4fc;}
+.pos-dd-opt.sel{background:rgba(232,200,64,.18);}
+.pos-dd-opt.disabled{opacity:.4;cursor:not-allowed;}
+.pos-dd-opt.disabled:hover{background:transparent;}
 /* Pos cell in table: left-aligned, first badge has fixed width */
 .pos-wrap{display:flex;align-items:center;gap:3px;justify-content:flex-start;padding:0 4px;}
 .pb-primary{min-width:36px;}
@@ -292,9 +323,10 @@ tr:hover .drb{color:var(--gm);}
 .mo.open{display:flex;}
 .mob{background:#fff;border-radius:14px;padding:20px 24px;max-width:96vw;box-shadow:0 10px 44px rgba(0,0,0,.25);max-height:92vh;overflow-y:auto;}
 .mob h3{font-family:'Bebas Neue',sans-serif;font-size:1.28rem;color:var(--bd);letter-spacing:2px;margin-bottom:12px;}
-.mob label{display:block;font-size:.7rem;font-weight:700;color:var(--gd);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;}
-.mob input,.mob select,.mob textarea{width:100%;padding:8px 11px;border:1.5px solid var(--gl);border-radius:7px;font-family:'Barlow',sans-serif;font-size:.86rem;margin-bottom:10px;outline:none;color:#1e3050;transition:border-color .13s;}
-.mob input:focus,.mob select:focus,.mob textarea:focus{border-color:var(--bm);}
+.mob label{display:block;font-size:.7rem;font-weight:700;color:var(--gd);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px;line-height:1.3;}
+.mob input:not([type=range]),.mob select,.mob textarea{width:100%;padding:8px 11px;border:1.5px solid var(--gl);border-radius:7px;font-family:'Barlow',sans-serif;font-size:.86rem;margin-bottom:10px;outline:none;color:#1e3050;transition:border-color .13s;}
+.mob input:not([type=range]):focus,.mob select:focus,.mob textarea:focus{border-color:var(--bm);}
+.mob input[type=range]{margin:0;padding:0;border:none;}
 .mob .note{font-size:.72rem;color:var(--gm);margin-bottom:9px;line-height:1.5;}
 .mob-btns{display:flex;gap:7px;margin-top:7px;flex-wrap:wrap;}
 .mob-btns .btn{flex:1;justify-content:center;min-width:88px;}
@@ -710,8 +742,9 @@ select.slp-fmt-btn option:checked{background:var(--ac);color:#071e48;}
 
 <!-- Player Stats -->
 <div class="mo" id="moPlayer"><div class="mob" style="width:530px;">
-  <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:13px;">
-    <div style="flex:1;">
+  <div style="display:flex;align-items:flex-start;gap:13px;margin-bottom:13px;">
+    <div id="ps-avatar-wrap" style="flex-shrink:0;cursor:pointer;" onclick="if(canEdit())pickPlayerPhoto()" title="Foto ändern"></div>
+    <div style="flex:1;min-width:0;">
       <div id="ps-name" style="font-family:'Bebas Neue',sans-serif;font-size:1.55rem;color:var(--bd);letter-spacing:2px;line-height:1;">–</div>
       <div style="display:flex;align-items:center;gap:7px;margin-top:5px;">
         <span id="ps-nr" style="font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:var(--gm);">#–</span>
@@ -720,7 +753,7 @@ select.slp-fmt-btn option:checked{background:var(--ac);color:#071e48;}
       </div>
       <div id="ps-note-display" style="margin-top:5px;font-size:.78rem;color:var(--gd);font-style:italic;display:none;"></div>
     </div>
-    <div style="display:flex;gap:6px;"><button class="btn" style="font-size:.76rem;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" onclick="playerGoBack()">← Zurück</button><button class="btn bs" onclick="closeM('moPlayer')">✕</button></div>
+    <div style="display:flex;gap:6px;flex-shrink:0;"><button class="btn" style="font-size:.76rem;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" onclick="playerGoBack()">← Zurück</button><button class="btn bs" onclick="closeM('moPlayer')">✕</button></div>
   </div>
   <div class="ps-cards" id="ps-cards"></div>
   <div class="sec" style="margin-bottom:6px;">📅 Monatliche Übersicht</div>
@@ -737,10 +770,20 @@ select.slp-fmt-btn option:checked{background:var(--ac);color:#071e48;}
         <div style="flex:2;min-width:110px;"><label>Name</label><input type="text" id="pe-name" style="margin-bottom:0;"/></div>
         <div style="flex:1;min-width:90px;"><label>Kurzname</label><input type="text" id="pe-shortname" placeholder="z.B. Maxi" style="margin-bottom:0;"/></div>
       </div>
-      <div class="sec" style="margin-bottom:6px;">Position 1</div>
-      <div class="pos-grid" id="pe-pos1"></div>
-      <div class="sec" style="margin-bottom:6px;">Position 2 (optional)</div>
-      <div class="pos-grid" id="pe-pos2"></div>
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 105px;gap:7px;margin-bottom:8px;align-items:end;">
+        <div>
+          <label>Position 1</label>
+          <div id="pe-pos1-sel"></div>
+        </div>
+        <div>
+          <label>Position 2</label>
+          <div id="pe-pos2-sel"></div>
+        </div>
+        <div>
+          <label>🦵 Fuß</label>
+          <div id="pe-foot-sel"></div>
+        </div>
+      </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px;">
         <div>
           <label>🎫 Spieler-Passnummer</label>
@@ -751,19 +794,24 @@ select.slp-fmt-btn option:checked{background:var(--ac);color:#071e48;}
           <input type="date" id="pe-birthdate" style="margin-bottom:0;"/>
         </div>
       </div>
-      <div style="margin-bottom:8px;">
-        <label>🦵 Bevorzugter Fuß</label>
-        <div style="display:flex;gap:6px;margin-top:4px;">
-          <div class="radio-opt" id="foot-right" onclick="setFoot('right')" style="flex:1;justify-content:center;">Rechts</div>
-          <div class="radio-opt" id="foot-left" onclick="setFoot('left')" style="flex:1;justify-content:center;">Links</div>
-          <div class="radio-opt" id="foot-both" onclick="setFoot('both')" style="flex:1;justify-content:center;">Beidfüßig</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px;">
+        <div>
+          <label>📞 Telefon</label>
+          <input type="tel" id="pe-phone" placeholder="z.B. +49 170 1234567" style="margin-bottom:0;"/>
+        </div>
+        <div>
+          <label>✉️ E-Mail</label>
+          <input type="email" id="pe-email" placeholder="z.B. spieler@email.de" style="margin-bottom:0;"/>
         </div>
       </div>
-      <div class="sec" style="margin-bottom:6px;">📝 Kommentar</div>
+      <label>📝 Kommentar</label>
       <textarea id="pe-note" rows="2" placeholder="z.B. Verletzt bis KW 20, Schulnoten, ..." style="width:100%;padding:7px;border:1.5px solid var(--gl);border-radius:7px;font-family:'Barlow',sans-serif;font-size:.8rem;resize:vertical;margin-bottom:8px;"></textarea>
-      <div style="display:flex;gap:7px;flex-wrap:wrap;">
+      <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;">
         <button class="btn bp" onclick="savePlayerEdit()">✓ Speichern</button>
         <button class="btn" onclick="closeM('moPlayer')" style="background:#f0f4fc;color:var(--gd);border:1.5px solid var(--gl);">✕ Abbrechen</button>
+        <span style="flex:1;"></span>
+        <button class="btn bs" onclick="pickPlayerPhoto()" style="font-size:.74rem;">📷 Foto</button>
+        <button class="btn" id="pe-photo-del" onclick="removePlayerPhoto()" style="background:rgba(231,76,60,.1);color:#c0392b;border:1px solid rgba(231,76,60,.3);font-size:.74rem;display:none;">🗑 Entfernen</button>
       </div>
     </div>
   </div>
@@ -797,14 +845,68 @@ select.slp-fmt-btn option:checked{background:var(--ac);color:#071e48;}
 </div></div>
 
 <!-- Add Player -->
-<div class="mo" id="moAddPlayer"><div class="mob" style="width:400px;">
+<div class="mo" id="moAddPlayer"><div class="mob" style="width:520px;max-width:95vw;max-height:90vh;overflow-y:auto;">
   <h3>Spieler hinzufügen</h3>
-  <label>Trikotnummer</label><input type="number" id="newNr" placeholder="21" min="1" max="99"/>
-  <label>Name</label><input type="text" id="newName" placeholder="Vorname Nachname"/>
-  <div class="sec" style="margin-bottom:6px;">Position 1</div>
-  <div class="pos-grid" id="add-pos1"></div>
-  <div class="sec" style="margin-bottom:6px;">Position 2 (optional)</div>
-  <div class="pos-grid" id="add-pos2"></div>
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;padding:10px;background:#f7f9fc;border-radius:8px;">
+    <div id="add-avatar-wrap"></div>
+    <div style="flex:1;">
+      <div style="font-size:.7rem;font-weight:700;color:var(--gd);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Profilfoto (optional)</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="btn bs" type="button" onclick="pickAddPlayerPhoto()" style="font-size:.74rem;">📷 Foto wählen</button>
+        <button class="btn" type="button" id="add-photo-del" onclick="removeAddPlayerPhoto()" style="background:rgba(231,76,60,.1);color:#c0392b;border:1px solid rgba(231,76,60,.3);font-size:.74rem;display:none;">🗑 Entfernen</button>
+      </div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:90px 1fr 110px;gap:7px;margin-bottom:8px;align-items:end;">
+    <div>
+      <label>Nr.</label>
+      <input type="number" id="newNr" placeholder="21" min="1" max="99" style="margin-bottom:0;"/>
+    </div>
+    <div>
+      <label>Vollständiger Name*</label>
+      <input type="text" id="newName" placeholder="Vorname Nachname" style="margin-bottom:0;"/>
+    </div>
+    <div>
+      <label>Kurzname</label>
+      <input type="text" id="newShortname" placeholder="z.B. Müller" style="margin-bottom:0;" maxlength="20"/>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 105px;gap:7px;margin-bottom:8px;align-items:end;">
+    <div>
+      <label>Position 1</label>
+      <div id="add-pos1-sel"></div>
+    </div>
+    <div>
+      <label>Position 2</label>
+      <div id="add-pos2-sel"></div>
+    </div>
+    <div>
+      <label>🦵 Fuß</label>
+      <div id="add-foot-sel"></div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px;">
+    <div>
+      <label>🎫 Spieler-Passnummer</label>
+      <input type="text" id="newPassnr" placeholder="z.B. 12345678" style="margin-bottom:0;"/>
+    </div>
+    <div>
+      <label>🎂 Geburtsdatum</label>
+      <input type="date" id="newBirthdate" style="margin-bottom:0;"/>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px;">
+    <div>
+      <label>📞 Telefon</label>
+      <input type="tel" id="newPhone" placeholder="z.B. +49 170 1234567" style="margin-bottom:0;"/>
+    </div>
+    <div>
+      <label>✉️ E-Mail</label>
+      <input type="email" id="newEmail" placeholder="z.B. spieler@email.de" style="margin-bottom:0;"/>
+    </div>
+  </div>
+  <label>📝 Kommentar</label>
+  <textarea id="newNote" rows="2" placeholder="z.B. Verletzt bis KW 20, Schulnoten, ..." style="width:100%;padding:7px;border:1.5px solid var(--gl);border-radius:7px;font-family:'Barlow',sans-serif;font-size:.8rem;resize:vertical;margin-bottom:8px;"></textarea>
   <div class="mob-btns">
     <button class="btn bp" onclick="addPlayer()">＋ Hinzufügen</button>
     <button class="btn bs" onclick="closeM('moAddPlayer')">Abbrechen</button>
@@ -2087,6 +2189,221 @@ function cycSt(pi,si){
 // ══════════════════════════════
 //  PLAYER STATS
 // ══════════════════════════════
+// ── PLAYER PHOTO ────────────────────────────────────────────
+function getPlayerInitials(p){
+  if(!p||!p.name)return '?';
+  const parts=p.name.trim().split(/\s+/);
+  if(parts.length>=2)return (parts[0][0]+parts[parts.length-1][0]).toUpperCase();
+  return parts[0].slice(0,2).toUpperCase();
+}
+function renderPlayerAvatar(p,size){
+  size=size||72;
+  const initials=getPlayerInitials(p);
+  const editable=canEdit&&canEdit();
+  const cls='player-avatar'+(editable?'':' no-edit');
+  const style=`width:${size}px;height:${size}px;font-size:${Math.round(size*.4)}px;`;
+  if(p&&p.photo){
+    return `<div class="${cls}" style="${style}"><img src="${p.photo}" alt=""/></div>`;
+  }
+  return `<div class="${cls}" style="${style}">${initials}</div>`;
+}
+// Photo cropper state
+let _cropState={img:null,scale:1,minScale:1,offsetX:0,offsetY:0,stageSize:0,
+  draggingFrom:null,onApply:null};
+
+function pickPlayerPhoto(callback){
+  // callback: optional fn(dataUrl) - if not given, applies to current player
+  if(!canEdit())return;
+  const inp=document.createElement('input');
+  inp.type='file';
+  inp.accept='image/*';
+  inp.style.display='none';
+  inp.addEventListener('change',(e)=>{
+    const file=e.target.files&&e.target.files[0];
+    if(!file)return;
+    if(file.size>10*1024*1024){alert('Datei zu groß (max. 10 MB).');return;}
+    const reader=new FileReader();
+    reader.onload=(ev)=>{
+      const img=new Image();
+      img.onload=()=>{
+        openCropper(img,(dataUrl)=>{
+          if(callback){callback(dataUrl);return;}
+          // Default behaviour: apply to current player
+          const D=cd();const p=D&&D.players&&D.players[currentPI];
+          if(!p)return;
+          snap();
+          p.photo=dataUrl;
+          saveG();
+          openPlayerStats(currentPI);
+          renderBody&&renderBody();
+        });
+      };
+      img.onerror=()=>alert('Ungültiges Bildformat');
+      img.src=ev.target.result;
+    };
+    reader.onerror=()=>alert('Datei kann nicht gelesen werden');
+    reader.readAsDataURL(file);
+  });
+  document.body.appendChild(inp);
+  inp.click();
+  setTimeout(()=>inp.remove(),0);
+}
+
+function openCropper(img,onApply){
+  // Open modal first so stage gets actual dimensions
+  openM('moPhotoCrop');
+  // Defer measurement until layout is computed
+  requestAnimationFrame(()=>{
+    const stage=document.getElementById('cropStage');
+    const stageSize=stage.clientWidth||340;
+    const minScale=Math.max(stageSize/img.width,stageSize/img.height);
+    _cropState={
+      img,
+      scale:minScale,
+      minScale,
+      offsetX:(stageSize-img.width*minScale)/2,
+      offsetY:(stageSize-img.height*minScale)/2,
+      stageSize,
+      draggingFrom:null,
+      onApply
+    };
+    const imgEl=document.getElementById('cropImg');
+    imgEl.src=img.src;
+    imgEl.style.width=img.width+'px';
+    imgEl.style.height=img.height+'px';
+    const zoom=document.getElementById('cropZoom');
+    zoom.min=0;
+    zoom.max=100;
+    zoom.step=0.5;
+    zoom.value=0;
+    cropApplyTransform();
+    drawCropMask();
+  });
+}
+
+function cropApplyTransform(){
+  const imgEl=document.getElementById('cropImg');
+  if(!imgEl||!_cropState.img)return;
+  // Clamp offsets so image always covers stage
+  const ss=_cropState.stageSize;
+  const sw=_cropState.img.width*_cropState.scale;
+  const sh=_cropState.img.height*_cropState.scale;
+  const minX=ss-sw, minY=ss-sh;
+  if(_cropState.offsetX>0)_cropState.offsetX=0;
+  if(_cropState.offsetY>0)_cropState.offsetY=0;
+  if(_cropState.offsetX<minX)_cropState.offsetX=minX;
+  if(_cropState.offsetY<minY)_cropState.offsetY=minY;
+  imgEl.style.transform=`translate(${_cropState.offsetX}px,${_cropState.offsetY}px) scale(${_cropState.scale})`;
+}
+
+function drawCropMask(){
+  const svg=document.getElementById('cropMask');
+  if(!svg)return;
+  // Stage is square 100×100 viewBox; circle hole at center r=50 (touches edges)
+  svg.innerHTML=`<defs><mask id="cropHole">
+    <rect x="0" y="0" width="100" height="100" fill="white"/>
+    <circle cx="50" cy="50" r="50" fill="black"/>
+  </mask></defs>
+  <rect x="0" y="0" width="100" height="100" fill="rgba(7,15,35,.65)" mask="url(#cropHole)"/>
+  <circle cx="50" cy="50" r="50" fill="none" stroke="rgba(255,255,255,.85)" stroke-width="0.4"/>`;
+}
+
+function cropPointerDown(e){
+  e.preventDefault();
+  _cropState.draggingFrom={x:e.clientX,y:e.clientY,ox:_cropState.offsetX,oy:_cropState.offsetY};
+  document.addEventListener('pointermove',cropPointerMove);
+  document.addEventListener('pointerup',cropPointerUp,{once:true});
+}
+function cropPointerMove(e){
+  if(!_cropState.draggingFrom)return;
+  const dx=e.clientX-_cropState.draggingFrom.x;
+  const dy=e.clientY-_cropState.draggingFrom.y;
+  _cropState.offsetX=_cropState.draggingFrom.ox+dx;
+  _cropState.offsetY=_cropState.draggingFrom.oy+dy;
+  cropApplyTransform();
+}
+function cropPointerUp(){
+  _cropState.draggingFrom=null;
+  document.removeEventListener('pointermove',cropPointerMove);
+}
+function cropWheel(e){
+  e.preventDefault();
+  const delta=e.deltaY<0?1.08:0.92;
+  const newScale=Math.max(_cropState.minScale,Math.min(_cropState.minScale*4,_cropState.scale*delta));
+  const ss=_cropState.stageSize;
+  const cx=ss/2,cy=ss/2;
+  const ratio=newScale/_cropState.scale;
+  _cropState.offsetX=cx-(cx-_cropState.offsetX)*ratio;
+  _cropState.offsetY=cy-(cy-_cropState.offsetY)*ratio;
+  _cropState.scale=newScale;
+  // Update slider position (scale 1..4 → 0..100)
+  const pct=((newScale/_cropState.minScale-1)/3)*100;
+  document.getElementById('cropZoom').value=pct;
+  cropApplyTransform();
+}
+function cropSetZoom(v){
+  const pct=parseFloat(v);
+  if(isNaN(pct))return;
+  // 0..100 → minScale..minScale*4
+  const newScale=_cropState.minScale*(1+pct/100*3);
+  const ss=_cropState.stageSize;
+  const cx=ss/2,cy=ss/2;
+  const ratio=newScale/_cropState.scale;
+  _cropState.offsetX=cx-(cx-_cropState.offsetX)*ratio;
+  _cropState.offsetY=cy-(cy-_cropState.offsetY)*ratio;
+  _cropState.scale=newScale;
+  cropApplyTransform();
+}
+function cropReset(){
+  _cropState.scale=_cropState.minScale;
+  _cropState.offsetX=(_cropState.stageSize-_cropState.img.width*_cropState.minScale)/2;
+  _cropState.offsetY=(_cropState.stageSize-_cropState.img.height*_cropState.minScale)/2;
+  document.getElementById('cropZoom').value=0;
+  cropApplyTransform();
+}
+function closeCropper(){
+  closeM('moPhotoCrop');
+  _cropState.onApply=null;
+}
+function cropApply(){
+  // Compute crop region in original image coordinates
+  // Stage shows: image positioned at offset, scaled.
+  // Visible region (the stage) maps back to image coords:
+  // src_x = -offsetX / scale, src_y = -offsetY / scale
+  // src_w = stageSize / scale, src_h = stageSize / scale
+  const ss=_cropState.stageSize;
+  const sx=-_cropState.offsetX/_cropState.scale;
+  const sy=-_cropState.offsetY/_cropState.scale;
+  const sw=ss/_cropState.scale;
+  const sh=ss/_cropState.scale;
+  const target=240;
+  const canvas=document.createElement('canvas');
+  canvas.width=target;canvas.height=target;
+  const ctx=canvas.getContext('2d');
+  ctx.imageSmoothingQuality='high';
+  ctx.drawImage(_cropState.img,sx,sy,sw,sh,0,0,target,target);
+  let q=0.78;
+  let result=canvas.toDataURL('image/jpeg',q);
+  while(result.length>80000&&q>0.4){
+    q-=0.1;
+    result=canvas.toDataURL('image/jpeg',q);
+  }
+  const cb=_cropState.onApply;
+  closeCropper();
+  if(typeof cb==='function')cb(result);
+}
+function removePlayerPhoto(){
+  if(!canEdit())return;
+  if(!confirm('Foto wirklich entfernen?'))return;
+  const D=cd();const p=D&&D.players&&D.players[currentPI];
+  if(!p||!p.photo)return;
+  snap();
+  delete p.photo;
+  saveG();
+  openPlayerStats(currentPI);
+  renderBody&&renderBody();
+}
+
 function openPlayerStats(pi){
   currentPI=pi;
   const D=cd(),p=D.players[pi],ss=D.sessions,foc=teamFoc();
@@ -2095,6 +2412,12 @@ function openPlayerStats(pi){
   document.getElementById('ps-nr').textContent='#'+(p.nr||'?');
   document.getElementById('ps-pos-badge').innerHTML=pbHtml(p);
   document.getElementById('ps-ctx').textContent=UI.currentTeam+' · '+UI.currentSeason;
+  // Avatar
+  const avEl=document.getElementById('ps-avatar-wrap');
+  if(avEl)avEl.innerHTML=renderPlayerAvatar(p,72);
+  // Photo remove button visibility
+  const photoDelBtn=document.getElementById('pe-photo-del');
+  if(photoDelBtn)photoDelBtn.style.display=p.photo?'':'none';
   const noteEl=document.getElementById('ps-note-display');
   if(noteEl){
     let info=[];
@@ -2102,6 +2425,13 @@ function openPlayerStats(pi){
     if(p.passnr)info.push('🎫 '+p.passnr);
     if(p.birthdate)info.push('🎂 '+new Date(p.birthdate).toLocaleDateString('de-DE'));
     if(p.foot)info.push('🦵 '+(p.foot==='right'?'Rechts':p.foot==='left'?'Links':'Beidfüßig'));
+    if(p.phone){
+      const tel=p.phone.replace(/[^\d+]/g,'');
+      info.push(`📞 <a href="tel:${tel}" style="color:var(--bl);text-decoration:none;" onclick="event.stopPropagation();">${p.phone}</a>`);
+    }
+    if(p.email){
+      info.push(`✉️ <a href="mailto:${p.email}" style="color:var(--bl);text-decoration:none;" onclick="event.stopPropagation();">${p.email}</a>`);
+    }
     if(info.length){noteEl.innerHTML=info.join(' &nbsp;·&nbsp; ');noteEl.style.display='block';}
     else{noteEl.style.display='none';}
   }
@@ -2118,6 +2448,8 @@ function openPlayerStats(pi){
     document.getElementById('pe-shortname').value=p.shortname||'';
     document.getElementById('pe-passnr').value=p.passnr||'';
     document.getElementById('pe-birthdate').value=p.birthdate||'';
+    document.getElementById('pe-phone').value=p.phone||'';
+    document.getElementById('pe-email').value=p.email||'';
     _currentFoot=p.foot||'right';
     setFoot(_currentFoot);
     document.getElementById('pe-name').value=p.name||'';
@@ -2161,13 +2493,6 @@ function openPlayerStats(pi){
 }
 
 let _currentFoot='right';
-function setFoot(v){
-  _currentFoot=v;
-  ['right','left','both'].forEach(f=>{
-    const el=document.getElementById('foot-'+f);
-    if(el)el.classList.toggle('sel',f===v);
-  });
-}
 function togglePlayerEdit(){
   const box=document.getElementById('ps-edit');
   const btn=document.getElementById('ps-edit-toggle');
@@ -2185,6 +2510,8 @@ function savePlayerEdit(){
   p.shortname=document.getElementById('pe-shortname').value.trim();
   p.passnr=document.getElementById('pe-passnr').value.trim();
   p.birthdate=document.getElementById('pe-birthdate').value;
+  p.phone=document.getElementById('pe-phone').value.trim();
+  p.email=document.getElementById('pe-email').value.trim();
   p.foot=_currentFoot;
   saveG();renderBody();renderTfoot();
   // Collapse edit section after save
@@ -2345,24 +2672,143 @@ function delCurrSess(){
 // ══════════════════════════════
 //  POSITION SELECT GRIDS
 // ══════════════════════════════
-function buildPosGrid(cid,cur,fn,allowNone=false,exclude=null){
-  const c=document.getElementById(cid);if(!c)return;
-  let html='';
-  if(allowNone)html+=`<div class="pos-opt${!cur?' sel':''}" onclick="${fn}('')" style="grid-column:1/-1;"><span style="font-size:.76rem;color:var(--gm);">– Keine zweite Position –</span></div>`;
-  POS.forEach(pos=>{
-    if(exclude&&pos===exclude)return;
-    html+=`<div class="pos-opt${cur===pos?' sel':''}" onclick="${fn}('${pos}')">
-      <span class="pb pb-${pos}">${pos}</span><span style="font-size:.74rem;">${POS_LBL[pos]}</span>
-    </div>`;
-  });
-  c.innerHTML=html;
+function buildFootSelect(targetId,cur){
+  const container=document.getElementById(targetId);if(!container)return;
+  const ddId=targetId+'__dd';
+  const opts=[
+    {val:'right',label:'Rechts'},
+    {val:'left',label:'Links'},
+    {val:'both',label:'Beidfüßig'}
+  ];
+  const curOpt=opts.find(o=>o.val===cur)||opts[0];
+  container.innerHTML=`<div class="pos-dd foot-dd" id="${ddId}">
+    <button type="button" class="pos-dd-btn" onclick="togglePosDD('${ddId}')"><span>${curOpt.label}</span></button>
+    <div class="pos-dd-list">${opts.map(o=>{
+      let cls='pos-dd-opt';
+      if(o.val===cur)cls+=' sel';
+      return `<div class="${cls}" onclick="event.stopPropagation();selectPosDD('${ddId}','${o.val}','setFoot')" data-val="${o.val}"><span>${o.label}</span></div>`;
+    }).join('')}</div>
+  </div>`;
 }
-function initAddPos(){selP1='8er';selP2='';buildPosGrid('add-pos1','8er','setAP1',false);buildPosGrid('add-pos2','','setAP2',true,selP1);}
-function setAP1(v){selP1=v;buildPosGrid('add-pos1',v,'setAP1',false);buildPosGrid('add-pos2',selP2!==v?selP2:'','setAP2',true,v);if(selP2===v)selP2='';}
-function setAP2(v){selP2=v;buildPosGrid('add-pos2',v,'setAP2',true,selP1);}
-function initEditPos(p1,p2){editP1=p1;editP2=p2;buildPosGrid('pe-pos1',p1,'setEP1',false);buildPosGrid('pe-pos2',p2!==p1?p2:'','setEP2',true,p1);}
-function setEP1(v){editP1=v;buildPosGrid('pe-pos1',v,'setEP1',false);buildPosGrid('pe-pos2',editP2!==v?editP2:'','setEP2',true,v);if(editP2===v)editP2='';}
-function setEP2(v){editP2=v;buildPosGrid('pe-pos2',v,'setEP2',true,editP1);}
+function setFoot(v){
+  _currentFoot=v;
+  buildFootSelect('pe-foot-sel',v);
+}
+
+function buildPosSelect(targetId,cur,allowNone=false,exclude=null,onChangeFn){
+  const container=document.getElementById(targetId);if(!container)return;
+  const ddId=targetId+'__dd';
+  // Build options list
+  const opts=[];
+  if(allowNone)opts.push({val:'',badge:null,label:'– Keine –'});
+  POS.forEach(pos=>{
+    const disabled=exclude&&pos===exclude;
+    opts.push({val:pos,badge:pos,label:POS_LBL[pos],disabled});
+  });
+  // Find current option label/badge
+  const curOpt=opts.find(o=>o.val===cur)||opts[0];
+  const renderBtn=o=>{
+    if(!o.badge)return `<span style="color:var(--gm);font-style:italic;">${o.label}</span>`;
+    return `<span class="pb pb-${o.badge}">${o.badge}</span><span style="font-size:.78rem;">${o.label}</span>`;
+  };
+  // Render container
+  container.innerHTML=`<div class="pos-dd" id="${ddId}">
+    <button type="button" class="pos-dd-btn" onclick="togglePosDD('${ddId}')">${renderBtn(curOpt)}</button>
+    <div class="pos-dd-list">${opts.map(o=>{
+      let cls='pos-dd-opt';
+      if(o.val===cur)cls+=' sel';
+      if(o.disabled)cls+=' disabled';
+      const handler=o.disabled?'':`onclick="event.stopPropagation();selectPosDD('${ddId}','${o.val}',${onChangeFn?'\''+onChangeFn+'\'':'null'})"`;
+      return `<div class="${cls}" ${handler} data-val="${o.val}">${renderBtn(o)}</div>`;
+    }).join('')}</div>
+  </div>`;
+}
+function togglePosDD(ddId){
+  // Close any other open dropdowns
+  document.querySelectorAll('.pos-dd.open').forEach(d=>{if(d.id!==ddId)d.classList.remove('open');});
+  const dd=document.getElementById(ddId);
+  if(dd)dd.classList.toggle('open');
+}
+function selectPosDD(ddId,val,fnName){
+  const dd=document.getElementById(ddId);
+  if(dd)dd.classList.remove('open');
+  if(fnName&&typeof window[fnName]==='function')window[fnName](val);
+}
+// Close dropdowns on outside click
+document.addEventListener('click',(e)=>{
+  if(!e.target.closest('.pos-dd')){
+    document.querySelectorAll('.pos-dd.open').forEach(d=>d.classList.remove('open'));
+  }
+});
+
+let _addFoot='right';
+let _addPhoto=null;
+function pickAddPlayerPhoto(){
+  pickPlayerPhoto((dataUrl)=>{
+    _addPhoto=dataUrl;
+    refreshAddAvatar();
+  });
+}
+function removeAddPlayerPhoto(){
+  _addPhoto=null;
+  refreshAddAvatar();
+}
+function refreshAddAvatar(){
+  const av=document.getElementById('add-avatar-wrap');
+  if(!av)return;
+  const fakeP={
+    name:document.getElementById('newName')?.value||'?',
+    photo:_addPhoto
+  };
+  av.innerHTML=renderPlayerAvatar(fakeP,64);
+  const delBtn=document.getElementById('add-photo-del');
+  if(delBtn)delBtn.style.display=_addPhoto?'':'none';
+}
+function setAddFoot(v){_addFoot=v;buildFootSelectAdd('add-foot-sel',v);}
+function buildFootSelectAdd(targetId,cur){
+  const container=document.getElementById(targetId);if(!container)return;
+  const ddId=targetId+'__dd';
+  const opts=[
+    {val:'right',label:'Rechts'},
+    {val:'left',label:'Links'},
+    {val:'both',label:'Beidfüßig'}
+  ];
+  const curOpt=opts.find(o=>o.val===cur)||opts[0];
+  container.innerHTML=`<div class="pos-dd" id="${ddId}">
+    <button type="button" class="pos-dd-btn" onclick="togglePosDD('${ddId}')"><span>${curOpt.label}</span></button>
+    <div class="pos-dd-list">${opts.map(o=>{
+      let cls='pos-dd-opt';
+      if(o.val===cur)cls+=' sel';
+      return `<div class="${cls}" onclick="event.stopPropagation();selectPosDD('${ddId}','${o.val}','setAddFoot')" data-val="${o.val}"><span>${o.label}</span></div>`;
+    }).join('')}</div>
+  </div>`;
+}
+
+function initAddPos(){
+  selP1='8er';selP2='';
+  buildPosSelect('add-pos1-sel','8er',false,null,'setAP1');
+  buildPosSelect('add-pos2-sel','',true,selP1,'setAP2');
+  // Reset all add form fields
+  _addFoot='right';
+  _addPhoto=null;
+  buildFootSelectAdd('add-foot-sel','right');
+  ['newNr','newName','newShortname','newPassnr','newBirthdate','newPhone','newEmail','newNote'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.value='';
+  });
+  // Live-update avatar initials when name is typed
+  const nameEl=document.getElementById('newName');
+  if(nameEl&&!nameEl._addAvatarBound){
+    nameEl.addEventListener('input',refreshAddAvatar);
+    nameEl._addAvatarBound=true;
+  }
+  refreshAddAvatar();
+}
+function setAP1(v){selP1=v;buildPosSelect('add-pos1-sel',v,false,null,'setAP1');buildPosSelect('add-pos2-sel',selP2!==v?selP2:'',true,v,'setAP2');if(selP2===v)selP2='';}
+function setAP2(v){selP2=v;buildPosSelect('add-pos2-sel',v,true,selP1,'setAP2');}
+function initEditPos(p1,p2){editP1=p1;editP2=p2;buildPosSelect('pe-pos1-sel',p1,false,null,'setEP1');buildPosSelect('pe-pos2-sel',p2!==p1?p2:'',true,p1,'setEP2');}
+function setEP1(v){editP1=v;buildPosSelect('pe-pos1-sel',v,false,null,'setEP1');buildPosSelect('pe-pos2-sel',editP2!==v?editP2:'',true,v,'setEP2');if(editP2===v)editP2='';}
+function setEP2(v){editP2=v;buildPosSelect('pe-pos2-sel',v,true,editP1,'setEP2');}
 
 // ══════════════════════════════
 // ── Custom calendar events ─────────────────────────────────
@@ -2449,12 +2895,12 @@ function openCalEvent(eventId,defaultDateK){
   document.getElementById('ceId').value=eventId||'';
   document.getElementById('ceDelBtn').style.display=eventId?'':'none';
   document.getElementById('ceEditTitle').textContent=eventId?'📌 Termin bearbeiten':'📌 Neuer Termin';
-  let date='',name='',note='',players=[];
+  let date='',name='',note='',time='',players=[];
   if(eventId){
     const ev=getCalEvents().find(e=>e.id===eventId);
     if(ev){
       date=ev.date?(typeof dispToISO==='function'?dispToISO(ev.date):''):'';
-      name=ev.name||'';note=ev.note||'';players=Array.isArray(ev.players)?ev.players.slice():[];
+      name=ev.name||'';note=ev.note||'';time=ev.time||'';players=Array.isArray(ev.players)?ev.players.slice():[];
     }
   } else if(defaultDateK){
     const y=Math.floor(defaultDateK/10000);
@@ -2463,6 +2909,7 @@ function openCalEvent(eventId,defaultDateK){
     date=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
   }
   document.getElementById('ceDate').value=date;
+  document.getElementById('ceTime').value=time;
   document.getElementById('ceName').value=name;
   document.getElementById('ceNote').value=note;
   // Init selection state
@@ -2477,6 +2924,7 @@ function openCalEvent(eventId,defaultDateK){
 function saveCalEvent(){
   const id=document.getElementById('ceId').value;
   const dateIso=document.getElementById('ceDate').value;
+  const time=document.getElementById('ceTime').value;
   const name=document.getElementById('ceName').value.trim();
   const note=document.getElementById('ceNote').value.trim();
   if(!dateIso){alert('Bitte ein Datum auswählen.');return;}
@@ -2494,9 +2942,9 @@ function saveCalEvent(){
   const list=getCalEvents();
   if(id){
     const ev=list.find(e=>e.id===id);
-    if(ev){ev.date=disp;ev.name=name;ev.note=note;ev.players=players;ev.updatedAt=Date.now();}
+    if(ev){ev.date=disp;ev.time=time;ev.name=name;ev.note=note;ev.players=players;ev.updatedAt=Date.now();}
   } else {
-    list.push({id:'cev_'+Date.now()+'_'+Math.floor(Math.random()*999),date:disp,name,note,players,createdAt:Date.now()});
+    list.push({id:'cev_'+Date.now()+'_'+Math.floor(Math.random()*999),date:disp,time,name,note,players,createdAt:Date.now()});
   }
   saveG();
   closeM('moCalEvent');
@@ -2521,7 +2969,12 @@ function viewCalEvent(eventId){
   if(!ev)return;
   _cevCurrent=eventId;
   document.getElementById('cevTitle').textContent='📌 '+(ev.name||'Termin');
-  document.getElementById('cevDate').textContent=ev.date||'';
+  const dateEl=document.getElementById('cevDate');
+  if(dateEl){
+    const dateStr=ev.date||'';
+    const timeStr=ev.time?` &nbsp;·&nbsp; 🕒 ${ev.time}`:'';
+    dateEl.innerHTML=dateStr+timeStr;
+  }
   // Note
   const noteWrap=document.getElementById('cevNoteWrap');
   const noteEl=document.getElementById('cevNote');
@@ -2697,8 +3150,9 @@ function renderCalendarMonth(y,m,monthNames,dowNames,sessByKey,eventsByKey,bdayB
     // Custom events
     const eList=eventsByKey[dateK]||[];
     eList.forEach(ev=>{
-      const tip=ev.name.replace(/"/g,'&quot;');
-      evts+=`<div class="cal-evt cal-evt-e" title="${tip}" onclick="event.stopPropagation();viewCalEvent('${ev.id}');">📌 ${ev.name}</div>`;
+      const time=ev.time?ev.time+' ':'';
+      const tip=(time+ev.name).replace(/"/g,'&quot;');
+      evts+=`<div class="cal-evt cal-evt-e" title="${tip}" onclick="event.stopPropagation();viewCalEvent('${ev.id}');">📌 ${time}${ev.name}</div>`;
     });
     const md=String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');
     const bList=bdayByMD[md]||[];
@@ -2787,8 +3241,9 @@ function renderMgrPlayers(){
   const D=cd();
   const sortedP=sortMgrPlayers(D.players||[]);
   // Add sort buttons to header
-  const sortHdr=`<div style="display:flex;gap:4px;padding:4px 10px;background:var(--bd);border-radius:7px 7px 0 0;">
+  const sortHdr=`<div style="display:flex;align-items:center;gap:7px;padding:4px 10px;background:var(--bd);border-radius:7px 7px 0 0;">
     <div style="width:26px;font-size:.65rem;font-weight:700;color:rgba(255,255,255,.6);cursor:pointer;" onclick="sortMgr('nr')">№${mgrSort.col==='nr'?(mgrSort.asc?'▲':'▼'):''}</div>
+    <div style="width:32px;flex-shrink:0;"></div>
     <div style="flex:1;font-size:.65rem;font-weight:700;color:rgba(255,255,255,.6);cursor:pointer;" onclick="sortMgr('name')">Spieler${mgrSort.col==='name'?(mgrSort.asc?'▲':'▼'):''}</div>
     <div style="min-width:82px;font-size:.65rem;font-weight:700;color:rgba(255,255,255,.6);cursor:pointer;" onclick="sortMgr('pos')">Pos.${mgrSort.col==='pos'?(mgrSort.asc?'▲':'▼'):''}</div>
     <div style="width:60px;"></div>
@@ -2796,6 +3251,7 @@ function renderMgrPlayers(){
   document.getElementById('tmgr-pl-list').innerHTML=(sortedP.length)?
     sortHdr+sortedP.map((p)=>{const i=D.players.indexOf(p);return`<div class="pl-row">
       <div class="pl-nr">${p.nr||''}</div>
+      <div style="flex-shrink:0;">${renderPlayerAvatar(p,32)}</div>
       <div class="pl-name" onclick="navPush({id:'moTeamMgr',tab:'spieler'});closeM('moTeamMgr');openPlayerStats(${i});">${p.name||''}</div>
       <div class="pl-pos">${pbHtml(p)}</div>
       <div class="pl-btns">
@@ -3096,8 +3552,30 @@ function addPlayer(){
   const nr=parseInt(document.getElementById('newNr').value)||cd().players.length+1;
   const name=document.getElementById('newName').value.trim();
   if(!name)return alert('Name eingeben.');
-  snap();ensureCd().players.push({nr,name,pos:selP1||'8er',pos2:selP2||'',s:new Array(cd().sessions.length).fill(3)});
-  saveG();render();closeM('moAddPlayer');document.getElementById('newNr').value='';document.getElementById('newName').value='';
+  const shortname=document.getElementById('newShortname').value.trim();
+  const passnr=document.getElementById('newPassnr').value.trim();
+  const birthdate=document.getElementById('newBirthdate').value;
+  const phone=document.getElementById('newPhone').value.trim();
+  const email=document.getElementById('newEmail').value.trim();
+  const note=document.getElementById('newNote').value.trim();
+  const foot=_addFoot||'right';
+  snap();
+  const newP={nr,name,pos:selP1||'8er',pos2:selP2||'',s:new Array(cd().sessions.length).fill(3)};
+  if(shortname)newP.shortname=shortname;
+  if(passnr)newP.passnr=passnr;
+  if(birthdate)newP.birthdate=birthdate;
+  if(phone)newP.phone=phone;
+  if(email)newP.email=email;
+  if(note)newP.note=note;
+  if(foot)newP.foot=foot;
+  if(_addPhoto)newP.photo=_addPhoto;
+  ensureCd().players.push(newP);
+  saveG();render();closeM('moAddPlayer');
+  // Clear form fields for next add
+  ['newNr','newName','newShortname','newPassnr','newBirthdate','newPhone','newEmail','newNote'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.value='';
+  });
 }
 function delPlayer(pi){const p=cd().players[pi];if(!p||!confirm(`"${p.name}" löschen?`))return;snap();cd().players.splice(pi,1);saveG();render();}
 function updNr(pi,v){snap();cd().players[pi].nr=parseInt(v)||pi+1;saveG();}
@@ -3650,10 +4128,20 @@ function lpRender(){
 
     let inner='';
     if(player){
-      const fullNm=lpFullName(player,11);
-      inner=`<text y="${-R+12}" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="8" fill="rgba(255,255,255,.38)" letter-spacing="1">${slot.lbl}</text>
-        <text y="3" text-anchor="middle" font-family="'Barlow',sans-serif" font-size="9.5" font-weight="700" fill="#fff">${fullNm}</text>
-        <text y="15" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="12" fill="#e8c840">${player.nr||'–'}</text>`;
+      const fullNm=lpFullName(player,12);
+      // Photo (clipped to circle) if available - inside the circle
+      const photoBlock=player.photo?
+        `<defs><clipPath id="lpc-${slot.id}"><circle r="${R-2}"/></clipPath></defs>
+         <image x="${-R+2}" y="${-R+2}" width="${(R-2)*2}" height="${(R-2)*2}" href="${player.photo}" clip-path="url(#lpc-${slot.id})" preserveAspectRatio="xMidYMid slice"/>`:
+        // Fallback: number in big letters in the middle of circle
+        `<text y="6" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="22" fill="#e8c840" letter-spacing="1">${player.nr||'–'}</text>`;
+      // Info BELOW circle: position label, name, number (if photo shown)
+      const infoBlock=player.photo?
+        `<text y="${R+11}" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="8" fill="rgba(255,255,255,.65)" letter-spacing="1">${slot.lbl}</text>
+         <text y="${R+22}" text-anchor="middle" font-family="'Barlow',sans-serif" font-size="9.5" font-weight="700" fill="#fff">#${player.nr||'–'} ${fullNm}</text>`:
+        `<text y="${R+11}" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="8" fill="rgba(255,255,255,.65)" letter-spacing="1">${slot.lbl}</text>
+         <text y="${R+22}" text-anchor="middle" font-family="'Barlow',sans-serif" font-size="9.5" font-weight="700" fill="#fff">${fullNm}</text>`;
+      inner=photoBlock+infoBlock;
     } else {
       inner=`<text y="-4" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="9" fill="rgba(255,255,255,.4)" letter-spacing="1">${slot.lbl}</text>
         <text y="10" text-anchor="middle" font-family="'Barlow',sans-serif" font-size="14" fill="rgba(255,255,255,.22)">+</text>`;
@@ -5211,8 +5699,16 @@ checkAutoBackup();
     <button class="btn bs" onclick="closeM('moCalEvent')">✕</button>
   </div>
   <input type="hidden" id="ceId"/>
-  <label style="font-size:.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gm);">Datum*</label>
-  <input type="date" id="ceDate" class="inp" style="margin:4px 0 12px;"/>
+  <div style="display:grid;grid-template-columns:2fr 1fr;gap:8px;margin:4px 0 12px;">
+    <div>
+      <label style="font-size:.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gm);">Datum*</label>
+      <input type="date" id="ceDate" class="inp" style="margin:4px 0 0;"/>
+    </div>
+    <div>
+      <label style="font-size:.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gm);">Uhrzeit</label>
+      <input type="time" id="ceTime" class="inp" style="margin:4px 0 0;"/>
+    </div>
+  </div>
   <label style="font-size:.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gm);">Name*</label>
   <input type="text" id="ceName" class="inp" placeholder="z.B. Mannschaftsabend, Turnier, Trainerbesprechung" style="margin:4px 0 12px;" maxlength="80"/>
   <label style="font-size:.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gm);">Kommentar (optional)</label>
@@ -5248,6 +5744,30 @@ checkAutoBackup();
   <div id="cevTeilnWrap" style="display:none;">
     <div style="font-size:.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gm);margin-bottom:6px;">Teilnehmer (<span id="cevTeilnCount">0</span>)</div>
     <div id="cevTeilnList" style="display:flex;flex-wrap:wrap;gap:5px;"></div>
+  </div>
+</div></div>
+
+<!-- Photo Cropper -->
+<div class="mo" id="moPhotoCrop" style="z-index:870;"><div class="mob" style="width:440px;max-width:95vw;">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+    <h3 style="flex:1;margin:0;color:var(--bd);">📷 Foto zuschneiden</h3>
+    <button class="btn bs" onclick="closeCropper()">✕</button>
+  </div>
+  <p class="note" style="margin:0 0 8px;font-size:.74rem;color:var(--gm);">Bild verschieben (ziehen) · Größe ändern (Slider oder Mausrad)</p>
+  <div class="crop-stage" id="cropStage"
+       onpointerdown="cropPointerDown(event)"
+       onwheel="cropWheel(event)">
+    <img class="crop-img" id="cropImg" alt=""/>
+    <svg class="crop-mask" id="cropMask" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+  </div>
+  <div class="crop-controls">
+    <span style="font-size:.72rem;color:var(--gm);">Zoom:</span>
+    <input type="range" id="cropZoom" min="0" max="100" step="0.5" value="0" oninput="cropSetZoom(this.value)"/>
+    <button class="btn bs" onclick="cropReset()" style="font-size:.72rem;">↺</button>
+  </div>
+  <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px;">
+    <button class="btn bs" onclick="closeCropper()">Abbrechen</button>
+    <button class="btn bp" onclick="cropApply()">✓ Übernehmen</button>
   </div>
 </div></div>
 
