@@ -695,6 +695,11 @@ select.slp-fmt-btn option:checked{background:var(--ac);color:#071e48;}
 .ma-sess .ma-sess-date{font-size:.86rem;font-weight:800;}
 .ma-sess .ma-sess-meta{font-size:.62rem;opacity:.85;text-transform:uppercase;letter-spacing:.5px;margin-top:2px;}
 .ma-list{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:8px;}
+.ma-list-wrap{flex:1;overflow:hidden;display:flex;flex-direction:column;position:relative;}
+.ma-ptr{position:absolute;top:-44px;left:0;right:0;height:44px;display:flex;align-items:center;justify-content:center;gap:8px;color:var(--bm);font-size:.78rem;font-weight:600;background:var(--ow);transition:transform .25s ease-out,opacity .15s;pointer-events:none;}
+.ma-ptr.ready{color:var(--cp);}
+.ma-ptr.loading #maPtrIcon{animation:maSpin 1s linear infinite;display:inline-block;}
+@keyframes maSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 .ma-card{background:#fff;border-radius:11px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px;box-shadow:0 1px 3px rgba(0,0,0,.08);border:1.5px solid transparent;transition:border-color .12s;}
 .ma-card.confirmed{border-color:rgba(39,174,96,.3);}
 .ma-card-info{flex:1;min-width:0;cursor:pointer;}
@@ -714,6 +719,25 @@ select.slp-fmt-btn option:checked{background:var(--ac);color:#071e48;}
 .ma-btn.ma-4{background:#f39c12;}
 .ma-btn.ma-4.dim{background:#f9e6c8;color:#c8a060;}
 .ma-empty{text-align:center;padding:40px 20px;color:var(--gm);font-size:.8rem;}
+
+/* Mobile calendar list view */
+.cal-section-mob{padding:12px 14px 6px;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1.5px;color:var(--bd);position:sticky;top:0;background:#fff;z-index:2;border-bottom:2px solid var(--ac);}
+.cal-section-mob.cal-section-past{color:var(--gm);border-color:var(--gl);margin-top:14px;}
+.cal-mo-hdr-mob{padding:8px 14px 4px;font-size:.74rem;font-weight:700;color:var(--gm);text-transform:uppercase;letter-spacing:1px;}
+.cal-evt-mob{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--gl);cursor:pointer;transition:background .12s;background:#fff;}
+.cal-evt-mob:hover,.cal-evt-mob:active{background:var(--ow);}
+.cal-evt-mob.today{background:rgba(232,200,64,.12);border-left:3px solid var(--ac);}
+.cal-evt-mob-date{flex-shrink:0;width:42px;text-align:center;}
+.cal-evt-mob-day{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;line-height:1;color:var(--bd);}
+.cal-evt-mob-dow{font-size:.6rem;text-transform:uppercase;color:var(--gm);font-weight:700;letter-spacing:.5px;}
+.cal-evt-mob-icon{font-size:1.1rem;flex-shrink:0;}
+.cal-evt-mob-content{flex:1;min-width:0;}
+.cal-evt-mob-title{font-size:.86rem;font-weight:600;color:var(--gd);line-height:1.2;}
+.cal-evt-mob-sub{font-size:.7rem;color:var(--gm);margin-top:2px;}
+.cal-evt-mob-match .cal-evt-mob-day{color:#cc6500;}
+.cal-evt-mob-event .cal-evt-mob-day{color:#1a8758;}
+.cal-evt-mob-birthday .cal-evt-mob-day{color:#7a2db8;}
+.cal-empty-mob{text-align:center;padding:60px 20px;color:var(--gm);font-size:.86rem;}
 
 /* Mobile mode toggle visibility */
 @media (max-width:767px){
@@ -767,8 +791,22 @@ select.slp-fmt-btn option:checked{background:var(--ac);color:#071e48;}
   .cal-day-num{font-size:.62rem !important;}
   .cal-evt{font-size:.5rem !important;padding:1px 2px !important;line-height:1.1;}
   .cal-month-hdr{font-size:.95rem !important;padding:5px 8px !important;}
+  /* Hide month navigation on mobile - list view shows entire season */
+  .cal-nav{display:none !important;}
+  /* Calendar modal: full screen, cleaner padding */
+  #moCalendar .mob{padding:10px 0 0 !important;}
+  #moCalendar .mob h3{padding:0 14px;}
+  #cal-content{padding:0 !important;}
   /* Lineup planner — adapt overlay padding */
   .lp-overlay,.slp-overlay{padding:8px !important;}
+  /* Lineup planner: stack vertically, compress sub panel */
+  .lp-content,.slp-content{flex-direction:column !important;}
+  .lp-pitch-col,.slp-pitch-col{padding:8px 4px !important;width:100% !important;flex:0 1 auto !important;}
+  .lp-pitch-svg,.slp-pitch-svg{max-height:50vh !important;width:100% !important;height:auto !important;}
+  .lp-subs-col,.slp-subs-col{flex:0 0 auto !important;width:100% !important;max-width:100% !important;border-left:none !important;border-top:1px solid rgba(255,255,255,.15);padding:8px !important;}
+  .lp-roster-col,.slp-roster-col{display:none !important;}
+  .lp-topbar,.slp-topbar{flex-wrap:wrap;gap:6px !important;padding:6px 8px !important;}
+  .lp-topbar .btn,.slp-topbar .btn{font-size:.72rem !important;padding:5px 10px !important;}
   /* Avoid hover-only states on touch */
   .photo-edit-wrap::after{opacity:1 !important;}
 }
@@ -776,6 +814,48 @@ select.slp-fmt-btn option:checked{background:var(--ac);color:#071e48;}
 @supports(padding:max(0px)){
   body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);}
   .header{padding-top:max(8px,env(safe-area-inset-top));}
+}
+
+/* ════════════════════════════════════════
+   GUEST MODE — read-only, hide private data
+   ════════════════════════════════════════ */
+body.guest-mode #notifWrap{display:none !important;}
+body.guest-mode #btn-addSeas,
+body.guest-mode #btn-delSeas,
+body.guest-mode .toolbar .btn[onclick*="openSlpFloating"],
+body.guest-mode #pickTeamBtn,
+body.guest-mode #ud-admin{display:none !important;}
+/* Hide message system entries in notification panel via JS */
+body.guest-mode .notif-compose{display:none !important;}
+/* Hide trainer chips */
+body.guest-mode #hTrainersWrap{display:none !important;}
+/* Manager modal buttons */
+body.guest-mode #btn-mgr-addpl,
+body.guest-mode .pl-edit-btn,
+body.guest-mode .lp-fab,
+body.guest-mode .slp-fab,
+body.guest-mode .lp-floating-btn,
+body.guest-mode .next-btn{display:none !important;}
+/* Edit icons next to player photos */
+body.guest-mode .photo-edit-wrap::after{display:none !important;}
+body.guest-mode .photo-edit-wrap{cursor:default !important;}
+/* Logo not editable */
+body.guest-mode .logo-ring{cursor:default !important;}
+body.guest-mode .logo-ring.editable::after{display:none !important;}
+/* Banner indicating guest mode */
+body.guest-mode::before{
+  content:'🔗 Gast-Modus · Nur-Lese-Zugriff';
+  position:fixed;top:0;left:0;right:0;
+  background:linear-gradient(90deg,var(--ac),#f5d060);
+  color:var(--bd);
+  text-align:center;padding:3px 14px;
+  font-size:.66rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;
+  z-index:99998;
+  box-shadow:0 2px 8px rgba(0,0,0,.2);
+}
+body.guest-mode{padding-top:24px;}
+@media (max-width:767px){
+  body.guest-mode{padding-top:22px;}
 }
 
 </style>
@@ -895,7 +975,10 @@ select.slp-fmt-btn option:checked{background:var(--ac);color:#071e48;}
 <!-- Mobile attendance view (replaces table on narrow screens) -->
 <div id="mobileAttView" class="mobile-att-view" style="display:none;">
   <div class="ma-sess-bar" id="maSessBar"></div>
-  <div class="ma-list" id="maList"></div>
+  <div class="ma-list-wrap" id="maListWrap">
+    <div class="ma-ptr" id="maPtr"><span id="maPtrIcon">↓</span> <span id="maPtrText">Zum Aktualisieren ziehen</span></div>
+    <div class="ma-list" id="maList"></div>
+  </div>
 </div>
 
 <div class="footer">
@@ -1263,6 +1346,7 @@ select.slp-fmt-btn option:checked{background:var(--ac);color:#071e48;}
   <div class="tbar">
     <button class="tbtn active" onclick="switchAdminTab('trainers')">🎽 Trainer</button>
     <button class="tbtn" onclick="switchAdminTab('teams')">👥 Teams</button>
+    <button class="tbtn" onclick="switchAdminTab('guest')">🔗 Gast-Zugriff</button>
     <button class="tbtn" onclick="switchAdminTab('data')">💾 Daten</button>
     <button class="tbtn" onclick="switchAdminTab('firebase')">🌐 Online-Sync</button>
   </div>
@@ -1288,6 +1372,10 @@ select.slp-fmt-btn option:checked{background:var(--ac);color:#071e48;}
     <div class="mob-btns" style="margin-top:10px;">
       <button class="btn bs" onclick="closeM('moAdmin')">Schließen</button>
     </div>
+  </div>
+  <div class="tpanel" id="atab-guest">
+    <p class="note" style="margin-bottom:10px;">Erstelle Links zum Teilen mit Eltern und Spielern. Diese sehen nur Termine, Spielerliste, Anwesenheitsstatistik und Geburtstage – ohne Bearbeitungsrechte und ohne Kontaktdaten.</p>
+    <div id="admin-guest-list"></div>
   </div>
   <div class="tpanel" id="atab-data">
     <div style="background:rgba(231,76,60,.06);border:1px solid rgba(231,76,60,.15);border-radius:9px;padding:12px;margin-bottom:10px;">
@@ -1668,6 +1756,8 @@ function startFbListener(){
         render();
       }
       setFbStatus('connected');
+      // Trigger system push for new notifications received via sync
+      if(typeof pushAfterSync==='function')pushAfterSync();
     } else if(!data){
       _fbSaving=true;
       fbRef.set(fbEncode(G))
@@ -1812,6 +1902,8 @@ function initAuth(){
     _fbInitialLoaded=true;
   }
   loadG();
+  // Guest URL check (?guest=<token>) — bypass normal auth if valid
+  if(typeof tryGuestUrlAuth==='function'&&tryGuestUrlAuth())return;
   // localStorage = persistent (remember me), sessionStorage = tab-only (survives F5 but not new tab)
   // We use a page-reload flag to detect actual reload vs tab restore
   const reloaded=sessionStorage.getItem('fcf_reloaded');
@@ -1910,6 +2002,11 @@ function confirmLogout(){
   closeUserMenu();
   if(!confirm('Wirklich abmelden?'))return;
   localStorage.removeItem(AUTH_SK);sessionStorage.removeItem(AUTH_SK);
+  // Guest mode: redirect to clean URL (without ?guest=)
+  if(CU&&CU.role==='guest'){
+    location.href=location.pathname;
+    return;
+  }
   CU=null;
   document.getElementById('authInput').value='';
   document.getElementById('authErr').textContent='';
@@ -1999,12 +2096,13 @@ function renderUserPill(){
   if(!CU){p.style.display='none';return;}
   p.style.display='flex';
   if(CU.role==='admin'){ri.textContent='🛡';un.textContent='Admin';p.classList.remove('view-pill');}
+  else if(CU.role==='guest'){ri.textContent='🔗';un.textContent='Gast';p.classList.add('view-pill');}
   else if(CU.role==='viewer'){ri.textContent='👁';un.textContent='Nur ansehen';p.classList.add('view-pill');}
   else{ri.textContent='👕';un.textContent=CU.name;p.classList.remove('view-pill');}
 }
 
 function applyRoleUI(){
-  const edit=canEdit(),admin=isAdmin();
+  const edit=canEdit(),admin=isAdmin(),guest=isGuest();
   ['btn-addSess','btn-addMatch','btn-mgr-addpl'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=edit?'':'none';});
   ['btn-addSeas','btn-delSeas','btn-plan'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=admin?'':'none';});
   const ba=document.getElementById('ud-admin');if(ba)ba.style.display=admin?'':'none';
@@ -2012,6 +2110,8 @@ function applyRoleUI(){
   const ta=document.getElementById('mgr-tr-add');if(ta)ta.style.display=admin?'block':'none';
   // Focus add for editors
   const fa=document.getElementById('foc-add-row');if(fa)fa.style.display=edit?'flex':'none';
+  // Guest mode: hide UI elements not relevant to guests
+  document.body.classList.toggle('guest-mode',guest);
 }
 
 // ══════════════════════════════
@@ -3099,7 +3199,7 @@ document.addEventListener('click',(e)=>{
 });
 
 // ── Appearance settings ──
-const APPEARANCE_DEFAULTS={theme:'light',fontScale:1,animations:true,compact:false,notifVisible:true,palette:'',customColor:''};
+const APPEARANCE_DEFAULTS={theme:'light',fontScale:1,animations:true,compact:false,notifVisible:true,palette:'',customColor:'',pushEnabled:false};
 const PALETTE_LIST=['','green','red','purple','orange','teal','burgundy','graphite'];
 
 // HSL helpers for custom color derivation
@@ -3206,6 +3306,12 @@ function setAppFontScale(v){const s=getAppearance();s.fontScale=v;saveAppearance
 function setAppAnimations(v){const s=getAppearance();s.animations=v;saveAppearance(s);applyAppearance();}
 function setAppCompact(v){const s=getAppearance();s.compact=v;saveAppearance(s);applyAppearance();}
 function setAppNotifVisible(v){const s=getAppearance();s.notifVisible=v;saveAppearance(s);applyAppearance();}
+async function onPushToggle(el){
+  const checked=el.checked;
+  await setAppPushEnabled(checked);
+  // Re-sync UI in case permission was denied
+  updateAppearanceUI();
+}
 function setAppPalette(v){const s=getAppearance();s.palette=v||'';s.customColor='';saveAppearance(s);applyAppearance();updateAppearanceUI();}
 function setAppCustomColor(hex){
   const s=getAppearance();
@@ -3243,6 +3349,26 @@ function updateAppearanceUI(){
   // Saisonkader-Button & Vergangene ausblenden — mirror current colState
   const sb=document.getElementById('setSlpBtn');if(sb)sb.checked=!!(typeof colState!=='undefined'&&colState.slpBtn!==false);
   const hp=document.getElementById('setHidePast');if(hp)hp.checked=!!(typeof colState!=='undefined'&&colState.hidePast);
+  // Push notifications: reflect both setting and OS-level permission
+  const pe=document.getElementById('setPushEnabled');
+  const psub=document.getElementById('pushSubLabel');
+  if(pe&&psub){
+    if(!pushSupported()){
+      pe.checked=false;pe.disabled=true;
+      psub.textContent='⚠️ Wird in diesem Browser nicht unterstützt';
+    } else {
+      const perm=pushPermission();
+      pe.disabled=false;
+      pe.checked=s.pushEnabled===true&&perm==='granted';
+      if(perm==='denied'){
+        psub.textContent='⚠️ In Browser-Einstellungen blockiert';
+      } else if(perm==='granted'&&s.pushEnabled){
+        psub.textContent='✓ Aktiv für Nachrichten und Geburtstage';
+      } else {
+        psub.textContent='System-Benachrichtigungen für Nachrichten und Geburtstage';
+      }
+    }
+  }
   // Palette swatches: active state
   document.querySelectorAll('.palette-swatch').forEach(b=>{
     b.classList.toggle('active',!s.customColor&&(b.dataset.palette||'')===(s.palette||''));
@@ -3325,20 +3451,16 @@ function renderMobileAtt(){
     const fullnm=p.name||nm;
     const pos=(p.pos||'').toUpperCase();
     const showName=fullnm!==nm?`${nm} <span style="color:var(--gm);font-weight:400;font-size:.78rem;">(${fullnm.split(' ').slice(-1)[0]})</span>`:nm;
-    // Buttons: 1=present, 2=absent, 3=pending, 4=excused
-    const cycleVal=v=>{
-      // For past sessions skip "?" (status 3)
-      if(past&&v===3)return false;
-      return true;
-    };
-    const btns=[
+    // Status codes: 1=Anwesend, 0=Fehlend, 2=Entschuldigt, 3=Ausstehend
+    // For past sessions, "?" (3) is hidden
+    const btnDefs=[
       {v:1,sym:'✓',cls:'ma-1'},
-      {v:2,sym:'✗',cls:'ma-2'},
-      {v:4,sym:'E',cls:'ma-4'},
+      {v:0,sym:'✗',cls:'ma-2'},
+      {v:2,sym:'E',cls:'ma-4'},
       {v:3,sym:'?',cls:'ma-3'}
-    ].filter(b=>cycleVal(b.v));
+    ].filter(b=>!(past&&b.v===3));
     let btnsHtml='';
-    btns.forEach(b=>{
+    btnDefs.forEach(b=>{
       const active=status===b.v;
       const dim=editable?(active?'':'dim'):'dim';
       const handler=editable?`onclick="maSetStatus(${pi},${si},${b.v})"`:'';
@@ -3370,6 +3492,373 @@ window.addEventListener('resize',()=>{
   if(typeof renderMobileAtt==='function')renderMobileAtt();
 });
 
+// ── Pull-to-refresh on mobile attendance list ──
+let _maPtrStart=0,_maPtrPulling=false,_maPtrLoading=false;
+const PTR_THRESHOLD=72;
+function maInitPullToRefresh(){
+  const list=document.getElementById('maList');
+  const ptr=document.getElementById('maPtr');
+  if(!list||!ptr||list._ptrInit)return;
+  list._ptrInit=true;
+  list.addEventListener('touchstart',e=>{
+    if(_maPtrLoading)return;
+    if(list.scrollTop<=0){
+      _maPtrStart=e.touches[0].clientY;
+      _maPtrPulling=false;
+    } else {
+      _maPtrStart=0;
+    }
+  },{passive:true});
+  list.addEventListener('touchmove',e=>{
+    if(!_maPtrStart||_maPtrLoading)return;
+    const dy=e.touches[0].clientY-_maPtrStart;
+    if(dy>0&&list.scrollTop<=0){
+      _maPtrPulling=true;
+      const pull=Math.min(dy*.55,90);
+      ptr.style.transform=`translateY(${pull}px)`;
+      ptr.style.opacity='1';
+      if(pull>=PTR_THRESHOLD){
+        ptr.classList.add('ready');
+        document.getElementById('maPtrText').textContent='Loslassen zum Aktualisieren';
+        document.getElementById('maPtrIcon').textContent='↑';
+      } else {
+        ptr.classList.remove('ready');
+        document.getElementById('maPtrText').textContent='Zum Aktualisieren ziehen';
+        document.getElementById('maPtrIcon').textContent='↓';
+      }
+    }
+  },{passive:true});
+  list.addEventListener('touchend',()=>{
+    if(!_maPtrPulling||_maPtrLoading)return;
+    const tr=ptr.style.transform;
+    const m=tr.match(/translateY\((\d+)/);
+    const pull=m?parseInt(m[1]):0;
+    if(pull>=PTR_THRESHOLD){
+      // Trigger reload
+      _maPtrLoading=true;
+      ptr.classList.add('loading');
+      ptr.style.transform='translateY(44px)';
+      document.getElementById('maPtrText').textContent='Aktualisiere...';
+      document.getElementById('maPtrIcon').textContent='⟳';
+      // Use existing manualSyncLoad if Firebase connected, otherwise just re-render
+      const finishPtr=()=>{
+        _maPtrLoading=false;
+        _maPtrPulling=false;
+        ptr.style.transform='translateY(0)';
+        ptr.style.opacity='0';
+        ptr.classList.remove('loading','ready');
+      };
+      if(typeof manualSyncLoad==='function'&&navigator.onLine){
+        try{manualSyncLoad();}catch(e){}
+        setTimeout(finishPtr,1200);
+      } else {
+        if(typeof render==='function')render();
+        setTimeout(finishPtr,500);
+      }
+    } else {
+      ptr.style.transform='translateY(0)';
+      ptr.style.opacity='0';
+      _maPtrPulling=false;
+    }
+  },{passive:true});
+}
+// Init pull-to-refresh once DOM is ready
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',maInitPullToRefresh);
+else maInitPullToRefresh();
+
+// ── PUSH NOTIFICATIONS (System-level) ────────────────────────
+// Uses Notification API. Works while app is open or PWA installed.
+// Tracks shown IDs separately from "seen" to avoid re-notifying for old items.
+
+function pushSupported(){return 'Notification' in window;}
+function pushPermission(){return pushSupported()?Notification.permission:'unsupported';}
+function pushIsEnabled(){
+  // Combined: user toggle ON in appearance + browser permission GRANTED
+  const s=getAppearance();
+  return s.pushEnabled===true && pushPermission()==='granted';
+}
+async function requestPushPermission(){
+  if(!pushSupported())return 'unsupported';
+  if(Notification.permission==='granted')return 'granted';
+  if(Notification.permission==='denied')return 'denied';
+  try{
+    const result=await Notification.requestPermission();
+    return result;
+  }catch(e){return 'denied';}
+}
+async function setAppPushEnabled(checked){
+  const s=getAppearance();
+  if(checked){
+    const perm=await requestPushPermission();
+    if(perm!=='granted'){
+      s.pushEnabled=false;
+      saveAppearance(s);
+      updateAppearanceUI();
+      if(perm==='denied')alert('Benachrichtigungen sind in deinem Browser blockiert. Bitte erlaube sie in den Browsereinstellungen.');
+      else if(perm==='unsupported')alert('Dein Browser unterstützt keine System-Benachrichtigungen.');
+      return;
+    }
+  }
+  s.pushEnabled=checked;
+  saveAppearance(s);
+  // When enabling, run an initial check so user sees something soon
+  if(checked&&typeof checkAndPushNew==='function'){
+    setTimeout(()=>checkAndPushNew({skipExisting:true}),300);
+  }
+}
+
+// Track which IDs have been pushed already (per device)
+function getPushedIds(){
+  try{
+    const raw=localStorage.getItem('pushedIds');
+    if(raw)return new Set(JSON.parse(raw));
+  }catch(e){}
+  return new Set();
+}
+function setPushedIds(set){
+  try{
+    // Cap at 200 most recent to prevent unbounded growth
+    const arr=Array.from(set).slice(-200);
+    localStorage.setItem('pushedIds',JSON.stringify(arr));
+  }catch(e){}
+}
+
+function showSystemNotif(title,body,opts){
+  if(!pushIsEnabled())return null;
+  if(document.visibilityState==='visible'&&!opts?.alsoWhenVisible)return null; // Don't disturb when actively viewing
+  try{
+    const n=new Notification(title,{
+      body:body||'',
+      icon:opts?.icon,
+      tag:opts?.tag||'fcf-'+Date.now(),
+      badge:opts?.icon,
+      silent:false,
+      requireInteraction:false
+    });
+    n.onclick=()=>{
+      window.focus();
+      if(opts?.onClick)try{opts.onClick();}catch(e){}
+      n.close();
+    };
+    // Auto-close after 8 seconds (some platforms ignore this)
+    setTimeout(()=>{try{n.close();}catch(e){}},8000);
+    return n;
+  }catch(e){console.warn('Notification failed:',e);return null;}
+}
+
+// Compute unseen-and-not-yet-pushed notifications and trigger system push
+function checkAndPushNew(opts){
+  if(!pushIsEnabled())return;
+  if(typeof computeNotifications!=='function')return;
+  const list=computeNotifications();
+  const pushed=getPushedIds();
+  const seen=getSeenNotifs();
+  const dismissed=getDismissedNotifs();
+  let newPushedIds=null;
+  list.forEach(n=>{
+    if(pushed.has(n.id))return;
+    if(seen.has(n.id))return; // already seen in-app
+    if(dismissed.has(n.id))return;
+    // First-time setup: don't blast user with backlog
+    if(opts?.skipExisting){
+      if(!newPushedIds)newPushedIds=pushed;
+      newPushedIds.add(n.id);
+      return;
+    }
+    // Show system notification
+    const title=n.title||'Benachrichtigung';
+    const body=n.sub||'';
+    showSystemNotif(title,body,{
+      tag:n.id,
+      icon:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgcng9IjMyIiBmaWxsPSIjMGQzYjdjIi8+PHRleHQgeD0iOTYiIHk9IjEyMCIgZm9udC1zaXplPSI3NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2U4Yzg0MCIgZm9udC1mYW1pbHk9IkFyaWFsIEJsYWNrLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI5MDAiPkZDPC90ZXh0Pjwvc3ZnPg==',
+      onClick:()=>{
+        if(typeof onNotifClick==='function')onNotifClick(n.id,n.action||'');
+      }
+    });
+    if(!newPushedIds)newPushedIds=pushed;
+    newPushedIds.add(n.id);
+  });
+  if(newPushedIds)setPushedIds(newPushedIds);
+}
+
+// Hook: run check after each Firebase data sync
+function pushAfterSync(){
+  // Small delay to let G stabilize
+  setTimeout(()=>{
+    try{checkAndPushNew();}catch(e){console.warn(e);}
+  },400);
+}
+
+// Periodic check while app is open (safety net for time-based items like weekly schedule on Monday)
+setInterval(()=>{
+  if(pushIsEnabled())checkAndPushNew();
+},5*60*1000); // every 5 minutes
+
+// ── GUEST ACCESS ────────────────────────────────────────────
+// Token-based read-only access for parents/players.
+// Storage: G.guestAccess[<team>] = {token, enabled, createdAt, createdBy}
+// URL pattern: ?guest=<token>
+
+function generateGuestToken(){
+  // 24-char random hex from secure crypto
+  const arr=new Uint8Array(12);
+  if(window.crypto&&window.crypto.getRandomValues)window.crypto.getRandomValues(arr);
+  else for(let i=0;i<arr.length;i++)arr[i]=Math.floor(Math.random()*256);
+  return Array.from(arr).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function ensureGuestAccessStruct(){
+  if(!G.guestAccess||typeof G.guestAccess!=='object')G.guestAccess={};
+}
+function getGuestAccessForTeam(team){
+  ensureGuestAccessStruct();
+  return G.guestAccess[team]||null;
+}
+function findTeamByGuestToken(token){
+  if(!token||!G||!G.guestAccess)return null;
+  for(const team of Object.keys(G.guestAccess)){
+    const ga=G.guestAccess[team];
+    if(ga&&ga.enabled&&ga.token===token)return team;
+  }
+  return null;
+}
+function buildGuestLink(token){
+  const base=location.origin+location.pathname;
+  return base+'?guest='+token;
+}
+function regenerateGuestLink(team){
+  if(!isAdmin())return;
+  ensureGuestAccessStruct();
+  const old=G.guestAccess[team];
+  if(old&&old.token){
+    if(!confirm('Den bestehenden Link für '+team+' ungültig machen und einen neuen erzeugen?'))return;
+  }
+  snap();
+  G.guestAccess[team]={
+    token:generateGuestToken(),
+    enabled:true,
+    createdAt:Date.now(),
+    createdBy:(CU&&CU.name)||'Admin'
+  };
+  saveG();
+  renderAdminGuestList();
+}
+function toggleGuestLinkEnabled(team){
+  if(!isAdmin())return;
+  ensureGuestAccessStruct();
+  const ga=G.guestAccess[team];
+  if(!ga)return;
+  snap();
+  ga.enabled=!ga.enabled;
+  saveG();
+  renderAdminGuestList();
+}
+function deleteGuestLink(team){
+  if(!isAdmin())return;
+  if(!confirm('Den Gast-Link für '+team+' endgültig entfernen?'))return;
+  ensureGuestAccessStruct();
+  if(!G.guestAccess[team])return;
+  snap();
+  delete G.guestAccess[team];
+  saveG();
+  renderAdminGuestList();
+}
+function copyGuestLink(token){
+  const url=buildGuestLink(token);
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(
+      ()=>{if(typeof showSaveFlash==='function')showSaveFlash('🔗 Link kopiert');},
+      ()=>{prompt('Link kopieren:',url);}
+    );
+  } else {
+    prompt('Link kopieren:',url);
+  }
+}
+function renderAdminGuestList(){
+  const el=document.getElementById('admin-guest-list');
+  if(!el)return;
+  ensureGuestAccessStruct();
+  const teams=Array.isArray(G.teamList)?G.teamList:[];
+  if(!teams.length){
+    el.innerHTML='<p class="note">Keine Mannschaften vorhanden.</p>';
+    return;
+  }
+  let html='';
+  teams.forEach(team=>{
+    const ga=G.guestAccess[team];
+    const has=ga&&ga.token;
+    const enabled=has&&ga.enabled!==false;
+    const link=has?buildGuestLink(ga.token):'';
+    html+=`<div style="border:1px solid var(--gl);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:${enabled?'rgba(39,174,96,.04)':'#fff'};">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <span style="font-weight:700;color:var(--bd);font-size:.95rem;">${team}</span>
+        ${enabled?'<span style="font-size:.66rem;background:var(--cp);color:#fff;padding:2px 7px;border-radius:4px;font-weight:700;">AKTIV</span>':(has?'<span style="font-size:.66rem;background:var(--gm);color:#fff;padding:2px 7px;border-radius:4px;">DEAKTIVIERT</span>':'')}
+        <span style="flex:1;"></span>
+        ${has?`<button class="btn bs" style="font-size:.7rem;padding:3px 8px;" onclick="toggleGuestLinkEnabled('${team}')">${enabled?'❌ Deaktivieren':'✓ Aktivieren'}</button>`:''}
+      </div>
+      ${has?`<div style="background:#f7f9fc;border-radius:5px;padding:6px 8px;font-family:monospace;font-size:.7rem;color:var(--gd);word-break:break-all;margin-bottom:6px;border:1px solid var(--gl);">${link}</div>`:''}
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        ${has?`<button class="btn bp" style="font-size:.72rem;padding:4px 10px;" onclick="copyGuestLink('${ga.token}')">📋 Link kopieren</button>`:''}
+        <button class="btn bs" style="font-size:.72rem;padding:4px 10px;" onclick="regenerateGuestLink('${team}')">${has?'🔄 Neu erzeugen':'＋ Link erstellen'}</button>
+        ${has?`<button class="btn bd" style="font-size:.72rem;padding:4px 10px;" onclick="deleteGuestLink('${team}')">🗑 Entfernen</button>`:''}
+      </div>
+    </div>`;
+  });
+  el.innerHTML=html;
+}
+
+function isGuest(){return CU&&CU.role==='guest';}
+
+function tryGuestUrlAuth(){
+  const params=new URLSearchParams(location.search);
+  const token=params.get('guest');
+  if(!token)return false;
+  const overlay=document.getElementById('authOverlay');
+  if(overlay){
+    overlay.innerHTML='<div class="auth-box"><div style="text-align:center;padding:34px 16px;color:#fff;"><div style="font-size:1.4rem;margin-bottom:12px;">⏳</div><div style="font-size:1rem;margin-bottom:6px;font-weight:600;">Verbinde...</div><div style="opacity:.7;font-size:.82rem;">Gast-Zugriff wird geprüft</div></div></div>';
+    overlay.classList.add('open');
+  }
+  let attempts=0;
+  const tryFinalize=()=>{
+    attempts++;
+    // Wait until Firebase initial load completed (or no FB) - then G is up to date
+    if(_fbInitialLoaded||attempts>50){
+      const team=findTeamByGuestToken(token);
+      if(team){
+        // Valid token → enter guest mode
+        CU={role:'guest',name:'Gast',teams:[team]};
+        UI.currentTeam=team;
+        if(Array.isArray(G.seasonList)&&G.seasonList.length){
+          const latest=G.seasonList[G.seasonList.length-1];
+          UI.currentSeason=latest;
+        }
+        try{
+          localStorage.setItem('fcf_currentTeam',team);
+          if(UI.currentSeason)localStorage.setItem('fcf_currentSeason',UI.currentSeason);
+        }catch(e){}
+        if(overlay){
+          overlay.classList.remove('open');
+          overlay.innerHTML='';
+        }
+        showApp();
+      } else {
+        // Invalid → error screen
+        if(overlay){
+          overlay.innerHTML=`<div class="auth-box"><div style="text-align:center;padding:34px 18px;color:#fff;">
+            <div style="font-size:2rem;margin-bottom:14px;">⚠️</div>
+            <div style="font-size:1.05rem;margin-bottom:6px;font-weight:600;">Ungültiger Gast-Link</div>
+            <div style="opacity:.75;font-size:.78rem;line-height:1.5;margin-bottom:16px;">Dieser Link wurde deaktiviert oder ist nicht mehr gültig. Bitte frage den Trainer nach einem neuen Link.</div>
+            <a href="${location.pathname}" style="display:inline-block;color:var(--ac);text-decoration:underline;font-size:.85rem;font-weight:600;">Zur Anmeldung →</a>
+          </div></div>`;
+        }
+      }
+      return;
+    }
+    setTimeout(tryFinalize,200);
+  };
+  tryFinalize();
+  return true;
+}
+
 function applyClubLogo(){
   const customLogo=(G&&G.clubLogo)||null;
   const src=customLogo||('data:image/jpeg;base64,'+LB64);
@@ -3399,15 +3888,15 @@ function openPlayerStats(pi){
   const noteEl=document.getElementById('ps-note-display');
   if(noteEl){
     let info=[];
-    if(p.note)info.push('📝 '+p.note);
+    if(p.note&&!isGuest())info.push('📝 '+p.note);
     if(p.passnr)info.push('🎫 '+p.passnr);
     if(p.birthdate)info.push('🎂 '+new Date(p.birthdate).toLocaleDateString('de-DE'));
     if(p.foot)info.push('🦵 '+(p.foot==='right'?'Rechts':p.foot==='left'?'Links':'Beidfüßig'));
-    if(p.phone){
+    if(p.phone&&!isGuest()){
       const tel=p.phone.replace(/[^\d+]/g,'');
       info.push(`📞 <a href="tel:${tel}" style="color:var(--bl);text-decoration:none;" onclick="event.stopPropagation();">${p.phone}</a>`);
     }
-    if(p.email){
+    if(p.email&&!isGuest()){
       info.push(`✉️ <a href="mailto:${p.email}" style="color:var(--bl);text-decoration:none;" onclick="event.stopPropagation();">${p.email}</a>`);
     }
     if(info.length){noteEl.innerHTML=info.join(' &nbsp;·&nbsp; ');noteEl.style.display='block';}
@@ -4028,6 +4517,114 @@ function isAtSeasonEnd(){
   return _calCur.y===r.ey&&_calCur.m===r.em;
 }
 
+// ── Mobile calendar: chronological list ──
+function renderCalendarMobile(el){
+  const D=cd();
+  const monthNames=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  const dowNames=['So','Mo','Di','Mi','Do','Fr','Sa'];
+  const r=getSeasonRange();
+  const seasonStartSK=r.sy*10000+r.sm*100+1;
+  const seasonEndSK=r.ey*10000+r.em*100+31;
+  const events=[];
+  if(D&&Array.isArray(D.sessions)){
+    D.sessions.forEach((s,si)=>{
+      if(!s||!s.date)return;
+      const sk=dispToSortKey(s.date);
+      if(sk<seasonStartSK||sk>seasonEndSK)return;
+      const isMatch=s.type==='match';
+      events.push({
+        sk,type:isMatch?'match':'training',
+        icon:isMatch?'⚽':'🏃',
+        title:isMatch?(s.label||'Spiel'):'Training'+(s.focus?' · '+s.focus:''),
+        sub:s.time||'',
+        action:`closeM('moCalendar');openSessFromMain(${si});`
+      });
+    });
+  }
+  const ts=UI.currentTeam+'__'+UI.currentSeason;
+  const calEvts=(G.calEvents&&G.calEvents[ts])||[];
+  calEvts.forEach(ev=>{
+    if(!ev||!ev.date)return;
+    const sk=dispToSortKey(ev.date);
+    if(sk<seasonStartSK||sk>seasonEndSK)return;
+    events.push({
+      sk,type:'event',icon:'📌',
+      title:ev.name||'Termin',
+      sub:(ev.time||'')+(ev.note?' · '+ev.note.slice(0,40):''),
+      action:`viewCalEvent('${ev.id}');`
+    });
+  });
+  if(D&&Array.isArray(D.players)){
+    D.players.forEach((p,pi)=>{
+      if(!p||!p.birthdate)return;
+      let mo=null,da=null,yr=null;
+      if(/^\d{4}-\d{2}-\d{2}/.test(p.birthdate)){yr=parseInt(p.birthdate.slice(0,4));mo=parseInt(p.birthdate.slice(5,7));da=parseInt(p.birthdate.slice(8,10));}
+      else if(/^\d{2}\.\d{2}\.\d{4}/.test(p.birthdate)){da=parseInt(p.birthdate.slice(0,2));mo=parseInt(p.birthdate.slice(3,5));yr=parseInt(p.birthdate.slice(6,10));}
+      if(!mo||!da)return;
+      [r.sy,r.ey].forEach(y=>{
+        const sk=y*10000+mo*100+da;
+        if(sk<seasonStartSK||sk>seasonEndSK)return;
+        const age=yr?(y-yr):null;
+        const nm=getDisplayName?getDisplayName(p):p.name;
+        events.push({
+          sk,type:'birthday',icon:'🎂',
+          title:`${nm} – Geburtstag`,
+          sub:age?`wird ${age}`:'',
+          action:`closeM('moCalendar');jumpToPlayer(${pi});`
+        });
+      });
+    });
+  }
+  events.sort((a,b)=>a.sk-b.sk);
+  const today=todaySK();
+  const upcoming=events.filter(e=>e.sk>=today);
+  const past=events.filter(e=>e.sk<today);
+  function groupByMonth(list){
+    const groups={};
+    list.forEach(e=>{
+      const y=Math.floor(e.sk/10000),m=Math.floor((e.sk%10000)/100);
+      const key=y*100+m;
+      if(!groups[key])groups[key]={y,m,items:[]};
+      groups[key].items.push(e);
+    });
+    return Object.keys(groups).sort((a,b)=>+a-+b).map(k=>groups[k]);
+  }
+  function renderGroup(g){
+    let h=`<div class="cal-mo-hdr-mob">${monthNames[g.m-1]} ${g.y}</div>`;
+    g.items.forEach(e=>{
+      const dt=new Date(Math.floor(e.sk/10000),Math.floor((e.sk%10000)/100)-1,e.sk%100);
+      const dow=dowNames[dt.getDay()];
+      const isToday=e.sk===today;
+      h+=`<div class="cal-evt-mob cal-evt-mob-${e.type}${isToday?' today':''}" onclick="${e.action.replace(/"/g,'&quot;')}">
+        <div class="cal-evt-mob-date">
+          <div class="cal-evt-mob-day">${e.sk%100}</div>
+          <div class="cal-evt-mob-dow">${dow}</div>
+        </div>
+        <div class="cal-evt-mob-icon">${e.icon}</div>
+        <div class="cal-evt-mob-content">
+          <div class="cal-evt-mob-title">${e.title}</div>
+          ${e.sub?'<div class="cal-evt-mob-sub">'+e.sub+'</div>':''}
+        </div>
+      </div>`;
+    });
+    return h;
+  }
+  let html='';
+  if(upcoming.length===0&&past.length===0){
+    html='<div class="cal-empty-mob">📅 Keine Termine in dieser Saison</div>';
+  } else {
+    if(upcoming.length){
+      html+='<div class="cal-section-mob">Bevorstehend</div>';
+      groupByMonth(upcoming).forEach(g=>{html+=renderGroup(g);});
+    }
+    if(past.length){
+      html+='<div class="cal-section-mob cal-section-past">Vergangen</div>';
+      groupByMonth(past).reverse().forEach(g=>{g.items=g.items.slice().reverse();html+=renderGroup(g);});
+    }
+  }
+  el.innerHTML=html;
+}
+
 function openCalendar(){
   const ctx=document.getElementById('cal-ctx');
   if(ctx)ctx.textContent=`${UI.currentTeam} · Saison ${UI.currentSeason}`;
@@ -4087,6 +4684,11 @@ function calGoToday(){
 function renderCalendar(){
   const el=document.getElementById('cal-content');
   if(!el)return;
+  // Mobile: render compact list view
+  if(window.matchMedia('(max-width:767px)').matches){
+    renderCalendarMobile(el);
+    return;
+  }
   const D=cd();
   const monthNames=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
   const dowNames=['Mo','Di','Mi','Do','Fr','Sa','So'];
@@ -4650,12 +5252,13 @@ function updNr(pi,v){snap();cd().players[pi].nr=parseInt(v)||pi+1;saveG();}
 //  ADMIN
 // ══════════════════════════════
 function switchAdminTab(t){
-  ['trainers','teams','data','firebase'].forEach((n,i)=>{
+  ['trainers','teams','guest','data','firebase'].forEach((n,i)=>{
     document.querySelectorAll('#moAdmin .tbtn')[i]?.classList.toggle('active',n===t);
     document.getElementById('atab-'+n)?.classList.toggle('active',n===t);
   });
   if(t==='trainers'){renderAllTr();buildTeamChecks('atTeamChecks');}
   if(t==='teams')renderAdminTeams();
+  if(t==='guest')renderAdminGuestList();
   if(t==='firebase'){loadFbConfigFields();setFbStatus(fbRef?'connected':'offline');}
 }
 function renderAllTr(){
@@ -6682,6 +7285,16 @@ checkAutoBackup();
     </div>
     <div class="setting-control">
       <label class="setting-switch"><input type="checkbox" id="setNotifEnabled" onchange="setAppNotifVisible(this.checked)"/><span class="setting-slider"></span></label>
+    </div>
+  </div>
+
+  <div class="setting-row">
+    <div>
+      <div class="setting-label">📲 Push-Benachrichtigungen</div>
+      <div class="setting-sub" id="pushSubLabel">System-Benachrichtigungen für Nachrichten und Geburtstage</div>
+    </div>
+    <div class="setting-control">
+      <label class="setting-switch"><input type="checkbox" id="setPushEnabled" onchange="onPushToggle(this)"/><span class="setting-slider"></span></label>
     </div>
   </div>
 
