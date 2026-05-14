@@ -248,6 +248,13 @@
   .footer-brand b{color:var(--blue-l);}
   .footer-meta{font-size:.72rem;color:var(--txt-faint);margin-top:5px;}
 
+  .empty-week{
+    background:var(--card);border:1px solid var(--card-br);border-radius:16px;
+    padding:28px 20px;text-align:center;
+  }
+  .empty-week-ico{font-size:2.6rem;margin-bottom:10px;}
+  .empty-week-txt{color:var(--txt-dim);font-size:.92rem;line-height:1.6;}
+  .empty-week-txt b{color:var(--txt);}
   .fade-seq{opacity:0;animation:fadeUp .55s ease forwards;}
   @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
 </style>
@@ -375,8 +382,10 @@ function renderReport(r){
   </div>
   <div class="wrap">`;
 
-  // Diese Woche
-  if((wk.sessions||[]).length){
+  const hasWeekSessions=(wk.sessions||[]).length>0;
+
+  if(hasWeekSessions){
+    // Diese Woche
     html+=`<div class="sec fade-seq" style="animation-delay:.05s">
       <div class="sec-head"><h2>\ud83d\udcc5 Diese Woche</h2><div class="sec-line"></div></div>
       <div class="week-card">
@@ -387,20 +396,28 @@ function renderReport(r){
         </div>
       </div>
     </div>`;
-  }
 
-  // Rangliste der Woche
-  html+=`<div class="sec fade-seq" style="animation-delay:.1s">
-    <div class="sec-head"><h2>\ud83c\udfc6 Rangliste der Woche</h2><div class="sec-line"></div></div>
-    <div class="rank-list">
-      ${weekRanked.map((p,i)=>rankRow(p,i,'wPct',
-        pp=>pp.wTotal?`${pp.wPresent}/${pp.wTotal}`:'\u2013',true)).join('')}
-    </div>
-    <div class="legend">
-      <span>\u2705 da</span><span>\ud83d\udfe1 entschuldigt</span>
-      <span>\u274c gefehlt</span><span>\u2796 offen</span>
-    </div>
-  </div>`;
+    // Rangliste der Woche
+    html+=`<div class="sec fade-seq" style="animation-delay:.1s">
+      <div class="sec-head"><h2>\ud83c\udfc6 Rangliste der Woche</h2><div class="sec-line"></div></div>
+      <div class="rank-list">
+        ${weekRanked.map((p,i)=>rankRow(p,i,'wPct',
+          pp=>pp.wTotal?`${pp.wPresent}/${pp.wTotal}`:'\u2013',true)).join('')}
+      </div>
+      <div class="legend">
+        <span>\u2705 da</span><span>\ud83d\udfe1 entschuldigt</span>
+        <span>\u274c gefehlt</span><span>\u2796 offen</span>
+      </div>
+    </div>`;
+  } else {
+    // Empty week — no training/match. Season standings still apply.
+    html+=`<div class="sec fade-seq" style="animation-delay:.05s">
+      <div class="empty-week">
+        <div class="empty-week-ico">\u2615</div>
+        <div class="empty-week-txt">In dieser Woche gab es <b>keine Termine</b>.<br>Die Saison-Wertung l\u00e4uft aber weiter \u2014 schau dir deinen Platz an!</div>
+      </div>
+    </div>`;
+  }
 
   // Saison-Wertung
   html+=`<div class="sec fade-seq" style="animation-delay:.15s">
