@@ -1925,10 +1925,11 @@ const APP_CHANGELOG=[
     {icon:'🦵',title:'Spieler-Detailstatistik',desc:'Neue Übersicht ganz oben (Alter, Saisons, Top-Position, KPIs). Wochentag-Muster pro Spieler. Positionsverlauf zeigt sowohl Kader-Position als auch tatsächlich gespielte Positionen.'},
     {icon:'🎨',title:'UI-Politur',desc:'footy.ai-Branding im Footer, kompakterer Header, dünnerer Logo-Ring, "Kompakte Ansicht" jetzt Standard für neue Nutzer.'},
     {icon:'📦',title:'Schnellerer Ladevorgang',desc:'HTML-Datei um ~13% kleiner (–136 KB) durch optimierte Bilder und WebP statt PNG.'},
+    {icon:'🟡',title:'Anmeldungs-Status intuitiver',desc:'Häkchen wird jetzt für angemeldete Spieler gesetzt (vorher umgekehrt). Neue Spieler sind standardmäßig gelb, bis sie abgehakt werden.'},
     {icon:'🐛',title:'Weitere Bugfixes',desc:'Export-Menü im Dashboard wurde abgeschnitten — jetzt korrekt sichtbar. Spieler ohne Kader-Position aber mit Aufstellungs-Daten werden jetzt richtig angezeigt.'},
   ]},
   {version:'1.0.0-beta',date:'13.05.2026',title:'Anmeldungs-Status, Sicherheit & UI-Politur',items:[
-    {icon:'🟡',title:'Anmeldungs-Status',desc:'Im Saisonkader: markiere wer für die neue Saison noch nicht angemeldet ist. Diese Spieler erscheinen überall gelb. Aktivieren in „⚙️ Erweiterte Einstellungen".'},
+    {icon:'🟡',title:'Anmeldungs-Status',desc:'Im Saisonkader: hake ab, wer sich für die neue Saison angemeldet hat. Spieler ohne Häkchen erscheinen überall gelb. Aktivieren in „⚙️ Erweiterte Einstellungen".'},
     {icon:'📋',title:'Status verwalten',desc:'Bestätigungen + Anmeldungs-Status zentral in einem Dialog. Änderungen werden erst beim Verlassen gespeichert (Verwerfen möglich).'},
     {icon:'🔐',title:'Login-Seite überarbeitet',desc:'Name + Passwort gleich sichtbar. PIN erst nach erfolgreicher Passworteingabe (falls aktiviert). Generische Fehlermeldungen schützen vor Benutzerausspähung.'},
     {icon:'🔒',title:'Sicherheitsupdate',desc:'Brute-Force-Schutz (nach 3 Fehlversuchen Sperre), kritische Aktionen erfordern erneute Passwortbestätigung, individuelle Sitzungsdauer (Mein Konto).'},
@@ -2400,7 +2401,31 @@ function sanitizeG(data){
   if(!Array.isArray(data.sessionTemplates))data.sessionTemplates=data.sessionTemplates?Object.values(data.sessionTemplates).filter(Boolean):[];
   // One-time migration: legacy "team__idx" matchLineup keys → "team__season__idx"
   _migrateMatchLineupsIn(data);
+  // One-time migration: invert registration model (V2)
+  _migrateRegModelIn(data);
   return data;
+}
+// Registration model V2 migration. OLD model: p.registered===false flags UNregistered
+// (default = registered). NEW model: p.registered===true flags registered (default = NOT
+// registered). Preserves each player's effective status across the flip.
+function _migrateRegModelIn(data){
+  if(!data||data._regModelV2)return;
+  if(data.db&&typeof data.db==='object'){
+    Object.values(data.db).forEach(block=>{
+      if(!block||!Array.isArray(block.players))return;
+      block.players.forEach(p=>{
+        if(!p||typeof p!=='object')return;
+        if(p.registered===false){
+          // was explicitly UNregistered → still unregistered → that's the new default, drop prop
+          delete p.registered;
+        } else {
+          // was implicitly registered (no prop or truthy) → make it explicit true
+          p.registered=true;
+        }
+      });
+    });
+  }
+  data._regModelV2=true;
 }
 // Migration that works on a data object (not the global G). Conservative: never drops
 // data — unresolvable entries stay in legacy format so Wartung can show them for manual fix.
@@ -4306,7 +4331,7 @@ function toggleHidePast(){colState.hidePast=!colState.hidePast;saveVS();render()
   if(el)el.style.fontWeight=colState.hidePast?'700':'600',el.style.color=colState.hidePast?'var(--ac)':'rgba(255,255,255,.65)';
 }
 // ── REGISTRATION STATUS (temporary feature) ───────────────────
-// Toggles yellow highlight for players where p.registered === false.
+// Toggles yellow highlight for players where p.registered !== true (V2: default unregistered).
 // User-preference only; applies to current viewer.
 function isRegStatusShown(){return getUserPref('showRegStatus',true)===true;}
 function toggleRegStatus(){
@@ -4336,9 +4361,9 @@ function updateRegStatusCheck(){
   if(item)item.classList.toggle('vd-active',on);
 }
 // Returns CSS class for a player's name span based on registration state.
-// Returns empty string by default — class is harmless when not registered=false.
+// Returns 'player-unregistered' unless p.registered===true (V2 model: default = unregistered).
 function plNameClass(p){
-  return (p&&p.registered===false)?'player-unregistered':'';
+  return (p&&p.registered!==true)?'player-unregistered':'';
 }
 function toggleViewMenu2(e){e.stopPropagation();document.getElementById('viewDropdown2').classList.toggle('open');}
 document.addEventListener('click',e=>{
@@ -8167,7 +8192,7 @@ function openPlayerStats(pi){
   const psNameEl=document.getElementById('ps-name');
   if(psNameEl){
     psNameEl.textContent=p.name||'–';
-    psNameEl.classList.toggle('player-unregistered',p.registered===false);
+    psNameEl.classList.toggle('player-unregistered',p.registered!==true);
   }
   document.getElementById('ps-nr').textContent='#'+(p.nr||'?');
   document.getElementById('ps-pos-badge').innerHTML=pbHtml(p);
@@ -13454,7 +13479,7 @@ function _slpCaptureStatusSnapshot(){
   const confKey=slpConfKey();
   const confEntry=G.slpConfirmations&&G.slpConfirmations[confKey];
   const regMap={};
-  (D.players||[]).forEach((p,i)=>{if(p&&p.registered===false)regMap[i]=false;});
+  (D.players||[]).forEach((p,i)=>{if(p&&p.registered===true)regMap[i]=true;});
   return {
     confKey,
     confirmed:confEntry&&confEntry.confirmed?JSON.parse(JSON.stringify(confEntry.confirmed)):{},
@@ -13470,7 +13495,7 @@ function _slpRestoreStatusSnapshot(){
   G.slpConfirmations[_slpStatusSnapshot.confKey].confirmed=JSON.parse(JSON.stringify(_slpStatusSnapshot.confirmed));
   (D.players||[]).forEach((p,i)=>{
     if(!p)return;
-    if(_slpStatusSnapshot.registered[i]===false)p.registered=false;
+    if(_slpStatusSnapshot.registered[i]===true)p.registered=true;
     else delete p.registered;
   });
 }
@@ -13515,14 +13540,14 @@ function slpOpenStatusList(){
   openM('moSlpStatus');
 }
 // Anmeldungs-Status: temporary feature for managing pre-season registration.
-// Player is "registered" by default — explicit p.registered === false flags them as unregistered.
+// V2 model: player is UNregistered by default — explicit p.registered === true flags them as registered.
 function slpToggleReg(pi){
   if(!canEdit())return;
   const D=cd();
   const p=D&&D.players&&D.players[pi];
   if(!p)return;
-  if(p.registered===false){delete p.registered;}
-  else {p.registered=false;}
+  if(p.registered===true){delete p.registered;}
+  else {p.registered=true;}
   // Don't saveG — keep in memory until user confirms on exit.
   _slpMarkStatusDirty();
   slpRenderStatusList();
@@ -13551,7 +13576,7 @@ function slpRenderStatusList(){
     if(seasonStarted){
       noteEl.innerHTML='Die Saison hat bereits begonnen — Status-Verwaltung steht für die Vor-Saison-Phase zur Verfügung.';
     } else {
-      noteEl.innerHTML='<b>Bestätigung</b>: Spieler hat Teilnahme bestätigt.<br><b>Anmeldung</b>: Spieler ist <b>noch nicht angemeldet</b> (gelbe Markierung).';
+      noteEl.innerHTML='<b>Bestätigung</b>: Spieler hat Teilnahme bestätigt.<br><b>Anmeldung</b>: Häkchen setzen, sobald sich der Spieler angemeldet hat. <b>Ohne Häkchen</b> = gelb markiert.';
     }
   }
   const el=document.getElementById('slp-status-list');
@@ -13574,12 +13599,13 @@ function slpRenderStatusList(){
     <span style="flex:1;">Spieler</span>
     <span style="width:48px;text-align:center;" title="Position">Pos</span>
     <span style="width:60px;text-align:center;" title="Bestätigt">✓ Best.</span>
-    <span style="width:60px;text-align:center;" title="Anmeldung fehlt">🟡 nicht ang.</span>
+    <span style="width:60px;text-align:center;" title="Angemeldet">✓ Angemeldet</span>
   </div>`;
   html+=sortedPis.map(pi=>{
     const p=players[pi];
     const conf=!!c.confirmed[pi];
-    const isUnreg=p.registered===false;
+    const isReg=p.registered===true;
+    const isUnreg=!isReg;
     const bcol1=(PB_COLORS[p.pos]||'#ddd;color:#333').split(';');
     const bcol2=p.pos2?(PB_COLORS[p.pos2]||'#ddd;color:#333').split(';'):null;
     // Row tint priority: yellow (unreg) > green (confirmed) > none
@@ -13595,17 +13621,17 @@ function slpRenderStatusList(){
         ${bcol2?`<span class="lp-card-pos1" style="background:${bcol2[0]};${bcol2[1]};font-size:.6rem;">${escapeHtml(p.pos2)}</span>`:''}
       </span>
       <span style="width:60px;text-align:center;"><input type="checkbox" ${conf?'checked':''} onchange="slpToggleConf(${pi})" style="width:18px;height:18px;cursor:pointer;accent-color:var(--cp);" title="Bestätigt"/></span>
-      <span style="width:60px;text-align:center;"><input type="checkbox" ${isUnreg?'checked':''} onchange="slpToggleReg(${pi})" style="width:18px;height:18px;cursor:pointer;accent-color:#d4a017;" title="Nicht angemeldet"/></span>
+      <span style="width:60px;text-align:center;"><input type="checkbox" ${isReg?'checked':''} onchange="slpToggleReg(${pi})" style="width:18px;height:18px;cursor:pointer;accent-color:var(--bm);" title="Angemeldet"/></span>
     </div>`;
   }).join('');
   el.innerHTML=html;
   // Stats line
   const total=players.length;
   const confCount=players.filter((_,i)=>c.confirmed[i]).length;
-  const unregCount=players.filter(p=>p&&p.registered===false).length;
+  const regCount=players.filter(p=>p&&p.registered===true).length;
   const dirtyMark=(typeof _slpStatusEffectivelyDirty==='function'&&_slpStatusEffectivelyDirty())?' · <span style="color:#a02525;font-weight:700;">● Ungespeicherte Änderungen</span>':'';
   const stEl=document.getElementById('slp-status-stats');
-  if(stEl)stEl.innerHTML=`${confCount} / ${total} bestätigt · ${unregCount} / ${total} nicht angemeldet${dirtyMark}`;
+  if(stEl)stEl.innerHTML=`${confCount} / ${total} bestätigt · ${regCount} / ${total} angemeldet${dirtyMark}`;
 }
 // Backward-compat aliases (called from older code paths)
 function slpRenderConfList(){slpRenderStatusList();}
@@ -13741,10 +13767,10 @@ async function closeSeasonLineup(){
     const c=slpGetConf();
     const players=D?D.players:[];
     const confCount=players.filter((_,i)=>c.confirmed[i]).length;
-    const unregCount=players.filter(p=>p&&p.registered===false).length;
+    const regCount=players.filter(p=>p&&p.registered===true).length;
     const itemsHtml=_impactRowsHtml([
       {label:'Bestätigt',value:confCount+' Spieler',icon:'✓'},
-      {label:'Nicht angemeldet',value:unregCount+' Spieler',icon:'🟡'}
+      {label:'Angemeldet',value:regCount+' Spieler',icon:'✓'}
     ]);
     const ok=await new Promise(resolve=>{
       _showSaveDraftDialog(resolve,itemsHtml);
@@ -13902,7 +13928,7 @@ function slpRender(){
       const yPos=R+18+i*14;
       const confirmed=confEnabled?slpIsPlayerConfirmed(pi):false;
       // Reg-status takes priority over confirmed when both apply, since it signals admin issue
-      const isUnreg=isRegStatusShown()&&p&&p.registered===false;
+      const isUnreg=isRegStatusShown()&&p&&p.registered!==true;
       const textColor=isUnreg?'#ffd34d':(confirmed?'#7dffa0':col);
       // When conf mode disabled - center align; when enabled - left align with reserved check space
       let nameTxt;
