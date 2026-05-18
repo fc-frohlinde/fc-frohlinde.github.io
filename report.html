@@ -248,6 +248,33 @@
   .footer-brand b{color:var(--blue-l);}
   .footer-meta{font-size:.72rem;color:var(--txt-faint);margin-top:5px;}
 
+  /* ── Ranking toggle + dual pct ── */
+  .rank-tog{display:inline-flex;background:rgba(255,255,255,.04);border:1px solid var(--card-br);border-radius:8px;padding:2px;flex-shrink:0;}
+  .rank-tog-btn{
+    background:transparent;color:var(--txt-dim);border:none;
+    padding:5px 12px;font-family:'Barlow',sans-serif;font-size:.74rem;font-weight:700;
+    border-radius:6px;cursor:pointer;letter-spacing:.3px;
+    transition:background .15s,color .15s;white-space:nowrap;
+  }
+  .rank-tog-btn:hover{color:var(--txt);}
+  .rank-tog-btn.active{background:var(--blue);color:#fff;box-shadow:0 2px 8px rgba(46,125,228,.35);}
+  .rank-sub{font-size:.8rem;color:var(--txt-dim);margin-bottom:12px;padding:0 2px;}
+  .rank-pct-main{text-align:right;}
+  .rank-pct-alt{
+    margin-top:5px;text-align:right;
+    font-size:.66rem;color:var(--txt-faint);
+    border-top:1px solid rgba(255,255,255,.06);padding-top:4px;
+  }
+  .rank-pct-alt .alt-lbl{
+    color:var(--txt-faint);font-weight:700;text-transform:uppercase;letter-spacing:.5px;
+    margin-right:5px;
+  }
+  .rank-pct-alt .alt-val{font-weight:700;}
+  @media(max-width:380px){
+    .sec-head{flex-wrap:wrap;}
+    .rank-tog{margin-top:6px;flex:0 0 auto;}
+    .rank-tog-btn{padding:5px 9px;font-size:.7rem;}
+  }
   .empty-week{
     background:var(--card);border:1px solid var(--card-br);border-radius:16px;
     padding:28px 20px;text-align:center;
@@ -301,8 +328,48 @@ function pctClass(p){
   return 'pct-zero';
 }
 const CELL_EMOJI={1:'\u2705',0:'\u274c',2:'\ud83d\udfe1',3:'\u2796'};
+let _rankSort='season'; // 'season' | 'week' — toggle state for combined ranking
+let _rankState=null;    // {weekRanked, seasonRanked, hasWeekSessions, rankRow}
 function cellEmoji(v){return CELL_EMOJI[v]!=null?CELL_EMOJI[v]:'\u2796';}
 
+function renderRankingSection(){
+  if(!_rankState)return;
+  const el=document.getElementById('ranking-sec');
+  if(!el)return;
+  const {weekRanked,seasonRanked,hasWeekSessions,rankRow}=_rankState;
+  // If there's no week data, lock to season sort
+  if(!hasWeekSessions)_rankSort='season';
+  const list=_rankSort==='week'?weekRanked:seasonRanked;
+  const showAlt=hasWeekSessions; // only show "other" pct when both metrics exist
+  const isWeek=_rankSort==='week';
+  const seasonBtn=`<button class="rank-tog-btn ${isWeek?'':'active'}" onclick="setRankSort('season')">Saison</button>`;
+  const weekBtn=hasWeekSessions
+    ? `<button class="rank-tog-btn ${isWeek?'active':''}" onclick="setRankSort('week')">Diese Woche</button>`
+    : '';
+  const sub=isWeek
+    ? 'Teilnahme dieser Woche'
+    : 'Gesamte Anwesenheit diese Saison \u2014 hier z\u00e4hlt jede Woche!';
+  let html=`<div class="sec-head">
+    <h2>\ud83c\udfc6 Rangliste</h2>
+    <div class="sec-line"></div>
+    <div class="rank-tog">${seasonBtn}${weekBtn}</div>
+  </div>
+  <p class="rank-sub">${sub}</p>
+  <div class="rank-list">${list.map((p,i)=>rankRow(p,i,_rankSort,showAlt)).join('')}</div>`;
+  if(hasWeekSessions){
+    html+=`<div class="legend">
+      <span>\u2705 da</span><span>\ud83d\udfe1 entschuldigt</span>
+      <span>\u274c gefehlt</span><span>\u2796 offen</span>
+    </div>`;
+  }
+  el.innerHTML=html;
+}
+function setRankSort(s){
+  if(s!=='week'&&s!=='season')return;
+  if(_rankSort===s)return;
+  _rankSort=s;
+  renderRankingSection();
+}
 function showError(emoji,title,msg){
   document.getElementById('app').innerHTML=
     `<div class="state"><div class="state-emoji">${emoji}</div>`+
@@ -317,17 +384,26 @@ function renderReport(r){
     if(p.photo)return `<img class="avatar" src="${esc(p.photo)}" alt="">`;
     return `<div class="avatar-ph" style="background:${avatarColor(p.name)}">${esc(initials(p.name))}</div>`;
   };
-  // Ranking row builder
-  const rankRow=(p,idx,pctField,subText,showCells)=>{
+  // Ranking row builder — shows BOTH week and season %; active sort is emphasized.
+  const rankRow=(p,idx,activeSort,showAlt)=>{
     const rank=idx+1;
     const topCls=rank<=3?` top${rank}`:'';
     const medal=['\ud83e\udd47','\ud83e\udd48','\ud83e\udd49'][idx]||'';
-    const pct=p[pctField];
-    const cellsHtml=showCells&&p.wCells&&p.wCells.length
+    const cellsHtml=p.wCells&&p.wCells.length
       ? `<div class="rank-cells">${p.wCells.map(cellEmoji).join('')}</div>` : '';
     const numOrMedal=rank<=3
       ? `<div class="rank-num"><span class="rank-medal">${medal}</span></div>`
       : `<div class="rank-num">${rank}</div>`;
+    // Primary = active sort, Alt = the other one
+    const mainPct=activeSort==='week'?p.wPct:p.sPct;
+    const mainSub=activeSort==='week'
+      ? (p.wTotal?`${p.wPresent}/${p.wTotal}`:'\u2013')
+      : (p.sTotal?`${p.sPresent}/${p.sTotal}`:'\u2013');
+    const altPct=activeSort==='week'?p.sPct:p.wPct;
+    const altLbl=activeSort==='week'?'Saison':'Woche';
+    const altHtml=showAlt
+      ? `<div class="rank-pct-alt"><span class="alt-lbl">${altLbl}</span><span class="alt-val ${pctClass(altPct)}">${altPct==null?'\u2013':altPct+'%'}</span></div>`
+      : '';
     return `<div class="rank-row${topCls}" style="animation-delay:${Math.min(idx*55,900)}ms">
       ${numOrMedal}
       ${av(p)}
@@ -340,8 +416,11 @@ function renderReport(r){
         ${cellsHtml}
       </div>
       <div class="rank-pct">
-        <div class="num ${pctClass(pct)}">${pct==null?'\u2013':pct+'%'}</div>
-        <div class="sub">${esc(subText(p))}</div>
+        <div class="rank-pct-main">
+          <div class="num ${pctClass(mainPct)}">${mainPct==null?'\u2013':mainPct+'%'}</div>
+          <div class="sub">${esc(mainSub)}</div>
+        </div>
+        ${altHtml}
       </div>
     </div>`;
   };
@@ -397,18 +476,6 @@ function renderReport(r){
       </div>
     </div>`;
 
-    // Rangliste der Woche
-    html+=`<div class="sec fade-seq" style="animation-delay:.1s">
-      <div class="sec-head"><h2>\ud83c\udfc6 Rangliste der Woche</h2><div class="sec-line"></div></div>
-      <div class="rank-list">
-        ${weekRanked.map((p,i)=>rankRow(p,i,'wPct',
-          pp=>pp.wTotal?`${pp.wPresent}/${pp.wTotal}`:'\u2013',true)).join('')}
-      </div>
-      <div class="legend">
-        <span>\u2705 da</span><span>\ud83d\udfe1 entschuldigt</span>
-        <span>\u274c gefehlt</span><span>\u2796 offen</span>
-      </div>
-    </div>`;
   } else {
     // Empty week — no training/match. Season standings still apply.
     html+=`<div class="sec fade-seq" style="animation-delay:.05s">
@@ -419,17 +486,10 @@ function renderReport(r){
     </div>`;
   }
 
-  // Saison-Wertung
-  html+=`<div class="sec fade-seq" style="animation-delay:.15s">
-    <div class="sec-head"><h2>\ud83d\udcca Saison-Wertung</h2><div class="sec-line"></div></div>
-    <p style="font-size:.8rem;color:var(--txt-dim);margin-bottom:12px;padding:0 2px;">
-      Gesamte Anwesenheit diese Saison \u2014 hier z\u00e4hlt jede Woche!
-    </p>
-    <div class="rank-list">
-      ${seasonRanked.map((p,i)=>rankRow(p,i,'sPct',
-        pp=>pp.sTotal?`${pp.sPresent}/${pp.sTotal}`:'\u2013',false)).join('')}
-    </div>
-  </div>`;
+  // Combined Rangliste — Saison (default) ↔ Diese Woche toggle.
+  // Cache state + rows for the toggle handler to re-render in place.
+  _rankState={weekRanked,seasonRanked,hasWeekSessions,rankRow};
+  html+=`<div class="sec fade-seq" id="ranking-sec" style="animation-delay:.1s"></div>`;
 
   // Mannschaft
   html+=`<div class="sec fade-seq" style="animation-delay:.2s">
@@ -465,7 +525,10 @@ function renderReport(r){
   </div>`;
 
   html+=`</div>`; // .wrap
+  // Reset to default sort on each fresh report load
+  _rankSort='season';
   app.innerHTML=html;
+  renderRankingSection();
 }
 
 // ── Load ──
