@@ -96,8 +96,8 @@ body{background:linear-gradient(140deg,var(--bg-dark) 0%,var(--bg-mid) 55%,var(-
 
 /* Presence indicator */
 .user-menu-wrap{position:relative;display:flex;align-items:center;gap:6px;}
-.presence-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:18px;padding:4px 9px;cursor:pointer;color:#fff;font-size:.78rem;font-weight:600;font-family:'Barlow',sans-serif;transition:all .15s;}
-.presence-pill:hover{background:rgba(255,255,255,.2);}
+.presence-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:3px 8px;cursor:pointer;color:rgba(255,255,255,.85);font-size:.72rem;font-weight:600;font-family:'Barlow',sans-serif;transition:all .15s;}
+.presence-pill:hover{background:rgba(255,255,255,.16);color:#fff;border-color:rgba(255,255,255,.24);}
 .presence-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#27ae60;box-shadow:0 0 0 2px rgba(39,174,96,.25);animation:presencePulse 2s ease-in-out infinite;}
 @keyframes presencePulse{0%,100%{box-shadow:0 0 0 2px rgba(39,174,96,.25);}50%{box-shadow:0 0 0 4px rgba(39,174,96,.45);}}
 .presence-menu{position:fixed;background:#fff;border:1px solid rgba(0,0,0,.1);border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.25);min-width:240px;max-width:320px;max-height:60vh;overflow-y:auto;display:none;z-index:99999;}
@@ -427,16 +427,27 @@ tr:hover .drb{color:var(--gm);}
 .cal-day{background:#fff;min-height:90px;padding:5px 6px;display:flex;flex-direction:column;gap:3px;position:relative;font-family:'Barlow',sans-serif;}
 .cal-day.empty{background:#f7f9fc;}
 .cal-day.weekend{background:#f9fafd;}
-.cal-day.today{background:linear-gradient(180deg,#fff8e1,#fff);box-shadow:inset 0 0 0 2px var(--ac);}
+.cal-day.today{background:linear-gradient(180deg,color-mix(in srgb,var(--bd) 10%,#fff),#fff);box-shadow:inset 0 0 0 2px var(--bm);}
 .cal-day.past{opacity:.55;}
 .cal-day-num{font-size:.72rem;font-weight:700;color:#234;align-self:flex-start;}
-.cal-day.today .cal-day-num{color:#7a5a00;background:var(--ac);border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:.7rem;}
+.cal-day.today .cal-day-num{color:#fff;background:var(--bm);border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;}
 .cal-evt{font-size:.62rem;line-height:1.2;padding:2px 4px;border-radius:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;font-weight:600;}
 .cal-evt-m{background:#ffe0b0;color:#7a3a00;border-left:2px solid #d97a00;}
 .cal-evt-t{background:#cce5ff;color:#003d80;border-left:2px solid #0066cc;}
 .cal-evt-b{background:#ffd6e6;color:#80004d;border-left:2px solid #c71585;font-style:italic;}
 .cal-evt-e{background:#d4f4e0;color:#0a4d2c;border-left:2px solid #1a8c4a;}
 .cal-evt:hover{filter:brightness(.95);}
+/* Calendar action buttons — unified pill style, semantic colors via dot */
+.cal-btn{font-size:.74rem;padding:5px 11px;background:color-mix(in srgb,var(--bd) 5%,#fff);color:var(--gd);border:1px solid color-mix(in srgb,var(--bd) 18%,#fff);border-radius:6px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;transition:background .15s,border-color .15s;font-family:'Barlow',sans-serif;font-weight:600;}
+.cal-btn:hover{background:color-mix(in srgb,var(--bd) 12%,#fff);border-color:color-mix(in srgb,var(--bd) 28%,#fff);}
+.cal-btn::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.cal-btn-plan::before{background:#785ac8;box-shadow:0 0 0 1px rgba(120,90,200,.3);}
+.cal-btn-train::before{background:#0066cc;box-shadow:0 0 0 1px rgba(0,102,204,.3);}
+.cal-btn-match::before{background:#d97a00;box-shadow:0 0 0 1px rgba(217,122,0,.3);}
+.cal-btn-termin::before{background:#1a8c4a;box-shadow:0 0 0 1px rgba(26,140,74,.3);}
+.cal-btn-export::before{display:none;}
+body.theme-dark .cal-btn{background:rgba(255,255,255,.06);color:#dde5f0;border-color:rgba(255,255,255,.15);}
+body.theme-dark .cal-btn:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.22);}
 .cal-legend{display:flex;gap:14px;flex-wrap:wrap;padding:8px 12px;font-size:.72rem;color:#456;background:#f7f9fc;border-radius:8px;}
 .cal-legend-item{display:flex;align-items:center;gap:5px;}
 .cal-legend-sw{width:16px;height:10px;border-radius:2px;}
@@ -633,10 +644,11 @@ select.lp-fmt-btn option:checked{background:var(--ac);color:#071e48;}
 .lp-card-name{flex:1;font-size:.76rem;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .lp-card-badges{display:flex;gap:2px;}
 .lp-card-pos1{font-size:.55rem;font-weight:700;padding:1px 4px;border-radius:7px;min-width:30px;text-align:center;display:inline-block;}
-.lp-statsbar{display:flex;align-items:center;gap:6px;padding:7px 12px;background:rgba(0,0,0,.25);border-top:1px solid rgba(255,255,255,.06);flex-shrink:0;}
-.lp-stat{display:flex;flex-direction:column;align-items:center;}
-.lp-stat .sv{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;line-height:1;color:#fff;}
-.lp-stat .sk{font-size:.55rem;color:rgba(255,255,255,.75);text-transform:uppercase;letter-spacing:.5px;}
+.lp-statsbar{display:flex;align-items:center;gap:8px;padding:9px 12px;background:rgba(0,0,0,.25);border-top:1px solid rgba(255,255,255,.06);flex-shrink:0;}
+.lp-stat{display:flex;flex-direction:column;align-items:center;padding:6px 14px;background:color-mix(in srgb,var(--bl) 18%,transparent);border:1px solid color-mix(in srgb,var(--bl) 38%,transparent);border-radius:8px;min-width:60px;transition:background .15s;}
+.lp-stat:hover{background:color-mix(in srgb,var(--bl) 26%,transparent);}
+.lp-stat .sv{font-family:'Bebas Neue',sans-serif;font-size:1.18rem;line-height:1;color:#fff;letter-spacing:1px;}
+.lp-stat .sk{font-size:.55rem;color:rgba(255,255,255,.85);text-transform:uppercase;letter-spacing:.5px;margin-top:3px;}
 .lp-close-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.92);border-radius:8px;padding:5px 14px;font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .12s;}
 .lp-close-btn:hover{background:rgba(231,76,60,.3);color:#fff;border-color:rgba(231,76,60,.5);}
 .lp-hint{font-size:.68rem;color:rgba(255,255,255,.65);padding:4px 0;font-style:italic;}
@@ -782,11 +794,11 @@ body.show-reg-status .player-unregistered .name {
 .slp-close-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.65);border-radius:8px;padding:5px 14px;font-family:'Barlow',sans-serif;font-size:.77rem;font-weight:600;cursor:pointer;}
 .slp-close-btn:hover{background:rgba(231,76,60,.3);color:#fff;}
 .slp-fmt-btn{padding:4px 12px;border-radius:18px;border:1.5px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:rgba(255,255,255,.92);font-family:'Barlow',sans-serif;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;}
-.slp-fmt-btn.active{background:var(--ac);color:#071e48;border-color:var(--ac);}
+.slp-fmt-btn.active{background:var(--bm);color:#fff;border-color:color-mix(in srgb,var(--bl) 60%,#fff);box-shadow:0 0 0 1px var(--bm);}
 .slp-fmt-btn:hover:not(.active){background:rgba(255,255,255,.12);}
 select.slp-fmt-btn{appearance:none;-webkit-appearance:none;-moz-appearance:none;background-image:linear-gradient(45deg,transparent 50%,rgba(255,255,255,.5) 50%),linear-gradient(135deg,rgba(255,255,255,.5) 50%,transparent 50%);background-position:calc(100% - 14px) 50%,calc(100% - 9px) 50%;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:24px;}
 select.slp-fmt-btn option{background:#1a3568;color:#fff;padding:8px;}
-select.slp-fmt-btn option:checked{background:var(--ac);color:#071e48;}
+select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
 
 /* ════════════════════════════════════════
    MOBILE ATTENDANCE VIEW (cards)
@@ -831,7 +843,7 @@ select.slp-fmt-btn option:checked{background:var(--ac);color:#071e48;}
 .cal-mo-hdr-mob{padding:8px 14px 4px;font-size:.74rem;font-weight:700;color:var(--gm);text-transform:uppercase;letter-spacing:1px;}
 .cal-evt-mob{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--gl);cursor:pointer;transition:background .12s;background:#fff;}
 .cal-evt-mob:hover,.cal-evt-mob:active{background:var(--ow);}
-.cal-evt-mob.today{background:rgba(232,200,64,.12);border-left:3px solid var(--ac);}
+.cal-evt-mob.today{background:color-mix(in srgb,var(--bd) 7%,#fff);border-left:3px solid var(--bm);}
 .cal-evt-mob-date{flex-shrink:0;width:42px;text-align:center;}
 .cal-evt-mob-day{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;line-height:1;color:var(--bd);}
 .cal-evt-mob-dow{font-size:.6rem;text-transform:uppercase;color:var(--gm);font-weight:700;letter-spacing:.5px;}
@@ -1015,6 +1027,18 @@ mark.sr-hl{background:rgba(243,156,18,.35);color:inherit;border-radius:2px;paddi
 .db-tog button.active{background:#fff;color:var(--bd);box-shadow:0 1px 3px rgba(0,0,0,.1);}
 
 /* Weekly Report section */
+.wr-head{display:flex;align-items:baseline;gap:12px;margin-bottom:14px;flex-shrink:0;padding-right:36px;flex-wrap:wrap;}
+.mob h3.wr-head-title{margin:0;color:var(--bd);font-size:1.28rem;line-height:1;letter-spacing:2px;flex-shrink:0;font-family:'Bebas Neue',sans-serif;}
+.wr-head-nav{display:inline-flex;align-items:baseline;margin-left:auto;line-height:1;}
+.wr-head-meta{font-size:.8rem;color:var(--gm);font-weight:600;line-height:1;flex-shrink:0;}
+.db-wr-prepublish{margin-top:14px;padding:0;}
+.db-wr-settings{display:flex;flex-wrap:wrap;align-items:center;gap:12px 28px;margin-top:14px;}
+.db-wr-wa-stil{display:flex;align-items:center;gap:8px;}
+@media(max-width:520px){
+  .wr-head{gap:8px;}
+  .wr-head-meta{margin-left:0;width:100%;}
+  .db-wr-settings{flex-direction:column;align-items:flex-start;}
+}
 .db-wr-nav{display:flex;align-items:center;gap:6px;margin-left:auto;}
 .db-wr-nav button{background:#eaf0fa;border:1px solid var(--gl);border-radius:6px;width:28px;height:28px;cursor:pointer;font-size:1rem;color:var(--bd);font-weight:700;display:flex;align-items:center;justify-content:center;padding:0;transition:background .12s;}
 .db-wr-nav button:hover:not(:disabled){background:#d8e4f5;}
@@ -1028,14 +1052,26 @@ mark.sr-hl{background:rgba(243,156,18,.35);color:inherit;border-radius:2px;paddi
 .db-wr-teampct{text-align:center;flex-shrink:0;padding-left:10px;border-left:1px solid var(--gl);}
 .db-wr-teampct b{display:block;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--bd);line-height:1;}
 .db-wr-teampct span{font-size:.62rem;color:var(--gm);text-transform:uppercase;letter-spacing:.5px;}
-.db-wr-photo-toggle{display:flex;align-items:center;gap:7px;margin-top:10px;font-size:.8rem;color:var(--gd);cursor:pointer;user-select:none;}
-.db-wr-photo-toggle input{width:16px;height:16px;cursor:pointer;accent-color:var(--bm);}
+/* Photo toggle — keeps uppercase look (matches other modal labels) but explicit flex/gap */
+.mob label.db-wr-photo-toggle{display:flex;align-items:center;gap:10px;margin:0;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;line-height:1.3;color:var(--gd);cursor:pointer;user-select:none;}
+.mob label.db-wr-photo-toggle input[type="checkbox"]{width:16px;height:16px;margin:0;padding:0;flex-shrink:0;cursor:pointer;accent-color:var(--bm);}
+.mob label.db-wr-photo-toggle .db-wr-photo-txt{white-space:nowrap;font-size:inherit;font-weight:inherit;text-transform:inherit;letter-spacing:inherit;margin:0;display:inline;}
+.mob label.db-wr-photo-toggle .db-wr-hint{white-space:nowrap;margin:0;font-size:.6rem;text-transform:uppercase;letter-spacing:.4px;font-weight:700;}
 .db-wr-hint{font-size:.68rem;color:var(--gm);background:rgba(0,0,0,.04);padding:1px 6px;border-radius:4px;}
 .db-wr-pub-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
 .db-wr-pub-actions .btn{font-size:.84rem;}
 .db-wr-publish{flex:1;min-width:160px;}
 .db-wr-copy{flex:1;min-width:130px;}
 .db-wr-copy.db-wr-copied{background:#27ae60 !important;border-color:#27ae60 !important;color:#fff !important;}
+.db-wr-wa-row{display:flex;align-items:center;gap:8px;margin-top:10px;}
+.mob label.db-wr-wa-lbl{display:inline;font-size:.7rem;color:var(--gd);font-weight:700;text-transform:uppercase;letter-spacing:.4px;line-height:1.3;margin:0;}
+.db-wr-wa-sel{flex:1;max-width:200px;padding:5px 8px;border:1px solid var(--gl);border-radius:6px;background:#fff;font-size:.82rem;font-family:'Barlow',sans-serif;color:var(--gd);cursor:pointer;}
+.db-wr-wa-sel:focus{outline:none;border-color:var(--bm);}
+.db-wr-wa-preview-wrap{margin-top:8px;}
+.db-wr-wa-preview-h{font-size:.66rem;color:var(--gm);text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:4px;padding-left:2px;}
+.db-wr-wa-preview{padding:10px 12px;background:#f5f8fc;border:1px solid var(--gl);border-radius:8px;font-size:.78rem;line-height:1.5;color:var(--gd);white-space:pre-wrap;word-break:break-word;max-height:220px;overflow-y:auto;font-family:'Barlow',sans-serif;}
+.db-wr-wa-btn{background:#25d366 !important;border-color:#1eb955 !important;color:#fff !important;}
+.db-wr-wa-btn:hover{background:#1eb955 !important;}
 .db-wr-published{margin-top:12px;padding:12px;background:rgba(39,174,96,.06);border:1px solid rgba(39,174,96,.25);border-radius:8px;}
 .db-wr-pub-status{font-size:.8rem;font-weight:700;color:#1f8c4d;}
 .db-wr-pub-status span{font-weight:500;color:var(--gm);}
@@ -1360,6 +1396,7 @@ body.guest-mode{padding-top:24px;}
     <button class="btn bd" id="btn-delSeas" onclick="deleteSeason()" style="display:none;">✕</button>
     <div class="tsep"></div>
     <button class="btn bs" onclick="openCalendar()" title="Kalender">📅 Kalender</button>
+    <button class="btn bs" onclick="openWeekReport()" title="Wochenbericht">📄 Wochenbericht</button>
   </div>
   <div class="toolbar-r">
     <button class="btn bundo" id="undoBtn" onclick="undo()" disabled title="Rückgängig Ctrl+Z">↩</button>
@@ -1949,12 +1986,20 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.0.2-beta';
-const APP_VERSION_LABEL='1.0.2 (Beta)';
+const APP_VERSION='1.0.3-beta';
+const APP_VERSION_LABEL='1.0.3 (Beta)';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1779106373532; // 2026-05-18 12:12
+const APP_RELEASE_TS=1779141233483; // 2026-05-18 21:53
 const APP_CHANGELOG=[
+  {version:'1.0.3-beta',date:'18.05.2026',title:'WhatsApp-Integration, eigenes Fenster & UI-Politur',items:[
+    {icon:'📄',title:'Wochenbericht als eigene Funktion',desc:'Eigener Button „📄 Wochenbericht" neben dem Kalender. Eigenes Fenster mit Wochen-Navigation oben — der Bericht ist nicht mehr im Trainer-Dashboard versteckt.'},
+    {icon:'💬',title:'WhatsApp-Text mit Vorlagen',desc:'Drei Stile zur Auswahl: mit Hype (Wettbewerb), neutral (kurz), mit Metriken (Trainings/Spiele/Teilnahme%). Live-Vorschau zeigt, was kopiert wird. Ein Klick — fertig zum Einfügen in den Mannschafts-Chat.'},
+    {icon:'🏆',title:'Rangliste umgeschaltbar',desc:'Auf der öffentlichen Berichtsseite gibt es jetzt einen Umschalter zwischen Wochen-Rangliste und Saison-Wertung. Top 3 Medaillen folgen der aktiven Sortierung.'},
+    {icon:'🎨',title:'UI-Politur',desc:'Kalender-Buttons vereinheitlicht (Plan/Training/Spiel/Termin/Export). Aktive Formation im Saisonkader-Planer in Marken-Blau statt Gelb. „Heute" im Kalender in Marken-Blau. Statistik-Karten in der Aufstellungs-Planung als Mini-Cards. Alle Farben passen sich an die gewählte Palette an.'},
+    {icon:'🛡️',title:'Wochen-Auswahl pro Saison begrenzt',desc:'Vor-/Zurück-Buttons werden an den Saison-Grenzen deaktiviert. Kein Wechsel mehr in fremde Saisons.'},
+    {icon:'🐛',title:'Fehlerbehebungen',desc:'Wochen-Navigation („Heute", „‹", „›") war zwischenzeitlich kaputt — wieder funktionsfähig. Modal-Größe wechselt nicht mehr beim Wochenwechsel. Checkbox- und Label-Ausrichtung in den Einstellungen korrigiert.'},
+  ]},
   {version:'1.0.2-beta',date:'18.05.2026',title:'Wochenbericht & Veröffentlichungen',items:[
     {icon:'📤',title:'Wochenbericht veröffentlichen',desc:'Im Trainer-Dashboard lässt sich der Wochenbericht jetzt als Link für die Mannschafts-Gruppe veröffentlichen. Sonntags abends einmal klicken — Link in WhatsApp posten — Spieler sehen die Teilnahme der Woche.'},
     {icon:'🏆',title:'Öffentliche Berichtsseite mit Wettbewerb',desc:'Die Link-Seite zeigt zwei Ranglisten: Teilnahme der Woche und kumulative Saison-Wertung. Das soll einen Wettbewerb unter den Spielern um den höchsten Prozentsatz schaffen.'},
@@ -6910,6 +6955,21 @@ function _dbIsoWeek(d){
 }
 function _dbFmtDM(d){return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0');}
 function _dbFmtDMY(d){return _dbFmtDM(d)+'.'+d.getFullYear();}
+function _dbSeasonBounds(season){
+  // German football season "YYYY/YY" runs from July 1 of year1 → June 30 of year2.
+  // Returns {startYSK, endYSK} as YYYYMMDD ints, or null if season unparseable.
+  const m=season&&season.match(/^(\d{4})\/(\d{2})$/);
+  if(!m)return null;
+  const y1=parseInt(m[1]);
+  return{startYSK:y1*10000+7*100+1,endYSK:(y1+1)*10000+6*100+30};
+}
+function _dbWeekInSeason(offsetWeeks,season){
+  // Returns true if any day of the (Mon-Sun) week at offsetWeeks overlaps the season.
+  const sb=_dbSeasonBounds(season);
+  if(!sb)return true; // unknown season format → permissive
+  const b=_dbWeekBounds(offsetWeeks);
+  return b.sundayYSK>=sb.startYSK&&b.mondayYSK<=sb.endYSK;
+}
 function dbComputeWeekReport(data,offsetWeeks){
   const {sessions,players,season,team}=data;
   const b=_dbWeekBounds(offsetWeeks);
@@ -7066,7 +7126,11 @@ function dbPublishWeekReport(){
       token:token,team:snapshot.team,season:snapshot.season,
       kw:snapshot.week.kw,from:snapshot.week.from,to:snapshot.week.to,
       publishedAt:snapshot.publishedAt,hasPhotos:includePhotos,
-      sessionCount:r.weekSess.length
+      sessionCount:r.weekSess.length,
+      // Fields used by WhatsApp templates
+      weekTrainCount:r.trainCount,
+      weekMatchCount:r.matchCount,
+      weekPct:r.teamAgg.overallPct
     };
     if(existing)Object.assign(existing,logEntry);
     else G.reportLog.unshift(logEntry);
@@ -7075,7 +7139,8 @@ function dbPublishWeekReport(){
     _dbPublishing=false;
     _dbCopyText(_dbReportUrl(token));
     if(typeof showSaveFlash==='function')showSaveFlash('\u2705 Ver\u00f6ffentlicht & Link kopiert');
-    renderDashboard();
+    if(document.getElementById('wr-content'))renderWeekReportModal();
+    else if(typeof renderDashboard==='function')renderDashboard();
   }).catch(err=>{
     _dbPublishing=false;
     if(btn){btn.disabled=false;btn.innerHTML='\ud83d\udce4 Bericht ver\u00f6ffentlichen';}
@@ -7084,6 +7149,81 @@ function dbPublishWeekReport(){
 }
 function dbToggleReportPhotos(cb){
   _dbState.reportIncludePhotos=!!cb.checked;
+}
+// ── WhatsApp announcement templates ──
+function _dbFmtSessCount(tc,mc){
+  const parts=[];
+  if(tc>0)parts.push(tc===1?'1 Training':tc+' Trainings');
+  if(mc>0)parts.push(mc===1?'1 Spiel':mc+' Spiele');
+  return parts.length?parts.join(', '):'keine Termine';
+}
+const _waTemplates={
+  hype:{
+    label:'Mit Hype',
+    build:ctx=>{
+      if(!ctx.hasSessions)return '\ud83c\udfc6 *Wochenbericht KW '+ctx.kw+'*\n\nDiese Woche war Pause \u2014 aber die Saison-Wertung l\u00e4uft weiter! \ud83d\udcca\n\n\ud83d\udc49 '+ctx.url+'\n\nWer steht ganz oben? \ud83e\udd47';
+      return '\ud83c\udfc6 *Wochenbericht KW '+ctx.kw+' ist da!*\n\nHier seht ihr eure Anwesenheit der Woche und den aktuellen Stand der Saison-Wertung \ud83d\udcca\n\n\ud83d\udc49 '+ctx.url+'\n\nWer schafft es auf Platz 1? \ud83e\udd47';
+    }
+  },
+  neutral:{
+    label:'Neutral',
+    build:ctx=>{
+      if(!ctx.hasSessions)return '\ud83d\udccb Wochenbericht KW '+ctx.kw+' (Pause)\n\nAktueller Saison-Stand:\n\ud83d\udc49 '+ctx.url;
+      return '\ud83d\udccb Wochenbericht KW '+ctx.kw+'\n\nTeilnahme der Woche + Saison-Wertung:\n\ud83d\udc49 '+ctx.url;
+    }
+  },
+  metrics:{
+    label:'Mit Metriken',
+    build:ctx=>{
+      if(!ctx.hasSessions)return '\ud83d\udcca *Wochenbericht KW '+ctx.kw+'*\n\nDiese Woche keine Termine.\nAber die Saison-Wertung l\u00e4uft weiter:\n\ud83d\udc49 '+ctx.url;
+      const lines=['\ud83d\udcca *Wochenbericht KW '+ctx.kw+'*',''];
+      if(ctx.sessCountStr)lines.push('Diese Woche: '+ctx.sessCountStr);
+      if(ctx.teamPct!=null)lines.push('Mannschaft: '+ctx.teamPct+'% Teilnahme');
+      lines.push('','\ud83d\udc49 Wer steht ganz oben?',ctx.url);
+      return lines.join('\n');
+    }
+  }
+};
+function _dbBuildWhatsAppText(token,templateKey){
+  if(!Array.isArray(G.reportLog))return null;
+  const entry=G.reportLog.find(e=>e&&e.token===token);
+  if(!entry)return null;
+  const tmpl=_waTemplates[templateKey]||_waTemplates.hype;
+  const tc=entry.weekTrainCount,mc=entry.weekMatchCount;
+  const hasBreakdown=typeof tc==='number'||typeof mc==='number';
+  return tmpl.build({
+    kw:entry.kw,
+    url:_dbReportUrl(token),
+    hasSessions:(entry.sessionCount||0)>0,
+    teamPct:typeof entry.weekPct==='number'?entry.weekPct:null,
+    sessCountStr:hasBreakdown?_dbFmtSessCount(tc||0,mc||0):null
+  });
+}
+function dbCopyWhatsAppText(token,btnEl){
+  const tplKey=(typeof getUserPref==='function')?getUserPref('waTemplate','hype'):'hype';
+  const txt=_dbBuildWhatsAppText(token,tplKey);
+  if(!txt){alert('Text konnte nicht erstellt werden.');return;}
+  _dbCopyText(txt,()=>{
+    if(btnEl){
+      const orig=btnEl.innerHTML;
+      btnEl.innerHTML='\u2705 Kopiert!';
+      btnEl.classList.add('db-wr-copied');
+      setTimeout(()=>{btnEl.innerHTML=orig;btnEl.classList.remove('db-wr-copied');},2000);
+    }
+  });
+}
+function dbSetWaTemplate(sel){
+  if(typeof setUserPref==='function')setUserPref('waTemplate',sel.value||'hype');
+  // Live-update the preview if present
+  const preview=document.getElementById('db-wr-wa-preview');
+  if(preview&&preview.dataset.token)_dbUpdateWaPreview(preview.dataset.token);
+}
+function _dbUpdateWaPreview(token){
+  const preview=document.getElementById('db-wr-wa-preview');
+  if(!preview)return;
+  const tplKey=(typeof getUserPref==='function')?getUserPref('waTemplate','hype'):'hype';
+  const txt=_dbBuildWhatsAppText(token,tplKey);
+  if(txt)preview.textContent=txt; // textContent: pre-wrap CSS preserves \n
 }
 function _dbCopyText(txt,onDone){
   if(navigator.clipboard&&navigator.clipboard.writeText){
@@ -7119,20 +7259,76 @@ function dbRenderPublishedList(){
   html+='</div>';
   return html;
 }
+// ── Wochenbericht modal (standalone — uses UI.currentTeam/currentSeason) ──
+function openWeekReport(){
+  if(!UI.currentTeam||!UI.currentSeason){alert('Bitte zuerst eine Mannschaft und Saison ausw\u00e4hlen.');return;}
+  renderWeekReportModal();
+  if(typeof openM==='function')openM('moWeekReport');
+}
+function renderWeekReportModal(){
+  const el=document.getElementById('wr-content');
+  if(!el)return;
+  const team=UI.currentTeam,season=UI.currentSeason;
+  _dbState.team=team;_dbState.season=season;
+  const meta=document.getElementById('wr-team-meta');
+  if(meta)meta.textContent=team+' \u00b7 '+season;
+  const navSlot=document.getElementById('wr-nav-slot');
+  const block=G.db&&G.db[team+'__'+season];
+  if(!block||!Array.isArray(block.sessions)||!Array.isArray(block.players)){
+    if(navSlot)navSlot.innerHTML='';
+    el.innerHTML='<div style="padding:30px;text-align:center;color:var(--gm);font-size:.86rem;">Keine Daten f\u00fcr '+_dbEscapeHtml(team)+' \u00b7 '+_dbEscapeHtml(season)+'.</div>';
+    return;
+  }
+  const data={team,season,block,sessions:block.sessions,players:block.players};
+  if(navSlot)navSlot.innerHTML=_dbBuildWeekNav(data);
+  el.innerHTML=dbRenderWeekReportSection(data);
+}
+// Restored: was accidentally dropped during earlier refactor. Modal-aware: refreshes whichever container is open.
+function dbWeekReportNav(delta){
+  const season=_dbState.season||UI.currentSeason;
+  if(delta===0){
+    // "Heute" — if today is outside season, snap to season-end week
+    if(!_dbWeekInSeason(0,season)){
+      // walk backward week-by-week until we hit the season
+      let off=-1;
+      while(off>-60&&!_dbWeekInSeason(off,season))off--;
+      _dbState.weekReportOffset=off>-60?off:0;
+    } else {
+      _dbState.weekReportOffset=0;
+    }
+  } else {
+    const next=(_dbState.weekReportOffset||0)+delta;
+    if(next>0)return; // never into the future beyond current calendar week
+    if(!_dbWeekInSeason(next,season))return; // outside season boundary
+    _dbState.weekReportOffset=next;
+  }
+  if(document.getElementById('wr-content'))renderWeekReportModal();
+  else if(typeof renderDashboard==='function')renderDashboard();
+}
+function _dbBuildWeekNav(data){
+  // Returns the week-navigation HTML (used in the modal header slot)
+  const r=dbComputeWeekReport(data,_dbState.weekReportOffset||0);
+  const offset=_dbState.weekReportOffset||0;
+  const isCurrentWeek=offset===0;
+  const weekLbl=`KW ${r.kw} \u00b7 ${_dbFmtDM(r.bounds.monday)}\u2013${_dbFmtDM(r.bounds.sunday)}`;
+  const canPrev=_dbWeekInSeason(offset-1,r.season);
+  const canNext=!isCurrentWeek&&_dbWeekInSeason(offset+1,r.season);
+  const todayInSeason=_dbWeekInSeason(0,r.season);
+  let html='<div class="db-wr-nav">';
+  html+=`<button onclick="dbWeekReportNav(-1)" ${canPrev?'':'disabled'} title="Vorige Woche">\u2039</button>`;
+  html+=`<span class="db-wr-wk">${weekLbl}</span>`;
+  html+=`<button onclick="dbWeekReportNav(1)" ${canNext?'':'disabled'} title="N\u00e4chste Woche">\u203a</button>`;
+  if(!isCurrentWeek&&todayInSeason)html+=`<button class="db-wr-today" onclick="dbWeekReportNav(0)">Heute</button>`;
+  html+='</div>';
+  return html;
+}
 function dbRenderWeekReportSection(data){
   const offset=_dbState.weekReportOffset||0;
   const r=dbComputeWeekReport(data,offset);
   const isCurrentWeek=offset===0;
   const weekLbl=`KW ${r.kw} \u00b7 ${_dbFmtDM(r.bounds.monday)}\u2013${_dbFmtDM(r.bounds.sunday)}`;
-  let html='<div class="db-section db-wr">';
-  // Header + week navigation
-  html+='<div class="db-h-flex"><div class="db-h" style="margin-bottom:0;">\ud83d\udcc4 Wochenbericht</div>';
-  html+='<div class="db-wr-nav">';
-  html+=`<button onclick="dbWeekReportNav(-1)" title="Vorige Woche">\u2039</button>`;
-  html+=`<span class="db-wr-wk">${weekLbl}</span>`;
-  html+=`<button onclick="dbWeekReportNav(1)" ${isCurrentWeek?'disabled':''} title="N\u00e4chste Woche">\u203a</button>`;
-  if(!isCurrentWeek)html+=`<button class="db-wr-today" onclick="dbWeekReportNav(0)">Heute</button>`;
-  html+='</div></div>';
+  let html='<div class="db-section db-wr" style="padding-top:0;">';
+  // Header/nav are rendered separately in the modal header slot (see _dbBuildWeekNav)
   const emptyWeek=r.weekSess.length===0;
   // Week summary — compact session strip, or an empty-week note
   if(emptyWeek){
@@ -7148,22 +7344,46 @@ function dbRenderWeekReportSection(data){
     html+=`<div class="db-wr-teampct"><b>${r.teamAgg.overallPct==null?'\u2013':r.teamAgg.overallPct+'%'}</b><span>Team</span></div>`;
     html+='</div>';
   }
-  // Photo toggle
-  html+=`<label class="db-wr-photo-toggle"><input type="checkbox" ${_dbState.reportIncludePhotos?'checked':''} onchange="dbToggleReportPhotos(this)"> Spielerfotos einbeziehen <span class="db-wr-hint">gr\u00f6\u00dfere Datei</span></label>`;
-  // Publish area — published state vs not-yet
+  // Settings row (photo toggle + WhatsApp style if published) — assembled below
+  // Find existing published report for this week (used to decide what to render)
   const existing=Array.isArray(G.reportLog)?G.reportLog.find(e=>e&&e.team===r.team&&e.season===r.season&&e.kw===r.kw):null;
+  // Photo-toggle HTML — reused in both states (above publish button OR in published settings row)
+  const photoToggleHtml=`<label class="db-wr-photo-toggle"><input type="checkbox" ${_dbState.reportIncludePhotos?'checked':''} onchange="dbToggleReportPhotos(this)"><span class="db-wr-photo-txt">Spielerfotos einbeziehen</span><span class="db-wr-hint">gr\u00f6\u00dfere Datei</span></label>`;
+  // Publish area
   if(existing){
     const url=_dbReportUrl(existing.token);
     const d=new Date(existing.publishedAt);
     const ds=d.toLocaleDateString('de-DE')+' '+d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+    const waTpl=(typeof getUserPref==='function')?getUserPref('waTemplate','hype'):'hype';
+    const previewText=_dbBuildWhatsAppText(existing.token,waTpl)||'';
     html+='<div class="db-wr-published">';
     html+=`<div class="db-wr-pub-status">\u2705 Ver\u00f6ffentlicht \u00b7 <span>${ds}</span></div>`;
     html+=`<div class="db-wr-link">${_dbEscapeHtml(url)}</div>`;
+    // Settings under the link: photo toggle + WhatsApp style selector
+    html+='<div class="db-wr-settings">';
+    html+=photoToggleHtml;
+    html+='<div class="db-wr-wa-stil"><label class="db-wr-wa-lbl">WhatsApp-Stil:</label>';
+    html+=`<select class="db-wr-wa-sel" onchange="dbSetWaTemplate(this)">`;
+    Object.entries(_waTemplates).forEach(([k,v])=>{
+      html+=`<option value="${k}" ${k===waTpl?'selected':''}>${_dbEscapeHtml(v.label)}</option>`;
+    });
+    html+='</select></div>';
+    html+='</div>';
+    // Live preview of WhatsApp text
+    html+=`<div class="db-wr-wa-preview-wrap">
+      <div class="db-wr-wa-preview-h">Vorschau (wird kopiert):</div>
+      <div class="db-wr-wa-preview" id="db-wr-wa-preview" data-token="${_dbEscapeHtml(existing.token)}">${_dbEscapeHtml(previewText)}</div>
+    </div>`;
     html+='<div class="db-wr-pub-actions">';
     html+=`<button class="btn bp db-wr-copy" onclick="dbCopyReportLink('${_dbEscapeHtml(existing.token)}',this)">\ud83d\udd17 Link kopieren</button>`;
+    html+=`<button class="btn bp db-wr-wa-btn" onclick="dbCopyWhatsAppText('${_dbEscapeHtml(existing.token)}',this)">\ud83d\udcac WhatsApp-Text</button>`;
     html+=`<button class="btn bs db-wr-publish" onclick="dbPublishWeekReport()">\ud83d\udd04 Aktualisieren</button>`;
     html+='</div></div>';
   } else {
+    // Not yet published: photo toggle as standalone setting above the publish button
+    html+='<div class="db-wr-prepublish">';
+    html+=photoToggleHtml;
+    html+='</div>';
     html+='<div class="db-wr-pub-actions">';
     const pubLbl=emptyWeek?'\ud83d\udce4 Ver\u00f6ffentlichen (nur Saison-Wertung)':'\ud83d\udce4 Bericht ver\u00f6ffentlichen';
     html+=`<button class="btn bp db-wr-publish" onclick="dbPublishWeekReport()">${pubLbl}</button>`;
@@ -7214,8 +7434,6 @@ function renderDashboard(){
   html+=dbKpiCard('Ø Spiel','Spieler',m.groupSize.match,m.counts.matchesDone?'von '+m.counts.players+' Spielern':'noch keine');
   html+=dbKpiCard('Kader',null,m.counts.players,'Spieler insgesamt');
   html+='</div>';
-  // Weekly Report — primary Sunday-afternoon use case, placed prominently near top
-  html+=dbRenderWeekReportSection(data);
   // Row: Status breakdown + Sessions overview
   html+='<div class="db-two-col">';
   html+='<div class="db-card"><div class="db-h">📊 Status-Verteilung <span class="db-h-sub">(markiert)</span></div>'+dbRenderStatusBar(sb)+'</div>';
@@ -15365,11 +15583,11 @@ checkAutoBackup();
   <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;flex-shrink:0;flex-wrap:wrap;padding-right:32px;">
     <h3 style="flex:1;margin:0;color:var(--bd);min-width:140px;">📅 Kalender <span id="cal-presence-inline" class="inline-presence"></span></h3>
     <span id="cal-ctx" style="font-size:.78rem;color:var(--gm);"></span>
-    <button class="btn bs" id="cal-gen-plan" onclick="openGenSch();" style="background:rgba(120,90,200,.12);color:#3d2080;border-color:rgba(120,90,200,.35);font-size:.74rem;" title="Saisonplan generieren">⚙️ Plan</button>
-    <button class="btn bs" id="cal-add-train" onclick="openM('moSession');" style="background:rgba(0,102,204,.12);color:#003d80;border-color:rgba(0,102,204,.35);font-size:.74rem;">＋ Training</button>
-    <button class="btn bs" id="cal-add-match" onclick="openM('moMatch');" style="background:rgba(217,122,0,.15);color:#7a3a00;border-color:rgba(217,122,0,.35);font-size:.74rem;">⚽ Spiel</button>
-    <button class="btn bs" id="cal-add-btn" onclick="openCalEvent(null)" style="background:rgba(26,140,74,.12);color:#0a4d2c;border-color:rgba(26,140,74,.35);font-size:.74rem;">＋ Termin</button>
-    <button class="btn bs" id="cal-export-btn" onclick="openExportIcs()" style="background:rgba(80,80,80,.1);color:var(--gd);border-color:rgba(80,80,80,.25);font-size:.74rem;" title="In Google/Apple Kalender importieren">📥 Export</button>
+    <button class="cal-btn cal-btn-plan" id="cal-gen-plan" onclick="openGenSch();" title="Saisonplan generieren">⚙️ Plan</button>
+    <button class="cal-btn cal-btn-train" id="cal-add-train" onclick="openM('moSession');">＋ Training</button>
+    <button class="cal-btn cal-btn-match" id="cal-add-match" onclick="openM('moMatch');">⚽ Spiel</button>
+    <button class="cal-btn cal-btn-termin" id="cal-add-btn" onclick="openCalEvent(null)">＋ Termin</button>
+    <button class="cal-btn cal-btn-export" id="cal-export-btn" onclick="openExportIcs()" title="In Google/Apple Kalender importieren">📥 Export</button>
   </div>
   <div class="cal-legend">
     <div class="cal-legend-item"><div class="cal-legend-sw" style="background:#ffe0b0;border-left:2px solid #d97a00;"></div>Spiel</div>
@@ -15438,6 +15656,17 @@ checkAutoBackup();
     </div>
   </div>
   <div id="db-content" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 2px 6px;min-height:0;"></div>
+</div></div>
+
+<!-- Wochenbericht -->
+<div class="mo" id="moWeekReport" style="z-index:540;"><div class="mob" style="width:760px;max-width:96vw;height:82vh;max-height:740px;min-height:540px;display:flex;flex-direction:column;position:relative;">
+  <button class="mob-close-x" onclick="closeM('moWeekReport')" aria-label="Schließen">✕</button>
+  <div class="wr-head">
+    <h3 class="wr-head-title">📄 Wochenbericht</h3>
+    <div id="wr-nav-slot" class="wr-head-nav"></div>
+    <div id="wr-team-meta" class="wr-head-meta"></div>
+  </div>
+  <div id="wr-content" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 2px 6px;min-height:0;"></div>
 </div></div>
 
 <!-- Detailstatistik (Player) -->
