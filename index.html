@@ -1013,6 +1013,44 @@ mark.sr-hl{background:rgba(243,156,18,.35);color:inherit;border-radius:2px;paddi
 .db-tog button{background:none;border:none;padding:4px 11px;font-size:.7rem;font-weight:700;color:var(--gm);cursor:pointer;border-radius:5px;font-family:'Barlow',sans-serif;letter-spacing:.3px;transition:all .12s;}
 .db-tog button:hover:not(.active){color:var(--bd);}
 .db-tog button.active{background:#fff;color:var(--bd);box-shadow:0 1px 3px rgba(0,0,0,.1);}
+
+/* Weekly Report section */
+.db-wr-nav{display:flex;align-items:center;gap:6px;margin-left:auto;}
+.db-wr-nav button{background:#eaf0fa;border:1px solid var(--gl);border-radius:6px;width:28px;height:28px;cursor:pointer;font-size:1rem;color:var(--bd);font-weight:700;display:flex;align-items:center;justify-content:center;padding:0;transition:background .12s;}
+.db-wr-nav button:hover:not(:disabled){background:#d8e4f5;}
+.db-wr-nav button:disabled{opacity:.35;cursor:not-allowed;}
+.db-wr-nav button.db-wr-today{width:auto;padding:0 10px;font-size:.72rem;font-weight:600;}
+.db-wr-wk{font-size:.78rem;font-weight:700;color:var(--gd);padding:0 4px;white-space:nowrap;}
+.db-wr-empty{background:#f7f9fc;border:1px solid var(--gl);border-radius:8px;padding:18px;margin-top:8px;text-align:center;color:var(--gm);font-size:.84rem;}
+.db-wr-summary{display:flex;align-items:center;gap:12px;margin-top:10px;padding:10px 12px;background:#f7f9fc;border:1px solid var(--gl);border-radius:8px;}
+.db-wr-sess{display:flex;flex-wrap:wrap;gap:5px;flex:1;}
+.db-wr-chip{background:#fff;border:1px solid var(--gl);border-radius:6px;padding:3px 8px;font-size:.74rem;font-weight:600;color:var(--gd);white-space:nowrap;}
+.db-wr-teampct{text-align:center;flex-shrink:0;padding-left:10px;border-left:1px solid var(--gl);}
+.db-wr-teampct b{display:block;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--bd);line-height:1;}
+.db-wr-teampct span{font-size:.62rem;color:var(--gm);text-transform:uppercase;letter-spacing:.5px;}
+.db-wr-photo-toggle{display:flex;align-items:center;gap:7px;margin-top:10px;font-size:.8rem;color:var(--gd);cursor:pointer;user-select:none;}
+.db-wr-photo-toggle input{width:16px;height:16px;cursor:pointer;accent-color:var(--bm);}
+.db-wr-hint{font-size:.68rem;color:var(--gm);background:rgba(0,0,0,.04);padding:1px 6px;border-radius:4px;}
+.db-wr-pub-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.db-wr-pub-actions .btn{font-size:.84rem;}
+.db-wr-publish{flex:1;min-width:160px;}
+.db-wr-copy{flex:1;min-width:130px;}
+.db-wr-copy.db-wr-copied{background:#27ae60 !important;border-color:#27ae60 !important;color:#fff !important;}
+.db-wr-published{margin-top:12px;padding:12px;background:rgba(39,174,96,.06);border:1px solid rgba(39,174,96,.25);border-radius:8px;}
+.db-wr-pub-status{font-size:.8rem;font-weight:700;color:#1f8c4d;}
+.db-wr-pub-status span{font-weight:500;color:var(--gm);}
+.db-wr-link{margin-top:6px;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:.72rem;color:var(--bm);background:#fff;border:1px solid var(--gl);border-radius:6px;padding:7px 9px;word-break:break-all;}
+.db-wr-loglist{margin-top:14px;padding-top:12px;border-top:1px solid var(--gl);}
+.db-wr-log-h{font-size:.66rem;font-weight:700;color:var(--gm);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;}
+.db-wr-logrow{display:flex;align-items:center;gap:8px;padding:6px 4px;border-bottom:1px solid var(--gl);}
+.db-wr-logrow:last-child{border-bottom:none;}
+.db-wr-log-kw{font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:var(--bd);letter-spacing:.5px;flex-shrink:0;width:48px;}
+.db-wr-log-meta{flex:1;font-size:.75rem;color:var(--gd);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.db-wr-log-date{font-size:.7rem;color:var(--gm);flex-shrink:0;}
+.db-wr-log-copy{background:#eaf0fa;border:1px solid var(--gl);border-radius:6px;width:28px;height:26px;cursor:pointer;font-size:.8rem;flex-shrink:0;transition:background .12s;}
+.db-wr-log-copy:hover{background:#d8e4f5;}
+.db-wr-log-copy.db-wr-copied{background:#27ae60;border-color:#27ae60;}
+@media(max-width:560px){.db-wr-nav{width:100%;margin-left:0;margin-top:6px;}.db-wr-wk{flex:1;text-align:center;}.db-wr-summary{flex-direction:column;align-items:stretch;}.db-wr-teampct{border-left:none;border-top:1px solid var(--gl);padding-left:0;padding-top:8px;}}
 .db-export-row{display:flex;justify-content:flex-end;margin-top:18px;padding-top:12px;border-top:1px solid var(--gl);}
 .db-meta{color:var(--gm);font-size:.66rem;text-align:center;margin:18px 0 4px;}
 @media (max-width:767px){
@@ -1911,12 +1949,21 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.0.1-beta';
-const APP_VERSION_LABEL='1.0.1 (Beta)';
+const APP_VERSION='1.0.2-beta';
+const APP_VERSION_LABEL='1.0.2 (Beta)';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1778706847227; // 2026-05-13 21:14
+const APP_RELEASE_TS=1779106373532; // 2026-05-18 12:12
 const APP_CHANGELOG=[
+  {version:'1.0.2-beta',date:'18.05.2026',title:'Wochenbericht & Veröffentlichungen',items:[
+    {icon:'📤',title:'Wochenbericht veröffentlichen',desc:'Im Trainer-Dashboard lässt sich der Wochenbericht jetzt als Link für die Mannschafts-Gruppe veröffentlichen. Sonntags abends einmal klicken — Link in WhatsApp posten — Spieler sehen die Teilnahme der Woche.'},
+    {icon:'🏆',title:'Öffentliche Berichtsseite mit Wettbewerb',desc:'Die Link-Seite zeigt zwei Ranglisten: Teilnahme der Woche und kumulative Saison-Wertung. Das soll einen Wettbewerb unter den Spielern um den höchsten Prozentsatz schaffen.'},
+    {icon:'📷',title:'Optional mit Spielerfotos',desc:'Beim Veröffentlichen kannst du entscheiden, ob die Spielerfotos mit auf die Seite kommen oder nur Initialen-Avatare gezeigt werden.'},
+    {icon:'🔄',title:'Aktualisieren statt neu erzeugen',desc:'Wird der Bericht für dieselbe Woche erneut veröffentlicht, bleibt der bereits geteilte Link gültig — die Seite zeigt einfach die aktualisierten Daten.'},
+    {icon:'📋',title:'Verlauf veröffentlichter Berichte',desc:'Die zuletzt veröffentlichten Berichte sind im Dashboard sichtbar — alte Links lassen sich mit einem Klick erneut kopieren.'},
+    {icon:'☕',title:'Auch in Wochen ohne Termine',desc:'Selbst wenn in einer Woche kein Training und kein Spiel stattfand, kann der Bericht veröffentlicht werden — er zeigt dann nur die Saison-Wertung, damit der Wettbewerb nicht pausiert.'},
+    {icon:'🐛',title:'Fehlerbehebung',desc:'Anzeige-Fehler im Dashboard nach dem Öffnen behoben.'},
+  ]},
   {version:'1.0.1-beta',date:'13.05.2026',title:'Statistik überarbeitet & wichtige Bugfixes',items:[
     {icon:'📊',title:'Trainer-Dashboard erweitert',desc:'Status-Verteilung (Anwesend/Fehlend/Entschuldigt), Termine-Übersicht (letzte/nächste), Wochentag-Analyse mit Filter (absolviert/geplant, Trainings/Spiele), Geburtstage in 30 Tagen, Position-Übersicht der Mannschaft.'},
     {icon:'🔥',title:'Heatmap repariert',desc:'Aufstellungs-Positionen zeigen jetzt die richtigen Stellen auf dem Spielfeld. Bisher waren alle Markierungen fälschlicherweise in der Mitte.'},
@@ -2399,6 +2446,8 @@ function sanitizeG(data){
   if(!Array.isArray(data.auditLog))data.auditLog=data.auditLog?Object.values(data.auditLog).filter(Boolean):[];
   // Session templates
   if(!Array.isArray(data.sessionTemplates))data.sessionTemplates=data.sessionTemplates?Object.values(data.sessionTemplates).filter(Boolean):[];
+  // Published weekly reports log (metadata only; snapshots live in top-level publishedReports node)
+  if(!Array.isArray(data.reportLog))data.reportLog=data.reportLog?Object.values(data.reportLog).filter(Boolean):[];
   // One-time migration: legacy "team__idx" matchLineup keys → "team__season__idx"
   _migrateMatchLineupsIn(data);
   // One-time migration: invert registration model (V2)
@@ -6481,7 +6530,7 @@ function pmSetStatus(si,val){
   renderPlayerMode();
 }
 // ── TRAINER DASHBOARD ────────────────────────────────────────
-let _dbState={team:null,season:null,weekdayTime:'past',weekdayType:'all'};
+let _dbState={team:null,season:null,weekdayTime:'past',weekdayType:'all',weekReportOffset:0,reportIncludePhotos:false};
 function setDbWeekdayTime(t){_dbState.weekdayTime=t;renderDashboard();}
 function setDbWeekdayType(t){_dbState.weekdayType=t;renderDashboard();}
 function openDashboard(){
@@ -6841,6 +6890,299 @@ function dbRenderPositions(posData){
     ${posData.noPos>0?`<div class="db-pos-cell pos-none"><div class="db-pos-lbl">?</div><div class="db-pos-val">${posData.noPos}</div></div>`:''}
   </div>`;
 }
+// ══ WEEKLY REPORT ═══════════════════════════════════════════════
+// Calendar week Mon-Sun. offsetWeeks: 0=current week, -1=last week, etc.
+function _dbWeekBounds(offsetWeeks){
+  const now=new Date();now.setHours(0,0,0,0);
+  now.setDate(now.getDate()+offsetWeeks*7);
+  const dow=now.getDay(); // 0=Sun..6=Sat
+  const daysSinceMon=(dow===0)?6:dow-1;
+  const monday=new Date(now);monday.setDate(now.getDate()-daysSinceMon);
+  const sunday=new Date(monday);sunday.setDate(monday.getDate()+6);
+  const toYSK=d=>d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
+  return {monday,sunday,mondayYSK:toYSK(monday),sundayYSK:toYSK(sunday)};
+}
+function _dbIsoWeek(d){
+  const date=new Date(d.getTime());date.setHours(0,0,0,0);
+  date.setDate(date.getDate()+3-((date.getDay()+6)%7));
+  const week1=new Date(date.getFullYear(),0,4);
+  return 1+Math.round(((date-week1)/86400000-3+((week1.getDay()+6)%7))/7);
+}
+function _dbFmtDM(d){return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0');}
+function _dbFmtDMY(d){return _dbFmtDM(d)+'.'+d.getFullYear();}
+function dbComputeWeekReport(data,offsetWeeks){
+  const {sessions,players,season,team}=data;
+  const b=_dbWeekBounds(offsetWeeks);
+  // Sessions falling in this calendar week, sorted chronologically
+  const weekSess=[];
+  sessions.forEach((s,i)=>{
+    if(!s||!s.date)return;
+    const k=_dbSortKey(s.date,season);
+    if(k>=b.mondayYSK&&k<=b.sundayYSK)weekSess.push({s,i,sortKey:k});
+  });
+  weekSess.sort((a,b2)=>a.sortKey-b2.sortKey);
+  // Per-player participation. cells = raw status values (1/0/2/3) for snapshot consumption.
+  const playerRows=[];
+  players.forEach((p,pi)=>{
+    if(!p)return;
+    let present=0,marked=0;
+    const cells=weekSess.map(({i})=>{
+      const v=p.s&&p.s[i];
+      if(v===1){present++;marked++;return 1;}
+      if(v===0){marked++;return 0;}
+      if(v===2){marked++;return 2;}
+      return 3; // open / not marked
+    });
+    playerRows.push({
+      pi,name:(typeof getDisplayName==='function'?getDisplayName(p):p.name)||p.name||'?',
+      nr:+p.nr||99,cells,present,marked,total:weekSess.length
+    });
+  });
+  // Sort: present count desc, then marked count desc, then jersey number
+  playerRows.sort((a,b2)=>b2.present-a.present||b2.marked-a.marked||a.nr-b2.nr);
+  // Team aggregates (training vs match)
+  let tA=0,tT=0,mA=0,mT=0;
+  weekSess.forEach(({s,i})=>{
+    const isMatch=s.type==='match';
+    players.forEach(p=>{
+      if(!p)return;
+      const v=p.s&&p.s[i];
+      if(v==null||v===3)return;
+      if(isMatch){mT++;if(v===1)mA++;}else{tT++;if(v===1)tA++;}
+    });
+  });
+  const trainCount=weekSess.filter(w=>w.s.type!=='match').length;
+  const matchCount=weekSess.filter(w=>w.s.type==='match').length;
+  return {
+    bounds:b,kw:_dbIsoWeek(b.monday),team,season,
+    weekSess,playerRows,trainCount,matchCount,
+    teamAgg:{
+      tAvg:trainCount?Math.round(tA/trainCount):null,
+      mAvg:matchCount?Math.round(mA/matchCount):null,
+      tPct:tT?Math.round(tA/tT*100):null,
+      mPct:mT?Math.round(mA/mT*100):null,
+      overallPct:(tT+mT)?Math.round((tA+mA)/(tT+mT)*100):null
+    },
+    rosterSize:players.filter(p=>p).length
+  };
+}
+// ── Weekly Report: publish flow ──────────────────────────────
+let _dbPublishing=false;
+function _dbComputeSeasonStats(data){
+  // Per-player cumulative season attendance + overall team season %
+  const {sessions,players}=data;
+  const perPlayer={};
+  let teamA=0,teamT=0;
+  players.forEach((p,pi)=>{
+    if(!p)return;
+    let pres=0,tot=0;
+    sessions.forEach((s,si)=>{
+      if(!s)return;
+      const v=p.s&&p.s[si];
+      if(v==null||v===3)return;
+      tot++;teamT++;
+      if(v===1){pres++;teamA++;}
+    });
+    perPlayer[pi]={present:pres,total:tot};
+  });
+  return {perPlayer,teamPct:teamT?Math.round(teamA/teamT*100):null};
+}
+function _dbGenReportToken(){
+  const chars='abcdefghijkmnpqrstuvwxyz23456789'; // no ambiguous chars
+  let t='wr_';
+  for(let i=0;i<10;i++)t+=chars[Math.floor(Math.random()*chars.length)];
+  return t;
+}
+function _dbReportUrl(token){
+  const base=location.origin+location.pathname.replace(/\/[^\/]*$/,'/');
+  return base+'report.html?id='+encodeURIComponent(token);
+}
+function dbBuildReportSnapshot(data,offset,includePhotos){
+  const r=dbComputeWeekReport(data,offset);
+  const seasonStats=_dbComputeSeasonStats(data);
+  const players=data.players;
+  const playerEntries=r.playerRows.map(pr=>{
+    const p=players[pr.pi]||{};
+    const ss=seasonStats.perPlayer[pr.pi]||{present:0,total:0};
+    const wPct=pr.marked>0?Math.round(pr.present/pr.total*100):null;
+    const sPct=ss.total>0?Math.round(ss.present/ss.total*100):null;
+    return {
+      name:pr.name,
+      nr:(p.nr!=null&&p.nr!=='')?p.nr:null,
+      pos:p.pos||'',
+      photo:(includePhotos&&p.photo)?p.photo:null,
+      wCells:pr.cells,
+      wPresent:pr.present,wTotal:pr.total,wPct:wPct,
+      sPresent:ss.present,sTotal:ss.total,sPct:sPct
+    };
+  });
+  return {
+    v:1,
+    publishedAt:Date.now(),
+    club:(G&&G.clubName)||'FC Frohlinde',
+    clubLogo:(G&&G.clubLogo)||null,
+    team:r.team,season:r.season,
+    week:{
+      kw:r.kw,
+      from:_dbFmtDMY(r.bounds.monday),
+      to:_dbFmtDMY(r.bounds.sunday),
+      sessions:r.weekSess.map(({s})=>({
+        date:s.date,
+        type:s.type==='match'?'match':'training',
+        label:s.label||''
+      }))
+    },
+    players:playerEntries,
+    teamStats:{
+      weekPct:r.teamAgg.overallPct,
+      seasonPct:seasonStats.teamPct,
+      trainingAvg:r.teamAgg.tAvg,
+      matchAvg:r.teamAgg.mAvg,
+      rosterSize:r.rosterSize,
+      weekTrainCount:r.trainCount,
+      weekMatchCount:r.matchCount
+    }
+  };
+}
+function dbPublishWeekReport(){
+  if(_dbPublishing)return;
+  if(!fbDb){alert('Keine Verbindung zur Datenbank \u2014 Bericht kann nicht ver\u00f6ffentlicht werden. Bitte Internetverbindung pr\u00fcfen.');return;}
+  const data=dbGetData();
+  if(!data.block)return;
+  const offset=_dbState.weekReportOffset||0;
+  const r=dbComputeWeekReport(data,offset);
+  // Empty weeks are allowed — the report then shows only the season standings.
+  const includePhotos=!!_dbState.reportIncludePhotos;
+  const snapshot=dbBuildReportSnapshot(data,offset,includePhotos);
+  if(!Array.isArray(G.reportLog))G.reportLog=[];
+  // Reuse token if a report for this team+season+KW already exists (so the shared link stays valid)
+  const existing=G.reportLog.find(e=>e&&e.team===snapshot.team&&e.season===snapshot.season&&e.kw===snapshot.week.kw);
+  const token=existing?existing.token:_dbGenReportToken();
+  _dbPublishing=true;
+  const btn=document.querySelector('.db-wr-publish');
+  if(btn){btn.disabled=true;btn.innerHTML='\u23f3 Wird ver\u00f6ffentlicht\u2026';}
+  fbDb.ref('publishedReports/'+token).set(snapshot).then(()=>{
+    const logEntry={
+      token:token,team:snapshot.team,season:snapshot.season,
+      kw:snapshot.week.kw,from:snapshot.week.from,to:snapshot.week.to,
+      publishedAt:snapshot.publishedAt,hasPhotos:includePhotos,
+      sessionCount:r.weekSess.length
+    };
+    if(existing)Object.assign(existing,logEntry);
+    else G.reportLog.unshift(logEntry);
+    if(G.reportLog.length>30)G.reportLog=G.reportLog.slice(0,30);
+    saveG();
+    _dbPublishing=false;
+    _dbCopyText(_dbReportUrl(token));
+    if(typeof showSaveFlash==='function')showSaveFlash('\u2705 Ver\u00f6ffentlicht & Link kopiert');
+    renderDashboard();
+  }).catch(err=>{
+    _dbPublishing=false;
+    if(btn){btn.disabled=false;btn.innerHTML='\ud83d\udce4 Bericht ver\u00f6ffentlichen';}
+    alert('Ver\u00f6ffentlichung fehlgeschlagen. Bitte Internetverbindung pr\u00fcfen und erneut versuchen.');
+  });
+}
+function dbToggleReportPhotos(cb){
+  _dbState.reportIncludePhotos=!!cb.checked;
+}
+function _dbCopyText(txt,onDone){
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(()=>onDone&&onDone()).catch(()=>_dbCopyFallback(txt,onDone));
+  } else {
+    _dbCopyFallback(txt,onDone);
+  }
+}
+function dbCopyReportLink(token,btnEl){
+  _dbCopyText(_dbReportUrl(token),()=>{
+    if(btnEl){
+      const orig=btnEl.innerHTML;
+      btnEl.innerHTML='\u2705 Kopiert!';
+      btnEl.classList.add('db-wr-copied');
+      setTimeout(()=>{btnEl.innerHTML=orig;btnEl.classList.remove('db-wr-copied');},2000);
+    }
+  });
+}
+function dbRenderPublishedList(){
+  if(!Array.isArray(G.reportLog)||G.reportLog.length===0)return '';
+  const sorted=[...G.reportLog].sort((a,b)=>(b.publishedAt||0)-(a.publishedAt||0)).slice(0,8);
+  let html='<div class="db-wr-loglist"><div class="db-wr-log-h">Zuletzt ver\u00f6ffentlicht</div>';
+  sorted.forEach(e=>{
+    const d=new Date(e.publishedAt);
+    const ds=d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'});
+    html+=`<div class="db-wr-logrow">
+      <span class="db-wr-log-kw">KW ${e.kw}</span>
+      <span class="db-wr-log-meta">${_dbEscapeHtml(e.team)} \u00b7 ${_dbEscapeHtml(e.from)}\u2013${_dbEscapeHtml(e.to)}${e.hasPhotos?' \u00b7 \ud83d\udcf7':''}</span>
+      <span class="db-wr-log-date">${ds}</span>
+      <button class="db-wr-log-copy" onclick="dbCopyReportLink('${_dbEscapeHtml(e.token)}',this)" title="Link kopieren">\ud83d\udd17</button>
+    </div>`;
+  });
+  html+='</div>';
+  return html;
+}
+function dbRenderWeekReportSection(data){
+  const offset=_dbState.weekReportOffset||0;
+  const r=dbComputeWeekReport(data,offset);
+  const isCurrentWeek=offset===0;
+  const weekLbl=`KW ${r.kw} \u00b7 ${_dbFmtDM(r.bounds.monday)}\u2013${_dbFmtDM(r.bounds.sunday)}`;
+  let html='<div class="db-section db-wr">';
+  // Header + week navigation
+  html+='<div class="db-h-flex"><div class="db-h" style="margin-bottom:0;">\ud83d\udcc4 Wochenbericht</div>';
+  html+='<div class="db-wr-nav">';
+  html+=`<button onclick="dbWeekReportNav(-1)" title="Vorige Woche">\u2039</button>`;
+  html+=`<span class="db-wr-wk">${weekLbl}</span>`;
+  html+=`<button onclick="dbWeekReportNav(1)" ${isCurrentWeek?'disabled':''} title="N\u00e4chste Woche">\u203a</button>`;
+  if(!isCurrentWeek)html+=`<button class="db-wr-today" onclick="dbWeekReportNav(0)">Heute</button>`;
+  html+='</div></div>';
+  const emptyWeek=r.weekSess.length===0;
+  // Week summary — compact session strip, or an empty-week note
+  if(emptyWeek){
+    html+='<div class="db-wr-empty">In dieser Woche gibt es keine Termine. Der Bericht kann trotzdem ver\u00f6ffentlicht werden \u2014 er zeigt dann nur die Saison-Wertung.</div>';
+  } else {
+    html+='<div class="db-wr-summary">';
+    html+='<div class="db-wr-sess">';
+    r.weekSess.forEach(({s})=>{
+      const ico=s.type==='match'?'\u26bd':'\ud83c\udfc3';
+      html+=`<span class="db-wr-chip">${ico} ${_dbEscapeHtml(s.date)}</span>`;
+    });
+    html+='</div>';
+    html+=`<div class="db-wr-teampct"><b>${r.teamAgg.overallPct==null?'\u2013':r.teamAgg.overallPct+'%'}</b><span>Team</span></div>`;
+    html+='</div>';
+  }
+  // Photo toggle
+  html+=`<label class="db-wr-photo-toggle"><input type="checkbox" ${_dbState.reportIncludePhotos?'checked':''} onchange="dbToggleReportPhotos(this)"> Spielerfotos einbeziehen <span class="db-wr-hint">gr\u00f6\u00dfere Datei</span></label>`;
+  // Publish area — published state vs not-yet
+  const existing=Array.isArray(G.reportLog)?G.reportLog.find(e=>e&&e.team===r.team&&e.season===r.season&&e.kw===r.kw):null;
+  if(existing){
+    const url=_dbReportUrl(existing.token);
+    const d=new Date(existing.publishedAt);
+    const ds=d.toLocaleDateString('de-DE')+' '+d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+    html+='<div class="db-wr-published">';
+    html+=`<div class="db-wr-pub-status">\u2705 Ver\u00f6ffentlicht \u00b7 <span>${ds}</span></div>`;
+    html+=`<div class="db-wr-link">${_dbEscapeHtml(url)}</div>`;
+    html+='<div class="db-wr-pub-actions">';
+    html+=`<button class="btn bp db-wr-copy" onclick="dbCopyReportLink('${_dbEscapeHtml(existing.token)}',this)">\ud83d\udd17 Link kopieren</button>`;
+    html+=`<button class="btn bs db-wr-publish" onclick="dbPublishWeekReport()">\ud83d\udd04 Aktualisieren</button>`;
+    html+='</div></div>';
+  } else {
+    html+='<div class="db-wr-pub-actions">';
+    const pubLbl=emptyWeek?'\ud83d\udce4 Ver\u00f6ffentlichen (nur Saison-Wertung)':'\ud83d\udce4 Bericht ver\u00f6ffentlichen';
+    html+=`<button class="btn bp db-wr-publish" onclick="dbPublishWeekReport()">${pubLbl}</button>`;
+    html+='</div>';
+  }
+  html+=dbRenderPublishedList();
+  html+='</div>';
+  return html;
+}
+function _dbEscapeHtml(s){
+  return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function _dbCopyFallback(txt,cb){
+  const ta=document.createElement('textarea');
+  ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');cb&&cb();}catch(e){alert('Kopieren nicht m\u00f6glich \u2014 bitte manuell markieren.');}
+  document.body.removeChild(ta);
+}
 function renderDashboard(){
   const data=dbGetData();
   const el=document.getElementById('db-content');
@@ -6872,6 +7214,8 @@ function renderDashboard(){
   html+=dbKpiCard('Ø Spiel','Spieler',m.groupSize.match,m.counts.matchesDone?'von '+m.counts.players+' Spielern':'noch keine');
   html+=dbKpiCard('Kader',null,m.counts.players,'Spieler insgesamt');
   html+='</div>';
+  // Weekly Report — primary Sunday-afternoon use case, placed prominently near top
+  html+=dbRenderWeekReportSection(data);
   // Row: Status breakdown + Sessions overview
   html+='<div class="db-two-col">';
   html+='<div class="db-card"><div class="db-h">📊 Status-Verteilung <span class="db-h-sub">(markiert)</span></div>'+dbRenderStatusBar(sb)+'</div>';
