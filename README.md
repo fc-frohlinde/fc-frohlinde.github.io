@@ -19,7 +19,7 @@ Eine vollständige App für die tägliche Arbeit eines Vereinstrainers — Anwes
 
 ## Status
 
-🧪 **Beta-Phase** — Version `1.0.0-beta` (Mai 2026)
+🧪 **Beta-Phase** — Version `1.0.2-beta` (Mai 2026)
 
 Die App wird kontinuierlich weiterentwickelt. Eine vollständige Versionshistorie ist in der App unter **Mein Konto → ℹ Über footy.ai** einsehbar.
 
