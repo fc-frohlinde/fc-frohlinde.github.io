@@ -385,10 +385,13 @@ function renderReport(r){
     return `<div class="avatar-ph" style="background:${avatarColor(p.name)}">${esc(initials(p.name))}</div>`;
   };
   // Ranking row builder — shows BOTH week and season %; active sort is emphasized.
+  // Uses competition ranking (tied players share rank).
   const rankRow=(p,idx,activeSort,showAlt)=>{
-    const rank=idx+1;
+    // Use pre-computed competition rank; fall back to idx+1 if not available (e.g. null pct).
+    const cRank=activeSort==='week'?p._wRank:p._sRank;
+    const rank=cRank!=null?cRank:(idx+1);
     const topCls=rank<=3?` top${rank}`:'';
-    const medal=['\ud83e\udd47','\ud83e\udd48','\ud83e\udd49'][idx]||'';
+    const medal=rank<=3?['\ud83e\udd47','\ud83e\udd48','\ud83e\udd49'][rank-1]:'';
     const cellsHtml=p.wCells&&p.wCells.length
       ? `<div class="rank-cells">${p.wCells.map(cellEmoji).join('')}</div>` : '';
     const numOrMedal=rank<=3
@@ -425,13 +428,26 @@ function renderReport(r){
     </div>`;
   };
 
-  // Sort copies
+  // Sort copies — primary by pct, then presents, then jersey number for stable display.
+  // BUT the actual rank is determined by competition ranking on pct only (tied = same rank).
   const weekRanked=[...r.players].sort((a,b)=>
     (b.wPct==null?-1:b.wPct)-(a.wPct==null?-1:a.wPct)
     || b.wPresent-a.wPresent || (a.nr||99)-(b.nr||99));
   const seasonRanked=[...r.players].sort((a,b)=>
     (b.sPct==null?-1:b.sPct)-(a.sPct==null?-1:a.sPct)
     || b.sPresent-a.sPresent || (a.nr||99)-(b.nr||99));
+  // Competition ranking (1224): tied pct → same rank, next rank jumps.
+  // E.g. 4 players at 100% → all are #1, next is #5.
+  const _addCompRank=(arr,pctKey,rankKey)=>{
+    arr.forEach(p=>{
+      if(p[pctKey]==null){p[rankKey]=null;return;}
+      let higher=0;
+      arr.forEach(q=>{if(q!==p&&q[pctKey]!=null&&q[pctKey]>p[pctKey])higher++;});
+      p[rankKey]=higher+1;
+    });
+  };
+  _addCompRank(weekRanked,'wPct','_wRank');
+  _addCompRank(seasonRanked,'sPct','_sRank');
 
   const ts=r.teamStats||{};
   const wk=r.week||{};
