@@ -1592,7 +1592,7 @@ body.guest-mode{padding-top:24px;}
     <button class="btn bundo" id="undoBtn" onclick="undo()" disabled title="Rückgängig Ctrl+Z">↩</button>
     <button class="btn bundo" id="redoBtn" onclick="redo()" disabled title="Wiederholen Ctrl+Y">↪</button>
     <span class="saved" id="savedBadge">✓</span>
-    <span id="syncStatus" style="font-size:.72rem;font-weight:600;color:var(--gm);white-space:nowrap;">⚫ Lokal</span>
+    <span id="syncStatus" title="Klicke um zu aktualisieren" style="font-size:.72rem;font-weight:600;color:var(--gm);white-space:nowrap;cursor:pointer;user-select:none;padding:2px 6px;border-radius:4px;" onclick="forceSyncRefresh()">⚫ Lokal</span>
     <div class="tsep"></div>
     <button class="btn" id="btn-slp" style="background:rgba(232,200,64,.12);color:#c8a820;border:1px solid rgba(232,200,64,.3);" onclick="openSeasonLineup()">📋 Saisonkader</button>
     <button class="btn bteam" onclick="openTeamMgr('spieler')">🏆 Mannschaft</button>
@@ -2182,13 +2182,22 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.0.4-beta';
-const APP_VERSION_LABEL='1.0.4 (Beta)';
+const APP_VERSION='1.0.5-beta';
+const APP_VERSION_LABEL='1.0.5 (Beta)';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1779600000000; // v1.0.4-beta release
+const APP_RELEASE_TS=1779800000000; // v1.0.5-beta: safety overhaul
 const APP_CHANGELOG=[
+  {version:'1.0.5-beta',date:'21.05.2026',title:'Datensicherheit & Synchronisations-Schutz',items:[
+    {icon:'🟢',title:'Synchronisations-Anzeige',desc:'Neue Anzeige oben rechts zeigt, wie aktuell deine Daten sind: 🟢 Live (gerade synchronisiert), 🟡 vor 45s, 🟠 vor 5 min (veraltet), 🔴 Verbindungsfehler. Klick auf die Anzeige erzwingt sofortige Aktualisierung. Du weißt jederzeit, ob du mit den neuesten Daten arbeitest.'},
+    {icon:'🔄',title:'Auto-Aktualisierung beim Tab-Wechsel',desc:'Wenn du nach längerer Pause zur App zurückkehrst (z.B. anderer Tab oder Handy-Bildschirm aus), werden Daten automatisch frisch aus Firebase geladen — vorausgesetzt du hast keine ungespeicherten Änderungen. Schluss mit dem Risiko, auf veralteten Daten zu arbeiten.'},
+    {icon:'🛡',title:'Schutz beim Löschen erweitert',desc:'Vor jedem Lösch-Vorgang (Spieler, Sitzung, Saison, Mannschaft, Stundenplan-Generierung) prüft die App jetzt drei Dinge: ist die App-Version aktuell, ist Firebase verbunden, sind die Daten frisch (< 5 min). Bei Problemen wird die Aktion blockiert mit klarer Anweisung was zu tun ist. Verhindert versehentliche Datenkollisionen.'},
+    {icon:'💾',title:'Backup-Speicher erhöht',desc:'Firebase bewahrt jetzt bis zu 15 Backups auf (vorher nur 3 wegen eines internen Bugs). Im Notfall kann viel weiter zurück wiederhergestellt werden.'},
+    {icon:'📦',title:'Automatische Aktualisierung verbessert',desc:'Beim Öffnen der App nach längerer Pause wird eine eventuell veraltete Version jetzt sofort und unmerklich aktualisiert — kein Banner mehr nötig. Nur wenn du gerade aktiv arbeitest und eine neue Version verfügbar ist, erscheint ein Countdown-Banner (10 Sek), damit dein aktueller Vorgang nicht abrupt unterbrochen wird.'},
+    {icon:'📜',title:'Lückenlose Protokollierung',desc:'Das Löschen von Sitzungen über das Termin-Fenster wurde bisher nicht im Verlauf protokolliert — jetzt schon. Auch die Stundenplan-Generierung wird vollständig erfasst. Keine stillen Löschungen mehr.'},
+    {icon:'🔧',title:'Erweiterte Selbstheilung',desc:'Beim Laden bereinigt die App automatisch auch beschädigte Bestätigungs-Verweise (slpConfirmations) und Gast-Listen — nicht nur Saisonkader und Aufstellungen wie bisher. Mehr Robustheit gegen Daten aus älteren Versionen.'},
+  ]},
   {version:'1.0.4-beta',date:'21.05.2026',title:'Status „Angemeldet", Spieler-App-Politur & robustere Synchronisation',items:[
     {icon:'🅼',title:'Neuer Status „Angemeldet" (M)',desc:'Anwesenheits-Status erweitert um einen 5. Status: „Angemeldet" (blau, „M"). Spieler antworten in der Spieler-App mit „Komme" — der Status wird automatisch auf „Angemeldet" gesetzt. Am Termin tippt der Trainer einmal — daraus wird „Anwesend". So sieht man immer wer schon zugesagt hat, ohne Verwechslung mit der tatsächlichen Anwesenheit.'},
     {icon:'📋',title:'Spieler-Anmeldungen sammeln',desc:'Neuer Workflow „Anmeldungen": Bestätigungslinks an alle (oder pro Termin) per WhatsApp verschicken. Spieler antworten in der Spieler-App mit „Komme" oder „Kann nicht" — Status erscheint direkt in der Mitspielerliste als „Angemeldet" oder „Entschuldigt".'},
@@ -2203,7 +2212,7 @@ const APP_CHANGELOG=[
     {icon:'🔒',title:'Robusterer Manuell-Sync-Modus',desc:'Auto-Sync „Aus" funktioniert jetzt konsequent in beide Richtungen — entfernte Änderungen überschreiben nicht mehr stillschweigend deine lokalen. Beim Zurückschalten auf „Ein" wird gewarnt, falls lokale Änderungen vorliegen. Manuell-Speichern stempelt jetzt korrekt Metadaten.'},
     {icon:'\ud83c\udfaf',title:'Sitzungs-Modal nach Phase',desc:'Vor Trainingsbeginn werden nur Planungsoptionen gezeigt (Angemeldet/Entschuldigt/Ausstehend) — der Anmeldungs-Balken mit Frist und „Erinnern". Ab Trainingsbeginn werden Anwesenheits-Karten (Anwesend/Fehlend/Entsch.) und Faktstatus-Optionen gezeigt. Kein visuelles Durcheinander mehr zwischen Plan und Fakt.'},
     {icon:'\ud83d\udcdd',title:'Einheitliche Bezeichnungen',desc:'\u00dcberall werden jetzt dieselben Status-Namen verwendet (Angemeldet, Entschuldigt, Ausstehend) \u2014 in Karten, Listen, Filtern, Chips. „Komme"/„Kann nicht" sind nur noch in der Spieler-App als Aktions-Buttons sichtbar, nicht mehr als Status-Bezeichnung beim Trainer.'},
-    {icon:'\ud83d\udd27',title:'Saisonkader-Datenfehler behoben',desc:'Beim L\u00f6schen eines Spielers \u00fcber „Mannschaft" wurden Verweise in gespeicherten Saisonkader-Pl\u00e4nen nicht aktualisiert \u2014 Indizes verschoben sich auf andere Spieler. Behoben. Beim Laden werden veraltete Verweise automatisch entfernt.'},
+    {icon:'🔧',title:'Saisonkader-Datenfehler behoben',desc:'Beim Löschen eines Spielers über „Mannschaft" wurden Verweise in gespeicherten Saisonkader-Plänen nicht aktualisiert — Indizes verschoben sich auf andere Spieler. Behoben. Beim Laden werden veraltete Verweise automatisch entfernt.'},
     {icon:'\ud83e\uddf9',title:'UI aufger\u00e4umt',desc:'„Anmeldungen sammeln"-Button aus der Hauptleiste entfernt (Funktion l\u00e4uft \u00fcber die Sitzungs-Modale). Bulk-Setze-Buttons („Alle Anwesend", „Alle Fehlend" usw.) entfernt \u2014 Anwesenheit wird pro Spieler gesetzt, nicht massenhaft.'},
     {icon:'\ud83d\udc1b',title:'Fehlerbehebungen',desc:'Checkbox-Ausrichtung im Wochenbericht repariert. Anwesenheits-% in der Spieler-App stimmt jetzt mit dem Wochenbericht \u00fcberein. Spieler-Status-\u00c4nderungen synchronisieren jetzt korrekt zum Trainer (Pfad-Encoding f\u00fcr verschachtelte Arrays in Firebase repariert).'},
   ]},
@@ -2633,6 +2642,8 @@ function _fbWriteWithStamp(data){
     setTimeout(()=>{_fbSaving=false;},500);
     _localDirty=false;
     if(typeof setFbStatus==='function')setFbStatus('connected');
+    // We just wrote = our local state matches Firebase = we're synced
+    if(typeof _markSynced==='function')_markSynced();
   }).catch(e=>{
     _fbSaving=false;
     if(typeof setFbStatus==='function')setFbStatus('error');
@@ -2722,6 +2733,172 @@ function fbDecode(d){
   // Deep decode entire response
   return fbDecodeValue(d);
 }
+// ── FORENSIC RECOVERY UTILITY ─────────────────────────────────
+// Recover index-based references (slpConfirmations, seasonLineups, matchLineups)
+// by matching player NAMES (not indices) from a backup — fixes cases where
+// players were deleted via a buggy path that didn't shift refs properly.
+//
+// Usage from DevTools console:
+//   forensicRecover()                       — list backups
+//   forensicRecover('Auto 20.5.2026')       — dry-run preview
+//   forensicRecover('Auto 20.5.2026', true) — APPLY (safety backup first)
+async function forensicRecover(backupLabel,apply){
+  if(!fbDb||!fbRef){console.error('Firebase not connected');return;}
+  if(!CU){console.error('Not logged in');return;}
+  const bSnap=await fbRef.parent.child('__backups').once('value');
+  const raw=bSnap.val();
+  const backups=(raw&&raw.__arr?raw.v:(Array.isArray(raw)?raw:Object.values(raw||{}))).filter(Boolean);
+  if(!backups.length){console.error('No backups in Firebase');return;}
+  backups.sort((a,b)=>(b.ts||0)-(a.ts||0));
+  if(!backupLabel){
+    console.info('Available backups:');
+    backups.forEach((b,i)=>console.info(`  [${i}] ${new Date(b.ts).toLocaleString('de-DE')} — "${b.label||b.kind||'?'}"`));
+    console.info('\nUsage: forensicRecover("Label-Teil") for dry-run, then forensicRecover("Label-Teil",true) to apply.');
+    return;
+  }
+  const target=backups.find(b=>(b.label||'').toLowerCase().includes(backupLabel.toLowerCase()));
+  if(!target){console.error('No backup matches:',backupLabel);return;}
+  console.info('Using backup:',target.label,'@',new Date(target.ts).toLocaleString('de-DE'));
+  // Decode backup data — Firebase stores it in different forms:
+  //   1. Plain JSON string (most common, current format)
+  //   2. Character-indexed object (legacy when stored as oversized string)
+  //   3. Direct object with .db field (uncompressed legacy)
+  let backupData=target.data;
+  if(typeof backupData==='string'){
+    try{backupData=JSON.parse(backupData);}
+    catch(e){console.error('Failed to JSON.parse backup string:',e);return;}
+  } else if(backupData&&typeof backupData==='object'&&!backupData.db){
+    // Try character-indexed reassembly
+    const keys=Object.keys(backupData).map(Number).filter(n=>!isNaN(n)).sort((a,b)=>a-b);
+    if(keys.length>10){
+      try{backupData=JSON.parse(keys.map(k=>target.data[k]).join(''));}
+      catch(e){console.error('Failed to decode char-indexed backup:',e);return;}
+    }
+  }
+  if(!backupData||!backupData.db){console.error('Backup has no db field after decode');return;}
+  const ts=ck();
+  if(!ts){console.error('No current team/season selected');return;}
+  const backupPlayers=(backupData.db[ts]&&backupData.db[ts].players)||[];
+  const currentPlayers=(G.db[ts]&&G.db[ts].players)||[];
+  const backupIdxToName={};
+  backupPlayers.forEach((p,i)=>{if(p&&p.name)backupIdxToName[i]=p.name;});
+  const nameToCurrentIdx={};
+  currentPlayers.forEach((p,i)=>{if(p&&p.name)nameToCurrentIdx[p.name]=i;});
+  console.info('Backup roster:',backupPlayers.length,'players. Current roster:',currentPlayers.length,'players.');
+  const lostNames=[],sameMapping=[],changedMapping=[];
+  Object.entries(backupIdxToName).forEach(([oldIdx,name])=>{
+    const newIdx=nameToCurrentIdx[name];
+    if(newIdx===undefined)lostNames.push(name);
+    else if(String(newIdx)===oldIdx)sameMapping.push(name);
+    else changedMapping.push(`${name}: ${oldIdx}→${newIdx}`);
+  });
+  if(lostNames.length)console.info('Players deleted since backup:',lostNames);
+  if(changedMapping.length)console.info('Players whose index changed:',changedMapping);
+  if(!changedMapping.length&&!lostNames.length){
+    console.info('No index changes detected — data appears consistent with backup.');
+    return;
+  }
+  const ops={confirmations:0,seasonLineupSlots:0,matchLineupSlots:0,matchLineupSubs:0,droppedRefs:0};
+  const remap=(backupPi)=>{
+    const name=backupIdxToName[backupPi];
+    if(!name)return undefined;
+    return nameToCurrentIdx[name];
+  };
+  // Stage 1: slpConfirmations
+  const backupConf=backupData.slpConfirmations&&backupData.slpConfirmations[ts];
+  const newConfirmed={};
+  if(backupConf&&backupConf.confirmed){
+    Object.entries(backupConf.confirmed).forEach(([piKey,val])=>{
+      const newPi=remap(parseInt(piKey,10));
+      if(newPi===undefined){ops.droppedRefs++;return;}
+      newConfirmed[newPi]=val;
+      ops.confirmations++;
+    });
+  }
+  // Stage 2: seasonLineups slots
+  const backupSlps=(backupData.seasonLineups||[]).filter(s=>s&&s.teamSeason===ts);
+  const newSlpsPatches=[];
+  backupSlps.forEach(bSlp=>{
+    if(!bSlp.slots||typeof bSlp.slots!=='object')return;
+    const newSlots={};
+    Object.entries(bSlp.slots).forEach(([slotId,arr])=>{
+      if(!Array.isArray(arr)){newSlots[slotId]=arr;return;}
+      const remapped=arr.map(remap).filter(v=>v!==undefined);
+      newSlots[slotId]=remapped;
+      ops.seasonLineupSlots+=remapped.length;
+      ops.droppedRefs+=arr.length-remapped.length;
+    });
+    newSlpsPatches.push({id:bSlp.id,slots:newSlots});
+  });
+  // Stage 3: matchLineups
+  const backupMLs=backupData.matchLineups||{};
+  const newMLPatches=[];
+  Object.entries(backupMLs).forEach(([key,bLu])=>{
+    if(!bLu)return;
+    if(!key.startsWith(ts+'__'))return;
+    const newSlots={};
+    if(bLu.slots&&typeof bLu.slots==='object'){
+      Object.entries(bLu.slots).forEach(([slotId,v])=>{
+        if(typeof v!=='number'){newSlots[slotId]=v;return;}
+        const newPi=remap(v);
+        if(newPi===undefined){ops.droppedRefs++;return;}
+        newSlots[slotId]=newPi;
+        ops.matchLineupSlots++;
+      });
+    }
+    const newSubs=[];
+    if(Array.isArray(bLu.subs)){
+      bLu.subs.forEach(v=>{
+        if(typeof v!=='number'){newSubs.push(v);return;}
+        const newPi=remap(v);
+        if(newPi===undefined){ops.droppedRefs++;return;}
+        newSubs.push(newPi);
+        ops.matchLineupSubs++;
+      });
+    }
+    newMLPatches.push({key,slots:newSlots,subs:newSubs});
+  });
+  console.info('\n=== Recovery operations ===');
+  console.info('Bestätigungen (confirmations):',ops.confirmations);
+  console.info('Saisonkader-Slots:',ops.seasonLineupSlots);
+  console.info('Match-Aufstellung slots:',ops.matchLineupSlots);
+  console.info('Match-Aufstellung subs:',ops.matchLineupSubs);
+  console.info('Verworfene Verweise (Spieler nicht mehr vorhanden):',ops.droppedRefs);
+  if(!apply){
+    console.info('\n>>> DRY-RUN MODE. To APPLY: forensicRecover("'+backupLabel+'",true)');
+    return;
+  }
+  const summaryText='Forensic recovery anwenden:\n\n'
+    +`• ${ops.confirmations} Bestätigungen neu zugeordnet\n`
+    +`• ${ops.seasonLineupSlots} Saisonkader-Slot-Einträge\n`
+    +`• ${ops.matchLineupSlots+ops.matchLineupSubs} Match-Aufstellungs-Einträge\n`
+    +`• ${ops.droppedRefs} verwaiste Verweise entfernt\n\n`
+    +'Eine Sicherung wird vorher automatisch erstellt. Fortfahren?';
+  if(!confirm(summaryText)){console.info('Abgebrochen');return;}
+  if(typeof autoBackupBeforeOp==='function'){
+    autoBackupBeforeOp('Vor Forensic Recovery: '+ts);
+  }
+  if(typeof snap==='function')snap();
+  if(!G.slpConfirmations)G.slpConfirmations={};
+  if(!G.slpConfirmations[ts])G.slpConfirmations[ts]={};
+  G.slpConfirmations[ts].confirmed=newConfirmed;
+  if(!Array.isArray(G.seasonLineups))G.seasonLineups=[];
+  newSlpsPatches.forEach(patch=>{
+    const slp=G.seasonLineups.find(s=>s&&s.id===patch.id);
+    if(slp)slp.slots=patch.slots;
+  });
+  if(!G.matchLineups)G.matchLineups={};
+  newMLPatches.forEach(patch=>{
+    if(!G.matchLineups[patch.key])G.matchLineups[patch.key]={};
+    G.matchLineups[patch.key].slots=patch.slots;
+    G.matchLineups[patch.key].subs=patch.subs;
+  });
+  saveG();
+  if(typeof render==='function')render();
+  console.info('✅ Recovery applied. Safety-Backup wurde erstellt.');
+}
+if(typeof window!=='undefined')window.forensicRecover=forensicRecover;
+
 // ──────────────────────────────────────────────────────────────
 // CLEANUP UTILITY: removes orphan Firebase keys from past bugs
 // Call from console: fbCleanupOrphans()
@@ -2872,6 +3049,26 @@ function _sanitizeSeasonLineupRefs(data){
           });
         }
         if(Array.isArray(lu.subs))lu.subs=lu.subs.filter(v=>typeof v!=='number'||(v>=0&&v<maxPi));
+        // Guests list — same out-of-bounds cleanup
+        if(Array.isArray(lu.guests))lu.guests=lu.guests.filter(v=>typeof v!=='number'||(v>=0&&v<maxPi));
+      });
+    }
+    // Clean slpConfirmations: confirmed[pi] = true keyed by player index.
+    // If pi >= team's player count, the player no longer exists at that slot.
+    // (This is a SECOND defense — cleanPlayerFromLineups should handle this,
+    // but pre-fix data on v1.0.3 may have stale entries from buggy mgrDelPl.)
+    if(data.slpConfirmations&&typeof data.slpConfirmations==='object'){
+      Object.entries(data.slpConfirmations).forEach(([ts,conf])=>{
+        if(!conf||!conf.confirmed||typeof conf.confirmed!=='object')return;
+        const maxPi=teamCounts[ts];
+        if(typeof maxPi!=='number')return;
+        const cleaned={};
+        Object.entries(conf.confirmed).forEach(([piKey,val])=>{
+          const piNum=parseInt(piKey,10);
+          if(isNaN(piNum)||piNum<0||piNum>=maxPi)return; // drop out-of-bounds
+          cleaned[piKey]=val;
+        });
+        conf.confirmed=cleaned;
       });
     }
   }catch(e){console.error('[sanitizeSeasonLineupRefs]',e);}
@@ -3053,6 +3250,8 @@ function startFbListener(){
       if(typeof isPlayerMode==='function'&&isPlayerMode()&&typeof _pmSanitizeG==='function'){
         try{_pmSanitizeG();}catch(e){console.error('[PlayerPrivacy resync]',e);}
       }
+      // Mark synced — data is fresh from Firebase right now
+      if(typeof _markSynced==='function')_markSynced();
       // Check remote app version — show update banner if remote is newer
       if(typeof _checkRemoteAppVersion==='function')_checkRemoteAppVersion();
       // If user is actively typing in an input/textarea, skip the render to not steal focus / overwrite their input
@@ -3102,15 +3301,150 @@ function startFbListener(){
 function setFbStatus(s){
   const dot=document.getElementById('fb-status-dot');
   const txt=document.getElementById('fb-status-text');
-  const syncEl=document.getElementById('syncStatus');
-  const map={connected:['🟢','Verbunden – Echtzeit-Sync aktiv','🟢 Online','var(--cp)'],
-    connecting:['🟡','Verbinde...','🟡 Verbinde...','var(--ce)'],
-    error:['🔴','Verbindungsfehler – prüfe die Konfiguration','🔴 Fehler','var(--ca)'],
-    offline:['⚫','Nicht verbunden – lokaler Speicher','⚫ Lokal','var(--gm)']};
+  const map={connected:['🟢','Verbunden – Echtzeit-Sync aktiv'],
+    connecting:['🟡','Verbinde...'],
+    error:['🔴','Verbindungsfehler – prüfe die Konfiguration'],
+    offline:['⚫','Nicht verbunden – lokaler Speicher']};
   const v=map[s]||map.offline;
+  _fbConnState=s;
   if(dot)dot.textContent=v[0];
   if(txt)txt.textContent=v[1];
-  if(syncEl){syncEl.textContent=v[2];syncEl.style.color=v[3];}
+  // Sync indicator (freshness) updated separately via updateSyncIndicator()
+  updateSyncIndicator();
+}
+
+// ── DATA FRESHNESS TRACKING ──────────────────────────────────
+// Safety-first: track how stale the local data is. Block destructive
+// actions when data is potentially out of sync with Firebase.
+let _lastSyncAt=0;        // Last successful Firebase read or write
+let _fbConnState='offline'; // Current connection state
+let _syncIndicatorTimer=null;
+
+function _markSynced(){
+  _lastSyncAt=Date.now();
+  updateSyncIndicator();
+}
+// How stale is our data right now? Used by destructive action guards.
+function _dataAgeMs(){
+  if(!_lastSyncAt)return Infinity;
+  return Date.now()-_lastSyncAt;
+}
+function _isDataStale(thresholdMs){
+  // No Firebase configured = always "stale" in the sense that we can't verify
+  if(!fbRef)return false; // local-only mode, no remote to compare with
+  if(_fbConnState!=='connected')return true;
+  return _dataAgeMs()>(thresholdMs||60000); // default: 60s
+}
+// Format age as a short human label
+function _fmtAge(ms){
+  if(ms<10000)return 'jetzt';
+  if(ms<60000)return Math.floor(ms/1000)+'s';
+  if(ms<3600000)return Math.floor(ms/60000)+' min';
+  return Math.floor(ms/3600000)+' h';
+}
+function updateSyncIndicator(){
+  const el=document.getElementById('syncStatus');
+  if(!el)return;
+  const setTitle=(txt)=>{el.title=txt+'\n\n(Klicken zum Aktualisieren)';};
+  // No Firebase configured
+  if(!fbRef){
+    el.textContent='⚫ Lokal';
+    el.style.color='var(--gm)';
+    el.style.background='transparent';
+    setTitle('Kein Firebase – nur lokaler Speicher');
+    return;
+  }
+  // Connection issues
+  if(_fbConnState==='error'){
+    el.textContent='🔴 Verbindungsfehler';
+    el.style.color='var(--ca)';
+    el.style.background='rgba(231,76,60,.12)';
+    setTitle('Keine Verbindung zu Firebase');
+    return;
+  }
+  if(_fbConnState==='connecting'){
+    el.textContent='🟡 Verbinde...';
+    el.style.color='var(--ce)';
+    el.style.background='rgba(241,196,15,.12)';
+    setTitle('Verbinde mit Firebase...');
+    return;
+  }
+  if(_fbConnState!=='connected'){
+    el.textContent='⚫ Offline';
+    el.style.color='var(--gm)';
+    el.style.background='transparent';
+    setTitle('Keine Verbindung');
+    return;
+  }
+  // Connected — show freshness
+  const age=_dataAgeMs();
+  if(!_lastSyncAt||age>300000){
+    el.textContent='🟠 vor '+_fmtAge(age);
+    el.style.color='#a05500';
+    el.style.background='rgba(232,144,32,.15)';
+    setTitle('Daten sind veraltet (letzte Synchronisation vor '+_fmtAge(age)+')');
+  } else if(age>30000){
+    el.textContent='🟡 vor '+_fmtAge(age);
+    el.style.color='#7a5500';
+    el.style.background='rgba(241,196,15,.12)';
+    setTitle('Letzte Synchronisation vor '+_fmtAge(age));
+  } else {
+    el.textContent='🟢 Live';
+    el.style.color='#1a7a3a';
+    el.style.background='rgba(39,174,96,.10)';
+    setTitle('Daten sind aktuell (letzte Synchronisation vor '+_fmtAge(age)+')');
+  }
+}
+// Force refresh from Firebase. Used on click or visibility change.
+function forceSyncRefresh(){
+  if(!fbRef||!_fbInitialLoaded){
+    return;
+  }
+  if(_fbDebounce||_pendingSave||_fbSaving){
+    // Unsaved local changes — don't clobber. Let normal flow handle.
+    return;
+  }
+  fbRef.once('value').then(snap=>{
+    const raw=snap.val();
+    const data=raw?fbDecode(raw):null;
+    if(data&&data.version>=14){
+      G=sanitizeG(data);
+      if(typeof isPlayerMode==='function'&&isPlayerMode()&&typeof _pmSanitizeG==='function'){
+        try{_pmSanitizeG();}catch(e){}
+      }
+      safeLocalSave(SK,JSON.stringify(G));
+      if(typeof _checkRemoteAppVersion==='function')_checkRemoteAppVersion();
+      _markSynced();
+      if(typeof render==='function')render();
+    }
+  }).catch(e=>console.warn('[forceSyncRefresh]',e));
+}
+// Periodic update of indicator text (so "vor 12s" becomes "vor 18s" without action)
+function _startSyncIndicatorTicker(){
+  if(_syncIndicatorTimer)return;
+  _syncIndicatorTimer=setInterval(()=>{
+    updateSyncIndicator();
+  },5000);
+}
+// Refresh data when user returns to the tab (covers stale-data scenario where
+// the tab was open in background for minutes/hours/days, Firebase listener may
+// have been throttled by the browser, and now they're about to do something).
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden)return;
+  if(!fbRef||!_fbInitialLoaded)return;
+  // Don't clobber unsaved local changes
+  if(_fbDebounce||_pendingSave||_fbSaving)return;
+  // Only refresh if data is somewhat stale (avoid hammering Firebase on quick tab switches)
+  if(_dataAgeMs()<10000)return;
+  forceSyncRefresh();
+});
+// Start the periodic indicator update once the app is ready
+if(typeof window!=='undefined'){
+  if(document.readyState==='complete'||document.readyState==='interactive'){
+    setTimeout(_startSyncIndicatorTicker,500);
+  } else {
+    document.addEventListener('DOMContentLoaded',()=>{setTimeout(_startSyncIndicatorTicker,500);});
+  }
 }
 
 function saveFbConfig(){
@@ -3255,6 +3589,8 @@ function initAuth(){
             safeLocalSave(SK,JSON.stringify(G));
             // Check remote app version (compare to local APP_RELEASE_TS)
             if(typeof _checkRemoteAppVersion==='function')_checkRemoteAppVersion();
+            // Initial fetch completed — data is fresh from Firebase
+            if(typeof _markSynced==='function')_markSynced();
             // If app is already showing, re-render with fresh data
             if(CU&&typeof render==='function')render();
           }
@@ -3986,6 +4322,41 @@ function _maybeShowChangelogOnLogin(){
 // Compare local APP_RELEASE_TS to Firebase-stored version. If a newer version
 // is live, prompt user to reload. If our local is newer, push it up.
 // Called from startFbListener after each data sync.
+function _isVersionStale(){
+  // Returns true if Firebase has a newer release than this local copy.
+  // Used to block destructive operations on stale cached versions.
+  const srvTs=Number(G&&G._appReleaseTs)||0;
+  return srvTs>APP_RELEASE_TS;
+}
+// ── DESTRUCTIVE ACTION GUARD ─────────────────────────────────
+// Combined safety check for delete/bulk operations. Blocks if:
+//   1. App version is stale (Firebase has newer release than local)
+//   2. Firebase connection is not active
+//   3. Data hasn't synced in >5 minutes (silent listener death possible)
+// Returns true if safe to proceed, false if blocked (alert shown).
+function _guardDestructive(){
+  // 1. Stale app version
+  if(_isVersionStale()){
+    alert('⚠ Diese Seite ist veraltet.\n\nBitte aktualisiere zuerst die Seite (Strg+Shift+R bzw. Cmd+Shift+R am Mac), bevor du löschst.\n\nGrund: in älteren Versionen kann es zu Datenfehlern kommen.');
+    return false;
+  }
+  // No Firebase = local-only mode, allow (it's just localStorage anyway)
+  if(!fbRef)return true;
+  // 2. Connection check
+  if(_fbConnState!=='connected'){
+    alert('⚠ Keine aktive Verbindung zu Firebase.\n\nBitte warte bis die Verbindung wiederhergestellt ist (Sync-Anzeige oben rechts ist grün), bevor du löschst.\n\nGrund: ohne Verbindung können deine Änderungen mit denen anderer Trainer kollidieren.');
+    return false;
+  }
+  // 3. Freshness check — if no sync events for 5+ min, the realtime listener
+  // may have silently died (browser throttling, network blip). Force user to
+  // refresh to confirm latest state.
+  if(_lastSyncAt&&_dataAgeMs()>300000){
+    const age=_fmtAge(_dataAgeMs());
+    alert('⚠ Daten könnten veraltet sein!\n\nLetzte Synchronisation vor '+age+'.\n\nKlicke auf die Sync-Anzeige (🟠 oben rechts) um zu aktualisieren, dann versuche es erneut.');
+    return false;
+  }
+  return true;
+}
 function _checkRemoteAppVersion(){
   if(!G)return;
   const srvTs=Number(G._appReleaseTs)||0;
@@ -4012,23 +4383,54 @@ function _updateAppTitle(){
   const team=UI&&UI.currentTeam?UI.currentTeam:'';
   document.title=team?`footy.ai · ${club} ${team}`:`footy.ai · ${club}`;
 }
+// Track when the app started + whether user has interacted.
+// Used to distinguish "fresh load with stale cache" (safe to reload immediately)
+// from "user actively working" (need a countdown banner so we don't kill their work).
+const _appStartTime=Date.now();
+let _userInteracted=false;
+if(typeof document!=='undefined'){
+  ['click','keydown','touchstart'].forEach(evt=>{
+    document.addEventListener(evt,()=>{_userInteracted=true;},{once:true,capture:true,passive:true});
+  });
+}
 function _showUpdateBanner(remoteVer){
   // Don't show twice in same session
   if(document.getElementById('_updateBanner'))return;
+  // FRESH-LOAD FAST PATH: if the page just loaded and the user hasn't done
+  // anything yet, there's no work to preserve — just reload silently.
+  // This handles the common case "trainer opens site after a few days,
+  // service worker / HTTP cache served stale HTML" where the banner UX
+  // is unnecessary noise.
+  const sinceStart=Date.now()-_appStartTime;
+  if(!_userInteracted&&sinceStart<5000){
+    console.info('[UpdateBanner] Fresh-load detected ('+sinceStart+'ms since start, no interaction) — reloading silently');
+    location.reload(true);
+    return;
+  }
+  // Otherwise: forced reload with countdown. No dismiss option.
+  // Past UX with a dismissable banner caused trainers to keep using stale
+  // cached versions for days, triggering data-corruption bugs that were
+  // already fixed in the new version.
   const banner=document.createElement('div');
   banner.id='_updateBanner';
-  banner.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(180deg,#1d70d8,#1659b8);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:10px;font-family:\'Barlow\',sans-serif;font-size:.86rem;box-shadow:0 4px 14px rgba(0,0,0,.25);cursor:pointer;';
+  banner.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(180deg,#1d70d8,#1659b8);color:#fff;padding:11px 16px;display:flex;align-items:center;gap:10px;font-family:\'Barlow\',sans-serif;font-size:.86rem;box-shadow:0 4px 14px rgba(0,0,0,.25);cursor:pointer;';
   banner.innerHTML=`
     <span style="font-size:1.1rem;">📦</span>
-    <span style="flex:1;font-weight:600;">Neue Version verfügbar${remoteVer?' ('+escapeHtml(remoteVer)+')':''} — klicke hier zum Aktualisieren</span>
-    <button type="button" style="background:rgba(255,255,255,.2);color:#fff;border:none;padding:5px 11px;border-radius:5px;font-weight:700;font-size:.78rem;cursor:pointer;">🔄 Aktualisieren</button>
-    <button type="button" id="_updateBannerClose" style="background:rgba(0,0,0,.15);color:#fff;border:none;padding:5px 9px;border-radius:5px;font-size:.86rem;cursor:pointer;" title="Später" onclick="event.stopPropagation();document.getElementById('_updateBanner').remove();">✕</button>`;
-  banner.addEventListener('click',(e)=>{
-    if(e.target.id==='_updateBannerClose')return;
-    // Hard reload to bypass cache
-    location.reload(true);
-  });
+    <span style="flex:1;font-weight:600;">Neue Version verfügbar${remoteVer?' ('+escapeHtml(remoteVer)+')':''} — wird in <span id="_updRldCnt">10</span> Sek. automatisch geladen…</span>
+    <button type="button" style="background:rgba(255,255,255,.25);color:#fff;border:none;padding:6px 14px;border-radius:5px;font-weight:700;font-size:.82rem;cursor:pointer;">🔄 Jetzt aktualisieren</button>`;
+  banner.addEventListener('click',()=>{location.reload(true);});
   document.body.appendChild(banner);
+  // Auto-reload countdown
+  let _updSec=10;
+  const _updCntEl=document.getElementById('_updRldCnt');
+  const _updTimer=setInterval(()=>{
+    _updSec--;
+    if(_updCntEl)_updCntEl.textContent=String(Math.max(0,_updSec));
+    if(_updSec<=0){
+      clearInterval(_updTimer);
+      location.reload(true);
+    }
+  },1000);
 }
 function _renderChangelog(highlightNew,lastSeen){
   const verEl=document.getElementById('moAbout-version');
@@ -11042,6 +11444,7 @@ function duplicateCurrentSession(){
 
 async function delCurrSess(){
   if(!canEdit())return;
+  if(!_guardDestructive())return;
   if(currentSI<0)return;
   const imp=_impactSession(currentSI);
   if(!imp)return;
@@ -11065,6 +11468,8 @@ async function delCurrSess(){
   snap();const D=cd();D.sessions.splice(currentSI,1);D.players.forEach(p=>{if(p.s)p.s.splice(currentSI,1);});
   shiftMatchLineupsIndices(UI.currentTeam,currentSI,-1);
   saveG();render();closeM('moSession2');
+  // AUDIT: was missing — silent deletion bypassed Verlauf
+  logAudit('Sitzung entfernt',sLabel);
 }
 
 // ══════════════════════════════
@@ -12599,6 +13004,7 @@ function _impactRowsHtml(rows){
 
 async function deleteSeason(){
   if(!isAdmin())return;
+  if(!_guardDestructive())return;
   if(G.seasonList.length<=1)return alert('Mindestens eine Saison erforderlich.');
   const s=UI.currentSeason;
   // Compute impact
@@ -12672,6 +13078,7 @@ function cleanupSeasonReferences(season,sessCountsByTeam){
   }
 }
 async function delTeam(t){
+  if(!_guardDestructive())return;
   if(G.teamList.length<=1)return alert('Mindestens eine Mannschaft.');
   // Compute impact
   const imp=_impactTeam(t);
@@ -12826,6 +13233,7 @@ function addMatch(){
 }
 async function delSess(si){
   if(!canEdit())return;
+  if(!_guardDestructive())return;
   const imp=_impactSession(si);
   if(!imp)return;
   const sess=imp.sess;
@@ -12913,6 +13321,7 @@ function _saveSchedulePattern(tD,mD,tTime,mTime){
   };
 }
 function doGen(){
+  if(!_guardDestructive())return;
   const sIso=document.getElementById('genS').value,eIso=document.getElementById('genE').value;
   if(!sIso||!eIso)return alert('Datum auswählen.');
   if(sIso>=eIso)return alert('Startdatum muss vor dem Enddatum liegen.');
@@ -13081,6 +13490,7 @@ async function applyBulkPosition(){
 // ── Bulk: delete players ──
 async function bulkDeletePlayers(){
   if(!canEdit())return;
+  if(!_guardDestructive())return;
   if(!_multiSelIds.size){alert('Keine Spieler ausgewählt.');return;}
   const D=cd();
   if(!D)return;
@@ -13104,7 +13514,8 @@ async function bulkDeletePlayers(){
     confirmLabel:'🗑 Alle löschen'
   });
   if(!ok)return;
-  if(sel.length>=3&&typeof autoBackupBeforeOp==='function')autoBackupBeforeOp('Mehrfach-Löschung: '+sel.length+' Spieler ('+UI.currentTeam+')');
+  // SAFETY NET: always backup before bulk delete (was only for 3+ players before)
+  if(typeof autoBackupBeforeOp==='function')autoBackupBeforeOp('Mehrfach-Löschung: '+sel.length+' Spieler ('+UI.currentTeam+' '+UI.currentSeason+')');
   snap();
   // Save each player to recycle bin BEFORE removing
   const teamSeasonKey=ck();
@@ -13127,6 +13538,7 @@ async function bulkDeletePlayers(){
 // ── Bulk: move players to another team (same season) ──
 function bulkMoveToTeam(){
   if(!canEdit())return;
+  if(!_guardDestructive())return;
   if(!_multiSelIds.size){alert('Keine Spieler ausgewählt.');return;}
   // Build target team list (exclude current)
   const teams=(G.teamList||[]).filter(t=>t!==UI.currentTeam);
@@ -13228,6 +13640,7 @@ async function applyBulkMoveTeam(){
 
 async function delPlayer(pi){
   if(!canEdit())return;
+  if(!_guardDestructive())return;
   const D=cd();
   const p=D&&D.players&&D.players[pi];
   if(!p)return;
@@ -13248,8 +13661,13 @@ async function delPlayer(pi){
     confirmLabel:'🗑 Spieler löschen'
   });
   if(!ok)return;
+  // SAFETY NET: full snapshot backup BEFORE the destructive operation.
+  // If anything goes wrong (data corruption, index shift, wrong cleanup),
+  // user can restore from this backup.
+  if(typeof autoBackupBeforeOp==='function'){
+    autoBackupBeforeOp('Spieler-Löschung: '+(p.name||'?')+' ('+UI.currentTeam+' '+UI.currentSeason+')');
+  }
   snap();
-  // Save to recycle bin BEFORE removing
   _trashAdd(_trashSnapPlayer(p,ck()));
   cd().players.splice(pi,1);
   cleanPlayerFromLineups(UI.currentTeam,pi);
@@ -13880,9 +14298,13 @@ function _buildBackupEntry(opts){
     data:JSON.stringify(G)
   };
 }
-// Trim backup list to BK_MAX, preserving pre-op entries first
-function _trimBackups(bks){
-  while(bks.length>BK_MAX){
+// Trim backup list to a given limit, preserving pre-op entries first.
+// IMPORTANT: previously this used BK_MAX (=3) unconditionally — destroyed
+// older Firebase backups every time a new one was created. Now caller must
+// specify the appropriate limit (BK_MAX for local, BK_FB_MAX for Firebase).
+function _trimBackups(bks,limit){
+  limit=limit||BK_MAX;
+  while(bks.length>limit){
     let dropIdx=-1;
     for(let i=bks.length-1;i>=0;i--){if(bks[i].kind!=='pre-op'){dropIdx=i;break;}}
     if(dropIdx<0)dropIdx=bks.length-1;
@@ -13913,7 +14335,8 @@ function modifyBackups(modifier,doneCb){
       const result=modifier(bks);
       let modified=Array.isArray(result)?result:bks;
       modified.sort((a,b)=>(b.ts||0)-(a.ts||0));
-      _trimBackups(modified);
+      // Firebase: keep up to BK_FB_MAX (15). Local trim happens separately in saveBackups.
+      _trimBackups(modified,BK_FB_MAX);
       // Sanitize for Firebase write
       return modified.map(b=>({
         ts:b.ts,label:b.label,kind:b.kind||'manual',
@@ -14291,7 +14714,9 @@ function writePresenceEntry(){
         lastSeen:Date.now(),
         team:UI.currentTeam||'',
         season:UI.currentSeason||'',
-        viewing:_presenceContext||''
+        viewing:_presenceContext||'',
+        appVersion:(typeof APP_VERSION!=='undefined')?APP_VERSION:'',
+        appTs:(typeof APP_RELEASE_TS!=='undefined')?APP_RELEASE_TS:0
       }).catch(()=>{}); // best-effort, fail silently if rules block
     }catch(e){}
   }
@@ -14301,7 +14726,11 @@ function writePresenceEntry(){
     team:UI.currentTeam||'',
     season:UI.currentSeason||'',
     viewing:_presenceContext||'',
-    lastSeen:Date.now()
+    lastSeen:Date.now(),
+    // Diagnostic: track which version each trainer is running. Absence of these
+    // fields in Firebase = trainer is on a pre-tracking version (older).
+    appVersion:(typeof APP_VERSION!=='undefined')?APP_VERSION:'',
+    appTs:(typeof APP_RELEASE_TS!=='undefined')?APP_RELEASE_TS:0
   };
   // Optimistic: update local presence state immediately so pill appears
   // even if Firebase write is slow or fails (e.g., security rules).
