@@ -1592,7 +1592,6 @@ body.guest-mode{padding-top:24px;}
     <button class="btn bundo" id="undoBtn" onclick="undo()" disabled title="Rückgängig Ctrl+Z">↩</button>
     <button class="btn bundo" id="redoBtn" onclick="redo()" disabled title="Wiederholen Ctrl+Y">↪</button>
     <span class="saved" id="savedBadge">✓</span>
-    <span id="syncStatus" title="Klicke um zu aktualisieren" style="font-size:.72rem;font-weight:600;color:var(--gm);white-space:nowrap;cursor:pointer;user-select:none;padding:2px 6px;border-radius:4px;" onclick="forceSyncRefresh()">⚫ Lokal</span>
     <div class="tsep"></div>
     <button class="btn" id="btn-slp" style="background:rgba(232,200,64,.12);color:#c8a820;border:1px solid rgba(232,200,64,.3);" onclick="openSeasonLineup()">📋 Saisonkader</button>
     <button class="btn bteam" onclick="openTeamMgr('spieler')">🏆 Mannschaft</button>
@@ -2187,16 +2186,16 @@ const APP_VERSION_LABEL='1.0.5 (Beta)';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1779800000000; // v1.0.5-beta: safety overhaul
+const APP_RELEASE_TS=1779900000000; // v1.0.5-beta: data safety overhaul
 const APP_CHANGELOG=[
   {version:'1.0.5-beta',date:'21.05.2026',title:'Datensicherheit & Synchronisations-Schutz',items:[
-    {icon:'🟢',title:'Synchronisations-Anzeige',desc:'Neue Anzeige oben rechts zeigt, wie aktuell deine Daten sind: 🟢 Live (gerade synchronisiert), 🟡 vor 45s, 🟠 vor 5 min (veraltet), 🔴 Verbindungsfehler. Klick auf die Anzeige erzwingt sofortige Aktualisierung. Du weißt jederzeit, ob du mit den neuesten Daten arbeitest.'},
-    {icon:'🔄',title:'Auto-Aktualisierung beim Tab-Wechsel',desc:'Wenn du nach längerer Pause zur App zurückkehrst (z.B. anderer Tab oder Handy-Bildschirm aus), werden Daten automatisch frisch aus Firebase geladen — vorausgesetzt du hast keine ungespeicherten Änderungen. Schluss mit dem Risiko, auf veralteten Daten zu arbeiten.'},
-    {icon:'🛡',title:'Schutz beim Löschen erweitert',desc:'Vor jedem Lösch-Vorgang (Spieler, Sitzung, Saison, Mannschaft, Stundenplan-Generierung) prüft die App jetzt drei Dinge: ist die App-Version aktuell, ist Firebase verbunden, sind die Daten frisch (< 5 min). Bei Problemen wird die Aktion blockiert mit klarer Anweisung was zu tun ist. Verhindert versehentliche Datenkollisionen.'},
+    {icon:'🔄',title:'Auto-Aktualisierung beim Tab-Wechsel',desc:'Wenn du nach längerer Pause zur App zurückkehrst (anderer Tab, Handy-Bildschirm aus), werden Daten automatisch frisch aus Firebase geladen — vorausgesetzt du hast keine ungespeicherten Änderungen. Schluss mit dem Risiko, auf veralteten Daten zu arbeiten.'},
+    {icon:'🛡',title:'Schutz beim Löschen erweitert',desc:'Vor jedem Lösch-Vorgang (Spieler, Sitzung, Saison, Mannschaft, Stundenplan-Generierung) prüft die App: ist die App-Version aktuell, ist Firebase verbunden, sind die Daten frisch (< 5 min). Bei Problemen wird die Aktion blockiert mit klarer Anweisung was zu tun ist. Verhindert versehentliche Datenkollisionen.'},
     {icon:'💾',title:'Backup-Speicher erhöht',desc:'Firebase bewahrt jetzt bis zu 15 Backups auf (vorher nur 3 wegen eines internen Bugs). Im Notfall kann viel weiter zurück wiederhergestellt werden.'},
     {icon:'📦',title:'Automatische Aktualisierung verbessert',desc:'Beim Öffnen der App nach längerer Pause wird eine eventuell veraltete Version jetzt sofort und unmerklich aktualisiert — kein Banner mehr nötig. Nur wenn du gerade aktiv arbeitest und eine neue Version verfügbar ist, erscheint ein Countdown-Banner (10 Sek), damit dein aktueller Vorgang nicht abrupt unterbrochen wird.'},
     {icon:'📜',title:'Lückenlose Protokollierung',desc:'Das Löschen von Sitzungen über das Termin-Fenster wurde bisher nicht im Verlauf protokolliert — jetzt schon. Auch die Stundenplan-Generierung wird vollständig erfasst. Keine stillen Löschungen mehr.'},
     {icon:'🔧',title:'Erweiterte Selbstheilung',desc:'Beim Laden bereinigt die App automatisch auch beschädigte Bestätigungs-Verweise (slpConfirmations) und Gast-Listen — nicht nur Saisonkader und Aufstellungen wie bisher. Mehr Robustheit gegen Daten aus älteren Versionen.'},
+    {icon:'✏',title:'Saisonkader: Status nicht mehr verloren',desc:'Bestätigungen und Anmeldungs-Häkchen werden jetzt in einem geschützten Zwischenspeicher bearbeitet — Firebase-Synchronisation kann sie während der Bearbeitung nicht mehr überschreiben. Beim Schließen erscheint der gewohnte „Speichern/Verwerfen"-Dialog mit ALLEN Änderungen (Status + Aufstellungspositionen).'},
   ]},
   {version:'1.0.4-beta',date:'21.05.2026',title:'Status „Angemeldet", Spieler-App-Politur & robustere Synchronisation',items:[
     {icon:'🅼',title:'Neuer Status „Angemeldet" (M)',desc:'Anwesenheits-Status erweitert um einen 5. Status: „Angemeldet" (blau, „M"). Spieler antworten in der Spieler-App mit „Komme" — der Status wird automatisch auf „Angemeldet" gesetzt. Am Termin tippt der Trainer einmal — daraus wird „Anwesend". So sieht man immer wer schon zugesagt hat, ohne Verwechslung mit der tatsächlichen Anwesenheit.'},
@@ -3318,7 +3317,6 @@ function setFbStatus(s){
 // actions when data is potentially out of sync with Firebase.
 let _lastSyncAt=0;        // Last successful Firebase read or write
 let _fbConnState='offline'; // Current connection state
-let _syncIndicatorTimer=null;
 
 function _markSynced(){
   _lastSyncAt=Date.now();
@@ -3338,72 +3336,20 @@ function _isDataStale(thresholdMs){
 // Format age as a short human label
 function _fmtAge(ms){
   if(ms<10000)return 'jetzt';
-  if(ms<60000)return Math.floor(ms/1000)+'s';
+  if(ms<60000)return Math.floor(ms/1000)+' s';
   if(ms<3600000)return Math.floor(ms/60000)+' min';
   return Math.floor(ms/3600000)+' h';
 }
 function updateSyncIndicator(){
-  const el=document.getElementById('syncStatus');
-  if(!el)return;
-  const setTitle=(txt)=>{el.title=txt+'\n\n(Klicken zum Aktualisieren)';};
-  // No Firebase configured
-  if(!fbRef){
-    el.textContent='⚫ Lokal';
-    el.style.color='var(--gm)';
-    el.style.background='transparent';
-    setTitle('Kein Firebase – nur lokaler Speicher');
-    return;
-  }
-  // Connection issues
-  if(_fbConnState==='error'){
-    el.textContent='🔴 Verbindungsfehler';
-    el.style.color='var(--ca)';
-    el.style.background='rgba(231,76,60,.12)';
-    setTitle('Keine Verbindung zu Firebase');
-    return;
-  }
-  if(_fbConnState==='connecting'){
-    el.textContent='🟡 Verbinde...';
-    el.style.color='var(--ce)';
-    el.style.background='rgba(241,196,15,.12)';
-    setTitle('Verbinde mit Firebase...');
-    return;
-  }
-  if(_fbConnState!=='connected'){
-    el.textContent='⚫ Offline';
-    el.style.color='var(--gm)';
-    el.style.background='transparent';
-    setTitle('Keine Verbindung');
-    return;
-  }
-  // Connected — show freshness
-  const age=_dataAgeMs();
-  if(!_lastSyncAt||age>300000){
-    el.textContent='🟠 vor '+_fmtAge(age);
-    el.style.color='#a05500';
-    el.style.background='rgba(232,144,32,.15)';
-    setTitle('Daten sind veraltet (letzte Synchronisation vor '+_fmtAge(age)+')');
-  } else if(age>30000){
-    el.textContent='🟡 vor '+_fmtAge(age);
-    el.style.color='#7a5500';
-    el.style.background='rgba(241,196,15,.12)';
-    setTitle('Letzte Synchronisation vor '+_fmtAge(age));
-  } else {
-    el.textContent='🟢 Live';
-    el.style.color='#1a7a3a';
-    el.style.background='rgba(39,174,96,.10)';
-    setTitle('Daten sind aktuell (letzte Synchronisation vor '+_fmtAge(age)+')');
-  }
+  // Indicator removed from UI. Function kept as no-op for the call sites
+  // (setFbStatus, _markSynced, etc.) — they still update _lastSyncAt and
+  // _fbConnState which power _guardDestructive's connection/freshness checks.
 }
-// Force refresh from Firebase. Used on click or visibility change.
+// Force refresh from Firebase. Used by the visibility-change handler so
+// returning to an open tab reloads fresh state.
 function forceSyncRefresh(){
-  if(!fbRef||!_fbInitialLoaded){
-    return;
-  }
-  if(_fbDebounce||_pendingSave||_fbSaving){
-    // Unsaved local changes — don't clobber. Let normal flow handle.
-    return;
-  }
+  if(!fbRef||!_fbInitialLoaded)return;
+  if(_fbDebounce||_pendingSave||_fbSaving)return;
   fbRef.once('value').then(snap=>{
     const raw=snap.val();
     const data=raw?fbDecode(raw):null;
@@ -3419,33 +3365,16 @@ function forceSyncRefresh(){
     }
   }).catch(e=>console.warn('[forceSyncRefresh]',e));
 }
-// Periodic update of indicator text (so "vor 12s" becomes "vor 18s" without action)
-function _startSyncIndicatorTicker(){
-  if(_syncIndicatorTimer)return;
-  _syncIndicatorTimer=setInterval(()=>{
-    updateSyncIndicator();
-  },5000);
-}
-// Refresh data when user returns to the tab (covers stale-data scenario where
-// the tab was open in background for minutes/hours/days, Firebase listener may
-// have been throttled by the browser, and now they're about to do something).
+// Refresh data when user returns to the tab after being away.
+// Critical safety measure: long-idle tabs may have a silently-throttled
+// Firebase listener, so explicitly refetch to avoid acting on stale data.
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden)return;
   if(!fbRef||!_fbInitialLoaded)return;
-  // Don't clobber unsaved local changes
   if(_fbDebounce||_pendingSave||_fbSaving)return;
-  // Only refresh if data is somewhat stale (avoid hammering Firebase on quick tab switches)
-  if(_dataAgeMs()<10000)return;
+  if(_dataAgeMs()<10000)return; // tab switch within 10s — listener was likely active
   forceSyncRefresh();
 });
-// Start the periodic indicator update once the app is ready
-if(typeof window!=='undefined'){
-  if(document.readyState==='complete'||document.readyState==='interactive'){
-    setTimeout(_startSyncIndicatorTicker,500);
-  } else {
-    document.addEventListener('DOMContentLoaded',()=>{setTimeout(_startSyncIndicatorTicker,500);});
-  }
-}
 
 function saveFbConfig(){
   const cfg={
@@ -4344,7 +4273,7 @@ function _guardDestructive(){
   if(!fbRef)return true;
   // 2. Connection check
   if(_fbConnState!=='connected'){
-    alert('⚠ Keine aktive Verbindung zu Firebase.\n\nBitte warte bis die Verbindung wiederhergestellt ist (Sync-Anzeige oben rechts ist grün), bevor du löschst.\n\nGrund: ohne Verbindung können deine Änderungen mit denen anderer Trainer kollidieren.');
+    alert('⚠ Keine aktive Verbindung zu Firebase.\n\nBitte warte bis die Verbindung wiederhergestellt ist, dann lade die Seite neu (Strg+Shift+R) und versuche es erneut.\n\nGrund: ohne Verbindung könnten deine Änderungen mit denen anderer Trainer kollidieren.');
     return false;
   }
   // 3. Freshness check — if no sync events for 5+ min, the realtime listener
@@ -4352,7 +4281,7 @@ function _guardDestructive(){
   // refresh to confirm latest state.
   if(_lastSyncAt&&_dataAgeMs()>300000){
     const age=_fmtAge(_dataAgeMs());
-    alert('⚠ Daten könnten veraltet sein!\n\nLetzte Synchronisation vor '+age+'.\n\nKlicke auf die Sync-Anzeige (🟠 oben rechts) um zu aktualisieren, dann versuche es erneut.');
+    alert('⚠ Daten könnten veraltet sein!\n\nLetzte Synchronisation vor '+age+'.\n\nBitte lade die Seite neu (Strg+Shift+R bzw. Cmd+Shift+R am Mac), dann versuche es erneut.');
     return false;
   }
   return true;
@@ -15959,6 +15888,9 @@ function slpIsConfEnabled(){
   return getUserPref('slpConfEnabled_'+slpConfKey(),false)===true;
 }
 function slpIsPlayerConfirmed(pi){
+  // Read from draft if Saisonkader is open (live preview of unsaved toggles),
+  // else from committed state in G.
+  if(_slpStatusDraft)return !!_slpStatusDraft.confirmed[pi];
   return !!slpGetConf().confirmed[pi];
 }
 function slpToggleConfirmations(enabled){
@@ -15979,11 +15911,50 @@ function _updateSlpStatusBtn(){
   btn.style.display=seasonStarted?'none':'';
 }
 // ── SLP STATUS DRAFT TRACKING ────────────────────────────────
-// Bestätigungen + Anmeldungen are pending in memory until user explicitly saves
-// (via closeSeasonLineup's confirmation dialog).
+// Bestätigungen + Anmeldungen go to a PROTECTED draft buffer (not in G) that
+// is immune to Firebase listener overrides. Committed to G + Firebase only
+// when user explicitly confirms on close via closeSeasonLineup dialog.
+// Slot positions (drag&drop on the field) live in slpState.slots — snapshot
+// on open lets us detect unsaved layout changes too.
 let _slpStatusDirty=false;
 let _slpStatusSnapshot=null;
+let _slpSlotSnapshot=null; // snapshot of slpState.slots + formation at open time
+// Draft buffer: kept OUTSIDE G so Firebase listener cannot overwrite it.
+let _slpStatusDraft=null;
+function _slpInitDraft(){
+  // Seed draft from current G state. Called on Saisonkader open and
+  // anytime draft is missing but we're inside the modal.
+  const D=cd();
+  if(!D){_slpStatusDraft=null;return;}
+  const confKey=slpConfKey();
+  const confEntry=G.slpConfirmations&&G.slpConfirmations[confKey];
+  const regMap={};
+  (D.players||[]).forEach((p,i)=>{if(p&&p.registered===true)regMap[i]=true;});
+  _slpStatusDraft={
+    confKey,
+    confirmed:confEntry&&confEntry.confirmed?JSON.parse(JSON.stringify(confEntry.confirmed)):{},
+    registered:regMap
+  };
+}
+// Accessor used by render functions: returns the live draft state if Saisonkader
+// is open, otherwise returns the committed state in G. This way the rendering
+// reflects the trainer's pending toggles while the modal is open.
+function _slpGetEffectiveStatus(){
+  if(_slpStatusDraft)return _slpStatusDraft;
+  const D=cd();
+  const confKey=slpConfKey();
+  const confEntry=G.slpConfirmations&&G.slpConfirmations[confKey];
+  const regMap={};
+  (D?D.players:[]||[]).forEach((p,i)=>{if(p&&p.registered===true)regMap[i]=true;});
+  return {
+    confKey,
+    confirmed:confEntry&&confEntry.confirmed?confEntry.confirmed:{},
+    registered:regMap
+  };
+}
 function _slpCaptureStatusSnapshot(){
+  // Capture from G (committed state), not draft. Used to seed snapshot on open
+  // so we can compare draft vs original at close.
   const D=cd();
   if(!D)return null;
   const confKey=slpConfKey();
@@ -15997,17 +15968,8 @@ function _slpCaptureStatusSnapshot(){
   };
 }
 function _slpRestoreStatusSnapshot(){
-  if(!_slpStatusSnapshot)return;
-  const D=cd();
-  if(!D)return;
-  if(!G.slpConfirmations)G.slpConfirmations={};
-  if(!G.slpConfirmations[_slpStatusSnapshot.confKey])G.slpConfirmations[_slpStatusSnapshot.confKey]={};
-  G.slpConfirmations[_slpStatusSnapshot.confKey].confirmed=JSON.parse(JSON.stringify(_slpStatusSnapshot.confirmed));
-  (D.players||[]).forEach((p,i)=>{
-    if(!p)return;
-    if(_slpStatusSnapshot.registered[i]===true)p.registered=true;
-    else delete p.registered;
-  });
+  // Discard draft — used when user chooses "Verwerfen" on close
+  _slpStatusDraft=null;
 }
 function _slpMarkStatusDirty(){
   _slpStatusDirty=true;
@@ -16015,6 +15977,7 @@ function _slpMarkStatusDirty(){
 function _slpClearStatusDirty(){
   _slpStatusDirty=false;
   _slpStatusSnapshot=null;
+  _slpStatusDraft=null;
 }
 // Refresh snapshot to "current state = last saved state". Called after any save
 // so future diff compares against the just-saved point, not the initial open state.
@@ -16022,21 +15985,57 @@ function _slpRefreshStatusSnapshot(){
   _slpStatusSnapshot=_slpCaptureStatusSnapshot();
   _slpStatusDirty=false;
 }
-// State-diff check: compares current state to snapshot. Returns true only if effectively different.
-// Used for close-gate to avoid prompting when toggle was clicked back-and-forth to original state.
+// State-diff check: compares draft to snapshot. Returns true only if effectively different.
+// Used for close-gate to avoid prompting when toggle was clicked back-and-forth.
 function _slpStatusEffectivelyDirty(){
-  if(!_slpStatusSnapshot)return false;
-  const cur=_slpCaptureStatusSnapshot();
-  if(!cur)return false;
-  return JSON.stringify(cur.confirmed)!==JSON.stringify(_slpStatusSnapshot.confirmed)
-      || JSON.stringify(cur.registered)!==JSON.stringify(_slpStatusSnapshot.registered);
+  if(!_slpStatusSnapshot||!_slpStatusDraft)return false;
+  return JSON.stringify(_slpStatusDraft.confirmed)!==JSON.stringify(_slpStatusSnapshot.confirmed)
+      || JSON.stringify(_slpStatusDraft.registered)!==JSON.stringify(_slpStatusSnapshot.registered);
+}
+// Snapshot the field layout (slots + formation + customSlots) at open-time
+function _slpCaptureSlotSnapshot(){
+  return {
+    slots:JSON.parse(JSON.stringify(slpState.slots||{})),
+    formation:slpState.formation||'',
+    customSlots:slpState.customSlots?JSON.parse(JSON.stringify(slpState.customSlots)):null
+  };
+}
+// Has the field layout changed since open?
+function _slpSlotsEffectivelyDirty(){
+  if(!_slpSlotSnapshot)return false;
+  const cur=_slpCaptureSlotSnapshot();
+  return JSON.stringify(cur.slots)!==JSON.stringify(_slpSlotSnapshot.slots)
+      || cur.formation!==_slpSlotSnapshot.formation
+      || JSON.stringify(cur.customSlots)!==JSON.stringify(_slpSlotSnapshot.customSlots);
+}
+// Combined dirty check — any unsaved change in modal
+function _slpAnyDirty(){
+  return _slpStatusEffectivelyDirty()||_slpSlotsEffectivelyDirty();
+}
+// Commit draft → G → Firebase. Called from closeSeasonLineup when user clicks "Speichern".
+function _slpCommitDraft(){
+  if(!_slpStatusDraft)return;
+  const D=cd();
+  if(!D)return;
+  // Apply confirmations
+  if(!G.slpConfirmations)G.slpConfirmations={};
+  if(!G.slpConfirmations[_slpStatusDraft.confKey])G.slpConfirmations[_slpStatusDraft.confKey]={};
+  G.slpConfirmations[_slpStatusDraft.confKey].confirmed=JSON.parse(JSON.stringify(_slpStatusDraft.confirmed));
+  // Apply registration flags to players
+  (D.players||[]).forEach((p,i)=>{
+    if(!p)return;
+    if(_slpStatusDraft.registered[i]===true)p.registered=true;
+    else delete p.registered;
+  });
+  saveG();
 }
 function slpToggleConf(pi){
   if(!canEdit())return;
-  const c=slpGetConf();
-  if(c.confirmed[pi])delete c.confirmed[pi];
-  else c.confirmed[pi]=true;
-  // Don't saveG — keep in memory until user confirms on exit.
+  // Draft mode: changes go to _slpStatusDraft (in-memory, not in G),
+  // immune to Firebase listener overrides. Committed to G on close-confirm.
+  if(!_slpStatusDraft)_slpInitDraft();
+  if(_slpStatusDraft.confirmed[pi])delete _slpStatusDraft.confirmed[pi];
+  else _slpStatusDraft.confirmed[pi]=true;
   _slpMarkStatusDirty();
   slpRenderStatusList();
   slpRender();
@@ -16053,12 +16052,9 @@ function slpOpenStatusList(){
 // V2 model: player is UNregistered by default — explicit p.registered === true flags them as registered.
 function slpToggleReg(pi){
   if(!canEdit())return;
-  const D=cd();
-  const p=D&&D.players&&D.players[pi];
-  if(!p)return;
-  if(p.registered===true){delete p.registered;}
-  else {p.registered=true;}
-  // Don't saveG — keep in memory until user confirms on exit.
+  if(!_slpStatusDraft)_slpInitDraft();
+  if(_slpStatusDraft.registered[pi]===true)delete _slpStatusDraft.registered[pi];
+  else _slpStatusDraft.registered[pi]=true;
   _slpMarkStatusDirty();
   slpRenderStatusList();
   if(typeof slpRender==='function')slpRender();
@@ -16070,7 +16066,12 @@ function slpToggleReg(pi){
 function slpRenderStatusList(){
   const D=cd();
   const players=(D&&D.players)||[];
-  const c=slpGetConf();
+  // Read from draft buffer if Saisonkader is open (live preview of unsaved toggles).
+  // Falls back to committed G state otherwise.
+  const status=(typeof _slpGetEffectiveStatus==='function')?_slpGetEffectiveStatus():null;
+  const conf=status?status.confirmed:slpGetConf().confirmed;
+  const reg=status?status.registered:null;
+  const isRegistered=(pi)=>reg?reg[pi]===true:(players[pi]&&players[pi].registered===true);
   const seasonStarted=typeof slpSeasonStarted==='function'?slpSeasonStarted():false;
   // Both modes are available equally when season has not started yet
   const confActive=!seasonStarted;
@@ -16113,15 +16114,15 @@ function slpRenderStatusList(){
   </div>`;
   html+=sortedPis.map(pi=>{
     const p=players[pi];
-    const conf=!!c.confirmed[pi];
-    const isReg=p.registered===true;
+    const isConf=!!conf[pi];
+    const isReg=isRegistered(pi);
     const isUnreg=!isReg;
     const bcol1=(PB_COLORS[p.pos]||'#ddd;color:#333').split(';');
     const bcol2=p.pos2?(PB_COLORS[p.pos2]||'#ddd;color:#333').split(';'):null;
     // Row tint priority: yellow (unreg) > green (confirmed) > none
     let rowBg='transparent';
     if(isUnreg)rowBg='rgba(212,160,23,.08)';
-    else if(conf)rowBg='rgba(39,174,96,.06)';
+    else if(isConf)rowBg='rgba(39,174,96,.06)';
     const nameColor=isUnreg?'#a87800':'var(--gd)';
     return `<div style="display:flex;align-items:center;gap:9px;padding:7px 12px;border-bottom:1px solid var(--gl);background:${rowBg};">
       <span style="font-family:'Bebas Neue';color:var(--bd);width:24px;text-align:center;">${p.nr||'–'}</span>
@@ -16130,15 +16131,15 @@ function slpRenderStatusList(){
         <span class="lp-card-pos1" style="background:${bcol1[0]};${bcol1[1]};font-size:.6rem;">${escapeHtml(p.pos||'')}</span>
         ${bcol2?`<span class="lp-card-pos1" style="background:${bcol2[0]};${bcol2[1]};font-size:.6rem;">${escapeHtml(p.pos2)}</span>`:''}
       </span>
-      <span style="width:60px;text-align:center;"><input type="checkbox" ${conf?'checked':''} onchange="slpToggleConf(${pi})" style="width:18px;height:18px;cursor:pointer;accent-color:var(--cp);" title="Bestätigt"/></span>
+      <span style="width:60px;text-align:center;"><input type="checkbox" ${isConf?'checked':''} onchange="slpToggleConf(${pi})" style="width:18px;height:18px;cursor:pointer;accent-color:var(--cp);" title="Bestätigt"/></span>
       <span style="width:60px;text-align:center;"><input type="checkbox" ${isReg?'checked':''} onchange="slpToggleReg(${pi})" style="width:18px;height:18px;cursor:pointer;accent-color:var(--bm);" title="Angemeldet"/></span>
     </div>`;
   }).join('');
   el.innerHTML=html;
   // Stats line
   const total=players.length;
-  const confCount=players.filter((_,i)=>c.confirmed[i]).length;
-  const regCount=players.filter(p=>p&&p.registered===true).length;
+  const confCount=players.filter((_,i)=>conf[i]).length;
+  const regCount=players.filter((_,i)=>isRegistered(i)).length;
   const dirtyMark=(typeof _slpStatusEffectivelyDirty==='function'&&_slpStatusEffectivelyDirty())?' · <span style="color:#a02525;font-weight:700;">● Ungespeicherte Änderungen</span>':'';
   const stEl=document.getElementById('slp-status-stats');
   if(stEl)stEl.innerHTML=`${confCount} / ${total} bestätigt · ${regCount} / ${total} angemeldet${dirtyMark}`;
@@ -16264,48 +16265,75 @@ function openSeasonLineup(){
   // Presence: notify others we're editing the season kader
   if(typeof setPresenceContext==='function')setPresenceContext('📋 Saisonkader '+(UI.currentTeam||''));
   if(typeof updateInlinePresence==='function')setTimeout(()=>updateInlinePresence(),50);
-  // Snapshot for draft tracking — Bestätigung+Anmeldung changes are kept in memory
+  // Initialize draft buffer for Bestätigungs/Anmeldungs toggles — kept OUTSIDE G
+  // so Firebase listener cannot wipe out unsaved changes.
+  _slpInitDraft();
+  // Snapshot baseline for diff at close-time (status + slots/formation)
   _slpStatusSnapshot=_slpCaptureStatusSnapshot();
+  _slpSlotSnapshot=_slpCaptureSlotSnapshot();
   _slpStatusDirty=false;
 }
 
 async function closeSeasonLineup(){
-  // Only show dialog if state actually differs from snapshot (state-driven, not flag-driven)
-  const reallyDirty=_slpStatusEffectivelyDirty();
-  if(reallyDirty){
+  // Combined dirty check — both status (confirmations/registered) AND slot layout
+  const statusDirty=_slpStatusEffectivelyDirty();
+  const slotsDirty=_slpSlotsEffectivelyDirty();
+  if(statusDirty||slotsDirty){
     const D=cd();
-    const c=slpGetConf();
     const players=D?D.players:[];
-    const confCount=players.filter((_,i)=>c.confirmed[i]).length;
-    const regCount=players.filter(p=>p&&p.registered===true).length;
-    const itemsHtml=_impactRowsHtml([
-      {label:'Bestätigt',value:confCount+' Spieler',icon:'✓'},
-      {label:'Angemeldet',value:regCount+' Spieler',icon:'✓'}
-    ]);
+    const draftConf=_slpStatusDraft?_slpStatusDraft.confirmed:{};
+    const draftReg=_slpStatusDraft?_slpStatusDraft.registered:{};
+    const confCount=players.filter((_,i)=>draftConf[i]).length;
+    const regCount=players.filter((_,i)=>draftReg[i]===true).length;
+    const slotPlayerCount=Object.values(slpState.slots||{}).reduce((s,arr)=>s+(Array.isArray(arr)?arr.length:0),0);
+    // Build a custom "what will be saved" list — NOT _impactRowsHtml (that's for deletes)
+    const changes=[];
+    if(statusDirty){
+      changes.push({label:'Bestätigt',value:confCount+' Spieler',icon:'✓'});
+      changes.push({label:'Angemeldet',value:regCount+' Spieler',icon:'✓'});
+    }
+    if(slotsDirty){
+      changes.push({label:'Kaderplan (Positionen)',value:slotPlayerCount+' Zuordnungen · '+(slpState.formation||'?'),icon:'⚽'});
+    }
+    const itemsHtml='<div class="mcd-list-title">Folgende Änderungen werden gespeichert:</div>'+
+      changes.map(r=>`<div class="mcd-row"><span class="mcd-icon">${r.icon}</span><span class="mcd-label">${escapeHtml(r.label)}</span><span class="mcd-value">${escapeHtml(String(r.value))}</span></div>`).join('');
     const ok=await new Promise(resolve=>{
       _showSaveDraftDialog(resolve,itemsHtml);
     });
     if(ok==='cancel')return;
     if(ok==='save'){
       snap();
-      G._lastSaveBy=(CU&&CU.name)||'?';
-      G._lastSaveTs=Date.now();
-      saveG();
-      logAudit('Status gespeichert',UI.currentTeam+' · '+UI.currentSeason,confCount+' bestätigt · '+unregCount+' nicht angemeldet');
-      // Refresh snapshot — even though SLP closes after this, keep state consistent
+      if(statusDirty)_slpCommitDraft();
+      if(slotsDirty)slpSave(); // persist field layout to G.seasonLineups
+      logAudit('Saisonkader gespeichert',UI.currentTeam+' · '+UI.currentSeason,
+        (statusDirty?(confCount+' bestätigt · '+regCount+' angemeldet'):'')
+        +(statusDirty&&slotsDirty?' · ':'')
+        +(slotsDirty?(slotPlayerCount+' Slots'):''));
       _slpRefreshStatusSnapshot();
+      _slpSlotSnapshot=_slpCaptureSlotSnapshot();
     } else if(ok==='discard'){
-      _slpRestoreStatusSnapshot();
+      _slpRestoreStatusSnapshot(); // discard status draft
+      // Slot changes: re-load last saved plan from G to undo unsaved layout edits
+      const plans=slpGetPlans();
+      if(plans.length){
+        const last=plans[0];
+        if(last&&last.slots){
+          try{slpState.slots=JSON.parse(JSON.stringify(last.slots));}catch(e){slpState.slots={};}
+          slpState.formation=last.formation||'4-2-3-1';
+          slpState.customSlots=last.customSlots?{...last.customSlots}:null;
+        }
+      } else {
+        slpState.slots={};
+      }
     }
     _slpClearStatusDirty();
   } else {
-    // No real changes — clear flag without dialog
     _slpClearStatusDirty();
   }
   slpClosePopup();
   const el=document.getElementById('moSeasonLineup');
   if(el)el.classList.remove('open');
-  // Re-render main app so player colors reflect any committed/reverted changes
+  // Re-render main app so player colors reflect committed state
   if(typeof render==='function')render();
 }
 // Inline confirm dialog: returns 'save' / 'discard' / 'cancel' via callback
@@ -16465,8 +16493,10 @@ function slpRender(){
       const fs=fontFor(i);
       const yPos=R+18+i*LINE_H;
       const confirmed=confEnabled?slpIsPlayerConfirmed(pi):false;
-      // Reg-status takes priority over confirmed when both apply, since it signals admin issue
-      const isUnreg=isRegStatusShown()&&p&&p.registered!==true;
+      // Reg-status: read from draft if Saisonkader is open (live preview)
+      const draftReg=(typeof _slpStatusDraft!=='undefined'&&_slpStatusDraft)?_slpStatusDraft.registered:null;
+      const isPlayerReg=draftReg?(draftReg[pi]===true):(p&&p.registered===true);
+      const isUnreg=isRegStatusShown()&&p&&!isPlayerReg;
       const textColor=isUnreg?'#ffd34d':(confirmed?'#7dffa0':col);
       // When conf mode disabled - center align; when enabled - left align with reserved check space
       let nameTxt;
