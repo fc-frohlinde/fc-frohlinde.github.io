@@ -2123,6 +2123,7 @@ if(window._fbBlocked){
     <div style="border:1px solid var(--gl);border-radius:8px;max-height:280px;overflow-y:auto;margin-bottom:10px;" id="tmgr-pl-list"></div>
     <div class="mob-btns">
       <button class="btn bp" id="btn-mgr-addpl" onclick="closeM('moTeamMgr');openM('moAddPlayer');" style="display:none;">＋ Spieler</button>
+      <button class="btn" onclick="exportPlayersCSV()" style="background:var(--gd);color:#fff;" title="Spielerdaten als CSV exportieren (Trikotverwaltung-Format)">⬇ CSV-Export</button>
       <button class="btn bs" onclick="closeM('moTeamMgr')">Schließen</button>
     </div>
   </div>
@@ -2291,14 +2292,14 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.0.6.2';
-const APP_VERSION_LABEL='1.0.6.2';
+const APP_VERSION='1.0.6.3';
+const APP_VERSION_LABEL='1.0.6.3';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1780100000000; // v1.0.6.2: UX polish — past-data protection, automation cloud-sync, weekreport fix
+const APP_RELEASE_TS=1780200000000; // v1.0.6.3: CSV-Export Spieler (Trikotverwaltung)
 const APP_CHANGELOG=[
-  {version:'1.0.6.2',date:'23.05.2026',title:'UX-Politur & Schutz historischer Daten',items:[
+  {version:'1.0.6.3',date:'27.06.2026',title:'UX-Politur & Schutz historischer Daten',items:[
     {icon:'\u2601\ufe0f',title:'Automatisierungen ger\u00e4te\u00fcbergreifend',desc:'Deine Einstellungen f\u00fcr Wochenbericht-Erinnerung, RSVP-Erinnerung und Roll-Call wurden bisher pro Ger\u00e4t gespeichert (Handy ≠ Laptop). Jetzt sind sie an deinen Benutzer gebunden und folgen dir auf jedes Ger\u00e4t. Bestehende Einstellungen werden beim n\u00e4chsten Start automatisch \u00fcbernommen.'},
     {icon:'\ud83d\udcc6',title:'Wochenbericht: abgeschlossene Woche',desc:'Die Karte „Wochenbericht KW N bereit" zeigt jetzt die zuletzt abgeschlossene Mo\u2013So-Woche, nicht die gerade angefangene. Sonntag = laufende Woche, Mo\u2013Sa = Vorwoche. Keine leeren Berichte am Wochenstart mehr.'},
     {icon:'\ud83d\udd12',title:'Vergangene Statuszellen gesch\u00fctzt',desc:'In der Haupttabelle wird das Tippen auf eine vergangene Trainings-/Spielzelle nicht mehr durch Cycle-Wechsel beantwortet — stattdessen \u00f6ffnet sich ein klares Dropdown mit Anwesend / Fehlend / Entschuldigt. Versehentliche Klicks ver\u00e4ndern keine alten Daten mehr.'},
@@ -13993,6 +13994,50 @@ function switchTab(t){
   if(t==='statistik')renderMgrStats();
   if(t==='trainings')renderMgrSessions('training');
   if(t==='spiele')renderMgrSessions('match');
+}
+
+// CSV-Export für Trikotverwaltung (trikotverwaltung.de / ähnliche Dienste)
+// Spalten: Vorname;Nachname;Mannschaft;Rückennummer;Größe;Notizen
+// Trennzeichen: Semikolon. Encoding: UTF-8 mit BOM (Excel-kompatibel).
+function exportPlayersCSV(){
+  const D=cd();
+  if(!D||!D.players||!D.players.length){
+    alert('Keine Spielerdaten vorhanden.');return;
+  }
+  const team=UI.currentTeam||'U19';
+  const SEP=';';
+
+  // Helper: escape a CSV cell — wrap in quotes if it contains SEP, quote or newline
+  const esc=v=>{
+    const s=String(v??'');
+    return(s.includes(SEP)||s.includes('"')||s.includes('\n'))?'"'+s.replace(/"/g,'""')+'"':s;
+  };
+
+  const header=['Vorname','Nachname','Mannschaft','Rückennummer','Größe','Notizen'];
+  const rows=D.players
+    .filter(p=>p&&p.name)
+    .map(p=>{
+      // Split "Vorname Nachname" — first word = Vorname, remainder = Nachname
+      const parts=(p.name||'').trim().split(/\s+/);
+      const vorname=parts[0]||'';
+      const nachname=parts.slice(1).join(' ')||'';
+      return [vorname,nachname,team,p.nr||'','',p.note||''].map(esc).join(SEP);
+    });
+
+  // UTF-8 BOM so Excel opens correctly without encoding dialog
+  const bom='\uFEFF';
+  const csv=bom+header.map(esc).join(SEP)+'\n'+rows.join('\n');
+
+  // Trigger download
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  const date=new Date().toISOString().slice(0,10).replace(/-/g,'');
+  a.download=`spieler_${team.toLowerCase()}_${date}.csv`;
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 function renderMgrPlayers(){
