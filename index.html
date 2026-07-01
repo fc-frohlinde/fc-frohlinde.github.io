@@ -585,6 +585,14 @@ input[type="date"]{cursor:pointer;}
 .att-st{padding:2px 7px;border-radius:4px;font-size:.67rem;font-weight:700;cursor:pointer;transition:transform .1s;}
 .att-st.ro{cursor:default;}
 .att-st:not(.ro):hover{transform:scale(1.1);}
+/* Leistungsnote (performance grade) badge — shown only for present players
+   in already-conducted trainings. 1=sehr gut(green) 2=gut(blue) 3=nicht gut(orange). */
+.perf-btn{padding:2px 7px;border-radius:4px;font-size:.67rem;font-weight:700;cursor:pointer;transition:transform .1s;flex-shrink:0;}
+.perf-btn:hover{transform:scale(1.1);}
+.perf-1{background:rgba(39,174,96,.15);color:#1a7a40;}
+.perf-2{background:rgba(22,89,184,.15);color:#0d3d80;}
+.perf-3{background:rgba(243,156,18,.18);color:#a56a0a;}
+.perf-none{background:rgba(0,0,0,.04);color:var(--gm);border:1px dashed var(--gl);}
 
 /* match lineup */
 .lineup-section{background:var(--ow);border-radius:8px;padding:10px 12px;border:1px solid var(--gl);margin-bottom:10px;}
@@ -1820,6 +1828,8 @@ if(window._fbBlocked){
   <div id="ps-months" style="margin-bottom:12px;"></div>
   <div class="sec" style="margin-bottom:6px;">🎯 Schwerpunkte</div>
   <div id="ps-focuses" style="margin-bottom:12px;"></div>
+  <div class="sec" id="ps-perf-sec" style="margin-bottom:6px;display:none;">⭐ Leistungsnote</div>
+  <div id="ps-perf" style="margin-bottom:12px;display:none;"></div>
   <div class="sec" style="margin-bottom:6px;">📜 Notizen-Timeline <span id="ps-notes-count" style="font-size:.7rem;color:var(--gm);font-weight:500;margin-left:6px;"></span></div>
   <div id="ps-notes-timeline" style="margin-bottom:12px;"></div>
   <div class="sec" style="margin-bottom:6px;">📋 Alle Einheiten</div>
@@ -2292,16 +2302,20 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.0.7';
-const APP_VERSION_LABEL='1.0.7';
+const APP_VERSION='1.0.8';
+const APP_VERSION_LABEL='1.0.8';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1780200000000; // v1.0.7
+const APP_RELEASE_TS=1780300000000; // v1.0.8
 const APP_CHANGELOG=[
+  {version:'1.0.8',date:'01.07.2026',title:'Leistungsnote',items:[
+    {icon:'⭐',title:'Leistungsnote pro Training',desc:'Im Trainingsmenü kann jeder anwesende Spieler direkt bewertet werden: 1 = sehr gut, 2 = gut, 3 = nicht gut. Verfügbar nur für Trainings, die bereits stattgefunden haben — Spiele und zukünftige Trainings sind ausgenommen.'},
+    {icon:'📈',title:'Notenübersicht im Spielerprofil',desc:'Im Spielerprofil zeigt der neue Abschnitt „Leistungsnote" die Durchschnittsnote sowie alle bisherigen Bewertungen chronologisch — ein Blick genügt für die Entwicklung über die Zeit.'},
+    {icon:'🏆',title:'Ø Note in der Mannschaftsstatistik',desc:'Die Spieler-Tabelle unter Mannschaft → Statistik hat eine neue, sortierbare Spalte „⭐ Note" mit der Durchschnittsnote jedes Spielers.'},
+  ]},
   {version:'1.0.7',date:'27.06.2026',title:'CSV-Export',items:[
     {icon:'\u2b07\ufe0f',title:'Spieler-Export als CSV',desc:'In Mannschaft \u2192 Spieler gibt es jetzt den Button \u201e\u2b07 CSV-Export\u201c. Die Datei enth\u00e4lt Vorname, Nachname, Mannschaft, R\u00fcckennummer und Notizen im Trikotverwaltung-Format (Semikolon-getrennt, UTF-8). Direkt in Excel oder Numbers \u00f6ffnen und hochladen.'},
-    {icon:'\ud83d\udccb',title:'Status verwalten dauerhaft verf\u00fcgbar',desc:'Bestätigungen und Anmeldungs-Status im Saisonkader-Planer waren bisher nur bis zum Saisonstart (01.07.) sichtbar. Jetzt bleiben sie das ganze Jahr \u00fcber nutzbar.'},
   ]},
   {version:'1.0.6.2',date:'23.05.2026',title:'UX-Politur & Schutz historischer Daten',items:[
     {icon:'\u2601\ufe0f',title:'Automatisierungen ger\u00e4te\u00fcbergreifend',desc:'Deine Einstellungen f\u00fcr Wochenbericht-Erinnerung, RSVP-Erinnerung und Roll-Call wurden bisher pro Ger\u00e4t gespeichert (Handy ≠ Laptop). Jetzt sind sie an deinen Benutzer gebunden und folgen dir auf jedes Ger\u00e4t. Bestehende Einstellungen werden beim n\u00e4chsten Start automatisch \u00fcbernommen.'},
@@ -2578,7 +2592,7 @@ function insertSorted(D,sess){
   const k=dispToSortKey(sess.date);let at=D.sessions.length;
   for(let i=0;i<D.sessions.length;i++)if(dispToSortKey(D.sessions[i].date)>k){at=i;break;}
   D.sessions.splice(at,0,sess);
-  D.players.forEach(p=>{if(p.s)p.s.splice(at,0,3);});
+  D.players.forEach(p=>{if(p.s)p.s.splice(at,0,3);if(p&&p.perf)p.perf.splice(at,0,null);});
   // Detect team/season from the D reference so we shift the right block's lineups,
   // even when this is called for a non-current block (e.g. _applySchedulePattern).
   let team=UI.currentTeam,season=UI.currentSeason;
@@ -2779,7 +2793,7 @@ const DEF_PL={
     {nr:5,name:'Luca Feld',pos:'LV',pos2:''},{nr:6,name:'Jonas Rau',pos:'8er',pos2:''},
     {nr:7,name:'Felix Stern',pos:'10er',pos2:''},{nr:8,name:'Marc Hase',pos:'ST',pos2:''}],
 };
-function mkPl(team,n){return(DEF_PL[team]||[]).map(p=>({...p,s:new Array(n).fill(3)}));}
+function mkPl(team,n){return(DEF_PL[team]||[]).map(p=>({...p,s:new Array(n).fill(3),perf:new Array(n).fill(null)}));}
 
 // ══════════════════════════════
 //  DATA / STORAGE
@@ -6012,6 +6026,17 @@ function togAttMenu(id,pi,si,v){
   m.style.display='block';
 }
 document.addEventListener('click',()=>document.querySelectorAll('[id^="am_"]').forEach(m=>m.style.display='none'));
+function togPerfMenu(id,pi,si){
+  document.querySelectorAll('[id^="pm_"]').forEach(m=>{if(m.id!==id)m.style.display='none';});
+  const m=document.getElementById(id);if(!m)return;
+  if(m.style.display==='block'){m.style.display='none';return;}
+  const btn=m.previousElementSibling;if(!btn)return;
+  const r=btn.getBoundingClientRect();
+  m.style.left=Math.max(4,Math.min(window.innerWidth-160,r.left))+'px';
+  m.style.top=(r.bottom+3)+'px';
+  m.style.display='block';
+}
+document.addEventListener('click',()=>document.querySelectorAll('[id^="pm_"]').forEach(m=>m.style.display='none'));
 function cycStPlayer(pi,si){
   if(!canEdit())return;
   const D=cd(),p=D.players[pi];if(!p||!p.s)return;
@@ -6032,6 +6057,46 @@ function setSessPlayerStatus(pi,si,val){
   const sess=D.sessions[si];
   const sessLabel=sess?(sess.date+(sess.type==='match'?' (Spiel)':' (Training)')):'?';
   logAudit('Status geändert',D.players[pi].name||'?',sessLabel+': '+_statusName(oldVal)+' → '+_statusName(val));
+}
+// ── LEISTUNGSNOTE (performance grade) ──────────────────────────
+// Per-player, per-training grade: 1=sehr gut, 2=gut, 3=nicht gut. null = not graded.
+// Training-only (not matches), and only enterable once the session has
+// actually taken place (see _isSessRollCallTime) — grading a training that
+// hasn't happened yet doesn't make sense.
+// Stored as p.perf[si], parallel array to p.s[si] — kept in sync at every
+// point that splices D.sessions / p.s (insertSorted, delCurrSess, delSess,
+// doGen, updSessDate, trash restore).
+const PERF_LABEL={1:'Sehr gut',2:'Gut',3:'Nicht gut'};
+const PERF_ICON={1:'🟢',2:'🔵',3:'🟠'};
+function getPerf(pi,si){
+  const D=cd();const p=D&&D.players&&D.players[pi];
+  if(!p||!Array.isArray(p.perf))return null;
+  const v=p.perf[si];
+  return(v===1||v===2||v===3)?v:null;
+}
+// Only offer grading for training sessions that have already taken place.
+function canGradeSession(si){
+  const D=cd();const s=D&&D.sessions&&D.sessions[si];
+  if(!s)return false;
+  if(s.type==='match')return false;
+  return typeof _isSessRollCallTime==='function'?_isSessRollCallTime(si):false;
+}
+function setPerf(pi,si,val){
+  if(!canEdit())return;
+  if(!canGradeSession(si))return;
+  const D=cd();const p=D&&D.players&&D.players[pi];
+  if(!p)return;
+  if(!Array.isArray(p.perf))p.perf=[];
+  while(p.perf.length<=si)p.perf.push(null);
+  const oldVal=p.perf[si]??null;
+  const newVal=(val===1||val===2||val===3)?val:null;
+  if(oldVal===newVal)return;
+  snap();
+  p.perf[si]=newVal;
+  saveG();
+  const sess=D.sessions[si];
+  const sessLabel=sess?sess.date:'?';
+  logAudit('Leistungsnote geändert',p.name||'?',sessLabel+': '+(oldVal?PERF_LABEL[oldVal]:'–')+' → '+(newVal?PERF_LABEL[newVal]:'–'));
 }
 function cycStForce(pi,si){
   // Bypass past lock - allowed in session detail modal
@@ -12215,6 +12280,35 @@ function openPlayerStats(pi){
     const pct=focMap[f].pl?Math.round((focMap[f].a/focMap[f].pl)*100):0;
     return `<div class="fr"><div class="fr-nm">${f}</div><div class="fr-bw"><div class="fr-bar" style="width:${pct}%;background:var(--bm);"></div></div><div class="fr-val">${focMap[f].a}/${focMap[f].pl}</div><div style="min-width:28px;flex-shrink:0;text-align:right;font-size:.63rem;color:var(--gm);">${pct}%</div></div>`;
   }).join('')||'<p style="font-size:.72rem;color:var(--gm);">Keine Schwerpunkt-Daten.</p>';
+  // Leistungsnote — average + chronological history. Only training sessions
+  // that were actually graded (tIdx already limited to past trainings above).
+  // Section stays hidden entirely if the player has no graded sessions yet,
+  // so teams not using the feature don't see empty clutter.
+  {
+    const perfSecEl=document.getElementById('ps-perf-sec');
+    const perfEl=document.getElementById('ps-perf');
+    const perfEntries=tIdx
+      .map(i=>({date:ss[i].date,grade:(typeof getPerf==='function')?getPerf(pi,i):null}))
+      .filter(e=>e.grade!=null)
+      .sort((a,b)=>dispToSortKey(b.date)-dispToSortKey(a.date));
+    if(perfEntries.length&&perfSecEl&&perfEl){
+      perfSecEl.style.display='';perfEl.style.display='';
+      const avg=perfEntries.reduce((sum,e)=>sum+e.grade,0)/perfEntries.length;
+      const avgColor=avg<=1.5?'#1a7a40':avg<=2.5?'#0d3d80':'#a56a0a';
+      let html=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;padding:8px 12px;background:var(--ow);border-radius:8px;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:${avgColor};line-height:1;">${avg.toFixed(1).replace('.',',')}</div>
+        <div style="font-size:.72rem;color:var(--gm);">Ø Note aus ${perfEntries.length} bewerteten Training${perfEntries.length===1?'':'s'}</div>
+      </div>`;
+      html+=perfEntries.map(e=>{
+        const c=e.grade===1?'#1a7a40':e.grade===2?'#0d3d80':'#a56a0a';
+        return `<div style="display:flex;align-items:center;gap:8px;padding:4px 2px;font-size:.76rem;border-bottom:1px solid var(--gl);"><div style="flex:1;color:var(--gd);">${e.date}</div><div style="font-weight:700;color:${c};">${PERF_ICON[e.grade]} ${PERF_LABEL[e.grade]}</div></div>`;
+      }).join('');
+      perfEl.innerHTML=html;
+    } else {
+      if(perfSecEl)perfSecEl.style.display='none';
+      if(perfEl)perfEl.style.display='none';
+    }
+  }
   // Session list — two zones:
   //   • Upcoming/today (ascending): next-imminent at the top, then further out
   //   • Past (descending): most recent first
@@ -12520,6 +12614,9 @@ function buildSessAtt(si){
   // Phase-aware cards: hide during PLANNING (Anmeldungen-bar already shows the state)
   // Show only in ROLL-CALL/PAST: factual statuses (Anwesend, Fehlend, Entschuldigt).
   const _rollCall=_isSessRollCallTime(si);
+  // Grading is only offered for trainings that have already taken place —
+  // matches excluded, future/not-yet-started trainings excluded.
+  const _gradable=(typeof canGradeSession==='function')?canGradeSession(si):false;
   const cardsEl=document.getElementById('ss-cards');
   if(!_rollCall){
     cardsEl.innerHTML='';
@@ -12556,10 +12653,25 @@ function buildSessAtt(si){
     html+=`<div class="att-grp"><div class="att-grp-hdr ${cls}">${title} <span style="font-size:.7rem;font-weight:500;">(${pis.length})</span></div>`;
     pis.forEach(pi=>{
       const p=D.players[pi];const v=p.s?p.s[si]:3;const ro=!canEdit()?'ro':'';
+      // Leistungsnote badge — only for players marked Anwesend (key===1), and
+      // only when the session itself is gradable (past/started training, not a match).
+      const curGrade=(key===1&&_gradable)?getPerf(pi,si):null;
+      const gradeHtml=(key===1&&_gradable)?`
+        <div style="position:relative;display:inline-block;">
+          <button class="perf-btn ${curGrade?'perf-'+curGrade:'perf-none'}" style="cursor:${canEdit()?'pointer':'default'};border:none;" title="${curGrade?PERF_LABEL[curGrade]:'Note vergeben'}" onclick="${canEdit()?`event.stopPropagation();togPerfMenu('pm_${pi}_${si}',${pi},${si})`:'event.stopPropagation()'}">${curGrade?PERF_ICON[curGrade]:'☆'}</button>
+          <div id="pm_${pi}_${si}" style="display:none;position:fixed;z-index:600;background:var(--surface-dark);border:1px solid rgba(255,255,255,.2);border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.4);overflow:hidden;min-width:160px;">
+            <div onclick="event.stopPropagation();setPerf(${pi},${si},1);buildSessAtt(${si});" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.85);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">🟢 <span>1 – Sehr gut</span></div>
+            <div onclick="event.stopPropagation();setPerf(${pi},${si},2);buildSessAtt(${si});" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.85);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">🔵 <span>2 – Gut</span></div>
+            <div onclick="event.stopPropagation();setPerf(${pi},${si},3);buildSessAtt(${si});" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.85);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">🟠 <span>3 – Nicht gut</span></div>
+            ${curGrade?`<div onclick="event.stopPropagation();setPerf(${pi},${si},null);buildSessAtt(${si});" style="padding:6px 14px;font-size:.74rem;font-weight:600;color:rgba(255,255,255,.5);cursor:pointer;display:flex;align-items:center;gap:8px;border-top:1px solid rgba(255,255,255,.08);" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">✕ <span>Kein Eintrag</span></div>`:''}
+          </div>
+        </div>
+      `:'';
       html+=`<div class="att-row">
         <div class="att-nr">${p.nr||''}</div>
         <div class="att-name" style="cursor:pointer;" onclick="openPlayerFromSession(${si},${pi})">${getDisplayName(p)||''}</div>
         <div class="att-pos">${pbHtml(p)}</div>
+        ${gradeHtml}
         <div style="position:relative;display:inline-block;">
           <button class="att-st ${STCLS[v]}" style="cursor:${canEdit()?'pointer':'default'};border:none;padding:3px 6px;border-radius:4px;font-size:.72rem;font-weight:700;min-width:26px;display:inline-flex;align-items:center;justify-content:center;" onclick="${canEdit()?`event.stopPropagation();togAttMenu('am_${pi}_${si}',${pi},${si},${v})`:'event.stopPropagation()'}">${SYM[v]}</button>
           <div id="am_${pi}_${si}" style="display:none;position:fixed;z-index:600;background:var(--surface-dark);border:1px solid rgba(255,255,255,.2);border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.4);overflow:hidden;min-width:150px;">
@@ -12905,9 +13017,10 @@ function updSessDate(si,iso){
   const savedLineup=(G.matchLineups&&G.matchLineups[lineupKey])?G.matchLineups[lineupKey]:null;
   // Capture each player's status for this session
   const playerStatuses=D.players.map(p=>(p&&p.s&&si<p.s.length)?p.s[si]:3);
+  const playerPerfs=D.players.map(p=>(p&&p.perf&&si<p.perf.length)?p.perf[si]:null);
   // Remove from current position
   D.sessions.splice(si,1);
-  D.players.forEach(p=>{if(p&&p.s)p.s.splice(si,1);});
+  D.players.forEach(p=>{if(p&&p.s)p.s.splice(si,1);if(p&&p.perf)p.perf.splice(si,1);});
   shiftMatchLineupsIndices(team,si,-1); // drop old lineup at si, shift higher down
   // Update date and reinsert in sorted position
   sess.date=disp;
@@ -12918,6 +13031,7 @@ function updSessDate(si,iso){
     if(!p)return;
     if(!p.s)p.s=[];
     p.s[newPos]=playerStatuses[pi];
+    if(playerPerfs[pi]!=null){if(!p.perf)p.perf=[];p.perf[newPos]=playerPerfs[pi];}
   });
   // Restore lineup at new position with updated sessDate
   if(savedLineup){
@@ -13217,7 +13331,7 @@ async function delCurrSess(){
   // Save to recycle bin BEFORE removing
   const snapItem=_trashSnapSession(currentSI);
   if(snapItem)_trashAdd(snapItem);
-  snap();const D=cd();D.sessions.splice(currentSI,1);D.players.forEach(p=>{if(p.s)p.s.splice(currentSI,1);});
+  snap();const D=cd();D.sessions.splice(currentSI,1);D.players.forEach(p=>{if(p.s)p.s.splice(currentSI,1);if(p&&p.perf)p.perf.splice(currentSI,1);});
   shiftMatchLineupsIndices(UI.currentTeam,currentSI,-1);
   saveG();render();closeM('moSession2');
   // AUDIT: was missing — silent deletion bypassed Verlauf
@@ -14329,7 +14443,10 @@ function renderMgrStats(){
     const tA=tIdx.filter(i=>p.s&&p.s[i]===1).length,tPl=tIdx.filter(i=>p.s&&isFact(p.s[i])).length;
     const mA=mIdx.filter(i=>p.s&&p.s[i]===1).length,mPl=mIdx.filter(i=>p.s&&isFact(p.s[i])).length;
     const tPct=tPl?Math.round((tA/tPl)*100):0,mPct=mPl?Math.round((mA/mPl)*100):0;
-    return{pi:D.players.indexOf(p),nr:p.nr,name:p.name,shortname:p.shortname,pos:p.pos,pos2:p.pos2||'',tA,tPl,tPct,mA,mPl,mPct,pct:tPct};
+    // Leistungsnote average across all graded past trainings (1=sehr gut..3=nicht gut)
+    const perfVals=tIdx.map(i=>(p.perf&&(p.perf[i]===1||p.perf[i]===2||p.perf[i]===3))?p.perf[i]:null).filter(v=>v!=null);
+    const perfAvg=perfVals.length?(perfVals.reduce((s,v)=>s+v,0)/perfVals.length):null;
+    return{pi:D.players.indexOf(p),nr:p.nr,name:p.name,shortname:p.shortname,pos:p.pos,pos2:p.pos2||'',tA,tPl,tPct,mA,mPl,mPct,pct:tPct,perfAvg,perfAvgSort:perfAvg!=null?perfAvg:99,perfCount:perfVals.length};
   });
   rows.sort((a,b)=>{const v=statsSort.col;const r=typeof a[v]==='string'?a[v].localeCompare(b[v]):a[v]-b[v];return statsSort.asc?r:-r;});
   const sa=c=>statsSort.col===c?(statsSort.asc?'↑':'↓'):'';
@@ -14346,17 +14463,19 @@ function renderMgrStats(){
     <div class="sec" style="margin-top:12px;margin-bottom:8px;">🏆 Alle Spieler</div>
     <div style="max-height:240px;overflow-y:auto;border:1px solid var(--gl);border-radius:8px;">
     <table class="full-table"><thead><tr>
-      ${th('nr','#')}${th('name','Spieler')}${th('pos','Pos.')}${th('tPct','T%')}${th('tA','T-A')}${th('tPl','T-∑')}
+      ${th('nr','#')}${th('name','Spieler')}${th('pos','Pos.')}${th('tPct','T%')}${th('tA','T-A')}${th('tPl','T-∑')}${th('perfAvgSort','⭐ Note')}
       ${mS?th('mPct','S%')+th('mA','S-A')+th('mPl','S-∑'):''}
     </tr></thead><tbody>
     ${rows.map(r=>{const bc=pctColor(r.tPct);
       const openHandler=`navPush({id:'moTeamMgr',tab:'statistik'});closeM('moTeamMgr');openPlayerStats(${r.pi});`;
+      const perfColor=r.perfAvg==null?'var(--gm)':r.perfAvg<=1.5?'#1a7a40':r.perfAvg<=2.5?'#0d3d80':'#a56a0a';
       return`<tr style="cursor:pointer;" onclick="${openHandler}">
       <td>${r.nr}</td>
       <td style="text-align:left;">${getDisplayName(r)}</td>
       <td class="pos-td"><div class="pos-wrap">${pbHtml(r)}</div></td>
       <td style="font-weight:700;color:${bc};">${r.tPl?r.tPct+'%':'–'}</td>
       <td>${r.tA}</td><td>${r.tPl}</td>
+      <td style="font-weight:700;color:${perfColor};" title="${r.perfCount} bewertete Trainings">${r.perfAvg!=null?r.perfAvg.toFixed(1).replace('.',','):'–'}</td>
       ${mS?`<td style="font-weight:700;color:${pctColor(r.mPct)};">${r.mPl?r.mPct+'%':'–'}</td><td>${r.mA}</td><td>${r.mPl}</td>`:''}
     </tr>`;}).join('')}
     </tbody></table></div>`;
@@ -14415,7 +14534,7 @@ async function addSeason(){
   // Copy roster from current season for each team
   G.teamList.forEach(t=>{
     const prev=G.db[t+'__'+prevSeason];
-    const players=prev?prev.players.map(p=>({...p,s:[]})):[];
+    const players=prev?prev.players.map(p=>({...p,s:[],perf:[]})):[];
     G.db[t+'__'+n]={sessions:[],players};
   });
   UI.currentSeason=n;saveG();render();closeM('moSeason');
@@ -14523,9 +14642,13 @@ function _trashSnapSession(si){
   const [team]=teamSeason.split('__');
   // Attendance by player NAME (so restore works even if pi has shifted)
   const attMap={};
+  const perfMap={};
   D.players.forEach(p=>{
     if(p&&p.name&&Array.isArray(p.s)&&p.s[si]!==undefined){
       attMap[p.name]=p.s[si];
+    }
+    if(p&&p.name&&Array.isArray(p.perf)&&p.perf[si]!=null){
+      perfMap[p.name]=p.perf[si];
     }
   });
   // Match lineup if present (key includes season for uniqueness)
@@ -14541,6 +14664,7 @@ function _trashSnapSession(si){
     payload:{
       session:JSON.parse(JSON.stringify(sess)),
       attendanceByName:attMap,
+      perfByName:perfMap,
       lineup
     }
   };
@@ -14641,6 +14765,13 @@ function _restorePlayer(t){
   } else if(p.s.length>need){
     p.s=p.s.slice(0,need);
   }
+  // Same for Leistungsnote — pad with null (no grade), truncate if sessions were removed
+  if(!Array.isArray(p.perf))p.perf=[];
+  if(p.perf.length<need){
+    while(p.perf.length<need)p.perf.push(null);
+  } else if(p.perf.length>need){
+    p.perf=p.perf.slice(0,need);
+  }
   block.players.push(p);
   return {msg:'Spieler wiederhergestellt'+nrWarning};
 }
@@ -14656,6 +14787,7 @@ function _restoreSession(t){
   if(!Array.isArray(block.players))block.players=[];
   const sess=JSON.parse(JSON.stringify(t.payload.session));
   const attMap=t.payload.attendanceByName||{};
+  const perfMap=t.payload.perfByName||{};
   // Find insertion index: first existing session whose date is AFTER restored
   const sessKey=dispToSortKey(sess.date);
   let insertIdx=0;
@@ -14668,7 +14800,7 @@ function _restoreSession(t){
   shiftMatchLineupsIndices(t.teamName,insertIdx,+1,t.seasonName);
   // Insert session at chronological position
   block.sessions.splice(insertIdx,0,sess);
-  // For each player, splice their s[] array at insertIdx
+  // For each player, splice their s[] (and perf[]) array at insertIdx
   block.players.forEach(p=>{
     if(!p)return;
     if(!Array.isArray(p.s))p.s=[];
@@ -14676,6 +14808,10 @@ function _restoreSession(t){
     while(p.s.length<insertIdx)p.s.push(3);
     const val=(p.name&&attMap[p.name]!==undefined)?attMap[p.name]:3;
     p.s.splice(insertIdx,0,val);
+    if(!Array.isArray(p.perf))p.perf=[];
+    while(p.perf.length<insertIdx)p.perf.push(null);
+    const pval=(p.name&&perfMap[p.name]!==undefined)?perfMap[p.name]:null;
+    p.perf.splice(insertIdx,0,pval);
   });
   // Restore matchLineup at the (now-empty) slot at insertIdx
   if(t.payload.lineup){
@@ -15147,7 +15283,7 @@ async function delSess(si){
   // Save to recycle bin BEFORE removing
   const snapItem=_trashSnapSession(si);
   if(snapItem)_trashAdd(snapItem);
-  snap();D.sessions.splice(si,1);D.players.forEach(p=>{if(p.s)p.s.splice(si,1);});
+  snap();D.sessions.splice(si,1);D.players.forEach(p=>{if(p.s)p.s.splice(si,1);if(p&&p.perf)p.perf.splice(si,1);});
   shiftMatchLineupsIndices(UI.currentTeam,si,-1);
   saveG();render();
   logAudit('Sitzung entfernt',sLabel);
@@ -15235,7 +15371,7 @@ function doGen(){
     }
   });
   // Remove in reverse order
-  toRemove.reverse().forEach(i=>{D.sessions.splice(i,1);D.players.forEach(p=>{if(p.s)p.s.splice(i,1);});shiftMatchLineupsIndices(UI.currentTeam,i,-1);});
+  toRemove.reverse().forEach(i=>{D.sessions.splice(i,1);D.players.forEach(p=>{if(p.s)p.s.splice(i,1);if(p&&p.perf)p.perf.splice(i,1);});shiftMatchLineupsIndices(UI.currentTeam,i,-1);});
   // Prevent same day for training AND match
   const tSet=new Set(tD),mSet=new Set(mD);
   const overlap=[...tSet].filter(d=>mSet.has(d));
@@ -15584,6 +15720,9 @@ async function applyBulkMoveTeam(){
     if(newP.nr&&targetNrs.has(String(newP.nr)))newP.nr='';
     // Fresh attendance for target sessions
     newP.s=new Array(targetBlock.sessions.length).fill(3);
+    // Fresh Leistungsnote too — old grades were tied to the source team's
+    // training sessions, which don't correspond to the target team's sessions.
+    newP.perf=new Array(targetBlock.sessions.length).fill(null);
     targetBlock.players.push(newP);
     if(newP.nr)targetNrs.add(String(newP.nr));
     copied.push(src.name);
