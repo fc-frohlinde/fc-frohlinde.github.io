@@ -2301,6 +2301,7 @@ const APP_RELEASE_TS=1780200000000; // v1.0.7
 const APP_CHANGELOG=[
   {version:'1.0.7',date:'27.06.2026',title:'CSV-Export',items:[
     {icon:'\u2b07\ufe0f',title:'Spieler-Export als CSV',desc:'In Mannschaft \u2192 Spieler gibt es jetzt den Button \u201e\u2b07 CSV-Export\u201c. Die Datei enth\u00e4lt Vorname, Nachname, Mannschaft, R\u00fcckennummer und Notizen im Trikotverwaltung-Format (Semikolon-getrennt, UTF-8). Direkt in Excel oder Numbers \u00f6ffnen und hochladen.'},
+    {icon:'\ud83d\udccb',title:'Status verwalten dauerhaft verf\u00fcgbar',desc:'Bestätigungen und Anmeldungs-Status im Saisonkader-Planer waren bisher nur bis zum Saisonstart (01.07.) sichtbar. Jetzt bleiben sie das ganze Jahr \u00fcber nutzbar.'},
   ]},
   {version:'1.0.6.2',date:'23.05.2026',title:'UX-Politur & Schutz historischer Daten',items:[
     {icon:'\u2601\ufe0f',title:'Automatisierungen ger\u00e4te\u00fcbergreifend',desc:'Deine Einstellungen f\u00fcr Wochenbericht-Erinnerung, RSVP-Erinnerung und Roll-Call wurden bisher pro Ger\u00e4t gespeichert (Handy ≠ Laptop). Jetzt sind sie an deinen Benutzer gebunden und folgen dir auf jedes Ger\u00e4t. Bestehende Einstellungen werden beim n\u00e4chsten Start automatisch \u00fcbernommen.'},
@@ -18394,15 +18395,13 @@ function lpCircleColor(count){
   return count>=2?'#27ae60':count>=1?'var(--ac)':'rgba(255,255,255,.65)';
 }
 function slpSeasonStarted(){
-  // Pre-season window: BEFORE 01.07 of season's y1.
-  // From 01.07 onwards, status features (Bestätigungen / Anmeldungen) are hidden.
-  if(!UI.currentSeason)return false;
-  const m=UI.currentSeason.match(/^(\d{4})/);
-  if(!m)return false;
-  const y1=parseInt(m[1],10);
-  const today=new Date();
-  const seasonStart=new Date(y1,6,1); // July is month 6 (0-indexed)
-  return today>=seasonStart;
+  // DISABLED: previously returned true from 01.07 onward, hiding
+  // Bestätigungen/Anmeldungen/Status verwalten in the Saisonkader-Planer once
+  // the season "officially" began. Trainers want this available year-round —
+  // squad status and registrations are useful before AND during the season.
+  // Kept as a function (not inlined at call sites) so all 5 gates below stay
+  // in sync if this ever needs to change again.
+  return false;
 }
 function openSeasonLineup(){
   slpState.openSlot=null;
