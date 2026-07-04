@@ -2310,9 +2310,9 @@ const APP_VERSION_LABEL='1.0.8';
 const APP_RELEASE_TS=1780300000000; // v1.0.8
 const APP_CHANGELOG=[
   {version:'1.0.8',date:'01.07.2026',title:'Leistungsnote',items:[
-    {icon:'⭐',title:'Leistungsnote pro Training',desc:'Im Trainingsmenü kann jeder anwesende Spieler direkt bewertet werden: 1 = sehr gut, 2 = gut, 3 = nicht gut. Verfügbar nur für Trainings, die bereits stattgefunden haben — Spiele und zukünftige Trainings sind ausgenommen.'},
-    {icon:'📈',title:'Notenübersicht im Spielerprofil',desc:'Im Spielerprofil zeigt der neue Abschnitt „Leistungsnote" die Durchschnittsnote sowie alle bisherigen Bewertungen chronologisch — ein Blick genügt für die Entwicklung über die Zeit.'},
-    {icon:'🏆',title:'Ø Note in der Mannschaftsstatistik',desc:'Die Spieler-Tabelle unter Mannschaft → Statistik hat eine neue, sortierbare Spalte „⭐ Note" mit der Durchschnittsnote jedes Spielers.'},
+    {icon:'⭐',title:'Leistungsnote pro Training & Spiel',desc:'Im Trainings- und Spielmenü kann jeder anwesende Spieler direkt bewertet werden: 1 = sehr gut, 2 = gut, 3 = nicht gut. Verfügbar nur für Einheiten, die bereits stattgefunden haben — zukünftige Termine sind ausgenommen.'},
+    {icon:'📈',title:'Notenübersicht im Spielerprofil',desc:'Im Spielerprofil zeigt der neue Abschnitt „Leistungsnote" die Durchschnittsnote sowie alle bisherigen Bewertungen chronologisch (Trainings und Spiele) — ein Blick genügt für die Entwicklung über die Zeit.'},
+    {icon:'🏆',title:'Ø Note in der Mannschaftsstatistik',desc:'Die Spieler-Tabelle unter Mannschaft → Statistik hat eine neue, sortierbare Spalte „⭐ Note" mit der Durchschnittsnote jedes Spielers über Trainings und Spiele hinweg.'},
   ]},
   {version:'1.0.7',date:'27.06.2026',title:'CSV-Export',items:[
     {icon:'\u2b07\ufe0f',title:'Spieler-Export als CSV',desc:'In Mannschaft \u2192 Spieler gibt es jetzt den Button \u201e\u2b07 CSV-Export\u201c. Die Datei enth\u00e4lt Vorname, Nachname, Mannschaft, R\u00fcckennummer und Notizen im Trikotverwaltung-Format (Semikolon-getrennt, UTF-8). Direkt in Excel oder Numbers \u00f6ffnen und hochladen.'},
@@ -6059,10 +6059,10 @@ function setSessPlayerStatus(pi,si,val){
   logAudit('Status geändert',D.players[pi].name||'?',sessLabel+': '+_statusName(oldVal)+' → '+_statusName(val));
 }
 // ── LEISTUNGSNOTE (performance grade) ──────────────────────────
-// Per-player, per-training grade: 1=sehr gut, 2=gut, 3=nicht gut. null = not graded.
-// Training-only (not matches), and only enterable once the session has
-// actually taken place (see _isSessRollCallTime) — grading a training that
-// hasn't happened yet doesn't make sense.
+// Per-player, per-session grade: 1=sehr gut, 2=gut, 3=nicht gut. null = not graded.
+// Available for both trainings and matches, and only enterable once the
+// session has actually taken place (see _isSessRollCallTime) — grading a
+// session that hasn't happened yet doesn't make sense.
 // Stored as p.perf[si], parallel array to p.s[si] — kept in sync at every
 // point that splices D.sessions / p.s (insertSorted, delCurrSess, delSess,
 // doGen, updSessDate, trash restore).
@@ -6074,11 +6074,11 @@ function getPerf(pi,si){
   const v=p.perf[si];
   return(v===1||v===2||v===3)?v:null;
 }
-// Only offer grading for training sessions that have already taken place.
+// Grading is offered for both trainings AND matches, as long as the session
+// has already taken place (or started today) — see _isSessRollCallTime.
 function canGradeSession(si){
   const D=cd();const s=D&&D.sessions&&D.sessions[si];
   if(!s)return false;
-  if(s.type==='match')return false;
   return typeof _isSessRollCallTime==='function'?_isSessRollCallTime(si):false;
 }
 function setPerf(pi,si,val){
@@ -12280,15 +12280,15 @@ function openPlayerStats(pi){
     const pct=focMap[f].pl?Math.round((focMap[f].a/focMap[f].pl)*100):0;
     return `<div class="fr"><div class="fr-nm">${f}</div><div class="fr-bw"><div class="fr-bar" style="width:${pct}%;background:var(--bm);"></div></div><div class="fr-val">${focMap[f].a}/${focMap[f].pl}</div><div style="min-width:28px;flex-shrink:0;text-align:right;font-size:.63rem;color:var(--gm);">${pct}%</div></div>`;
   }).join('')||'<p style="font-size:.72rem;color:var(--gm);">Keine Schwerpunkt-Daten.</p>';
-  // Leistungsnote — average + chronological history. Only training sessions
-  // that were actually graded (tIdx already limited to past trainings above).
-  // Section stays hidden entirely if the player has no graded sessions yet,
-  // so teams not using the feature don't see empty clutter.
+  // Leistungsnote — average + chronological history. Trainings AND matches,
+  // only sessions that were actually graded. Section stays hidden entirely if
+  // the player has no graded sessions yet, so teams not using the feature
+  // don't see empty clutter.
   {
     const perfSecEl=document.getElementById('ps-perf-sec');
     const perfEl=document.getElementById('ps-perf');
-    const perfEntries=tIdx
-      .map(i=>({date:ss[i].date,grade:(typeof getPerf==='function')?getPerf(pi,i):null}))
+    const perfEntries=[...tIdx,...mIdx]
+      .map(i=>({date:ss[i].date,isMatch:ss[i].type==='match',grade:(typeof getPerf==='function')?getPerf(pi,i):null}))
       .filter(e=>e.grade!=null)
       .sort((a,b)=>dispToSortKey(b.date)-dispToSortKey(a.date));
     if(perfEntries.length&&perfSecEl&&perfEl){
@@ -12297,11 +12297,11 @@ function openPlayerStats(pi){
       const avgColor=avg<=1.5?'#1a7a40':avg<=2.5?'#0d3d80':'#a56a0a';
       let html=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;padding:8px 12px;background:var(--ow);border-radius:8px;">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:${avgColor};line-height:1;">${avg.toFixed(1).replace('.',',')}</div>
-        <div style="font-size:.72rem;color:var(--gm);">Ø Note aus ${perfEntries.length} bewerteten Training${perfEntries.length===1?'':'s'}</div>
+        <div style="font-size:.72rem;color:var(--gm);">Ø Note aus ${perfEntries.length} bewerteten Einheit${perfEntries.length===1?'':'en'}</div>
       </div>`;
       html+=perfEntries.map(e=>{
         const c=e.grade===1?'#1a7a40':e.grade===2?'#0d3d80':'#a56a0a';
-        return `<div style="display:flex;align-items:center;gap:8px;padding:4px 2px;font-size:.76rem;border-bottom:1px solid var(--gl);"><div style="flex:1;color:var(--gd);">${e.date}</div><div style="font-weight:700;color:${c};">${PERF_ICON[e.grade]} ${PERF_LABEL[e.grade]}</div></div>`;
+        return `<div style="display:flex;align-items:center;gap:8px;padding:4px 2px;font-size:.76rem;border-bottom:1px solid var(--gl);"><div style="flex:1;color:var(--gd);">${e.isMatch?'⚽ ':''}${e.date}</div><div style="font-weight:700;color:${c};">${PERF_ICON[e.grade]} ${PERF_LABEL[e.grade]}</div></div>`;
       }).join('');
       perfEl.innerHTML=html;
     } else {
@@ -12614,8 +12614,8 @@ function buildSessAtt(si){
   // Phase-aware cards: hide during PLANNING (Anmeldungen-bar already shows the state)
   // Show only in ROLL-CALL/PAST: factual statuses (Anwesend, Fehlend, Entschuldigt).
   const _rollCall=_isSessRollCallTime(si);
-  // Grading is only offered for trainings that have already taken place —
-  // matches excluded, future/not-yet-started trainings excluded.
+  // Grading is only offered for sessions (training or match) that have
+  // already taken place — future/not-yet-started sessions excluded.
   const _gradable=(typeof canGradeSession==='function')?canGradeSession(si):false;
   const cardsEl=document.getElementById('ss-cards');
   if(!_rollCall){
@@ -12654,7 +12654,7 @@ function buildSessAtt(si){
     pis.forEach(pi=>{
       const p=D.players[pi];const v=p.s?p.s[si]:3;const ro=!canEdit()?'ro':'';
       // Leistungsnote badge — only for players marked Anwesend (key===1), and
-      // only when the session itself is gradable (past/started training, not a match).
+      // only when the session itself is gradable (past/started training or match).
       const curGrade=(key===1&&_gradable)?getPerf(pi,si):null;
       const gradeHtml=(key===1&&_gradable)?`
         <div style="position:relative;display:inline-block;">
@@ -14443,8 +14443,8 @@ function renderMgrStats(){
     const tA=tIdx.filter(i=>p.s&&p.s[i]===1).length,tPl=tIdx.filter(i=>p.s&&isFact(p.s[i])).length;
     const mA=mIdx.filter(i=>p.s&&p.s[i]===1).length,mPl=mIdx.filter(i=>p.s&&isFact(p.s[i])).length;
     const tPct=tPl?Math.round((tA/tPl)*100):0,mPct=mPl?Math.round((mA/mPl)*100):0;
-    // Leistungsnote average across all graded past trainings (1=sehr gut..3=nicht gut)
-    const perfVals=tIdx.map(i=>(p.perf&&(p.perf[i]===1||p.perf[i]===2||p.perf[i]===3))?p.perf[i]:null).filter(v=>v!=null);
+    // Leistungsnote average across all graded past sessions (trainings + matches)
+    const perfVals=[...tIdx,...mIdx].map(i=>(p.perf&&(p.perf[i]===1||p.perf[i]===2||p.perf[i]===3))?p.perf[i]:null).filter(v=>v!=null);
     const perfAvg=perfVals.length?(perfVals.reduce((s,v)=>s+v,0)/perfVals.length):null;
     return{pi:D.players.indexOf(p),nr:p.nr,name:p.name,shortname:p.shortname,pos:p.pos,pos2:p.pos2||'',tA,tPl,tPct,mA,mPl,mPct,pct:tPct,perfAvg,perfAvgSort:perfAvg!=null?perfAvg:99,perfCount:perfVals.length};
   });
