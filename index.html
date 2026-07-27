@@ -17859,7 +17859,26 @@ function fmtSlots(fmtName,customSlots){
     return out;
   });
 }
-let lpState={formation:'4-2-3-1',slots:{},subs:[],guests:[],selectedSlot:null,selectedBench:null,currentLineupId:null,sessIdx:null,editing:false};
+let lpState={formation:'4-2-3-1',slots:{},subs:[],guests:[],selectedSlot:null,selectedBench:null,currentLineupId:null,sessIdx:null,editing:false,matchKind:'meisterschaft'};
+// Spieltyp: Meisterschaftsspiel erlaubt 7 Bank-Spieler, Testspiel 10 (DFB-Jugend).
+function lpMaxSubs(){return lpState.matchKind==='test'?10:7;}
+function lpSetMatchKind(kind){
+  if(kind!=='test'&&kind!=='meisterschaft')return;
+  if(lpState.matchKind===kind)return;
+  lpState.matchKind=kind;
+  // Shrinking 10 → 7: release overflow bench players back to the roster
+  // instead of hiding them invisibly (they'd still count as "used").
+  const max=lpMaxSubs();
+  if(lpState.subs.length>max)lpState.subs.length=max;
+  lpSyncKindBtns();
+  lpRender();
+}
+function lpSyncKindBtns(){
+  const a=document.getElementById('lp-kind-ms');
+  const b=document.getElementById('lp-kind-test');
+  if(a)a.classList.toggle('active',lpState.matchKind!=='test');
+  if(b)b.classList.toggle('active',lpState.matchKind==='test');
+}
 
 
 function openLineupForSess(){
@@ -17909,10 +17928,13 @@ function openLineupPlanner(sessIdx){
       lpState.subs=[...(saved.subs||[])];
       lpState.guests=[...(saved.guests||[])];
       lpState.customSlots=saved.customSlots?{...saved.customSlots}:null;
+      lpState.matchKind=saved.matchKind||'meisterschaft';
       lpState.currentLineupId=key;
     } else {
       lpState.slots={};lpState.subs=[];lpState.guests=[];lpState.customSlots=null;lpState.currentLineupId=null;
+      lpState.matchKind='meisterschaft';
     }
+    lpSyncKindBtns();
   }
   el.classList.add('open');
   // Presence: notify others we're editing the lineup
@@ -17967,9 +17989,11 @@ function lpSetFormation(f){
   for(let i=0;i<limit;i++){
     newAssign[newSlots[i].id]=oldOrdered[i];
   }
-  // Any leftover old players (if new formation has fewer slots) → bench
+  // Any leftover old players (if new formation has fewer slots) → bench,
+  // but never beyond the bench cap for the current match kind
   for(let i=limit;i<oldOrdered.length;i++){
     const pid=oldOrdered[i];
+    if(lpState.subs.length>=lpMaxSubs())break;
     if(!lpState.subs.includes(pid))lpState.subs.push(pid);
   }
   lpState.slots=newAssign;
@@ -18346,7 +18370,7 @@ function lpRenderSubs(){
   // Render sub circles (clickable like positions)
   const circlesEl=document.getElementById('lp-subs-circles');
   if(circlesEl){
-    const MAX_SUBS=7;
+    const MAX_SUBS=lpMaxSubs();
     const subSlots=[];
     for(let i=0;i<MAX_SUBS;i++){
       const pi=lpState.subs[i];
@@ -18643,6 +18667,7 @@ function lpSave(){
       subs:[...lpState.subs],
       guests:[...lpState.guests],
       customSlots:lpState.customSlots?{...lpState.customSlots}:null,
+      matchKind:lpState.matchKind||'meisterschaft',
       savedAt:Date.now(),
       sessDate:sess?sess.date:null,  // for migration safety
       season:UI.currentSeason
@@ -18651,7 +18676,7 @@ function lpSave(){
   } else {
     const name='Aufstellung '+new Date().toLocaleDateString('de-DE');
     const lus=lpGetLineups();
-    const lu={id:lpState.currentLineupId||('lu_'+Date.now()),name,formation:lpState.formation,slots:{...lpState.slots},subs:[...lpState.subs],customSlots:lpState.customSlots?{...lpState.customSlots}:null,savedAt:Date.now()};
+    const lu={id:lpState.currentLineupId||('lu_'+Date.now()),name,formation:lpState.formation,slots:{...lpState.slots},subs:[...lpState.subs],customSlots:lpState.customSlots?{...lpState.customSlots}:null,matchKind:lpState.matchKind||'meisterschaft',savedAt:Date.now()};
     const ex=lus.findIndex(l=>l.id===lu.id);
     if(ex>=0)lus[ex]=lu;else lus.unshift(lu);
     if(lus.length>20)lus.length=20;
@@ -18691,7 +18716,8 @@ function lpLoad(id){
   const l=lpGetLineups().find(x=>x.id===id);if(!l)return;
   lpState.currentLineupId=l.id;lpState.formation=l.formation;
   lpState.slots={...l.slots};lpState.subs=[...(l.subs||[])];lpState.selectedSlot=null;lpState.selectedBench=null;
-
+  lpState.matchKind=l.matchKind||'meisterschaft';
+  lpSyncKindBtns();
   renderFmtBtns('lp-fmt-btns',l.formation,'lpSetFormation');
   lpRender();lpRenderSaves();
 }
@@ -19862,6 +19888,10 @@ checkAutoBackup();
   <div class="lp-topbar">
     <div><div class="lp-logo">⚽ Aufstellungsplaner <span id="lp-presence-inline" class="inline-presence"></span></div><div class="lp-sub" id="lp-context-info">FC Frohlinde 1949</div></div>
     <div id="lp-fmt-btns" style="display:flex;gap:5px;flex-wrap:wrap;margin-left:8px;"></div>
+    <div style="display:flex;gap:4px;margin-left:10px;align-items:center;" title="Spieltyp bestimmt die Bankgröße">
+      <button class="lp-fmt-btn active" id="lp-kind-ms" onclick="lpSetMatchKind('meisterschaft')">Meisterschaft · 7</button>
+      <button class="lp-fmt-btn" id="lp-kind-test" onclick="lpSetMatchKind('test')">Testspiel · 10</button>
+    </div>
     <div class="lp-spacer"></div>
     <div class="lp-hint" id="lp-hint">Slot wählen → Spieler klicken</div>
     <button class="lp-close-btn" onclick="closeLineupPlanner()">✕ Schließen</button>
