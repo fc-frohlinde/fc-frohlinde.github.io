@@ -208,8 +208,8 @@
   }
   .rank-pct .sub{font-size:.66rem;color:var(--txt-faint);font-weight:600;margin-top:1px;}
   .pct-hi{color:var(--green);}
-  .pct-mid{color:var(--blue-l);}
-  .pct-lo{color:var(--amber);}
+  .pct-mid{color:#ffd600;}
+  .pct-lo{color:#ff3131;}
   .pct-zero{color:var(--txt-faint);}
 
   /* ── Team totals ── */
@@ -321,11 +321,11 @@ function avatarColor(name){
   return `linear-gradient(135deg,hsl(${hue},58%,46%),hsl(${(hue+40)%360},60%,34%))`;
 }
 function pctClass(p){
+  // >=80 gruen, 50-79 knallgelb, <50 (auch 0) knallrot; null = keine Daten
   if(p==null)return 'pct-zero';
   if(p>=80)return 'pct-hi';
   if(p>=50)return 'pct-mid';
-  if(p>0)return 'pct-lo';
-  return 'pct-zero';
+  return 'pct-lo';
 }
 const CELL_EMOJI={1:'\u2705',0:'\u274c',2:'\ud83d\udfe1',3:'\u2796'};
 let _rankSort='season'; // 'season' | 'week' — toggle state for combined ranking
