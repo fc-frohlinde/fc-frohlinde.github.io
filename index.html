@@ -2416,12 +2416,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.0.9';
-const APP_VERSION_LABEL='1.0.9';
+const APP_VERSION='1.0.9.1';
+const APP_VERSION_LABEL='1.0.9.1';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1780400000000; // v1.0.9: Startseite
+const APP_RELEASE_TS=1780500000000; // v1.0.9.1: media split (Firebase traffic fix), stats integrity, Spieltyp
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -3049,6 +3049,65 @@ function initFirebase(cfg){
 // ── Firebase key/value encoding ──────────────────────────────
 // Firebase forbids / . # $ [ ] in keys, and rejects undefined values.
 // Arrays are preserved using {__arr:1, v:[...]} wrapper so they survive round-trip.
+// ══ MEDIA SPLIT ═══════════════════════════════════════════════
+// WHY: G used to carry every photo (players ~80KB each, club logo, hero
+// photo) inside the single fcf_data node. Every save wrote megabytes and —
+// worse — every connected client re-DOWNLOADED all of it on every change
+// (fbRef.on('value')). One roll-call evening = hundreds of MB → Spark
+// download limit exceeded, Firebase threatened to disable the DB.
+// HOW: fbEncode transparently swaps large image dataURLs for tiny markers
+// {__media:id,v:rev} and uploads the actual bytes to a separate fcf_media
+// node — written ONLY when a photo actually changes, downloaded ONCE per
+// device (then cached in localStorage). fbDecode swaps markers back from
+// the cache, so p.photo / G.clubLogo / G.heroPhoto keep working everywhere
+// in the UI without a single call-site change.
+let MEDIA={photos:{},rev:{}};
+let _mediaDirty={},_mediaFlushT=null,_mediaNeedsRefetch=false,_mediaRefetchT=null;
+const MEDIA_SK='fcf_media_cache';
+try{
+  const _mc=localStorage.getItem(MEDIA_SK);
+  if(_mc){const p=JSON.parse(_mc);if(p&&p.photos)MEDIA=p;}
+}catch(e){}
+function _mediaSaveLS(){
+  try{localStorage.setItem(MEDIA_SK,JSON.stringify(MEDIA));}catch(e){/* quota — cache stays in-memory */}
+}
+function _mediaMarkDirty(id){
+  _mediaDirty[id]=1;
+  clearTimeout(_mediaFlushT);
+  _mediaFlushT=setTimeout(_mediaFlush,400);
+}
+function _mediaFlush(){
+  if(!fbDb)return;
+  const ids=Object.keys(_mediaDirty);
+  if(!ids.length)return;
+  const payload={};
+  ids.forEach(id=>{
+    payload['photos/'+id]=MEDIA.photos[id]||null;
+    payload['rev/'+id]=MEDIA.rev[id]||Date.now();
+  });
+  const retry={..._mediaDirty};
+  _mediaDirty={};
+  fbDb.ref('fcf_media').update(payload)
+    .then(()=>{_mediaSaveLS();})
+    .catch(()=>{Object.assign(_mediaDirty,retry);});
+}
+// Another client added/changed a photo we don't have — pull the media node
+// once (debounced), then re-render so avatars fill in.
+function _mediaRefetchAll(){
+  clearTimeout(_mediaRefetchT);
+  _mediaRefetchT=setTimeout(()=>{
+    if(!fbDb)return; // connection may still be initializing — checked at fire time
+    fbDb.ref('fcf_media').once('value').then(snap=>{
+      const v=snap.val();
+      if(v&&v.photos){
+        MEDIA.photos={...MEDIA.photos,...v.photos};
+        MEDIA.rev={...MEDIA.rev,...(v.rev||{})};
+        _mediaSaveLS();
+        if(typeof render==='function')render();
+      }
+    }).catch(()=>{});
+  },1500);
+}
 function fbEncodeValue(val){
   if(val===undefined||val===null)return null;
   if(Array.isArray(val)){
@@ -3058,6 +3117,21 @@ function fbEncodeValue(val){
   if(typeof val==='object'){
     const out={};
     for(const k of Object.keys(val)){
+      // Media split: large image dataURLs leave the hot node (see block above).
+      // Covers player photos (incl. trash snapshots), club logo, hero photo.
+      if((k==='photo'||k==='clubLogo'||k==='heroPhoto')
+         &&typeof val[k]==='string'&&val[k].length>1500&&val[k].indexOf('data:image')===0){
+        const idKey='_mid_'+k;
+        let id=val[idKey];
+        if(!id){id='m'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);val[idKey]=id;}
+        if(MEDIA.photos[id]!==val[k]){
+          MEDIA.photos[id]=val[k];
+          MEDIA.rev[id]=Date.now();
+          _mediaMarkDirty(id);
+        }
+        out[k]={__media:id,v:MEDIA.rev[id]||0};
+        continue;
+      }
       const v=fbEncodeValue(val[k]);
       if(v===undefined)continue; // strip undefined
       const ek=k.replace(/\//g,'__SL__').replace(/\./g,'__DOT__')
@@ -3071,6 +3145,16 @@ function fbEncodeValue(val){
 function fbDecodeValue(val){
   if(val===null||val===undefined)return null;
   if(typeof val==='object'&&!Array.isArray(val)){
+    // Media marker → inject the actual dataURL from the local cache.
+    // Missing/stale → return what we have (UI falls back to initials
+    // avatar for null) and schedule a one-shot media refetch.
+    if(val.__media){
+      const id=val.__media;
+      const cached=MEDIA.photos[id];
+      if(cached&&(MEDIA.rev[id]||0)>=(val.v||0))return cached;
+      _mediaNeedsRefetch=true;
+      return cached||null;
+    }
     // __arr marker: v may be a real JS array OR a Firebase-converted object {0:x,1:y,...}
     if(val.__arr===1){
       if(!val.v)return []; // empty array stored as null
@@ -3100,8 +3184,11 @@ function fbEncode(g){
   return encoded;
 }
 function fbDecode(d){
-  // Deep decode entire response
-  return fbDecodeValue(d);
+  // Deep decode entire response. If any media marker missed the local
+  // cache during this decode, pull the media node once (debounced).
+  const out=fbDecodeValue(d);
+  if(_mediaNeedsRefetch){_mediaNeedsRefetch=false;_mediaRefetchAll();}
+  return out;
 }
 // ── FORENSIC RECOVERY UTILITY ─────────────────────────────────
 // Recover index-based references (slpConfirmations, seasonLineups, matchLineups)
@@ -6113,13 +6200,11 @@ function renderTfoot(){
   //   still a pre-statement). For consistency, we only count v∈{1,0,2} on past
   //   sessions: attendance ratio = Anwesend ÷ (Anwesend+Fehlend+Entschuldigt).
   let totA=0,totPl=0;
-  const _tFootToday=todaySK();
   D.players.forEach(p=>{
     if(!p.s)return;
     p.s.forEach((v,si)=>{
       const s2=D.sessions[si];
-      if(!s2||!s2.date)return;
-      if(dispToSortKey(s2.date)>=_tFootToday)return;
+      if(!s2||!sessTookPlace(s2))return; // held sessions only (incl. today's started)
       if(v===1){totA++;totPl++;}
       else if(v===0||v===2){totPl++;}
     });
@@ -6154,13 +6239,13 @@ function renderFooter(){
   const mS=(D.sessions||[]).filter(s=>s.type==='match').length;
   // Fact-based aggregate — only past sessions, statuses 1/0/2
   let totA=0,totPl=0;
-  const _foTk=todaySK();
+
   (D.players||[]).forEach(p=>{
     if(!p.s)return;
     p.s.forEach((v,si)=>{
       const s2=D.sessions[si];
       if(!s2||!s2.date)return;
-      if(dispToSortKey(s2.date)>=_foTk)return;
+      if(!sessTookPlace(s2))return; // held sessions only
       if(v===1){totA++;totPl++;}
       else if(v===0||v===2){totPl++;}
     });
@@ -6317,6 +6402,25 @@ function _isSessRollCallTime(si){
   if(isNaN(h))return false;
   const now=new Date();
   return (now.getHours()*60+now.getMinutes())>=(h*60+m);
+}
+// "Session took place": strictly earlier day, or today with start time already
+// reached. THE stats-inclusion predicate — aggregate statistics must never
+// count sessions that haven't happened yet (a future Entschuldigt/Fehlend
+// would otherwise register as a real miss and skew every percentage).
+// Optional `season` enables cross-season year inference via _dbSortKey
+// (dashboard/report data); without it dispToSortKey (current season) is used.
+// Note: isSessPast (strictly < today) intentionally stays separate — it
+// drives UI protection (dropdown vs cycle), not statistics.
+function sessTookPlace(s,season){
+  if(!s||!s.date)return false;
+  const tk=todaySK();
+  const k=(season&&typeof _dbSortKey==='function')?_dbSortKey(s.date,season):dispToSortKey(s.date);
+  if(k<tk)return true;
+  if(k>tk)return false;
+  const tp=String(s.time||'00:00').split(':').map(Number);
+  const mins=(isNaN(tp[0])?0:tp[0])*60+(tp[1]||0);
+  const now=new Date();
+  return (now.getHours()*60+now.getMinutes())>=mins;
 }
 function cycSt(pi,si){
   if(!canEdit())return;
@@ -10228,17 +10332,18 @@ function dbComputeMetrics(data){
   const today=todaySK();
   const tIdx=sessions.map((s,i)=>s&&s.type==='training'?i:-1).filter(i=>i>=0);
   const mIdx=sessions.map((s,i)=>s&&s.type==='match'?i:-1).filter(i=>i>=0);
-  // Past-only indices for averages (skip future sessions that haven't happened)
-  // Uses season-aware sort key so non-current seasons are evaluated correctly
-  const isPast=i=>{const s=sessions[i];return s&&s.date&&_dbSortKey(s.date,season)<today;};
+  // "Took place" indices (past days + today's already-started sessions).
+  // Season-aware sort key so non-current seasons are evaluated correctly.
+  const isPast=i=>{const s=sessions[i];return s&&sessTookPlace(s,season);};
   const tPastIdx=tIdx.filter(isPast);
   const mPastIdx=mIdx.filter(isPast);
-  // Percentages — naturally past-only because future sessions have all v=null/3 (skipped)
+  // Percentages — ONLY held sessions. Future ones can carry Angemeldet (4)
+  // or Entschuldigt (2); both would otherwise count as misses here.
   let tA=0,tT=0,mA=0,mT=0,oA=0,oT=0;
   players.forEach(p=>{
     if(!p)return;
-    tIdx.forEach(i=>{const v=p.s&&p.s[i];if(v===3||v==null)return;tT++;oT++;if(v===1){tA++;oA++;}});
-    mIdx.forEach(i=>{const v=p.s&&p.s[i];if(v===3||v==null)return;mT++;oT++;if(v===1){mA++;oA++;}});
+    tPastIdx.forEach(i=>{const v=p.s&&p.s[i];if(v===3||v==null||v===4)return;tT++;oT++;if(v===1){tA++;oA++;}});
+    mPastIdx.forEach(i=>{const v=p.s&&p.s[i];if(v===3||v==null||v===4)return;mT++;oT++;if(v===1){mA++;oA++;}});
   });
   // Avg group size — ONLY past sessions (otherwise future "0 anwesend" drags it down)
   const sessionPresent=sessions.map((s,i)=>{
@@ -10268,12 +10373,13 @@ function dbComputeMetrics(data){
   };
 }
 function dbRankPlayers(data){
-  const {sessions,players}=data;
+  const {sessions,players,season}=data;
   const ranked=players.map((p,pi)=>{
     if(!p)return null;
     let att=0,taken=0;
     sessions.forEach((s,i)=>{
       if(!s)return;
+      if(!sessTookPlace(s,season))return; // future sessions are not facts
       const v=p.s&&p.s[i];
       if(v===3||v==null||v===4)return; // 4 = Angemeldet = pre-state
       taken++;
@@ -10302,13 +10408,14 @@ function _dbYearForMonth(mo,season){
   return mo>=7?y1:y1+1;
 }
 function dbComputeStatusBreakdown(data){
-  // Detailed breakdown of statuses across all (training+match) sessions
-  const {sessions,players}=data;
+  // Detailed breakdown of statuses across all HELD (training+match) sessions
+  const {sessions,players,season}=data;
   let a=0,f=0,e=0;
   let aT=0,fT=0,eT=0; // training only
   let aM=0,fM=0,eM=0; // match only
   sessions.forEach((s,si)=>{
     if(!s)return;
+    if(!sessTookPlace(s,season))return; // future Entschuldigt is not a miss yet
     const isMatch=s.type==='match';
     players.forEach(p=>{
       if(!p)return;
@@ -10419,6 +10526,7 @@ function dbComputeMonthlyTrend(data){
   const monthly={};
   sessions.forEach((s,si)=>{
     if(!s||!s.date)return;
+    if(!sessTookPlace(s,season))return; // only held sessions enter the trend
     const m=s.date.match(/(\d+)\.(\d+)/);
     if(!m)return;
     const mo=+m[2];
@@ -10579,7 +10687,9 @@ function dbComputeWeekReport(data,offsetWeeks){
   sessions.forEach((s,i)=>{
     if(!s||!s.date)return;
     const k=_dbSortKey(s.date,season);
-    if(k>=b.mondayYSK&&k<=b.sundayYSK)weekSess.push({s,i,sortKey:k});
+    // Only sessions that already took place — a report published mid-week
+    // must not count Thursday's training as columns/misses on Wednesday.
+    if(k>=b.mondayYSK&&k<=b.sundayYSK&&sessTookPlace(s,season))weekSess.push({s,i,sortKey:k});
   });
   weekSess.sort((a,b2)=>a.sortKey-b2.sortKey);
   // Per-player participation. cells = raw status values (1/0/2/3) for snapshot consumption.
@@ -10631,7 +10741,7 @@ function dbComputeWeekReport(data,offsetWeeks){
 let _dbPublishing=false;
 function _dbComputeSeasonStats(data){
   // Per-player cumulative season attendance + overall team season %
-  const {sessions,players}=data;
+  const {sessions,players,season}=data;
   const perPlayer={};
   let teamA=0,teamT=0;
   players.forEach((p,pi)=>{
@@ -10639,6 +10749,7 @@ function _dbComputeSeasonStats(data){
     let pres=0,tot=0;
     sessions.forEach((s,si)=>{
       if(!s)return;
+      if(!sessTookPlace(s,season))return; // future sessions are not facts
       const v=p.s&&p.s[si];
       if(v==null||v===3||v===4)return; // 4 = Angemeldet = pre-state, not yet marked
       tot++;teamT++;
@@ -12429,8 +12540,7 @@ function openPlayerStats(pi){
   // Stats — only past sessions, only factual statuses (1/0/2). Future intentions
   // (Angemeldet, Entschuldigt vorab) and missing data (Ausstehend) excluded so the
   // percentage reflects actual attendance, not planned.
-  const _psTk=todaySK();
-  const _isPast=i=>{const s=ss[i];return s&&s.date&&dispToSortKey(s.date)<_psTk;};
+  const _isPast=i=>{const s=ss[i];return s&&sessTookPlace(s);}; // held incl. today's started
   const _isFact=v=>(v===1||v===0||v===2);
   const tIdx=ss.map((s,i)=>s.type==='training'&&_isPast(i)?i:-1).filter(i=>i>=0);
   const mIdx=ss.map((s,i)=>s.type==='match'&&_isPast(i)?i:-1).filter(i=>i>=0);
@@ -14470,9 +14580,8 @@ function homeRenderBottom(){
     :'<div class="home-panel-empty">Keine Geburtstage in den n\u00e4chsten 30 Tagen</div>';
   // Mini stats — fact-based attendance overall
   let a=0,f=0,e=0;
-  const tk=todaySK();
   (D.sessions||[]).forEach((s,si)=>{
-    if(!s||!s.date||dispToSortKey(s.date)>=tk)return;
+    if(!s||!sessTookPlace(s))return;
     (D.players||[]).forEach(p=>{
       const v=p&&p.s?p.s[si]:3;
       if(v===1)a++;else if(v===0)f++;else if(v===2)e++;
@@ -14838,7 +14947,7 @@ function renderFocList(){
     D.sessions.forEach(s=>{
       if(s.type!=='training'||!s.focus||!sessCount[s.focus])return;
       sessCount[s.focus].total++;
-      if(dispToSortKey(s.date)<today)sessCount[s.focus].past++;
+      if(sessTookPlace(s))sessCount[s.focus].past++;
     });
   }
   document.getElementById('foc-list').innerHTML=foc.length?
@@ -14916,8 +15025,7 @@ function renderMgrStats(){
   const tS=ss.filter(s=>s.type==='training').length,mS=ss.filter(s=>s.type==='match').length;
   // Aggregate: only past sessions, only factual statuses (1/0/2). Future
   // intentions (Angemeldet=4) and missing data (Ausstehend=3) excluded.
-  const _mgTk=todaySK();
-  const _isPast=si=>{const s=ss[si];return s&&s.date&&dispToSortKey(s.date)<_mgTk;};
+  const _isPast=si=>{const s=ss[si];return s&&sessTookPlace(s);}; // held incl. today's started
   let totA=0,totPl=0;
   (D.players||[]).forEach(p=>{
     if(!p.s)return;
