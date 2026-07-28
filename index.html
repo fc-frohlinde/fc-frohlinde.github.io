@@ -1243,10 +1243,13 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   .legend-bar{display:none !important;}
   body{padding-bottom:0;}
   .mobile-att-view{padding-bottom:0 !important;}
-  /* Clearance = exactly the nav height (50px slot + 2x6px padding). The
-     browser's own toolbar is already accounted for by 100dvh above — adding
-     a safety margin on top of that just leaves an empty band. */
-  .ma-list-wrap{padding-bottom:calc(62px + env(safe-area-inset-bottom,0px)) !important;}
+  /* Clearance belongs on the SCROLLER (.ma-list), not on its wrapper.
+     .ma-list-wrap is overflow:hidden — padding there permanently shrinks the
+     visible area and shows up as a dead band under the list. On the scroller
+     the same padding is only reachable at the end of the scroll, which is
+     exactly what lets the last player row clear the fixed nav. */
+  .ma-list-wrap{padding-bottom:0 !important;}
+  .ma-list{padding-bottom:calc(58px + env(safe-area-inset-bottom,0px)) !important;}
   #mobNav{display:flex;}
   /* Modals — full-screen on mobile */
   .mob{width:100% !important;max-width:100vw !important;border-radius:14px 14px 0 0;padding:14px 16px;max-height:calc(100vh - 20px);box-sizing:border-box;}
