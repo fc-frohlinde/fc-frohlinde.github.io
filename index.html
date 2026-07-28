@@ -15380,11 +15380,15 @@ setTimeout(_bootVeilHide,5000);
 function homeOpen(){
   const ov=document.getElementById('homeOverlay');
   if(!ov)return;
-  homeRender();
+  // Show first, render second. Previously a throw inside homeRender() left
+  // the overlay closed and the user stranded on the table with the Start
+  // button apparently doing nothing.
+  ov.classList.add('open');
+  try{homeRender();}catch(e){console.error('homeRender:',e);}
   // Entrance animations replay on every open, but NOT on background
   // re-renders (Firebase sync etc.) — class is dropped after the sequence,
   // then one deferred render (if any arrived meanwhile) is flushed.
-  ov.classList.add('open','home-animate');
+  ov.classList.add('home-animate');
   if(typeof _mobNavSync==='function')_mobNavSync('home');
   clearTimeout(ov._animT);
   ov._animT=setTimeout(()=>{
@@ -15537,7 +15541,7 @@ function homeData(){
 }
 function homeRender(){
   if(!homeEligible())return;
-  const D=homeData();
+  const D=homeData()||{players:[],sessions:[]};
   // ── Hero ──
   const heroTitle=document.getElementById('home-hero-title');
   const heroSub=document.getElementById('home-hero-sub');
@@ -15567,6 +15571,7 @@ function homeRender(){
   if(unEl)unEl.textContent=(CU&&CU.name)||'\u2013';
   // ── Sections isolated: one broken block must not kill the whole screen ──
   try{homeRenderNext();}catch(e){console.error('homeRenderNext:',e);}
+
   try{homeRenderTiles();}catch(e){console.error('homeRenderTiles:',e);}
   try{homeRenderBottom();}catch(e){console.error('homeRenderBottom:',e);}
 }
@@ -15582,7 +15587,7 @@ function _homeSetHtml(el,html){
 function homeRenderNext(){
   const row=document.getElementById('home-next-row');
   if(!row)return;
-  const D=homeData();
+  const D=homeData()||{players:[],sessions:[]};
   const seas=homeSeason();
   const _sk=d=>_dbSortKey(d,seas); // season-aware: home may show another season than the table
   const t=todaySK();
@@ -15700,7 +15705,7 @@ function homeRenderTiles(){
 function homeRenderBottom(){
   const el=document.getElementById('home-bottom');
   if(!el)return;
-  const D=homeData();
+  const D=homeData()||{players:[],sessions:[]};
   const seas=homeSeason();
   // Birthdays in next 30 days (reuse parseBirthdate logic pattern)
   const today=new Date();today.setHours(0,0,0,0);
