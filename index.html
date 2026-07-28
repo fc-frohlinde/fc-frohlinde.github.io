@@ -635,7 +635,10 @@ input[type="date"]{cursor:pointer;}
 .tchecks{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
 .tcheck{padding:4px 10px;border:1.5px solid var(--gl);border-radius:6px;cursor:pointer;font-size:.74rem;font-weight:600;color:var(--gd);transition:all .12s;user-select:none;}
 .tcheck.sel{border-color:var(--bm);background:rgba(22,89,184,.09);color:var(--bm);}
-.tbar{display:flex;gap:0;border-bottom:2px solid var(--gl);margin-bottom:12px;}
+.tbar{display:flex;gap:0;border-bottom:2px solid var(--gl);margin-bottom:12px;
+  overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.tbar::-webkit-scrollbar{display:none;}
+.tbtn{flex-shrink:0;white-space:nowrap;}
 .tbtn{padding:7px 14px;font-family:'Barlow',sans-serif;font-weight:700;font-size:.74rem;color:var(--gm);cursor:pointer;border:none;background:none;text-transform:uppercase;border-bottom:2.5px solid transparent;margin-bottom:-2px;transition:all .12s;}
 .tbtn:hover{color:var(--bm);}
 .tbtn.active{color:var(--bm);border-bottom-color:var(--bm);}
@@ -1313,13 +1316,19 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   .cal-month-hdr{font-size:.95rem !important;padding:5px 8px !important;}
   /* Hide month navigation on mobile - list view shows entire season */
   .cal-nav{display:none !important;}
-  /* Calendar actions: 2x2 grid of the "add" buttons, Export spanning the row
-     below them — secondary action, but deliberate rather than orphaned. */
-  #moCalendar .mob > div:first-of-type{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
-  #moCalendar .mob > div:first-of-type h3{grid-column:1 / -1;}
-  #moCalendar #cal-ctx{grid-column:1 / -1;}
-  #moCalendar .cal-btn{width:100%;justify-content:center;min-height:40px;}
-  #moCalendar #cal-export-btn{grid-column:1 / -1;}
+  /* Calendar actions: five icon buttons on ONE row. Labels are dropped on
+     phones (titles keep them discoverable) — a 2-column grid of labelled
+     buttons ate half the screen before the calendar even appeared. */
+  #moCalendar .cb-lbl{display:none;}
+  #moCalendar .mob > div:first-of-type{gap:5px;flex-wrap:nowrap;}
+  #moCalendar .cal-btn{flex:1;min-width:0;justify-content:center;min-height:40px;padding:6px 4px;font-size:1rem;}
+  #moCalendar #cal-ctx{display:none;}
+  /* Constant height across tabs: the sheet no longer grows and shrinks as
+     the trainer moves between Spieler / Statistik / Spiele. The active pane
+     scrolls inside it instead. */
+  #moTeamMgr .mob{height:calc(var(--vvh,100vh) * .88);display:flex;flex-direction:column;}
+  #moTeamMgr .tbar{flex-shrink:0;}
+  #moTeamMgr .tpanel.active{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;}
   /* Calendar modal: full screen, cleaner padding */
   #moCalendar .mob{padding:10px 0 0 !important;}
   #moCalendar .mob h3{padding:0 14px;}
@@ -22038,11 +22047,11 @@ checkAutoBackup();
   <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;flex-shrink:0;flex-wrap:wrap;padding-right:32px;">
     <h3 style="flex:1;margin:0;color:var(--bd);min-width:140px;">📅 Kalender <span id="cal-presence-inline" class="inline-presence"></span></h3>
     <span id="cal-ctx" style="font-size:.78rem;color:var(--gm);"></span>
-    <button class="cal-btn cal-btn-plan" id="cal-gen-plan" onclick="openGenSch();" title="Saisonplan generieren">⚙️ Plan</button>
-    <button class="cal-btn cal-btn-train" id="cal-add-train" onclick="openM('moSession');">＋ Training</button>
-    <button class="cal-btn cal-btn-match" id="cal-add-match" onclick="openM('moMatch');">⚽ Spiel</button>
-    <button class="cal-btn cal-btn-termin" id="cal-add-btn" onclick="openCalEvent(null)">＋ Termin</button>
-    <button class="cal-btn cal-btn-export" id="cal-export-btn" onclick="openExportIcs()" title="In Google/Apple Kalender importieren">📥 Export</button>
+    <button class="cal-btn cal-btn-plan" id="cal-gen-plan" onclick="openGenSch();" title="Saisonplan generieren">⚙️<span class="cb-lbl"> Plan</span></button>
+    <button class="cal-btn cal-btn-train" id="cal-add-train" onclick="openM('moSession');" title="Training anlegen">＋🏃<span class="cb-lbl"> Training</span></button>
+    <button class="cal-btn cal-btn-match" id="cal-add-match" onclick="openM('moMatch');" title="Spiel anlegen">⚽<span class="cb-lbl"> Spiel</span></button>
+    <button class="cal-btn cal-btn-termin" id="cal-add-btn" onclick="openCalEvent(null)" title="Termin anlegen">📌<span class="cb-lbl"> Termin</span></button>
+    <button class="cal-btn cal-btn-export" id="cal-export-btn" onclick="openExportIcs()" title="In Google/Apple Kalender importieren">📥<span class="cb-lbl"> Export</span></button>
   </div>
   <div class="cal-legend">
     <div class="cal-legend-item"><div class="cal-legend-sw" style="background:#ffe0b0;border-left:2px solid #d97a00;"></div>Spiel</div>
