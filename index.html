@@ -5636,7 +5636,19 @@ let _navConsume=0,_navExitArmed=false;
 // page load, cannot lie about this.
 let _navArmed=false;
 function _navArm(){
-  try{history.pushState({fcf:1},'');_navArmed=true;}catch(e){}
+  // Measure, don't assume: if history.length does not grow, the entry was
+  // never created and the whole approach cannot work in this browser.
+  let before=-1,after=-1;
+  try{
+    before=history.length;
+    history.pushState({fcf:1},'');
+    after=history.length;
+    _navArmed=true;
+  }catch(e){
+    try{_navDbgStore('arm FEHLER: '+(e&&e.message?e.message:e));}catch(_){}
+    return;
+  }
+  try{_navDbgStore('arm: len '+before+' -> '+after+(after>before?' OK':' KEIN EINTRAG'));}catch(e){}
 }
 // Re-arming from INSIDE a popstate handler is unreliable on several Android
 // browsers — the push is sometimes swallowed, and the next back press then
@@ -5760,7 +5772,10 @@ setInterval(()=>{
   b.textContent=_navArmed?'GUARD ✓':'GUARD ✗';
   b.style.color=_navArmed?'#7be0a8':'#ff8a7a';
 },500);
-window.addEventListener('beforeunload',()=>{_navDbgStore('beforeunload (Seite verlassen)');});
+window.addEventListener('beforeunload',()=>{
+  let l='?';try{l=history.length;}catch(e){}
+  _navDbgStore('beforeunload  len='+l+' armed='+(_navArmed?1:0));
+});
 window.addEventListener('popstate',()=>{
   try{
   _navArmed=false;   // the press consumed our entry
