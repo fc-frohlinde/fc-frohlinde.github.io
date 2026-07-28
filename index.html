@@ -5636,8 +5636,12 @@ let _navConsume=0;
 // the very next back press left the document without firing popstate at all
 // — the "green guard but silent exit" case. A plain variable, reset by every
 // page load, cannot lie about this.
-let _navArmed=false;
+let _navArmed=false,_navInPop=false;
 function _navArm(){
+  // Never arm while handling a back press: the modal that navBack re-opens
+  // would push a guard outside any user gesture, and Chromium skips exactly
+  // those — the extra entry then swallowed the following press.
+  if(_navInPop)return;
   try{history.pushState({fcf:1},'');_navArmed=true;}catch(e){}
 }
 // Re-arming from INSIDE a popstate handler is unreliable on several Android
@@ -5701,6 +5705,10 @@ function _navGotoDefaultView(){
 // (our reloads) opt out via allowLeaveOnce().
 let _allowLeave=false;
 function allowLeaveOnce(){_allowLeave=true;setTimeout(()=>{_allowLeave=false;},5000);}
+// A reload is not an accidental exit — F5 / Ctrl+R / Cmd+R opt out.
+document.addEventListener('keydown',e=>{
+  if(e.key==='F5'||((e.ctrlKey||e.metaKey)&&(e.key==='r'||e.key==='R')))allowLeaveOnce();
+},true);
 window.addEventListener('beforeunload',e=>{
   if(_allowLeave)return;
   if(!_userInteracted)return;   // browsers ignore the prompt without interaction anyway
@@ -5709,6 +5717,7 @@ window.addEventListener('beforeunload',e=>{
   e.returnValue='';
 });
 window.addEventListener('popstate',()=>{
+  _navInPop=true;
   try{
   _navArmed=false;   // the press consumed our entry
   if(_navConsume>0){_navConsume--;return;}
@@ -5728,6 +5737,7 @@ window.addEventListener('popstate',()=>{
   }
   // Nothing left to close: the browser's own confirmation handles leaving.
   }catch(err){/* never let a throw disable the handler */}
+  finally{setTimeout(()=>{_navInPop=false;},0);}
 });
 // The guard can go missing in more ways than one: a bfcache restore drops it,
 // a reload starts without it, and any other history call can replace it. So
