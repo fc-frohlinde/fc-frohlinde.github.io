@@ -5628,7 +5628,7 @@ document.getElementById('authInput').addEventListener('keydown',e=>{if(e.key==='
 // per open layer failed: at the root there was nothing left to pop.
 // So: one guard entry is pushed at startup, every back press consumes it,
 // we act on the topmost thing on screen, and immediately re-arm.
-let _navConsume=0,_navExitArmed=false;
+let _navConsume=0;
 // ARMED STATE IS PER PAGE LOAD, NOT PER HISTORY ENTRY.
 // history.state survives a reload: after refreshing, the entry the app sits
 // on still carries our {fcf:1} marker even though there is nothing above it
@@ -5645,11 +5645,7 @@ function _navArm(){
 // escapes the page. Doing it on the next tick (plus two later re-checks)
 // makes it dependable; that intermittency is exactly what "works every other
 // time" looked like.
-function _navRearm(){
-  setTimeout(_navEnsureArmed,0);
-  setTimeout(_navEnsureArmed,120);
-  setTimeout(_navEnsureArmed,400);
-}
+
 function _navLayers(){
   // Home is not a layer — it is a view (see _navViewLevel).
   return Array.from(document.querySelectorAll(
@@ -5696,24 +5692,6 @@ function _navGotoDefaultView(){
   if(_navHomeIsDefault()){if(typeof homeOpen==='function')homeOpen();}
   else{if(typeof homeClose==='function')homeClose();}
 }
-function _navShowExitHint(){
-  let t=document.getElementById('exitHint');
-  if(!t){
-    t=document.createElement('div');
-    t.id='exitHint';
-    t.style.cssText='position:fixed;left:50%;transform:translateX(-50%);'
-      +'bottom:calc(16px + var(--mob-nav-h,0px) + env(safe-area-inset-bottom,0px));'
-      +'z-index:100001;background:rgba(10,20,40,.94);color:#fff;padding:11px 18px;'
-      +'border-radius:999px;font-family:\'Barlow\',sans-serif;font-size:.82rem;'
-      +'font-weight:600;box-shadow:0 6px 22px rgba(0,0,0,.4);pointer-events:none;'
-      +'transition:opacity .2s;text-align:center;max-width:88vw;';
-    document.body.appendChild(t);
-  }
-  t.textContent='Nochmal \u201eZur\u00fcck\u201c dr\u00fccken, um die Seite zu verlassen';
-  t.style.opacity='1';
-  clearTimeout(t._h);
-  t._h=setTimeout(()=>{t.style.opacity='0';},2400);
-}
 // ── LEAVING THE SITE ─────────────────────────────────────────
 // Measured on the affected devices: the guard entry IS created
 // (history.length grows) and the flag IS set, yet "back" unloads the
@@ -5742,43 +5720,22 @@ window.addEventListener('popstate',()=>{
     }else{
       _navCloseLayer(top);
     }
-    _navRearm();
     return;
   }
   if(_navViewLevel()===1){
     _navGotoDefaultView();
-    _navRearm();
     return;
   }
-  // Root reached. First press warns, a second one within the window leaves.
-  if(_navExitArmed){
-    _navExitArmed=false;
-    _navArmed=false;
-    history.back();   // no re-arm → this actually navigates away
-    return;
-  }
-  _navExitArmed=true;
-  _navShowExitHint();
-  setTimeout(()=>{_navExitArmed=false;},2600);
-  _navRearm();
-  }catch(err){
-    // A throw here used to kill the handler silently, leaving the next press
-    // unguarded — never let that happen again.
-    _navRearm();
-  }
+  // Nothing left to close: the browser's own confirmation handles leaving.
+  }catch(err){/* never let a throw disable the handler */}
 });
 // The guard can go missing in more ways than one: a bfcache restore drops it,
 // a reload starts without it, and any other history call can replace it. So
 // instead of arming once, we verify continuously — history.state tells us
 // whether our entry is the current one.
-function _navEnsureArmed(){
-  if(!_navArmed)_navArm();
-}
-_navEnsureArmed();                                   // immediately at load
-document.addEventListener('DOMContentLoaded',()=>setTimeout(_navEnsureArmed,50));
-window.addEventListener('pageshow',()=>setTimeout(_navEnsureArmed,50));
-window.addEventListener('focus',_navEnsureArmed);
-setInterval(_navEnsureArmed,400);
+// No timer-based arming any more: entries pushed outside a user gesture are
+// exactly the ones Chromium skips. Every guard now originates from the click
+// that opened something (see openM / rcOpen / mobSheetOpen / homeClose).
 // Record the very first arm so we can tell "never armed" from "armed and lost"
 // ══ POPUP PLACEMENT ══════════════════════════════════════════
 // Every dropdown used to compute its own left/top from the anchor rect, with
@@ -13924,6 +13881,7 @@ function rcOpen(si){
   if(!canEdit())return;
   const D=cd();const s=D&&D.sessions&&D.sessions[si];
   if(!s)return;
+  if(typeof _navArm==='function')_navArm();
   _rcSi=si;
   _rcOnlyOpen=false;
   const ov=document.getElementById('rcOverlay');
@@ -15671,6 +15629,7 @@ function homeOpen(){
   },1150);
 }
 function homeClose(){
+  if(typeof _navArm==='function')_navArm(); // so "back" returns to the Startseite
   if(typeof _mobNavSync==='function')_mobNavSync('list');
   const ov=document.getElementById('homeOverlay');
   if(ov)ov.classList.remove('open');
@@ -15719,6 +15678,7 @@ function mobSeasonTap(){
 function mobSheetOpen(){
   const sh=document.getElementById('mobSheet');
   if(!sh)return;
+  if(typeof _navArm==='function')_navArm();
   // Season picker mirrors the desktop select. seasonList can arrive from
   // Firebase as an object ({0:'2025/26',…}) — normalise before rendering,
   // otherwise the picker silently stays empty and the season looks stuck.
@@ -18149,6 +18109,13 @@ function exportData(){const b=new Blob([JSON.stringify(G,null,2)],{type:'applica
 //  MODALS
 // ══════════════════════════════
 function openM(id){
+  // Guard entry is pushed HERE, synchronously inside the user's click.
+  // Chromium marks history entries created without a user gesture as
+  // "skippable" (its anti-back-trap intervention) — a timer-pushed entry is
+  // silently stepped over, which is why back kept escaping the page even
+  // though history.length had grown. Pushed from a real interaction it
+  // behaves normally, so one back press = one closed layer.
+  if(typeof _navArm==='function')_navArm();
   document.getElementById(id).classList.add('open');
   if(id==='moAddPlayer')initAddPos();
   if(id==='moSession'){
