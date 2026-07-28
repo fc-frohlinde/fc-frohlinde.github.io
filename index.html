@@ -5627,7 +5627,17 @@ document.getElementById('authInput').addEventListener('keydown',e=>{if(e.key==='
 // So: one guard entry is pushed at startup, every back press consumes it,
 // we act on the topmost thing on screen, and immediately re-arm.
 let _navConsume=0,_navExitArmed=false;
-function _navArm(){try{history.pushState({fcf:1},'');}catch(e){}}
+// ARMED STATE IS PER PAGE LOAD, NOT PER HISTORY ENTRY.
+// history.state survives a reload: after refreshing, the entry the app sits
+// on still carries our {fcf:1} marker even though there is nothing above it
+// to pop. Trusting that marker meant the app believed it was protected while
+// the very next back press left the document without firing popstate at all
+// — the "green guard but silent exit" case. A plain variable, reset by every
+// page load, cannot lie about this.
+let _navArmed=false;
+function _navArm(){
+  try{history.pushState({fcf:1},'');_navArmed=true;}catch(e){}
+}
 // Re-arming from INSIDE a popstate handler is unreliable on several Android
 // browsers — the push is sometimes swallowed, and the next back press then
 // escapes the page. Doing it on the next tick (plus two later re-checks)
@@ -5747,14 +5757,13 @@ setInterval(()=>{
       +'padding:5px 8px;border-radius:8px;pointer-events:none;';
     document.body.appendChild(b);
   }
-  let armed=false;
-  try{armed=!!(history.state&&history.state.fcf);}catch(e){}
-  b.textContent=armed?'GUARD ✓':'GUARD ✗';
-  b.style.color=armed?'#7be0a8':'#ff8a7a';
+  b.textContent=_navArmed?'GUARD ✓':'GUARD ✗';
+  b.style.color=_navArmed?'#7be0a8':'#ff8a7a';
 },500);
 window.addEventListener('beforeunload',()=>{_navDbgStore('beforeunload (Seite verlassen)');});
 window.addEventListener('popstate',()=>{
   try{
+  _navArmed=false;   // the press consumed our entry
   _navDbg('popstate  layers='+_navLayers().length+' stack='+_navStackLen()
     +' view='+_navViewLevel()+' armed='+(_navExitArmed?1:0));
   if(_navConsume>0){_navConsume--;return;}
@@ -5780,6 +5789,7 @@ window.addEventListener('popstate',()=>{
   if(_navExitArmed){
     _navExitArmed=false;
     _navDbg('ROOT → verlasse Seite');
+    _navArmed=false;
     history.back();   // no re-arm → this actually navigates away
     return;
   }
@@ -5800,7 +5810,7 @@ window.addEventListener('popstate',()=>{
 // instead of arming once, we verify continuously — history.state tells us
 // whether our entry is the current one.
 function _navEnsureArmed(){
-  try{if(!history.state||!history.state.fcf)_navArm();}catch(e){}
+  if(!_navArmed)_navArm();
 }
 _navEnsureArmed();                                   // immediately at load
 document.addEventListener('DOMContentLoaded',()=>setTimeout(_navEnsureArmed,50));
