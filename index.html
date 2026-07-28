@@ -3133,6 +3133,25 @@ const FB_CFG_KEY='fcf_fb_config';
 // Canonical "write to Firebase" helper — handles metadata stamps,
 // _fbSaving guard, _localDirty flag, and status indicator in ONE place.
 // Use this from any code that needs to push the full G to Firebase.
+// ── FIREBASE ERROR REPORTING ─────────────────────────────────
+// Two multi-day outages (photos, trainer activity) were caused by writes
+// failing silently behind `.catch(()=>{})`. Rule of thumb since then:
+// a write that carries USER DATA must never fail quietly. Best-effort
+// cleanup writes may stay silent, but are marked as such at the call site.
+//   scope  — short id, keeps one noisy path from spamming the console
+//   userMsg— optional flash for the trainer; omit for background paths
+function _fbWarn(scope,err,userMsg){
+  const key='_fbWarned_'+scope;
+  const msg=(err&&err.message)?err.message:String(err||'?');
+  if(!window[key]){
+    window[key]=true;
+    console.error('[Firebase:'+scope+'] Schreiben fehlgeschlagen:',msg);
+    if(String(msg).includes('permission_denied')){
+      console.error('   \u2192 Security Rules pr\u00fcfen: der Pfad oder ein geschriebenes Feld ist nicht erlaubt.');
+    }
+    if(userMsg&&typeof showSaveFlash==='function')showSaveFlash(userMsg);
+  }
+}
 function _fbWriteWithStamp(data){
   if(!fbRef){return Promise.reject(new Error('No Firebase connection'));}
   data._lastSaveBy=(CU&&CU.name)||'?';
@@ -3224,11 +3243,7 @@ function _mediaFlush(){
       // through. Photos must reach the cloud. permission_denied gets a LOUD
       // one-time warning: it means the fcf_media path is missing from the
       // Firebase security rules (that's exactly how photos got lost once).
-      if(err&&String(err).includes('permission_denied')&&!window._mediaPermWarned){
-        window._mediaPermWarned=true;
-        console.error('[MEDIA] permission_denied auf fcf_media — Security Rules in der Firebase-Konsole um "fcf_media" erweitern (wie fcf_data)!');
-        if(typeof showSaveFlash==='function')showSaveFlash('\u26a0\ufe0f Fotos k\u00f6nnen nicht gespeichert werden \u2014 Firebase-Regeln pr\u00fcfen');
-      }
+      if(typeof _fbWarn==='function')_fbWarn('media',err,'\u26a0\ufe0f Fotos k\u00f6nnen nicht gespeichert werden \u2014 Firebase-Regeln pr\u00fcfen');
       Object.assign(_mediaDirty,retry);
       clearTimeout(_mediaFlushT);
       _mediaFlushT=setTimeout(_mediaFlush,5000);
@@ -4041,7 +4056,8 @@ function startFbListener(){
         // not older than the remote — a stale base must never win silently.
         if(G&&!(data._lastSaveTs>((G._lastSaveTs)||0))){
           _fbSaving=true;
-          fbRef.set(fbEncode(G)).then(()=>{setTimeout(()=>{_fbSaving=false;},500);}).catch(()=>{_fbSaving=false;});
+          fbRef.set(fbEncode(G)).then(()=>{setTimeout(()=>{_fbSaving=false;},500);})
+            .catch(e=>{_fbSaving=false;_fbWarn('conflict-push',e,'\u26a0\ufe0f \u00c4nderungen nicht gespeichert \u2014 Verbindung pr\u00fcfen');});
         } else if(data&&data.version>=14){
           console.warn('[FB] Stale local base — adopting newer remote instead of pushing.');
           G=sanitizeG(data);
@@ -6251,8 +6267,8 @@ function snap(){
   if(undoStack.length>40)undoStack.shift();
   redoStack.length=0;updateUndoBtns();
 }
-function undo(){if(!undoStack.length)return;redoStack.push(JSON.stringify(G));G=JSON.parse(undoStack.pop());safeLocalSave(SK,JSON.stringify(G));if(fbRef&&_fbInitialLoaded){clearTimeout(_fbDebounce);_fbDebounce=setTimeout(()=>{_fbSaving=true;fbRef.set(fbEncode(G)).then(()=>{_fbSaving=false;}).catch(e=>{_fbSaving=false;});},800);}render();updateUndoBtns();}
-function redo(){if(!redoStack.length)return;undoStack.push(JSON.stringify(G));G=JSON.parse(redoStack.pop());safeLocalSave(SK,JSON.stringify(G));if(fbRef&&_fbInitialLoaded){clearTimeout(_fbDebounce);_fbDebounce=setTimeout(()=>{_fbSaving=true;fbRef.set(fbEncode(G)).then(()=>{_fbSaving=false;}).catch(e=>{_fbSaving=false;});},800);}render();updateUndoBtns();}
+function undo(){if(!undoStack.length)return;redoStack.push(JSON.stringify(G));G=JSON.parse(undoStack.pop());safeLocalSave(SK,JSON.stringify(G));if(fbRef&&_fbInitialLoaded){clearTimeout(_fbDebounce);_fbDebounce=setTimeout(()=>{_fbSaving=true;fbRef.set(fbEncode(G)).then(()=>{_fbSaving=false;}).catch(e=>{_fbSaving=false;_fbWarn('undo-push',e,'\u26a0\ufe0f R\u00fcckg\u00e4ngig nicht synchronisiert');});},800);}render();updateUndoBtns();}
+function redo(){if(!redoStack.length)return;undoStack.push(JSON.stringify(G));G=JSON.parse(redoStack.pop());safeLocalSave(SK,JSON.stringify(G));if(fbRef&&_fbInitialLoaded){clearTimeout(_fbDebounce);_fbDebounce=setTimeout(()=>{_fbSaving=true;fbRef.set(fbEncode(G)).then(()=>{_fbSaving=false;}).catch(e=>{_fbSaving=false;_fbWarn('redo-push',e,'\u26a0\ufe0f Wiederholen nicht synchronisiert');});},800);}render();updateUndoBtns();}
 function updateUndoBtns(){
   const u=document.getElementById('undoBtn'),r=document.getElementById('redoBtn');
   if(u)u.disabled=!undoStack.length;if(r)r.disabled=!redoStack.length;
@@ -9364,7 +9380,11 @@ function setupPlayerLinks(){
   alert(result);
   // Auto-copy link to clipboard
   if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(teamLink).catch(()=>{});
+    navigator.clipboard.writeText(teamLink).catch(()=>{
+      // Clipboard is blocked in some mobile browsers / insecure contexts —
+      // tell the trainer instead of pretending it worked.
+      if(typeof showSaveFlash==='function')showSaveFlash('\u2139\ufe0f Link konnte nicht kopiert werden \u2014 bitte manuell kopieren');
+    });
   }
 }
 function renderPeConfirmLink(pi){
@@ -11253,6 +11273,7 @@ function dbPublishWeekReport(){
   }).catch(err=>{
     _dbPublishing=false;
     if(btn){btn.disabled=false;btn.innerHTML='\ud83d\udce4 Bericht ver\u00f6ffentlichen';}
+    console.error('[Firebase:publish] Bericht konnte nicht ver\u00f6ffentlicht werden:',err&&err.message?err.message:err);
     alert('Ver\u00f6ffentlichung fehlgeschlagen. Bitte Internetverbindung pr\u00fcfen und erneut versuchen.');
   });
 }
@@ -18259,6 +18280,19 @@ function startPresence(){
     _presenceRef=userRef;
     // Auto-cleanup on disconnect
     userRef.onDisconnect().remove().catch(err=>console.error('[Presence] onDisconnect:',err));
+    // Server-stamped last-seen: the browser cannot write anything once the tab
+    // is closed, the phone sleeps or the network drops — so ask the SERVER to
+    // stamp the activity record at the exact moment the connection ends.
+    // Without this, "zuletzt online" showed the last foreground heartbeat,
+    // which on a backgrounded phone could be many hours (or a day) earlier.
+    try{
+      const akey=_actKeyForName(CU.name);
+      if(akey&&typeof firebase!=='undefined'&&firebase.database&&firebase.database.ServerValue){
+        fbRef.parent.child('__trainerActivity').child(akey)
+          .onDisconnect().update({lastSeen:firebase.database.ServerValue.TIMESTAMP})
+          .catch(err=>console.warn('[Activity] onDisconnect:',err&&err.message));
+      }
+    }catch(e){}
     // Write initial entry (also updates local state optimistically)
     writePresenceEntry();
   } else {
@@ -18304,7 +18338,7 @@ function startPresence(){
     // Best-effort cleanup of orphans (any client can do it — idempotent)
     if(staleToDelete.length&&fbRef){
       staleToDelete.forEach(k=>{
-        fbRef.parent.child('__presence').child(k).remove().catch(()=>{});
+        fbRef.parent.child('__presence').child(k).remove().catch(()=>{}); // best-effort cleanup of a stale entry: harmless if it fails
       });
     }
     renderPresence();
@@ -18312,14 +18346,19 @@ function startPresence(){
     console.error('[Presence] Lesefehler — möglicherweise blockieren Firebase-Regeln den Pfad /__presence:',err&&err.message?err.message:err);
   });
   if(!isHiddenUser){
-    // Heartbeat every 60s
-    _presenceHeartbeat=setInterval(()=>{
-      if(document.visibilityState==='visible')writePresenceEntry();
-    },60*1000);
-    // Update on visibility change
+    // Heartbeat every 60s. It runs regardless of tab visibility: a backgrounded
+    // tab still holds an open connection, so the trainer IS online and the
+    // activity record must keep up. (Browsers throttle background timers to
+    // ~1/min, which matches this interval anyway.) The "viewing" context is
+    // only refreshed while visible — see writePresenceEntry.
+    _presenceHeartbeat=setInterval(()=>{writePresenceEntry();},60*1000);
+    // Update immediately when the tab comes back to the foreground
     document.addEventListener('visibilitychange',()=>{
       if(document.visibilityState==='visible')writePresenceEntry();
     });
+    // Last chance to stamp an accurate time on a normal close/navigation
+    // (onDisconnect covers crashes and sleeping devices).
+    window.addEventListener('pagehide',()=>{try{writePresenceEntry(true);}catch(e){}});
   }
 }
 // Stop presence: clean up
@@ -18327,15 +18366,19 @@ function stopPresence(){
   if(_presenceHeartbeat){clearInterval(_presenceHeartbeat);_presenceHeartbeat=null;}
   if(_presenceListener&&fbRef){fbRef.parent.child('__presence').off('value',_presenceListener);_presenceListener=null;}
   if(_trainerActivityListener&&fbRef){fbRef.parent.child('__trainerActivity').off('value',_trainerActivityListener);_trainerActivityListener=null;_trainerActivity={};}
-  if(_presenceRef){_presenceRef.remove().catch(()=>{});_presenceRef=null;}
+  if(_presenceRef){_presenceRef.remove().catch(()=>{});_presenceRef=null;} // onDisconnect removes it anyway
   _presenceSessionId=null;
   _presenceUsers={};
   renderPresence();
 }
-function writePresenceEntry(){
+function writePresenceEntry(isFinal){
   if(!CU)return;
   // "Admin" is a hidden user: never publish a presence entry
   if(CU.name==='Admin')return;
+  // Server-authoritative timestamp — a trainer's device clock may be off by
+  // hours, which previously produced "zuletzt online: morgen" style nonsense.
+  const _now=(typeof firebase!=='undefined'&&firebase.database&&firebase.database.ServerValue)
+    ?firebase.database.ServerValue.TIMESTAMP:Date.now();
   // Persistent activity log (separate from ephemeral __presence)
   // Updated on every heartbeat — Admin can see last-seen time for each trainer.
   if(fbRef&&CU.name){
@@ -18344,13 +18387,13 @@ function writePresenceEntry(){
       if(key)fbRef.parent.child('__trainerActivity').child(key).set({
         name:CU.name,
         role:CU.role||'trainer',
-        lastSeen:Date.now(),
+        lastSeen:_now,
         team:UI.currentTeam||'',
         season:UI.currentSeason||'',
         viewing:_presenceContext||'',
         appVersion:(typeof APP_VERSION!=='undefined')?APP_VERSION:'',
         appTs:(typeof APP_RELEASE_TS!=='undefined')?APP_RELEASE_TS:0
-      }).catch(()=>{}); // best-effort, fail silently if rules block
+      }).catch(err=>_fbWarn('activity',err)); // background path: console only, no flash
     }catch(e){}
   }
   const entry={
@@ -18359,7 +18402,7 @@ function writePresenceEntry(){
     team:UI.currentTeam||'',
     season:UI.currentSeason||'',
     viewing:_presenceContext||'',
-    lastSeen:Date.now(),
+    lastSeen:_now,
     // Diagnostic: track which version each trainer is running. Absence of these
     // fields in Firebase = trainer is on a pre-tracking version (older).
     appVersion:(typeof APP_VERSION!=='undefined')?APP_VERSION:'',
@@ -18368,9 +18411,11 @@ function writePresenceEntry(){
   // Optimistic: update local presence state immediately so pill appears
   // even if Firebase write is slow or fails (e.g., security rules).
   if(_presenceSessionId){
-    _presenceUsers[_presenceSessionId]=entry;
+    // Local mirror needs a concrete number (the sentinel only resolves server-side)
+    _presenceUsers[_presenceSessionId]={...entry,lastSeen:Date.now()};
     renderPresence();
   }
+  if(isFinal)return; // pagehide: activity record already stamped above
   if(!_presenceRef)return;
   _presenceRef.set(entry).catch(err=>{
     console.error('[Presence] Schreibfehler — möglicherweise blockieren Firebase-Regeln den Pfad /__presence:',err&&err.message?err.message:err);
@@ -18446,6 +18491,9 @@ function renderPresence(){
     const acts=Object.values(_trainerActivity||{})
       .filter(a=>a&&a.name&&!onlineKeys.has(_actKeyForName(a.name))) // exclude already-online users
       .sort((a,b)=>(b.lastSeen||0)-(a.lastSeen||0));
+    // Names currently holding a live __presence entry — for them the activity
+    // record is by definition "now", whatever its last written timestamp says.
+    const _liveNames=new Set(Object.values(_presenceUsers||{}).map(u=>u&&u.name).filter(Boolean));
     if(acts.length){
       adminHtml='<div style="padding:8px 12px 4px;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--gm);border-top:1px solid var(--gl);margin-top:5px;">🛡 Letzte Aktivität</div>';
       adminHtml+=acts.slice(0,8).map(a=>{
@@ -18458,7 +18506,7 @@ function renderPresence(){
         return `<div class="presence-user" style="opacity:.72;">
           <div class="presence-avatar" style="background:var(--gl);color:var(--gd);">${escapeHtml(initials)}</div>
           <div class="presence-info">
-            <div class="presence-name">${escapeHtml(a.name||'?')}${roleLabel} <span style="font-size:.62rem;color:var(--gm);font-weight:500;">— ${escapeHtml(_fmtRelative(a.lastSeen))}</span></div>
+            <div class="presence-name">${escapeHtml(a.name||'?')}${roleLabel} <span style="font-size:.62rem;color:${_liveNames.has(a.name)?'var(--ok)':'var(--gm)'};font-weight:${_liveNames.has(a.name)?'700':'500'};">— ${_liveNames.has(a.name)?'jetzt online':escapeHtml(_fmtRelative(a.lastSeen))}</span></div>
             <div class="presence-context">${ctxParts.join(' ')}</div>
           </div>
         </div>`;
