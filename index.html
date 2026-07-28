@@ -5649,7 +5649,29 @@ function _navTopLayer(){
 function _navStackLen(){
   return (typeof _navStack!=='undefined'&&Array.isArray(_navStack))?_navStack.length:0;
 }
-function _navTotalDepth(){return _navLayers().length+_navStackLen();}
+// The configured start view is the ROOT of in-app history. Standing anywhere
+// else (table when Startseite is the default, or vice versa) counts as one
+// step, so "back" returns there before it ever considers leaving the site.
+function _navHomeIsDefault(){
+  if(typeof homeEligible==='function'&&!homeEligible())return false;
+  return (typeof _homeStartViewPref!=='function')||_homeStartViewPref()!=='table';
+}
+function _navHomeOpen(){
+  const ov=document.getElementById('homeOverlay');
+  return !!(ov&&ov.classList.contains('open'));
+}
+function _navViewLevel(){
+  if(typeof homeEligible==='function'&&!homeEligible())return 0; // players have no home
+  return (_navHomeOpen()===_navHomeIsDefault())?0:1;
+}
+function _navGotoDefaultView(){
+  if(_navHomeIsDefault()){
+    if(typeof homeOpen==='function')homeOpen();
+  }else{
+    if(typeof homeClose==='function')homeClose();
+  }
+}
+function _navTotalDepth(){return _navLayers().length+_navStackLen()+_navViewLevel();}
 function _navCloseLayer(el){
   if(!el)return;
   try{
@@ -5663,7 +5685,26 @@ window.addEventListener('popstate',()=>{
   // Our own history.back() calls (layer closed via UI) must not close a second one
   if(_navConsume>0){_navConsume--;return;}
   const top=_navTopLayer();
-  if(!top)return;            // nothing open → let the browser navigate away
+  if(!top){
+    // No layer open. One step may remain: getting back to the start view.
+    if(_navViewLevel()===1){
+      _navGotoDefaultView();
+      _navDepth=Math.max(0,_navDepth-1);
+      return;
+    }
+    // We are at the root. First press warns, second press really leaves.
+    if(_navExitArmed){_navExitArmed=false;history.back();return;}
+    _navExitArmed=true;
+    history.pushState({fcf:1},''); // stay on the page
+    _navShowExitHint();
+    setTimeout(()=>{
+      if(!_navExitArmed)return;
+      _navExitArmed=false;
+      _navConsume++;                // drop the guard entry again
+      history.back();
+    },2600);
+    return;
+  }
   // If the app remembers where this modal was opened from, retrace that hop
   // (team → player → back → team) instead of dropping the whole context.
   if(_navStackLen()>0&&top.classList.contains('mo')&&top.id&&typeof navBack==='function'){
@@ -5675,8 +5716,31 @@ window.addEventListener('popstate',()=>{
   // any further difference (e.g. navBack that landed back on the main table).
   _navDepth=Math.max(0,_navDepth-1);
 });
+// Leaving the site needs a deliberate second press — being thrown out of the
+// tab mid-work by a stray swipe is the single most annoying thing a web app
+// can do on Android.
+let _navExitArmed=false;
+function _navShowExitHint(){
+  let t=document.getElementById('exitHint');
+  if(!t){
+    t=document.createElement('div');
+    t.id='exitHint';
+    t.style.cssText='position:fixed;left:50%;transform:translateX(-50%);'
+      +'bottom:calc(16px + var(--mob-nav-h,0px) + env(safe-area-inset-bottom,0px));'
+      +'z-index:100001;background:rgba(10,20,40,.94);color:#fff;padding:11px 18px;'
+      +'border-radius:var(--r-pill);font-family:\'Barlow\',sans-serif;font-size:.82rem;'
+      +'font-weight:600;box-shadow:0 6px 22px rgba(0,0,0,.4);pointer-events:none;'
+      +'transition:opacity .2s;';
+    document.body.appendChild(t);
+  }
+  t.textContent='Nochmal \u201eZur\u00fcck\u201c dr\u00fccken, um die Seite zu verlassen';
+  t.style.opacity='1';
+  clearTimeout(t._h);
+  t._h=setTimeout(()=>{t.style.opacity='0';},2400);
+}
 // Keep the history depth in step with what is actually on screen
 setInterval(()=>{
+  if(_navExitArmed)return;   // the guard entry is intentional — leave it alone
   const n=_navTotalDepth();
   if(n>_navDepth){
     for(let i=_navDepth;i<n;i++)history.pushState({fcf:1},'');
