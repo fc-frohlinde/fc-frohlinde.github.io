@@ -1243,13 +1243,14 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   .legend-bar{display:none !important;}
   body{padding-bottom:0;}
   .mobile-att-view{padding-bottom:0 !important;}
-  /* Clearance belongs on the SCROLLER (.ma-list), not on its wrapper.
-     .ma-list-wrap is overflow:hidden — padding there permanently shrinks the
-     visible area and shows up as a dead band under the list. On the scroller
-     the same padding is only reachable at the end of the scroll, which is
-     exactly what lets the last player row clear the fixed nav. */
+  /* Instead of letting the list run UNDER the fixed nav and compensating with
+     padding (which is guesswork: safe-area gets counted twice on some
+     devices), reserve the strip in the layout itself. The app column then
+     ends exactly where the nav starts, and the list needs no extra padding —
+     the last player card sits its normal 8px above the bar.
+     --mob-nav-h is measured from the real element at runtime (see JS). */
+  body{padding-bottom:var(--mob-nav-h,62px) !important;}
   .ma-list-wrap{padding-bottom:0 !important;}
-  .ma-list{padding-bottom:calc(58px + env(safe-area-inset-bottom,0px)) !important;}
   #mobNav{display:flex;}
   /* Modals — full-screen on mobile */
   .mob{width:100% !important;max-width:100vw !important;border-radius:14px 14px 0 0;padding:14px 16px;max-height:calc(100vh - 20px);box-sizing:border-box;}
@@ -15507,6 +15508,18 @@ function _mobNavVisibility(){
   nav.style.visibility=blocking?'hidden':'';
 }
 setInterval(_mobNavVisibility,400);
+// Publish the real nav height (it includes its own safe-area padding, so this
+// is the one number that is correct on every device) for the layout to reserve.
+function _mobNavMeasure(){
+  const nav=document.getElementById('mobNav');
+  if(!nav)return;
+  const h=(window.innerWidth<=767&&getComputedStyle(nav).display!=='none')?nav.offsetHeight:0;
+  document.documentElement.style.setProperty('--mob-nav-h',h?h+'px':'0px');
+}
+window.addEventListener('resize',_mobNavMeasure);
+window.addEventListener('orientationchange',()=>setTimeout(_mobNavMeasure,150));
+document.addEventListener('DOMContentLoaded',()=>setTimeout(_mobNavMeasure,60));
+setTimeout(_mobNavMeasure,300);
 function homeSeason(){
   const list=Array.isArray(G.seasonList)?G.seasonList.slice():[];
   if(!list.length)return UI.currentSeason||null;
