@@ -1265,10 +1265,38 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   body{padding-bottom:var(--mob-nav-h,62px) !important;}
   .ma-list-wrap{padding-bottom:0 !important;}
   #mobNav{display:flex;}
-  /* Modals — full-screen on mobile */
-  .mob{width:100% !important;max-width:100vw !important;border-radius:14px 14px 0 0;padding:14px 16px;max-height:calc(100vh - 20px);box-sizing:border-box;}
+  /* ── MODALS AS BOTTOM SHEETS ──────────────────────────────────
+     Three separate causes made dialogs drift or run off screen:
+       1. max-height in vh — on Android that is the toolbar-less height, so
+          the sheet was taller than the visible area and its footer sat below
+          the fold. dvh tracks what is actually visible.
+       2. Long content pushed the action buttons out of reach with no way to
+          scroll to them. The button row is sticky now, so Speichern/Abbrechen
+          stay on screen whatever the content does.
+       3. Inline widths (width:440px) from desktop markup fought the mobile
+          full-width rule; the !important pair settles it. */
   .mo{align-items:flex-end;}
+  .mob{
+    width:100% !important;max-width:100vw !important;
+    border-radius:18px 18px 0 0;
+    padding:14px 16px calc(14px + env(safe-area-inset-bottom,0px));
+    max-height:88vh;box-sizing:border-box;
+    display:block;overflow-y:auto;overscroll-behavior:contain;
+    animation:sheetUp .24s cubic-bezier(.22,1,.36,1);
+  }
   .mob h3{font-size:1.1rem;}
+  /* Action row pinned to the bottom edge of the sheet */
+  .mob .mob-btns{
+    position:sticky;bottom:calc(-14px - env(safe-area-inset-bottom,0px));
+    background:#fff;margin:10px -16px calc(-14px - env(safe-area-inset-bottom,0px));
+    padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));
+    border-top:1px solid var(--gl);z-index:2;
+  }
+  .mob .mob-btns .btn{flex:1;justify-content:center;min-height:44px;}
+  /* A grip makes the sheet read as bottom-anchored, matching the Mehr sheet */
+  .mob::before{content:'';display:block;width:38px;height:4px;border-radius:var(--r-pill);
+    background:var(--gl);margin:-4px auto 10px;}
+  @supports (height:100dvh){ .mob{max-height:88dvh;} }
   /* Notification panel — full width on mobile */
   .notif-panel{width:calc(100vw - 16px) !important;max-width:none !important;left:8px !important;right:8px !important;}
   /* Larger tap targets */
@@ -1325,6 +1353,7 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   border-radius:var(--r-lg) var(--r-lg) 0 0;padding:var(--sp-3) var(--sp-3) calc(var(--sp-5) + env(safe-area-inset-bottom,0px));
   max-height:76vh;overflow-y:auto;animation:msUp .22s cubic-bezier(.22,1,.36,1);}
 @keyframes msUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+@keyframes sheetUp{from{transform:translateY(18px);opacity:.6;}to{transform:translateY(0);opacity:1;}}
 .ms-grip{width:38px;height:4px;border-radius:var(--r-pill);background:var(--gl);margin:2px auto var(--sp-3);}
 .ms-sec{font-size:var(--fs-2xs);font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--gm);padding:var(--sp-3) var(--sp-2) var(--sp-1);}
 .ms-row{display:flex;align-items:center;gap:var(--sp-3);width:100%;padding:13px var(--sp-3);border:none;background:none;
@@ -5547,16 +5576,48 @@ function _renderChangelog(highlightNew,lastSeen){
 }
 document.getElementById('authInput').addEventListener('keydown',e=>{if(e.key==='Enter')doAuth();});
 
+// ══ POPUP PLACEMENT ══════════════════════════════════════════
+// Every dropdown used to compute its own left/top from the anchor rect, with
+// at best an ad-hoc Math.min for the right edge. Result: menus opened near
+// the bottom or the right edge ran off screen, and on phones that meant
+// unreachable options. One helper now handles all of them:
+//   • prefers below the anchor, flips above when there is no room
+//   • if neither fits, pins into the viewport and lets the menu scroll
+//   • clamps horizontally with an 8px margin
+// The element must already be visible when this is called (otherwise it
+// measures 0x0) — callers open first, then place.
+function _placePopup(el,rect,opt){
+  if(!el||!rect)return;
+  opt=opt||{};
+  const M=8,gap=opt.gap==null?4:opt.gap;
+  const vw=window.innerWidth,vh=window.innerHeight;
+  el.style.maxHeight='';
+  el.style.right='auto';
+  const pw=el.offsetWidth,ph=el.offsetHeight;
+  let top=rect.bottom+gap;
+  if(top+ph>vh-M){
+    const above=rect.top-gap-ph;
+    if(above>=M){
+      top=above;                       // flip above the anchor
+    }else{
+      top=Math.max(M,vh-M-ph);         // pin, and scroll inside if still too tall
+      if(ph>vh-2*M){top=M;el.style.maxHeight=(vh-2*M)+'px';el.style.overflowY='auto';}
+    }
+  }
+  let left=(opt.align==='right')?(rect.right-pw):rect.left;
+  left=Math.max(M,Math.min(vw-M-pw,left));
+  el.style.left=left+'px';
+  el.style.top=top+'px';
+}
 function toggleUserMenu(e){
   e.stopPropagation();
   const dd=document.getElementById('userDropdown');
   if(!dd)return;
   dd.classList.remove('from-home');
   const btn=document.getElementById('userPill');
-  const r=btn.getBoundingClientRect();
-  dd.style.top=(r.bottom+4)+'px';
-  dd.style.right=(window.innerWidth-r.right)+'px';
-  dd.classList.toggle('open');
+  const willOpen=!dd.classList.contains('open');
+  dd.classList.toggle('open',willOpen);
+  if(willOpen)_placePopup(dd,btn.getBoundingClientRect(),{align:'right'});
   updateUserMenuState();
 }
 // Same dropdown, opened from the Startseite pill. from-home hides items
@@ -5568,10 +5629,9 @@ function homeToggleUserMenu(e){
   dd.classList.add('from-home');
   const btn=document.getElementById('home-user-pill');
   if(!btn)return;
-  const r=btn.getBoundingClientRect();
-  dd.style.top=(r.bottom+6)+'px';
-  dd.style.right=(window.innerWidth-r.right)+'px';
-  dd.classList.toggle('open');
+  const willOpen=!dd.classList.contains('open');
+  dd.classList.toggle('open',willOpen);
+  if(willOpen)_placePopup(dd,btn.getBoundingClientRect(),{align:'right',gap:6});
   updateUserMenuState();
 }
 function closeUserMenu(){
@@ -6824,10 +6884,8 @@ function togAttMenu(id,pi,si,v){
   if(m.style.display==='block'){m.style.display='none';return;}
   // Position the menu near the button
   const btn=m.previousElementSibling;if(!btn)return;
-  const r=btn.getBoundingClientRect();
-  m.style.left=r.left+'px';
-  m.style.top=(r.bottom+3)+'px';
   m.style.display='block';
+  _placePopup(m,btn.getBoundingClientRect(),{gap:3});
 }
 document.addEventListener('click',()=>document.querySelectorAll('[id^="am_"]').forEach(m=>m.style.display='none'));
 function togPerfMenu(id,pi,si){
@@ -6835,10 +6893,8 @@ function togPerfMenu(id,pi,si){
   const m=document.getElementById(id);if(!m)return;
   if(m.style.display==='block'){m.style.display='none';return;}
   const btn=m.previousElementSibling;if(!btn)return;
-  const r=btn.getBoundingClientRect();
-  m.style.left=Math.max(4,Math.min(window.innerWidth-160,r.left))+'px';
-  m.style.top=(r.bottom+3)+'px';
   m.style.display='block';
+  _placePopup(m,btn.getBoundingClientRect(),{gap:3});
 }
 document.addEventListener('click',()=>document.querySelectorAll('[id^="pm_"]').forEach(m=>m.style.display='none'));
 function cycStPlayer(pi,si){
@@ -7015,11 +7071,9 @@ function cellOpenMenu(pi,si,cell){
     `<div onclick="event.stopPropagation();setCellStatus(${pi},${si},1)" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.85);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">\u2705 <span>Anwesend</span></div>`+
     `<div onclick="event.stopPropagation();setCellStatus(${pi},${si},0)" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.85);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">\u274c <span>Fehlend</span></div>`+
     `<div onclick="event.stopPropagation();setCellStatus(${pi},${si},2)" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.85);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">\ud83d\udccb <span>Entschuldigt</span></div>`;
-  // Position near cell
-  const r=cell.getBoundingClientRect();
-  menu.style.left=Math.max(4,Math.min(window.innerWidth-160,r.left))+'px';
-  menu.style.top=(r.bottom+3)+'px';
+  // Position near cell (clamped/flipped by the shared helper)
   menu.style.display='block';
+  _placePopup(menu,cell.getBoundingClientRect(),{gap:3});
 }
 function setCellStatus(pi,si,val){
   if(!canEdit())return;
@@ -7688,15 +7742,8 @@ function toggleNotifPanel(e){
     renderNotifPanel();
     // Position panel below bell button (fixed positioning)
     const btn=document.getElementById('notifBtn');
-    if(btn){
-      const r=btn.getBoundingClientRect();
-      const panelW=Math.min(360,window.innerWidth-20);
-      let left=r.right-panelW;
-      if(left<10)left=10;
-      panel.style.left=left+'px';
-      panel.style.top=(r.bottom+8)+'px';
-    }
     panel.classList.add('open');
+    if(btn)_placePopup(panel,btn.getBoundingClientRect(),{align:'right',gap:8});
   }
 }
 function closeNotifPanel(){
