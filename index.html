@@ -965,8 +965,10 @@ select.lp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   .home-hero-logo{width:56px;height:56px;}
   .home-hero-title{font-size:1.5rem;letter-spacing:1.5px;}
   .home-hero-sub{font-size:.66rem;letter-spacing:2px;margin-top:3px;}
-  /* Photo/user controls stay reachable but stop crowding the title */
-  .home-hero-photobtn{opacity:1;pointer-events:auto;top:8px;left:8px;right:auto;padding:4px 9px;font-size:.66rem;}
+  /* No hover on touch, so the desktop reveal-on-hover button would sit
+     permanently on the photo. Hidden here — the action lives in the user
+     menu instead (Mannschaftsfoto), out of the way. */
+  .home-hero-photobtn{display:none !important;}
   .home-user-pill{top:8px;right:8px;padding:4px 9px;font-size:.7rem;}
   /* Tiles: natural height, two columns, real tap targets */
   .home-tiles{flex:0 0 auto;min-height:0;align-content:flex-start;gap:10px;margin-bottom:16px;}
@@ -1221,7 +1223,14 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   .header{padding:8px 10px;gap:8px;border-radius:0;flex-wrap:nowrap;overflow:hidden;}
   .header.collapsed{padding:5px 10px;}
   .htext{flex:1;min-width:0;overflow:hidden;}
-  .hclub{font-size:1rem !important;letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  /* Drop the legal suffix and the user's name: on a 360px header the club
+     name is the one thing that must stay readable, and both are one tap
+     away (the menu shows the full user name). */
+  .hclub{font-size:1.05rem !important;letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .hclub-suffix{display:none;}
+  .user-pill .uname{display:none !important;}
+  .user-pill{padding:0 !important;width:38px;justify-content:center;}
+  .user-pill .role-icon{margin:0;}
   .hsub,.hmeta{display:none !important;}
   .logo-ring{width:38px !important;height:38px !important;flex-shrink:0;}
   .header.collapsed .logo-ring{width:30px !important;height:30px !important;}
@@ -1986,7 +1995,7 @@ if(window._fbBlocked){
   
   <div class="logo-ring" id="logoRingWrap" onclick="if(canEdit())pickClubLogo()" style="cursor:pointer;" title="Logo ändern"><img id="clogo" alt="FC Frohlinde"/></div>
   <div class="htext" id="hTextHome" onclick="headerHome()" title="Zur Startseite" style="cursor:pointer;">
-    <div class="hclub">FC Frohlinde 1949 e.V.</div>
+    <div class="hclub">FC Frohlinde<span class="hclub-suffix"> 1949 e.V.</span></div>
     <div class="hsub" id="hSub">U19 · Junioren</div>
       </div>
   <div class="hright">
@@ -21731,6 +21740,7 @@ checkAutoBackup();
   <div class="ud-group" id="ud-work-group" style="display:none;">Arbeit</div>
   <div class="ud-item" id="ud-anmeld" onclick="closeUserMenu();openAnmeldungen()" style="display:none;">📋 Anmeldungen &amp; Versand</div>
   <div class="ud-item" id="ud-dashboard" onclick="closeUserMenu();openDashboard();" style="display:none;">📊 Dashboard</div>
+  <div class="ud-item" id="ud-heroPhoto" onclick="closeUserMenu();homeUploadHeroPhoto();" style="display:none;">📷 Mannschaftsfoto</div>
 
   <!-- ── ADMIN ── -->
   <div class="ud-sep" id="ud-admin-sep" style="display:none;"></div>
