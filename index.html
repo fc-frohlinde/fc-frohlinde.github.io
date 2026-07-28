@@ -638,6 +638,7 @@ input[type="date"]{cursor:pointer;}
 .tbar{display:flex;gap:0;border-bottom:2px solid var(--gl);margin-bottom:12px;
   overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
 .tbar::-webkit-scrollbar{display:none;}
+.tmgr-foot{display:none;}
 .tbtn{flex-shrink:0;white-space:nowrap;}
 .tbtn{padding:7px 14px;font-family:'Barlow',sans-serif;font-weight:700;font-size:.74rem;color:var(--gm);cursor:pointer;border:none;background:none;text-transform:uppercase;border-bottom:2.5px solid transparent;margin-bottom:-2px;transition:all .12s;}
 .tbtn:hover{color:var(--bm);}
@@ -1334,6 +1335,14 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
      Header shrinks to just the title; back navigation stays (it is the only
      way back to a session/player the trainer came from). */
   #moTeamMgr #tmgr-close-top{display:none;}
+  /* A per-pane button row sits wherever that pane's content ends, so
+     "Schließen" jumped around between tabs. One footer, always at the same
+     place; pane-specific actions (＋ Spieler, CSV-Export) stay in the pane,
+     and rows left with nothing but a close button disappear. */
+  #moTeamMgr .tmgr-foot{display:flex;flex-shrink:0;gap:7px;padding:9px 0 0;border-top:1px solid var(--gl);}
+  #moTeamMgr .tmgr-foot .btn{flex:1;justify-content:center;min-height:44px;}
+  #moTeamMgr .tpanel .mob-btns .btn.bs{display:none;}
+  #moTeamMgr .tpanel .mob-btns:not(:has(.btn:not(.bs))){display:none;}
   #moTeamMgr .mob > div:first-of-type{margin-bottom:6px;}
   #moTeamMgr #tmgr-h{font-size:1rem;}
   #moTeamMgr #tmgr-back{padding:4px 9px;font-size:.72rem;}
@@ -2607,6 +2616,9 @@ if(window._fbBlocked){
     <div class="mob-btns" style="margin-top:10px;">
       <button class="btn bs" onclick="closeM('moTeamMgr')">Schließen</button>
     </div>
+  </div>
+  <div class="tmgr-foot" id="tmgr-foot">
+    <button class="btn bs" onclick="closeM('moTeamMgr')">Schließen</button>
   </div>
 </div></div>
 
