@@ -7935,6 +7935,13 @@ function renderMobileAtt(){
   const list=document.getElementById('maList');
   const si=_maSelectedSi;
   const past=typeof isSessPast==='function'?isSessPast(si):false;
+  // Phase gate — identical to the table (cycSt / cellOpenMenu):
+  //   before the session starts → planning statuses  ? / M / E
+  //   once it has started/passed → factual statuses  A / F / E
+  // Offering "Anwesend" for next week's training, or "Angemeldet" for a
+  // training that already happened, produces data the stats then have to
+  // guess about, so those options must not exist here either.
+  const rollCall=(typeof _isSessRollCallTime==='function')?_isSessRollCallTime(si):past;
   const editable=canEdit&&canEdit();
   // Sort: by attendance status, then by number
   const ordered=D.players.map((p,pi)=>({p,pi})).filter(o=>o.p);
@@ -7951,14 +7958,18 @@ function renderMobileAtt(){
     const pos=(p.pos||'').toUpperCase();
     const showName=fullnm!==nm?`${nm} <span style="color:var(--gm);font-weight:400;font-size:.78rem;">(${fullnm.split(' ').slice(-1)[0]})</span>`:nm;
     // Status codes: 1=Anwesend, 0=Fehlend, 2=Entschuldigt, 3=Ausstehend, 4=Angemeldet
-    // For past sessions, "?" (3) is hidden. Angemeldet (4) clicking → Anwesend (matches cycSt logic)
-    const btnDefs=[
+    const ALL_ST=[
       {v:1,sym:'✓',cls:'ma-1'},
       {v:0,sym:'✗',cls:'ma-2'},
       {v:2,sym:'E',cls:'ma-4'},
       {v:4,sym:'M',cls:'ma-5'},
       {v:3,sym:'?',cls:'ma-3'}
-    ].filter(b=>!(past&&b.v===3));
+    ];
+    const allowed=rollCall?[1,0,2]:[3,4,2];
+    // A value already stored outside the current phase (e.g. an Angemeldet
+    // left over from before the session started) stays visible so the trainer
+    // can see and change it — it just can't be newly selected.
+    const btnDefs=ALL_ST.filter(b=>allowed.includes(b.v)||status===b.v);
     let btnsHtml='';
     btnDefs.forEach(b=>{
       const active=status===b.v;
@@ -7981,6 +7992,13 @@ function maSelectSession(si){
   renderMobileAtt();
 }
 function maSetStatus(pi,si,val){
+  // Phase guard mirrors the rendering above (defence in depth: stale DOM,
+  // double-tap during a session start, etc. must not write a phase-invalid value)
+  const rollCall=(typeof _isSessRollCallTime==='function')?_isSessRollCallTime(si):false;
+  const allowed=rollCall?[1,0,2]:[3,4,2];
+  const D=cd();
+  const cur=(D&&D.players&&D.players[pi]&&D.players[pi].s)?D.players[pi].s[si]:undefined;
+  if(!allowed.includes(val)&&val!==cur)return;
   if(typeof setSessPlayerStatus==='function'){
     snap();
     setSessPlayerStatus(pi,si,val);
