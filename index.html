@@ -5616,6 +5616,63 @@ function _renderChangelog(highlightNew,lastSeen){
 }
 document.getElementById('authInput').addEventListener('keydown',e=>{if(e.key==='Enter')doAuth();});
 
+// ══ ANDROID BACK BUTTON ══════════════════════════════════════
+// Without this, the hardware/gesture "back" leaves the page (or switches
+// tabs) while a modal is open — the trainer loses context mid-edit. The
+// browser only offers one hook for that: history. So every open layer gets
+// a history entry, and a back press pops the topmost layer instead of the
+// page. Layers are detected by polling rather than by patching two dozen
+// open/close call sites: it keeps the mechanism in ONE place and cannot
+// drift out of sync when a new modal is added later.
+let _navDepth=0,_navConsume=0;
+function _navLayers(){
+  // Home is deliberately excluded: it is the start screen, so "back" there
+  // should leave the app like any other first page.
+  return Array.from(document.querySelectorAll(
+    '.mo.open, .lp-overlay.open, .slp-overlay.open, .rc-overlay.open, #mobSheet.open'
+  ));
+}
+function _navTopLayer(){
+  const l=_navLayers();
+  if(!l.length)return null;
+  let top=l[0],topZ=parseInt(getComputedStyle(top).zIndex,10)||0;
+  l.forEach(el=>{
+    const z=parseInt(getComputedStyle(el).zIndex,10)||0;
+    if(z>=topZ){topZ=z;top=el;}
+  });
+  return top;
+}
+function _navCloseLayer(el){
+  if(!el)return;
+  try{
+    if(el.id==='mobSheet'&&typeof mobSheetClose==='function')return mobSheetClose();
+    if(el.classList.contains('rc-overlay')&&typeof rcClose==='function')return rcClose();
+    if(el.classList.contains('mo')&&el.id&&typeof closeM==='function')return closeM(el.id);
+  }catch(e){}
+  el.classList.remove('open'); // planners and anything without a dedicated closer
+}
+window.addEventListener('popstate',()=>{
+  // Our own history.back() calls (layer closed via UI) must not close a second one
+  if(_navConsume>0){_navConsume--;return;}
+  const top=_navTopLayer();
+  if(!top)return;            // nothing open → let the browser navigate away
+  _navCloseLayer(top);
+  _navDepth=Math.max(0,_navDepth-1);
+});
+// Keep the history depth in step with what is actually on screen
+setInterval(()=>{
+  const n=_navLayers().length;
+  if(n>_navDepth){
+    for(let i=_navDepth;i<n;i++)history.pushState({fcf:1},'');
+    _navDepth=n;
+  }else if(n<_navDepth){
+    // Closed through the UI (✕ / Schließen): drop one of our entries so the
+    // next back press is not swallowed by a stale state.
+    _navConsume++;
+    _navDepth--;
+    history.back();
+  }
+},250);
 // ══ POPUP PLACEMENT ══════════════════════════════════════════
 // Every dropdown used to compute its own left/top from the anchor rect, with
 // at best an ad-hoc Math.min for the right edge. Result: menus opened near
