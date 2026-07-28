@@ -28,6 +28,108 @@
   --bg-dark:#071a3e;--bg-mid:#1659b8;--surface-dark:#1a3a6e;--surface-mid:#0c2450;--surface-bright:#1a4fa0;--header-end:#0a2d6e;
   --planner-dark:#061628;--planner-mid:#0d3060;
   --c0:34px;--c1:164px;--c2:100px;
+
+  /* ── DESIGN TOKENS ────────────────────────────────────────────
+     One vocabulary for every component. Palette overrides below only
+     need to touch the base colours — semantic tokens derive from them,
+     so a new palette automatically restyles badges, charts and chips.
+     Migration policy: new code uses tokens; existing rules move over
+     component by component, never in bulk, so nothing shifts silently. */
+
+  /* Type scale — steps chosen to match the sizes already in use */
+  --fs-2xs:.62rem;  /* micro caps labels */
+  --fs-xs:.68rem;   /* dense table/badge text */
+  --fs-sm:.76rem;   /* secondary body */
+  --fs-md:.82rem;   /* body */
+  --fs-lg:.95rem;   /* emphasised body */
+  --fs-xl:1.15rem;  /* card headline */
+  --fs-2xl:1.4rem;  /* modal / screen headline */
+
+  /* Spacing — 4px base rhythm */
+  --sp-1:4px;--sp-2:6px;--sp-3:8px;--sp-4:12px;--sp-5:16px;--sp-6:24px;
+
+  /* Radii */
+  --r-sm:5px;--r-md:8px;--r-lg:12px;--r-pill:999px;
+
+  /* Elevation */
+  --sh-1:0 1px 3px rgba(0,0,0,.08);
+  --sh-2:0 4px 14px rgba(0,0,0,.14);
+  --sh-3:0 10px 28px rgba(0,0,0,.18);
+
+  /* Semantic status — single source of truth for "good / neutral / warn / bad".
+     Used by attendance badges, Leistungsnote chips, charts and dashboards. */
+  --ok:#1a9a50;      --ok-bg:rgba(39,174,96,.15);      --ok-fg:#1a7a40;
+  --info:var(--bm);  --info-bg:rgba(22,89,184,.15);    --info-fg:#0d3d80;
+  --warn:#e08a0c;    --warn-bg:rgba(243,156,18,.18);   --warn-fg:#a56a0a;
+  --bad:#d64535;     --bad-bg:rgba(231,76,60,.15);     --bad-fg:#a5301f;
+  --muted-bg:rgba(0,0,0,.04);
+
+  /* Grade scale (1 sehr gut · 2 gut · 3 nicht gut) — aliases so charts and
+     badges can never drift apart again */
+  --grade-1:var(--ok);--grade-2:var(--info);--grade-3:var(--warn);
+}
+
+/* ── COMPONENT UTILITIES ─────────────────────────────────────────
+   Reusable building blocks so new features stop inventing their own
+   card/chip/heading styling in inline styles. */
+.u-card{background:var(--wh);border:1px solid var(--gl);border-radius:var(--r-lg);padding:var(--sp-4);box-shadow:var(--sh-1);}
+.u-sec-h{font-family:'Barlow',sans-serif;font-size:var(--fs-2xs);font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--gm);margin-bottom:var(--sp-2);}
+.u-chip{display:inline-flex;align-items:center;gap:var(--sp-2);border-radius:var(--r-pill);padding:3px 10px;font-size:var(--fs-sm);font-weight:600;background:var(--ow);border:1px solid var(--gl);color:var(--gd);}
+.u-chip.tone-ok{background:var(--ok-bg);color:var(--ok-fg);border-color:transparent;}
+.u-chip.tone-info{background:var(--info-bg);color:var(--info-fg);border-color:transparent;}
+.u-chip.tone-warn{background:var(--warn-bg);color:var(--warn-fg);border-color:transparent;}
+.u-chip.tone-bad{background:var(--bad-bg);color:var(--bad-fg);border-color:transparent;}
+.u-chip.tone-muted{background:var(--muted-bg);color:var(--gm);border-style:dashed;}
+/* Empty states — an explicit, friendly "nothing here yet" instead of blankness */
+.u-empty{display:flex;flex-direction:column;align-items:center;gap:var(--sp-2);padding:var(--sp-6) var(--sp-4);text-align:center;color:var(--gm);}
+.u-empty-icon{font-size:1.8rem;opacity:.5;line-height:1;}
+.u-empty-txt{font-size:var(--fs-sm);max-width:280px;line-height:1.45;}
+
+/* ── ROLL-CALL (mobile-first attendance capture) ──────────────────
+   Built for the real situation: trainer standing on the pitch, phone in
+   one hand, 27 names to mark. One player per row, thumb-sized targets
+   (44px min), progress always visible, and the list can collapse to the
+   players still missing a mark. */
+.rc-overlay{position:fixed;inset:0;z-index:520;background:linear-gradient(165deg,var(--planner-dark) 0%,var(--planner-mid) 55%,var(--planner-dark) 100%);display:none;flex-direction:column;}
+.rc-overlay.open{display:flex;}
+.rc-head{flex-shrink:0;padding:calc(var(--sp-4) + env(safe-area-inset-top,0px)) var(--sp-4) var(--sp-3);border-bottom:1px solid rgba(255,255,255,.1);}
+.rc-head-top{display:flex;align-items:flex-start;gap:var(--sp-3);}
+.rc-title{flex:1;min-width:0;}
+.rc-date{font-family:'Bebas Neue',sans-serif;font-size:var(--fs-xl);letter-spacing:2px;color:#fff;line-height:1.1;}
+.rc-sub{font-size:var(--fs-sm);color:rgba(255,255,255,.55);margin-top:2px;}
+.rc-x{flex-shrink:0;width:40px;height:40px;border-radius:50%;border:none;background:rgba(255,255,255,.12);color:#fff;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s;}
+.rc-x:hover{background:rgba(255,255,255,.22);}
+.rc-progress{margin-top:var(--sp-3);}
+.rc-bar{height:7px;border-radius:var(--r-pill);background:rgba(255,255,255,.13);overflow:hidden;}
+.rc-bar-fill{height:100%;border-radius:var(--r-pill);background:linear-gradient(90deg,var(--ok),var(--ac));transition:width .3s cubic-bezier(.22,1,.36,1);}
+.rc-prog-row{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);margin-top:var(--sp-2);}
+.rc-prog-txt{font-size:var(--fs-sm);font-weight:600;color:rgba(255,255,255,.75);}
+.rc-filter{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.8);border-radius:var(--r-pill);padding:5px 12px;font-size:var(--fs-xs);font-weight:600;cursor:pointer;font-family:'Barlow',sans-serif;transition:background .15s;}
+.rc-filter.on{background:var(--ac);border-color:var(--ac);color:#3a2c00;}
+.rc-list{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:var(--sp-3) var(--sp-3) calc(var(--sp-6) + env(safe-area-inset-bottom,0px));}
+.rc-row{display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-2);border-radius:var(--r-lg);margin-bottom:var(--sp-2);background:rgba(255,255,255,.05);transition:background .18s,opacity .18s;}
+.rc-row.done{background:rgba(255,255,255,.025);}
+.rc-av{width:38px;height:38px;border-radius:50%;flex-shrink:0;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1rem;color:rgba(255,255,255,.85);overflow:hidden;}
+.rc-av img{width:100%;height:100%;object-fit:cover;}
+.rc-name{flex:1;min-width:0;font-size:var(--fs-md);font-weight:600;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.rc-nr{font-size:var(--fs-xs);color:rgba(255,255,255,.4);font-weight:700;margin-right:2px;}
+.rc-btns{display:flex;gap:var(--sp-1);flex-shrink:0;}
+.rc-b{width:44px;height:44px;border-radius:var(--r-md);border:1.5px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:rgba(255,255,255,.5);font-size:1.05rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .12s,background .15s,color .15s;font-family:'Barlow',sans-serif;}
+.rc-b:active{transform:scale(.92);}
+.rc-b.sel-a{background:var(--ok);border-color:var(--ok);color:#fff;}
+.rc-b.sel-f{background:var(--bad);border-color:var(--bad);color:#fff;}
+.rc-b.sel-e{background:var(--warn);border-color:var(--warn);color:#fff;}
+.rc-grade{display:flex;gap:var(--sp-1);margin:0 0 var(--sp-2) 54px;}
+.rc-g{padding:5px 12px;border-radius:var(--r-pill);border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.05);color:rgba(255,255,255,.55);font-size:var(--fs-xs);font-weight:600;cursor:pointer;font-family:'Barlow',sans-serif;transition:all .14s;}
+.rc-g.on{background:rgba(255,255,255,.9);color:var(--planner-dark);border-color:transparent;}
+.rc-foot{flex-shrink:0;padding:var(--sp-3) var(--sp-4) calc(var(--sp-4) + env(safe-area-inset-bottom,0px));border-top:1px solid rgba(255,255,255,.1);display:flex;gap:var(--sp-2);}
+.rc-fb{flex:1;padding:13px;border-radius:var(--r-md);border:none;font-family:'Barlow',sans-serif;font-size:var(--fs-md);font-weight:700;cursor:pointer;transition:transform .12s;}
+.rc-fb:active{transform:scale(.97);}
+.rc-fb-all{background:rgba(255,255,255,.12);color:#fff;}
+.rc-fb-done{background:var(--ac);color:#3a2c00;}
+@media(min-width:700px){
+  .rc-list{max-width:680px;margin:0 auto;width:100%;}
+  .rc-head,.rc-foot{max-width:680px;margin:0 auto;width:100%;}
 }
 /* Palette overrides — dark/saturated */
 body.palette-green{--bd:#0a5c3e;--bm:#1a8758;--bl:#2dad77;--bg-dark:#06301f;--bg-mid:#1a8758;--surface-dark:#1a4d3a;--surface-mid:#0a3a26;--planner-dark:#04200f;--planner-mid:#0d4520;--surface-bright:#1a6845;--header-end:#073e2a;}
@@ -589,10 +691,34 @@ input[type="date"]{cursor:pointer;}
    in already-conducted trainings. 1=sehr gut(green) 2=gut(blue) 3=nicht gut(orange). */
 .perf-btn{padding:2px 7px;border-radius:4px;font-size:.67rem;font-weight:700;cursor:pointer;transition:transform .1s;flex-shrink:0;}
 .perf-btn:hover{transform:scale(1.1);}
-.perf-1{background:rgba(39,174,96,.15);color:#1a7a40;}
-.perf-2{background:rgba(22,89,184,.15);color:#0d3d80;}
-.perf-3{background:rgba(243,156,18,.18);color:#a56a0a;}
-.perf-none{background:rgba(0,0,0,.04);color:var(--gm);border:1px dashed var(--gl);}
+.perf-1{background:var(--ok-bg);color:var(--ok-fg);}
+.perf-2{background:var(--info-bg);color:var(--info-fg);}
+.perf-3{background:var(--warn-bg);color:var(--warn-fg);}
+.perf-none{background:var(--muted-bg);color:var(--gm);border:1px dashed var(--gl);}
+
+/* Bewertungsthema (match evaluation topic) — label in the app's micro-caps
+   style, value in the display face like other headline values. */
+.evt-row{position:relative;display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+.evt-label{font-family:'Barlow',sans-serif;font-size:var(--fs-2xs);font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--gm);white-space:nowrap;}
+.evt-chip{display:inline-flex;align-items:center;gap:7px;background:var(--ow);border:1.5px solid var(--gl);border-radius:var(--r-lg);padding:3px 11px;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1.6px;line-height:1.35;color:var(--bd);cursor:default;transition:border-color .14s,background .14s;}
+.evt-chip.ed{cursor:pointer;}
+.evt-chip.ed:hover{border-color:var(--bm);background:#fff;}
+.evt-chip.evt-empty{border-style:dashed;color:var(--gm);background:transparent;}
+.evt-caret{font-family:'Barlow',sans-serif;font-size:.62rem;opacity:.5;letter-spacing:0;}
+.evt-menu{position:absolute;top:calc(100% + 6px);left:0;z-index:700;background:var(--wh);border:1px solid var(--gl);border-radius:var(--r-lg);box-shadow:var(--sh-3);padding:5px;min-width:210px;max-height:280px;overflow-y:auto;}
+.evt-mi{display:flex;align-items:center;border-radius:7px;transition:background .12s;}
+.evt-mi:hover{background:var(--ow);}
+.evt-mi-name{flex:1;padding:7px 4px 7px 10px;cursor:pointer;font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:600;color:var(--gd);}
+.evt-mi.on .evt-mi-name{color:var(--bd);font-weight:700;}
+.evt-mi-act{cursor:pointer;opacity:0;padding:7px 3px;font-size:.7rem;color:var(--gm);transition:opacity .12s;}
+.evt-mi-act:last-of-type{padding-right:9px;}
+.evt-mi:hover .evt-mi-act{opacity:.55;}
+.evt-mi-act:hover{opacity:1 !important;color:var(--bd);}
+.evt-mi-new{padding:8px 10px;border-radius:7px;cursor:pointer;font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:700;color:var(--bm);transition:background .12s;}
+.evt-mi-new:hover{background:var(--ow);}
+.evt-mi-clear{padding:8px 10px;border-radius:7px;cursor:pointer;font-family:'Barlow',sans-serif;font-size:.76rem;font-weight:600;color:var(--gm);transition:background .12s;}
+.evt-mi-clear:hover{background:var(--ow);color:var(--gd);}
+.evt-sep{height:1px;background:var(--gl);margin:4px 2px;}
 
 /* match lineup */
 .lineup-section{background:var(--ow);border-radius:8px;padding:10px 12px;border:1px solid var(--gl);margin-bottom:10px;}
@@ -2024,6 +2150,9 @@ if(window._fbBlocked){
       <div id="ss-meta" style="font-size:.76rem;color:var(--gm);margin-top:4px;"></div>
       <div id="ss-note-display" style="font-size:.78rem;color:var(--gd);font-style:italic;margin-top:4px;display:none;"></div>
       <div id="ss-plan-link" style="display:none;font-size:.78rem;margin-top:5px;"></div>
+      <div id="ss-rollcall-wrap" style="display:none;margin-top:8px;">
+        <button class="btn" style="background:var(--ok-bg);color:var(--ok-fg);border:1.5px solid rgba(39,174,96,.4);font-size:.78rem;font-weight:700;" onclick="rcOpen(_currentSessIdx)">✓ Anwesenheit erfassen</button>
+      </div>
       <div id="ss-lineup-btn-wrap" style="display:none;margin-top:8px;">
         <button class="btn" style="background:rgba(39,174,96,.15);color:#1a7a40;border:1.5px solid rgba(39,174,96,.4);font-size:.78rem;" onclick="openLineupForSess()">⚽ Aufstellung planen</button>
       </div>
@@ -2417,12 +2546,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.0.9.3';
-const APP_VERSION_LABEL='1.0.9.3';
+const APP_VERSION='1.0.9.4';
+const APP_VERSION_LABEL='1.0.9.4';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1780520000000; // v1.0.9.3: stale-cache write protection
+const APP_RELEASE_TS=1780530000000; // v1.0.9.4: dev-origin guard, reload loop protection
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -3237,6 +3366,18 @@ function fbDecode(d){
   if(out&&typeof out==='object')_mediaReinject(out);
   if(_mediaNeedsRefetch){_mediaNeedsRefetch=false;_mediaRefetchAll();}
   return out;
+}
+// ── REMOTE VERSION STAMP RESET ────────────────────────────────
+// If a never-deployed build (e.g. a local test) published a future
+// APP_RELEASE_TS, online clients keep seeing "update available" for a version
+// that does not exist on the server. Admin, console: resetRemoteVersion()
+function resetRemoteVersion(){
+  if(!isAdmin()){console.warn('Nur Admin');return;}
+  G._appVersion=APP_VERSION;
+  G._appReleaseTs=APP_RELEASE_TS;
+  saveG();
+  try{Object.keys(sessionStorage).forEach(k=>{if(k.indexOf('_updRld_')===0)sessionStorage.removeItem(k);});}catch(e){}
+  console.info('\u2705 Remote-Versionsstempel auf '+APP_VERSION+' ('+APP_RELEASE_TS+') zur\u00fcckgesetzt.');
 }
 // ── BACKUP NODE REPAIR (one-time) ─────────────────────────────
 // Strips photos from EXISTING __backups entries so the node fits back
@@ -5062,10 +5203,25 @@ function _guardDestructive(){
   }
   return true;
 }
+// A local dev build (localhost / file://) shares the production Firebase, but
+// it is NOT deployed — publishing its APP_RELEASE_TS made every online client
+// see "newer version available", hard-reload, still get the old deployed HTML,
+// and reload again: an infinite reload loop for the whole team.
+// Dev builds therefore never publish their version and never self-reload.
+const IS_DEV_ORIGIN=(()=>{
+  try{
+    const hn=location.hostname||'';
+    return location.protocol==='file:'||hn==='localhost'||hn==='127.0.0.1'||hn==='0.0.0.0'||hn===''||hn.endsWith('.local');
+  }catch(e){return false;}
+})();
 function _checkRemoteAppVersion(){
   if(!G)return;
   const srvTs=Number(G._appReleaseTs)||0;
   const srvVer=G._appVersion||'';
+  if(IS_DEV_ORIGIN){
+    if(srvTs!==APP_RELEASE_TS)console.info('[DEV] Version publish/reload suppressed (local build '+APP_RELEASE_TS+' vs remote '+srvTs+')');
+    return;
+  }
   if(!srvTs||srvTs<APP_RELEASE_TS){
     // Our version is newer (or remote is missing) → push ours.
     // Done by setting G fields directly; next saveG persists them.
@@ -5075,7 +5231,7 @@ function _checkRemoteAppVersion(){
     if(typeof saveG==='function'&&!_pendingSave)saveG(false);
   } else if(srvTs>APP_RELEASE_TS){
     // Remote is newer → we are stale → show update banner
-    _showUpdateBanner(srvVer);
+    _showUpdateBanner(srvVer,srvTs);
   }
 }
 // ── DYNAMIC BROWSER TAB TITLE ────────────────────────────────
@@ -5131,9 +5287,28 @@ async function _hardReload(){
   u.searchParams.set('_v',Date.now().toString(36));
   location.replace(u.toString());
 }
-function _showUpdateBanner(remoteVer){
+// Count auto-reloads per remote version in sessionStorage. If reloading twice
+// did not resolve the staleness, the new HTML simply isn't reachable (CDN lag,
+// aggressive proxy cache, or a version published by a build that was never
+// deployed) — looping further only locks the user out of the app.
+function _updReloadCount(srvTs,inc){
+  const k='_updRld_'+(srvTs||0);
+  let n=0;
+  try{
+    n=parseInt(sessionStorage.getItem(k)||'0',10)||0;
+    if(inc)sessionStorage.setItem(k,String(n+1));
+  }catch(e){}
+  return n;
+}
+function _showUpdateBanner(remoteVer,srvTs){
+  if(IS_DEV_ORIGIN)return; // dev build: never self-reload
   // Don't show twice in same session
   if(document.getElementById('_updateBanner'))return;
+  // Loop guard — switch to a manual, non-reloading banner after 2 attempts
+  if(_updReloadCount(srvTs)>=2){
+    _showStuckUpdateBanner(remoteVer);
+    return;
+  }
   // FRESH-LOAD FAST PATH: if the page just loaded and the user hasn't done
   // anything yet, there's no work to preserve — just reload silently.
   // This handles the common case "trainer opens site after a few days,
@@ -5142,6 +5317,7 @@ function _showUpdateBanner(remoteVer){
   const sinceStart=Date.now()-_appStartTime;
   if(!_userInteracted&&sinceStart<5000){
     console.info('[UpdateBanner] Fresh-load detected ('+sinceStart+'ms since start, no interaction) — reloading silently');
+    _updReloadCount(srvTs,true);
     _hardReload();
     return;
   }
@@ -5156,7 +5332,7 @@ function _showUpdateBanner(remoteVer){
     <span style="font-size:1.1rem;">📦</span>
     <span style="flex:1;font-weight:600;">Neue Version verfügbar${remoteVer?' ('+escapeHtml(remoteVer)+')':''} — wird in <span id="_updRldCnt">10</span> Sek. automatisch geladen…</span>
     <button type="button" style="background:rgba(255,255,255,.25);color:#fff;border:none;padding:6px 14px;border-radius:5px;font-weight:700;font-size:.82rem;cursor:pointer;">🔄 Jetzt aktualisieren</button>`;
-  banner.addEventListener('click',()=>{_hardReload();});
+  banner.addEventListener('click',()=>{_updReloadCount(srvTs,true);_hardReload();});
   document.body.appendChild(banner);
   // Auto-reload countdown
   let _updSec=10;
@@ -5166,9 +5342,26 @@ function _showUpdateBanner(remoteVer){
     if(_updCntEl)_updCntEl.textContent=String(Math.max(0,_updSec));
     if(_updSec<=0){
       clearInterval(_updTimer);
+      _updReloadCount(srvTs,true);
       _hardReload();
     }
   },1000);
+}
+// Shown when auto-reloading twice did not deliver the new version.
+// No timer, no forced reload — the app stays usable.
+function _showStuckUpdateBanner(remoteVer){
+  if(document.getElementById('_updateBanner'))return;
+  const b=document.createElement('div');
+  b.id='_updateBanner';
+  b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:linear-gradient(180deg,#c9821a,#a8690d);color:#fff;padding:10px 16px;display:flex;align-items:center;gap:10px;font-family:\'Barlow\',sans-serif;font-size:.84rem;box-shadow:0 4px 14px rgba(0,0,0,.25);';
+  b.innerHTML=`
+    <span style="font-size:1.05rem;">\u26a0\ufe0f</span>
+    <span style="flex:1;font-weight:600;">Neue Version${remoteVer?' ('+escapeHtml(remoteVer)+')':''} gemeldet, aber nicht ladbar. Die App funktioniert normal weiter \u2014 bitte sp\u00e4ter Seite manuell neu laden.</span>
+    <button type="button" id="_updStuckX" style="background:rgba(255,255,255,.22);color:#fff;border:none;padding:5px 12px;border-radius:5px;font-weight:700;font-size:.8rem;cursor:pointer;">Verstanden</button>`;
+  document.body.appendChild(b);
+  const x=document.getElementById('_updStuckX');
+  if(x)x.addEventListener('click',()=>b.remove());
+  console.warn('[UpdateBanner] Stale-version loop guard active — remote reports '+(remoteVer||'?')+' but reloads did not deliver it.');
 }
 function _renderChangelog(highlightNew,lastSeen){
   const verEl=document.getElementById('moAbout-version');
@@ -11365,7 +11558,7 @@ function dbRenderTopicCard(data){
           <span style="color:var(--gm);min-width:18px;">${i+1}.</span>
           <span style="flex:1;font-weight:600;color:var(--gd);">${escapeHtml(r.name)}</span>
           <span style="color:var(--gm);">${r.n}\u00d7</span>
-          <span style="font-weight:700;color:${r.avg<1.7?'#1a9a50':r.avg<2.4?'#1659b8':'#e08a0c'};min-width:30px;text-align:right;">${r.avg.toFixed(1).replace('.',',')}</span>
+          <span style="font-weight:700;color:${r.avg<1.7?'var(--grade-1)':r.avg<2.4?'var(--grade-2)':'var(--grade-3)'};min-width:30px;text-align:right;">${r.avg.toFixed(1).replace('.',',')}</span>
         </div>`).join('')}
       </div>
     </details>`;
@@ -11741,9 +11934,9 @@ function _topicSparkline(series){
   const n=series.length;
   const x=i=>n===1?W/2:pad+(W-2*pad)*i/(n-1);
   const y=g=>pad+(H-2*pad)*(g-1)/2;
-  const col=g=>g===1?'#1a9a50':g===2?'#1659b8':'#e08a0c';
+  const col=g=>g===1?'var(--grade-1)':g===2?'var(--grade-2)':'var(--grade-3)';
   let svg='<svg viewBox="0 0 '+W+' '+H+'" style="width:130px;height:auto;flex-shrink:0;" xmlns="http://www.w3.org/2000/svg">';
-  if(n>1)svg+='<polyline points="'+series.map((e,i)=>x(i)+','+y(e.grade)).join(' ')+'" fill="none" stroke="rgba(22,89,184,.35)" stroke-width="1.6"/>';
+  if(n>1)svg+='<polyline points="'+series.map((e,i)=>x(i)+','+y(e.grade)).join(' ')+'" fill="none" stroke="var(--info)" stroke-opacity=".35" stroke-width="1.6"/>';
   series.forEach((e,i)=>{svg+='<circle cx="'+x(i)+'" cy="'+y(e.grade)+'" r="3.4" fill="'+col(e.grade)+'"><title>'+e.date+': Note '+e.grade+'</title></circle>';});
   svg+='</svg>';
   return svg;
@@ -11755,8 +11948,8 @@ function _topicTrend(series){
   const a1=series.slice(0,half).reduce((s,e)=>s+e.grade,0)/half;
   const a2=series.slice(-half).reduce((s,e)=>s+e.grade,0)/half;
   const d=a1-a2; // positive = grades got LOWER = better
-  if(d>0.25)return '<span style="color:#1a9a50;font-weight:700;" title="Verbesserung">\u2197</span>';
-  if(d<-0.25)return '<span style="color:#e08a0c;font-weight:700;" title="Verschlechterung">\u2198</span>';
+  if(d>0.25)return '<span style="color:var(--ok);font-weight:700;" title="Verbesserung">\u2197</span>';
+  if(d<-0.25)return '<span style="color:var(--warn);font-weight:700;" title="Verschlechterung">\u2198</span>';
   return '<span style="color:var(--gm);" title="stabil">\u2192</span>';
 }
 function computePerfSeries(occurrences){
@@ -11782,7 +11975,8 @@ function renderPerfChart(series){
   const n=series.length;
   const x=i=>n===1?padL+iw/2:padL+iw*i/(n-1);
   const y=g=>padT+ih*(g-1)/2; // grade 1 top, 3 bottom
-  const col=g=>g===1?'#1a9a50':g===2?'#1659b8':'#e08a0c';
+  // Semantic grade tokens — palette changes restyle the chart automatically
+  const col=g=>g===1?'var(--grade-1)':g===2?'var(--grade-2)':'var(--grade-3)';
   const avg=series.reduce((s,e)=>s+e.grade,0)/n;
   let svg='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block;" xmlns="http://www.w3.org/2000/svg">';
   // Y grid + labels
@@ -11791,8 +11985,8 @@ function renderPerfChart(series){
     svg+='<text x="'+(padL-8)+'" y="'+(y(g)+4)+'" text-anchor="end" font-size="11" fill="'+col(g)+'" font-weight="700">'+g+'</text>';
   });
   // Ø reference line
-  svg+='<line x1="'+padL+'" y1="'+y(avg)+'" x2="'+(W-padR)+'" y2="'+y(avg)+'" stroke="#e8c840" stroke-width="1.5" stroke-dasharray="6,4" opacity=".8"/>';
-  svg+='<text x="'+(W-padR)+'" y="'+(y(avg)-5)+'" text-anchor="end" font-size="10" fill="#a58a10" font-weight="700">\u00d8 '+avg.toFixed(1).replace('.',',')+'</text>';
+  svg+='<line x1="'+padL+'" y1="'+y(avg)+'" x2="'+(W-padR)+'" y2="'+y(avg)+'" stroke="var(--ac)" stroke-width="1.5" stroke-dasharray="6,4" opacity=".8"/>';
+  svg+='<text x="'+(W-padR)+'" y="'+(y(avg)-5)+'" text-anchor="end" font-size="10" fill="var(--warn-fg)" font-weight="700">\u00d8 '+avg.toFixed(1).replace('.',',')+'</text>';
   // Season boundaries (multi-season history)
   for(let i=1;i<n;i++){
     if(series[i].season!==series[i-1].season){
@@ -11804,7 +11998,7 @@ function renderPerfChart(series){
   // Connecting line
   if(n>1){
     const pts=series.map((e,i)=>x(i)+','+y(e.grade)).join(' ');
-    svg+='<polyline points="'+pts+'" fill="none" stroke="rgba(22,89,184,.35)" stroke-width="2"/>';
+    svg+='<polyline points="'+pts+'" fill="none" stroke="var(--info)" stroke-opacity=".35" stroke-width="2"/>';
   }
   // Points (matches as squares, trainings as circles) + x labels (sparse)
   const labelEvery=Math.max(1,Math.ceil(n/8));
@@ -13200,11 +13394,11 @@ function renderEvalTopicRow(si){
   const ed=canEdit();
   if(!topic&&!ed){el.style.display='none';return;}
   el.style.display='';
-  el.innerHTML=`<span ${ed?`onclick="event.stopPropagation();togEvalTopicMenu(${si})" style="cursor:pointer;"`:''} 
-      id="evt_chip" style="display:inline-flex;align-items:center;gap:6px;background:${topic?'var(--ow)':'transparent'};border:1.5px ${topic?'solid var(--gl)':'dashed var(--gl)'};border-radius:14px;padding:4px 12px;font-size:.76rem;font-weight:600;color:${topic?'var(--bd)':'var(--gm)'};">
-      \ud83c\udfaf ${topic?escapeHtml(topic):'Bewertungsthema w\u00e4hlen'}${ed?' <span style="opacity:.5;">\u25be</span>':''}
-    </span>
-    <span id="evt_menu" style="display:none;position:absolute;z-index:700;background:var(--surface-hi,#fff);border:1px solid var(--gl);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:6px;min-width:190px;"></span>`;
+  el.innerHTML=`<div class="evt-row">
+      <span class="evt-label">\ud83c\udfaf Bewertungsthema</span>
+      <span id="evt_chip" class="evt-chip${ed?' ed':''}${topic?'':' evt-empty'}"${ed?` onclick="event.stopPropagation();togEvalTopicMenu(${si})"`:''}>${topic?escapeHtml(topic):'Thema w\u00e4hlen'}${ed?'<span class="evt-caret">\u25be</span>':''}</span>
+      <div id="evt_menu" class="evt-menu" style="display:none;"></div>
+    </div>`;
 }
 function togEvalTopicMenu(si){
   const menu=document.getElementById('evt_menu');
@@ -13219,14 +13413,15 @@ function togEvalTopicMenu(si){
   let html='';
   pool.forEach((t,ti)=>{
     const on=s.evalTopic===t;
-    html+=`<div style="display:flex;align-items:center;gap:4px;border-radius:7px;${on?'background:var(--ow);':''}">
-      <span onclick="event.stopPropagation();setEvalTopic(${si},window._evtPool[${ti}])" style="flex:1;padding:7px 4px 7px 10px;cursor:pointer;font-size:.78rem;font-weight:600;color:var(--bd);">${on?'\u2713 ':''}${escapeHtml(t)}</span>
-      <span onclick="event.stopPropagation();renameEvalTopic(${si},${ti})" style="cursor:pointer;opacity:.45;padding:7px 3px;font-size:.72rem;" title="Umbenennen (alle Spiele)">\u270e</span>
-      <span onclick="event.stopPropagation();deleteEvalTopic(${si},${ti})" style="cursor:pointer;opacity:.45;padding:7px 8px 7px 3px;font-size:.72rem;" title="Thema l\u00f6schen">\u2715</span>
+    html+=`<div class="evt-mi${on?' on':''}">
+      <span class="evt-mi-name" onclick="event.stopPropagation();setEvalTopic(${si},window._evtPool[${ti}])">${on?'\u2713 ':''}${escapeHtml(t)}</span>
+      <span class="evt-mi-act" onclick="event.stopPropagation();renameEvalTopic(${si},${ti})" title="Umbenennen (alle Spiele)">\u270e</span>
+      <span class="evt-mi-act" onclick="event.stopPropagation();deleteEvalTopic(${si},${ti})" title="Thema l\u00f6schen">\u2715</span>
     </div>`;
   });
-  html+=`<div onclick="event.stopPropagation();addEvalTopic(${si})" style="padding:7px 10px;border-radius:7px;cursor:pointer;font-size:.78rem;color:var(--bm);font-weight:700;border-top:${pool.length?'1px solid var(--gl)':'none'};margin-top:${pool.length?'4px':'0'};">\uff0b Neues Thema</div>`;
-  if(s.evalTopic)html+=`<div onclick="event.stopPropagation();setEvalTopic(${si},null)" style="padding:7px 10px;border-radius:7px;cursor:pointer;font-size:.78rem;color:var(--gm);">\u2715 Kein Thema</div>`;
+  if(pool.length)html+='<div class="evt-sep"></div>';
+  html+=`<div class="evt-mi-new" onclick="event.stopPropagation();addEvalTopic(${si})">\uff0b Neues Thema</div>`;
+  if(s.evalTopic)html+=`<div class="evt-mi-clear" onclick="event.stopPropagation();setEvalTopic(${si},null)">\u2715 Kein Thema</div>`;
   menu.innerHTML=html;
   menu.style.display='block';
   setTimeout(()=>{
@@ -13295,6 +13490,130 @@ function setEvalTopic(si,topic){
   logAudit('Bewertungsthema',s.date,(old?old+' \u2192 ':'')+(topic||'entfernt'));
   renderEvalTopicRow(si);
 }
+// ══ ROLL-CALL ════════════════════════════════════════════════
+// Fullscreen, thumb-driven attendance capture for the sideline. Writes
+// through the SAME helpers as the table (setSessPlayerStatus / setPerf),
+// so undo, audit log, Firebase sync and stats stay identical — this is a
+// different input surface, not a second source of truth.
+let _rcSi=null,_rcOnlyOpen=false;
+function rcOpen(si){
+  if(!canEdit())return;
+  const D=cd();const s=D&&D.sessions&&D.sessions[si];
+  if(!s)return;
+  _rcSi=si;
+  _rcOnlyOpen=false;
+  const ov=document.getElementById('rcOverlay');
+  if(!ov)return;
+  ov.classList.add('open');
+  document.getElementById('rc-date').textContent=s.date||'';
+  document.getElementById('rc-sub').textContent=
+    (s.type==='match'?'\u26bd Spiel':'\ud83c\udfc3 Training')
+    +(s.type==='match'&&s.label?' \u00b7 '+s.label:'')
+    +(s.type!=='match'&&s.focus?' \u00b7 '+s.focus:'')
+    +(s.time?' \u00b7 '+s.time:'');
+  const f=document.getElementById('rc-filter');
+  if(f)f.classList.remove('on');
+  rcRender();
+}
+function rcClose(){
+  const ov=document.getElementById('rcOverlay');
+  if(ov)ov.classList.remove('open');
+  _rcSi=null;
+  // Refresh whatever is behind us
+  if(typeof render==='function')render();
+  if(typeof buildSessAtt==='function'&&_currentSessIdx!=null){try{buildSessAtt(_currentSessIdx);}catch(e){}}
+}
+function rcToggleFilter(){
+  _rcOnlyOpen=!_rcOnlyOpen;
+  const f=document.getElementById('rc-filter');
+  if(f)f.classList.toggle('on',_rcOnlyOpen);
+  rcRender();
+}
+function rcRender(){
+  if(_rcSi==null)return;
+  const si=_rcSi;
+  const D=cd();const s=D&&D.sessions&&D.sessions[si];
+  const listEl=document.getElementById('rc-list');
+  if(!s||!listEl)return;
+  const players=D.players||[];
+  // "Marked" = a real decision was taken (Anwesend / Fehlend / Entschuldigt).
+  // Ausstehend (3/null) and Angemeldet (4) are pre-states → still open.
+  const isMarked=v=>(v===1||v===0||v===2);
+  let done=0;
+  players.forEach(p=>{if(p&&p.s&&isMarked(p.s[si]))done++;});
+  const total=players.length;
+  const pct=total?Math.round(done/total*100):0;
+  const bar=document.getElementById('rc-bar');
+  if(bar)bar.style.width=pct+'%';
+  const prog=document.getElementById('rc-prog');
+  if(prog)prog.textContent=done+' von '+total+' erfasst';
+  // Grading is offered right here when the session already took place —
+  // it is the same moment on the pitch, and saves a second pass later.
+  const gradable=(typeof canGradeSession==='function')&&canGradeSession(si);
+  let html='';
+  players.forEach((p,pi)=>{
+    if(!p)return;
+    const v=p.s?p.s[si]:3;
+    const marked=isMarked(v);
+    if(_rcOnlyOpen&&marked)return;
+    const nm=(typeof getDisplayName==='function'?getDisplayName(p):p.name)||'?';
+    const initials=(nm.split(' ').map(x=>x[0]).join('').slice(0,2)||'?').toUpperCase();
+    const av=p.photo?('<img src="'+p.photo+'" alt="">'):escapeHtml(initials);
+    html+='<div class="rc-row'+(marked?' done':'')+'">'
+      +'<div class="rc-av">'+av+'</div>'
+      +'<div class="rc-name">'+(p.nr?('<span class="rc-nr">#'+escapeHtml(String(p.nr))+'</span> '):'')+escapeHtml(nm)+'</div>'
+      +'<div class="rc-btns">'
+        +'<button class="rc-b'+(v===1?' sel-a':'')+'" onclick="rcSet('+pi+',1)" title="Anwesend">\u2713</button>'
+        +'<button class="rc-b'+(v===0?' sel-f':'')+'" onclick="rcSet('+pi+',0)" title="Fehlend">\u2715</button>'
+        +'<button class="rc-b'+(v===2?' sel-e':'')+'" onclick="rcSet('+pi+',2)" title="Entschuldigt">E</button>'
+      +'</div></div>';
+    // Grade row appears only for players actually present at a held session
+    if(gradable&&v===1){
+      const g=(typeof getPerf==='function')?getPerf(pi,si):null;
+      html+='<div class="rc-grade">'
+        +[1,2,3].map(x=>'<button class="rc-g'+(g===x?' on':'')+'" onclick="rcGrade('+pi+','+x+')">'+PERF_ICON[x]+' '+PERF_LABEL[x]+'</button>').join('')
+        +'</div>';
+    }
+  });
+  if(!html){
+    html='<div class="u-empty" style="color:rgba(255,255,255,.5);">'
+      +'<div class="u-empty-icon">\u2705</div>'
+      +'<div class="u-empty-txt">Alle Spieler erfasst.</div></div>';
+  }
+  listEl.innerHTML=html;
+}
+function rcSet(pi,val){
+  if(_rcSi==null)return;
+  const D=cd();const p=D&&D.players&&D.players[pi];
+  if(!p)return;
+  // Tapping the active state again clears it back to Ausstehend
+  const cur=p.s?p.s[_rcSi]:3;
+  setSessPlayerStatus(pi,_rcSi,cur===val?3:val);
+  rcRender();
+}
+function rcGrade(pi,val){
+  if(_rcSi==null)return;
+  const cur=(typeof getPerf==='function')?getPerf(pi,_rcSi):null;
+  if(typeof setPerf==='function')setPerf(pi,_rcSi,cur===val?null:val);
+  rcRender();
+}
+// Everyone still unmarked is present — the common case after checking who's missing
+function rcMarkRest(){
+  if(_rcSi==null||!canEdit())return;
+  const si=_rcSi;
+  const D=cd();
+  const open=(D.players||[]).map((p,pi)=>({p,pi})).filter(({p})=>{
+    const v=p&&p.s?p.s[si]:3;
+    return !(v===1||v===0||v===2);
+  });
+  if(!open.length)return;
+  if(!confirm(open.length+' offene Spieler als anwesend markieren?'))return;
+  snap();
+  open.forEach(({p,pi})=>{if(p.s)p.s[si]=1;});
+  saveG();
+  logAudit('Sammel-Anwesenheit',(D.sessions[si]||{}).date||'?',open.length+' Spieler auf Anwesend');
+  rcRender();
+}
 function openSessStats(si){
   _currentSessIdx=si;
   if(typeof _trackSessionModal==='function')_trackSessionModal(si);
@@ -13314,6 +13633,11 @@ function openSessStats(si){
   document.getElementById('ss-title').textContent=s.date+(isMat&&s.label?' – '+s.label:s.focus?' · '+s.focus:'');
   document.getElementById('ss-meta').innerHTML=isMat?`⚽ Spiel &nbsp;·&nbsp; ${s.homeAway==='home'?'🏠 Heim':'🚌 Auswärts'}${s.label?' &nbsp;·&nbsp; '+escapeHtml(s.label):''}${s.time?' &nbsp;·&nbsp; ⏰ '+escapeHtml(s.time):''}`:`Training${s.focus?' &nbsp;·&nbsp; 🎯 '+escapeHtml(s.focus):''}${s.time?' &nbsp;·&nbsp; ⏰ '+escapeHtml(s.time):''}`;
   try{renderEvalTopicRow(si);}catch(e){console.error('evalTopic:',e);}
+  // Roll-call entry point: trainers only, and only once the session is
+  // actually running/past — capturing attendance for a future date is not
+  // a thing (RSVP handles that).
+  const rcw=document.getElementById('ss-rollcall-wrap');
+  if(rcw)rcw.style.display=(canEdit()&&typeof _isSessRollCallTime==='function'&&_isSessRollCallTime(si))?'block':'none';
   const ssDelBtn=document.getElementById('ss-del');const ssEdit=document.getElementById('ss-edit');
   // Note display
   const noteEl=document.getElementById('ss-note-display');
@@ -14917,14 +15241,33 @@ function homeClose(){
 function homeEligible(){
   return CU&&!isPlayerMode();
 }
+// The Startseite is a "what's happening now" screen: it must ALWAYS show the
+// running season, even when the table view is parked in an archived one.
+// Football season runs Jul→Jun, so after June the current season is YYYY/YY+1.
+// Falls back to the newest known season when the running one has no block yet.
+function homeSeason(){
+  const list=Array.isArray(G.seasonList)?G.seasonList.slice():[];
+  if(!list.length)return UI.currentSeason||null;
+  const now=new Date();
+  const startY=(now.getMonth()>=6)?now.getFullYear():now.getFullYear()-1; // month 6 = July
+  const guess=startY+'/'+String((startY+1)%100).padStart(2,'0');
+  if(list.includes(guess))return guess;
+  list.sort((a,b)=>String(a).localeCompare(String(b)));
+  return list[list.length-1]||UI.currentSeason||null;
+}
+function homeData(){
+  const seas=homeSeason();
+  if(!seas||!UI.currentTeam||!G.db)return cd();
+  return G.db[UI.currentTeam+'__'+seas]||cd();
+}
 function homeRender(){
   if(!homeEligible())return;
-  const D=cd();
+  const D=homeData();
   // ── Hero ──
   const heroTitle=document.getElementById('home-hero-title');
   const heroSub=document.getElementById('home-hero-sub');
   if(heroTitle)heroTitle.textContent='FC FROHLINDE';
-  if(heroSub)heroSub.textContent=(UI.currentTeam||'U19')+' \u00b7 Saison '+(UI.currentSeason||'');
+  if(heroSub)heroSub.textContent=(UI.currentTeam||'U19')+' \u00b7 Saison '+(homeSeason()||'');
   const logoEl=document.getElementById('home-hero-logo');
   if(logoEl){
     const src=(G&&G.clubLogo)||('data:image/jpeg;base64,'+LB64);
@@ -14964,7 +15307,9 @@ function _homeSetHtml(el,html){
 function homeRenderNext(){
   const row=document.getElementById('home-next-row');
   if(!row)return;
-  const D=cd();
+  const D=homeData();
+  const seas=homeSeason();
+  const _sk=d=>_dbSortKey(d,seas); // season-aware: home may show another season than the table
   const t=todaySK();
   // Next training (first future training) and next match — shown as two
   // cards side by side. If the very next session IS the match, the match
@@ -14974,14 +15319,14 @@ function homeRenderNext(){
   for(let i=0;i<(D.sessions||[]).length;i++){
     const s=D.sessions[i];
     if(!s||!s.date)continue;
-    if(dispToSortKey(s.date)<t)continue;
+    if(_sk(s.date)<t)continue;
     if(s.type==='training'&&tIdx<0)tIdx=i;
     if(s.type==='match'&&mIdx<0)mIdx=i;
     if(tIdx>=0&&mIdx>=0)break;
   }
   if(tIdx<0&&mIdx<0){row.style.display='none';return;}
   const daysUntil=si=>{
-    const sk=dispToSortKey(D.sessions[si].date);
+    const sk=_sk(D.sessions[si].date);
     const y1=Math.floor(sk/10000),m1=Math.floor((sk%10000)/100),d1=sk%100;
     const y0=Math.floor(t/10000),m0=Math.floor((t%10000)/100),d0=t%100;
     return Math.round((new Date(y1,m1-1,d1)-new Date(y0,m0-1,d0))/864e5);
@@ -15032,7 +15377,21 @@ function homeRenderNext(){
   row.style.gridTemplateColumns=(tIdx>=0&&mIdx>=0)?'1fr 1fr':'1fr';
   row.style.display='';
 }
+// Everything launched FROM the Startseite must operate on the season the
+// Startseite shows (the running one) — not on whatever season the table was
+// last parked in. Called by every tile action and by the next-session cards.
+function homeEnsureSeason(){
+  const seas=homeSeason();
+  if(seas&&UI.currentSeason!==seas){
+    UI.currentSeason=seas;
+    try{localStorage.setItem('currentSeason',seas);}catch(e){}
+    if(typeof render==='function')render();
+  }
+}
 function homeOpenSess(si){
+  // The card belongs to the HOME season — switch first, otherwise the index
+  // would point into a different block's session list.
+  homeEnsureSeason();
   if(typeof openSessStats==='function')openSessStats(si);
 }
 function homeRenderTiles(){
@@ -15054,7 +15413,7 @@ function homeRenderTiles(){
   ];
   const shown=tiles.filter(t=>t[4]);
   _homeSetHtml(el,shown.map(t=>
-    '<div class="home-tile" onclick="'+t[3]+'">'+
+    '<div class="home-tile" onclick="homeEnsureSeason();'+t[3]+'">'+
       '<div class="home-tile-icon">'+t[0]+'</div>'+
       '<div><div class="home-tile-name">'+t[1]+'</div>'+
       '<div class="home-tile-desc">'+t[2]+'</div></div>'+
@@ -15066,7 +15425,8 @@ function homeRenderTiles(){
 function homeRenderBottom(){
   const el=document.getElementById('home-bottom');
   if(!el)return;
-  const D=cd();
+  const D=homeData();
+  const seas=homeSeason();
   // Birthdays in next 30 days (reuse parseBirthdate logic pattern)
   const today=new Date();today.setHours(0,0,0,0);
   // 30-day window — the panel title says so explicitly, and each row shows
@@ -15095,7 +15455,7 @@ function homeRenderBottom(){
   // Mini stats — fact-based attendance overall
   let a=0,f=0,e=0;
   (D.sessions||[]).forEach((s,si)=>{
-    if(!s||!sessTookPlace(s))return;
+    if(!s||!sessTookPlace(s,seas))return;
     (D.players||[]).forEach(p=>{
       const v=p&&p.s?p.s[si]:3;
       if(v===1)a++;else if(v===0)f++;else if(v===2)e++;
@@ -21082,6 +21442,31 @@ checkAutoBackup();
   <div class="ud-meta" onclick="closeUserMenu();openAbout();">footy.ai · <span id="ud-version-tag">v1.0.5-beta</span></div>
 </div>
 <!-- Season Lineup Planner -->
+<!-- Roll-call: fullscreen attendance capture -->
+<div class="rc-overlay" id="rcOverlay">
+  <div class="rc-head">
+    <div class="rc-head-top">
+      <div class="rc-title">
+        <div class="rc-date" id="rc-date">–</div>
+        <div class="rc-sub" id="rc-sub"></div>
+      </div>
+      <button class="rc-x" onclick="rcClose()" title="Schließen">✕</button>
+    </div>
+    <div class="rc-progress">
+      <div class="rc-bar"><div class="rc-bar-fill" id="rc-bar" style="width:0%;"></div></div>
+      <div class="rc-prog-row">
+        <span class="rc-prog-txt" id="rc-prog">–</span>
+        <button class="rc-filter" id="rc-filter" onclick="rcToggleFilter()">Nur offene</button>
+      </div>
+    </div>
+  </div>
+  <div class="rc-list" id="rc-list"></div>
+  <div class="rc-foot">
+    <button class="rc-fb rc-fb-all" onclick="rcMarkRest()">Rest anwesend</button>
+    <button class="rc-fb rc-fb-done" onclick="rcClose()">Fertig</button>
+  </div>
+</div>
+
 <!-- ══ STARTSEITE ══════════════════════════════════════════ -->
 <div class="home-overlay" id="homeOverlay">
   <div class="home-scroll">
