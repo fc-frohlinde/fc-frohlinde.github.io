@@ -1228,9 +1228,12 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
      away (the menu shows the full user name). */
   .hclub{font-size:1.05rem !important;letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .hclub-suffix{display:none;}
+  /* 38px circle, one glyph. The name lives in the menu, and the caret is
+     redundant once the pill reads as a round icon button like the bell. */
   .user-pill .uname{display:none !important;}
-  .user-pill{padding:0 !important;width:38px;justify-content:center;}
-  .user-pill .role-icon{margin:0;}
+  .user-pill .upill-caret{display:none !important;}
+  .user-pill{padding:0 !important;width:38px;height:38px;border-radius:50%;justify-content:center;align-items:center;}
+  .user-pill .role-icon{margin:0;font-size:1rem;line-height:1;}
   .hsub,.hmeta{display:none !important;}
   .logo-ring{width:38px !important;height:38px !important;flex-shrink:0;}
   .header.collapsed .logo-ring{width:30px !important;height:30px !important;}
@@ -2016,7 +2019,7 @@ if(window._fbBlocked){
           <button class="user-pill" id="userPill" onclick="toggleUserMenu(event)">
             <span class="role-icon" id="roleIcon">✏️</span>
             <span class="uname" id="uname">–</span>
-            <span style="font-size:.76rem;margin-left:4px;opacity:.8;">☰</span>
+            <span class="upill-caret" style="font-size:.76rem;margin-left:4px;opacity:.8;">☰</span>
           </button>
         </div>
       </div>
