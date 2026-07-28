@@ -5627,7 +5627,17 @@ document.getElementById('authInput').addEventListener('keydown',e=>{if(e.key==='
 // So: one guard entry is pushed at startup, every back press consumes it,
 // we act on the topmost thing on screen, and immediately re-arm.
 let _navConsume=0,_navExitArmed=false;
-function _navArm(){history.pushState({fcf:1},'');}
+function _navArm(){try{history.pushState({fcf:1},'');}catch(e){}}
+// Re-arming from INSIDE a popstate handler is unreliable on several Android
+// browsers — the push is sometimes swallowed, and the next back press then
+// escapes the page. Doing it on the next tick (plus two later re-checks)
+// makes it dependable; that intermittency is exactly what "works every other
+// time" looked like.
+function _navRearm(){
+  setTimeout(_navEnsureArmed,0);
+  setTimeout(_navEnsureArmed,120);
+  setTimeout(_navEnsureArmed,400);
+}
 function _navLayers(){
   // Home is not a layer — it is a view (see _navViewLevel).
   return Array.from(document.querySelectorAll(
@@ -5702,12 +5712,12 @@ window.addEventListener('popstate',()=>{
     }else{
       _navCloseLayer(top);
     }
-    _navArm();
+    _navRearm();
     return;
   }
   if(_navViewLevel()===1){
     _navGotoDefaultView();
-    _navArm();
+    _navRearm();
     return;
   }
   // Root reached. First press warns, a second one within the window leaves.
@@ -5719,7 +5729,7 @@ window.addEventListener('popstate',()=>{
   _navExitArmed=true;
   _navShowExitHint();
   setTimeout(()=>{_navExitArmed=false;},2600);
-  _navArm();
+  _navRearm();
 });
 // The guard can go missing in more ways than one: a bfcache restore drops it,
 // a reload starts without it, and any other history call can replace it. So
@@ -5732,7 +5742,7 @@ _navEnsureArmed();                                   // immediately at load
 document.addEventListener('DOMContentLoaded',()=>setTimeout(_navEnsureArmed,50));
 window.addEventListener('pageshow',()=>setTimeout(_navEnsureArmed,50));
 window.addEventListener('focus',_navEnsureArmed);
-setInterval(_navEnsureArmed,1000);
+setInterval(_navEnsureArmed,400);
 // ══ POPUP PLACEMENT ══════════════════════════════════════════
 // Every dropdown used to compute its own left/top from the anchor rect, with
 // at best an ad-hoc Math.min for the right edge. Result: menus opened near
