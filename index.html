@@ -1296,7 +1296,10 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   /* A grip makes the sheet read as bottom-anchored, matching the Mehr sheet */
   .mob::before{content:'';display:block;width:38px;height:4px;border-radius:var(--r-pill);
     background:var(--gl);margin:-4px auto 10px;}
-  @supports (height:100dvh){ .mob{max-height:88dvh;} }
+  /* !important is required: several modals carry inline max-height:92vh from
+     the desktop markup, which otherwise wins and pushes the sheet off the
+     top edge on browsers whose vh ignores their own toolbar (Edge/Android). */
+  .mob{max-height:calc(var(--vvh,100vh) * .88) !important;}
   /* Notification panel — full width on mobile */
   .notif-panel{width:calc(100vw - 16px) !important;max-width:none !important;left:8px !important;right:8px !important;}
   /* Larger tap targets */
@@ -1310,6 +1313,13 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   .cal-month-hdr{font-size:.95rem !important;padding:5px 8px !important;}
   /* Hide month navigation on mobile - list view shows entire season */
   .cal-nav{display:none !important;}
+  /* Calendar actions: 2x2 grid of the "add" buttons, Export spanning the row
+     below them — secondary action, but deliberate rather than orphaned. */
+  #moCalendar .mob > div:first-of-type{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+  #moCalendar .mob > div:first-of-type h3{grid-column:1 / -1;}
+  #moCalendar #cal-ctx{grid-column:1 / -1;}
+  #moCalendar .cal-btn{width:100%;justify-content:center;min-height:40px;}
+  #moCalendar #cal-export-btn{grid-column:1 / -1;}
   /* Calendar modal: full screen, cleaner padding */
   #moCalendar .mob{padding:10px 0 0 !important;}
   #moCalendar .mob h3{padding:0 14px;}
@@ -15582,6 +15592,22 @@ function _mobNavVisibility(){
 setInterval(_mobNavVisibility,400);
 // Publish the real nav height (it includes its own safe-area padding, so this
 // is the one number that is correct on every device) for the layout to reserve.
+// The one honest number: the visual viewport. dvh is close but Edge on
+// Android still reports a height that includes its bottom toolbar, and any
+// modal with an inline max-height in vh (several have) then overflows past
+// the top of the screen. --vvh is measured, so it cannot be wrong.
+function _vvhMeasure(){
+  const vv=window.visualViewport;
+  const px=Math.round((vv&&vv.height)||window.innerHeight||0);
+  if(px)document.documentElement.style.setProperty('--vvh',px+'px');
+}
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',_vvhMeasure);
+  window.visualViewport.addEventListener('scroll',_vvhMeasure);
+}
+window.addEventListener('resize',_vvhMeasure);
+window.addEventListener('orientationchange',()=>setTimeout(_vvhMeasure,150));
+_vvhMeasure();
 function _mobNavMeasure(){
   const nav=document.getElementById('mobNav');
   if(!nav)return;
