@@ -2738,12 +2738,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.0.9.4';
-const APP_VERSION_LABEL='1.0.9.4';
+const APP_VERSION='1.0.9.5';
+const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1780530000000; // v1.0.9.4: dev-origin guard, reload loop protection
+const APP_RELEASE_TS=1780560000000; // v1.0.9.5: mobile rework, back-button navigation
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -5721,9 +5721,18 @@ window.addEventListener('popstate',()=>{
   setTimeout(()=>{_navExitArmed=false;},2600);
   _navArm();
 });
-// Arm once the app is up (and again after a bfcache restore, which discards it)
-document.addEventListener('DOMContentLoaded',()=>setTimeout(_navArm,80));
-window.addEventListener('pageshow',e=>{if(e.persisted)setTimeout(_navArm,80);});
+// The guard can go missing in more ways than one: a bfcache restore drops it,
+// a reload starts without it, and any other history call can replace it. So
+// instead of arming once, we verify continuously — history.state tells us
+// whether our entry is the current one.
+function _navEnsureArmed(){
+  try{if(!history.state||!history.state.fcf)_navArm();}catch(e){}
+}
+_navEnsureArmed();                                   // immediately at load
+document.addEventListener('DOMContentLoaded',()=>setTimeout(_navEnsureArmed,50));
+window.addEventListener('pageshow',()=>setTimeout(_navEnsureArmed,50));
+window.addEventListener('focus',_navEnsureArmed);
+setInterval(_navEnsureArmed,1000);
 // ══ POPUP PLACEMENT ══════════════════════════════════════════
 // Every dropdown used to compute its own left/top from the anchor rect, with
 // at best an ad-hoc Math.min for the right edge. Result: menus opened near
