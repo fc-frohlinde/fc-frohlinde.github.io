@@ -1125,6 +1125,12 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
 .mobile-att-view{flex:1;display:flex;flex-direction:column;background:var(--ow);overflow:hidden;}
 .ma-sess-bar{display:flex;gap:6px;padding:10px 12px;background:var(--surface-mid);overflow-x:auto;-webkit-overflow-scrolling:touch;flex-shrink:0;border-bottom:2px solid var(--bd);}
 .ma-sess-bar::-webkit-scrollbar{display:none;}
+/* Season figures, previously in the desktop footer */
+.ma-stats{display:flex;align-items:center;justify-content:space-around;gap:var(--sp-2);
+  padding:7px 10px;background:var(--surface-mid);border-bottom:1px solid rgba(255,255,255,.09);flex-shrink:0;}
+.ma-stat{display:flex;align-items:baseline;gap:4px;}
+.ma-stat-v{font-family:'Bebas Neue',sans-serif;font-size:1rem;color:#fff;line-height:1;}
+.ma-stat-k{font-size:.58rem;letter-spacing:.8px;text-transform:uppercase;color:rgba(255,255,255,.5);}
 .ma-sess{flex-shrink:0;padding:8px 12px;border-radius:8px;cursor:pointer;background:rgba(255,255,255,.1);color:rgba(255,255,255,.85);font-size:.75rem;font-weight:600;border:1.5px solid rgba(255,255,255,.15);min-width:88px;text-align:center;line-height:1.2;}
 .ma-sess.match{background:rgba(217,122,0,.18);border-color:rgba(217,122,0,.5);}
 .ma-sess.active{background:var(--ac);color:var(--bd);border-color:var(--ac);box-shadow:0 2px 8px color-mix(in srgb, var(--ac) 40%, transparent);}
@@ -1182,9 +1188,12 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   .table-wrap{display:none !important;}
   #mobileAttView{display:flex !important;}
   .legend{display:none !important;}
-  .footer .next-btn{display:none !important;}
-  .footer{padding:6px 12px !important;}
-  .fstats{font-size:.66rem !important;}
+  /* The footer bar (footy.ai mark + stats + team/date + Ansicht menu) was
+     laid out for a wide screen and, since the bottom nav became fixed, it
+     also sat UNDERNEATH it — two bars stacked in the same 60px. Its only
+     mobile-relevant content (the season figures) moves into the compact
+     strip below the session tabs; the Ansicht options live in "Mehr". */
+  .footer{display:none !important;}
 }
 @media (min-width:768px){
   #mobileAttView{display:none !important;}
@@ -2073,6 +2082,7 @@ if(window._fbBlocked){
 <!-- Mobile attendance view (replaces table on narrow screens) -->
 <div id="mobileAttView" class="mobile-att-view" style="display:none;">
   <div class="ma-sess-bar" id="maSessBar"></div>
+  <div class="ma-stats" id="maStats"></div>
   <div class="ma-list-wrap" id="maListWrap">
     <div class="ma-ptr" id="maPtr"><span id="maPtrIcon">↓</span> <span id="maPtrText">Zum Aktualisieren ziehen</span></div>
     <div class="ma-list" id="maList"></div>
@@ -6753,6 +6763,15 @@ function renderFooter(){
     <div class="si"><div class="v">${tS}</div><div class="k">Trainings</div></div>
     <div class="si"><div class="v">${mS}</div><div class="k">Spiele</div></div>
     <div class="si"><div class="v">${avg}%</div><div class="k">Ø</div></div>`;
+  // Mobile mirror (footer is hidden there — see @media 767px)
+  const mst=document.getElementById('maStats');
+  if(mst){
+    mst.innerHTML=
+      `<div class="ma-stat"><span class="ma-stat-v">${D.players?D.players.length:0}</span><span class="ma-stat-k">Spieler</span></div>`+
+      `<div class="ma-stat"><span class="ma-stat-v">${tS}</span><span class="ma-stat-k">Trainings</span></div>`+
+      `<div class="ma-stat"><span class="ma-stat-v">${mS}</span><span class="ma-stat-k">Spiele</span></div>`+
+      `<div class="ma-stat"><span class="ma-stat-v">${avg}%</span><span class="ma-stat-k">Ø</span></div>`;
+  }
   const nb=document.getElementById('nextBtn'),nt=document.getElementById('nextTxt');
   if(nextIdx>=0&&D.sessions[nextIdx]){
     const s=D.sessions[nextIdx];nb.style.display='flex';
@@ -15415,6 +15434,21 @@ function mobSheetOpen(){
       +'<span class="ms-row-ic">'+r[0]+'</span>'+r[1]+'</button>'
     ).join('');
   }
+  // Start-view preference (lives in the desktop Ansicht menu, which is hidden here)
+  const sv=document.getElementById('ms-startview');
+  if(sv){
+    if(ed&&typeof _homeStartViewPref==='function'){
+      const cur=_homeStartViewPref();
+      sv.innerHTML=
+        `<button class="ms-row" onclick="homeSetStartView('home');mobSheetClose();"><span class="ms-row-ic">\u2302</span>Startseite${cur!=='table'?' \u2713':''}</button>`+
+        `<button class="ms-row" onclick="homeSetStartView('table');mobSheetClose();"><span class="ms-row-ic">\ud83d\udccb</span>Tabelle${cur==='table'?' \u2713':''}</button>`;
+      sv.previousElementSibling.style.display='';
+      sv.style.display='';
+    } else {
+      sv.style.display='none';
+      if(sv.previousElementSibling)sv.previousElementSibling.style.display='none';
+    }
+  }
   sh.classList.add('open');
 }
 function mobSheetClose(){
@@ -21677,6 +21711,8 @@ checkAutoBackup();
     <div style="padding:0 8px 4px;"><select class="ms-sel" id="ms-season" onchange="switchSeason(this.value);mobSheetClose();"></select></div>
     <div class="ms-sec">Bereiche</div>
     <div id="ms-areas"></div>
+    <div class="ms-sec">Start beim Laden</div>
+    <div id="ms-startview"></div>
     <div class="ms-sec">Aktionen</div>
     <div class="ms-inline">
       <button class="ms-row" onclick="undo();mobSheetClose();"><span class="ms-row-ic">↩</span> Rückgängig</button>
