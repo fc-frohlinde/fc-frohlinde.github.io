@@ -944,6 +944,40 @@ select.lp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   .home-hero-title{font-size:1.55rem;}
   .home-tiles{--tcols:2 !important;}
 }
+/* ── STARTSEITE ON PHONES ────────────────────────────────────────
+   The desktop layout is built for ONE fixed viewport: the tile grid takes
+   the leftover height (flex:1) and centres itself. On a phone everything
+   stacks past the fold and that same rule squashed the tiles into slivers
+   while the screen scrolled. Mobile therefore lets every block keep its
+   natural height and simply scrolls. */
+@media (max-width:767px){
+  .home-scroll{padding:0 14px calc(70px + env(safe-area-inset-bottom,0px));}
+  /* Hero bleeds edge-to-edge — margin must mirror the scroll padding */
+  .home-hero{margin:0 -14px 16px;min-height:auto;border-radius:0 0 20px 20px;}
+  .home-hero-content{padding:18px 16px 16px;gap:14px;align-items:center;}
+  .home-hero-logo{width:56px;height:56px;}
+  .home-hero-title{font-size:1.5rem;letter-spacing:1.5px;}
+  .home-hero-sub{font-size:.66rem;letter-spacing:2px;margin-top:3px;}
+  /* Photo/user controls stay reachable but stop crowding the title */
+  .home-hero-photobtn{opacity:1;pointer-events:auto;top:8px;left:8px;right:auto;padding:4px 9px;font-size:.66rem;}
+  .home-user-pill{top:8px;right:8px;padding:4px 9px;font-size:.7rem;}
+  /* Tiles: natural height, two columns, real tap targets */
+  .home-tiles{flex:0 0 auto;min-height:0;align-content:flex-start;gap:10px;margin-bottom:16px;}
+  .home-tile{min-height:82px;padding:14px 12px;border-radius:14px;gap:6px;}
+  .home-tile-icon{font-size:1.45rem;}
+  .home-tile-name{font-size:.86rem;}
+  .home-tile-desc{font-size:.64rem;line-height:1.25;}
+  /* Hover transforms are meaningless on touch and cause sticky states */
+  .home-tile:hover{transform:none;box-shadow:none;}
+  .home-tile:hover .home-tile-icon{transform:none;}
+  .home-tile:active{background:rgba(255,255,255,.14);transform:scale(.98);}
+  /* Next training / match cards */
+  .home-next{padding:14px 16px;}
+  .home-next-row{gap:10px;margin-bottom:16px;}
+  /* Bottom panels */
+  .home-bottom{gap:10px;}
+  .home-panel{padding:14px;}
+}
 /* ══ SEASON LINEUP PLANNER ══════════════════════════════════ */
 .slp-overlay{position:fixed;inset:0;z-index:801;background:linear-gradient(160deg,var(--planner-dark) 0%,var(--planner-mid) 50%,var(--planner-dark) 100%);display:none;flex-direction:column;overflow:hidden;}
 .slp-overlay.open{display:flex;}
@@ -1161,25 +1195,39 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
    ════════════════════════════════════════ */
 @media (max-width:767px){
   body{padding:0;}
-  /* Header — compact mobile version */
-  .header{padding:8px 12px;gap:8px;border-radius:0;}
-  .header.collapsed{padding:5px 12px;}
-  .hclub{font-size:1.05rem !important;letter-spacing:1px;}
+  /* ── HEADER: one row, nothing overlaps ────────────────────────
+     The desktop header packs logo + club + season + bell + presence +
+     user + trainer chips into one line. On a 360px phone that stack
+     collided. Mobile keeps only what a trainer needs at a glance:
+     logo, club name (truncating), bell and the user pill.
+     Season lives in the bottom sheet; presence and trainer chips are
+     admin-diagnostics and move into the user menu. */
+  .header{padding:8px 10px;gap:8px;border-radius:0;flex-wrap:nowrap;overflow:hidden;}
+  .header.collapsed{padding:5px 10px;}
+  .htext{flex:1;min-width:0;overflow:hidden;}
+  .hclub{font-size:1rem !important;letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .hsub,.hmeta{display:none !important;}
-  .logo-ring{width:42px !important;height:42px !important;}
-  .header.collapsed .logo-ring{width:32px !important;height:32px !important;}
-  /* Trainer chips: collapse to compact icon-only on mobile */
-  #hTrainersWrap{max-width:140px !important;font-size:.72rem;}
-  /* Right-side header controls */
-  .season-chip{font-size:.7rem !important;padding:2px 8px !important;}
-  .user-pill{padding:3px 8px !important;}
-  .user-pill .uname{max-width:60px !important;font-size:.68rem !important;}
-  .notif-btn{width:30px !important;height:30px !important;}
-  /* Toolbar — horizontal scroll on mobile */
-  .toolbar{padding:5px 8px;gap:6px;border-radius:0;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;}
-  .toolbar::-webkit-scrollbar{display:none;}
-  .toolbar .btn{flex-shrink:0;font-size:.74rem;padding:5px 10px;}
-  .tsep{display:none;}
+  .logo-ring{width:38px !important;height:38px !important;flex-shrink:0;}
+  .header.collapsed .logo-ring{width:30px !important;height:30px !important;}
+  .hright{margin-left:auto;max-width:none !important;flex-shrink:0;gap:6px;}
+  .hright>div{gap:6px !important;}
+  #hTrainersWrap,#hTrainersLbl,#hTrainers{display:none !important;}
+  .season-chip{display:none !important;}
+  #presencePill{display:none !important;}
+  .notif-btn{width:38px !important;height:38px !important;}
+  .user-pill{padding:6px 10px !important;min-height:38px;}
+  .user-pill .uname{max-width:64px !important;font-size:.72rem !important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  /* ── TOOLBAR → BOTTOM NAV ─────────────────────────────────────
+     A horizontally scrolling strip of 10 buttons at the TOP of the
+     screen is the worst place for a one-handed user: out of thumb
+     reach and half of it off-screen. Mobile gets a fixed bottom bar
+     with the four things trainers actually open, plus a sheet for
+     the rest. */
+  .toolbar{display:none !important;}
+  .legend-bar{display:none !important;}
+  body{padding-bottom:0;}
+  .mobile-att-view{padding-bottom:calc(60px + env(safe-area-inset-bottom,0px)) !important;}
+  #mobNav{display:flex;}
   /* Modals — full-screen on mobile */
   .mob{width:100% !important;max-width:100vw !important;border-radius:14px 14px 0 0;padding:14px 16px;max-height:calc(100vh - 20px);box-sizing:border-box;}
   .mo{align-items:flex-end;}
@@ -1214,6 +1262,43 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   /* Avoid hover-only states on touch */
   .photo-edit-wrap::after{opacity:1 !important;}
 }
+/* ── MOBILE BOTTOM NAVIGATION ────────────────────────────────────
+   Fixed, thumb-reachable, five slots. Hidden on desktop and whenever a
+   fullscreen surface (planner, roll-call, home, player mode) is open —
+   those bring their own navigation. */
+#mobNav{display:none;position:fixed;left:0;right:0;bottom:0;z-index:460;
+  background:linear-gradient(180deg,var(--surface-mid),var(--bg-dark));
+  border-top:1px solid rgba(255,255,255,.1);
+  padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));
+  box-shadow:0 -4px 18px rgba(0,0,0,.28);}
+.mn-item{flex:1;background:none;border:none;color:rgba(255,255,255,.62);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  padding:5px 2px;min-height:50px;cursor:pointer;font-family:'Barlow',sans-serif;
+  border-radius:var(--r-md);transition:color .15s,background .15s;}
+.mn-item:active{background:rgba(255,255,255,.08);}
+.mn-item.on{color:var(--ac);}
+.mn-ic{font-size:1.2rem;line-height:1;}
+.mn-lb{font-size:.58rem;font-weight:600;letter-spacing:.3px;}
+.mn-badge{position:absolute;top:2px;margin-left:22px;background:var(--bad);color:#fff;
+  border-radius:var(--r-pill);font-size:.55rem;font-weight:700;padding:1px 5px;line-height:1.4;}
+/* "Mehr" sheet — slides up from the bottom bar */
+#mobSheet{display:none;position:fixed;inset:0;z-index:431;background:rgba(0,0,0,.45);}
+#mobSheet.open{display:block;}
+.ms-panel{position:absolute;left:0;right:0;bottom:0;background:var(--wh);
+  border-radius:var(--r-lg) var(--r-lg) 0 0;padding:var(--sp-3) var(--sp-3) calc(var(--sp-5) + env(safe-area-inset-bottom,0px));
+  max-height:76vh;overflow-y:auto;animation:msUp .22s cubic-bezier(.22,1,.36,1);}
+@keyframes msUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.ms-grip{width:38px;height:4px;border-radius:var(--r-pill);background:var(--gl);margin:2px auto var(--sp-3);}
+.ms-sec{font-size:var(--fs-2xs);font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--gm);padding:var(--sp-3) var(--sp-2) var(--sp-1);}
+.ms-row{display:flex;align-items:center;gap:var(--sp-3);width:100%;padding:13px var(--sp-3);border:none;background:none;
+  font-family:'Barlow',sans-serif;font-size:var(--fs-md);font-weight:600;color:var(--gd);cursor:pointer;
+  border-radius:var(--r-md);text-align:left;min-height:48px;}
+.ms-row:active{background:var(--ow);}
+.ms-row-ic{font-size:1.15rem;width:26px;text-align:center;flex-shrink:0;}
+.ms-sel{width:100%;padding:11px var(--sp-3);border:1px solid var(--gl);border-radius:var(--r-md);
+  font-family:'Barlow',sans-serif;font-size:var(--fs-md);background:var(--wh);color:var(--gd);min-height:46px;}
+.ms-inline{display:flex;gap:var(--sp-2);padding:0 var(--sp-3) var(--sp-2);}
+.ms-inline .ms-row{flex:1;justify-content:center;background:var(--ow);}
 /* iOS safe areas */
 @supports(padding:max(0px)){
   body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);}
@@ -15248,6 +15333,7 @@ function homeOpen(){
   // re-renders (Firebase sync etc.) — class is dropped after the sequence,
   // then one deferred render (if any arrived meanwhile) is flushed.
   ov.classList.add('open','home-animate');
+  if(typeof _mobNavSync==='function')_mobNavSync('home');
   clearTimeout(ov._animT);
   ov._animT=setTimeout(()=>{
     ov.classList.remove('home-animate');
@@ -15255,6 +15341,7 @@ function homeOpen(){
   },1150);
 }
 function homeClose(){
+  if(typeof _mobNavSync==='function')_mobNavSync('list');
   const ov=document.getElementById('homeOverlay');
   if(ov)ov.classList.remove('open');
 }
@@ -15266,6 +15353,73 @@ function homeEligible(){
 // running season, even when the table view is parked in an archived one.
 // Football season runs Jul→Jun, so after June the current season is YYYY/YY+1.
 // Falls back to the newest known season when the running one has no block yet.
+// ══ MOBILE BOTTOM NAVIGATION ═════════════════════════════════
+// Drives the fixed bottom bar. Every entry reuses the SAME functions the
+// desktop toolbar calls — this is a different surface, not a parallel app.
+function mobNav(what){
+  switch(what){
+    case 'home': mobSheetClose(); if(typeof homeOpen==='function')homeOpen(); break;
+    case 'list': mobSheetClose(); if(typeof homeClose==='function')homeClose(); break;
+    case 'cal':  mobSheetClose(); if(typeof openCalendar==='function')openCalendar(); break;
+    case 'team': mobSheetClose(); if(typeof openTeamMgr==='function')openTeamMgr('spieler'); break;
+    case 'more': mobSheetOpen(); break;
+  }
+  _mobNavSync(what);
+}
+function _mobNavSync(active){
+  ['home','list','cal','team','more'].forEach(k=>{
+    const el=document.getElementById('mn-'+k);
+    if(el)el.classList.toggle('on',k===active);
+  });
+}
+function mobSheetOpen(){
+  const sh=document.getElementById('mobSheet');
+  if(!sh)return;
+  // Season picker mirrors the desktop select
+  const sel=document.getElementById('ms-season');
+  if(sel&&Array.isArray(G.seasonList)){
+    sel.innerHTML=G.seasonList.map(s=>'<option value="'+escapeHtml(s)+'"'+(s===UI.currentSeason?' selected':'')+'>'+escapeHtml(s)+'</option>').join('');
+  }
+  // Area rows — visibility follows the same permissions as the toolbar
+  const ed=(typeof canEdit==='function')&&canEdit();
+  const rows=[
+    ['\ud83d\udcc4','Wochenbericht','openWeekReport()',ed],
+    ['\u26bd','Aufstellung','openNextMatchLineup()',ed],
+    ['\ud83d\udccb','Saisonkader','openSeasonLineup()',ed],
+    ['\ud83d\udcca','Statistik','openTeamMgr(\'statistik\')',true],
+    ['\ud83d\udcc8','Dashboard','openDashboard()',ed],
+    ['\ud83d\udd17','Links','toggleLinksMenu(event)',true],
+  ].filter(r=>r[3]);
+  const areas=document.getElementById('ms-areas');
+  if(areas){
+    areas.innerHTML=rows.map(r=>
+      '<button class="ms-row" onclick="mobSheetClose();'+r[2]+'">'
+      +'<span class="ms-row-ic">'+r[0]+'</span>'+r[1]+'</button>'
+    ).join('');
+  }
+  sh.classList.add('open');
+}
+function mobSheetClose(){
+  const sh=document.getElementById('mobSheet');
+  if(sh)sh.classList.remove('open');
+  _mobNavSync(_mobCurrentView());
+}
+function _mobCurrentView(){
+  const home=document.getElementById('homeOverlay');
+  if(home&&home.classList.contains('open'))return 'home';
+  return 'list';
+}
+// Fullscreen surfaces bring their own navigation — the bar must not sit on top
+function _mobNavVisibility(){
+  const nav=document.getElementById('mobNav');
+  if(!nav)return;
+  const blocking=['moLineup','moSeasonLineup','rcOverlay'].some(id=>{
+    const el=document.getElementById(id);
+    return el&&(el.classList.contains('open')||el.style.display==='flex');
+  })||document.body.classList.contains('player-mode');
+  nav.style.visibility=blocking?'hidden':'';
+}
+setInterval(_mobNavVisibility,400);
 function homeSeason(){
   const list=Array.isArray(G.seasonList)?G.seasonList.slice():[];
   if(!list.length)return UI.currentSeason||null;
@@ -21490,6 +21644,29 @@ checkAutoBackup();
   <div class="ud-meta" onclick="closeUserMenu();openAbout();">footy.ai · <span id="ud-version-tag">v1.0.5-beta</span></div>
 </div>
 <!-- Season Lineup Planner -->
+<!-- Mobile bottom navigation (mobile only, see @media 767px) -->
+<div id="mobNav">
+  <button class="mn-item" id="mn-home" onclick="mobNav('home')"><span class="mn-ic">⌂</span><span class="mn-lb">Start</span></button>
+  <button class="mn-item on" id="mn-list" onclick="mobNav('list')"><span class="mn-ic">📋</span><span class="mn-lb">Liste</span></button>
+  <button class="mn-item" id="mn-cal" onclick="mobNav('cal')"><span class="mn-ic">📅</span><span class="mn-lb">Kalender</span></button>
+  <button class="mn-item" id="mn-team" onclick="mobNav('team')"><span class="mn-ic">🏆</span><span class="mn-lb">Team</span></button>
+  <button class="mn-item" id="mn-more" onclick="mobNav('more')"><span class="mn-ic">⋯</span><span class="mn-lb">Mehr</span></button>
+</div>
+<div id="mobSheet" onclick="if(event.target===this)mobSheetClose()">
+  <div class="ms-panel">
+    <div class="ms-grip"></div>
+    <div class="ms-sec">Saison</div>
+    <div style="padding:0 8px 4px;"><select class="ms-sel" id="ms-season" onchange="switchSeason(this.value);mobSheetClose();"></select></div>
+    <div class="ms-sec">Bereiche</div>
+    <div id="ms-areas"></div>
+    <div class="ms-sec">Aktionen</div>
+    <div class="ms-inline">
+      <button class="ms-row" onclick="undo();mobSheetClose();"><span class="ms-row-ic">↩</span> Rückgängig</button>
+      <button class="ms-row" onclick="redo();mobSheetClose();"><span class="ms-row-ic">↪</span> Wiederholen</button>
+    </div>
+  </div>
+</div>
+
 <!-- Roll-call: fullscreen attendance capture -->
 <div class="rc-overlay" id="rcOverlay">
   <div class="rc-head">
