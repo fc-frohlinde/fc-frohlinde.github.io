@@ -5702,7 +5702,47 @@ function _navShowExitHint(){
   clearTimeout(t._h);
   t._h=setTimeout(()=>{t.style.opacity='0';},2400);
 }
+// TEMPORARY DIAGNOSTICS (admin only) — three rounds of guessing why the
+// back button behaves inconsistently is two rounds too many. This reports
+// what the handler actually sees, on the device where it misbehaves.
+function _navDbgOn(){
+  try{return typeof isAdmin==='function'&&isAdmin();}catch(e){return false;}
+}
+function _navDbg(msg){
+  if(!_navDbgOn())return;
+  let d=document.getElementById('navDbg');
+  if(!d){
+    d=document.createElement('div');
+    d.id='navDbg';
+    d.style.cssText='position:fixed;left:6px;bottom:calc(6px + var(--mob-nav-h,0px));'
+      +'z-index:100002;background:rgba(0,0,0,.82);color:#7be0a8;font:600 11px/1.35 monospace;'
+      +'padding:6px 9px;border-radius:8px;max-width:70vw;pointer-events:none;white-space:pre-wrap;';
+    document.body.appendChild(d);
+  }
+  const t=new Date().toLocaleTimeString('de-DE');
+  d.textContent=(t+'  '+msg+'\n'+(d.textContent||'')).split('\n').slice(0,5).join('\n');
+}
+// Live badge: is our guard entry actually on top right now?
+setInterval(()=>{
+  if(!_navDbgOn())return;
+  let b=document.getElementById('navDbgArm');
+  if(!b){
+    b=document.createElement('div');
+    b.id='navDbgArm';
+    b.style.cssText='position:fixed;right:6px;bottom:calc(6px + var(--mob-nav-h,0px));'
+      +'z-index:100002;background:rgba(0,0,0,.82);font:700 11px/1.2 monospace;'
+      +'padding:5px 8px;border-radius:8px;pointer-events:none;';
+    document.body.appendChild(b);
+  }
+  let armed=false;
+  try{armed=!!(history.state&&history.state.fcf);}catch(e){}
+  b.textContent=armed?'GUARD ✓':'GUARD ✗';
+  b.style.color=armed?'#7be0a8':'#ff8a7a';
+},500);
 window.addEventListener('popstate',()=>{
+  try{
+  _navDbg('popstate  layers='+_navLayers().length+' stack='+_navStackLen()
+    +' view='+_navViewLevel()+' armed='+(_navExitArmed?1:0));
   if(_navConsume>0){_navConsume--;return;}
   const top=_navTopLayer();
   if(top){
@@ -5712,24 +5752,34 @@ window.addEventListener('popstate',()=>{
     }else{
       _navCloseLayer(top);
     }
+    _navDbg('LAYER geschlossen: '+(top.id||top.className));
     _navRearm();
     return;
   }
   if(_navViewLevel()===1){
     _navGotoDefaultView();
+    _navDbg('VIEW → Startansicht');
     _navRearm();
     return;
   }
   // Root reached. First press warns, a second one within the window leaves.
   if(_navExitArmed){
     _navExitArmed=false;
+    _navDbg('ROOT → verlasse Seite');
     history.back();   // no re-arm → this actually navigates away
     return;
   }
   _navExitArmed=true;
   _navShowExitHint();
+  _navDbg('ROOT → Warnung gezeigt');
   setTimeout(()=>{_navExitArmed=false;},2600);
   _navRearm();
+  }catch(err){
+    // A throw here used to kill the handler silently, leaving the next press
+    // unguarded — never let that happen again.
+    _navDbg('FEHLER: '+(err&&err.message?err.message:err));
+    _navRearm();
+  }
 });
 // The guard can go missing in more ways than one: a bfcache restore drops it,
 // a reload starts without it, and any other history call can replace it. So
