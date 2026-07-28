@@ -13215,10 +13215,15 @@ function togEvalTopicMenu(si){
   const pool=[...evalTopics(D)];
   (D.sessions||[]).forEach(x=>{if(x&&x.evalTopic&&!pool.includes(x.evalTopic))pool.push(x.evalTopic);});
   pool.sort((a,b)=>a.localeCompare(b));
+  window._evtPool=pool; // index-addressed by row handlers (avoids string escaping in onclick)
   let html='';
-  pool.forEach(t=>{
+  pool.forEach((t,ti)=>{
     const on=s.evalTopic===t;
-    html+=`<div onclick="event.stopPropagation();setEvalTopic(${si},'${escapeHtml(t).replace(/'/g,"\\'")}')" style="padding:7px 10px;border-radius:7px;cursor:pointer;font-size:.78rem;font-weight:600;color:var(--bd);${on?'background:var(--ow);':''}">${on?'\u2713 ':''}${escapeHtml(t)}</div>`;
+    html+=`<div style="display:flex;align-items:center;gap:4px;border-radius:7px;${on?'background:var(--ow);':''}">
+      <span onclick="event.stopPropagation();setEvalTopic(${si},window._evtPool[${ti}])" style="flex:1;padding:7px 4px 7px 10px;cursor:pointer;font-size:.78rem;font-weight:600;color:var(--bd);">${on?'\u2713 ':''}${escapeHtml(t)}</span>
+      <span onclick="event.stopPropagation();renameEvalTopic(${si},${ti})" style="cursor:pointer;opacity:.45;padding:7px 3px;font-size:.72rem;" title="Umbenennen (alle Spiele)">\u270e</span>
+      <span onclick="event.stopPropagation();deleteEvalTopic(${si},${ti})" style="cursor:pointer;opacity:.45;padding:7px 8px 7px 3px;font-size:.72rem;" title="Thema l\u00f6schen">\u2715</span>
+    </div>`;
   });
   html+=`<div onclick="event.stopPropagation();addEvalTopic(${si})" style="padding:7px 10px;border-radius:7px;cursor:pointer;font-size:.78rem;color:var(--bm);font-weight:700;border-top:${pool.length?'1px solid var(--gl)':'none'};margin-top:${pool.length?'4px':'0'};">\uff0b Neues Thema</div>`;
   if(s.evalTopic)html+=`<div onclick="event.stopPropagation();setEvalTopic(${si},null)" style="padding:7px 10px;border-radius:7px;cursor:pointer;font-size:.78rem;color:var(--gm);">\u2715 Kein Thema</div>`;
@@ -13227,6 +13232,45 @@ function togEvalTopicMenu(si){
   setTimeout(()=>{
     document.addEventListener('click',function _evtClose(){menu.style.display='none';document.removeEventListener('click',_evtClose);},{once:true});
   },0);
+}
+// Rename teamweit: pool entry + every session (this team+season) carrying it.
+function renameEvalTopic(si,ti){
+  if(!canEdit())return;
+  const t=(window._evtPool||[])[ti];if(!t)return;
+  const name=prompt('Thema umbenennen (gilt f\u00fcr alle Spiele dieser Saison):',t);
+  if(!name||!name.trim()||name.trim()===t)return;
+  const nm=name.trim().slice(0,50);
+  const D=cd();
+  snap();
+  D.evalTopics=evalTopics(D).filter(x=>x!==t);
+  if(!D.evalTopics.includes(nm))D.evalTopics.push(nm);
+  let n=0;
+  (D.sessions||[]).forEach(x=>{if(x&&x.evalTopic===t){x.evalTopic=nm;n++;}});
+  saveG();
+  logAudit('Bewertungsthema umbenannt','',t+' \u2192 '+nm+' ('+n+' Spiele)');
+  renderEvalTopicRow(si);
+  togEvalTopicMenu(si);
+}
+// Delete: unused → silently from pool; used → confirm and clear from those
+// matches too (the Leistungsnoten themselves stay untouched — they simply
+// lose the topic grouping).
+function deleteEvalTopic(si,ti){
+  if(!canEdit())return;
+  const t=(window._evtPool||[])[ti];if(!t)return;
+  const D=cd();
+  const used=(D.sessions||[]).filter(x=>x&&x.evalTopic===t).length;
+  if(used>0){
+    if(!confirm('Thema "'+t+'" ist bei '+used+' Spiel(en) gesetzt.\n\nL\u00f6schen entfernt das Thema auch von diesen Spielen \u2014 die Leistungsnoten selbst bleiben erhalten, nur die Themen-Zuordnung entf\u00e4llt.\n\nWirklich l\u00f6schen?'))return;
+  } else {
+    if(!confirm('Thema "'+t+'" l\u00f6schen?'))return;
+  }
+  snap();
+  D.evalTopics=evalTopics(D).filter(x=>x!==t);
+  (D.sessions||[]).forEach(x=>{if(x&&x.evalTopic===t)delete x.evalTopic;});
+  saveG();
+  logAudit('Bewertungsthema gel\u00f6scht','',t+(used?' ('+used+' Spiele bereinigt)':''));
+  renderEvalTopicRow(si);
+  togEvalTopicMenu(si);
 }
 function addEvalTopic(si){
   if(!canEdit())return;
