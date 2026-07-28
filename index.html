@@ -1329,6 +1329,15 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   #moTeamMgr .mob{height:calc(var(--vvh,100vh) * .88);display:flex;flex-direction:column;}
   #moTeamMgr .tbar{flex-shrink:0;}
   #moTeamMgr .tpanel.active{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;}
+  /* Every pane already ends in a sticky button row containing "Schließen",
+     so the ✕ in the header is a duplicate that costs a whole line of list.
+     Header shrinks to just the title; back navigation stays (it is the only
+     way back to a session/player the trainer came from). */
+  #moTeamMgr #tmgr-close-top{display:none;}
+  #moTeamMgr .mob > div:first-of-type{margin-bottom:6px;}
+  #moTeamMgr #tmgr-h{font-size:1rem;}
+  #moTeamMgr #tmgr-back{padding:4px 9px;font-size:.72rem;}
+  #moTeamMgr .tbar{margin-bottom:8px;}
   /* Calendar modal: full screen, cleaner padding */
   #moCalendar .mob{padding:10px 0 0 !important;}
   #moCalendar .mob h3{padding:0 14px;}
@@ -2533,8 +2542,8 @@ if(window._fbBlocked){
 <div class="mo" id="moTeamMgr"><div class="mob" style="width:560px;">
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
     <h3 id="tmgr-h" style="margin:0;flex:1;">Mannschaft</h3>
-    <button class="btn" style="font-size:.76rem;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" onclick="teamMgrGoBack()">← Zurück</button>
-    <button class="btn bs" onclick="closeM('moTeamMgr')">✕</button>
+    <button class="btn" id="tmgr-back" style="font-size:.76rem;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" onclick="teamMgrGoBack()">← Zurück</button>
+    <button class="btn bs" id="tmgr-close-top" onclick="closeM('moTeamMgr')">✕</button>
   </div>
   <div class="tbar">
     <button class="tbtn active" onclick="switchTab('spieler')">👥 Spieler</button>
