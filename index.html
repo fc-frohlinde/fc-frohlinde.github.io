@@ -5617,17 +5617,19 @@ function _renderChangelog(highlightNew,lastSeen){
 document.getElementById('authInput').addEventListener('keydown',e=>{if(e.key==='Enter')doAuth();});
 
 // ══ ANDROID BACK BUTTON ══════════════════════════════════════
-// Without this, the hardware/gesture "back" leaves the page (or switches
-// tabs) while a modal is open — the trainer loses context mid-edit. The
-// browser only offers one hook for that: history. So every open layer gets
-// a history entry, and a back press pops the topmost layer instead of the
-// page. Layers are detected by polling rather than by patching two dozen
-// open/close call sites: it keeps the mechanism in ONE place and cannot
-// drift out of sync when a new modal is added later.
-let _navDepth=0,_navConsume=0;
+// Goal: "back" walks the app (close modal → return to the start view →
+// warn before leaving) instead of dropping the trainer out of the tab.
+//
+// The mechanism rests on one invariant: WHILE THE APP IS OPEN THERE IS
+// ALWAYS EXACTLY ONE SPARE HISTORY ENTRY ON TOP. Without it the browser
+// navigates away before any handler runs — which is why counting entries
+// per open layer failed: at the root there was nothing left to pop.
+// So: one guard entry is pushed at startup, every back press consumes it,
+// we act on the topmost thing on screen, and immediately re-arm.
+let _navConsume=0,_navExitArmed=false;
+function _navArm(){history.pushState({fcf:1},'');}
 function _navLayers(){
-  // Home is deliberately excluded: it is the start screen, so "back" there
-  // should leave the app like any other first page.
+  // Home is not a layer — it is a view (see _navViewLevel).
   return Array.from(document.querySelectorAll(
     '.mo.open, .lp-overlay.open, .slp-overlay.open, .rc-overlay.open, #mobSheet.open'
   ));
@@ -5642,16 +5644,20 @@ function _navTopLayer(){
   });
   return top;
 }
-// The app has its own modal-to-modal history (_navStack): opening a player
-// FROM the team modal closes one and opens the other, so the number of open
-// layers never changes and a naive counter would miss the step. Counting the
-// stack as well makes "back" retrace those hops instead of closing outright.
+function _navCloseLayer(el){
+  if(!el)return;
+  try{
+    if(el.id==='mobSheet'&&typeof mobSheetClose==='function')return mobSheetClose();
+    if(el.classList.contains('rc-overlay')&&typeof rcClose==='function')return rcClose();
+    if(el.classList.contains('mo')&&el.id&&typeof closeM==='function')return closeM(el.id);
+  }catch(e){}
+  el.classList.remove('open'); // planners and anything without a dedicated closer
+}
 function _navStackLen(){
   return (typeof _navStack!=='undefined'&&Array.isArray(_navStack))?_navStack.length:0;
 }
-// The configured start view is the ROOT of in-app history. Standing anywhere
-// else (table when Startseite is the default, or vice versa) counts as one
-// step, so "back" returns there before it ever considers leaving the site.
+// The configured start view is the root of in-app history: standing on the
+// other one counts as a step back.
 function _navHomeIsDefault(){
   if(typeof homeEligible==='function'&&!homeEligible())return false;
   return (typeof _homeStartViewPref!=='function')||_homeStartViewPref()!=='table';
@@ -5665,61 +5671,9 @@ function _navViewLevel(){
   return (_navHomeOpen()===_navHomeIsDefault())?0:1;
 }
 function _navGotoDefaultView(){
-  if(_navHomeIsDefault()){
-    if(typeof homeOpen==='function')homeOpen();
-  }else{
-    if(typeof homeClose==='function')homeClose();
-  }
+  if(_navHomeIsDefault()){if(typeof homeOpen==='function')homeOpen();}
+  else{if(typeof homeClose==='function')homeClose();}
 }
-function _navTotalDepth(){return _navLayers().length+_navStackLen()+_navViewLevel();}
-function _navCloseLayer(el){
-  if(!el)return;
-  try{
-    if(el.id==='mobSheet'&&typeof mobSheetClose==='function')return mobSheetClose();
-    if(el.classList.contains('rc-overlay')&&typeof rcClose==='function')return rcClose();
-    if(el.classList.contains('mo')&&el.id&&typeof closeM==='function')return closeM(el.id);
-  }catch(e){}
-  el.classList.remove('open'); // planners and anything without a dedicated closer
-}
-window.addEventListener('popstate',()=>{
-  // Our own history.back() calls (layer closed via UI) must not close a second one
-  if(_navConsume>0){_navConsume--;return;}
-  const top=_navTopLayer();
-  if(!top){
-    // No layer open. One step may remain: getting back to the start view.
-    if(_navViewLevel()===1){
-      _navGotoDefaultView();
-      _navDepth=Math.max(0,_navDepth-1);
-      return;
-    }
-    // We are at the root. First press warns, second press really leaves.
-    if(_navExitArmed){_navExitArmed=false;history.back();return;}
-    _navExitArmed=true;
-    history.pushState({fcf:1},''); // stay on the page
-    _navShowExitHint();
-    setTimeout(()=>{
-      if(!_navExitArmed)return;
-      _navExitArmed=false;
-      _navConsume++;                // drop the guard entry again
-      history.back();
-    },2600);
-    return;
-  }
-  // If the app remembers where this modal was opened from, retrace that hop
-  // (team → player → back → team) instead of dropping the whole context.
-  if(_navStackLen()>0&&top.classList.contains('mo')&&top.id&&typeof navBack==='function'){
-    try{navBack(top.id);}catch(e){_navCloseLayer(top);}
-  }else{
-    _navCloseLayer(top);
-  }
-  // One of our entries was consumed by this press; the poll below reconciles
-  // any further difference (e.g. navBack that landed back on the main table).
-  _navDepth=Math.max(0,_navDepth-1);
-});
-// Leaving the site needs a deliberate second press — being thrown out of the
-// tab mid-work by a stray swipe is the single most annoying thing a web app
-// can do on Android.
-let _navExitArmed=false;
 function _navShowExitHint(){
   let t=document.getElementById('exitHint');
   if(!t){
@@ -5728,9 +5682,9 @@ function _navShowExitHint(){
     t.style.cssText='position:fixed;left:50%;transform:translateX(-50%);'
       +'bottom:calc(16px + var(--mob-nav-h,0px) + env(safe-area-inset-bottom,0px));'
       +'z-index:100001;background:rgba(10,20,40,.94);color:#fff;padding:11px 18px;'
-      +'border-radius:var(--r-pill);font-family:\'Barlow\',sans-serif;font-size:.82rem;'
+      +'border-radius:999px;font-family:\'Barlow\',sans-serif;font-size:.82rem;'
       +'font-weight:600;box-shadow:0 6px 22px rgba(0,0,0,.4);pointer-events:none;'
-      +'transition:opacity .2s;';
+      +'transition:opacity .2s;text-align:center;max-width:88vw;';
     document.body.appendChild(t);
   }
   t.textContent='Nochmal \u201eZur\u00fcck\u201c dr\u00fccken, um die Seite zu verlassen';
@@ -5738,21 +5692,38 @@ function _navShowExitHint(){
   clearTimeout(t._h);
   t._h=setTimeout(()=>{t.style.opacity='0';},2400);
 }
-// Keep the history depth in step with what is actually on screen
-setInterval(()=>{
-  if(_navExitArmed)return;   // the guard entry is intentional — leave it alone
-  const n=_navTotalDepth();
-  if(n>_navDepth){
-    for(let i=_navDepth;i<n;i++)history.pushState({fcf:1},'');
-    _navDepth=n;
-  }else if(n<_navDepth){
-    // Closed through the UI (✕ / Schließen): drop one of our entries so the
-    // next back press is not swallowed by a stale state.
-    _navConsume++;
-    _navDepth--;
-    history.back();
+window.addEventListener('popstate',()=>{
+  if(_navConsume>0){_navConsume--;return;}
+  const top=_navTopLayer();
+  if(top){
+    // Retrace the app's own modal-to-modal hops (team → player → back → team)
+    if(_navStackLen()>0&&top.classList.contains('mo')&&top.id&&typeof navBack==='function'){
+      try{navBack(top.id);}catch(e){_navCloseLayer(top);}
+    }else{
+      _navCloseLayer(top);
+    }
+    _navArm();
+    return;
   }
-},250);
+  if(_navViewLevel()===1){
+    _navGotoDefaultView();
+    _navArm();
+    return;
+  }
+  // Root reached. First press warns, a second one within the window leaves.
+  if(_navExitArmed){
+    _navExitArmed=false;
+    history.back();   // no re-arm → this actually navigates away
+    return;
+  }
+  _navExitArmed=true;
+  _navShowExitHint();
+  setTimeout(()=>{_navExitArmed=false;},2600);
+  _navArm();
+});
+// Arm once the app is up (and again after a bfcache restore, which discards it)
+document.addEventListener('DOMContentLoaded',()=>setTimeout(_navArm,80));
+window.addEventListener('pageshow',e=>{if(e.persisted)setTimeout(_navArm,80);});
 // ══ POPUP PLACEMENT ══════════════════════════════════════════
 // Every dropdown used to compute its own left/top from the anchor rect, with
 // at best an ad-hoc Math.min for the right edge. Result: menus opened near
