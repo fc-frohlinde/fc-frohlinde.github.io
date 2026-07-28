@@ -5708,7 +5708,20 @@ function _navShowExitHint(){
 function _navDbgOn(){
   try{return typeof isAdmin==='function'&&isAdmin();}catch(e){return false;}
 }
+// Events are ALSO persisted: when the browser leaves the page, anything drawn
+// on screen disappears with it — and the interesting moment is exactly the
+// one before the exit. The ring buffer survives, so reopening the site shows
+// what happened right before it closed.
+function _navDbgStore(msg){
+  try{
+    const k='fcf_navdbg';
+    const arr=JSON.parse(localStorage.getItem(k)||'[]');
+    arr.unshift(new Date().toLocaleTimeString('de-DE')+'  '+msg);
+    localStorage.setItem(k,JSON.stringify(arr.slice(0,12)));
+  }catch(e){}
+}
 function _navDbg(msg){
+  _navDbgStore(msg);
   if(!_navDbgOn())return;
   let d=document.getElementById('navDbg');
   if(!d){
@@ -5739,6 +5752,7 @@ setInterval(()=>{
   b.textContent=armed?'GUARD ✓':'GUARD ✗';
   b.style.color=armed?'#7be0a8':'#ff8a7a';
 },500);
+window.addEventListener('beforeunload',()=>{_navDbgStore('beforeunload (Seite verlassen)');});
 window.addEventListener('popstate',()=>{
   try{
   _navDbg('popstate  layers='+_navLayers().length+' stack='+_navStackLen()
@@ -5793,6 +5807,26 @@ document.addEventListener('DOMContentLoaded',()=>setTimeout(_navEnsureArmed,50))
 window.addEventListener('pageshow',()=>setTimeout(_navEnsureArmed,50));
 window.addEventListener('focus',_navEnsureArmed);
 setInterval(_navEnsureArmed,400);
+// Replay the stored events shortly after startup (admin only)
+setTimeout(()=>{
+  if(!_navDbgOn())return;
+  try{
+    const arr=JSON.parse(localStorage.getItem('fcf_navdbg')||'[]');
+    if(!arr.length)return;
+    let d=document.getElementById('navDbg');
+    if(!d){
+      d=document.createElement('div');
+      d.id='navDbg';
+      d.style.cssText='position:fixed;left:6px;bottom:calc(6px + var(--mob-nav-h,0px));'
+        +'z-index:100002;background:rgba(0,0,0,.82);color:#7be0a8;font:600 11px/1.35 monospace;'
+        +'padding:6px 9px;border-radius:8px;max-width:70vw;pointer-events:none;white-space:pre-wrap;';
+      document.body.appendChild(d);
+    }
+    d.textContent='\u2190 letzte Ereignisse:\n'+arr.slice(0,6).join('\n');
+  }catch(e){}
+},1200);
+// Record the very first arm so we can tell "never armed" from "armed and lost"
+_navDbgStore('load: state='+(function(){try{return JSON.stringify(history.state);}catch(e){return '?';}})());
 // ══ POPUP PLACEMENT ══════════════════════════════════════════
 // Every dropdown used to compute its own left/top from the anchor rect, with
 // at best an ad-hoc Math.min for the right edge. Result: menus opened near
