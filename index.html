@@ -2041,6 +2041,7 @@ if(window._fbBlocked){
     <button class="btn" id="ss-edit-toggle" style="width:100%;justify-content:center;background:var(--ow);color:var(--gd);border:1.5px solid var(--gl);margin-bottom:6px;display:none;" onclick="toggleSessEdit()">✎ Bearbeiten</button>
     <div id="ss-edit" style="display:none;background:var(--ow);border-radius:8px;padding:10px 12px;border:1px solid var(--gl);"></div>
   </div>
+  <div id="ss-evaltopic" style="display:none;margin:2px 0 8px;"></div>
   <div class="ps-cards" id="ss-cards"></div>
   <div id="ss-anmeld-summary" style="display:none;margin-bottom:10px;"></div>
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
@@ -3237,6 +3238,40 @@ function fbDecode(d){
   if(_mediaNeedsRefetch){_mediaNeedsRefetch=false;_mediaRefetchAll();}
   return out;
 }
+// ── BACKUP NODE REPAIR (one-time) ─────────────────────────────
+// Strips photos from EXISTING __backups entries so the node fits back
+// under the RTDB 16MB single-write limit. Works PER ENTRY (child reads +
+// child writes), never transferring the whole node at once. Downloads
+// ~2-4MB per photo-bearing entry — run after quota reset if tight.
+// Admin, console: await repairBackupsStripPhotos()
+async function repairBackupsStripPhotos(){
+  if(!isAdmin()){console.warn('Nur Admin');return;}
+  if(!fbRef){console.warn('Keine Firebase-Verbindung');return;}
+  const root=fbRef.parent.child('__backups');
+  let before=0,after=0,fixed=0;
+  for(let i=0;i<20;i++){
+    const ts=(await root.child(i+'/ts').once('value')).val();
+    if(ts==null)continue;
+    const raw=(await root.child(i+'/data').once('value')).val();
+    if(typeof raw!=='string'){continue;}
+    before+=raw.length;
+    if(raw.indexOf('data:image')===-1){after+=raw.length;continue;} // already clean
+    let parsed;
+    try{parsed=JSON.parse(raw);}catch(e){console.warn('Eintrag '+i+' nicht lesbar — \u00fcbersprungen');after+=raw.length;continue;}
+    const slim=JSON.stringify(parsed,(k,v)=>{
+      if((k==='photo'||k==='clubLogo'||k==='heroPhoto')
+         &&typeof v==='string'&&v.length>1500&&v.indexOf('data:image')===0)return undefined;
+      return v;
+    });
+    await root.child(i+'/data').set(slim);
+    after+=slim.length;fixed++;
+    console.info('Eintrag '+i+' ('+new Date(ts).toLocaleDateString('de-DE')+'): '
+      +Math.round(raw.length/1024)+' KB \u2192 '+Math.round(slim.length/1024)+' KB');
+  }
+  console.info('\u2705 Fertig: '+fixed+' Eintr\u00e4ge verschlankt \u00b7 Knoten '
+    +Math.round(before/1024/1024*10)/10+' MB \u2192 '+Math.round(after/1024/1024*10)/10+' MB');
+  console.info('Danach ein Test-Backup erstellen \u2014 es sollte jetzt in der Liste erscheinen.');
+}
 // ── PHOTO RECOVERY UTILITY (quota-frugal) ─────────────────────
 // Restores photos from Firebase __backups. Designed to run ON A NEARLY
 // EXHAUSTED Spark download quota: the list step reads only tiny metadata
@@ -4135,8 +4170,9 @@ function safeLocalSave(key,value){
       try{
         const bk=JSON.parse(localStorage.getItem('fcf_backups')||'[]');
         if(Array.isArray(bk)&&bk.length>0){
-          // Remove half of oldest backups
-          const keep=bk.slice(Math.floor(bk.length/2));
+          // List is newest-first — KEEP the first half (newest), drop oldest.
+          // (Previous code kept the tail = dropped the newest. Backwards.)
+          const keep=bk.slice(0,Math.ceil(bk.length/2));
           localStorage.setItem('fcf_backups',JSON.stringify(keep));
           // Retry
           localStorage.setItem(key,value);
@@ -11283,6 +11319,60 @@ function _dbCopyFallback(txt,cb){
   try{document.execCommand('copy');cb&&cb();}catch(e){alert('Kopieren nicht m\u00f6glich \u2014 bitte manuell markieren.');}
   document.body.removeChild(ta);
 }
+// Team-level evaluation-topic card: per topic a sparkline of the TEAM
+// average Leistungsnote per match, overall Ø, and an expandable per-player
+// ranking (the comparison payoff of the shared topic model).
+function dbRenderTopicCard(data){
+  const {sessions,players,season}=data;
+  const topics={};
+  (sessions||[]).forEach((s,si)=>{
+    if(!s||s.type!=='match'||!s.evalTopic)return;
+    if(!sessTookPlace(s,season))return;
+    let sum=0,n=0;
+    (players||[]).forEach(p=>{
+      const v=p&&p.perf&&p.perf[si];
+      if(v===1||v===2||v===3){sum+=v;n++;}
+    });
+    if(!n)return;
+    (topics[s.evalTopic]=topics[s.evalTopic]||[]).push({k:_dbSortKey(s.date,season),date:s.date,si,avg:sum/n,n});
+  });
+  const keys=Object.keys(topics).sort((a,b)=>topics[b].length-topics[a].length);
+  if(!keys.length)return '';
+  let html='<div class="db-card"><div class="db-h">\ud83c\udfaf Spiel-Themen <span class="db-h-sub">(Team-\u00d8 Leistungsnote \u00b7 1 = sehr gut)</span></div>';
+  keys.forEach(t=>{
+    const arr=topics[t].sort((a,b)=>a.k-b.k);
+    const overall=arr.reduce((s,e)=>s+e.avg,0)/arr.length;
+    const spark=_topicSparkline(arr.map(e=>({date:e.date,grade:Math.round(e.avg*10)/10})));
+    // Per-player Ø on this topic
+    const perPlayer=[];
+    (players||[]).forEach(p=>{
+      if(!p||!Array.isArray(p.perf))return;
+      let s2=0,n2=0;
+      arr.forEach(e=>{const v=p.perf[e.si];if(v===1||v===2||v===3){s2+=v;n2++;}});
+      if(n2)perPlayer.push({name:(typeof getDisplayName==='function'?getDisplayName(p):p.name)||'?',avg:s2/n2,n:n2});
+    });
+    perPlayer.sort((a,b)=>a.avg-b.avg);
+    html+=`<details style="border-bottom:1px solid rgba(0,0,0,.06);">
+      <summary style="display:flex;align-items:center;gap:10px;padding:7px 2px;cursor:pointer;list-style:none;">
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:700;font-size:.8rem;color:var(--bd);">${escapeHtml(t)}</div>
+          <div style="font-size:.68rem;color:var(--gm);">${arr.length} Spiel${arr.length!==1?'e':''} \u00b7 Team-\u00d8 ${overall.toFixed(1).replace('.',',')} \u00b7 \u25be Spieler-Vergleich</div>
+        </div>
+        ${spark}
+      </summary>
+      <div style="padding:2px 6px 8px;">
+        ${perPlayer.map((r,i)=>`<div style="display:flex;align-items:center;gap:8px;font-size:.74rem;padding:2px 0;">
+          <span style="color:var(--gm);min-width:18px;">${i+1}.</span>
+          <span style="flex:1;font-weight:600;color:var(--gd);">${escapeHtml(r.name)}</span>
+          <span style="color:var(--gm);">${r.n}\u00d7</span>
+          <span style="font-weight:700;color:${r.avg<1.7?'#1a9a50':r.avg<2.4?'#1659b8':'#e08a0c'};min-width:30px;text-align:right;">${r.avg.toFixed(1).replace('.',',')}</span>
+        </div>`).join('')}
+      </div>
+    </details>`;
+  });
+  html+='</div>';
+  return html;
+}
 function renderDashboard(){
   const data=dbGetData();
   const el=document.getElementById('db-content');
@@ -11319,6 +11409,9 @@ function renderDashboard(){
   html+='<div class="db-card"><div class="db-h">📊 Status-Verteilung <span class="db-h-sub">(markiert)</span></div>'+dbRenderStatusBar(sb)+'</div>';
   html+='<div class="db-card"><div class="db-h">🗓 Termine-Übersicht</div>'+dbRenderSessionsOverview(so)+'</div>';
   html+='</div>';
+  // Spiel-Themen: team development by evaluation topic
+  const topicCard=dbRenderTopicCard(data);
+  if(topicCard)html+=topicCard;
   // Rankings: side by side
   html+='<div class="db-rank-row">';
   html+='<div class="db-rank-col"><div class="db-h">🏆 Top 5 Anwesenheit</div>';
@@ -11620,6 +11713,116 @@ function pmLogout(){
 }
 
 // ── EXTENDED PLAYER STATISTICS (across all seasons) ──────────
+// Chronological Leistungsnote series across ALL seasons for one player.
+// Only held sessions (sessTookPlace) with an actual grade. Used by the
+// Detailstatistik chart.
+// Per-topic grade series for one player: held MATCHES carrying an
+// evalTopic where the player has a Leistungsnote. Grouped by topic string.
+function computeTopicSeries(occurrences){
+  const byTopic={};
+  occurrences.forEach(occ=>{
+    const ss=occ.block.sessions||[];
+    const p=occ.p;
+    if(!p||!Array.isArray(p.perf))return;
+    ss.forEach((s,si)=>{
+      if(!s||s.type!=='match'||!s.evalTopic)return;
+      if(!sessTookPlace(s,occ.season))return;
+      const v=p.perf[si];
+      if(v!==1&&v!==2&&v!==3)return;
+      (byTopic[s.evalTopic]=byTopic[s.evalTopic]||[]).push({k:_dbSortKey(s.date,occ.season),date:s.date,grade:v,season:occ.season});
+    });
+  });
+  Object.values(byTopic).forEach(arr=>arr.sort((a,b)=>a.k-b.k));
+  return byTopic;
+}
+// Compact sparkline (grades 1-3, 1 on top). ~220x44.
+function _topicSparkline(series){
+  const W=220,H=44,pad=6;
+  const n=series.length;
+  const x=i=>n===1?W/2:pad+(W-2*pad)*i/(n-1);
+  const y=g=>pad+(H-2*pad)*(g-1)/2;
+  const col=g=>g===1?'#1a9a50':g===2?'#1659b8':'#e08a0c';
+  let svg='<svg viewBox="0 0 '+W+' '+H+'" style="width:130px;height:auto;flex-shrink:0;" xmlns="http://www.w3.org/2000/svg">';
+  if(n>1)svg+='<polyline points="'+series.map((e,i)=>x(i)+','+y(e.grade)).join(' ')+'" fill="none" stroke="rgba(22,89,184,.35)" stroke-width="1.6"/>';
+  series.forEach((e,i)=>{svg+='<circle cx="'+x(i)+'" cy="'+y(e.grade)+'" r="3.4" fill="'+col(e.grade)+'"><title>'+e.date+': Note '+e.grade+'</title></circle>';});
+  svg+='</svg>';
+  return svg;
+}
+// Trend: averages of first vs. second half; grades are inverted (1 best).
+function _topicTrend(series){
+  if(series.length<3)return '';
+  const half=Math.floor(series.length/2);
+  const a1=series.slice(0,half).reduce((s,e)=>s+e.grade,0)/half;
+  const a2=series.slice(-half).reduce((s,e)=>s+e.grade,0)/half;
+  const d=a1-a2; // positive = grades got LOWER = better
+  if(d>0.25)return '<span style="color:#1a9a50;font-weight:700;" title="Verbesserung">\u2197</span>';
+  if(d<-0.25)return '<span style="color:#e08a0c;font-weight:700;" title="Verschlechterung">\u2198</span>';
+  return '<span style="color:var(--gm);" title="stabil">\u2192</span>';
+}
+function computePerfSeries(occurrences){
+  const out=[];
+  occurrences.forEach(occ=>{
+    const ss=occ.block.sessions||[];
+    const p=occ.p;
+    if(!p||!Array.isArray(p.perf))return;
+    ss.forEach((s,si)=>{
+      if(!s||!sessTookPlace(s,occ.season))return;
+      const v=p.perf[si];
+      if(v!==1&&v!==2&&v!==3)return;
+      out.push({date:s.date,k:_dbSortKey(s.date,occ.season),grade:v,isMatch:s.type==='match',season:occ.season});
+    });
+  });
+  out.sort((a,b)=>a.k-b.k);
+  return out;
+}
+// Inline SVG line chart for the grade series. Y axis: 1 (sehr gut) on TOP.
+function renderPerfChart(series){
+  const W=600,H=170,padL=34,padR=12,padT=16,padB=30;
+  const iw=W-padL-padR,ih=H-padT-padB;
+  const n=series.length;
+  const x=i=>n===1?padL+iw/2:padL+iw*i/(n-1);
+  const y=g=>padT+ih*(g-1)/2; // grade 1 top, 3 bottom
+  const col=g=>g===1?'#1a9a50':g===2?'#1659b8':'#e08a0c';
+  const avg=series.reduce((s,e)=>s+e.grade,0)/n;
+  let svg='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block;" xmlns="http://www.w3.org/2000/svg">';
+  // Y grid + labels
+  [1,2,3].forEach(g=>{
+    svg+='<line x1="'+padL+'" y1="'+y(g)+'" x2="'+(W-padR)+'" y2="'+y(g)+'" stroke="rgba(0,0,0,.08)" stroke-dasharray="3,3"/>';
+    svg+='<text x="'+(padL-8)+'" y="'+(y(g)+4)+'" text-anchor="end" font-size="11" fill="'+col(g)+'" font-weight="700">'+g+'</text>';
+  });
+  // Ø reference line
+  svg+='<line x1="'+padL+'" y1="'+y(avg)+'" x2="'+(W-padR)+'" y2="'+y(avg)+'" stroke="#e8c840" stroke-width="1.5" stroke-dasharray="6,4" opacity=".8"/>';
+  svg+='<text x="'+(W-padR)+'" y="'+(y(avg)-5)+'" text-anchor="end" font-size="10" fill="#a58a10" font-weight="700">\u00d8 '+avg.toFixed(1).replace('.',',')+'</text>';
+  // Season boundaries (multi-season history)
+  for(let i=1;i<n;i++){
+    if(series[i].season!==series[i-1].season){
+      const bx=(x(i-1)+x(i))/2;
+      svg+='<line x1="'+bx+'" y1="'+padT+'" x2="'+bx+'" y2="'+(padT+ih)+'" stroke="rgba(0,0,0,.18)" stroke-width="1"/>';
+      svg+='<text x="'+(bx+3)+'" y="'+(padT+9)+'" font-size="9" fill="rgba(0,0,0,.4)">'+series[i].season+'</text>';
+    }
+  }
+  // Connecting line
+  if(n>1){
+    const pts=series.map((e,i)=>x(i)+','+y(e.grade)).join(' ');
+    svg+='<polyline points="'+pts+'" fill="none" stroke="rgba(22,89,184,.35)" stroke-width="2"/>';
+  }
+  // Points (matches as squares, trainings as circles) + x labels (sparse)
+  const labelEvery=Math.max(1,Math.ceil(n/8));
+  series.forEach((e,i)=>{
+    const cx=x(i),cy=y(e.grade),c=col(e.grade);
+    if(e.isMatch){
+      svg+='<rect x="'+(cx-4.5)+'" y="'+(cy-4.5)+'" width="9" height="9" rx="2" fill="'+c+'"><title>'+e.date+' (Spiel): Note '+e.grade+'</title></rect>';
+    } else {
+      svg+='<circle cx="'+cx+'" cy="'+cy+'" r="5" fill="'+c+'"><title>'+e.date+': Note '+e.grade+'</title></circle>';
+    }
+    if(i%labelEvery===0||i===n-1){
+      const short=e.date.replace(/^\S+\s/,''); // drop weekday prefix
+      svg+='<text x="'+cx+'" y="'+(H-8)+'" text-anchor="middle" font-size="9" fill="rgba(0,0,0,.45)">'+short+'</text>';
+    }
+  });
+  svg+='</svg>';
+  return svg;
+}
 function findPlayerOccurrences(name,birthdate){
   const out=[];
   if(!G||!G.db)return out;
@@ -11649,6 +11852,7 @@ function computeMonthlyAttendance(occurrences){
     if(!Array.isArray(block.sessions))return;
     block.sessions.forEach((s,si)=>{
       if(!s||!s.date)return;
+      if(!sessTookPlace(s,season))return; // held sessions only
       const m=s.date.match(/(\d+)\.(\d+)/);
       if(!m)return;
       const mo=+m[2];
@@ -11735,10 +11939,11 @@ function _psYearForMonth(mo,season){
 function computePlayerOverallStats(occurrences){
   let tA=0,tT=0,mA=0,mT=0;
   let cA=0,cF=0,cE=0,cQ=0;
-  occurrences.forEach(({p,block})=>{
+  occurrences.forEach(({p,block,season})=>{
     if(!Array.isArray(block.sessions))return;
     block.sessions.forEach((s,si)=>{
       if(!s)return;
+      if(!sessTookPlace(s,season))return; // held sessions only
       const v=p.s&&p.s[si];
       const isMatch=s.type==='match';
       if(v===1){cA++;if(isMatch){mA++;mT++;}else{tA++;tT++;}}
@@ -11804,14 +12009,15 @@ function computePlayerLineupStats(targetName,targetBday){
 }
 function computePlayerWeekday(occurrences){
   const wd={Mo:{a:0,t:0},Di:{a:0,t:0},Mi:{a:0,t:0},Do:{a:0,t:0},Fr:{a:0,t:0},Sa:{a:0,t:0},So:{a:0,t:0}};
-  occurrences.forEach(({p,block})=>{
+  occurrences.forEach(({p,block,season})=>{
     if(!Array.isArray(block.sessions))return;
     block.sessions.forEach((s,si)=>{
       if(!s||!s.date)return;
+      if(!sessTookPlace(s,season))return; // held sessions only
       const dow=s.date.split(' ')[0];
       if(!wd[dow])return;
       const v=p.s&&p.s[si];
-      if(v===3||v==null)return;
+      if(v===3||v==null||v===4)return; // 4 = Angemeldet — pre-state, not a fact
       wd[dow].t++;
       if(v===1)wd[dow].a++;
     });
@@ -11865,9 +12071,8 @@ function computeTeamComparison(occurrences){
     const block=o.block;
     const sessions=block.sessions||[];
     const players=block.players||[];
-    // Only past sessions count; future intentions excluded.
-    const _xsTk=todaySK();
-    const _xsPast=i=>{const s=sessions[i];return s&&s.date&&dispToSortKey(s.date)<_xsTk;};
+    // Only held sessions count (incl. today's already-started); future intentions excluded.
+    const _xsPast=i=>{const s=sessions[i];return s&&sessTookPlace(s,o.season);};
     const _xsFact=v=>(v===1||v===0||v===2);
     const tIdx=sessions.map((s,i)=>s.type==='training'&&_xsPast(i)?i:-1).filter(i=>i>=0);
     const mIdx=sessions.map((s,i)=>s.type==='match'&&_xsPast(i)?i:-1).filter(i=>i>=0);
@@ -11956,6 +12161,33 @@ function openPlayerStatsExt(){
     html+='</div></div>';
   }
   
+  // ── 2b. LEISTUNGSNOTE CHART ──
+  const perfSeries=computePerfSeries(occurrences);
+  if(perfSeries.length){
+    html+='<div class="pse-section"><div class="pse-h">\u2b50 Leistungsnote \u00b7 Verlauf</div>';
+    html+='<div style="font-size:.7rem;color:var(--gm);margin-bottom:6px;">'+perfSeries.length+' Bewertungen \u00b7 \u25cf Training \u25a0 Spiel \u00b7 1 = sehr gut</div>';
+    html+=renderPerfChart(perfSeries);
+    html+='</div>';
+  }
+  // ── 2c. THEMEN-ENTWICKLUNG (match evaluation topics) ──
+  const topicMap=computeTopicSeries(occurrences);
+  const topicKeys=Object.keys(topicMap).sort((a,b)=>topicMap[b].length-topicMap[a].length);
+  if(topicKeys.length){
+    html+='<div class="pse-section"><div class="pse-h">\ud83c\udfaf Themen-Entwicklung</div>';
+    html+='<div style="font-size:.7rem;color:var(--gm);margin-bottom:6px;">Leistungsnoten der Spiele, gruppiert nach Bewertungsthema \u00b7 1 = sehr gut</div>';
+    topicKeys.forEach(t=>{
+      const ser=topicMap[t];
+      const avg=ser.reduce((s,e)=>s+e.grade,0)/ser.length;
+      html+=`<div style="display:flex;align-items:center;gap:10px;padding:6px 2px;border-bottom:1px solid rgba(0,0,0,.06);">
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:700;font-size:.8rem;color:var(--bd);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(t)} ${_topicTrend(ser)}</div>
+          <div style="font-size:.68rem;color:var(--gm);">${ser.length} Spiel${ser.length!==1?'e':''} \u00b7 \u00d8 ${avg.toFixed(1).replace('.',',')}</div>
+        </div>
+        ${_topicSparkline(ser)}
+      </div>`;
+    });
+    html+='</div>';
+  }
   // ── 3. WEEKDAY PATTERN ──
   const wdHasData=wd.some(d=>d.total>0);
   if(wdHasData){
@@ -12949,6 +13181,76 @@ async function delCurrentPlayer(){
 // ══════════════════════════════
 //  SESSION STATS
 // ══════════════════════════════
+// ══ BEWERTUNGSTHEMA (evaluation topic on matches) ═════════════
+// A match can carry ONE topic ("what we evaluated in this game" — e.g.
+// "Umschalten", "Pressing"). The player's score on that topic IS the
+// existing Leistungsnote of that match — no separate rating entry.
+// Topics are free strings on s.evalTopic; D.evalTopics keeps the team pool
+// for quick re-selection. Charts group by exact string.
+function evalTopics(D){
+  if(!Array.isArray(D.evalTopics))D.evalTopics=[];
+  return D.evalTopics;
+}
+function renderEvalTopicRow(si){
+  const el=document.getElementById('ss-evaltopic');
+  if(!el)return;
+  const D=cd();const s=D&&D.sessions&&D.sessions[si];
+  if(!s||s.type!=='match'){el.style.display='none';return;}
+  const topic=s.evalTopic||'';
+  const ed=canEdit();
+  if(!topic&&!ed){el.style.display='none';return;}
+  el.style.display='';
+  el.innerHTML=`<span ${ed?`onclick="event.stopPropagation();togEvalTopicMenu(${si})" style="cursor:pointer;"`:''} 
+      id="evt_chip" style="display:inline-flex;align-items:center;gap:6px;background:${topic?'var(--ow)':'transparent'};border:1.5px ${topic?'solid var(--gl)':'dashed var(--gl)'};border-radius:14px;padding:4px 12px;font-size:.76rem;font-weight:600;color:${topic?'var(--bd)':'var(--gm)'};">
+      \ud83c\udfaf ${topic?escapeHtml(topic):'Bewertungsthema w\u00e4hlen'}${ed?' <span style="opacity:.5;">\u25be</span>':''}
+    </span>
+    <span id="evt_menu" style="display:none;position:absolute;z-index:700;background:var(--surface-hi,#fff);border:1px solid var(--gl);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:6px;min-width:190px;"></span>`;
+}
+function togEvalTopicMenu(si){
+  const menu=document.getElementById('evt_menu');
+  if(!menu)return;
+  if(menu.style.display!=='none'){menu.style.display='none';return;}
+  const D=cd();const s=D.sessions[si];
+  // Pool = saved list + any topics already used on sessions (self-healing)
+  const pool=[...evalTopics(D)];
+  (D.sessions||[]).forEach(x=>{if(x&&x.evalTopic&&!pool.includes(x.evalTopic))pool.push(x.evalTopic);});
+  pool.sort((a,b)=>a.localeCompare(b));
+  let html='';
+  pool.forEach(t=>{
+    const on=s.evalTopic===t;
+    html+=`<div onclick="event.stopPropagation();setEvalTopic(${si},'${escapeHtml(t).replace(/'/g,"\\'")}')" style="padding:7px 10px;border-radius:7px;cursor:pointer;font-size:.78rem;font-weight:600;color:var(--bd);${on?'background:var(--ow);':''}">${on?'\u2713 ':''}${escapeHtml(t)}</div>`;
+  });
+  html+=`<div onclick="event.stopPropagation();addEvalTopic(${si})" style="padding:7px 10px;border-radius:7px;cursor:pointer;font-size:.78rem;color:var(--bm);font-weight:700;border-top:${pool.length?'1px solid var(--gl)':'none'};margin-top:${pool.length?'4px':'0'};">\uff0b Neues Thema</div>`;
+  if(s.evalTopic)html+=`<div onclick="event.stopPropagation();setEvalTopic(${si},null)" style="padding:7px 10px;border-radius:7px;cursor:pointer;font-size:.78rem;color:var(--gm);">\u2715 Kein Thema</div>`;
+  menu.innerHTML=html;
+  menu.style.display='block';
+  setTimeout(()=>{
+    document.addEventListener('click',function _evtClose(){menu.style.display='none';document.removeEventListener('click',_evtClose);},{once:true});
+  },0);
+}
+function addEvalTopic(si){
+  if(!canEdit())return;
+  const name=prompt('Neues Bewertungsthema (z.B. "Umschalten", "Pressing"):','');
+  if(!name||!name.trim())return;
+  const D=cd();
+  const nm=name.trim().slice(0,50);
+  const pool=evalTopics(D);
+  if(!pool.includes(nm))pool.push(nm);
+  setEvalTopic(si,nm);
+}
+function setEvalTopic(si,topic){
+  if(!canEdit())return;
+  const D=cd();const s=D.sessions[si];if(!s||s.type!=='match')return;
+  if((s.evalTopic||null)===(topic||null)){renderEvalTopicRow(si);return;}
+  snap();
+  const old=s.evalTopic||null;
+  if(topic)s.evalTopic=topic;else delete s.evalTopic;
+  // Keep pool in sync (add on use; never auto-delete)
+  if(topic){const pool=evalTopics(D);if(!pool.includes(topic))pool.push(topic);}
+  saveG();
+  logAudit('Bewertungsthema',s.date,(old?old+' \u2192 ':'')+(topic||'entfernt'));
+  renderEvalTopicRow(si);
+}
 function openSessStats(si){
   _currentSessIdx=si;
   if(typeof _trackSessionModal==='function')_trackSessionModal(si);
@@ -12967,6 +13269,7 @@ function openSessStats(si){
   const parts=s.date.split(' ');
   document.getElementById('ss-title').textContent=s.date+(isMat&&s.label?' – '+s.label:s.focus?' · '+s.focus:'');
   document.getElementById('ss-meta').innerHTML=isMat?`⚽ Spiel &nbsp;·&nbsp; ${s.homeAway==='home'?'🏠 Heim':'🚌 Auswärts'}${s.label?' &nbsp;·&nbsp; '+escapeHtml(s.label):''}${s.time?' &nbsp;·&nbsp; ⏰ '+escapeHtml(s.time):''}`:`Training${s.focus?' &nbsp;·&nbsp; 🎯 '+escapeHtml(s.focus):''}${s.time?' &nbsp;·&nbsp; ⏰ '+escapeHtml(s.time):''}`;
+  try{renderEvalTopicRow(si);}catch(e){console.error('evalTopic:',e);}
   const ssDelBtn=document.getElementById('ss-del');const ssEdit=document.getElementById('ss-edit');
   // Note display
   const noteEl=document.getElementById('ss-note-display');
@@ -17111,7 +17414,10 @@ function saveBackups(bks,skipFb){
   // Firebase: keep more — no quota issue in the cloud
   if(fbRef&&!skipFb){
     const fbBks=bks.slice(0,BK_FB_MAX);
-    fbRef.parent.child('__backups').set(fbBks.map(b=>({ts:b.ts,label:b.label,kind:b.kind||'manual',note:b.note||'',stats:b.stats||null,data:b.data}))).catch(()=>{});
+    fbRef.parent.child('__backups').set(fbBks.map(b=>({ts:b.ts,label:b.label,kind:b.kind||'manual',note:b.note||'',stats:b.stats||null,data:b.data}))).catch(err=>{
+      console.error('[Backup] Firebase-Schreiben fehlgeschlagen:',err);
+      if(typeof showSaveFlash==='function')showSaveFlash('\u26a0\ufe0f Backup konnte nicht in die Cloud geschrieben werden');
+    });
   }
 }
 function loadBackupsFromFb(cb){
@@ -17204,7 +17510,17 @@ function _buildBackupEntry(opts){
     ts,label,kind,
     note:(opts.note||'').slice(0,200),
     stats:computeBackupStats(G),
-    data:JSON.stringify(G)
+    // Photos are STRIPPED from backup data: with 25 players they inflated
+    // each entry to 2-4MB, pushing the 15-entry __backups node past the RTDB
+    // 16MB single-write limit — every backup write then failed silently.
+    // The _mid_* ids stay in the data, so a restore re-attaches photos from
+    // fcf_media automatically via _mediaReinject. (Photos additionally
+    // survive in G itself and in the media node.)
+    data:JSON.stringify(G,(k,v)=>{
+      if((k==='photo'||k==='clubLogo'||k==='heroPhoto')
+         &&typeof v==='string'&&v.length>1500&&v.indexOf('data:image')===0)return undefined;
+      return v;
+    })
   };
 }
 // Trim backup list to a given limit, preserving pre-op entries first.
@@ -17253,7 +17569,8 @@ function modifyBackups(modifier,doneCb){
       }));
     },(err,committed,snap)=>{
       if(err){
-        console.warn('Backup transaction failed:',err);
+        console.error('[Backup] Transaktion fehlgeschlagen:',err);
+        if(typeof showSaveFlash==='function')showSaveFlash('\u26a0\ufe0f Backup-Speichern fehlgeschlagen \u2014 Konsole pr\u00fcfen');
         if(doneCb)doneCb(null,err);
         return;
       }
@@ -17422,6 +17739,9 @@ function restoreBackup(i){
   autoBackupBeforeOp('Wiederherstellung von '+b.label);
   try{
     G=parsed;
+    // Photo-stripped backups (new format) carry _mid_* ids — fill the actual
+    // images back in from the media cache before saving/rendering.
+    if(typeof _mediaReinject==='function')_mediaReinject(G);
     saveG();render();closeM('moBackup');
     alert('✅ Backup wiederhergestellt.');
     logAudit('Backup wiederhergestellt',b.label||'?',_statsRow(newStats));
