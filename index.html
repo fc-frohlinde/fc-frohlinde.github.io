@@ -5642,6 +5642,14 @@ function _navTopLayer(){
   });
   return top;
 }
+// The app has its own modal-to-modal history (_navStack): opening a player
+// FROM the team modal closes one and opens the other, so the number of open
+// layers never changes and a naive counter would miss the step. Counting the
+// stack as well makes "back" retrace those hops instead of closing outright.
+function _navStackLen(){
+  return (typeof _navStack!=='undefined'&&Array.isArray(_navStack))?_navStack.length:0;
+}
+function _navTotalDepth(){return _navLayers().length+_navStackLen();}
 function _navCloseLayer(el){
   if(!el)return;
   try{
@@ -5656,12 +5664,20 @@ window.addEventListener('popstate',()=>{
   if(_navConsume>0){_navConsume--;return;}
   const top=_navTopLayer();
   if(!top)return;            // nothing open → let the browser navigate away
-  _navCloseLayer(top);
+  // If the app remembers where this modal was opened from, retrace that hop
+  // (team → player → back → team) instead of dropping the whole context.
+  if(_navStackLen()>0&&top.classList.contains('mo')&&top.id&&typeof navBack==='function'){
+    try{navBack(top.id);}catch(e){_navCloseLayer(top);}
+  }else{
+    _navCloseLayer(top);
+  }
+  // One of our entries was consumed by this press; the poll below reconciles
+  // any further difference (e.g. navBack that landed back on the main table).
   _navDepth=Math.max(0,_navDepth-1);
 });
 // Keep the history depth in step with what is actually on screen
 setInterval(()=>{
-  const n=_navLayers().length;
+  const n=_navTotalDepth();
   if(n>_navDepth){
     for(let i=_navDepth;i<n;i++)history.pushState({fcf:1},'');
     _navDepth=n;
