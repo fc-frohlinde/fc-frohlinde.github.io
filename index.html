@@ -5705,17 +5705,10 @@ function _navGotoDefaultView(){
 // (our reloads) opt out via allowLeaveOnce().
 let _allowLeave=false;
 function allowLeaveOnce(){_allowLeave=true;setTimeout(()=>{_allowLeave=false;},5000);}
-// A reload is not an accidental exit — F5 / Ctrl+R / Cmd+R opt out.
-document.addEventListener('keydown',e=>{
-  if(e.key==='F5'||((e.ctrlKey||e.metaKey)&&(e.key==='r'||e.key==='R')))allowLeaveOnce();
-},true);
-window.addEventListener('beforeunload',e=>{
-  if(_allowLeave)return;
-  if(!_userInteracted)return;   // browsers ignore the prompt without interaction anyway
-  if(typeof CU==='undefined'||!CU)return;  // login screen: nothing to protect
-  e.preventDefault();
-  e.returnValue='';
-});
+// No beforeunload confirmation: it fires on reload and on every legitimate
+// exit too, which in practice meant a nagging dialog. The app saves
+// instantly, so an accidental exit loses nothing; accidental exits are
+// instead absorbed by the gesture-armed history guard below.
 window.addEventListener('popstate',()=>{
   _navInPop=true;
   try{
@@ -5735,17 +5728,51 @@ window.addEventListener('popstate',()=>{
     _navGotoDefaultView();
     return;
   }
-  // Nothing left to close: the browser's own confirmation handles leaving.
+  // Root reached: nothing to close, view already the default.
+  // Mobile: show the Android-style hint and stay — the guard is consumed,
+  // so the NEXT press (without an intervening tap) leaves naturally.
+  // Desktop: leave right away; an invisible swallowed press feels broken.
+  if(window.innerWidth<=767){
+    _navShowExitHint();
+  }else{
+    history.back();
+  }
   }catch(err){/* never let a throw disable the handler */}
   finally{setTimeout(()=>{_navInPop=false;},0);}
 });
+function _navShowExitHint(){
+  let t=document.getElementById('exitHint');
+  if(!t){
+    t=document.createElement('div');
+    t.id='exitHint';
+    t.style.cssText='position:fixed;left:50%;transform:translateX(-50%);'
+      +'bottom:calc(16px + var(--mob-nav-h,0px) + env(safe-area-inset-bottom,0px));'
+      +'z-index:100001;background:rgba(10,20,40,.94);color:#fff;padding:11px 18px;'
+      +'border-radius:999px;font-family:\'Barlow\',sans-serif;font-size:.82rem;'
+      +'font-weight:600;box-shadow:0 6px 22px rgba(0,0,0,.4);pointer-events:none;'
+      +'transition:opacity .2s;text-align:center;max-width:88vw;';
+    document.body.appendChild(t);
+  }
+  t.textContent='Nochmal \u201eZur\u00fcck\u201c dr\u00fccken, um die Seite zu verlassen';
+  t.style.opacity='1';
+  clearTimeout(t._h);
+  t._h=setTimeout(()=>{t.style.opacity='0';},2400);
+}
 // The guard can go missing in more ways than one: a bfcache restore drops it,
 // a reload starts without it, and any other history call can replace it. So
 // instead of arming once, we verify continuously — history.state tells us
 // whether our entry is the current one.
-// No timer-based arming any more: entries pushed outside a user gesture are
-// exactly the ones Chromium skips. Every guard now originates from the click
-// that opened something (see openM / rcOpen / mobSheetOpen / homeClose).
+// Arming happens ONLY inside user gestures — Chromium's back-trap
+// intervention skips entries created without one, which is what all the
+// "works every other time" behaviour was. Two sources:
+//   • every layer open (openM / rcOpen / mobSheetOpen / homeClose) pushes
+//     its own entry inside the opening click;
+//   • any other click keeps ONE base guard alive, so after the last layer
+//     is closed the next back press is still ours to handle (view switch
+//     or exit hint) instead of silently leaving the tab.
+['click','touchend'].forEach(evt=>{
+  document.addEventListener(evt,()=>{if(!_navArmed)_navArm();},{capture:true,passive:true});
+});
 // Record the very first arm so we can tell "never armed" from "armed and lost"
 // ══ POPUP PLACEMENT ══════════════════════════════════════════
 // Every dropdown used to compute its own left/top from the anchor rect, with
