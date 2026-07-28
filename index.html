@@ -2416,12 +2416,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.0.9.2';
-const APP_VERSION_LABEL='1.0.9.2';
+const APP_VERSION='1.0.9.3';
+const APP_VERSION_LABEL='1.0.9.3';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1780510000000; // v1.0.9.2: media reinject fix + photo recovery from backups
+const APP_RELEASE_TS=1780520000000; // v1.0.9.3: stale-cache write protection
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -3089,9 +3089,16 @@ function _mediaFlush(){
   _mediaDirty={};
   fbDb.ref('fcf_media').update(payload)
     .then(()=>{_mediaSaveLS();})
-    .catch(()=>{
-      // Write failed (offline / DB limit lock) — keep dirty set and retry
-      // with backoff until it goes through. Photos must reach the cloud.
+    .catch(err=>{
+      // Write failed — keep dirty set and retry with backoff until it goes
+      // through. Photos must reach the cloud. permission_denied gets a LOUD
+      // one-time warning: it means the fcf_media path is missing from the
+      // Firebase security rules (that's exactly how photos got lost once).
+      if(err&&String(err).includes('permission_denied')&&!window._mediaPermWarned){
+        window._mediaPermWarned=true;
+        console.error('[MEDIA] permission_denied auf fcf_media — Security Rules in der Firebase-Konsole um "fcf_media" erweitern (wie fcf_data)!');
+        if(typeof showSaveFlash==='function')showSaveFlash('\u26a0\ufe0f Fotos k\u00f6nnen nicht gespeichert werden \u2014 Firebase-Regeln pr\u00fcfen');
+      }
       Object.assign(_mediaDirty,retry);
       clearTimeout(_mediaFlushT);
       _mediaFlushT=setTimeout(_mediaFlush,5000);
@@ -3134,7 +3141,12 @@ function _mediaRefetchAll(){
         }
         if(typeof render==='function')render();
       }
-    }).catch(()=>{});
+    }).catch(err=>{
+      if(err&&String(err).includes('permission_denied')&&!window._mediaPermWarned){
+        window._mediaPermWarned=true;
+        console.error('[MEDIA] permission_denied auf fcf_media — Security Rules in der Firebase-Konsole um "fcf_media" erweitern (wie fcf_data)!');
+      }
+    });
   },1500);
 }
 function fbEncodeValue(val){
@@ -3225,75 +3237,82 @@ function fbDecode(d){
   if(_mediaNeedsRefetch){_mediaNeedsRefetch=false;_mediaRefetchAll();}
   return out;
 }
-// ── PHOTO RECOVERY UTILITY ────────────────────────────────────
-// Restores player photos / club logo / hero photo from Firebase __backups
-// (which contain full pre-media-split G snapshots with inline photos).
-// Matches players by name+birthdate. Admin, from DevTools console:
-//   restorePhotosFromBackup()        — list backups + how many photos each holds
-//   restorePhotosFromBackup(ts)      — dry-run for backup with that ts
-//   restorePhotosFromBackup(ts,true) — APPLY: reattach photos + saveG
+// ── PHOTO RECOVERY UTILITY (quota-frugal) ─────────────────────
+// Restores photos from Firebase __backups. Designed to run ON A NEARLY
+// EXHAUSTED Spark download quota: the list step reads only tiny metadata
+// fields (ts/label/kind — a few KB total); the FULL backup data (~MBs) is
+// downloaded exactly ONCE, for the single backup you pick, and cached
+// in-memory for the apply step. Admin, from DevTools console:
+//   restorePhotosFromBackup()        — cheap list (no photo counts — counting would require downloading each backup)
+//   restorePhotosFromBackup(ts)      — downloads THAT ONE backup, dry-run match report
+//   restorePhotosFromBackup(ts,true) — apply (reuses the dry-run download)
+let _phRestoreCache=null; // {ts, harvest, logo, hero}
 async function restorePhotosFromBackup(ts,apply){
   if(!isAdmin()){console.warn('Nur Admin');return;}
   if(!fbRef){console.warn('Keine Firebase-Verbindung');return;}
-  const snap=await fbRef.parent.child('__backups').once('value');
-  const bks=snap.val();
-  if(!bks){console.warn('Keine Backups gefunden');return;}
-  const list=Array.isArray(bks)?bks:Object.values(bks);
-  const analyzed=list.map(b=>{
-    let data=null;
-    try{data=typeof b.data==='string'?JSON.parse(b.data):b.data;}catch(e){}
-    if(data&&data.__arr===undefined&&data._lastSaveBy===undefined&&data.db===undefined){
-      // possibly fbEncoded — decode
-      try{data=fbDecode(data);}catch(e){}
-    }
-    let photoCount=0;
-    const collect=(node)=>{
-      if(!node||typeof node!=='object')return;
-      if(Array.isArray(node)){node.forEach(collect);return;}
-      if(typeof node.photo==='string'&&node.photo.indexOf('data:image')===0)photoCount++;
-      Object.values(node).forEach(v=>{if(v&&typeof v==='object')collect(v);});
-    };
-    if(data)collect(data.db||data);
-    return {ts:b.ts,label:b.label,photoCount,data};
-  });
+  const root=fbRef.parent.child('__backups');
+  // ── Cheap metadata scan: individual tiny reads, never the data blobs ──
+  const metas=[];
+  for(let i=0;i<20;i++){
+    const t=(await root.child(i+'/ts').once('value')).val();
+    if(t==null)continue;
+    const label=(await root.child(i+'/label').once('value')).val();
+    const kind=(await root.child(i+'/kind').once('value')).val();
+    metas.push({idx:i,ts:t,label:label||'?',kind:kind||'?',datum:new Date(t).toLocaleString('de-DE')});
+  }
+  if(!metas.length){console.warn('Keine Backups gefunden');return;}
+  metas.sort((a,b)=>b.ts-a.ts);
   if(ts===undefined){
-    console.table(analyzed.map(a=>({ts:a.ts,label:a.label,fotos:a.photoCount})));
-    console.info('restorePhotosFromBackup(<ts>) für Dry-Run');
+    console.table(metas.map(m=>({ts:m.ts,datum:m.datum,label:m.label,kind:m.kind})));
+    console.info('W\u00e4hle das NEUESTE Backup von VOR dem Foto-Verlust (vor dem v1.0.9.1-Deploy).');
+    console.info('Dann: restorePhotosFromBackup(<ts>) \u2014 l\u00e4dt genau dieses eine Backup (~wenige MB).');
     return;
   }
-  const bk=analyzed.find(a=>a.ts===ts);
-  if(!bk||!bk.data){console.warn('Backup nicht gefunden / nicht lesbar');return;}
-  // Harvest name+birthdate → photo from ALL blocks of the backup
-  const harvest={};
-  let logo=null,hero=null;
-  const walk=(node)=>{
-    if(!node||typeof node!=='object')return;
-    if(Array.isArray(node)){node.forEach(walk);return;}
-    if(typeof node.photo==='string'&&node.photo.indexOf('data:image')===0&&node.name){
-      harvest[node.name+'|'+(node.birthdate||'')]=node.photo;
-    }
-    Object.values(node).forEach(v=>{if(v&&typeof v==='object')walk(v);});
-  };
-  walk(bk.data.db||bk.data);
-  if(typeof bk.data.clubLogo==='string'&&bk.data.clubLogo.indexOf('data:image')===0)logo=bk.data.clubLogo;
-  if(typeof bk.data.heroPhoto==='string'&&bk.data.heroPhoto.indexOf('data:image')===0)hero=bk.data.heroPhoto;
-  // Match against CURRENT G across all team__season blocks
-  let hit=0,miss=0;
-  const plan=[];
+  const meta=metas.find(m=>m.ts===ts);
+  if(!meta){console.warn('Backup mit ts='+ts+' nicht gefunden');return;}
+  // ── Download exactly one data blob (or reuse dry-run cache) ──
+  let harvest,logo,hero;
+  if(_phRestoreCache&&_phRestoreCache.ts===ts){
+    ({harvest,logo,hero}=_phRestoreCache);
+    console.info('(Daten aus Dry-Run-Cache \u2014 kein erneuter Download)');
+  } else {
+    console.info('Lade Backup "'+meta.label+'" \u2026');
+    const raw=(await root.child(meta.idx+'/data').once('value')).val();
+    if(!raw){console.warn('Backup-Daten leer');return;}
+    let data;
+    try{data=typeof raw==='string'?JSON.parse(raw):raw;}catch(e){console.warn('Backup nicht lesbar:',e);return;}
+    harvest={};logo=null;hero=null;
+    const walk=(node)=>{
+      if(!node||typeof node!=='object')return;
+      if(Array.isArray(node)){node.forEach(walk);return;}
+      if(typeof node.photo==='string'&&node.photo.indexOf('data:image')===0&&node.name){
+        harvest[node.name+'|'+(node.birthdate||'')]=node.photo;
+      }
+      Object.values(node).forEach(v=>{if(v&&typeof v==='object')walk(v);});
+    };
+    walk(data.db||data);
+    if(typeof data.clubLogo==='string'&&data.clubLogo.indexOf('data:image')===0)logo=data.clubLogo;
+    if(typeof data.heroPhoto==='string'&&data.heroPhoto.indexOf('data:image')===0)hero=data.heroPhoto;
+    _phRestoreCache={ts,harvest,logo,hero};
+  }
+  const nPhotos=Object.keys(harvest).length;
+  if(!nPhotos&&!logo&&!hero){console.warn('Dieses Backup enth\u00e4lt keine Fotos \u2014 \u00e4lteres w\u00e4hlen (vor dem Verlust).');return;}
+  // ── Match against current G ──
+  let hit=0;const plan=[];
   Object.keys(G.db||{}).forEach(blockKey=>{
     (G.db[blockKey].players||[]).forEach(p=>{
       if(!p||!p.name)return;
-      if(typeof p.photo==='string'&&p.photo.indexOf('data:image')===0)return; // already has one
+      if(typeof p.photo==='string'&&p.photo.indexOf('data:image')===0)return;
       const key=p.name+'|'+(p.birthdate||'');
       if(harvest[key]){plan.push({blockKey,name:p.name});hit++;}
-      else miss++;
     });
   });
-  console.info('Dry-Run: '+hit+' Fotos wiederherstellbar, '+miss+' Spieler ohne Treffer'
-    +(logo&&!(G.clubLogo&&G.clubLogo.indexOf&&G.clubLogo.indexOf('data:image')===0)?', + Vereinslogo':'')
-    +(hero&&!(G.heroPhoto&&G.heroPhoto.indexOf&&G.heroPhoto.indexOf('data:image')===0)?', + Startseiten-Foto':''));
+  const wantLogo=logo&&!(typeof G.clubLogo==='string'&&G.clubLogo.indexOf('data:image')===0);
+  const wantHero=hero&&!(typeof G.heroPhoto==='string'&&G.heroPhoto.indexOf('data:image')===0);
+  console.info('Backup enth\u00e4lt '+nPhotos+' Spielerfotos \u00b7 wiederherstellbar: '+hit
+    +(wantLogo?' + Vereinslogo':'')+(wantHero?' + Startseiten-Foto':''));
   console.table(plan);
-  if(!apply){console.info('restorePhotosFromBackup('+ts+', true) zum Anwenden');return;}
+  if(!apply){console.info('restorePhotosFromBackup('+ts+', true) zum Anwenden (nutzt diesen Download wieder)');return;}
   if(typeof snap==='function')snap(); // undo point
   Object.keys(G.db||{}).forEach(blockKey=>{
     (G.db[blockKey].players||[]).forEach(p=>{
@@ -3303,9 +3322,9 @@ async function restorePhotosFromBackup(ts,apply){
       if(harvest[key])p.photo=harvest[key];
     });
   });
-  if(logo&&!(typeof G.clubLogo==='string'&&G.clubLogo.indexOf('data:image')===0))G.clubLogo=logo;
-  if(hero&&!(typeof G.heroPhoto==='string'&&G.heroPhoto.indexOf('data:image')===0))G.heroPhoto=hero;
-  saveG(); // re-encode splits them properly into fcf_media
+  if(wantLogo)G.clubLogo=logo;
+  if(wantHero)G.heroPhoto=hero;
+  saveG(); // re-encode splits photos into fcf_media (rules now allow it)
   render();
   logAudit('Fotos aus Backup wiederhergestellt','',hit+' Spielerfotos');
   console.info('\u2705 '+hit+' Fotos wiederhergestellt und gespeichert');
@@ -3812,10 +3831,29 @@ function startFbListener(){
     const data=raw?fbDecode(raw):null;
     // Always mark initial load complete (even if we skip adoption below)
     if(!_fbInitialLoaded)_fbInitialLoaded=true;
+    // ── INITIAL SNAPSHOT ALWAYS WINS ──────────────────────────────
+    // Any "pending save" queued BEFORE the first remote read cannot be a
+    // meaningful user edit — the user hasn't even seen current data yet.
+    // It comes from boot-time migrations running over a possibly-STALE
+    // localStorage copy (classic case: old cache on another origin/device;
+    // this exact path once pushed week-old data over the live DB).
+    // Drop those flags and adopt remote; migrations re-run on the fresh G
+    // and their next save pushes a correct merged state.
+    if(wasInitialLoad&&(_fbDebounce||_pendingSave)){
+      console.warn('[FB] Discarding boot-time pending save — initial remote snapshot takes precedence over local cache.');
+      clearTimeout(_fbDebounce);
+      _fbDebounce=null;
+      _pendingSave=false;
+    }
     // CONFLICT DETECTION (Phase 2):
     // If we have a pending local save (_fbDebounce active OR _pendingSave queued)
-    // AND the remote was just saved by SOMEONE ELSE — real conflict.
-    if((_fbDebounce||_pendingSave)&&data&&data._lastSaveBy&&CU&&data._lastSaveBy!==CU.name){
+    // AND the remote base is AHEAD of ours — real conflict. "Ahead" covers
+    // both: saved by someone else, or by US from another device/origin
+    // (same trainer, two browsers — remote ts newer than our local base).
+    if((_fbDebounce||_pendingSave)&&data&&CU&&(
+        (data._lastSaveBy&&data._lastSaveBy!==CU.name)||
+        (data._lastSaveTs&&data._lastSaveTs>((G&&G._lastSaveTs)||0))
+      )){
       // Pause our save and show conflict dialog
       clearTimeout(_fbDebounce);
       _fbDebounce=null;
@@ -3823,10 +3861,16 @@ function startFbListener(){
       if(typeof showConflictDialog==='function'){
         showConflictDialog(data);
       } else {
-        // Fallback if dialog not ready: keep our local edits as before
-        if(G){
+        // Fallback if dialog not ready: keep local edits ONLY if our base is
+        // not older than the remote — a stale base must never win silently.
+        if(G&&!(data._lastSaveTs>((G._lastSaveTs)||0))){
           _fbSaving=true;
           fbRef.set(fbEncode(G)).then(()=>{setTimeout(()=>{_fbSaving=false;},500);}).catch(()=>{_fbSaving=false;});
+        } else if(data&&data.version>=14){
+          console.warn('[FB] Stale local base — adopting newer remote instead of pushing.');
+          G=sanitizeG(data);
+          safeLocalSave(SK,JSON.stringify(G));
+          render();
         }
       }
       return;
@@ -3839,6 +3883,9 @@ function startFbListener(){
       clearTimeout(_fbDebounce);
       _fbDebounce=null;
       _pendingSave=false;
+      // Reaching here means the conflict check above did NOT fire: remote is
+      // not ahead of our base (it's our own echo or an equal-base race), so
+      // pushing our local state is safe.
       if(G){
         _fbSaving=true;
         try{
