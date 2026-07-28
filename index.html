@@ -1243,10 +1243,10 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   .legend-bar{display:none !important;}
   body{padding-bottom:0;}
   .mobile-att-view{padding-bottom:0 !important;}
-  /* The scrolling list — not the container — carries the clearance, so the
-     last player row can always be scrolled clear of the nav and of the
-     browser's own bottom toolbar. */
-  .ma-list-wrap{padding-bottom:calc(78px + env(safe-area-inset-bottom,0px)) !important;}
+  /* Clearance = exactly the nav height (50px slot + 2x6px padding). The
+     browser's own toolbar is already accounted for by 100dvh above — adding
+     a safety margin on top of that just leaves an empty band. */
+  .ma-list-wrap{padding-bottom:calc(62px + env(safe-area-inset-bottom,0px)) !important;}
   #mobNav{display:flex;}
   /* Modals — full-screen on mobile */
   .mob{width:100% !important;max-width:100vw !important;border-radius:14px 14px 0 0;padding:14px 16px;max-height:calc(100vh - 20px);box-sizing:border-box;}
