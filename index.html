@@ -183,7 +183,8 @@ body{background:linear-gradient(140deg,var(--bg-dark) 0%,var(--bg-mid) 55%,var(-
 .logo-ring.editable:hover{transform:scale(1.06);box-shadow:0 0 0 1.5px var(--ac),0 0 0 2.5px rgba(255,255,255,.16),0 6px 18px rgba(0,0,0,.45);}
 .logo-ring.editable::after{content:'📷';position:absolute;bottom:-2px;right:-2px;width:22px;height:22px;background:var(--ac);color:#0a1430;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;border:2px solid #07132e;box-shadow:0 1px 3px rgba(0,0,0,.4);pointer-events:none;opacity:0;transition:opacity .15s;z-index:2;}
 .logo-ring.editable:hover::after{opacity:1;}
-.htext{z-index:1;transition:all .2s;}
+.htext{z-index:1;transition:all .2s;border-radius:var(--r-md);padding:2px 6px;margin-left:-6px;}
+.htext:hover{background:rgba(255,255,255,.08);}
 .hclub{font-family:'Bebas Neue',sans-serif;font-size:1.75rem;letter-spacing:2.5px;line-height:1;transition:font-size .2s;}
 .header.collapsed .hclub{font-size:1rem;}
 .hsub{font-size:.76rem;font-weight:300;letter-spacing:3.5px;color:var(--ac);margin-top:2px;text-transform:uppercase;}
@@ -1984,7 +1985,7 @@ if(window._fbBlocked){
 <div class="header" id="hdrEl">
   
   <div class="logo-ring" id="logoRingWrap" onclick="if(canEdit())pickClubLogo()" style="cursor:pointer;" title="Logo ändern"><img id="clogo" alt="FC Frohlinde"/></div>
-  <div class="htext">
+  <div class="htext" id="hTextHome" onclick="headerHome()" title="Zur Startseite" style="cursor:pointer;">
     <div class="hclub">FC Frohlinde 1949 e.V.</div>
     <div class="hsub" id="hSub">U19 · Junioren</div>
       </div>
@@ -15377,6 +15378,14 @@ function _bootVeilHide(){
 // Safety nets — never leave the user staring at a blank veil
 window.addEventListener('load',()=>setTimeout(_bootVeilHide,150));
 setTimeout(_bootVeilHide,5000);
+// Header title acts as "home" — always reachable, whatever the toolbar
+// visibility settings are. No-op for players/guests who have no home screen.
+function headerHome(){
+  if(typeof homeEligible==='function'&&!homeEligible())return;
+  const ov=document.getElementById('homeOverlay');
+  if(ov&&ov.classList.contains('open'))return; // already there
+  homeOpen();
+}
 function homeOpen(){
   const ov=document.getElementById('homeOverlay');
   if(!ov)return;
