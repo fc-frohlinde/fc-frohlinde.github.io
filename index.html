@@ -1388,6 +1388,12 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
      corner. Inside a header row it must match its neighbours (selects, chips)
      or it reads as a different class of control — see .mo-x-inrow below. */
   .mob-close-x:not(.mo-x-inrow){min-height:38px;min-width:44px;top:10px;right:10px;}
+  /* On a phone the dashboard header wraps: title on one line, controls on the
+     next. The close button belongs at the END of that control row, flush with
+     the right edge — otherwise it sits mid-row looking dropped in. */
+  #moDashboard .db-header{flex-wrap:wrap;gap:6px;}
+  #moDashboard .db-header-actions{width:100%;flex-wrap:wrap;justify-content:flex-end;}
+  #moDashboard .mob-close-x.mo-x-ingroup{margin-left:auto;}
   #moTeamMgr #tmgr-close-top{display:none;}
   /* A per-pane button row sits wherever that pane's content ends, so
      "Schließen" jumped around between tabs. One footer, always at the same
@@ -2053,7 +2059,11 @@ body.guest-mode{padding-top:24px;}
 .db-mini{color:var(--gm);font-size:.72rem;margin-left:4px;}
 .db-wd-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;align-items:end;height:170px;padding:6px 0;}
 .db-wd-col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;position:relative;background:#f7f9fc;border-radius:6px;padding:5px 2px;border:1px solid var(--gl);}
-.db-wd-bar{width:60%;max-width:32px;background:#1659b8;border-radius:4px 4px 0 0;min-height:6px;}
+/* The bar needs its own growing area: as a direct flex child of the column it
+   competed with the three labels below and got shrunk to roughly the same
+   height in every column, which made all weekdays look identical. */
+.db-wd-barwrap{flex:1;width:100%;min-height:0;display:flex;align-items:flex-end;justify-content:center;}
+.db-wd-bar{width:60%;max-width:32px;background:var(--info);border-radius:4px 4px 0 0;min-height:6px;flex-shrink:0;}
 .db-wd-col.wd-best .db-wd-bar{background:#27ae60;}
 .db-wd-col.wd-mid .db-wd-bar{background:#1659b8;}
 .db-wd-col.wd-low .db-wd-bar{background:#e67e22;}
@@ -11438,10 +11448,17 @@ function dbComputeMonthlyTrend(data){
   return monthly;
 }
 function dbComputeSeasonComparison(team,currentSeason){
-  // Find previous seasons for this team
-  const seasons=(G.seasonList||[]).slice();
-  const idx=seasons.indexOf(currentSeason);
-  const prevSeasons=seasons.slice(0,idx).reverse(); // most recent first
+  // Earlier seasons are those chronologically BEFORE the shown one. The old
+  // code sliced by list position, which broke in two ways: an unordered season
+  // list produced nonsense, and a shown season missing from the list gave
+  // indexOf === -1, so slice(0,-1) returned nearly every season — including
+  // the current one, which then appeared twice.
+  let seasons=(G.seasonList||[]);
+  seasons=(Array.isArray(seasons)?seasons.slice():Object.values(seasons||{}))
+    .filter(Boolean).sort((a,b)=>String(a).localeCompare(String(b)));
+  const prevSeasons=seasons
+    .filter(s=>String(s)<String(currentSeason))   // 'YYYY/YY' sorts chronologically
+    .reverse();                                   // most recent first
   const result=[];
   prevSeasons.forEach(s=>{
     const block=G.db&&G.db[team+'__'+s];
@@ -11486,13 +11503,13 @@ function dbRenderWeekday(wd,timeMode){
   const max=isFuture?Math.max(...wd.map(d=>d.sess),1):Math.max(...wd.map(d=>d.pct||0),1);
   return `<div class="db-wd-grid">
     ${wd.map(d=>{
-      if(d.sess===0)return `<div class="db-wd-col db-wd-empty"><div class="db-wd-bar"></div><div class="db-wd-pct">–</div><div class="db-wd-day">${d.day}</div><div class="db-wd-sub">${isFuture?'keine':'0'}</div></div>`;
+      if(d.sess===0)return `<div class="db-wd-col db-wd-empty"><div class="db-wd-barwrap"><div class="db-wd-bar"></div></div><div class="db-wd-pct">–</div><div class="db-wd-day">${d.day}</div><div class="db-wd-sub">${isFuture?'keine':'0'}</div></div>`;
       const barH=isFuture?Math.max(12,d.sess/max*100):Math.max(8,(d.pct||0)/max*100);
       const c=isFuture?'wd-future':(d.pct>=80?'wd-best':(d.pct>=60?'wd-mid':'wd-low'));
       const topLbl=isFuture?d.sess:(d.pct!==null?d.pct+'%':'–');
       const subLbl=isFuture?(d.sess===1?'geplant':'geplant'):(d.sess+' Termine');
       return `<div class="db-wd-col ${c}">
-        <div class="db-wd-bar" style="height:${barH}%"></div>
+        <div class="db-wd-barwrap"><div class="db-wd-bar" style="height:${barH}%"></div></div>
         <div class="db-wd-pct">${topLbl}</div>
         <div class="db-wd-day">${d.day}</div>
         <div class="db-wd-sub">${subLbl}</div>
@@ -12153,7 +12170,11 @@ function renderDashboard(){
     html+='</div>';
     // Current season
     html+='<div class="db-compare-row db-compare-current">';
-    html+=`<div><b>${data.season}</b> <span style="color:var(--ac);font-size:.65rem;">aktuell</span></div>`;
+    // "aktuell" only when the displayed season really is the running one —
+    // browsing an archived season used to label it as current.
+    const _runSeason=(typeof homeSeason==='function')?homeSeason():null;
+    const _isRun=!_runSeason||data.season===_runSeason;
+    html+=`<div><b>${data.season}</b> <span style="color:var(--ac);font-size:.65rem;">${_isRun?'aktuell':'angezeigt'}</span></div>`;
     html+=`<div>${m.pct.overall!==null?m.pct.overall+'%':'–'}</div>`;
     html+=`<div>${m.pct.training!==null?m.pct.training+'%':'–'}</div>`;
     html+=`<div>${m.pct.match!==null?m.pct.match+'%':'–'}</div>`;
@@ -12195,13 +12216,19 @@ function dbKpiCard(label,unit,value,subtitle){
 }
 function dbRankRow(rank,r,isWorst){
   const nm=getDisplayName?getDisplayName(r.p):r.p.name;
-  const pct=Math.round(r.pct);
   const cls=isWorst?'db-rank-worst':'db-rank-best';
-  return `<div class="db-rank-item ${cls}" onclick="closeM('moDashboard');jumpToPlayer(${r.pi},{id:'moDashboard'});">
+  // The "Fehlend" list is about ABSENCE: it printed the attendance percentage
+  // and the attended/total pair, so both columns showed the same figures in a
+  // different order while the heading promised the opposite.
+  const pct=isWorst?(100-Math.round(r.pct)):Math.round(r.pct);
+  const missed=Math.max(0,(r.total||0)-(r.attended||0));
+  const sub=isWorst?`${missed}/${r.total}`:`${r.attended}/${r.total}`;
+  const title=isWorst?`${missed} von ${r.total} verpasst`:`${r.attended} von ${r.total} anwesend`;
+  return `<div class="db-rank-item ${cls}" title="${title}" onclick="closeM('moDashboard');jumpToPlayer(${r.pi},{id:'moDashboard'});">
     <div class="db-rank-num">${rank}</div>
     <div class="db-rank-name">${nm}</div>
     <div class="db-rank-pct">${pct}%</div>
-    <div class="db-rank-sub">${r.attended}/${r.total}</div>
+    <div class="db-rank-sub">${sub}</div>
   </div>`;
 }
 function dbRenderTrendChart(monthly,months){
