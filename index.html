@@ -1480,11 +1480,14 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
 /* Placed into the header row by _placeCloseInHeader() */
 .mob-close-x.mo-x-inrow{
   position:static;margin-left:auto;align-self:center;flex-shrink:0;
+  align-items:center;
   /* Metrics of the controls it now stands beside (.db-sel, .btn): same
      padding, radius and border weight, so the row reads as one set. */
   padding:6px 12px;font-size:.78rem;line-height:1.25;
 }
 .has-inrow-close{padding-right:0 !important;}
+/* Inside an actions group it is one control among equals — no auto margin */
+.mob-close-x.mo-x-ingroup{margin-left:4px;}
 .mob-close-x:hover{background:#e6ecf8;border-color:var(--gm);}
 .mob-close-x:active{transform:scale(.96);}
 .au-list{padding:0 4px;}
@@ -18242,6 +18245,9 @@ function _syncCloseHeight(mo){
   if(!mo)return;
   const btn=mo.querySelector('.mob-close-x.mo-x-inrow');
   if(!btn||!btn.parentElement)return;
+  // Inside an actions group the shared flex context already aligns it; forcing
+  // a height there only reintroduces rounding differences.
+  if(btn.classList.contains('mo-x-ingroup')){btn.style.height='';return;}
   let tallest=0;
   btn.parentElement.querySelectorAll('select,input,button,.btn').forEach(el=>{
     if(el===btn)return;
@@ -18255,9 +18261,18 @@ function _placeCloseInHeader(){
     let header=btn.nextElementSibling;
     while(header&&getComputedStyle(header).display!=='flex')header=header.nextElementSibling;
     if(!header)return;                 // no header row → keep it floating
-    header.appendChild(btn);
+    // Prefer the header's own actions group (selects, buttons). Sitting in the
+    // SAME flex context as those controls is what makes the edges line up —
+    // as a sibling of the group the button was centred on the header's axis
+    // instead, which left it a couple of pixels off.
+    let host=header,inGroup=false;
+    const groups=Array.from(header.children).filter(el=>
+      el!==btn&&getComputedStyle(el).display==='flex'&&el.querySelector('select,button,input'));
+    if(groups.length){host=groups[groups.length-1];inGroup=true;}
+    host.appendChild(btn);
     header.classList.add('has-inrow-close');
     btn.classList.add('mo-x-inrow');
+    if(inGroup)btn.classList.add('mo-x-ingroup');
   });
 }
 document.addEventListener('DOMContentLoaded',()=>setTimeout(_placeCloseInHeader,100));
