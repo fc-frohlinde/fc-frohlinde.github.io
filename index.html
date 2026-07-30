@@ -5700,9 +5700,17 @@ function _navArm(){
 
 function _navLayers(){
   // Home is not a layer — it is a view (see _navViewLevel).
-  return Array.from(document.querySelectorAll(
+  const l=Array.from(document.querySelectorAll(
     '.mo.open, .lp-overlay.open, .slp-overlay.open, .rc-overlay.open, #mobSheet.open'
   ));
+  // Planner sub-menus are toggled through inline display, not a class, so they
+  // need their own check — without it "back" inside an open player picker
+  // closed the whole planner and threw away the lineup being built.
+  ['lp-popup','slp-popup'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el&&el.style.display&&el.style.display!=='none')l.push(el);
+  });
+  return l;
 }
 function _navTopLayer(){
   const l=_navLayers();
@@ -5717,6 +5725,8 @@ function _navTopLayer(){
 function _navCloseLayer(el){
   if(!el)return;
   try{
+    if(el.id==='lp-popup'&&typeof lpClosePopup==='function')return lpClosePopup();
+    if(el.id==='slp-popup'&&typeof slpClosePopup==='function')return slpClosePopup();
     if(el.id==='mobSheet'&&typeof mobSheetClose==='function')return mobSheetClose();
     if(el.classList.contains('rc-overlay')&&typeof rcClose==='function')return rcClose();
     if(el.classList.contains('mo')&&el.id&&typeof closeM==='function')return closeM(el.id);
@@ -19854,6 +19864,7 @@ function lpClickSlot(e,slotId){
   if(lpState.openSlot===slotId){
     lpClosePopup();return;
   }
+  if(typeof _navArm==='function')_navArm(); // inside the tap → back closes the picker first
   lpState.openSlot=slotId;
 
   // Position popup near click
@@ -21149,6 +21160,7 @@ function slpClickSlot(e,slotId){
   e.stopPropagation();
   if(slpState.editing)return; // edit mode: clicks don't open popup
   if(slpState.openSlot===slotId){slpClosePopup();return;}
+  if(typeof _navArm==='function')_navArm(); // inside the tap → back closes the picker first
   slpState.openSlot=slotId;
   slpRender();
   // Position popup near the slot
