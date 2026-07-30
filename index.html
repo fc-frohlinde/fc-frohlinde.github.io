@@ -1486,11 +1486,9 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   padding:6px 13px;font-size:.82rem;line-height:1;
 }
 .has-inrow-close{padding-right:0 !important;}
-/* Inside an actions group it is one control among equals — no auto margin.
-   align-self:stretch makes it exactly as tall as the group, i.e. as the
-   tallest control in it, so both edges line up without touching its padding,
-   font or any measured value. */
-.mob-close-x.mo-x-ingroup{margin-left:4px;align-self:stretch;height:auto !important;}
+/* Inside an actions group: top-aligned with the row, and the measured height
+   of the tallest neighbour brings the bottom edge down to meet theirs. */
+.mob-close-x.mo-x-ingroup{margin-left:4px;align-self:flex-start;}
 .mob-close-x:hover{background:#e6ecf8;border-color:var(--gm);}
 .mob-close-x:active{transform:scale(.96);}
 .au-list{padding:0 4px;}
@@ -18253,9 +18251,7 @@ function _syncCloseHeight(mo){
   // is why matching by construction beats any fixed value.
   const targets=[];
   const inrow=mo.querySelector('.mob-close-x.mo-x-inrow');
-  // In an actions group CSS handles it (align-self:stretch) — measuring there
-  // would only fight the layout with rounded pixel values.
-  if(inrow&&!inrow.classList.contains('mo-x-ingroup'))targets.push(inrow);
+  if(inrow)targets.push(inrow);
   mo.querySelectorAll('button.btn').forEach(b=>{
     if((b.textContent||'').trim()!=='\u2715')return;
     const p=b.parentElement;
