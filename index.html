@@ -1384,6 +1384,7 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
      way back to a session/player the trainer came from). */
   /* Header ✕ hidden only where a bottom close exists (see _markDuplicateCloses) */
   .mo-x-dup{display:none !important;}
+  .mob-close-x{min-height:38px;min-width:44px;top:10px;right:10px;}
   #moTeamMgr #tmgr-close-top{display:none;}
   /* A per-pane button row sits wherever that pane's content ends, so
      "Schließen" jumped around between tabs. One footer, always at the same
@@ -1461,17 +1462,20 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
 /* ════════════════════════════════════════
    AUDIT LOG
    ════════════════════════════════════════ */
+/* Same visual language as every other close button in the app (.btn.bs):
+   11 modals used a round translucent ✕ while 43 used the bordered button,
+   which read as two different controls doing the same thing. Kept absolutely
+   positioned — these modals have no header row to sit in. */
 .mob-close-x{
   position:absolute;top:8px;right:8px;
-  width:30px;height:30px;border-radius:50%;
-  background:rgba(0,0,0,.05);border:none;
-  color:var(--gd);font-size:.95rem;font-weight:600;
+  padding:6px 13px;border-radius:7px;
+  background:#f0f4fc;color:var(--gd);border:1.5px solid var(--gl);
+  font-family:'Barlow',sans-serif;font-size:.82rem;font-weight:600;line-height:1;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
-  transition:background .12s,transform .1s;
-  z-index:5;line-height:1;
+  transition:all .12s;z-index:5;
 }
-.mob-close-x:hover{background:rgba(231,76,60,.15);color:#c0392b;}
-.mob-close-x:active{transform:scale(.92);}
+.mob-close-x:hover{background:#e6ecf8;border-color:var(--gm);}
+.mob-close-x:active{transform:scale(.96);}
 .au-list{padding:0 4px;}
 .au-day-hdr{position:sticky;top:0;background:linear-gradient(180deg,var(--ow) 0%,var(--ow) 80%,transparent 100%);font-family:'Bebas Neue',sans-serif;font-size:.86rem;letter-spacing:1.5px;color:var(--bd);padding:8px 4px 6px;z-index:1;border-bottom:1px solid var(--gl);margin-bottom:2px;}
 .au-item{display:grid;grid-template-columns:46px 28px 1fr;gap:8px;padding:8px 6px;border-bottom:1px solid var(--gl);align-items:start;}
