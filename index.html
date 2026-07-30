@@ -1382,6 +1382,8 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
      so the ✕ in the header is a duplicate that costs a whole line of list.
      Header shrinks to just the title; back navigation stays (it is the only
      way back to a session/player the trainer came from). */
+  /* Header ✕ hidden only where a bottom close exists (see _markDuplicateCloses) */
+  .mo-x-dup{display:none !important;}
   #moTeamMgr #tmgr-close-top{display:none;}
   /* A per-pane button row sits wherever that pane's content ends, so
      "Schließen" jumped around between tabs. One footer, always at the same
@@ -18203,6 +18205,30 @@ function exportData(){const b=new Blob([JSON.stringify(G,null,2)],{type:'applica
 // ══════════════════════════════
 //  MODALS
 // ══════════════════════════════
+// ── DUPLICATE CLOSE AFFORDANCES ──────────────────────────────
+// 12 of the modals carry a ✕ in the header AND a Schließen/Abbrechen row at
+// the bottom. On a phone that costs a full row for a second way to do the
+// same thing. The header ✕ is marked here and hidden by the mobile CSS —
+// automatically, so a modal added later is covered without anyone
+// remembering this rule. Modals whose ONLY exit is the ✕ keep it: on iOS
+// there is no hardware back button, so a visible way out must always exist.
+function _markDuplicateCloses(){
+  document.querySelectorAll('.mo').forEach(mo=>{
+    const bottom=mo.querySelector('.mob-btns');
+    if(!bottom)return;
+    const bottomCloses=Array.from(bottom.querySelectorAll('button')).some(b=>{
+      const t=(b.textContent||'').trim();
+      return /Schlie\u00dfen|Abbrechen|Fertig/i.test(t);
+    });
+    if(!bottomCloses)return;
+    const header=mo.querySelector('.mob > div');
+    if(!header)return;
+    Array.from(header.querySelectorAll('button')).forEach(b=>{
+      if((b.textContent||'').trim()==='\u2715')b.classList.add('mo-x-dup');
+    });
+  });
+}
+document.addEventListener('DOMContentLoaded',()=>setTimeout(_markDuplicateCloses,120));
 function openM(id){
   // Guard entry is pushed HERE, synchronously inside the user's click.
   // Chromium marks history entries created without a user gesture as
