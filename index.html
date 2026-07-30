@@ -245,6 +245,8 @@ body{background:linear-gradient(140deg,var(--bg-dark) 0%,var(--bg-mid) 55%,var(-
 .inline-presence-pill.editing{background:rgba(241,196,15,.18);color:#9a6e00;border-color:rgba(241,196,15,.45);}
 .inline-presence-dot{width:6px;height:6px;border-radius:50%;background:#27ae60;flex-shrink:0;animation:presencePulse 2s ease-in-out infinite;}
 .inline-presence-pill.editing .inline-presence-dot{background:#f39c12;}
+.lk-short{display:none;}
+.lk-long{display:inline;}
 @media (max-width:767px){
   .presence-pill{padding:3px 7px;font-size:.7rem;}
 }
@@ -1367,6 +1369,17 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   #lp-kader-list,#slp-kader-list{padding:0 10px 8px;flex:none !important;overflow:visible !important;}
   #lp-subs-area{max-height:none !important;overflow:visible !important;}
   .lp-statsbar,.slp-statsbar{border-top:1px solid rgba(255,255,255,.1);}
+  /* Bench: a vertical stack of 7–10 circles is taller than the whole panel.
+     Horizontally it reads like a real bench and costs one row. */
+  .lp-subs-circles{flex-direction:row !important;flex-wrap:nowrap !important;
+    overflow-x:auto;-webkit-overflow-scrolling:touch;gap:6px !important;
+    justify-content:flex-start !important;padding:2px 0 6px;scrollbar-width:none;}
+  .lp-subs-circles::-webkit-scrollbar{display:none;}
+  .lp-subs-circles>div{flex-shrink:0;}
+  /* Short labels for the match-kind pair */
+  .lk-long{display:none;}
+  .lk-short{display:inline;}
+  /* desktop defaults live next to the mobile block for locality */
   /* Picker as a bottom sheet — a tooltip-sized popup is unusable here */
   .slp-popup{position:fixed !important;left:0 !important;right:0 !important;
     top:auto !important;bottom:0 !important;
@@ -19626,15 +19639,27 @@ function renderFmtBtns(targetId,currentFmt,onSelect){
   const isSlp=targetId.startsWith('slp');
   const cls=isSlp?'slp-fmt-btn':'lp-fmt-btn';
   let html='';
-  // Dropdowns
-  Object.keys(FORMATION_CATEGORIES).forEach(catName=>{
-    const opts=FORMATION_CATEGORIES[catName].map(f=>`<option value="${f}">${f}</option>`).join('');
-    html+=`<select class="${cls}" onchange="if(this.value){${onSelect}(this.value);this.selectedIndex=0;}">
-      <option value="" selected>${catName} ▾</option>${opts}
-    </select>`;
-  });
+  const narrow=window.innerWidth<=767;
+  if(narrow){
+    // One grouped select instead of a dropdown per category: on a phone the
+    // separate selects wrapped into a second and third row and pushed the
+    // pitch off screen. Categories survive as <optgroup> labels.
+    const groups=Object.keys(FORMATION_CATEGORIES).map(catName=>{
+      const opts=FORMATION_CATEGORIES[catName]
+        .map(f=>`<option value="${f}"${f===currentFmt?' selected':''}>${f}</option>`).join('');
+      return `<optgroup label="${catName}">${opts}</optgroup>`;
+    }).join('');
+    html+=`<select class="${cls}" onchange="if(this.value)${onSelect}(this.value);">${groups}</select>`;
+  }else{
+    Object.keys(FORMATION_CATEGORIES).forEach(catName=>{
+      const opts=FORMATION_CATEGORIES[catName].map(f=>`<option value="${f}">${f}</option>`).join('');
+      html+=`<select class="${cls}" onchange="if(this.value){${onSelect}(this.value);this.selectedIndex=0;}">
+        <option value="" selected>${catName} ▾</option>${opts}
+      </select>`;
+    });
+  }
   // Current formation pill (just before Edit button)
-  html+=`<span class="${cls} active" style="cursor:default;">${currentFmt}</span>`;
+  if(!narrow)html+=`<span class="${cls} active" style="cursor:default;">${currentFmt}</span>`;
   // Edit button
   const editFn=isSlp?'slpToggleEdit()':'lpToggleEdit()';
   const editing=isSlp?(typeof slpState!=='undefined'&&slpState.editing===true):(typeof lpState!=='undefined'&&lpState.editing===true);
@@ -21690,8 +21715,8 @@ checkAutoBackup();
     <div><div class="lp-logo">⚽ Aufstellungsplaner <span id="lp-presence-inline" class="inline-presence"></span></div><div class="lp-sub" id="lp-context-info">FC Frohlinde 1949</div></div>
     <div id="lp-fmt-btns" style="display:flex;gap:5px;flex-wrap:wrap;margin-left:8px;"></div>
     <div style="display:flex;gap:4px;margin-left:10px;align-items:center;" title="Spieltyp bestimmt die Bankgröße">
-      <button class="lp-fmt-btn active" id="lp-kind-ms" onclick="lpSetMatchKind('meisterschaft')">Meisterschaft · 7</button>
-      <button class="lp-fmt-btn" id="lp-kind-test" onclick="lpSetMatchKind('test')">Testspiel · 10</button>
+      <button class="lp-fmt-btn active" id="lp-kind-ms" onclick="lpSetMatchKind('meisterschaft')" title="Meisterschaftsspiel: 7 Bankplätze"><span class="lk-long">Meisterschaft</span><span class="lk-short">M</span> · 7</button>
+      <button class="lp-fmt-btn" id="lp-kind-test" onclick="lpSetMatchKind('test')" title="Testspiel: 10 Bankplätze"><span class="lk-long">Testspiel</span><span class="lk-short">T</span> · 10</button>
     </div>
     <div class="lp-spacer"></div>
     <div class="lp-hint" id="lp-hint">Slot wählen → Spieler klicken</div>
@@ -21761,7 +21786,7 @@ checkAutoBackup();
     <!-- Substitutes column (circles next to pitch) -->
     <div id="lp-subs-col" style="width:130px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding:12px 5px;background:rgba(0,0,0,.18);border-left:1px solid rgba(255,255,255,.05);overflow-y:auto;">
       <div style="font-size:.6rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.75);margin-bottom:10px;">🔄 Bank</div>
-      <div id="lp-subs-circles" style="display:flex;flex-direction:column;gap:8px;align-items:center;width:100%;"></div>
+      <div id="lp-subs-circles" style="display:flex;flex-direction:column;gap:8px;align-items:center;width:100%;" class="lp-subs-circles"></div>
     </div>
     <!-- Sidebar -->
     <div class="lp-sidebar">
