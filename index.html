@@ -1480,10 +1480,10 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
 /* Placed into the header row by _placeCloseInHeader() */
 .mob-close-x.mo-x-inrow{
   position:static;margin-left:auto;align-self:center;flex-shrink:0;
-  align-items:center;
-  /* Metrics of the controls it now stands beside (.db-sel, .btn): same
-     padding, radius and border weight, so the row reads as one set. */
-  padding:6px 12px;font-size:.78rem;line-height:1.25;
+  align-items:center;justify-content:center;
+  /* Same proportions as the app's other buttons; the exact height is matched
+     to the neighbouring controls at open time (_syncCloseHeight). */
+  padding:6px 13px;font-size:.82rem;line-height:1;
 }
 .has-inrow-close{padding-right:0 !important;}
 /* Inside an actions group it is one control among equals — no auto margin */
@@ -18243,18 +18243,30 @@ function exportData(){const b=new Blob([JSON.stringify(G,null,2)],{type:'applica
 // becomes visible (elements inside a display:none modal measure zero).
 function _syncCloseHeight(mo){
   if(!mo)return;
-  const btn=mo.querySelector('.mob-close-x.mo-x-inrow');
-  if(!btn||!btn.parentElement)return;
-  // Inside an actions group the shared flex context already aligns it; forcing
-  // a height there only reintroduces rounding differences.
-  if(btn.classList.contains('mo-x-ingroup')){btn.style.height='';return;}
-  let tallest=0;
-  btn.parentElement.querySelectorAll('select,input,button,.btn').forEach(el=>{
-    if(el===btn)return;
-    const hgt=el.getBoundingClientRect().height;
-    if(hgt>0&&hgt<64)tallest=Math.max(tallest,hgt);   // ignore stray containers
+  // Every close button that lives in a header row — the restyled .mob-close-x
+  // as well as the plain "btn bs" ✕ used by e.g. Mannschaft — takes the height
+  // of the tallest control standing next to it. Those neighbours differ per
+  // modal (selects, chips, a "← Zurück" with its own inline font-size), which
+  // is why matching by construction beats any fixed value.
+  const targets=[];
+  const inrow=mo.querySelector('.mob-close-x.mo-x-inrow');
+  if(inrow)targets.push(inrow);
+  mo.querySelectorAll('button.btn').forEach(b=>{
+    if((b.textContent||'').trim()!=='\u2715')return;
+    const p=b.parentElement;
+    if(p&&getComputedStyle(p).display==='flex')targets.push(b);
   });
-  btn.style.height=tallest?Math.round(tallest)+'px':'';
+  targets.forEach(btn=>{
+    const parent=btn.parentElement;
+    if(!parent)return;
+    let tallest=0;
+    parent.querySelectorAll('select,input,button,.btn').forEach(el=>{
+      if(el===btn)return;
+      const hgt=el.getBoundingClientRect().height;
+      if(hgt>0&&hgt<64)tallest=Math.max(tallest,hgt);
+    });
+    btn.style.height=tallest?Math.round(tallest)+'px':'';
+  });
 }
 function _placeCloseInHeader(){
   document.querySelectorAll('.mo .mob-close-x').forEach(btn=>{
