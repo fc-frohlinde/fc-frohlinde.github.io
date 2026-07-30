@@ -1384,7 +1384,10 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
      way back to a session/player the trainer came from). */
   /* Header ✕ hidden only where a bottom close exists (see _markDuplicateCloses) */
   .mo-x-dup{display:none !important;}
-  .mob-close-x{min-height:38px;min-width:44px;top:10px;right:10px;}
+  /* Enlarged tap target only for the FLOATING variant, which sits alone in a
+     corner. Inside a header row it must match its neighbours (selects, chips)
+     or it reads as a different class of control — see .mo-x-inrow below. */
+  .mob-close-x:not(.mo-x-inrow){min-height:38px;min-width:44px;top:10px;right:10px;}
   #moTeamMgr #tmgr-close-top{display:none;}
   /* A per-pane button row sits wherever that pane's content ends, so
      "Schließen" jumped around between tabs. One footer, always at the same
@@ -1475,7 +1478,12 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   transition:all .12s;z-index:5;
 }
 /* Placed into the header row by _placeCloseInHeader() */
-.mob-close-x.mo-x-inrow{position:static;margin-left:auto;align-self:center;flex-shrink:0;}
+.mob-close-x.mo-x-inrow{
+  position:static;margin-left:auto;align-self:center;flex-shrink:0;
+  /* Metrics of the controls it now stands beside (.db-sel, .btn): same
+     padding, radius and border weight, so the row reads as one set. */
+  padding:6px 12px;font-size:.78rem;line-height:1.25;
+}
 .has-inrow-close{padding-right:0 !important;}
 .mob-close-x:hover{background:#e6ecf8;border-color:var(--gm);}
 .mob-close-x:active{transform:scale(.96);}
