@@ -1474,6 +1474,9 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   cursor:pointer;display:flex;align-items:center;justify-content:center;
   transition:all .12s;z-index:5;
 }
+/* Placed into the header row by _placeCloseInHeader() */
+.mob-close-x.mo-x-inrow{position:static;margin-left:auto;align-self:center;flex-shrink:0;}
+.has-inrow-close{padding-right:0 !important;}
 .mob-close-x:hover{background:#e6ecf8;border-color:var(--gm);}
 .mob-close-x:active{transform:scale(.96);}
 .au-list{padding:0 4px;}
@@ -18216,6 +18219,22 @@ function exportData(){const b=new Blob([JSON.stringify(G,null,2)],{type:'applica
 // automatically, so a modal added later is covered without anyone
 // remembering this rule. Modals whose ONLY exit is the ✕ keep it: on iOS
 // there is no hardware back button, so a visible way out must always exist.
+// These modals reserve 36px on the right of their header and float a ✕ over
+// it. That worked while the button was a small circle; as a bordered button
+// it visibly fought the header's baseline. Placing it INSIDE the header row
+// makes it a normal member of the layout — aligned with the title, same as
+// every other modal — and frees the reserved padding.
+function _placeCloseInHeader(){
+  document.querySelectorAll('.mo .mob-close-x').forEach(btn=>{
+    let header=btn.nextElementSibling;
+    while(header&&getComputedStyle(header).display!=='flex')header=header.nextElementSibling;
+    if(!header)return;                 // no header row → keep it floating
+    header.appendChild(btn);
+    header.classList.add('has-inrow-close');
+    btn.classList.add('mo-x-inrow');
+  });
+}
+document.addEventListener('DOMContentLoaded',()=>setTimeout(_placeCloseInHeader,100));
 function _markDuplicateCloses(){
   document.querySelectorAll('.mo').forEach(mo=>{
     const bottom=mo.querySelector('.mob-btns');
