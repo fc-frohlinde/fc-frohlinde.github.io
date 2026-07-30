@@ -12060,6 +12060,8 @@ function dbRenderTopicCard(data){
   return html;
 }
 function renderDashboard(){
+  // Header controls are rebuilt here; re-match the close button afterwards
+  requestAnimationFrame(()=>{try{_syncCloseHeight(document.getElementById('moDashboard'));}catch(e){}});
   const data=dbGetData();
   const el=document.getElementById('db-content');
   if(!el)return;
@@ -18232,6 +18234,22 @@ function exportData(){const b=new Blob([JSON.stringify(G,null,2)],{type:'applica
 // it visibly fought the header's baseline. Placing it INSIDE the header row
 // makes it a normal member of the layout — aligned with the title, same as
 // every other modal — and frees the reserved padding.
+// Native <select> renders taller than a <button> with identical padding, so
+// no fixed height matches every header. The button therefore takes the height
+// of the tallest real control standing next to it — measured when the modal
+// becomes visible (elements inside a display:none modal measure zero).
+function _syncCloseHeight(mo){
+  if(!mo)return;
+  const btn=mo.querySelector('.mob-close-x.mo-x-inrow');
+  if(!btn||!btn.parentElement)return;
+  let tallest=0;
+  btn.parentElement.querySelectorAll('select,input,button,.btn').forEach(el=>{
+    if(el===btn)return;
+    const hgt=el.getBoundingClientRect().height;
+    if(hgt>0&&hgt<64)tallest=Math.max(tallest,hgt);   // ignore stray containers
+  });
+  btn.style.height=tallest?Math.round(tallest)+'px':'';
+}
 function _placeCloseInHeader(){
   document.querySelectorAll('.mo .mob-close-x').forEach(btn=>{
     let header=btn.nextElementSibling;
@@ -18268,7 +18286,9 @@ function openM(id){
   // though history.length had grown. Pushed from a real interaction it
   // behaves normally, so one back press = one closed layer.
   if(typeof _navArm==='function')_navArm();
-  document.getElementById(id).classList.add('open');
+  const _moEl=document.getElementById(id);
+  _moEl.classList.add('open');
+  requestAnimationFrame(()=>{try{_syncCloseHeight(_moEl);}catch(e){}});
   if(id==='moAddPlayer')initAddPos();
   if(id==='moSession'){
     populateFocSel();
