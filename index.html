@@ -1893,7 +1893,12 @@ mark.sr-hl{background:rgba(243,156,18,.35);color:inherit;border-radius:2px;paddi
    ════════════════════════════════════════ */
 body.player-mode>:not(#playerModeWrap):not(#authOverlay){display:none !important;}
 body.player-mode{padding:0;background:linear-gradient(160deg,var(--bg-dark) 0%,var(--bg-mid) 50%,var(--bg-dark) 100%);}
-body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
+  overscroll-behavior:none;
+  /* Opaque fill = the compositor's fallback for unpainted regions during a
+     fast fling. Transparent here meant the body's flat dark gradient flashed
+     through from the second/third swipe on, once Edge's toolbar animated. */
+  background:linear-gradient(160deg,var(--bg-dark) 0%,var(--bg-mid) 50%,var(--bg-dark) 100%);}
 /* ═══════════ PLAYER MODE — Athlete-app redesign ═══════════ */
 .pm-wrap{max-width:560px;margin:0 auto;padding:0 0 32px;color:var(--gd);}
 
