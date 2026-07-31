@@ -141,6 +141,13 @@ body.palette-teal{--bd:#0a4d5c;--bm:#147087;--bl:#2098b3;--bg-dark:#062b35;--bg-
 body.palette-burgundy{--bd:#5a1030;--bm:#8a1c4a;--bl:#bd2e6e;--bg-dark:#2d0818;--bg-mid:#8a1c4a;--surface-dark:#4a1430;--surface-mid:#2d0818;--planner-dark:#1a040d;--planner-mid:#3a0c20;--ac:#f5d060;--surface-bright:#6e1840;--header-end:#3e0d22;}
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;font-family:'Barlow',sans-serif;font-size:16px;}
+/* Swiping down past the top triggered the browser's pull-to-refresh and an
+   overscroll bounce: the body's gradient ends at its own box, so the rubber-band
+   area exposed the blank page underneath. Two fixes — contain the overscroll so
+   the gesture no longer leaves the app, and paint the same dark base on <html>
+   so any residual bounce shows the app's colour rather than white. */
+html{background:var(--bg-dark);overscroll-behavior-y:contain;}
+body{overscroll-behavior-y:contain;}
 body{background:linear-gradient(140deg,var(--bg-dark) 0%,var(--bg-mid) 55%,var(--bg-dark) 100%);height:100vh;max-height:100vh;padding:7px;display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box;}
 /* Android browsers (Edge/Chrome on Xiaomi et al.) keep a bottom toolbar that
    overlaps anything anchored to 100vh. dvh tracks the visible viewport. */
@@ -1271,6 +1278,23 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   body{padding-bottom:var(--mob-nav-h,62px) !important;}
   .ma-list-wrap{padding-bottom:0 !important;}
   #mobNav{display:flex;}
+  /* ── polish ──────────────────────────────────────────────────
+     Small things that make a phone build feel finished: a blurred
+     translucent bar, a marker on the active tab, softer cards with a
+     visible press state, and tabs that read as chips. */
+  #mobNav{backdrop-filter:blur(14px);background:color-mix(in srgb,var(--surface-mid) 82%,transparent);}
+  .mn-item{position:relative;}
+  .mn-item.on::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+    width:22px;height:3px;border-radius:0 0 3px 3px;background:var(--ac);}
+  .mn-ic{transition:transform .16s cubic-bezier(.34,1.56,.64,1);}
+  .mn-item.on .mn-ic{transform:translateY(-1px) scale(1.06);}
+  .ma-card{border-radius:13px;box-shadow:0 1px 2px rgba(0,0,0,.05),0 2px 8px rgba(0,0,0,.04);
+    transition:transform .12s,box-shadow .12s;}
+  .ma-card:active{transform:scale(.995);box-shadow:0 1px 3px rgba(0,0,0,.08);}
+  .ma-sess{border-radius:var(--r-pill);}
+  .ma-stats{border-bottom-left-radius:12px;border-bottom-right-radius:12px;}
+  /* Sheets and overlays get the same easing everywhere */
+  .ms-panel,.mob,.slp-popup{will-change:transform;}
   /* ── MODALS AS BOTTOM SHEETS ──────────────────────────────────
      Three separate causes made dialogs drift or run off screen:
        1. max-height in vh — on Android that is the toolbar-less height, so
