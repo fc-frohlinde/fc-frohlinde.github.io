@@ -164,9 +164,13 @@ body{background:linear-gradient(140deg,var(--bg-dark) 0%,var(--bg-mid) 55%,var(-
    The extra bottom padding keeps the last card clear of the toolbar while it
    is still shown. */
 @supports (height:100lvh){
-  body.player-mode{height:100lvh;max-height:100lvh;}
+  /* Being taller than the visible area, the page itself became scrollable and
+     any offset dragged the hero above the top edge. Pinning it removes the
+     document scroll entirely — only the inner wrap scrolls, as intended. */
+  html:has(body.player-mode){overflow:hidden;}
+  body.player-mode{position:fixed;top:0;left:0;right:0;height:100lvh;max-height:100lvh;overflow:hidden;}
   body.player-mode #playerModeWrap{height:100lvh;}
-  body.player-mode .pm-wrap{padding-bottom:100px;}
+  body.player-mode .pm-wrap{padding-bottom:104px;}
 }
 
 /* AUTH */
@@ -1916,7 +1920,7 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 .pm-wrap{max-width:560px;margin:0 auto;padding:0 0 32px;color:var(--gd);}
 
 /* HERO — player identity + season stats */
-.pm-hero{position:relative;padding:32px 20px 26px;background:linear-gradient(160deg,var(--bd) 0%,var(--bm) 65%,var(--bl,var(--bm)) 100%);color:#fff;overflow:hidden;}
+.pm-hero{position:relative;padding:28px 20px 24px;border-radius:0 0 26px 26px;background:linear-gradient(160deg,var(--bd) 0%,var(--bm) 65%,var(--bl,var(--bm)) 100%);color:#fff;overflow:hidden;}
 .pm-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 0%,rgba(255,255,255,.15),transparent 60%),radial-gradient(circle at 80% 100%,rgba(255,255,255,.08),transparent 50%);pointer-events:none;}
 .pm-hero-content{position:relative;z-index:1;text-align:center;}
 .pm-avatar{width:96px;height:96px;margin:0 auto 14px;border-radius:50%;overflow:hidden;background:#fff;box-shadow:0 6px 20px rgba(0,0,0,.25),0 0 0 4px rgba(255,255,255,.18);}
@@ -1928,12 +1932,13 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 .pm-meta .pm-pos{font-size:.78rem;color:rgba(255,255,255,.85);font-weight:600;text-transform:uppercase;letter-spacing:1px;}
 .pm-team-info{font-size:.72rem;color:rgba(255,255,255,.7);font-weight:600;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:18px;}
 .pm-stats{display:flex;justify-content:center;gap:8px;margin-top:18px;}
-.pm-stat{flex:1;max-width:110px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.22);border-radius:12px;padding:10px 6px;text-align:center;}
+.pm-stat{flex:1;max-width:110px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.2);
+  border-radius:14px;padding:11px 6px;text-align:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.14);}
 .pm-stat-val{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:#fff;letter-spacing:1px;line-height:1;}
 .pm-stat-lbl{font-size:.62rem;color:rgba(255,255,255,.75);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-top:4px;}
 
 /* Section headers */
-.pm-section-h{display:flex;align-items:center;gap:8px;font-family:'Bebas Neue',sans-serif;font-size:1rem;color:#fff;letter-spacing:1.5px;margin:22px 18px 10px;text-transform:uppercase;font-weight:400;}
+.pm-section-h{display:flex;align-items:center;gap:8px;font-family:'Bebas Neue',sans-serif;font-size:1rem;color:rgba(255,255,255,.92);letter-spacing:1.8px;margin:24px 18px 10px;text-transform:uppercase;font-weight:400;}
 .pm-section-h .pm-count{background:rgba(255,255,255,.18);color:#fff;font-family:'Barlow',sans-serif;font-size:.7rem;padding:2px 7px;border-radius:10px;font-weight:700;letter-spacing:.4px;}
 
 /* Card list and empty state */
@@ -1941,7 +1946,13 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 .pm-empty{margin:24px 16px;background:rgba(255,255,255,.08);border:1px dashed rgba(255,255,255,.2);border-radius:14px;padding:30px 20px;text-align:center;color:rgba(255,255,255,.85);font-size:.9rem;}
 
 /* CARD — base style */
-.pm-card{background:#fff;border-radius:14px;padding:14px;display:flex;gap:14px;box-shadow:0 4px 14px rgba(0,0,0,.18);border-left:5px solid var(--bm);margin:0 16px;}
+.pm-card{background:#fff;border-radius:16px;padding:14px;display:flex;gap:13px;
+  box-shadow:0 2px 6px rgba(0,0,0,.10),0 8px 22px rgba(0,0,0,.12);
+  border-left:5px solid var(--bm);margin:0 16px;
+  transition:transform .14s cubic-bezier(.22,1,.36,1),box-shadow .14s;}
+.pm-card:active{transform:scale(.994);}
+/* The next session is the one decision this screen asks for — give it weight */
+.pm-card.pm-hero-card{border-left-width:6px;box-shadow:0 3px 10px rgba(0,0,0,.14),0 12px 30px rgba(0,0,0,.16);}
 .pm-card.pm-match{border-left-color:#cc6500;}
 .pm-card-date{flex-shrink:0;width:54px;text-align:center;background:#f7f9fc;border-radius:10px;padding:8px 4px;align-self:flex-start;}
 .pm-day{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;line-height:1;color:var(--bd);}
@@ -1974,7 +1985,8 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 /* Action buttons */
 .pm-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
 .pm-actions-2 .pm-btn{flex:1 1 calc(50% - 4px);min-height:50px;}
-.pm-btn{flex:1;min-width:72px;min-height:44px;padding:10px 8px;border:1.5px solid var(--gl);background:#fff;border-radius:10px;cursor:pointer;font-family:'Barlow',sans-serif;font-size:.82rem;font-weight:700;color:var(--gd);transition:all .15s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;}
+.pm-btn{flex:1;min-width:72px;min-height:46px;padding:10px 8px;border:1.5px solid var(--gl);background:#fff;border-radius:12px;cursor:pointer;font-family:'Barlow',sans-serif;font-size:.82rem;font-weight:700;color:var(--gd);transition:transform .12s,background .15s,border-color .15s,box-shadow .15s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;}
+.pm-btn:active{transform:scale(.96);}
 .pm-btn:hover{border-color:var(--bm);transform:translateY(-1px);}
 .pm-btn:active{transform:scale(.96);}
 .pm-btn-ico{font-size:1rem;line-height:1;}
