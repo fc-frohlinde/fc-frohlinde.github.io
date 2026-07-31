@@ -1278,11 +1278,7 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
      ends exactly where the nav starts, and the list needs no extra padding —
      the last player card sits its normal 8px above the bar.
      --mob-nav-h is measured from the real element at runtime (see JS). */
-  body{padding-bottom:var(--mob-nav-h,62px) !important;
-    /* The reserved strip is painted in the bar's own colour: if the fixed bar
-       repaints a frame late, the gap shows the bar's colour, not the blue
-       page gradient. */
-    background-color:var(--surface-mid);}
+  body{padding-bottom:var(--mob-nav-h,62px) !important;}
   .ma-list-wrap{padding-bottom:0 !important;}
   #mobNav{display:flex;}
   /* ── polish ──────────────────────────────────────────────────
@@ -1487,7 +1483,11 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
 #mobNav{display:none;position:fixed;left:0;right:0;bottom:0;z-index:460;
   background:var(--surface-mid);
   border-top:1px solid rgba(255,255,255,.14);
-  padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));}
+  padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));
+  /* Reach 80px past the layout viewport's bottom edge: while the browser's
+     own toolbar animates away the visual viewport grows, and this apron is
+     what gets revealed — matching the bar instead of flashing a bare band. */
+  margin-bottom:-80px;padding-bottom:calc(86px + env(safe-area-inset-bottom,0px));}
 .mn-item{flex:1;background:none;border:none;color:rgba(255,255,255,.62);
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
   padding:5px 2px;min-height:50px;cursor:pointer;font-family:'Barlow',sans-serif;
