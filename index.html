@@ -10662,10 +10662,28 @@ function renderPlayerMode(){
     html+=renderCard(next.s,next.si,next.sk,true);
     // ── OTHER UPCOMING ──
     if(upcoming.length>1){
-      html+=`<div class="pm-section-h">\ud83d\udcc5 Weitere Termine <span class="pm-count">${upcoming.length-1}</span></div>`;
-      html+='<div class="pm-list">';
-      upcoming.slice(1).forEach(({s,si,sk})=>{html+=renderCard(s,si,sk,false);});
-      html+='</div>';
+      const others=upcoming.slice(1);
+      // Collapsed once there are more than two: the player's task on this
+      // screen is to answer for the NEXT session, and a long list of dates
+      // pushes that decision off the first screen. With two or fewer it stays
+      // open — a fold that hides almost nothing is just an extra tap.
+      // The count in the summary keeps the hidden dates discoverable, and the
+      // same <details> pattern as "Letzte Termine" makes it self-evident.
+      const collapsed=others.length>2;
+      if(collapsed){
+        html+=`<details class="pm-recent"><summary class="pm-section-h pm-section-summary">`
+          +`<span>\ud83d\udcc5 Weitere Termine</span>`
+          +`<span class="pm-count">${others.length}</span>`
+          +`<span class="pm-chevron">\u203a</span></summary>`;
+        html+='<div class="pm-list" style="padding-top:6px;">';
+        others.forEach(({s,si,sk})=>{html+=renderCard(s,si,sk,false);});
+        html+='</div></details>';
+      }else{
+        html+=`<div class="pm-section-h">\ud83d\udcc5 Weitere Termine <span class="pm-count">${others.length}</span></div>`;
+        html+='<div class="pm-list">';
+        others.forEach(({s,si,sk})=>{html+=renderCard(s,si,sk,false);});
+        html+='</div>';
+      }
     }
   } else {
     html+='<div class="pm-empty">\ud83d\udcc5 In den n\u00e4chsten 14 Tagen sind keine Termine geplant.</div>';
