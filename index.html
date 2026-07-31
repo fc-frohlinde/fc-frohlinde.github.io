@@ -155,6 +155,19 @@ body{background:linear-gradient(140deg,var(--bg-dark) 0%,var(--bg-mid) 55%,var(-
   body{height:100dvh;max-height:100dvh;}
   body.player-mode #playerModeWrap{height:100dvh;}
 }
+/* dvh tracks the CURRENT viewport, so while the browser toolbar slides away
+   the visible area is already bigger than the element sized to it — and the
+   strip that opens up exposes whatever is beneath (html, painted flat
+   --bg-dark). That is the band rising from the bottom on a fast fling.
+   lvh is the LARGEST possible viewport: sizing to it means the app always
+   paints past the toolbar, so there is never anything underneath to reveal.
+   The extra bottom padding keeps the last card clear of the toolbar while it
+   is still shown. */
+@supports (height:100lvh){
+  body.player-mode{height:100lvh;max-height:100lvh;}
+  body.player-mode #playerModeWrap{height:100lvh;}
+  body.player-mode .pm-wrap{padding-bottom:100px;}
+}
 
 /* AUTH */
 #authOverlay{position:fixed;inset:0;background:linear-gradient(140deg,#071a3e 0%,#1659b8 55%,#071a3e 100%);z-index:9999;display:none;align-items:center;justify-content:center;}
