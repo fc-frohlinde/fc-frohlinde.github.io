@@ -4850,6 +4850,30 @@ function initAuth(){
     const ageMs=Date.now()-u.loginAt;
     return ageMs>days*24*60*60*1000;
   };
+  // A player link always wins over any stored session. Without this, a player
+  // could edit the stored session in devtools (role:"admin" is accepted by the
+  // restore path below without any check), skip _pmSanitizeG — which is gated
+  // on the role — and receive the untouched dataset from Firebase.
+  // With the token present the app can only ever enter player mode.
+  try{
+    const _qp=new URLSearchParams(location.search);
+    if(_qp.get('player')){
+      const _st=localStorage.getItem(AUTH_SK);
+      if(_st){
+        try{
+          const _u=JSON.parse(_st);
+          if(_u&&_u.role&&_u.role!=='player')localStorage.removeItem(AUTH_SK);
+        }catch(e){localStorage.removeItem(AUTH_SK);}
+      }
+      const _ss=sessionStorage.getItem(AUTH_SK);
+      if(_ss){
+        try{
+          const _u2=JSON.parse(_ss);
+          if(_u2&&_u2.role&&_u2.role!=='player')sessionStorage.removeItem(AUTH_SK);
+        }catch(e){sessionStorage.removeItem(AUTH_SK);}
+      }
+    }
+  }catch(e){}
   // localStorage = persistent (remember me), sessionStorage = tab-only (survives F5 but not new tab)
   // We use a page-reload flag to detect actual reload vs tab restore
   const reloaded=sessionStorage.getItem('fcf_reloaded');
@@ -4862,6 +4886,7 @@ function initAuth(){
         if(_sessionExpired(u)){
           localStorage.removeItem(AUTH_SK);
         } else if(u.role==='trainer'){const t=G.trainers.find(x=>x.name.toLowerCase()===u.name.toLowerCase());if(!t){localStorage.removeItem(AUTH_SK);}else{u.teams=[...t.teams];CU=u;sessionStorage.setItem('fcf_reloaded','1');showApp();return;}}
+        else if(u.role==='player'&&!u.playerToken){localStorage.removeItem(AUTH_SK);}
         else{CU=u;sessionStorage.setItem('fcf_reloaded','1');showApp();return;}
       }
     }catch(e){}
