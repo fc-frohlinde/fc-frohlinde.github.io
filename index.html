@@ -15937,15 +15937,46 @@ function _vvhMeasure(){
   // once the toolbar had started sliding. Only real changes (rotation,
   // keyboard, split screen) matter, and those are far larger than 80px.
   if(Math.abs(px-cur)<80)return;
+  _sjpTick('vvhW');
   document.documentElement.style.setProperty('--vvh',px+'px');
 }
 function _vvhQueue(){clearTimeout(_vvhTimer);_vvhTimer=setTimeout(_vvhMeasure,150);}
+// ── TEMP scroll-jank probe (admin only, survives reloads) ──
+// Counts, per second, what fires during a fling: vv-resize events, --vvh
+// writes, nav re-measures, window resizes. Shown as one line over the nav.
+let _sjp={vv:0,vvhW:0,nav:0,wr:0};
+function _sjpTick(k){if(window._sjpOn)_sjp[k]++;}
+setInterval(()=>{
+  if(!window._sjpOn){const el=document.getElementById('sjProbe');if(el)el.remove();return;}
+  let el=document.getElementById('sjProbe');
+  if(!el){
+    el=document.createElement('div');
+    el.id='sjProbe';
+    el.style.cssText='position:fixed;left:6px;bottom:calc(8px + var(--mob-nav-h,62px));z-index:100005;'
+      +'background:rgba(0,0,0,.85);color:#7be0a8;font:700 11px/1.3 monospace;padding:5px 8px;border-radius:7px;pointer-events:none;';
+    document.body.appendChild(el);
+  }
+  el.textContent='vv:'+_sjp.vv+' vvhW:'+_sjp.vvhW+' nav:'+_sjp.nav+' wr:'+_sjp.wr
+    +' | vvh='+(getComputedStyle(document.documentElement).getPropertyValue('--vvh')||'?').trim()
+    +' navH='+(getComputedStyle(document.documentElement).getPropertyValue('--mob-nav-h')||'?').trim();
+  _sjp={vv:0,vvhW:0,nav:0,wr:0};
+},1000);
 if(window.visualViewport){
-  window.visualViewport.addEventListener('resize',_vvhQueue);
+  window.visualViewport.addEventListener('resize',()=>{_sjpTick('vv');_vvhQueue();});
 }
 window.addEventListener('resize',_vvhQueue);
 window.addEventListener('orientationchange',()=>setTimeout(_vvhMeasure,200));
 _vvhMeasure();
+// Toggle: 5 quick taps on the season-stats strip, or _sjpOn=true in console
+document.addEventListener('DOMContentLoaded',()=>{
+  const strip=document.getElementById('maStats');
+  if(!strip)return;
+  let taps=0,timer=null;
+  strip.addEventListener('click',()=>{
+    taps++;clearTimeout(timer);timer=setTimeout(()=>{taps=0;},900);
+    if(taps>=5){window._sjpOn=!window._sjpOn;taps=0;}
+  });
+});
 function _mobNavMeasure(){
   const nav=document.getElementById('mobNav');
   if(!nav)return;
@@ -15953,7 +15984,7 @@ function _mobNavMeasure(){
   document.documentElement.style.setProperty('--mob-nav-h',h?h+'px':'0px');
 }
 let _mnmTimer=null;
-window.addEventListener('resize',()=>{clearTimeout(_mnmTimer);_mnmTimer=setTimeout(_mobNavMeasure,150);});
+window.addEventListener('resize',()=>{_sjpTick('wr');clearTimeout(_mnmTimer);_mnmTimer=setTimeout(()=>{_sjpTick('nav');_mobNavMeasure();},150);});
 window.addEventListener('orientationchange',()=>setTimeout(_mobNavMeasure,150));
 document.addEventListener('DOMContentLoaded',()=>setTimeout(_mobNavMeasure,60));
 setTimeout(_mobNavMeasure,300);
