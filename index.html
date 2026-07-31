@@ -146,8 +146,8 @@ html,body{height:100%;font-family:'Barlow',sans-serif;font-size:16px;}
    area exposed the blank page underneath. Two fixes — contain the overscroll so
    the gesture no longer leaves the app, and paint the same dark base on <html>
    so any residual bounce shows the app's colour rather than white. */
-html{background:var(--bg-dark);overscroll-behavior-y:contain;}
-body{overscroll-behavior-y:contain;}
+html{background:var(--bg-dark);overscroll-behavior:none;}
+body{overscroll-behavior:none;}
 body{background:linear-gradient(140deg,var(--bg-dark) 0%,var(--bg-mid) 55%,var(--bg-dark) 100%);height:100vh;max-height:100vh;padding:7px;display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box;}
 /* Android browsers (Edge/Chrome on Xiaomi et al.) keep a bottom toolbar that
    overlaps anything anchored to 100vh. dvh tracks the visible viewport. */
@@ -1144,7 +1144,10 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
 /* ════════════════════════════════════════
    MOBILE ATTENDANCE VIEW (cards)
    ════════════════════════════════════════ */
-.mobile-att-view{flex:1;display:flex;flex-direction:column;background:var(--ow);overflow:hidden;}
+.mobile-att-view{flex:1;display:flex;flex-direction:column;background:var(--ow);overflow:hidden;
+  /* Own paint layer with an opaque fill: guarantees the page gradient behind
+     it can never be exposed mid-scroll. */
+  isolation:isolate;}
 .ma-sess-bar{display:flex;gap:6px;padding:10px 12px;background:var(--surface-mid);overflow-x:auto;-webkit-overflow-scrolling:touch;flex-shrink:0;border-bottom:2px solid var(--bd);}
 .ma-sess-bar::-webkit-scrollbar{display:none;}
 /* Season figures, previously in the desktop footer */
@@ -1158,7 +1161,7 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
 .ma-sess.active{background:var(--ac);color:var(--bd);border-color:var(--ac);box-shadow:0 2px 8px color-mix(in srgb, var(--ac) 40%, transparent);}
 .ma-sess .ma-sess-date{font-size:.86rem;font-weight:800;}
 .ma-sess .ma-sess-meta{font-size:.62rem;opacity:.85;text-transform:uppercase;letter-spacing:.5px;margin-top:2px;}
-.ma-list{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:8px;}
+.ma-list{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:8px;}
 .ma-list-wrap{flex:1;overflow:hidden;display:flex;flex-direction:column;position:relative;}
 .ma-ptr{position:absolute;top:-44px;left:0;right:0;height:44px;display:flex;align-items:center;justify-content:center;gap:8px;color:var(--bm);font-size:.78rem;font-weight:600;background:var(--ow);transition:transform .25s ease-out,opacity .15s;pointer-events:none;}
 .ma-ptr.ready{color:var(--cp);}
@@ -1275,7 +1278,11 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
      ends exactly where the nav starts, and the list needs no extra padding —
      the last player card sits its normal 8px above the bar.
      --mob-nav-h is measured from the real element at runtime (see JS). */
-  body{padding-bottom:var(--mob-nav-h,62px) !important;}
+  body{padding-bottom:var(--mob-nav-h,62px) !important;
+    /* The reserved strip is painted in the bar's own colour: if the fixed bar
+       repaints a frame late, the gap shows the bar's colour, not the blue
+       page gradient. */
+    background-color:var(--surface-mid);}
   .ma-list-wrap{padding-bottom:0 !important;}
   #mobNav{display:flex;}
   /* ── polish ──────────────────────────────────────────────────
@@ -1479,9 +1486,8 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
    those bring their own navigation. */
 #mobNav{display:none;position:fixed;left:0;right:0;bottom:0;z-index:460;
   background:var(--surface-mid);
-  border-top:1px solid rgba(255,255,255,.1);
-  padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));
-  box-shadow:0 -4px 18px rgba(0,0,0,.28);}
+  border-top:1px solid rgba(255,255,255,.14);
+  padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));}
 .mn-item{flex:1;background:none;border:none;color:rgba(255,255,255,.62);
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
   padding:5px 2px;min-height:50px;cursor:pointer;font-family:'Barlow',sans-serif;
