@@ -9978,42 +9978,21 @@ function _pmSanitizeG(){
       CU._pmTeamSize=fullD.players.filter(pp=>pp&&Array.isArray(pp.s)).length;
     }
   }catch(e){CU._pmRank=null;}
-  // Precompute lineup roles for this player — privacy-safe alternative to
-  // exposing the full G.matchLineups in player mode (which would leak everyone
-  // else's positions). For each match in player's team/season, if player is
-  // in the starting XI we record their position label; if on the bench we
-  // record 'subs'. The renderer reads this map.
-  try{
-    CU._pmLineupRoles={};
-    if(G.matchLineups&&typeof G.matchLineups==='object'){
-      const prefix=myTeam+'__'+mySeason+'__';
-      Object.entries(G.matchLineups).forEach(([key,lineup])=>{
-        if(!key.startsWith(prefix)||!lineup)return;
-        const si=parseInt(key.slice(prefix.length),10);
-        if(isNaN(si))return;
-        const slots=lineup.slots||{};
-        const subs=Array.isArray(lineup.subs)?lineup.subs:[];
-        // Starting XI: find slot whose value === myPi
-        let role=null,isSub=false;
-        for(const [sid,pi] of Object.entries(slots)){
-          if(pi===myPi){
-            try{
-              const slotDef=(typeof fmtSlots==='function')?fmtSlots(lineup.formation||'4-2-3-1',lineup.customSlots):[];
-              const found=slotDef.find(sl=>sl.id===sid);
-              role=found?found.lbl:'Startelf';
-            }catch(e){role='Startelf';}
-            break;
-          }
-        }
-        if(!role&&subs.includes(myPi)){isSub=true;}
-        if(role)CU._pmLineupRoles[si]={role,isSub:false};
-        else if(isSub)CU._pmLineupRoles[si]={role:'Bank',isSub:true};
-      });
-    }
-  }catch(e){CU._pmLineupRoles={};}
+  // Lineup information is deliberately NOT exposed in player mode.
+  // A planned lineup is working material: it changes up to kick-off, and a
+  // player reading "Du startest als Linksverteidiger" days earlier treats it
+  // as a promise. Trainers communicate the lineup themselves, when they
+  // decide to. Nothing about slots, bench or formation reaches this build.
+  CU._pmLineupRoles={};
+
   if(Array.isArray(G.auditLog))G.auditLog=[];
   if(Array.isArray(G.trash))G.trash=[];
   if(Array.isArray(G.backups))G.backups=[];
+  // Remove the lineups outright — not just their rendering. Anything left in
+  // memory is one console command away from being read by a curious player.
+  G.matchLineups={};
+  G.seasonLineups={};
+  delete G.lineupSaves;
   if(Array.isArray(G.sessionTemplates))G.sessionTemplates=[];
   if(Array.isArray(G.trainers))G.trainers=[];
   if(Array.isArray(G.exerciseLibrary))G.exerciseLibrary=[];
@@ -10491,13 +10470,7 @@ function _pmAvatar(p){
 // Look up the precomputed lineup role for the current player at the given session.
 // Returns an HTML fragment for the card (or '' if no role).
 function _pmLookupLineupRole(si,p){
-  if(typeof CU==='undefined'||!CU||!CU._pmLineupRoles)return '';
-  const r=CU._pmLineupRoles[si];
-  if(!r)return '';
-  if(r.isSub){
-    return '<div class="pm-lineup pm-lineup-sub">\ud83d\udd04 Du bist auf der Bank</div>';
-  }
-  return `<div class="pm-lineup pm-lineup-starter">\ud83c\udfaf Du startest als ${_amEscapeText(r.role||'')}</div>`;
+  return ''; // lineups are never shown to players — see renderPlayerMode
 }
 function _pmFmtUpcoming(s,sk){
   const dowNames=['So','Mo','Di','Mi','Do','Fr','Sa'];
