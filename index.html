@@ -1282,7 +1282,10 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
      Small things that make a phone build feel finished: a blurred
      translucent bar, a marker on the active tab, softer cards with a
      visible press state, and tabs that read as chips. */
-  #mobNav{backdrop-filter:blur(14px);background:color-mix(in srgb,var(--surface-mid) 82%,transparent);}
+  /* Opaque, not translucent: with blur the body's dark-blue gradient showed
+     through the bar and visibly drifted during momentum scrolling. A fixed
+     bar sitting over moving content has to be solid. */
+  #mobNav{background:var(--surface-mid);backdrop-filter:none;}
   .mn-item{position:relative;}
   .mn-item.on::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
     width:22px;height:3px;border-radius:0 0 3px 3px;background:var(--ac);}
@@ -1475,7 +1478,7 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
    fullscreen surface (planner, roll-call, home, player mode) is open —
    those bring their own navigation. */
 #mobNav{display:none;position:fixed;left:0;right:0;bottom:0;z-index:460;
-  background:linear-gradient(180deg,var(--surface-mid),var(--bg-dark));
+  background:var(--surface-mid);
   border-top:1px solid rgba(255,255,255,.1);
   padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));
   box-shadow:0 -4px 18px rgba(0,0,0,.28);}
