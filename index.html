@@ -15925,17 +15925,26 @@ setInterval(_mobNavVisibility,400);
 // Android still reports a height that includes its bottom toolbar, and any
 // modal with an inline max-height in vh (several have) then overflows past
 // the top of the screen. --vvh is measured, so it cannot be wrong.
+let _vvhTimer=null;
 function _vvhMeasure(){
   const vv=window.visualViewport;
   const px=Math.round((vv&&vv.height)||window.innerHeight||0);
-  if(px)document.documentElement.style.setProperty('--vvh',px+'px');
+  if(!px)return;
+  const cur=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--vvh'))||0;
+  // Ignore the browser-toolbar dance (~56px on Edge/Android). Writing --vvh
+  // on every viewport twitch re-laid-out everything bound to it DURING the
+  // fling — which is why the artefact only appeared from the second swipe on,
+  // once the toolbar had started sliding. Only real changes (rotation,
+  // keyboard, split screen) matter, and those are far larger than 80px.
+  if(Math.abs(px-cur)<80)return;
+  document.documentElement.style.setProperty('--vvh',px+'px');
 }
+function _vvhQueue(){clearTimeout(_vvhTimer);_vvhTimer=setTimeout(_vvhMeasure,150);}
 if(window.visualViewport){
-  window.visualViewport.addEventListener('resize',_vvhMeasure);
-  window.visualViewport.addEventListener('scroll',_vvhMeasure);
+  window.visualViewport.addEventListener('resize',_vvhQueue);
 }
-window.addEventListener('resize',_vvhMeasure);
-window.addEventListener('orientationchange',()=>setTimeout(_vvhMeasure,150));
+window.addEventListener('resize',_vvhQueue);
+window.addEventListener('orientationchange',()=>setTimeout(_vvhMeasure,200));
 _vvhMeasure();
 function _mobNavMeasure(){
   const nav=document.getElementById('mobNav');
@@ -15943,7 +15952,8 @@ function _mobNavMeasure(){
   const h=(window.innerWidth<=767&&getComputedStyle(nav).display!=='none')?nav.offsetHeight:0;
   document.documentElement.style.setProperty('--mob-nav-h',h?h+'px':'0px');
 }
-window.addEventListener('resize',_mobNavMeasure);
+let _mnmTimer=null;
+window.addEventListener('resize',()=>{clearTimeout(_mnmTimer);_mnmTimer=setTimeout(_mobNavMeasure,150);});
 window.addEventListener('orientationchange',()=>setTimeout(_mobNavMeasure,150));
 document.addEventListener('DOMContentLoaded',()=>setTimeout(_mobNavMeasure,60));
 setTimeout(_mobNavMeasure,300);
