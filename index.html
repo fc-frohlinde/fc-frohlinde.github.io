@@ -2033,6 +2033,27 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 .pm-fb-exc{background:rgba(243,156,18,.14);color:#7a4f00;}
 
 /* RECENT (past sessions, collapsible) */
+/* ── sRPE card ──────────────────────────────────────────────
+   The scale is intentionally NOT colour-graded: colouring 8–10 red would
+   suggest a wrong answer and push players toward the middle, which destroys
+   the data. Only the selected number is highlighted. */
+.pm-rpe{margin:16px 16px 0;background:#fff;border-radius:16px;padding:14px;
+  box-shadow:0 2px 6px rgba(0,0,0,.10),0 8px 22px rgba(0,0,0,.12);border-left:5px solid var(--ac);}
+.pm-rpe-done{border-left-color:var(--ok);}
+.pm-rpe-h{display:flex;gap:11px;align-items:flex-start;margin-bottom:12px;}
+.pm-rpe-icon{font-size:1.4rem;line-height:1;}
+.pm-rpe-title{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.6px;color:var(--bd);line-height:1.2;}
+.pm-rpe-sub{font-size:.74rem;color:var(--gm);margin-top:2px;}
+.pm-rpe-scale{display:grid;grid-template-columns:repeat(11,1fr);gap:4px;}
+.pm-rpe-n{aspect-ratio:1;min-height:34px;border:1.5px solid var(--gl);background:var(--ow);
+  border-radius:9px;font-family:'Barlow',sans-serif;font-size:.82rem;font-weight:700;color:var(--gd);
+  cursor:pointer;transition:transform .1s,background .14s,border-color .14s;padding:0;}
+.pm-rpe-n:active{transform:scale(.9);}
+.pm-rpe-n.on{background:var(--bm);border-color:var(--bm);color:#fff;box-shadow:0 3px 10px rgba(22,89,184,.35);}
+.pm-rpe-legend{display:flex;justify-content:space-between;font-size:.64rem;color:var(--gm);margin-top:6px;}
+.pm-rpe-fb{font-size:.74rem;color:var(--gm);margin-top:9px;line-height:1.35;}
+.pm-rpe-done .pm-rpe-fb{color:var(--ok-fg);font-weight:600;}
+.pm-past-rpe{font-size:.7rem;color:var(--gm);font-weight:700;padding-left:6px;white-space:nowrap;}
 .pm-recent{margin:0 16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;overflow:hidden;}
 .pm-recent>summary{list-style:none;cursor:pointer;padding:12px 16px;margin:0;display:flex;align-items:center;gap:8px;color:#fff;}
 .pm-recent>summary::-webkit-details-marker{display:none;}
@@ -2508,6 +2529,7 @@ if(window._fbBlocked){
       <div id="ss-meta" style="font-size:.76rem;color:var(--gm);margin-top:4px;"></div>
       <div id="ss-note-display" style="font-size:.78rem;color:var(--gd);font-style:italic;margin-top:4px;display:none;"></div>
       <div id="ss-plan-link" style="display:none;font-size:.78rem;margin-top:5px;"></div>
+      <div id="ss-rpe-wrap" style="display:none;margin-top:8px;"></div>
       <div id="ss-rollcall-wrap" style="display:none;margin-top:8px;">
         <button class="btn" style="background:var(--ok-bg);color:var(--ok-fg);border:1.5px solid rgba(39,174,96,.4);font-size:.78rem;font-weight:700;" onclick="rcOpen(_currentSessIdx)">✓ Anwesenheit erfassen</button>
       </div>
@@ -10109,6 +10131,8 @@ function _pmSanitizeG(){
           label:s.label||'',homeAway:s.homeAway||'',
           rsvpUntil:typeof s.rsvpUntil==='number'?s.rsvpUntil:undefined,
           focus:s.focus||'',
+          // sRPE needs the session length: load = minutes × rating
+          duration:typeof s.duration==='number'?s.duration:undefined,
           // Player-visible session info — explicitly whitelisted
           location:s.location||'',
           note:s.note||''
@@ -10118,6 +10142,121 @@ function _pmSanitizeG(){
     delete D.formations;
     delete D.lineupHistory;
     delete D.notes;
+  }
+}
+// ══ sRPE (session RPE) ═══════════════════════════════════════
+// Standard method in football: the player rates the session's exertion 0–10
+// afterwards; multiplied by the minutes it gives the session LOAD. The value
+// of the method rests entirely on honest numbers, so the UI must never frame
+// it as a grade — no good/bad colouring of the scale itself, no comparison
+// with team-mates shown to the player.
+const RPE_SCALE=[
+  [0,'Nichts','Ruhe'],
+  [1,'Sehr leicht',''],
+  [2,'Leicht',''],
+  [3,'Moderat',''],
+  [4,'Etwas fordernd',''],
+  [5,'Fordernd',''],
+  [6,'Anstrengend',''],
+  [7,'Sehr anstrengend',''],
+  [8,'Sehr, sehr anstrengend',''],
+  [9,'Fast maximal',''],
+  [10,'Maximal','Alles gegeben']
+];
+const RPE_DEFAULT_MIN=90;      // used when the trainer set no duration
+const RPE_WINDOW_H=72;         // entry stays open this long after the session
+function rpeSessionMinutes(s,p,si){
+  if(p&&Array.isArray(p.rpeMin)&&typeof p.rpeMin[si]==='number')return p.rpeMin[si];
+  if(s&&typeof s.duration==='number'&&s.duration>0)return s.duration;
+  return RPE_DEFAULT_MIN;
+}
+function rpeLoad(s,p,si){
+  const r=(p&&Array.isArray(p.rpe))?p.rpe[si]:null;
+  if(typeof r!=='number')return null;
+  return Math.round(r*rpeSessionMinutes(s,p,si));
+}
+// Open only for sessions that actually took place, where the player was
+// present, and only for a few days afterwards — a rating given a fortnight
+// later is guesswork, not data.
+function rpeIsOpen(s,si,p,season){
+  if(!s||!p)return false;
+  if(typeof sessTookPlace==='function'&&!sessTookPlace(s,season))return false;
+  const v=(p.s&&si<p.s.length)?p.s[si]:3;
+  if(v!==1)return false;                       // only players who were there
+  const sk=(typeof dispToSortKey==='function')?dispToSortKey(s.date):null;
+  if(!sk)return false;
+  const y=Math.floor(sk/10000),m=Math.floor(sk/100)%100,d=sk%100;
+  const start=new Date(y,m-1,d,...(String(s.time||'').split(':').map(Number).filter(n=>!isNaN(n)).length===2
+    ?String(s.time).split(':').map(Number):[18,0]));
+  const ageH=(Date.now()-start.getTime())/3600000;
+  return ageH>=0&&ageH<=RPE_WINDOW_H;
+}
+// Trainer view: how the squad experienced this session. Deliberately shows
+// the SPREAD, not just the mean — if a session lands at 8 for everyone the
+// plan was off, and if it splits 3/9 the intensity was unevenly distributed.
+function renderSessRpe(si){
+  const box=document.getElementById('ss-rpe-wrap');
+  if(!box)return;
+  const D=cd();const s=D&&D.sessions&&D.sessions[si];
+  if(!s||!canEdit()||!sessTookPlace(s,UI.currentSeason)){box.style.display='none';return;}
+  const vals=[];
+  (D.players||[]).forEach(p=>{
+    if(!p||!Array.isArray(p.rpe))return;
+    const r=p.rpe[si];
+    if(typeof r==='number')vals.push({n:getDisplayName?getDisplayName(p):p.name,r,load:rpeLoad(s,p,si)});
+  });
+  const present=(D.players||[]).filter(p=>p&&p.s&&p.s[si]===1).length;
+  if(!vals.length){
+    box.style.display='block';
+    box.innerHTML='<div class="u-empty" style="padding:10px;"><div class="u-empty-txt">'
+      +'\ud83d\udcaa Noch keine Belastungs-R\u00fcckmeldung'+(present?' (0 von '+present+')':'')+'</div></div>';
+    return;
+  }
+  const avg=vals.reduce((a,b)=>a+b.r,0)/vals.length;
+  const min=Math.min(...vals.map(v=>v.r)),max=Math.max(...vals.map(v=>v.r));
+  const avgLoad=Math.round(vals.reduce((a,b)=>a+(b.load||0),0)/vals.length);
+  const mins=rpeSessionMinutes(s,null,si);
+  box.style.display='block';
+  box.innerHTML=`<div class="u-card" style="padding:10px 12px;">
+    <div class="u-sec-h" style="margin-bottom:6px;">\ud83d\udcaa Belastung (sRPE)</div>
+    <div style="display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;">
+      <div><span style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--bd);">${avg.toFixed(1)}</span>
+        <span style="font-size:.7rem;color:var(--gm);"> \u00d8 von ${vals.length}${present?'/'+present:''}</span></div>
+      <div style="font-size:.74rem;color:var(--gm);">Spanne ${min}\u2013${max}</div>
+      <div style="font-size:.74rem;color:var(--gm);">\u00d8 Load ${avgLoad} <span style="opacity:.7;">(${mins} Min)</span></div>
+    </div>
+    <details style="margin-top:7px;"><summary style="font-size:.72rem;color:var(--gm);cursor:pointer;">Einzelwerte</summary>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;">
+        ${vals.sort((a,b)=>b.r-a.r).map(v=>`<span class="u-chip" style="font-size:.7rem;">${escapeHtml(v.n)} <b>${v.r}</b></span>`).join('')}
+      </div></details>
+  </div>`;
+}
+function pmSetRpe(si,val){
+  if(!isPlayerMode())return;
+  const D=cd();const myPi=_pmValidateIdx();
+  if(myPi==null||!D||!D.players||!D.players[myPi])return;
+  const p=D.players[myPi];
+  const s=D.sessions&&D.sessions[si];
+  if(!rpeIsOpen(s,si,p,UI.currentSeason))return;
+  if(!Array.isArray(p.rpe))p.rpe=[];
+  while(p.rpe.length<D.sessions.length)p.rpe.push(null);
+  // Tapping the active value again clears it — a mis-tap must be correctable
+  p.rpe[si]=(p.rpe[si]===val)?null:val;
+  _pmSaveTargeted();
+  try{
+    _pmAppendAudit({ts:Date.now(),user:p.name||'Spieler',role:'player',
+      action:'Belastung bewertet',target:(s&&s.date)||'?',
+      detail:(p.rpe[si]==null?'zur\u00fcckgenommen':'RPE '+p.rpe[si])});
+  }catch(e){}
+  // Repaint just this card: a full re-render would scroll the player away
+  const card=document.querySelector('.pm-rpe[data-si="'+si+'"]');
+  if(card){
+    card.classList.toggle('pm-rpe-done',p.rpe[si]!=null);
+    card.querySelectorAll('.pm-rpe-n').forEach((b,n)=>b.classList.toggle('on',p.rpe[si]===n));
+    const fb=document.getElementById('pm-rpe-fb-'+si);
+    if(fb)fb.textContent=(p.rpe[si]!=null)
+      ?('\u2713 '+RPE_SCALE[p.rpe[si]][1]+' \u2014 danke!')
+      :'Keine Note, kein richtig oder falsch \u2014 dein ehrliches Gef\u00fchl z\u00e4hlt.';
   }
 }
 function _pmSaveTargeted(){
@@ -10153,6 +10292,11 @@ function _pmSaveTargeted(){
   const updates={};
   if(Array.isArray(p.s))updates[basePath+'s']=_wrapArr(p.s);
   if(Array.isArray(p.preconfReason))updates[basePath+'preconfReason']=_wrapArr(p.preconfReason);
+  // sRPE: the player's own perceived exertion (0–10) and, for matches, the
+  // minutes actually played. Both are the player's data, written on the same
+  // whitelisted path as the rest.
+  if(Array.isArray(p.rpe))updates[basePath+'rpe']=_wrapArr(p.rpe);
+  if(Array.isArray(p.rpeMin))updates[basePath+'rpeMin']=_wrapArr(p.rpeMin);
   if(Object.keys(updates).length===0)return;
   _fbSaving=true;
   fbDb.ref().update(updates).then(()=>{
@@ -10710,6 +10854,37 @@ function renderPlayerMode(){
       </div>
     </div>`;
   };
+  // ── sRPE PROMPT ──
+  // Placed above the upcoming dates on purpose: it is time-critical (the
+  // window closes) while an RSVP for next week is not.
+  const rpeOpen=[];
+  (D.sessions||[]).forEach((s,si)=>{
+    if(rpeIsOpen(s,si,p,UI.currentSeason))rpeOpen.push({s,si});
+  });
+  if(rpeOpen.length){
+    rpeOpen.sort((a,b)=>dispToSortKey(b.s.date)-dispToSortKey(a.s.date));
+    rpeOpen.forEach(({s,si})=>{
+      const cur=(Array.isArray(p.rpe)&&typeof p.rpe[si]==='number')?p.rpe[si]:null;
+      const f=_pmFmtUpcoming(s,dispToSortKey(s.date));
+      const done=cur!==null;
+      html+=`<div class="pm-rpe ${done?'pm-rpe-done':''}" data-si="${si}">
+        <div class="pm-rpe-h">
+          <span class="pm-rpe-icon">\ud83d\udcaa</span>
+          <div>
+            <div class="pm-rpe-title">Wie anstrengend war ${f.isMatch?'das Spiel':'das Training'}?</div>
+            <div class="pm-rpe-sub">${_amEscapeText(f.day+'.'+f.mo+'. \u00b7 '+(f.title||''))}</div>
+          </div>
+        </div>
+        <div class="pm-rpe-scale">`;
+      for(let n=0;n<=10;n++){
+        html+=`<button type="button" class="pm-rpe-n${cur===n?' on':''}" onclick="pmSetRpe(${si},${n})">${n}</button>`;
+      }
+      html+=`</div>
+        <div class="pm-rpe-legend"><span>0 \u00b7 nichts</span><span>10 \u00b7 maximal</span></div>
+        <div class="pm-rpe-fb" id="pm-rpe-fb-${si}">${done?('\u2713 '+_amEscapeText(RPE_SCALE[cur][1])+' \u2014 danke!'):'Keine Note, kein richtig oder falsch \u2014 dein ehrliches Gef\u00fchl z\u00e4hlt.'}</div>
+      </div>`;
+    });
+  }
   // ── NEXT SESSION (hero card) ──
   if(upcoming.length>0){
     const next=upcoming[0];
@@ -10758,6 +10933,7 @@ function renderPlayerMode(){
         <div class="pm-past-date"><span class="pm-past-day">${f.day}.${f.mo}</span><span class="pm-past-dow">${f.dow}</span></div>
         <div class="pm-past-title">${f.isMatch?'\u26bd':'\ud83c\udfc3'} ${_amEscapeText(f.title)}</div>
         <div class="pm-past-status"><span class="pm-past-icon">${icon}</span><span class="pm-past-lbl">${lbl}</span></div>
+        ${(Array.isArray(p.rpe)&&typeof p.rpe[si]==='number')?`<div class="pm-past-rpe" title="Von dir bewertet">\ud83d\udcaa ${p.rpe[si]}</div>`:''}
       </div>`;
     });
     html+='</div></details>';
@@ -14269,6 +14445,7 @@ function openSessStats(si){
   // Roll-call entry point: trainers only, and only once the session is
   // actually running/past — capturing attendance for a future date is not
   // a thing (RSVP handles that).
+  try{renderSessRpe(si);}catch(e){console.error('sessRpe:',e);}
   const rcw=document.getElementById('ss-rollcall-wrap');
   if(rcw)rcw.style.display=(canEdit()&&typeof _isSessRollCallTime==='function'&&_isSessRollCallTime(si))?'block':'none';
   const ssDelBtn=document.getElementById('ss-del');const ssEdit=document.getElementById('ss-edit');
