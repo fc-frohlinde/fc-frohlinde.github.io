@@ -18559,6 +18559,25 @@ const LOC_ICON='<svg class="ico-loc" viewBox="0 0 24 24" width="1em" height="1em
   +'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>';
 function getLocations(){
   if(!Array.isArray(G.locationList))G.locationList=[];
+  // Self-healing: places already entered on sessions — in any team and any
+  // season — belong in the list even if they were typed before the list
+  // existed. Without this the dropdown starts empty on a database that is
+  // already full of locations.
+  try{
+    const seen=new Set(G.locationList.map(x=>String(x).toLowerCase()));
+    Object.values(G.db||{}).forEach(block=>{
+      if(!block||!Array.isArray(block.sessions))return;
+      block.sessions.forEach(s=>{
+        const v=s&&typeof s.location==='string'?s.location.trim():'';
+        if(!v)return;
+        const k=v.toLowerCase();
+        if(seen.has(k))return;
+        seen.add(k);
+        G.locationList.push(v);
+      });
+    });
+    G.locationList.sort((a,b)=>String(a).localeCompare(String(b),'de'));
+  }catch(e){}
   return G.locationList;
 }
 function rememberLocation(name){
