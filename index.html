@@ -2598,15 +2598,6 @@ if(window._fbBlocked){
       <div id="ss-meta" style="font-size:.76rem;color:var(--gm);margin-top:4px;"></div>
       <div id="ss-note-display" style="font-size:.78rem;color:var(--gd);font-style:italic;margin-top:4px;display:none;"></div>
       <div id="ss-plan-link" style="display:none;font-size:.78rem;margin-top:5px;"></div>
-      <div id="ss-loc-wrap" style="margin-top:8px;">
-        <div class="loc-field">
-          <span class="loc-ic">📍</span>
-          <input type="text" id="ss-loc" list="ssLocList" placeholder="Ort eintragen…" maxlength="80"
-            onchange="sessSetLocation(_currentSessIdx,this.value)">
-          <datalist id="ssLocList"></datalist>
-          <button type="button" class="btn bs loc-mgr-btn" onclick="openLocationManager()" title="Orte verwalten">⚙</button>
-        </div>
-      </div>
       <div id="ss-rpe-wrap" style="display:none;margin-top:8px;"></div>
       <div id="ss-rollcall-wrap" style="display:none;margin-top:8px;">
         <button class="btn" style="background:var(--ok-bg);color:var(--ok-fg);border:1.5px solid rgba(39,174,96,.4);font-size:.78rem;font-weight:700;" onclick="rcOpen(_currentSessIdx)">✓ Anwesenheit erfassen</button>
@@ -10698,12 +10689,8 @@ function renderSessRpe(si){
   const isMatch=s.type==='match';
   box.innerHTML=`<div class="u-card" style="padding:10px 12px;">
     <div class="u-sec-h" style="margin-bottom:6px;">\ud83d\udcaa Belastung (sRPE)</div>
-    <div class="rpe-dur">
-      <label>Dauer</label>
-      <input type="number" min="15" max="240" step="5" value="${mins}"
-        onchange="sessSetDuration(${si},this.value)"> <span>Min</span>
-      ${isMatch?'<span class="rpe-dur-hint">Einsatzminuten je Spieler unten</span>':''}
-    </div>
+    <div class="rpe-dur"><span>Dauer: ${mins} Min \u00b7 \u00e4nderbar unter \u201eBearbeiten\u201c</span>
+      ${isMatch?'<span class="rpe-dur-hint">Einsatzminuten je Spieler unten</span>':''}</div>
     <div style="display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;">
       <div><span style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--bd);">${avg.toFixed(1)}</span>
         <span style="font-size:.7rem;color:var(--gm);"> \u00d8 von ${vals.length}${present?'/'+present:''}</span></div>
@@ -15254,13 +15241,7 @@ function openSessStats(si){
   // Roll-call entry point: trainers only, and only once the session is
   // actually running/past — capturing attendance for a future date is not
   // a thing (RSVP handles that).
-  try{
-    renderLocationDatalist();
-    const lw=document.getElementById('ss-loc-wrap');
-    const li=document.getElementById('ss-loc');
-    if(lw)lw.style.display=canEdit()?'block':'none';
-    if(li)li.value=s.location||'';
-  }catch(e){console.error('sessLoc:',e);}
+  try{renderLocationDatalist();}catch(e){console.error('locList:',e);}
   try{renderSessRpe(si);}catch(e){console.error('sessRpe:',e);}
   const rcw=document.getElementById('ss-rollcall-wrap');
   if(rcw)rcw.style.display=(canEdit()&&typeof _isSessRollCallTime==='function'&&_isSessRollCallTime(si))?'block':'none';
@@ -15301,6 +15282,14 @@ function openSessStats(si){
           <input type="date" id="ss-e-date" value="${dispToISO(s.date)}" style="width:140px;padding:6px;border:1.5px solid var(--gl);border-radius:6px;font-size:.8rem;outline:none;margin-bottom:0;" onchange="updSessDate(${si},this.value)"/></div>
         <div style="flex:none;"><label style="font-size:.61rem;font-weight:700;color:var(--gd);text-transform:uppercase;">Uhrzeit</label>
           <input type="time" id="ss-e-time" value="${s.time||''}" style="width:96px;padding:6px;border:1.5px solid var(--gl);border-radius:6px;font-size:.8rem;outline:none;margin-bottom:0;" onchange="updSessTime(${si},this.value)"/></div>
+        <div style="flex:none;"><label style="font-size:.61rem;font-weight:700;color:var(--gd);text-transform:uppercase;">Dauer</label>
+          <input type="number" id="ss-e-dur" min="15" max="240" step="5" value="${rpeSessionMinutes(s,null,si)}" style="width:78px;padding:6px;border:1.5px solid var(--gl);border-radius:6px;font-size:.8rem;outline:none;margin-bottom:0;" onchange="sessSetDuration(${si},this.value)"/></div>
+        <div style="flex:2;min-width:150px;"><label style="font-size:.61rem;font-weight:700;color:var(--gd);text-transform:uppercase;">📍 Ort</label>
+          <div style="display:flex;gap:5px;">
+            <input type="text" id="ss-e-loc" list="ssLocList" value="${escapeHtml(s.location||'')}" placeholder="Ort…" maxlength="80" style="flex:1;min-width:0;padding:6px;border:1.5px solid var(--gl);border-radius:6px;font-size:.8rem;outline:none;margin-bottom:0;" onchange="sessSetLocation(${si},this.value)"/>
+            <datalist id="ssLocList"></datalist>
+            <button type="button" class="btn bs" style="padding:6px 9px;font-size:.76rem;flex-shrink:0;" onclick="openLocationManager()" title="Orte verwalten">⚙</button>
+          </div></div>
         ${isMat?`
           <div style="flex:2;min-width:120px;"><label style="font-size:.61rem;font-weight:700;color:var(--gd);text-transform:uppercase;">Gegner</label>
             <input type="text" id="ss-e-lbl" value="${s.label||''}" style="width:100%;padding:6px;border:1.5px solid var(--gl);border-radius:6px;font-size:.8rem;outline:none;margin-bottom:0;" oninput="updSessLabel(${si},this.value)"/></div>
