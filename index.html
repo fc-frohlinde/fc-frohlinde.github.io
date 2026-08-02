@@ -10068,6 +10068,10 @@ function _pmComputeRank(p,D){
     let pr=0,mk=0;
     D.sessions.forEach((s,si)=>{
       if(!s)return;
+      // Same basis as the percentage shown above — a rank computed over a
+      // different set of sessions is what makes equal percentages look
+      // unequally ranked.
+      if(typeof sessTookPlace==='function'&&!sessTookPlace(s,D.season||UI.currentSeason))return;
       const v=si<pp.s.length?pp.s[si]:3;
       if(v===1||v===0||v===2){mk++;if(v===1)pr++;}
     });
@@ -10130,7 +10134,12 @@ function _pmSanitizeG(){
       // ranking that only ranked 18 players.
       CU._pmTeamSize=fullD.players.filter(pp=>{
         if(!pp||!Array.isArray(pp.s))return false;
-        return pp.s.some(v=>v===1||v===0||v===2);
+        return (fullD.sessions||[]).some((s,si)=>{
+          if(!s)return false;
+          if(typeof sessTookPlace==='function'&&!sessTookPlace(s,UI.currentSeason))return false;
+          const v=si<pp.s.length?pp.s[si]:3;
+          return v===1||v===0||v===2;
+        });
       }).length;
     }
   }catch(e){CU._pmRank=null;}
@@ -10715,10 +10724,14 @@ function _pmCalcStats(p,D){
   // Compute player's season attendance %, streak, and rank among teammates.
   if(!p||!D||!Array.isArray(D.sessions))return null;
   const sessions=D.sessions;
-  // PCT: count ALL marked sessions (no date filter) — matches Wochenbericht logic
+  // PCT: only sessions that have actually taken place. Counting every marked
+  // session meant a trainer pre-marking a future date (or an Entschuldigt
+  // filed in advance) moved the player's percentage before the session
+  // happened — the number then disagreed with what the player had experienced.
   let present=0,marked=0;
   sessions.forEach((s,si)=>{
     if(!s)return;
+    if(typeof sessTookPlace==='function'&&!sessTookPlace(s,UI.currentSeason))return;
     const v=(p.s&&si<p.s.length)?p.s[si]:3;
     if(v===1||v===0||v===2){marked++;if(v===1)present++;}
   });
