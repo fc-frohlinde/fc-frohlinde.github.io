@@ -142,27 +142,6 @@
 
   /* ── Ranking ── */
   .rank-list{display:flex;flex-direction:column;gap:8px;}
-  /* Detail panel sits on its own line below the row, so the row keeps its
-     one-line rhythm and the ranking stays scannable. */
-  .rank-row.has-det{flex-wrap:wrap;}
-  .rank-det{flex-basis:100%;order:10;margin-top:8px;border-top:1px solid rgba(0,0,0,.07);padding-top:7px;}
-  .rank-det>summary{list-style:none;cursor:pointer;font-size:.7rem;font-weight:700;
-    letter-spacing:.6px;text-transform:uppercase;color:#8fa8cc;padding:2px 0;}
-  .rank-det>summary::-webkit-details-marker{display:none;}
-  .rank-det>summary::after{content:' \25be';}
-  .rank-det[open]>summary::after{content:' \25b4';}
-  .rank-det-body{padding-top:8px;}
-  .rd-kpis{display:flex;gap:8px;margin-bottom:7px;}
-  .rd-kpi{flex:1;background:#f0f4fc;border-radius:8px;padding:7px 4px;text-align:center;}
-  .rd-v{display:block;font-family:'Bebas Neue',sans-serif;font-size:1.05rem;color:#3d5272;line-height:1;}
-  .rd-l{display:block;font-size:.6rem;letter-spacing:.6px;text-transform:uppercase;color:#8fa8cc;margin-top:3px;}
-  .rd-split{font-size:.74rem;color:#8fa8cc;margin-bottom:7px;}
-  .rd-wd{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:4px;height:64px;}
-  .rd-wd-col{display:flex;flex-direction:column;align-items:center;min-width:0;}
-  .rd-wd-bar-wrap{flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center;}
-  .rd-wd-bar{width:58%;max-width:16px;background:#1659b8;border-radius:3px 3px 0 0;min-height:3px;}
-  .rd-wd-d{font-size:.58rem;color:#8fa8cc;margin-top:3px;}
-  .rd-wd-p{font-size:.58rem;color:#3d5272;font-weight:700;}
   .rank-row{
     display:flex;align-items:center;gap:12px;
     background:var(--card);border:1px solid var(--card-br);
@@ -428,23 +407,7 @@ function renderReport(r){
     const altHtml=showAlt
       ? `<div class="rank-pct-alt"><span class="alt-lbl">${altLbl}</span><span class="alt-val ${pctClass(altPct)}">${altPct==null?'\u2013':altPct+'%'}</span></div>`
       : '';
-    // Detail is optional (trainer decides when publishing) and collapsed:
-    // the ranking must stay scannable, the numbers are for whoever wants them.
-    const d=p.detail;
-    const detailHtml=d?`<details class="rank-det">
-      <summary>Details</summary>
-      <div class="rank-det-body">
-        <div class="rd-kpis">
-          <div class="rd-kpi"><span class="rd-v">${d.tPct==null?'\u2013':d.tPct+'%'}</span><span class="rd-l">Training</span></div>
-          <div class="rd-kpi"><span class="rd-v">${d.mPct==null?'\u2013':d.mPct+'%'}</span><span class="rd-l">Spiele</span></div>
-          <div class="rd-kpi"><span class="rd-v">${d.streak}</span><span class="rd-l">Serie</span></div>
-        </div>
-        <div class="rd-split">\u2705 ${d.cA} \u00b7 \u274c ${d.cF} \u00b7 \ud83d\udccb ${d.cE}</div>
-        ${d.weekday&&d.weekday.length?`<div class="rd-wd">${d.weekday.map(w=>
-          `<div class="rd-wd-col"><div class="rd-wd-bar-wrap"><div class="rd-wd-bar" style="height:${w.pct==null?0:w.pct}%"></div></div>
-           <div class="rd-wd-d">${w.day}</div><div class="rd-wd-p">${w.pct==null?'\u2013':w.pct+'%'}</div></div>`).join('')}</div>`:''}
-      </div></details>`:'';
-    return `<div class="rank-row${topCls}${d?' has-det':''}" style="animation-delay:${Math.min(idx*55,900)}ms">
+    return `<div class="rank-row${topCls}" style="animation-delay:${Math.min(idx*55,900)}ms">
       ${numOrMedal}
       ${av(p)}
       <div class="rank-info">
@@ -462,7 +425,6 @@ function renderReport(r){
         </div>
         ${altHtml}
       </div>
-      ${detailHtml}
     </div>`;
   };
 
