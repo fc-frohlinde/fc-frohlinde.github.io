@@ -2097,6 +2097,7 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 .loc-mgr-btn{flex-shrink:0;padding:6px 10px;font-size:.8rem;}
 .loc-row{display:flex;align-items:center;gap:8px;padding:7px 2px;border-bottom:1px solid var(--gl);}
 .loc-name{flex:1;min-width:0;font-size:.8rem;color:var(--gd);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.home-next-loc{font-size:.72rem;color:rgba(255,255,255,.6);margin-top:4px;display:flex;align-items:center;gap:5px;}
 .rpe-dur{display:flex;align-items:center;gap:6px;font-size:.74rem;color:var(--gm);margin-bottom:7px;}
 .rpe-dur input{width:66px;padding:4px 7px;border:1.5px solid var(--gl);border-radius:6px;
   font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:600;color:var(--gd);}
@@ -15257,7 +15258,9 @@ function openSessStats(si){
   const isMat=s.type==='match';
   const parts=s.date.split(' ');
   document.getElementById('ss-title').textContent=s.date+(isMat&&s.label?' – '+s.label:s.focus?' · '+s.focus:'');
-  document.getElementById('ss-meta').innerHTML=isMat?`⚽ Spiel &nbsp;·&nbsp; ${s.homeAway==='home'?'🏠 Heim':'🚌 Auswärts'}${s.label?' &nbsp;·&nbsp; '+escapeHtml(s.label):''}${s.time?' &nbsp;·&nbsp; ⏰ '+escapeHtml(s.time):''}`:`Training${s.focus?' &nbsp;·&nbsp; 🎯 '+escapeHtml(s.focus):''}${s.time?' &nbsp;·&nbsp; ⏰ '+escapeHtml(s.time):''}`;
+  // Location belongs on the meta line: it is the second question after "when"
+  const _locMeta=(s.location&&s.location.trim())?' &nbsp;·&nbsp; '+LOC_ICON+' '+escapeHtml(s.location.trim()):'';
+  document.getElementById('ss-meta').innerHTML=(isMat?`⚽ Spiel &nbsp;·&nbsp; ${s.homeAway==='home'?'🏠 Heim':'🚌 Auswärts'}${s.label?' &nbsp;·&nbsp; '+escapeHtml(s.label):''}${s.time?' &nbsp;·&nbsp; ⏰ '+escapeHtml(s.time):''}`:`Training${s.focus?' &nbsp;·&nbsp; 🎯 '+escapeHtml(s.focus):''}${s.time?' &nbsp;·&nbsp; ⏰ '+escapeHtml(s.time):''}`)+_locMeta;
   try{renderEvalTopicRow(si);}catch(e){console.error('evalTopic:',e);}
   // Roll-call entry point: trainers only, and only once the session is
   // actually running/past — capturing attendance for a future date is not
@@ -16522,7 +16525,7 @@ function renderCalendarMobile(el){
         sk,type:isMatch?'match':'training',
         icon:isMatch?'⚽':'🏃',
         title:isMatch?(s.label||'Spiel'):'Training'+(s.focus?' · '+s.focus:''),
-        sub:s.time||'',
+        sub:(s.time||'')+((s.location&&s.location.trim())?' \u00b7 '+escapeHtml(s.location.trim()):''),
         action:`closeM('moCalendar');jumpToSession(${si},{id:'moCalendar'});`
       });
     });
@@ -17198,7 +17201,9 @@ function homeRenderNext(){
       '<div class="home-next-main">'+
         '<div class="home-next-date">'+escapeHtml(s.date||'')+(s.time?(' \u00b7 '+s.time):'')+'</div>'+
         '<div class="home-next-count">'+whenTxt(d)+'</div>'+
-      '</div>'+rsvp(tIdx)+'</div>';
+      '</div>'+
+      ((s.location&&s.location.trim())?'<div class="home-next-loc">'+LOC_ICON+' '+escapeHtml(s.location.trim())+'</div>':'')+
+      rsvp(tIdx)+'</div>';
   }
   if(mIdx>=0){
     const s=D.sessions[mIdx];
@@ -17213,7 +17218,9 @@ function homeRenderNext(){
         '<div class="home-next-date" style="font-size:1.1rem;">'+escapeHtml(s.date||'')+(s.time?(' \u00b7 '+s.time):'')+'</div>'+
         '<span class="home-next-pill" style="'+haColor+'">'+ha+'</span>'+
         '<div class="home-next-count">'+whenTxt(d)+'</div>'+
-      '</div>'+rsvp(mIdx)+'</div>';
+      '</div>'+
+      ((s.location&&s.location.trim())?'<div class="home-next-loc">'+LOC_ICON+' '+escapeHtml(s.location.trim())+'</div>':'')+
+      rsvp(mIdx)+'</div>';
   }
   _homeSetHtml(row,html);
   row.style.gridTemplateColumns=(tIdx>=0&&mIdx>=0)?'1fr 1fr':'1fr';
