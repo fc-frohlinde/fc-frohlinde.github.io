@@ -2060,6 +2060,7 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 .pm-rpe-legend{display:flex;justify-content:space-between;font-size:.64rem;color:var(--gm);margin-top:6px;}
 .pm-rpe-fb{font-size:.74rem;color:var(--gm);margin-top:9px;line-height:1.35;}
 .pm-rpe-done .pm-rpe-fb{color:var(--ok-fg);font-weight:600;}
+.pm-count-open{background:var(--warn-bg) !important;color:var(--warn-fg) !important;}
 .pm-past-rpe{font-size:.7rem;color:var(--gm);font-weight:700;padding-left:6px;white-space:nowrap;}
 .pm-recent{margin:0 16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;overflow:hidden;}
 .pm-recent>summary{list-style:none;cursor:pointer;padding:12px 16px;margin:0;display:flex;align-items:center;gap:8px;color:#fff;}
@@ -10868,7 +10869,7 @@ function renderPlayerMode(){
     //   2 = Entschuldigt (player or trainer)| 3 = Ausstehend (default)
     //   4 = Angemeldet (player promised)
     const status=(p.s&&si<p.s.length)?p.s[si]:3;
-    const existingReason=(Array.isArray(p.preconfReason)&&si<p.preconfReason.length)?(p.preconfReason[si]||''):'';
+
     const rsvpUntil=_amSessionDeadline(si);
     const locked=_amRsvpLocked(si);
     let deadlineLine='';
@@ -10892,7 +10893,7 @@ function renderPlayerMode(){
     else if(status===2)feedback='<div class="pm-feedback pm-fb-exc">\ud83d\udccb Du bist abgemeldet</div>';
     else if(status===4)feedback='<div class="pm-feedback pm-fb-yes">\u2713 Du bist angemeldet</div>';
     // Reason textarea: show only when Entschuldigt (status===2). Player can edit own reason.
-    const showReason=(status===2);
+
     const haInfo=f.isMatch&&s.homeAway?`<div class="pm-loc">${s.homeAway==='home'?'\ud83c\udfe0 Heim':'\ud83d\ude8c Ausw\u00e4rts'}</div>`:'';
     // Location line — only if the session has one defined
     const locInfo=(s.location&&s.location.trim())?`<div class="pm-loc">\ud83d\udccd ${_amEscapeText(s.location.trim())}</div>`:'';
@@ -10919,9 +10920,9 @@ function renderPlayerMode(){
           <button class="pm-btn pm-yes${kommeActive?' active':''}"${kommeAttr} onclick="pmSetStatus(${si},1)"><span class="pm-btn-ico">\u2713</span><span class="pm-btn-lbl">Komme</span></button>
           <button class="pm-btn pm-no${kannNichtActive?' active':''}"${kannNichtAttr} onclick="pmSetStatus(${si},0)"><span class="pm-btn-ico">\u2717</span><span class="pm-btn-lbl">Kann nicht</span></button>
         </div>
-        ${showReason?`<div class="pm-reason-wrap">
-          <textarea class="pm-reason" placeholder="Grund (optional)\u2026" rows="1" maxlength="200"${locked?' readonly':''} onblur="pmSaveReason(${si},this.value)">${_amEscapeText(existingReason)}</textarea>
-        </div>`:''}
+<!-- Reason field removed: the weekly survey asks for availability, not for
+             justifications. Existing reasons stay in the data and remain
+             visible to trainers; nothing new is collected here. -->
         ${feedback}
       </div>
     </div>`;
@@ -10960,38 +10961,22 @@ function renderPlayerMode(){
       </div>`;
     });
   }
-  // ── NEXT SESSION (hero card) ──
+  // ── THIS WEEK'S DATES ──
+  // One flat list, every entry equal. Singling out the next session made the
+  // rest look optional, while the weekly survey needs an answer for ALL of
+  // them; the open count in the heading states the remaining task directly.
   if(upcoming.length>0){
-    const next=upcoming[0];
-    html+='<div class="pm-section-h">\ud83c\udfaf N\u00e4chster Termin</div>';
-    html+=renderCard(next.s,next.si,next.sk,true);
-    // ── OTHER UPCOMING ──
-    if(upcoming.length>1){
-      const others=upcoming.slice(1);
-      // Never collapsed: with a week-long horizon this is a short list, and
-      // every entry needs an answer.
-      // Collapsed once there are more than two: the player's task on this
-      // screen is to answer for the NEXT session, and a long list of dates
-      // pushes that decision off the first screen. With two or fewer it stays
-      // open — a fold that hides almost nothing is just an extra tap.
-      // The count in the summary keeps the hidden dates discoverable, and the
-      // same <details> pattern as "Letzte Termine" makes it self-evident.
-      const collapsed=false;
-      if(collapsed){
-        html+=`<details class="pm-recent"><summary class="pm-section-h pm-section-summary">`
-          +`<span>\ud83d\udcc5 Weitere Termine</span>`
-          +`<span class="pm-count">${others.length}</span>`
-          +`<span class="pm-chevron">\u203a</span></summary>`;
-        html+='<div class="pm-list" style="padding-top:6px;">';
-        others.forEach(({s,si,sk})=>{html+=renderCard(s,si,sk,false);});
-        html+='</div></details>';
-      }else{
-        html+=`<div class="pm-section-h">\ud83d\udcc5 Weitere Termine <span class="pm-count">${others.length}</span></div>`;
-        html+='<div class="pm-list">';
-        others.forEach(({s,si,sk})=>{html+=renderCard(s,si,sk,false);});
-        html+='</div>';
-      }
-    }
+    const openCount=upcoming.filter(({si})=>{
+      const v=(p.s&&si<p.s.length)?p.s[si]:3;
+      return v===3;
+    }).length;
+    html+=`<div class="pm-section-h">\ud83d\udcc5 Deine Termine`
+      +(openCount?`<span class="pm-count pm-count-open">${openCount} offen</span>`
+                 :`<span class="pm-count">\u2713 vollst\u00e4ndig</span>`)
+      +`</div>`;
+    html+='<div class="pm-list">';
+    upcoming.forEach(({s,si,sk})=>{html+=renderCard(s,si,sk,false);});
+    html+='</div>';
   } else {
     html+='<div class="pm-empty">\ud83d\udcc5 Diese Woche sind keine Termine mehr geplant.</div>';
   }
