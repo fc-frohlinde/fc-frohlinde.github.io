@@ -11316,8 +11316,11 @@ function renderPlayerMode(){
     // Feedback messages
     let feedback='';
     if(status===1)feedback='<div class="pm-feedback pm-fb-yes">\u2713 Vom Trainer als anwesend eingetragen</div>';
-    else if(status===0)feedback='<div class="pm-feedback pm-fb-no">\u2717 Vom Trainer als fehlend eingetragen</div>';
-    else if(status===2)feedback='<div class="pm-feedback pm-fb-exc">\ud83d\udccb Du bist abgemeldet</div>';
+    // Status 0 is now what the player's own "Kann nicht" writes, so reporting
+    // it back as a trainer entry was simply wrong. What the player needs here
+    // is the one thing that turns an absence into an excused one: a call.
+    else if(status===0)feedback='<div class="pm-feedback pm-fb-no">\u2717 Abgesagt \u2014 Grund bitte telefonisch beim Trainer melden</div>';
+    else if(status===2)feedback='<div class="pm-feedback pm-fb-exc">\ud83d\udccb Entschuldigt</div>';
     else if(status===4)feedback='<div class="pm-feedback pm-fb-yes">\u2713 Du bist angemeldet</div>';
     // Reason textarea: show only when Entschuldigt (status===2). Player can edit own reason.
 
