@@ -2088,6 +2088,12 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 .load-c{font-size:.7rem;text-align:center;padding:5px 2px;border-radius:6px;background:var(--muted-bg);color:var(--gm);font-weight:600;}
 .load-c.spike{box-shadow:inset 0 0 0 2px var(--warn);}
 .load-note{font-size:.66rem;color:var(--gm);margin-top:8px;line-height:1.4;}
+.loc-field{display:flex;align-items:center;gap:6px;}
+.loc-field input{flex:1;min-width:0;}
+.loc-ic{font-size:.9rem;}
+.loc-mgr-btn{flex-shrink:0;padding:6px 10px;font-size:.8rem;}
+.loc-row{display:flex;align-items:center;gap:8px;padding:7px 2px;border-bottom:1px solid var(--gl);}
+.loc-name{flex:1;min-width:0;font-size:.8rem;color:var(--gd);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .rpe-dur{display:flex;align-items:center;gap:6px;font-size:.74rem;color:var(--gm);margin-bottom:7px;}
 .rpe-dur input{width:66px;padding:4px 7px;border:1.5px solid var(--gl);border-radius:6px;
   font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:600;color:var(--gd);}
@@ -2592,6 +2598,15 @@ if(window._fbBlocked){
       <div id="ss-meta" style="font-size:.76rem;color:var(--gm);margin-top:4px;"></div>
       <div id="ss-note-display" style="font-size:.78rem;color:var(--gd);font-style:italic;margin-top:4px;display:none;"></div>
       <div id="ss-plan-link" style="display:none;font-size:.78rem;margin-top:5px;"></div>
+      <div id="ss-loc-wrap" style="margin-top:8px;">
+        <div class="loc-field">
+          <span class="loc-ic">📍</span>
+          <input type="text" id="ss-loc" list="ssLocList" placeholder="Ort eintragen…" maxlength="80"
+            onchange="sessSetLocation(_currentSessIdx,this.value)">
+          <datalist id="ssLocList"></datalist>
+          <button type="button" class="btn bs loc-mgr-btn" onclick="openLocationManager()" title="Orte verwalten">⚙</button>
+        </div>
+      </div>
       <div id="ss-rpe-wrap" style="display:none;margin-top:8px;"></div>
       <div id="ss-rollcall-wrap" style="display:none;margin-top:8px;">
         <button class="btn" style="background:var(--ok-bg);color:var(--ok-fg);border:1.5px solid rgba(39,174,96,.4);font-size:.78rem;font-weight:700;" onclick="rcOpen(_currentSessIdx)">✓ Anwesenheit erfassen</button>
@@ -2731,6 +2746,12 @@ if(window._fbBlocked){
   <label>Datum</label><input type="date" id="newDate"/>
   <label>Uhrzeit</label><input type="time" id="newTime" value="18:30"/>
   <label>Dauer (Minuten)</label><input type="number" id="newDur" value="90" min="15" max="240" step="5"/>
+  <label>Ort</label>
+  <div class="loc-field">
+    <input type="text" id="newLoc" list="locList" placeholder="z.B. Kunstrasen Platz 2" maxlength="80"/>
+    <datalist id="locList"></datalist>
+    <button type="button" class="btn bs loc-mgr-btn" onclick="openLocationManager()" title="Orte verwalten">⚙</button>
+  </div>
   <label>Schwerpunkt</label>
   <select id="newFocus"><option value="">– Kein –</option></select>
   <p class="note">Chronologisch einsortiert.</p>
@@ -10506,6 +10527,18 @@ function rpeIsOpen(s,si,p,season){
 // Trainer view: how the squad experienced this session. Deliberately shows
 // the SPREAD, not just the mean — if a session lands at 8 for everyone the
 // plan was off, and if it splits 3/9 the intensity was unevenly distributed.
+function sessSetLocation(si,val){
+  if(!canEdit())return;
+  const D=cd();const s=D&&D.sessions&&D.sessions[si];
+  if(!s)return;
+  const v=String(val||'').trim().slice(0,80);
+  if((s.location||'')===v)return;
+  snap();
+  if(v){s.location=v;rememberLocation(v);}else delete s.location;
+  saveG();
+  logAudit('Ort geändert',s.date||'?',v||'entfernt');
+  renderLocationDatalist();
+}
 function sessSetDuration(si,val){
   if(!canEdit())return;
   const D=cd();const s=D&&D.sessions&&D.sessions[si];
@@ -15221,6 +15254,13 @@ function openSessStats(si){
   // Roll-call entry point: trainers only, and only once the session is
   // actually running/past — capturing attendance for a future date is not
   // a thing (RSVP handles that).
+  try{
+    renderLocationDatalist();
+    const lw=document.getElementById('ss-loc-wrap');
+    const li=document.getElementById('ss-loc');
+    if(lw)lw.style.display=canEdit()?'block':'none';
+    if(li)li.value=s.location||'';
+  }catch(e){console.error('sessLoc:',e);}
   try{renderSessRpe(si);}catch(e){console.error('sessRpe:',e);}
   const rcw=document.getElementById('ss-rollcall-wrap');
   if(rcw)rcw.style.display=(canEdit()&&typeof _isSessRollCallTime==='function'&&_isSessRollCallTime(si))?'block':'none';
@@ -18480,6 +18520,67 @@ function _populateDatalist(datalistId){
   console.info('[autocomplete] '+UI.currentTeam+' opponents:',arr.length,arr.slice(0,10));
   dl.innerHTML=arr.map(v=>`<option value="${escapeHtml(v)}"></option>`).join('');
 }
+// ══ LOCATIONS ════════════════════════════════════════════════
+// Kept as a plain reusable list: a club trains on the same handful of
+// pitches, and retyping "Kunstrasen Platz 2" every week invites typos that
+// then read as different places on the players' screens.
+function getLocations(){
+  if(!Array.isArray(G.locationList))G.locationList=[];
+  return G.locationList;
+}
+function rememberLocation(name){
+  const v=String(name||'').trim().slice(0,80);
+  if(!v)return;
+  const list=getLocations();
+  // Case-insensitive match keeps "Platz 2" and "platz 2" from both appearing
+  if(list.some(x=>String(x).toLowerCase()===v.toLowerCase()))return;
+  list.push(v);
+  list.sort((a,b)=>String(a).localeCompare(String(b),'de'));
+}
+function removeLocation(name){
+  const list=getLocations();
+  const i=list.findIndex(x=>x===name);
+  if(i<0)return;
+  if(!confirm('Ort \u201e'+name+'\u201c aus der Liste entfernen?\n\nBereits eingetragene Termine behalten ihren Ort.'))return;
+  snap();list.splice(i,1);saveG();
+  renderLocationDatalist();
+  renderLocationManager();
+}
+function renderLocationDatalist(){
+  const dl=document.getElementById('locList');
+  if(!dl)return;
+  dl.innerHTML=getLocations().map(l=>`<option value="${escapeHtml(l)}"></option>`).join('');
+  const dl2=document.getElementById('ssLocList');
+  if(dl2)dl2.innerHTML=dl.innerHTML;
+}
+function openLocationManager(){
+  renderLocationManager();
+  openM('moLocations');
+}
+function renderLocationManager(){
+  const box=document.getElementById('loc-mgr-list');
+  if(!box)return;
+  const list=getLocations();
+  if(!list.length){
+    box.innerHTML='<div class="u-empty"><div class="u-empty-icon">\ud83d\udccd</div>'
+      +'<div class="u-empty-txt">Noch keine Orte gespeichert. Orte werden automatisch \u00fcbernommen, sobald du sie bei einem Termin eintr\u00e4gst.</div></div>';
+    return;
+  }
+  box.innerHTML=list.map(l=>`<div class="loc-row">
+    <span class="loc-name">\ud83d\udccd ${escapeHtml(l)}</span>
+    <button class="btn-mini" onclick="removeLocation('${escapeHtml(l).replace(/'/g,"\\'")}')" title="Entfernen">\u2715</button>
+  </div>`).join('');
+}
+function locAddManual(){
+  const inp=document.getElementById('loc-mgr-new');
+  if(!inp)return;
+  const v=String(inp.value||'').trim();
+  if(!v)return;
+  snap();rememberLocation(v);saveG();
+  inp.value='';
+  renderLocationDatalist();
+  renderLocationManager();
+}
 function addTraining(){
   if(!canEdit())return;
   const iso=document.getElementById('newDate').value;if(!iso)return alert('Datum auswählen.');
@@ -18488,7 +18589,11 @@ function addTraining(){
   // session would count as the 90-minute default.
   const durEl=document.getElementById('newDur');
   const dur=durEl?Math.max(15,Math.min(240,parseInt(durEl.value,10)||90)):90;
-  snap();insertSorted(ensureCd(),{date:disp,month:moFromDisp(disp),type:'training',focus,time:time||'18:30',duration:dur});
+  const locEl=document.getElementById('newLoc');
+  const loc=locEl?String(locEl.value||'').trim().slice(0,80):'';
+  snap();
+  if(loc)rememberLocation(loc);
+  insertSorted(ensureCd(),{date:disp,month:moFromDisp(disp),type:'training',focus,time:time||'18:30',duration:dur,location:loc||undefined});
   // Track template usage (only on actual session save)
   const tplSel=document.getElementById('tpl-training-sel');
   const tplId=tplSel?tplSel.value:'';
@@ -19451,6 +19556,7 @@ function openM(id){
   requestAnimationFrame(()=>{try{_syncCloseHeight(_moEl);}catch(e){}});
   if(id==='moAddPlayer')initAddPos();
   if(id==='moSession'){
+    renderLocationDatalist();
     populateFocSel();
     setSeasonDateBounds('newDate');
     populateTemplateSelect('training','tpl-training-sel');
@@ -23377,6 +23483,20 @@ checkAutoBackup();
     </div>
   </div>
 </div>
+
+<div class="mo" id="moLocations"><div class="mob" style="width:420px;">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+    <h3 style="margin:0;flex:1;">📍 Orte verwalten</h3>
+  </div>
+  <div style="display:flex;gap:6px;margin-bottom:10px;">
+    <input type="text" id="loc-mgr-new" placeholder="Neuen Ort hinzufügen…" maxlength="80" style="flex:1;">
+    <button class="btn bp" onclick="locAddManual()">＋</button>
+  </div>
+  <div id="loc-mgr-list"></div>
+  <div class="mob-btns">
+    <button class="btn bs" onclick="closeM('moLocations')">Schließen</button>
+  </div>
+</div></div>
 
 <!-- Roll-call: fullscreen attendance capture -->
 <div class="rc-overlay" id="rcOverlay">
