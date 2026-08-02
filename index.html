@@ -2741,11 +2741,7 @@ if(window._fbBlocked){
   <label>Uhrzeit</label><input type="time" id="newTime" value="18:30"/>
   <label>Dauer (Minuten)</label><input type="number" id="newDur" value="90" min="15" max="240" step="5"/>
   <label>Ort</label>
-  <div class="loc-field">
-    <input type="text" id="newLoc" list="locList" placeholder="z.B. Kunstrasen Platz 2" maxlength="80"/>
-    <datalist id="locList"></datalist>
-    <button type="button" class="btn bs loc-mgr-btn" onclick="openLocationManager()" title="Orte verwalten">⚙</button>
-  </div>
+  <div class="loc-field" id="newLocWrap"></div>
   <label>Schwerpunkt</label>
   <select id="newFocus"><option value="">– Kein –</option></select>
   <p class="note">Chronologisch einsortiert.</p>
@@ -15308,8 +15304,7 @@ function openSessStats(si){
           <input type="number" id="ss-e-dur" min="15" max="240" step="5" value="${rpeSessionMinutes(s,null,si)}" style="width:78px;padding:6px;border:1.5px solid var(--gl);border-radius:6px;font-size:.8rem;outline:none;margin-bottom:0;" onchange="sessSetDuration(${si},this.value)"/></div>
         <div style="flex:2;min-width:150px;"><label style="font-size:.61rem;font-weight:700;color:var(--gd);text-transform:uppercase;">${LOC_ICON} Ort</label>
           <div style="display:flex;gap:5px;">
-            <input type="text" id="ss-e-loc" list="ssLocList" value="${escapeHtml(s.location||'')}" placeholder="Ort…" maxlength="80" style="flex:1;min-width:0;padding:6px;border:1.5px solid var(--gl);border-radius:6px;font-size:.8rem;outline:none;margin-bottom:0;" onchange="sessSetLocation(${si},this.value)"/>
-            <datalist id="ssLocList"></datalist>
+            ${locSelectHtml(s.location||'',`locHandleSelect(${si},this.value,this)`,'ss-e-loc')}
             <button type="button" class="btn bs" style="padding:6px 9px;font-size:.76rem;flex-shrink:0;" onclick="openLocationManager()" title="Orte verwalten">⚙</button>
           </div></div>
         ${isMat?`
@@ -18564,6 +18559,46 @@ function removeLocation(name){
   renderLocationDatalist();
   renderLocationManager();
 }
+function locSelectHtml(current,onchangeFn,id){
+  const list=getLocations();
+  const cur=String(current||'');
+  const known=list.some(l=>l===cur);
+  let html=`<select id="${id||''}" onchange="${onchangeFn}" style="width:100%;padding:6px;border:1.5px solid var(--gl);border-radius:6px;font-size:.8rem;outline:none;margin-bottom:0;font-family:'Barlow',sans-serif;color:var(--gd);background:#fff;">`;
+  html+=`<option value=""${cur?'':' selected'}>\u2013 Kein Ort \u2013</option>`;
+  list.forEach(l=>{
+    html+=`<option value="${escapeHtml(l)}"${l===cur?' selected':''}>${escapeHtml(l)}</option>`;
+  });
+  // A place typed before it was in the list must not silently vanish
+  if(cur&&!known)html+=`<option value="${escapeHtml(cur)}" selected>${escapeHtml(cur)}</option>`;
+  html+=`<option value="__new__">\u2795 Neuer Ort\u2026</option>`;
+  html+='</select>';
+  return html;
+}
+function locHandleSelect(si,val,el){
+  if(val==='__new__'){
+    const name=prompt('Neuen Ort eingeben:');
+    const v=String(name||'').trim().slice(0,80);
+    if(!v){ // restore previous selection
+      const D=cd();const s=D&&D.sessions&&D.sessions[si];
+      if(el)el.value=(s&&s.location)||'';
+      return;
+    }
+    snap();rememberLocation(v);saveG();
+    sessSetLocation(si,v);
+    // Rebuild so the new entry appears in the list
+    if(el)el.outerHTML=locSelectHtml(v,`locHandleSelect(${si},this.value,this)`,'ss-e-loc');
+    return;
+  }
+  sessSetLocation(si,val);
+}
+function locHandleNewSelect(val,el){
+  if(val!=='__new__')return;
+  const name=prompt('Neuen Ort eingeben:');
+  const v=String(name||'').trim().slice(0,80);
+  if(!v){if(el)el.value='';return;}
+  snap();rememberLocation(v);saveG();
+  if(el)el.outerHTML=locSelectHtml(v,'locHandleNewSelect(this.value,this)','newLoc');
+}
 function renderLocationDatalist(){
   const dl=document.getElementById('locList');
   if(!dl)return;
@@ -19576,6 +19611,9 @@ function openM(id){
   requestAnimationFrame(()=>{try{_syncCloseHeight(_moEl);}catch(e){}});
   if(id==='moAddPlayer')initAddPos();
   if(id==='moSession'){
+    const lw=document.getElementById('newLocWrap');
+    if(lw)lw.innerHTML=locSelectHtml('','locHandleNewSelect(this.value,this)','newLoc')
+      +'<button type="button" class="btn bs loc-mgr-btn" onclick="openLocationManager()" title="Orte verwalten">\u2699</button>';
     renderLocationDatalist();
     populateFocSel();
     setSeasonDateBounds('newDate');
