@@ -2056,11 +2056,18 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
   border-radius:10px;font-family:'Barlow',sans-serif;font-size:1rem;font-weight:700;color:var(--gd);
   cursor:pointer;transition:transform .1s,background .14s,border-color .14s;padding:0;}
 .pm-rpe-n:active{transform:scale(.9);}
-.pm-rpe-n.on{background:var(--bm);border-color:var(--bm);color:#fff;box-shadow:0 3px 10px rgba(22,89,184,.35);}
-.pm-rpe-legend{display:flex;justify-content:space-between;font-size:.64rem;color:var(--gm);margin-top:6px;}
+.pm-rpe-n.on{box-shadow:0 3px 12px rgba(0,0,0,.28);transform:scale(1.04);}
+.pm-rpe-legend{display:flex;justify-content:space-between;font-size:.64rem;color:var(--gm);margin-top:8px;}
+.pm-rpe-ramp{height:4px;border-radius:999px;margin-top:4px;
+  background:linear-gradient(90deg,hsl(155 70% 55%),hsl(78 70% 52%),hsl(38 85% 55%),hsl(0 72% 55%));}
 .pm-rpe-fb{font-size:.74rem;color:var(--gm);margin-top:9px;line-height:1.35;}
 .pm-rpe-done .pm-rpe-fb{color:var(--ok-fg);font-weight:600;}
 .pm-count-open{background:var(--warn-bg) !important;color:var(--warn-fg) !important;}
+.pm-focus-hint{margin:18px 16px 0;text-align:center;font-size:.74rem;color:rgba(255,255,255,.5);line-height:1.4;}
+/* Focus mode: only the question. Season stats and streak would invite
+   comparison at the exact moment honesty matters most. */
+.pm-focus .pm-stats{display:none;}
+.pm-focus .pm-hero{padding-bottom:18px;}
 .pm-past-rpe{font-size:.7rem;color:var(--gm);font-weight:700;padding-left:6px;white-space:nowrap;}
 .pm-recent{margin:0 16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;overflow:hidden;}
 .pm-recent>summary{list-style:none;cursor:pointer;padding:12px 16px;margin:0;display:flex;align-items:center;gap:8px;color:#fff;}
@@ -10250,10 +10257,14 @@ function rpeIsOpen(s,si,p,season){
   const hm=String(s.time||'').split(':').map(Number);
   const start=new Date(y,m-1,d,(hm.length===2&&!isNaN(hm[0]))?hm[0]:18,(hm.length===2&&!isNaN(hm[1]))?hm[1]:0);
   // Window runs from the END of the session — asking mid-training would get a
-  // rating of half a session.
+  // rating of half a session — and closes at midnight the same day. A rating
+  // given the next morning describes a memory, not the session.
   const endMs=start.getTime()+rpeSessionMinutes(s,p,si)*60000;
-  const ageH=(Date.now()-endMs)/3600000;
-  return ageH>=0&&ageH<=(RPE_IS_PREVIEW?24*30:RPE_WINDOW_H);
+  const now=Date.now();
+  if(now<endMs)return false;
+  if(RPE_IS_PREVIEW)return (now-endMs)/3600000<=24*30;
+  const midnight=new Date(y,m-1,d,23,59,59,999).getTime();
+  return now<=midnight;
 }
 // Trainer view: how the squad experienced this session. Deliberately shows
 // the SPREAD, not just the mean — if a session lands at 8 for everyone the
@@ -10313,6 +10324,12 @@ function pmSetRpe(si,val){
       detail:(p.rpe[si]==null?'zur\u00fcckgenommen':'RPE '+p.rpe[si])});
   }catch(e){}
   // Repaint just this card: a full re-render would scroll the player away
+  // Focus mode showed only this question — once answered, show the week
+  if(document.querySelector('.pm-focus')&&p.rpe[si]!=null){
+    const stillOpen=(D.sessions||[]).some((s2,i2)=>
+      rpeIsOpen(s2,i2,p,UI.currentSeason)&&!(Array.isArray(p.rpe)&&typeof p.rpe[i2]==='number'));
+    if(!stillOpen){setTimeout(()=>{try{renderPlayerMode();}catch(e){}},420);return;}
+  }
   const card=document.querySelector('.pm-rpe[data-si="'+si+'"]');
   if(card){
     card.classList.toggle('pm-rpe-done',p.rpe[si]!=null);
@@ -10931,8 +10948,6 @@ function renderPlayerMode(){
     html+='<div class="pm-preview-banner">\ud83d\udc41 Trainer-Vorschau \u00b7 Eingaben werden echt gespeichert</div>';
   }
   // ── sRPE PROMPT ──
-  // Placed above the upcoming dates on purpose: it is time-critical (the
-  // window closes) while an RSVP for next week is not.
   const rpeOpen=[];
   (D.sessions||[]).forEach((s,si)=>{
     if(rpeIsOpen(s,si,p,UI.currentSeason))rpeOpen.push({s,si});
@@ -10953,13 +10968,31 @@ function renderPlayerMode(){
         </div>
         <div class="pm-rpe-scale">`;
       for(let n=0;n<=10;n++){
-        html+=`<button type="button" class="pm-rpe-n${cur===n?' on':''}" onclick="pmSetRpe(${si},${n})">${n}</button>`;
+        // Cool → hot across the scale so the magnitude is readable at a
+        // glance. Deliberately a HEAT ramp, not a good/bad one: red here
+        // means "hard", and hard is not a bad answer.
+        const hue=Math.round(155-(n/10)*155);        // 155° green → 0° red
+        const st=cur===n
+          ? `background:hsl(${hue} 72% 42%);border-color:hsl(${hue} 72% 42%);color:#fff;`
+          : `background:hsl(${hue} 70% 95%);border-color:hsl(${hue} 55% 78%);color:hsl(${hue} 60% 28%);`;
+        html+=`<button type="button" class="pm-rpe-n${cur===n?' on':''}" style="${st}" onclick="pmSetRpe(${si},${n})">${n}</button>`;
       }
       html+=`</div>
-        <div class="pm-rpe-legend"><span>0 \u00b7 nichts</span><span>10 \u00b7 maximal</span></div>
+        <div class="pm-rpe-legend"><span>0 \u00b7 gar nicht</span><span>10 \u00b7 maximal</span></div>
+        <div class="pm-rpe-ramp" aria-hidden="true"></div>
         <div class="pm-rpe-fb" id="pm-rpe-fb-${si}">${done?('\u2713 '+_amEscapeText(RPE_SCALE[cur][1])+' \u2014 danke!'):'Keine Note, kein richtig oder falsch \u2014 dein ehrliches Gef\u00fchl z\u00e4hlt.'}</div>
       </div>`;
     });
+  }
+  // A player opening the link right after training came for one thing. While
+  // a rating is still pending, the week's dates would only compete with it —
+  // and the window closes tonight, so this cannot wait. Once rated, the normal
+  // screen appears (the rating card stays, so it can still be corrected).
+  const _rpePending=rpeOpen.filter(({si})=>!(Array.isArray(p.rpe)&&typeof p.rpe[si]==='number'));
+  if(_rpePending.length){
+    wrap.innerHTML='<div class="pm-focus">'+html
+      +`<div class="pm-focus-hint">Danach siehst du deine Termine f\u00fcr die Woche.</div></div></div>`;
+    return;
   }
   // ── THIS WEEK'S DATES ──
   // One flat list, every entry equal. Singling out the next session made the
