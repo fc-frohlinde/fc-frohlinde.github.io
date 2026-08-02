@@ -2062,6 +2062,11 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
   background:linear-gradient(90deg,hsl(155 70% 55%),hsl(78 70% 52%),hsl(38 85% 55%),hsl(0 72% 55%));}
 .pm-rpe-fb{font-size:.74rem;color:var(--gm);margin-top:9px;line-height:1.35;}
 .pm-rpe-done .pm-rpe-fb{color:var(--ok-fg);font-weight:600;}
+.am-week-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;width:100%;margin-top:8px;
+  padding-top:8px;border-top:1px solid var(--gl);}
+.am-week-lbl{font-size:.72rem;font-weight:700;color:var(--gm);}
+.am-week-sel{padding:5px 9px;border:1.5px solid var(--gl);border-radius:7px;background:#fff;
+  font-family:'Barlow',sans-serif;font-size:.76rem;font-weight:600;color:var(--gd);cursor:pointer;}
 .pm-count-open{background:var(--warn-bg) !important;color:var(--warn-fg) !important;}
 .pm-focus-hint{margin:18px 16px 0;text-align:center;font-size:.74rem;color:rgba(255,255,255,.5);line-height:1.4;}
 /* Focus mode: only the question. Season stats and streak would invite
@@ -9199,6 +9204,106 @@ function _amCountSessionResponses(si){
   return out;
 }
 // ── WhatsApp text templates for player invitations ──
+// ══ WEEKLY INVITE TEXTS ══════════════════════════════════════
+// One link covers the whole week, so the message lists the week's dates
+// instead of a single session. Five variants: the same request lands
+// differently depending on the week, and a message that never changes stops
+// being read after a month.
+function _amWeekCtx(p){
+  const D=cd();
+  const nm=(getDisplayName?getDisplayName(p):p.name)||'Spieler';
+  const url=buildPlayerLink(p.confirmToken||'');
+  const today=todaySK();
+  const horizon=(typeof _pmWeekHorizon==='function')?_pmWeekHorizon():today;
+  const list=[];
+  (D&&Array.isArray(D.sessions)?D.sessions:[]).forEach(s=>{
+    if(!s||!s.date)return;
+    const sk=dispToSortKey(s.date);
+    if(sk<today||sk>horizon)return;
+    const isMatch=s.type==='match';
+    list.push({
+      sk,date:s.date,time:s.time||(isMatch?'15:00':'18:30'),isMatch,
+      what:isMatch?(s.label||'Spiel'):'Training',
+      place:s.location||''
+    });
+  });
+  list.sort((a,b)=>a.sk-b.sk);
+  const dows=['So','Mo','Di','Mi','Do','Fr','Sa'];
+  list.forEach(e=>{
+    const m=String(e.date).match(/(\d+)\.(\d+)/);
+    if(m){
+      const y=Math.floor(e.sk/10000);
+      e.dow=dows[new Date(y,+m[2]-1,+m[1]).getDay()];
+    }else e.dow='';
+  });
+  const trainCount=list.filter(e=>!e.isMatch).length;
+  const matchCount=list.filter(e=>e.isMatch).length;
+  return {nm,url,list,trainCount,matchCount,
+    kw:(typeof isoWeekKey==='function')?parseInt(isoWeekKey(new Date()).split('-W')[1],10):null};
+}
+const AM_WEEK_TEMPLATES={
+  kompakt:{
+    label:'Kompakt',
+    build:c=>{
+      if(!c.list.length)return `Hi ${c.nm}! \uD83D\uDC4B\n\nDiese Woche stehen keine Termine an. Dein Link bleibt gleich:\n${c.url}`;
+      const lines=[`Hi ${c.nm}! \uD83D\uDC4B`,'','Termine der Woche:'];
+      c.list.forEach(e=>lines.push(`${e.isMatch?'\u26bd':'\ud83c\udfc3'} ${e.dow} ${e.date} \u00b7 ${e.time} Uhr`));
+      lines.push('',`Bitte f\u00fcr alle kurz zu- oder absagen:`,c.url,'','Danke! \uD83D\uDE4F');
+      return lines.join('\n');
+    }
+  },
+  freundlich:{
+    label:'Freundlich',
+    build:c=>{
+      if(!c.list.length)return `Hi ${c.nm}! \uD83D\uDC4B\n\nDiese Woche ist trainingsfrei \u2014 geniesst die Pause! \uD83D\uDE0A\n\nDein Link bleibt derselbe:\n${c.url}`;
+      const lines=[`Hallo ${c.nm}! \uD83D\uDC4B`,'',`So sieht unsere Woche aus:`];
+      c.list.forEach(e=>lines.push(`${e.isMatch?'\u26bd':'\ud83c\udfc3'} ${e.dow}, ${e.date} um ${e.time} Uhr${e.place?' \u00b7 '+e.place:''}`));
+      lines.push('','Sag uns bitte einmal kurz Bescheid, wann du dabei bist \u2014 dann k\u00f6nnen wir richtig planen:',c.url,'','Bis bald! \u26BD');
+      return lines.join('\n');
+    }
+  },
+  motivierend:{
+    label:'Motivierend',
+    build:c=>{
+      if(!c.list.length)return `\uD83D\uDCAA ${c.nm}, diese Woche Pause \u2014 danach greifen wir wieder an!\n\n${c.url}`;
+      const head=c.matchCount>0?'\uD83D\uDD25 Spieltag-Woche!':'\uD83D\uDCAA Neue Woche, neue Einheiten!';
+      const lines=[`${head}`,'',`Hi ${c.nm}, das steht an:`];
+      c.list.forEach(e=>lines.push(`${e.isMatch?'\u26bd':'\ud83c\udfc3'} ${e.dow} ${e.date} \u00b7 ${e.time} Uhr`));
+      lines.push('','Wir z\u00e4hlen auf dich \u2014 trag kurz ein, wann du da bist:',c.url,'','\uD83D\uDE80');
+      return lines.join('\n');
+    }
+  },
+  sachlich:{
+    label:'Sachlich',
+    build:c=>{
+      if(!c.list.length)return `${c.nm}: diese Woche keine Termine. Link: ${c.url}`;
+      const lines=[`Terminplanung${c.kw?' KW '+c.kw:''}`,''];
+      c.list.forEach(e=>lines.push(`${e.dow} ${e.date}, ${e.time} Uhr \u2014 ${e.what}${e.place?', '+e.place:''}`));
+      lines.push('',`R\u00fcckmeldung bitte bis Montag \u00fcber diesen Link:`,c.url);
+      return lines.join('\n');
+    }
+  },
+  kurz:{
+    label:'Sehr kurz',
+    build:c=>{
+      if(!c.list.length)return `Diese Woche frei. Link: ${c.url}`;
+      const parts=c.list.map(e=>`${e.dow} ${e.time}`);
+      return `Hi ${c.nm}! Diese Woche: ${parts.join(', ')}.\nKurz eintragen bitte \uD83D\uDC47\n${c.url}`;
+    }
+  }
+};
+function amWeekTemplateKey(){
+  return (typeof getUserPref==='function')?getUserPref('amWeekTemplate','kompakt'):'kompakt';
+}
+function amSetWeekTemplate(v){
+  if(typeof setUserPref==='function')setUserPref('amWeekTemplate',v||'kompakt');
+  if(typeof renderAnmeldungenModal==='function'){try{renderAnmeldungenModal();}catch(e){}}
+}
+function amPreviewWeekText(){
+  const D=cd();const p=(D&&D.players||[]).find(x=>x&&x.confirmToken);
+  const tpl=AM_WEEK_TEMPLATES[amWeekTemplateKey()]||AM_WEEK_TEMPLATES.kompakt;
+  alert(tpl.build(_amWeekCtx(p||{name:'Max Mustermann'})));
+}
 function _amBuildInviteText(p,sessIdx,kind){
   // kind: 'general' | 'session' | 'reminder'
   const D=cd();
@@ -9206,8 +9311,10 @@ function _amBuildInviteText(p,sessIdx,kind){
     ?buildPlayerLink(p.confirmToken||'',sessIdx)
     :buildPlayerLink(p.confirmToken||'');
   const nm=(getDisplayName?getDisplayName(p):p.name)||'Spieler';
-  if(kind==='general'){
-    return `Hi ${nm}! \uD83D\uDC4B\n\nHier dein pers\u00f6nlicher Link, um Anwesenheit f\u00fcr Trainings und Spiele zu best\u00e4tigen:\n\n${url}\n\nEinfach speichern und vor dem n\u00e4chsten Termin kurz best\u00e4tigen \u2014 \u2705 Komme oder \u274c Komme nicht.\n\nDanke! \u26BD`;
+  if(kind==='general'||kind==='week'){
+    // The link covers the whole week — the message does too.
+    const tpl=AM_WEEK_TEMPLATES[amWeekTemplateKey()]||AM_WEEK_TEMPLATES.kompakt;
+    return tpl.build(_amWeekCtx(p));
   }
   if(D&&Array.isArray(D.sessions)&&sessIdx!=null){
     const s=D.sessions[sessIdx];
@@ -11355,6 +11462,17 @@ function _amRenderSessionView(sessIdx){
   if(allPi.length>0)html+=`<button class="am-bulk-btn" onclick="amSendBulk(${sessIdx},'all','session')">\ud83d\udcf2 Alle anschreiben (${allPi.length})</button>`;
   // Broadcast: single wa.me link, trainer picks the WhatsApp group, no phone needed
   html+=`<button class="am-bulk-btn" onclick="amBroadcastSession(${sessIdx})">\ud83d\udce2 In Gruppe broadcast</button>`;
+  // Weekly invite: one link for the whole week, five text variants
+  const _wk=amWeekTemplateKey();
+  html+=`<div class="am-week-row">
+    <span class="am-week-lbl">\ud83d\udcc5 Wochen-Einladung:</span>
+    <select class="am-week-sel" onchange="amSetWeekTemplate(this.value)">
+      ${Object.entries(AM_WEEK_TEMPLATES).map(([k,v])=>
+        `<option value="${k}"${k===_wk?' selected':''}>${v.label}</option>`).join('')}
+    </select>
+    <button class="am-bulk-btn" onclick="amPreviewWeekText()">\ud83d\udc41 Vorschau</button>
+    <button class="am-bulk-btn primary" onclick="amSendBulk(${sessIdx},'all','week')">\ud83d\udcf2 Woche senden</button>
+  </div>`;
   // (Adopt button removed in v1.0.4-beta+: Angemeldet is now a real status, no separate "adopt" step)
   html+='</div>';
   // Unified sort bar — same control as Overview, scoped to per-group ordering below
