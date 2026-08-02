@@ -10039,6 +10039,20 @@ function renderPeConfirmLink(pi){
   }
 }
 // ── PLAYER MODE DATA PRIVACY (Variant B — interim) ──
+// End of the week the player screen currently covers, as a YYYYMMDD sort key.
+// Before Sunday 16:00 → Sunday of this week. From then on → Sunday of next
+// week, matching when the weekly invitation is sent.
+const PM_SURVEY_DOW=0;      // 0 = Sunday (JS getDay)
+const PM_SURVEY_HOUR=16;    // switch to the coming week from this hour
+function _pmWeekHorizon(now){
+  const d=now?new Date(now):new Date();
+  const dow=(d.getDay()+6)%7;                  // 0 = Monday … 6 = Sunday
+  const daysToSunday=6-dow;
+  const flipped=(d.getDay()===PM_SURVEY_DOW&&d.getHours()>=PM_SURVEY_HOUR);
+  const end=new Date(d);
+  end.setDate(end.getDate()+daysToSunday+(flipped?7:0));
+  return end.getFullYear()*10000+(end.getMonth()+1)*100+end.getDate();
+}
 function _pmComputeRank(p,D){
   // Compute player's rank among teammates by season attendance %.
   // Match Wochenbericht logic: ALL marked sessions (no date filter), integer pct.
@@ -10764,13 +10778,13 @@ function renderPlayerMode(){
     else{wrap.innerHTML='<div style="padding:40px 20px;text-align:center;color:#fff;">⚠️ Verbindung verloren. Bitte Link neu öffnen.</div>';return;}
   }
   const today=todaySK();
-  // Invitations are sent per week, so the player screen covers exactly THIS
-  // week (through Sunday). Later dates are deliberately out of scope: they
-  // would invite answers that the next invitation asks for again.
-  const _hd=new Date();
-  const _dow=(_hd.getDay()+6)%7;              // 0 = Monday
-  _hd.setDate(_hd.getDate()+(6-_dow));        // → Sunday of the current week
-  const horizon=_hd.getFullYear()*10000+(_hd.getMonth()+1)*100+_hd.getDate();
+  // Invitations are sent per week, so the screen covers one week — and it has
+  // to flip BEFORE the invitation goes out, not after midnight. The survey is
+  // sent Sunday afternoon, so from Sunday 16:00 the horizon moves to the end
+  // of the following week: a player opening the link from that message finds
+  // the dates it asks about. Today's own sessions stay visible either way, so
+  // a Sunday evening match never disappears from the screen it belongs to.
+  const horizon=_pmWeekHorizon();
   const upcoming=[];
   const recent=[];
   if(Array.isArray(D.sessions)){
