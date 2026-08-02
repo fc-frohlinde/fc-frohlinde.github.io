@@ -9292,28 +9292,32 @@ function _amWeekCtx(p){
     kw:(typeof isoWeekKey==='function')?parseInt(isoWeekKey(new Date()).split('-W')[1],10):null};
 }
 const AM_WEEK_TEMPLATES={
+  // Ten variants so the weekly message can be rotated. A text that never
+  // changes stops being read after a month — the eye recognises the shape and
+  // skips it. Every variant carries the same three things: the week's dates,
+  // the RSVP link, and (once published) the personal statistics link.
   kompakt:{
     label:'Kompakt',
     build:c=>{
       if(!c.list.length)return `Hi ${c.nm}! \uD83D\uDC4B\n\nDiese Woche stehen keine Termine an. Dein Link bleibt gleich:\n${c.url}`;
-      const lines=[`Hi ${c.nm}! \uD83D\uDC4B`,'','Termine der Woche:'];
-      c.list.forEach(e=>lines.push(`${e.isMatch?'\u26bd':'\ud83c\udfc3'} ${e.dow} ${e.dnum} \u00b7 ${e.time} Uhr`));
-      lines.push('',`Bitte f\u00fcr alle kurz zu- oder absagen:`,c.url);
-      if(c.statsUrl)lines.push('',`\ud83d\udcca Deine pers\u00f6nliche Statistik:`,c.statsUrl);
-      lines.push('','Danke! \uD83D\uDE4F');
-      return lines.join('\n');
+      const l=[`Hi ${c.nm}! \uD83D\uDC4B`,'','Termine der Woche:'];
+      c.list.forEach(e=>l.push(`${e.isMatch?'\u26bd':'\ud83c\udfc3'} ${e.dow} ${e.dnum} \u00b7 ${e.time} Uhr`));
+      l.push('','Bitte f\u00fcr alle kurz zu- oder absagen:',c.url);
+      if(c.statsUrl)l.push('','\ud83d\udcca Deine pers\u00f6nliche Statistik:',c.statsUrl);
+      l.push('','Danke! \uD83D\uDE4F');
+      return l.join('\n');
     }
   },
   freundlich:{
     label:'Freundlich',
     build:c=>{
       if(!c.list.length)return `Hi ${c.nm}! \uD83D\uDC4B\n\nDiese Woche ist trainingsfrei \u2014 geniesst die Pause! \uD83D\uDE0A\n\nDein Link bleibt derselbe:\n${c.url}`;
-      const lines=[`Hallo ${c.nm}! \uD83D\uDC4B`,'',`So sieht unsere Woche aus:`];
-      c.list.forEach(e=>lines.push(`${e.isMatch?'\u26bd':'\ud83c\udfc3'} ${e.dow}, ${e.dnum} um ${e.time} Uhr${e.place?' \u00b7 '+e.place:''}`));
-      lines.push('','Sag uns bitte einmal kurz Bescheid, wann du dabei bist \u2014 dann k\u00f6nnen wir richtig planen:',c.url);
-      if(c.statsUrl)lines.push('',`Und hier deine pers\u00f6nliche Statistik \ud83d\udcca`,c.statsUrl);
-      lines.push('','Bis bald! \u26BD');
-      return lines.join('\n');
+      const l=[`Hallo ${c.nm}! \uD83D\uDC4B`,'','So sieht unsere Woche aus:'];
+      c.list.forEach(e=>l.push(`${e.isMatch?'\u26bd':'\ud83c\udfc3'} ${e.dow}, ${e.dnum} um ${e.time} Uhr${e.place?' \u00b7 '+e.place:''}`));
+      l.push('','Sag uns bitte einmal kurz Bescheid, wann du dabei bist \u2014 dann k\u00f6nnen wir richtig planen:',c.url);
+      if(c.statsUrl)l.push('','Und hier deine pers\u00f6nliche Statistik \ud83d\udcca',c.statsUrl);
+      l.push('','Bis bald! \u26BD');
+      return l.join('\n');
     }
   },
   motivierend:{
@@ -9321,23 +9325,23 @@ const AM_WEEK_TEMPLATES={
     build:c=>{
       if(!c.list.length)return `\uD83D\uDCAA ${c.nm}, diese Woche Pause \u2014 danach greifen wir wieder an!\n\n${c.url}`;
       const head=c.matchCount>0?'\uD83D\uDD25 Spieltag-Woche!':'\uD83D\uDCAA Neue Woche, neue Einheiten!';
-      const lines=[`${head}`,'',`Hi ${c.nm}, das steht an:`];
-      c.list.forEach(e=>lines.push(`${e.isMatch?'\u26bd':'\ud83c\udfc3'} ${e.dow} ${e.dnum} \u00b7 ${e.time} Uhr`));
-      lines.push('','Wir z\u00e4hlen auf dich \u2014 trag kurz ein, wann du da bist:',c.url);
-      if(c.statsUrl)lines.push('',`\ud83d\udcca Deine Zahlen:`,c.statsUrl);
-      lines.push('','\uD83D\uDE80');
-      return lines.join('\n');
+      const l=[head,'',`Hi ${c.nm}, das steht an:`];
+      c.list.forEach(e=>l.push(`${e.isMatch?'\u26bd':'\ud83c\udfc3'} ${e.dow} ${e.dnum} \u00b7 ${e.time} Uhr`));
+      l.push('','Wir z\u00e4hlen auf dich \u2014 trag kurz ein, wann du da bist:',c.url);
+      if(c.statsUrl)l.push('','\ud83d\udcca Deine Zahlen:',c.statsUrl);
+      l.push('','\uD83D\uDE80');
+      return l.join('\n');
     }
   },
   sachlich:{
     label:'Sachlich',
     build:c=>{
       if(!c.list.length)return `${c.nm}: diese Woche keine Termine. Link: ${c.url}`;
-      const lines=[`Terminplanung${c.kw?' KW '+c.kw:''}`,''];
-      c.list.forEach(e=>lines.push(`${e.dow} ${e.dnum}, ${e.time} Uhr \u2014 ${e.what}${e.place?', '+e.place:''}`));
-      lines.push('',`R\u00fcckmeldung bitte bis Montag \u00fcber diesen Link:`,c.url);
-      if(c.statsUrl)lines.push('',`Pers\u00f6nliche Statistik: `+c.statsUrl);
-      return lines.join('\n');
+      const l=[`Terminplanung${c.kw?' KW '+c.kw:''}`,''];
+      c.list.forEach(e=>l.push(`${e.dow} ${e.dnum}, ${e.time} Uhr \u2014 ${e.what}${e.place?', '+e.place:''}`));
+      l.push('','R\u00fcckmeldung bitte \u00fcber diesen Link:',c.url);
+      if(c.statsUrl)l.push('','Pers\u00f6nliche Statistik: '+c.statsUrl);
+      return l.join('\n');
     }
   },
   kurz:{
@@ -9347,6 +9351,70 @@ const AM_WEEK_TEMPLATES={
       const parts=c.list.map(e=>`${e.dow} ${e.time}`);
       return `Hi ${c.nm}! Diese Woche: ${parts.join(', ')}.\nKurz eintragen bitte \uD83D\uDC47\n${c.url}`
         +(c.statsUrl?`\n\n\ud83d\udcca ${c.statsUrl}`:'');
+    }
+  },
+  checkliste:{
+    label:'Checkliste',
+    build:c=>{
+      if(!c.list.length)return `Hi ${c.nm}! Diese Woche keine Termine \u2713\n${c.url}`;
+      const l=[`Hi ${c.nm}! \uD83D\uDC4B`,'','Deine Woche \u2014 bitte alles abhaken:'];
+      c.list.forEach(e=>l.push(`\u2610 ${e.dow} ${e.dnum}, ${e.time} Uhr \u2014 ${e.what}`));
+      l.push('','Hier eintragen:',c.url);
+      if(c.statsUrl)l.push('','\ud83d\udcca Statistik: '+c.statsUrl);
+      return l.join('\n');
+    }
+  },
+  teamgeist:{
+    label:'Teamgeist',
+    build:c=>{
+      if(!c.list.length)return `${c.nm}, diese Woche Pause \u2014 erholt euch gut! \u26BD\n${c.url}`;
+      const l=[`\u26BD Hi ${c.nm}!`,'','Je fr\u00fcher wir wissen, wer dabei ist, desto besser wird das Training f\u00fcr alle.','','Diese Woche:'];
+      c.list.forEach(e=>l.push(`${e.isMatch?'\u26bd':'\ud83c\udfc3'} ${e.dow} ${e.dnum} \u00b7 ${e.time} Uhr`));
+      l.push('','Zwei Klicks, mehr nicht:',c.url);
+      if(c.statsUrl)l.push('','Deine Statistik: '+c.statsUrl);
+      l.push('','Danke dir! \uD83D\uDE4F');
+      return l.join('\n');
+    }
+  },
+  countdown:{
+    label:'Countdown',
+    build:c=>{
+      if(!c.list.length)return `Keine Termine diese Woche. \u26BD\n${c.url}`;
+      const first=c.list[0];
+      const l=[`Hi ${c.nm}!`,'',`N\u00e4chster Termin: ${first.dow} ${first.dnum}, ${first.time} Uhr \u2014 ${first.what}`];
+      if(c.list.length>1){
+        l.push('','Danach:');
+        c.list.slice(1).forEach(e=>l.push(`\u00b7 ${e.dow} ${e.dnum}, ${e.time} Uhr`));
+      }
+      l.push('','Bitte f\u00fcr die ganze Woche eintragen:',c.url);
+      if(c.statsUrl)l.push('','\ud83d\udcca '+c.statsUrl);
+      return l.join('\n');
+    }
+  },
+  fokus:{
+    label:'Mit Schwerpunkt',
+    build:c=>{
+      if(!c.list.length)return `Hi ${c.nm}! Diese Woche keine Einheiten.\n${c.url}`;
+      const l=[`Hi ${c.nm}! \uD83D\uDC4B`,'','Das haben wir diese Woche vor:'];
+      c.list.forEach(e=>l.push(`${e.isMatch?'\u26bd':'\ud83c\udfc3'} ${e.dow} ${e.dnum}, ${e.time} Uhr \u2014 ${e.what}`));
+      const n=c.trainCount+c.matchCount;
+      l.push('',`${n} Termin${n===1?'':'e'} \u2014 sag uns bitte kurz, bei welchen du dabei bist:`,c.url);
+      if(c.statsUrl)l.push('','\ud83d\udcca Deine Entwicklung: '+c.statsUrl);
+      return l.join('\n');
+    }
+  },
+  statsfokus:{
+    label:'Statistik im Fokus',
+    build:c=>{
+      if(!c.list.length)return `Hi ${c.nm}! Diese Woche Pause.`+(c.statsUrl?`\n\n\ud83d\udcca Dein Saison-Stand: ${c.statsUrl}`:`\n${c.url}`);
+      const l=[`Hi ${c.nm}! \uD83D\uDCCA`,''];
+      if(c.statsUrl){
+        l.push('Dein aktueller Stand \u2014 Anwesenheit, Serie und Verlauf:',c.statsUrl,'');
+      }
+      l.push('Und das steht diese Woche an:');
+      c.list.forEach(e=>l.push(`${e.isMatch?'\u26bd':'\ud83c\udfc3'} ${e.dow} ${e.dnum} \u00b7 ${e.time} Uhr`));
+      l.push('','Bitte eintragen:',c.url);
+      return l.join('\n');
     }
   }
 };
@@ -12669,29 +12737,86 @@ function _dbFmtSessCount(tc,mc){
   return parts.length?parts.join(', '):'keine Termine';
 }
 const _waTemplates={
+  // Ten variants for the group message that carries the weekly report link.
+  // Same rotation logic as the personal invites: a message that always reads
+  // the same gets scrolled past.
   hype:{
     label:'Mit Hype',
-    build:ctx=>{
-      if(!ctx.hasSessions)return '\ud83c\udfc6 *Wochenbericht KW '+ctx.kw+'*\n\nDiese Woche war Pause \u2014 aber die Saison-Wertung l\u00e4uft weiter! \ud83d\udcca\n\n\ud83d\udc49 '+ctx.url+'\n\nWer steht ganz oben? \ud83e\udd47';
-      return '\ud83c\udfc6 *Wochenbericht KW '+ctx.kw+' ist da!*\n\nHier seht ihr eure Anwesenheit der Woche und den aktuellen Stand der Saison-Wertung \ud83d\udcca\n\n\ud83d\udc49 '+ctx.url+'\n\nWer schafft es auf Platz 1? \ud83e\udd47';
-    }
+    build:c=>c.hasSessions
+      ?'\ud83c\udfc6 *Wochenbericht KW '+c.kw+' ist da!*\n\nHier seht ihr eure Anwesenheit der Woche und den aktuellen Stand der Saison-Wertung \ud83d\udcca\n\n\ud83d\udc49 '+c.url+'\n\nWer schafft es auf Platz 1? \ud83e\udd47'
+      :'\ud83c\udfc6 *Wochenbericht KW '+c.kw+'*\n\nDiese Woche war Pause \u2014 aber die Saison-Wertung l\u00e4uft weiter! \ud83d\udcca\n\n\ud83d\udc49 '+c.url+'\n\nWer steht ganz oben? \ud83e\udd47'
   },
   neutral:{
     label:'Neutral',
-    build:ctx=>{
-      if(!ctx.hasSessions)return '\ud83d\udccb Wochenbericht KW '+ctx.kw+' (Pause)\n\nAktueller Saison-Stand:\n\ud83d\udc49 '+ctx.url;
-      return '\ud83d\udccb Wochenbericht KW '+ctx.kw+'\n\nTeilnahme der Woche + Saison-Wertung:\n\ud83d\udc49 '+ctx.url;
-    }
+    build:c=>c.hasSessions
+      ?'\ud83d\udccb Wochenbericht KW '+c.kw+'\n\nTeilnahme der Woche + Saison-Wertung:\n\ud83d\udc49 '+c.url
+      :'\ud83d\udccb Wochenbericht KW '+c.kw+' (Pause)\n\nAktueller Saison-Stand:\n\ud83d\udc49 '+c.url
   },
   metrics:{
     label:'Mit Metriken',
-    build:ctx=>{
-      if(!ctx.hasSessions)return '\ud83d\udcca *Wochenbericht KW '+ctx.kw+'*\n\nDiese Woche keine Termine.\nAber die Saison-Wertung l\u00e4uft weiter:\n\ud83d\udc49 '+ctx.url;
-      const lines=['\ud83d\udcca *Wochenbericht KW '+ctx.kw+'*',''];
-      if(ctx.sessCountStr)lines.push('Diese Woche: '+ctx.sessCountStr);
-      if(ctx.teamPct!=null)lines.push('Mannschaft: '+ctx.teamPct+'% Teilnahme');
-      lines.push('','\ud83d\udc49 Wer steht ganz oben?',ctx.url);
-      return lines.join('\n');
+    build:c=>{
+      if(!c.hasSessions)return '\ud83d\udcca *Wochenbericht KW '+c.kw+'*\n\nDiese Woche keine Termine.\nAber die Saison-Wertung l\u00e4uft weiter:\n\ud83d\udc49 '+c.url;
+      const l=['\ud83d\udcca *Wochenbericht KW '+c.kw+'*',''];
+      if(c.sessCountStr)l.push('Diese Woche: '+c.sessCountStr);
+      if(c.teamPct!=null)l.push('Mannschaft: '+c.teamPct+'% Teilnahme');
+      l.push('','\ud83d\udc49 Wer steht ganz oben?',c.url);
+      return l.join('\n');
+    }
+  },
+  danke:{
+    label:'Dankend',
+    build:c=>{
+      if(!c.hasSessions)return '\ud83d\ude4f Diese Woche war Pause \u2014 n\u00e4chste Woche geht es weiter!\n\nSaison-Stand: '+c.url;
+      const pct=c.teamPct!=null?' Bei '+c.teamPct+'% Beteiligung.':'';
+      return '\ud83d\ude4f *Danke f\u00fcr diese Woche, Jungs!*'+pct+'\n\nDer Wochenbericht ist online:\n\ud83d\udc49 '+c.url;
+    }
+  },
+  kurz:{
+    label:'Sehr kurz',
+    build:c=>'\ud83d\udcca Wochenbericht KW '+c.kw+':\n'+c.url
+  },
+  frage:{
+    label:'Als Frage',
+    build:c=>{
+      if(!c.hasSessions)return 'Wer f\u00fchrt die Saison-Wertung an? \ud83d\udc40\n'+c.url;
+      return 'Wer war diese Woche am fleissigsten? \ud83d\udc40\n\nWochenbericht KW '+c.kw+':\n'+c.url;
+    }
+  },
+  ziel:{
+    label:'Mit Zielsetzung',
+    build:c=>{
+      if(!c.hasSessions)return '\ud83c\udfaf Pause-Woche. Der Saison-Stand bleibt einsehbar:\n'+c.url;
+      const l=['\ud83c\udfaf *Wochenbericht KW '+c.kw+'*',''];
+      if(c.teamPct!=null){
+        l.push(c.teamPct>=85?'Starke '+c.teamPct+'% Beteiligung \u2014 genau so weiter!'
+          :c.teamPct>=70?c.teamPct+'% Beteiligung \u2014 da geht noch was.'
+          :c.teamPct+'% Beteiligung \u2014 lasst uns das gemeinsam hochschrauben.');
+        l.push('');
+      }
+      l.push('\ud83d\udc49 '+c.url);
+      return l.join('\n');
+    }
+  },
+  saison:{
+    label:'Saison-Fokus',
+    build:c=>'\ud83d\udcc8 Der Saison-\u00dcberblick ist aktualisiert'+(c.hasSessions?' (inkl. KW '+c.kw+')':'')+':\n\n'+c.url+'\n\nSchaut mal rein, wo ihr steht.'
+  },
+  formell:{
+    label:'Formell',
+    build:c=>{
+      const l=['Wochenbericht KW '+c.kw,''];
+      if(c.hasSessions&&c.sessCountStr)l.push('Termine: '+c.sessCountStr);
+      if(c.hasSessions&&c.teamPct!=null)l.push('Teilnahmequote: '+c.teamPct+'%');
+      if(!c.hasSessions)l.push('In dieser Woche fanden keine Termine statt.');
+      l.push('','Zum Bericht: '+c.url);
+      return l.join('\n');
+    }
+  },
+  emoji:{
+    label:'Bildhaft',
+    build:c=>{
+      if(!c.hasSessions)return '\u26bd \ud83d\udcca \ud83d\udc47\n\nSaison-Wertung:\n'+c.url;
+      return '\u26bd\ud83d\udd25 KW '+c.kw+' ist ausgewertet!\n\n\ud83d\udcca Anwesenheit\n\ud83c\udfc6 Saison-Wertung\n\ud83d\udcc8 Verlauf\n\n\ud83d\udc47\n'+c.url;
     }
   }
 };
