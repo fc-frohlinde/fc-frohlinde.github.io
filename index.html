@@ -13792,6 +13792,19 @@ function computePlayerLineupStats(targetName,targetBday){
     const lineup=G.matchLineups[key];
     if(!lineup)return;
     const team=key.split('__')[0];
+    // A saved lineup for a match that has not been played is a PLAN. Counting
+    // it as "23× aufgestellt, meist Linksverteidiger" turns intentions into
+    // history — and the plan still changes right up to kick-off. Only matches
+    // that actually took place may enter any statistic.
+    {
+      const parts=key.split('__');
+      const kSeason=parts[1]||'';
+      const kIdx=parseInt(parts[2],10);
+      const kBlock=G.db&&G.db[team+'__'+kSeason];
+      const kSess=(kBlock&&Array.isArray(kBlock.sessions))?kBlock.sessions[kIdx]:null;
+      if(!kSess)return;                       // orphaned lineup → not a fact
+      if(typeof sessTookPlace==='function'&&!sessTookPlace(kSess,kSeason))return;
+    }
     // Best season identifier: from lineup.season or parse from key (team__season__idx)
     const seasonOfLineup=lineup.season||(key.split('__')[1])||'';
     const seasonKey=team+'__'+seasonOfLineup;
