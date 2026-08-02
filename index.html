@@ -11530,15 +11530,13 @@ function pmSetStatus(si,val){
   //   Player can freely transition between 2 (Entschuldigt), 3 (Ausstehend), 4 (Angemeldet)
   //   before the RSVP deadline. Only blocked: 1 (Anwesend) and 0 (Fehlend) — those are
   //   the trainer's roll-call result and shouldn't be overridable by the player.
-  // Anwesend and Entschuldigt are trainer decisions and stay untouchable.
-  // Fehlend is now also what the player's own "no" writes, so it has to stay
-  // changeable — otherwise a mis-tap would be permanent. After the deadline
-  // (_amRsvpLocked above) nothing can be changed anyway, so a roll-call
-  // Fehlend cannot be overwritten either.
-  if(current===1||current===2){
-    alert('Bereits vom Trainer eingetragen \u2014 \u00c4nderung nicht m\u00f6glich.');
-    return;
-  }
+  // Until the deadline the answer belongs to the player, whatever it currently
+  // says. Changing away from a granted Entschuldigung is legitimate — a player
+  // who recovers and wants to come should be able to say so, and the trainers
+  // see the change. What he still cannot do is GRANT himself an excuse: the
+  // only values this function ever writes are Angemeldet and Fehlend.
+  // The deadline check above (_amRsvpLocked) already closes the window, so a
+  // roll-call result cannot be touched afterwards either.
   if(current===targetStatus)return; // no-op
   const oldVal=current;
   p.s[si]=targetStatus;
