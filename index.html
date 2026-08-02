@@ -2094,10 +2094,6 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 .loc-mgr-btn{flex-shrink:0;padding:6px 10px;font-size:.8rem;}
 .loc-row{display:flex;align-items:center;gap:8px;padding:7px 2px;border-bottom:1px solid var(--gl);}
 .loc-name{flex:1;min-width:0;font-size:.8rem;color:var(--gd);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-/* Abgemeldet — the player's own "no", not (yet) an excuse */
-.csx{background:rgba(231,76,60,.10);color:#a5301f;}
-.ss-x{background:rgba(231,76,60,.14);color:#a5301f;}
-.ma-6{background:rgba(231,76,60,.12);border-color:rgba(231,76,60,.35);color:#a5301f;}
 .rpe-dur{display:flex;align-items:center;gap:6px;font-size:.74rem;color:var(--gm);margin-bottom:7px;}
 .rpe-dur input{width:66px;padding:4px 7px;border:1.5px solid var(--gl);border-radius:6px;
   font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:600;color:var(--gd);}
@@ -3156,14 +3152,10 @@ const POS_ORDER=POS; // sorted goalkeeper→forward
 const POS_LBL={TW:'Torwart',RV:'Rechter Verteidiger',IV:'Innenverteidiger',LV:'Linker Verteidiger',
   '6er':'Def. MF','8er':'Zentr. MF','10er':'Off. MF',RF:'Rechter Flügel',LF:'Linker Flügel',ST:'Stürmer'};
 const SC=[3,1,0,2]; // trainer cycle: ?→A→F→E (status 4 not in cycle — set by player only)
-// 5 = Abgemeldet: the player said they cannot come. Deliberately distinct
-// from 2 (Entschuldigt) — an excuse is a judgement the trainers make, usually
-// after a phone call, and letting players file their own turned every "no"
-// into an excused absence in the statistics.
-const SYM={1:'A',0:'F',2:'E',3:'?',4:'M',5:'X'};
-const CLS={1:'csa',0:'csf',2:'cse',3:'csq',4:'csm',5:'csx'};
-const STLBL={1:'Anwesend',0:'Fehlend',2:'Entschuldigt',3:'Ausstehend',4:'Angemeldet',5:'Abgemeldet'};
-const STCLS={1:'ss-a',0:'ss-f',2:'ss-e',3:'ss-q',4:'ss-m',5:'ss-x'};
+const SYM={1:'A',0:'F',2:'E',3:'?',4:'M'}; // M for "aMgemeldet" (Angemeldet)
+const CLS={1:'csa',0:'csf',2:'cse',3:'csq',4:'csm'};
+const STLBL={1:'Anwesend',0:'Fehlend',2:'Entschuldigt',3:'Ausstehend',4:'Angemeldet'};
+const STCLS={1:'ss-a',0:'ss-f',2:'ss-e',3:'ss-q',4:'ss-m'};
 const DOW=['So','Mo','Di','Mi','Do','Fr','Sa'];
 const DEM={1:'Januar',2:'Februar',3:'März',4:'April',5:'Mai',6:'Juni',
   7:'Juli',8:'August',9:'September',10:'Oktober',11:'November',12:'Dezember'};
@@ -7272,7 +7264,6 @@ function renderBody(){
       // For Angemeldet (4) and Entschuldigt-by-player (2), show reason in tooltip
       let title='';
       if(sVal===4)title=' title="Vom Spieler angemeldet — noch nicht überprüft"';
-      if(sVal===5)title=' title="Vom Spieler abgemeldet — Entschuldigung noch nicht bestätigt"';
       else if(sVal===2&&Array.isArray(p.preconfReason)&&p.preconfReason[realSi])title=` title="Abgemeldet: ${(p.preconfReason[realSi]||'').replace(/"/g,'&quot;')}"`;
       cells+=`<td class="${cls}" data-pi="${origPi}" data-si="${realSi}"${title} ${!ro?(isPast?`onclick="event.stopPropagation();cellOpenMenu(${origPi},${realSi},this)"`:`onclick="cycSt(${origPi},${realSi})"`):''}>${SYM[sVal]}</td>`;
     }
@@ -8566,10 +8557,9 @@ function renderMobileAtt(){
       {v:0,sym:'✗',cls:'ma-2'},
       {v:2,sym:'E',cls:'ma-4'},
       {v:4,sym:'M',cls:'ma-5'},
-      {v:5,sym:'X',cls:'ma-6'},
       {v:3,sym:'?',cls:'ma-3'}
     ];
-    const allowed=rollCall?[1,0,2]:[3,4,5,2];
+    const allowed=rollCall?[1,0,2]:[3,4,2];
     // A value already stored outside the current phase (e.g. an Angemeldet
     // left over from before the session started) stays visible so the trainer
     // can see and change it — it just can't be newly selected.
@@ -8599,7 +8589,7 @@ function maSetStatus(pi,si,val){
   // Phase guard mirrors the rendering above (defence in depth: stale DOM,
   // double-tap during a session start, etc. must not write a phase-invalid value)
   const rollCall=(typeof _isSessRollCallTime==='function')?_isSessRollCallTime(si):false;
-  const allowed=rollCall?[1,0,2]:[3,4,5,2];
+  const allowed=rollCall?[1,0,2]:[3,4,2];
   const D=cd();
   const cur=(D&&D.players&&D.players[pi]&&D.players[pi].s)?D.players[pi].s[si]:undefined;
   if(!allowed.includes(val)&&val!==cur)return;
@@ -9263,7 +9253,6 @@ function _amCountSessionResponses(si){
     const v=_amSessResponse(p,si);
     if(v===1){out.komme++;}
     else if(v===4){out.komme++;out.angemeldet++;}
-    else if(v===5){out.absage=(out.absage||0)+1;}
     else if(v===0)out.abgesagt++;
     else if(v===2)out.entsch++;
     else out.offen++;
@@ -10510,7 +10499,7 @@ function rpeIsOpen(s,si,p,season){
   // list is usually filled in. So everyone who was not explicitly marked
   // absent or excused is asked. If the trainer marks them absent afterwards,
   // the entry simply stops being shown and is ignored in the evaluation.
-  if(v===0||v===2||v===5)return false;
+  if(v===0||v===2)return false;
   const sk=(typeof dispToSortKey==='function')?dispToSortKey(s.date):null;
   if(!sk||sk===99999999)return false;
   const y=Math.floor(sk/10000),m=Math.floor(sk/100)%100,d=sk%100;
@@ -11186,7 +11175,7 @@ function _pmCalcStats(p,D){
     const si=pastIdxs[i].si;
     const v=(p.s&&si<p.s.length)?p.s[si]:3;
     if(v===1)streak++;
-    else if(v===3||v===4||v===5)continue; // player's own answer — trainer hasn't rolled call yet
+    else if(v===3||v===4)continue; // Ausstehend / Angemeldet (trainer didn't roll-call yet) — skip without breaking
     else break; // Fehlend (0) OR Entschuldigt (2) breaks streak
   }
   // Rank: cached from CU (computed before sanitization in player mode).
@@ -11324,7 +11313,6 @@ function renderPlayerMode(){
     else if(status===0)feedback='<div class="pm-feedback pm-fb-no">\u2717 Vom Trainer als fehlend eingetragen</div>';
     else if(status===2)feedback='<div class="pm-feedback pm-fb-exc">\ud83d\udccb Du bist abgemeldet</div>';
     else if(status===4)feedback='<div class="pm-feedback pm-fb-yes">\u2713 Du bist angemeldet</div>';
-    else if(status===5)feedback='<div class="pm-feedback pm-fb-no">\u2713 Du hast abgesagt</div>';
     // Reason textarea: show only when Entschuldigt (status===2). Player can edit own reason.
 
     const haInfo=f.isMatch&&s.homeAway?`<div class="pm-loc">${s.homeAway==='home'?'\ud83c\udfe0 Heim':'\ud83d\ude8c Ausw\u00e4rts'}</div>`:'';
@@ -11437,7 +11425,7 @@ function renderPlayerMode(){
     showRecent.forEach(({s,si,sk})=>{
       const f=_pmFmtUpcoming(s,sk);
       const v=(p.s&&si<p.s.length)?p.s[si]:3;
-      const iconCls=v===1?'pm-past-yes':v===0?'pm-past-no':v===2?'pm-past-exc':v===5?'pm-past-no':'pm-past-q';
+      const iconCls=v===1?'pm-past-yes':v===0?'pm-past-no':v===2?'pm-past-exc':v===4?'pm-past-q':'pm-past-q';
       const icon=v===1?'\u2705':v===0?'\u274c':v===2?'\ud83d\udccb':'\u2796';
       const lbl=v===1?'Anwesend':v===0?'Gefehlt':v===2?'Entsch.':'\u2013';
       html+=`<div class="pm-past-card ${iconCls}">
@@ -11532,17 +11520,22 @@ function pmSetStatus(si,val){
   const current=p.s[si];
   // Map UI input to status:
   //   val=1 (Komme)      -> status 4 (Angemeldet)
-  //   val=0 (Kann nicht) -> status 5 (Abgemeldet)
-  // Never 2 (Entschuldigt): that is the trainers' decision, entered after
-  // they have spoken to the player.
-  const targetStatus=(val===1)?4:5;
+  //   val=0 (Kann nicht) -> status 0 (Fehlend)
+  // NOT 2 (Entschuldigt): an excuse is granted by the trainers after they
+  // have spoken to the player. A player's own "no" is a plain absence until
+  // then. Nothing changes on the player's screen — only what lands in the
+  // table.
+  const targetStatus=(val===1)?4:0;
   // Permission rules (relaxed in 1.0.4-beta after trainer feedback):
   //   Player can freely transition between 2 (Entschuldigt), 3 (Ausstehend), 4 (Angemeldet)
   //   before the RSVP deadline. Only blocked: 1 (Anwesend) and 0 (Fehlend) — those are
   //   the trainer's roll-call result and shouldn't be overridable by the player.
-  // Trainer decisions are final for the player: roll-call results (1/0) and a
-  // granted excuse (2) cannot be overwritten from the player screen.
-  if(current===1||current===0||current===2){
+  // Anwesend and Entschuldigt are trainer decisions and stay untouchable.
+  // Fehlend is now also what the player's own "no" writes, so it has to stay
+  // changeable — otherwise a mis-tap would be permanent. After the deadline
+  // (_amRsvpLocked above) nothing can be changed anyway, so a roll-call
+  // Fehlend cannot be overwritten either.
+  if(current===1||current===2){
     alert('Bereits vom Trainer eingetragen \u2014 \u00c4nderung nicht m\u00f6glich.');
     return;
   }
@@ -11837,7 +11830,7 @@ function _amRenderSessionView(sessIdx){
   players.forEach((p,pi)=>{
     if(!p)return;
     const v=_amSessResponse(p,sessIdx);
-    const key=(v===1||v===4||v===5||v===2||v===3||v===0)?v:3;
+    const key=(v===1||v===4||v===2||v===3||v===0)?v:3;
     buckets[key].push(pi);
   });
   // Sort each bucket using _amSort
@@ -11858,7 +11851,7 @@ function _amRenderSessionView(sessIdx){
       const hasTok=!!p.confirmToken;
       const phone=p.phone&&p.phone.trim();
       const v=_amSessResponse(p,sessIdx);
-      const respIcon=v===1?'\u2705':v===4?'\ud83d\udcdd':v===5?'\ud83d\udeab':v===0?'\u274c':v===2?'\ud83d\udccb':'\u2754';
+      const respIcon=v===1?'\u2705':v===4?'\ud83d\udcdd':v===0?'\u274c':v===2?'\ud83d\udccb':'\u2754';
       const nm=(getDisplayName?getDisplayName(p):p.name)||'(ohne Name)';
       const nr=p.nr?`<span class="am-row-nr">#${_dbEscapeHtml(p.nr)}</span>`:'';
       const posHtml=(typeof pbHtml==='function')?pbHtml(p):'';
@@ -12117,8 +12110,8 @@ function dbComputeMetrics(data){
   let tA=0,tT=0,mA=0,mT=0,oA=0,oT=0;
   players.forEach(p=>{
     if(!p)return;
-    tPastIdx.forEach(i=>{const v=p.s&&p.s[i];if(v===3||v==null||v===4||v===5)return;tT++;oT++;if(v===1){tA++;oA++;}});
-    mPastIdx.forEach(i=>{const v=p.s&&p.s[i];if(v===3||v==null||v===4||v===5)return;mT++;oT++;if(v===1){mA++;oA++;}});
+    tPastIdx.forEach(i=>{const v=p.s&&p.s[i];if(v===3||v==null||v===4)return;tT++;oT++;if(v===1){tA++;oA++;}});
+    mPastIdx.forEach(i=>{const v=p.s&&p.s[i];if(v===3||v==null||v===4)return;mT++;oT++;if(v===1){mA++;oA++;}});
   });
   // Avg group size — ONLY past sessions (otherwise future "0 anwesend" drags it down)
   const sessionPresent=sessions.map((s,i)=>{
@@ -12156,7 +12149,7 @@ function dbRankPlayers(data){
       if(!s)return;
       if(!sessTookPlace(s,season))return; // future sessions are not facts
       const v=p.s&&p.s[i];
-      if(v===3||v==null||v===4||v===5)return; // 4/5 = player's own answer = pre-state
+      if(v===3||v==null||v===4)return; // 4 = Angemeldet = pre-state
       taken++;
       if(v===1)att++;
     });
@@ -12500,7 +12493,7 @@ function dbComputeWeekReport(data,offsetWeeks){
     players.forEach(p=>{
       if(!p)return;
       const v=p.s&&p.s[i];
-      if(v==null||v===3||v===4||v===5)return; // 4/5 = player's own answer, not yet verified
+      if(v==null||v===3||v===4||v===4)return; // 4 = Angemeldet = pre-state, not yet marked
       if(isMatch){mT++;if(v===1)mA++;}else{tT++;if(v===1)tA++;}
     });
   });
@@ -12533,7 +12526,7 @@ function _dbComputeSeasonStats(data){
       if(!s)return;
       if(!sessTookPlace(s,season))return; // future sessions are not facts
       const v=p.s&&p.s[si];
-      if(v==null||v===3||v===4||v===5)return; // 4/5 = player's own answer, not yet verified
+      if(v==null||v===3||v===4||v===4)return; // 4 = Angemeldet = pre-state, not yet marked
       tot++;teamT++;
       if(v===1){pres++;teamA++;}
     });
@@ -12584,7 +12577,7 @@ function _psWeekSeries(p,block,season,weeks){
     const y=Math.floor(sk/10000),m=Math.floor(sk/100)%100,d=sk%100;
     const key=isoWeekKey(new Date(y,m-1,d));
     const v=p.s&&p.s[si];
-    if(v==null||v===3||v===4||v===5)return;
+    if(v==null||v===3||v===4)return;
     if(!buckets[key])buckets[key]={a:0,t:0,sk};
     buckets[key].t++;
     if(v===1)buckets[key].a++;
@@ -12613,7 +12606,7 @@ function dbBuildPlayerStatsSnapshot(data,pi,offset,includePhoto){
   for(let i=held.length-1;i>=0;i--){
     const v=p.s&&p.s[held[i].si];
     if(v===1)streak++;
-    else if(v===3||v===4||v===5||v==null)continue;
+    else if(v===3||v===4||v==null)continue;
     else break;
   }
   // Competition rank on the rounded season percentage — ties share a rank
@@ -13831,7 +13824,7 @@ function computePlayerWeekday(occurrences){
       const dow=s.date.split(' ')[0];
       if(!wd[dow])return;
       const v=p.s&&p.s[si];
-      if(v===3||v==null||v===4||v===5)return; // 4/5 = player's own answer, not a fact
+      if(v===3||v==null||v===4||v===4)return; // 4 = Angemeldet — pre-state, not a fact
       wd[dow].t++;
       if(v===1)wd[dow].a++;
     });
