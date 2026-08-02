@@ -10053,10 +10053,15 @@ function _pmComputeRank(p,D){
       const v=si<pp.s.length?pp.s[si]:3;
       if(v===1||v===0||v===2){mk++;if(v===1)pr++;}
     });
-    return mk>0?{pct:Math.round(pr*100/mk),name:pp.name}:null;
+    // Compare on the ROUNDED percentage — the number the players actually see.
+    // Comparing raw fractions made 79.6% and 80.4% two different ranks while
+    // both screens read "80%", which is exactly what looks like a broken tie.
+    return mk>0?{pct:Math.round(pr*100/mk),ref:pp}:null;
   }).filter(x=>x);
   if(!entries.length)return null;
-  const me=entries.find(e=>e.name===p.name);
+  // Identity, not name: two players can share a name, and a renamed player
+  // would silently drop out of the ranking.
+  const me=entries.find(e=>e.ref===p);
   if(!me)return null;
   // Standard competition ranking: rank = (count of players with strictly HIGHER pct) + 1
   let higher=0;
@@ -10102,7 +10107,13 @@ function _pmSanitizeG(){
     const fullD=G.db[myKey];
     if(fullD&&Array.isArray(fullD.players)&&fullD.players[myPi]){
       CU._pmRank=_pmComputeRank(fullD.players[myPi],fullD);
-      CU._pmTeamSize=fullD.players.filter(pp=>pp&&Array.isArray(pp.s)).length;
+      // Same population the rank is computed over: players with at least one
+      // marked session. Counting everyone here made "#3 von 24" sit next to a
+      // ranking that only ranked 18 players.
+      CU._pmTeamSize=fullD.players.filter(pp=>{
+        if(!pp||!Array.isArray(pp.s))return false;
+        return pp.s.some(v=>v===1||v===0||v===2);
+      }).length;
     }
   }catch(e){CU._pmRank=null;}
   // Lineup information is deliberately NOT exposed in player mode.
@@ -10753,8 +10764,13 @@ function renderPlayerMode(){
     else{wrap.innerHTML='<div style="padding:40px 20px;text-align:center;color:#fff;">⚠️ Verbindung verloren. Bitte Link neu öffnen.</div>';return;}
   }
   const today=todaySK();
-  const horizonDate=new Date();horizonDate.setDate(horizonDate.getDate()+14);
-  const horizon=horizonDate.getFullYear()*10000+(horizonDate.getMonth()+1)*100+horizonDate.getDate();
+  // Invitations are sent per week, so the player screen covers exactly THIS
+  // week (through Sunday). Later dates are deliberately out of scope: they
+  // would invite answers that the next invitation asks for again.
+  const _hd=new Date();
+  const _dow=(_hd.getDay()+6)%7;              // 0 = Monday
+  _hd.setDate(_hd.getDate()+(6-_dow));        // → Sunday of the current week
+  const horizon=_hd.getFullYear()*10000+(_hd.getMonth()+1)*100+_hd.getDate();
   const upcoming=[];
   const recent=[];
   if(Array.isArray(D.sessions)){
@@ -10913,13 +10929,15 @@ function renderPlayerMode(){
     // ── OTHER UPCOMING ──
     if(upcoming.length>1){
       const others=upcoming.slice(1);
+      // Never collapsed: with a week-long horizon this is a short list, and
+      // every entry needs an answer.
       // Collapsed once there are more than two: the player's task on this
       // screen is to answer for the NEXT session, and a long list of dates
       // pushes that decision off the first screen. With two or fewer it stays
       // open — a fold that hides almost nothing is just an extra tap.
       // The count in the summary keeps the hidden dates discoverable, and the
       // same <details> pattern as "Letzte Termine" makes it self-evident.
-      const collapsed=others.length>2;
+      const collapsed=false;
       if(collapsed){
         html+=`<details class="pm-recent"><summary class="pm-section-h pm-section-summary">`
           +`<span>\ud83d\udcc5 Weitere Termine</span>`
@@ -10936,7 +10954,7 @@ function renderPlayerMode(){
       }
     }
   } else {
-    html+='<div class="pm-empty">\ud83d\udcc5 In den n\u00e4chsten 14 Tagen sind keine Termine geplant.</div>';
+    html+='<div class="pm-empty">\ud83d\udcc5 Diese Woche sind keine Termine mehr geplant.</div>';
   }
   // ── RECENT PAST ──
   if(recent.length>0){
