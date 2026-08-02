@@ -9213,6 +9213,9 @@ function _amWeekCtx(p){
   const D=cd();
   const nm=(getDisplayName?getDisplayName(p):p.name)||'Spieler';
   const url=buildPlayerLink(p.confirmToken||'');
+  // Personal statistics page — only included once it has been published,
+  // so the message never carries a dead link.
+  const statsUrl=(p.statsToken&&G.statsPublishedAt)?buildStatsLink(p.statsToken):'';
   const today=todaySK();
   const horizon=(typeof _pmWeekHorizon==='function')?_pmWeekHorizon():today;
   const list=[];
@@ -9238,7 +9241,7 @@ function _amWeekCtx(p){
   });
   const trainCount=list.filter(e=>!e.isMatch).length;
   const matchCount=list.filter(e=>e.isMatch).length;
-  return {nm,url,list,trainCount,matchCount,
+  return {nm,url,statsUrl,list,trainCount,matchCount,
     kw:(typeof isoWeekKey==='function')?parseInt(isoWeekKey(new Date()).split('-W')[1],10):null};
 }
 const AM_WEEK_TEMPLATES={
@@ -9248,7 +9251,9 @@ const AM_WEEK_TEMPLATES={
       if(!c.list.length)return `Hi ${c.nm}! \uD83D\uDC4B\n\nDiese Woche stehen keine Termine an. Dein Link bleibt gleich:\n${c.url}`;
       const lines=[`Hi ${c.nm}! \uD83D\uDC4B`,'','Termine der Woche:'];
       c.list.forEach(e=>lines.push(`${e.isMatch?'\u26bd':'\ud83c\udfc3'} ${e.dow} ${e.date} \u00b7 ${e.time} Uhr`));
-      lines.push('',`Bitte f\u00fcr alle kurz zu- oder absagen:`,c.url,'','Danke! \uD83D\uDE4F');
+      lines.push('',`Bitte f\u00fcr alle kurz zu- oder absagen:`,c.url);
+      if(c.statsUrl)lines.push('',`\ud83d\udcca Deine pers\u00f6nliche Statistik:`,c.statsUrl);
+      lines.push('','Danke! \uD83D\uDE4F');
       return lines.join('\n');
     }
   },
@@ -9258,7 +9263,9 @@ const AM_WEEK_TEMPLATES={
       if(!c.list.length)return `Hi ${c.nm}! \uD83D\uDC4B\n\nDiese Woche ist trainingsfrei \u2014 geniesst die Pause! \uD83D\uDE0A\n\nDein Link bleibt derselbe:\n${c.url}`;
       const lines=[`Hallo ${c.nm}! \uD83D\uDC4B`,'',`So sieht unsere Woche aus:`];
       c.list.forEach(e=>lines.push(`${e.isMatch?'\u26bd':'\ud83c\udfc3'} ${e.dow}, ${e.date} um ${e.time} Uhr${e.place?' \u00b7 '+e.place:''}`));
-      lines.push('','Sag uns bitte einmal kurz Bescheid, wann du dabei bist \u2014 dann k\u00f6nnen wir richtig planen:',c.url,'','Bis bald! \u26BD');
+      lines.push('','Sag uns bitte einmal kurz Bescheid, wann du dabei bist \u2014 dann k\u00f6nnen wir richtig planen:',c.url);
+      if(c.statsUrl)lines.push('',`Und hier deine pers\u00f6nliche Statistik \ud83d\udcca`,c.statsUrl);
+      lines.push('','Bis bald! \u26BD');
       return lines.join('\n');
     }
   },
@@ -9269,7 +9276,9 @@ const AM_WEEK_TEMPLATES={
       const head=c.matchCount>0?'\uD83D\uDD25 Spieltag-Woche!':'\uD83D\uDCAA Neue Woche, neue Einheiten!';
       const lines=[`${head}`,'',`Hi ${c.nm}, das steht an:`];
       c.list.forEach(e=>lines.push(`${e.isMatch?'\u26bd':'\ud83c\udfc3'} ${e.dow} ${e.date} \u00b7 ${e.time} Uhr`));
-      lines.push('','Wir z\u00e4hlen auf dich \u2014 trag kurz ein, wann du da bist:',c.url,'','\uD83D\uDE80');
+      lines.push('','Wir z\u00e4hlen auf dich \u2014 trag kurz ein, wann du da bist:',c.url);
+      if(c.statsUrl)lines.push('',`\ud83d\udcca Deine Zahlen:`,c.statsUrl);
+      lines.push('','\uD83D\uDE80');
       return lines.join('\n');
     }
   },
@@ -9280,6 +9289,7 @@ const AM_WEEK_TEMPLATES={
       const lines=[`Terminplanung${c.kw?' KW '+c.kw:''}`,''];
       c.list.forEach(e=>lines.push(`${e.dow} ${e.date}, ${e.time} Uhr \u2014 ${e.what}${e.place?', '+e.place:''}`));
       lines.push('',`R\u00fcckmeldung bitte bis Montag \u00fcber diesen Link:`,c.url);
+      if(c.statsUrl)lines.push('',`Pers\u00f6nliche Statistik: `+c.statsUrl);
       return lines.join('\n');
     }
   },
@@ -9288,7 +9298,8 @@ const AM_WEEK_TEMPLATES={
     build:c=>{
       if(!c.list.length)return `Diese Woche frei. Link: ${c.url}`;
       const parts=c.list.map(e=>`${e.dow} ${e.time}`);
-      return `Hi ${c.nm}! Diese Woche: ${parts.join(', ')}.\nKurz eintragen bitte \uD83D\uDC47\n${c.url}`;
+      return `Hi ${c.nm}! Diese Woche: ${parts.join(', ')}.\nKurz eintragen bitte \uD83D\uDC47\n${c.url}`
+        +(c.statsUrl?`\n\n\ud83d\udcca ${c.statsUrl}`:'');
     }
   }
 };
@@ -12175,6 +12186,130 @@ function _dbReportUrl(token){
   const base=location.origin+location.pathname.replace(/\/[^\/]*$/,'/');
   return base+'report.html?id='+encodeURIComponent(token);
 }
+// ══ PER-PLAYER STATS DOCUMENTS ═══════════════════════════════
+// One published document per player, each under its own token, so a player
+// can only ever open their own figures. Deliberately excluded: Leistungsnoten
+// and Bewertungsthemen. Those are the trainers' working notes about a player,
+// not feedback the player is meant to read off a web page — publishing them
+// would change how they get written. Attendance, the player's own sRPE input
+// and their trend are all fair game.
+function ensureStatsToken(pi){
+  const D=cd();const p=D&&D.players&&D.players[pi];
+  if(!p)return null;
+  // Separate from confirmToken on purpose: a leaked stats link must not also
+  // hand over the ability to answer for that player.
+  if(!p.statsToken){
+    const arr=new Uint8Array(9);
+    (crypto&&crypto.getRandomValues)?crypto.getRandomValues(arr):arr.forEach((_,i)=>arr[i]=Math.floor(Math.random()*256));
+    p.statsToken='s_'+Array.from(arr).map(b=>b.toString(16).padStart(2,'0')).join('');
+  }
+  return p.statsToken;
+}
+function buildStatsLink(token){
+  const base=location.origin+location.pathname.replace(/\/[^\/]*$/,'/');
+  return base+'report.html?id='+encodeURIComponent(token||'');
+}
+// Weekly attendance series for the trend chart (last N weeks, held sessions)
+function _psWeekSeries(p,block,season,weeks){
+  const buckets={};
+  (block.sessions||[]).forEach((s,si)=>{
+    if(!s||!s.date||!sessTookPlace(s,season))return;
+    const sk=_dbSortKey(s.date,season);
+    if(!sk||sk===99999999)return;
+    const y=Math.floor(sk/10000),m=Math.floor(sk/100)%100,d=sk%100;
+    const key=isoWeekKey(new Date(y,m-1,d));
+    const v=p.s&&p.s[si];
+    if(v==null||v===3||v===4)return;
+    if(!buckets[key])buckets[key]={a:0,t:0,sk};
+    buckets[key].t++;
+    if(v===1)buckets[key].a++;
+  });
+  return Object.entries(buckets)
+    .sort((a,b)=>a[1].sk-b[1].sk)
+    .slice(-(weeks||10))
+    .map(([k,v])=>({kw:parseInt(k.split('-W')[1],10),pct:Math.round(v.a/v.t*100),a:v.a,t:v.t}));
+}
+function dbBuildPlayerStatsSnapshot(data,pi,offset,includePhoto){
+  const {block,season,team}=data;
+  const p=data.players[pi];
+  if(!p)return null;
+  const r=dbComputeWeekReport(data,offset);
+  const row=r.playerRows.find(x=>x.pi===pi);
+  const occ=[{p,block,season}];
+  const ov=computePlayerOverallStats(occ);
+  const wd=computePlayerWeekday(occ).filter(x=>x.total>0);
+  // Current streak, most recent backwards
+  const held=[];
+  (block.sessions||[]).forEach((s,si)=>{
+    if(s&&sessTookPlace(s,season))held.push({si,sk:_dbSortKey(s.date,season)});
+  });
+  held.sort((a,b)=>a.sk-b.sk);
+  let streak=0;
+  for(let i=held.length-1;i>=0;i--){
+    const v=p.s&&p.s[held[i].si];
+    if(v===1)streak++;
+    else if(v===3||v===4||v==null)continue;
+    else break;
+  }
+  // Competition rank on the rounded season percentage — ties share a rank
+  const pcts=data.players.map(pp=>{
+    if(!pp||!Array.isArray(pp.s))return null;
+    let a=0,t=0;
+    (block.sessions||[]).forEach((s,si)=>{
+      if(!s||!sessTookPlace(s,season))return;
+      const v=pp.s[si];
+      if(v===1||v===0||v===2){t++;if(v===1)a++;}
+    });
+    return t?Math.round(a/t*100):null;
+  });
+  const mine=pcts[pi];
+  const rank=(mine==null)?null:pcts.filter(x=>x!=null&&x>mine).length+1;
+  const ranked=pcts.filter(x=>x!=null).length;
+  // The player's OWN sRPE entries — their data, and useful feedback
+  const rpeWeeks={};
+  (block.sessions||[]).forEach((s,si)=>{
+    if(!s||!s.date||!Array.isArray(p.rpe))return;
+    const v=p.rpe[si];
+    if(typeof v!=='number')return;
+    const sk=_dbSortKey(s.date,season);
+    const y=Math.floor(sk/10000),m=Math.floor(sk/100)%100,d=sk%100;
+    const key=isoWeekKey(new Date(y,m-1,d));
+    if(!rpeWeeks[key])rpeWeeks[key]={load:0,n:0,sk};
+    rpeWeeks[key].load+=v*rpeSessionMinutes(s,p,si);
+    rpeWeeks[key].n++;
+  });
+  const rpeSeries=Object.entries(rpeWeeks).sort((a,b)=>a[1].sk-b[1].sk).slice(-8)
+    .map(([k,v])=>({kw:parseInt(k.split('-W')[1],10),load:Math.round(v.load),n:v.n}));
+  return {
+    v:2,kind:'player',
+    publishedAt:Date.now(),
+    club:(G&&G.clubName)||'FC Frohlinde',
+    clubLogo:(G&&G.clubLogo)||null,
+    team,season,
+    week:{kw:r.kw,from:_dbFmtDMY(r.bounds.monday),to:_dbFmtDMY(r.bounds.sunday),
+      sessions:r.weekSess.map(({s})=>({date:s.date,type:s.type==='match'?'match':'training',label:s.label||''}))},
+    players:[{
+      name:row?row.name:(getDisplayName?getDisplayName(p):p.name),
+      nr:(p.nr!=null&&p.nr!=='')?p.nr:null,
+      pos:p.pos||'',
+      photo:(includePhoto&&p.photo)?p.photo:null,
+      wCells:row?row.cells:[],
+      wPresent:row?row.present:0,wTotal:row?row.total:0,
+      wPct:(row&&row.total)?Math.round(row.present/row.total*100):null,
+      sPresent:ov.cA,sTotal:ov.marked,sPct:ov.overall
+    }],
+    teamStats:{weekPct:r.teamAgg.overallPct,seasonPct:null,
+      trainingAvg:r.teamAgg.tAvg,matchAvg:r.teamAgg.mAvg,rosterSize:r.rosterSize,
+      weekTrainCount:r.trainCount,weekMatchCount:r.matchCount},
+    detail:{
+      tPct:ov.tPct,mPct:ov.mPct,cA:ov.cA,cF:ov.cF,cE:ov.cE,
+      streak,rank,ranked,
+      weekday:wd.map(x=>({day:x.day,pct:x.pct,total:x.total})),
+      trend:_psWeekSeries(p,block,season,10),
+      rpe:rpeSeries
+    }
+  };
+}
 function dbBuildReportSnapshot(data,offset,includePhotos){
   const r=dbComputeWeekReport(data,offset);
   const seasonStats=_dbComputeSeasonStats(data);
@@ -12221,6 +12356,39 @@ function dbBuildReportSnapshot(data,offset,includePhotos){
       weekMatchCount:r.matchCount
     }
   };
+}
+function dbPublishPlayerStats(){
+  if(!canEdit())return;
+  if(!fbDb){alert('Keine Verbindung zur Datenbank.');return;}
+  const data=dbGetData();
+  if(!data.block)return;
+  const offset=_dbState.weekReportOffset||0;
+  const includePhoto=!!_dbState.reportIncludePhotos;
+  const targets=[];
+  data.players.forEach((p,pi)=>{if(p)targets.push(pi);});
+  if(!targets.length){alert('Keine Spieler.');return;}
+  if(!confirm(targets.length+' pers\u00f6nliche Statistik-Seiten ver\u00f6ffentlichen bzw. aktualisieren?'))return;
+  snap();
+  const updates={};
+  let built=0;
+  targets.forEach(pi=>{
+    const tok=ensureStatsToken(pi);
+    const snapshot=dbBuildPlayerStatsSnapshot(data,pi,offset,includePhoto);
+    if(!tok||!snapshot)return;
+    updates['publishedReports/'+tok]=snapshot;
+    built++;
+  });
+  if(!built){alert('Nichts zu ver\u00f6ffentlichen.');return;}
+  saveG(); // persist the freshly created statsTokens
+  fbDb.ref().update(updates).then(()=>{
+    G.statsPublishedAt=Date.now();
+    saveG();
+    if(typeof showSaveFlash==='function')showSaveFlash('\u2705 '+built+' Statistik-Seiten aktualisiert');
+    if(typeof renderDashboard==='function')renderDashboard();
+  }).catch(err=>{
+    _fbWarn('playerStats',err,'\u26a0\ufe0f Statistik-Seiten nicht ver\u00f6ffentlicht');
+    alert('Ver\u00f6ffentlichung fehlgeschlagen. Bitte Verbindung pr\u00fcfen.');
+  });
 }
 function dbPublishWeekReport(){
   if(!canEdit())return;
@@ -12469,6 +12637,10 @@ function dbRenderWeekReportSection(data){
   const existing=Array.isArray(G.reportLog)?G.reportLog.find(e=>e&&e.team===r.team&&e.season===r.season&&e.kw===r.kw):null;
   // Photo-toggle HTML — reused in both states (above publish button OR in published settings row)
   const photoToggleHtml=`<label class="db-wr-photo-toggle"><input type="checkbox" ${_dbState.reportIncludePhotos?'checked':''} onchange="dbToggleReportPhotos(this)"><span class="db-wr-photo-txt">Spielerfotos einbeziehen</span><span class="db-wr-hint">gr\u00f6\u00dfere Datei</span></label>`;
+  // Personal statistics: one document per player, published as its own step
+  const _spAt=G.statsPublishedAt?new Date(G.statsPublishedAt).toLocaleDateString('de-DE'):null;
+  const statsBtnHtml=`<button class="btn" style="font-size:.74rem;margin-left:8px;" onclick="dbPublishPlayerStats()">\ud83d\udcca Pers\u00f6nliche Statistiken ${_spAt?'aktualisieren':'ver\u00f6ffentlichen'}</button>`
+    +(_spAt?`<span class="db-wr-hint" style="margin-left:6px;">zuletzt ${_spAt}</span>`:'');
   // Publish area
   if(existing){
     const url=_dbReportUrl(existing.token);
@@ -12481,7 +12653,7 @@ function dbRenderWeekReportSection(data){
     html+=`<div class="db-wr-link">${_dbEscapeHtml(url)}</div>`;
     // Settings under the link: photo toggle + WhatsApp style selector
     html+='<div class="db-wr-settings">';
-    html+=photoToggleHtml;
+    html+=photoToggleHtml+statsBtnHtml;
     html+='<div class="db-wr-wa-stil"><label class="db-wr-wa-lbl">WhatsApp-Stil:</label>';
     html+=`<select class="db-wr-wa-sel" onchange="dbSetWaTemplate(this)">`;
     Object.entries(_waTemplates).forEach(([k,v])=>{
@@ -12502,7 +12674,7 @@ function dbRenderWeekReportSection(data){
   } else {
     // Not yet published: photo toggle as standalone setting above the publish button
     html+='<div class="db-wr-prepublish">';
-    html+=photoToggleHtml;
+    html+=photoToggleHtml+statsBtnHtml;
     html+='</div>';
     html+='<div class="db-wr-pub-actions">';
     const pubLbl=emptyWeek?'\ud83d\udce4 Ver\u00f6ffentlichen (nur Saison-Wertung)':'\ud83d\udce4 Bericht ver\u00f6ffentlichen';
