@@ -7537,7 +7537,9 @@ function cycSt(pi,si){
     // Roll-call kickoff: M or ? \u2192 A (trainer confirms attendance)
     p.s[si]=1;
   } else {
-    const cycle=rollCall?[1,0,2]:[3,4,2];
+    // Fehlend is part of the planning cycle: it is what a player's own
+    // "Kann nicht" writes, so trainers cycle through and correct it here.
+    const cycle=rollCall?[1,0,2]:[3,4,0,2];
     let curIdx=cycle.indexOf(p.s[si]);
     if(curIdx<0)curIdx=-1; // not in cycle (defensive) — start from beginning
     p.s[si]=cycle[(curIdx+1)%cycle.length];
@@ -8559,7 +8561,7 @@ function renderMobileAtt(){
       {v:4,sym:'M',cls:'ma-5'},
       {v:3,sym:'?',cls:'ma-3'}
     ];
-    const allowed=rollCall?[1,0,2]:[3,4,2];
+    const allowed=rollCall?[1,0,2]:[3,4,0,2];
     // A value already stored outside the current phase (e.g. an Angemeldet
     // left over from before the session started) stays visible so the trainer
     // can see and change it — it just can't be newly selected.
@@ -8589,7 +8591,9 @@ function maSetStatus(pi,si,val){
   // Phase guard mirrors the rendering above (defence in depth: stale DOM,
   // double-tap during a session start, etc. must not write a phase-invalid value)
   const rollCall=(typeof _isSessRollCallTime==='function')?_isSessRollCallTime(si):false;
-  const allowed=rollCall?[1,0,2]:[3,4,2];
+  // Planning phase includes Fehlend: a player's own "Kann nicht" lands there,
+  // so trainers must be able to set and correct it before the session too.
+  const allowed=rollCall?[1,0,2]:[3,4,0,2];
   const D=cd();
   const cur=(D&&D.players&&D.players[pi]&&D.players[pi].s)?D.players[pi].s[si]:undefined;
   if(!allowed.includes(val)&&val!==cur)return;
@@ -11298,13 +11302,15 @@ function renderPlayerMode(){
       if(locked)deadlineLine=`<div class="pm-deadline locked">\ud83d\udd12 Antworten gesperrt seit ${_amFmtDeadline(rsvpUntil)}</div>`;
       else deadlineLine=`<div class="pm-deadline">\u23f0 Antwort bis ${_amFmtDeadline(rsvpUntil)}</div>`;
     }
-    // Button state logic — relaxed: player can freely switch between Komme and Kann nicht
-    // before deadline. Only trainer's roll-call result (1/0) locks both buttons.
-    const trainerLocked=(status===1||status===0);
+    // Only the deadline locks the buttons. Fehlend (0) used to lock them as a
+    // roll-call result — but that is now exactly what the player's own "Kann
+    // nicht" writes, so locking on it meant one tap was final. After the
+    // deadline everything is closed anyway, which is what protects the
+    // trainer's roll call.
     const kommeActive=(status===4||status===1);
     const kannNichtActive=(status===2||status===0);
-    const kommeDisabled=locked||trainerLocked;
-    const kannNichtDisabled=locked||trainerLocked;
+    const kommeDisabled=locked;
+    const kannNichtDisabled=locked;
     const kommeAttr=kommeDisabled?' disabled':'';
     const kannNichtAttr=kannNichtDisabled?' disabled':'';
     // Feedback messages
