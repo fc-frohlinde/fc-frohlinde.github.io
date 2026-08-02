@@ -142,6 +142,45 @@
 
   /* ── Ranking ── */
   .rank-list{display:flex;flex-direction:column;gap:8px;}
+  /* ── Personal statistics page ── */
+  .ps-wrap{max-width:560px;margin:0 auto;padding:18px 14px 40px;}
+  .ps-hero{display:flex;align-items:center;gap:14px;margin-bottom:6px;}
+  .ps-av{width:64px;height:64px;border-radius:50%;object-fit:cover;flex-shrink:0;
+    border:2px solid rgba(255,255,255,.25);}
+  .ps-av-ph{display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.15);
+    font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:#fff;}
+  .ps-name{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:1.5px;color:#fff;line-height:1.1;}
+  .ps-meta{font-size:.76rem;color:rgba(255,255,255,.6);margin-top:2px;}
+  .ps-kw{font-size:.72rem;color:rgba(255,255,255,.5);margin-bottom:16px;}
+  .ps-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(78px,1fr));gap:8px;margin-bottom:16px;}
+  .ps-kpi{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
+    border-radius:12px;padding:11px 6px;text-align:center;}
+  .ps-kpi-v{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:#fff;line-height:1;}
+  .ps-kpi-v.good{color:#3ddc84;} .ps-kpi-v.mid{color:#ffd600;} .ps-kpi-v.bad{color:#ff6b5a;}
+  .ps-kpi-l{font-size:.6rem;letter-spacing:.8px;text-transform:uppercase;color:rgba(255,255,255,.55);margin-top:4px;}
+  .ps-kpi-s{font-size:.62rem;color:rgba(255,255,255,.4);margin-top:2px;}
+  .ps-sec{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);
+    border-radius:14px;padding:14px;margin-bottom:12px;}
+  .ps-h{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1.4px;
+    color:rgba(255,255,255,.9);margin-bottom:10px;text-transform:uppercase;}
+  .ps-split{display:flex;gap:10px;margin-bottom:9px;}
+  .ps-split-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+    background:rgba(255,255,255,.06);border-radius:10px;padding:10px 6px;}
+  .ps-split-ic{font-size:1.1rem;}
+  .ps-split-v{font-family:'Bebas Neue',sans-serif;font-size:1.35rem;color:#fff;line-height:1;}
+  .ps-split-v.good{color:#3ddc84;} .ps-split-v.mid{color:#ffd600;} .ps-split-v.bad{color:#ff6b5a;}
+  .ps-split-l{font-size:.62rem;letter-spacing:.6px;text-transform:uppercase;color:rgba(255,255,255,.5);}
+  .ps-counts{font-size:.76rem;color:rgba(255,255,255,.6);text-align:center;}
+  .ps-chart{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:5px;height:104px;}
+  .ps-col{display:flex;flex-direction:column;align-items:center;min-width:0;}
+  .ps-bar-wrap{flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center;min-height:0;}
+  .ps-bar{width:62%;max-width:26px;background:#3ddc84;border-radius:4px 4px 0 0;min-height:3px;}
+  .ps-bar-alt{background:#4d9fff;}
+  .ps-bar-load{background:#ffb020;}
+  .ps-col-l{font-size:.58rem;color:rgba(255,255,255,.45);margin-top:4px;}
+  .ps-col-v{font-size:.6rem;color:rgba(255,255,255,.75);font-weight:700;}
+  .ps-note{font-size:.66rem;color:rgba(255,255,255,.45);margin-top:8px;line-height:1.4;}
+  .ps-foot{font-size:.66rem;color:rgba(255,255,255,.35);text-align:center;margin-top:18px;}
   .rank-row{
     display:flex;align-items:center;gap:12px;
     background:var(--card);border:1px solid var(--card-br);
@@ -575,6 +614,65 @@ function renderReport(r){
     showError('\ud83d\udd04','Zeit\u00fcberschreitung',
       'Der Bericht konnte nicht geladen werden. Pr\u00fcfe deine Internetverbindung und lade die Seite neu.');
   },12000);
+  // ── PERSONAL STATISTICS PAGE ──────────────────────────────
+  // Contains one player only. Deliberately no trainer grades and no team
+  // ranking: this page belongs to the player, not to a comparison.
+  function renderPlayerStats(d){
+    const p=(d.players&&d.players[0])||{};
+    const det=d.detail||{};
+    const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const pctCls=v=>v==null?'':(v>=80?'good':v>=50?'mid':'bad');
+    const av=p.photo?`<img class="ps-av" src="${p.photo}" alt="">`
+      :`<div class="ps-av ps-av-ph">${esc((p.name||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase())}</div>`;
+    const wdMax=Math.max(1,...(det.weekday||[]).map(w=>w.pct||0));
+    const trMax=Math.max(1,...(det.trend||[]).map(t=>t.pct||0));
+    const loadMax=Math.max(1,...(det.rpe||[]).map(r=>r.load||0));
+    let html=`<div class="ps-hero">
+      ${av}
+      <div class="ps-hero-txt">
+        <div class="ps-name">${esc(p.name)}</div>
+        <div class="ps-meta">${p.nr?'#'+esc(p.nr)+' \u00b7 ':''}${esc(p.pos||'')}${p.pos?' \u00b7 ':''}${esc(d.team||'')} \u00b7 ${esc(d.season||'')}</div>
+      </div>
+    </div>
+    <div class="ps-kw">KW ${esc(d.week&&d.week.kw)} \u00b7 ${esc(d.week&&d.week.from)}\u2013${esc(d.week&&d.week.to)}</div>
+    <div class="ps-kpis">
+      <div class="ps-kpi"><div class="ps-kpi-v ${pctCls(p.sPct)}">${p.sPct==null?'\u2013':p.sPct+'%'}</div><div class="ps-kpi-l">Saison</div><div class="ps-kpi-s">${p.sPresent}/${p.sTotal}</div></div>
+      <div class="ps-kpi"><div class="ps-kpi-v ${pctCls(p.wPct)}">${p.wPct==null?'\u2013':p.wPct+'%'}</div><div class="ps-kpi-l">Diese Woche</div><div class="ps-kpi-s">${p.wPresent}/${p.wTotal}</div></div>
+      <div class="ps-kpi"><div class="ps-kpi-v">${det.streak||0}</div><div class="ps-kpi-l">Serie</div><div class="ps-kpi-s">in Folge</div></div>
+      ${det.rank?`<div class="ps-kpi"><div class="ps-kpi-v">#${det.rank}</div><div class="ps-kpi-l">Platz</div><div class="ps-kpi-s">von ${det.ranked}</div></div>`:''}
+    </div>
+    <div class="ps-sec">
+      <div class="ps-h">Training &amp; Spiele</div>
+      <div class="ps-split">
+        <div class="ps-split-item"><span class="ps-split-ic">\ud83c\udfc3</span><span class="ps-split-v ${pctCls(det.tPct)}">${det.tPct==null?'\u2013':det.tPct+'%'}</span><span class="ps-split-l">Training</span></div>
+        <div class="ps-split-item"><span class="ps-split-ic">\u26bd</span><span class="ps-split-v ${pctCls(det.mPct)}">${det.mPct==null?'\u2013':det.mPct+'%'}</span><span class="ps-split-l">Spiele</span></div>
+      </div>
+      <div class="ps-counts">\u2705 ${det.cA||0} anwesend \u00b7 \u274c ${det.cF||0} gefehlt \u00b7 \ud83d\udccb ${det.cE||0} entschuldigt</div>
+    </div>`;
+    if(det.trend&&det.trend.length>1){
+      html+=`<div class="ps-sec"><div class="ps-h">Verlauf der letzten Wochen</div>
+        <div class="ps-chart">${det.trend.map(t=>
+          `<div class="ps-col"><div class="ps-bar-wrap"><div class="ps-bar" style="height:${Math.round((t.pct/trMax)*100)}%"></div></div>
+           <div class="ps-col-l">KW${t.kw}</div><div class="ps-col-v">${t.pct}%</div></div>`).join('')}</div></div>`;
+    }
+    if(det.weekday&&det.weekday.length){
+      html+=`<div class="ps-sec"><div class="ps-h">Nach Wochentag</div>
+        <div class="ps-chart">${det.weekday.map(w=>
+          `<div class="ps-col"><div class="ps-bar-wrap"><div class="ps-bar ps-bar-alt" style="height:${Math.round(((w.pct||0)/wdMax)*100)}%"></div></div>
+           <div class="ps-col-l">${esc(w.day)}</div><div class="ps-col-v">${w.pct==null?'\u2013':w.pct+'%'}</div></div>`).join('')}</div></div>`;
+    }
+    if(det.rpe&&det.rpe.length){
+      html+=`<div class="ps-sec"><div class="ps-h">Deine Belastung (eigene Einsch\u00e4tzung)</div>
+        <div class="ps-chart">${det.rpe.map(r=>
+          `<div class="ps-col"><div class="ps-bar-wrap"><div class="ps-bar ps-bar-load" style="height:${Math.round((r.load/loadMax)*100)}%"></div></div>
+           <div class="ps-col-l">KW${r.kw}</div><div class="ps-col-v">${r.load}</div></div>`).join('')}</div>
+        <div class="ps-note">Belastung = deine Bewertung \u00d7 Minuten. Nur deine eigenen Angaben.</div></div>`;
+    }
+    html+=`<div class="ps-foot">Stand: ${new Date(d.publishedAt).toLocaleDateString('de-DE')} \u00b7 ${esc(d.club||'')}</div>`;
+    const root=document.getElementById('app')||document.body;
+    root.innerHTML='<div class="ps-wrap">'+html+'</div>';
+    document.body.classList.add('ps-mode');
+  }
   db.ref('publishedReports/'+id).get().then(snap=>{
     if(settled)return;settled=true;clearTimeout(to);
     if(!snap.exists()){
@@ -588,7 +686,7 @@ function renderReport(r){
         'Die Bericht-Daten konnten nicht gelesen werden.');
       return;
     }
-    try{renderReport(data);}
+    try{ (data.kind==='player') ? renderPlayerStats(data) : renderReport(data); }
     catch(e){
       showError('\u26a0\ufe0f','Anzeigefehler','Der Bericht konnte nicht dargestellt werden.');
     }
