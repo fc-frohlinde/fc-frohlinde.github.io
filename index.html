@@ -2047,9 +2047,13 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 .pm-rpe-icon{font-size:1.4rem;line-height:1;}
 .pm-rpe-title{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:.6px;color:var(--bd);line-height:1.2;}
 .pm-rpe-sub{font-size:.74rem;color:var(--gm);margin-top:2px;}
-.pm-rpe-scale{display:grid;grid-template-columns:repeat(11,1fr);gap:4px;}
-.pm-rpe-n{aspect-ratio:1;min-height:34px;border:1.5px solid var(--gl);background:var(--ow);
-  border-radius:9px;font-family:'Barlow',sans-serif;font-size:.82rem;font-weight:700;color:var(--gd);
+/* Two rows of six on phones: eleven cells across a 360px screen leave ~26px
+   each — below any usable tap target and visually cramped. Six columns give
+   ~48px, and the 0–5 / 6–10 split reads naturally as "leicht / schwer". */
+.pm-rpe-scale{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;}
+@media (min-width:600px){.pm-rpe-scale{grid-template-columns:repeat(11,1fr);gap:4px;}}
+.pm-rpe-n{aspect-ratio:1;min-height:44px;border:1.5px solid var(--gl);background:var(--ow);
+  border-radius:10px;font-family:'Barlow',sans-serif;font-size:1rem;font-weight:700;color:var(--gd);
   cursor:pointer;transition:transform .1s,background .14s,border-color .14s;padding:0;}
 .pm-rpe-n:active{transform:scale(.9);}
 .pm-rpe-n.on{background:var(--bm);border-color:var(--bm);color:#fff;box-shadow:0 3px 10px rgba(22,89,184,.35);}
@@ -10224,13 +10228,21 @@ function rpeIsOpen(s,si,p,season){
   if(!s||!p)return false;
   if(typeof sessTookPlace==='function'&&!sessTookPlace(s,season))return false;
   const v=(p.s&&si<p.s.length)?p.s[si]:3;
-  if(v!==1)return false;                       // only players who were there
+  // Waiting for the trainer's roll call would defeat the method: the ideal
+  // moment is 15–30 minutes after the session, long before the attendance
+  // list is usually filled in. So everyone who was not explicitly marked
+  // absent or excused is asked. If the trainer marks them absent afterwards,
+  // the entry simply stops being shown and is ignored in the evaluation.
+  if(v===0||v===2)return false;
   const sk=(typeof dispToSortKey==='function')?dispToSortKey(s.date):null;
-  if(!sk)return false;
+  if(!sk||sk===99999999)return false;
   const y=Math.floor(sk/10000),m=Math.floor(sk/100)%100,d=sk%100;
-  const start=new Date(y,m-1,d,...(String(s.time||'').split(':').map(Number).filter(n=>!isNaN(n)).length===2
-    ?String(s.time).split(':').map(Number):[18,0]));
-  const ageH=(Date.now()-start.getTime())/3600000;
+  const hm=String(s.time||'').split(':').map(Number);
+  const start=new Date(y,m-1,d,(hm.length===2&&!isNaN(hm[0]))?hm[0]:18,(hm.length===2&&!isNaN(hm[1]))?hm[1]:0);
+  // Window runs from the END of the session — asking mid-training would get a
+  // rating of half a session.
+  const endMs=start.getTime()+rpeSessionMinutes(s,p,si)*60000;
+  const ageH=(Date.now()-endMs)/3600000;
   return ageH>=0&&ageH<=(RPE_IS_PREVIEW?24*30:RPE_WINDOW_H);
 }
 // Trainer view: how the squad experienced this session. Deliberately shows
