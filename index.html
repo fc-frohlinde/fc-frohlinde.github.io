@@ -9273,11 +9273,18 @@ function _amWeekCtx(p){
   list.sort((a,b)=>a.sk-b.sk);
   const dows=['So','Mo','Di','Mi','Do','Fr','Sa'];
   list.forEach(e=>{
-    const m=String(e.date).match(/(\d+)\.(\d+)/);
-    if(m){
-      const y=Math.floor(e.sk/10000);
-      e.dow=dows[new Date(y,+m[2]-1,+m[1]).getDay()];
-    }else e.dow='';
+    // Stored dates already carry the weekday ("Mi 05.08."). Split it off so
+    // templates compose the parts themselves — prepending a computed weekday
+    // produced "Mi Mi 05.08.".
+    const parts=String(e.date).trim().split(/\s+/);
+    if(parts.length>1&&/^[A-Za-zÄÖÜäöü]{2,3}$/.test(parts[0])){
+      e.dow=parts[0];
+      e.dnum=parts.slice(1).join(' ');
+    }else{
+      e.dnum=String(e.date).trim();
+      const m=e.dnum.match(/(\d+)\.(\d+)/);
+      e.dow=m?dows[new Date(Math.floor(e.sk/10000),+m[2]-1,+m[1]).getDay()]:'';
+    }
   });
   const trainCount=list.filter(e=>!e.isMatch).length;
   const matchCount=list.filter(e=>e.isMatch).length;
@@ -9290,7 +9297,7 @@ const AM_WEEK_TEMPLATES={
     build:c=>{
       if(!c.list.length)return `Hi ${c.nm}! \uD83D\uDC4B\n\nDiese Woche stehen keine Termine an. Dein Link bleibt gleich:\n${c.url}`;
       const lines=[`Hi ${c.nm}! \uD83D\uDC4B`,'','Termine der Woche:'];
-      c.list.forEach(e=>lines.push(`${e.isMatch?'\u26bd':'\ud83c\udfc3'} ${e.dow} ${e.date} \u00b7 ${e.time} Uhr`));
+      c.list.forEach(e=>lines.push(`${e.isMatch?'\u26bd':'\ud83c\udfc3'} ${e.dow} ${e.dnum} \u00b7 ${e.time} Uhr`));
       lines.push('',`Bitte f\u00fcr alle kurz zu- oder absagen:`,c.url);
       if(c.statsUrl)lines.push('',`\ud83d\udcca Deine pers\u00f6nliche Statistik:`,c.statsUrl);
       lines.push('','Danke! \uD83D\uDE4F');
@@ -9302,7 +9309,7 @@ const AM_WEEK_TEMPLATES={
     build:c=>{
       if(!c.list.length)return `Hi ${c.nm}! \uD83D\uDC4B\n\nDiese Woche ist trainingsfrei \u2014 geniesst die Pause! \uD83D\uDE0A\n\nDein Link bleibt derselbe:\n${c.url}`;
       const lines=[`Hallo ${c.nm}! \uD83D\uDC4B`,'',`So sieht unsere Woche aus:`];
-      c.list.forEach(e=>lines.push(`${e.isMatch?'\u26bd':'\ud83c\udfc3'} ${e.dow}, ${e.date} um ${e.time} Uhr${e.place?' \u00b7 '+e.place:''}`));
+      c.list.forEach(e=>lines.push(`${e.isMatch?'\u26bd':'\ud83c\udfc3'} ${e.dow}, ${e.dnum} um ${e.time} Uhr${e.place?' \u00b7 '+e.place:''}`));
       lines.push('','Sag uns bitte einmal kurz Bescheid, wann du dabei bist \u2014 dann k\u00f6nnen wir richtig planen:',c.url);
       if(c.statsUrl)lines.push('',`Und hier deine pers\u00f6nliche Statistik \ud83d\udcca`,c.statsUrl);
       lines.push('','Bis bald! \u26BD');
@@ -9315,7 +9322,7 @@ const AM_WEEK_TEMPLATES={
       if(!c.list.length)return `\uD83D\uDCAA ${c.nm}, diese Woche Pause \u2014 danach greifen wir wieder an!\n\n${c.url}`;
       const head=c.matchCount>0?'\uD83D\uDD25 Spieltag-Woche!':'\uD83D\uDCAA Neue Woche, neue Einheiten!';
       const lines=[`${head}`,'',`Hi ${c.nm}, das steht an:`];
-      c.list.forEach(e=>lines.push(`${e.isMatch?'\u26bd':'\ud83c\udfc3'} ${e.dow} ${e.date} \u00b7 ${e.time} Uhr`));
+      c.list.forEach(e=>lines.push(`${e.isMatch?'\u26bd':'\ud83c\udfc3'} ${e.dow} ${e.dnum} \u00b7 ${e.time} Uhr`));
       lines.push('','Wir z\u00e4hlen auf dich \u2014 trag kurz ein, wann du da bist:',c.url);
       if(c.statsUrl)lines.push('',`\ud83d\udcca Deine Zahlen:`,c.statsUrl);
       lines.push('','\uD83D\uDE80');
@@ -9327,7 +9334,7 @@ const AM_WEEK_TEMPLATES={
     build:c=>{
       if(!c.list.length)return `${c.nm}: diese Woche keine Termine. Link: ${c.url}`;
       const lines=[`Terminplanung${c.kw?' KW '+c.kw:''}`,''];
-      c.list.forEach(e=>lines.push(`${e.dow} ${e.date}, ${e.time} Uhr \u2014 ${e.what}${e.place?', '+e.place:''}`));
+      c.list.forEach(e=>lines.push(`${e.dow} ${e.dnum}, ${e.time} Uhr \u2014 ${e.what}${e.place?', '+e.place:''}`));
       lines.push('',`R\u00fcckmeldung bitte bis Montag \u00fcber diesen Link:`,c.url);
       if(c.statsUrl)lines.push('',`Pers\u00f6nliche Statistik: `+c.statsUrl);
       return lines.join('\n');
