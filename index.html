@@ -1463,6 +1463,13 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   #moDashboard .db-header{flex-wrap:wrap;gap:6px;}
   #moDashboard .db-header-actions{width:100%;flex-wrap:wrap;justify-content:flex-end;}
   #moDashboard .mob-close-x.mo-x-ingroup{margin-left:auto;}
+  /* Weekly invite block: on a phone the select and both buttons cannot share
+     a row — the select shrinks to unreadable. Stack them full width. */
+  .am-week-row{flex-direction:column;align-items:stretch;gap:6px;}
+  .am-week-lbl{font-size:.7rem;}
+  .am-week-sel{width:100%;min-height:44px;font-size:.82rem;}
+  .am-week-row .am-bc-btn{width:100%;min-height:44px;justify-content:center;}
+  .am-broadcast-actions .am-bc-btn{width:100%;min-height:44px;justify-content:center;}
   #moTeamMgr #tmgr-close-top{display:none;}
   /* A per-pane button row sits wherever that pane's content ends, so
      "Schließen" jumped around between tabs. One footer, always at the same
@@ -16540,6 +16547,7 @@ function mobSheetOpen(){
   // Area rows — visibility follows the same permissions as the toolbar
   const ed=(typeof canEdit==='function')&&canEdit();
   const rows=[
+    ['\ud83d\udce9','Anmeldungen & Versand','openAnmeldungen()',ed],
     ['\ud83d\udcc4','Wochenbericht','openWeekReport()',ed],
     ['\u26bd','Aufstellung','openNextMatchLineup()',ed],
     ['\ud83d\udccb','Saisonkader','openSeasonLineup()',ed],
