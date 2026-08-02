@@ -2089,6 +2089,8 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 .load-c{font-size:.7rem;text-align:center;padding:5px 2px;border-radius:6px;background:var(--muted-bg);color:var(--gm);font-weight:600;}
 .load-c.spike{box-shadow:inset 0 0 0 2px var(--warn);}
 .load-note{font-size:.66rem;color:var(--gm);margin-top:8px;line-height:1.4;}
+.ico-loc{vertical-align:-.13em;opacity:.85;}
+.u-empty-icon .ico-loc{width:1.8rem;height:1.8rem;}
 .loc-field{display:flex;align-items:center;gap:6px;}
 .loc-field input{flex:1;min-width:0;}
 .loc-ic{font-size:.9rem;}
@@ -11330,7 +11332,7 @@ function renderPlayerMode(){
 
     const haInfo=f.isMatch&&s.homeAway?`<div class="pm-loc">${s.homeAway==='home'?'\ud83c\udfe0 Heim':'\ud83d\ude8c Ausw\u00e4rts'}</div>`:'';
     // Location line — only if the session has one defined
-    const locInfo=(s.location&&s.location.trim())?`<div class="pm-loc">\ud83d\udccd ${_amEscapeText(s.location.trim())}</div>`:'';
+    const locInfo=(s.location&&s.location.trim())?`<div class="pm-loc">${LOC_ICON} ${_amEscapeText(s.location.trim())}</div>`:'';
     // Trainer's note for this session — surfaced for the player (e.g. "Bring 2 pairs of cleats")
     const noteInfo=(s.note&&s.note.trim())?`<div class="pm-note">\ud83d\udccc ${_amEscapeText(s.note.trim())}</div>`:'';
     // Lineup position — only for matches where trainer has named player in the starting XI/bank
@@ -15304,7 +15306,7 @@ function openSessStats(si){
           <input type="time" id="ss-e-time" value="${s.time||''}" style="width:96px;padding:6px;border:1.5px solid var(--gl);border-radius:6px;font-size:.8rem;outline:none;margin-bottom:0;" onchange="updSessTime(${si},this.value)"/></div>
         <div style="flex:none;"><label style="font-size:.61rem;font-weight:700;color:var(--gd);text-transform:uppercase;">Dauer</label>
           <input type="number" id="ss-e-dur" min="15" max="240" step="5" value="${rpeSessionMinutes(s,null,si)}" style="width:78px;padding:6px;border:1.5px solid var(--gl);border-radius:6px;font-size:.8rem;outline:none;margin-bottom:0;" onchange="sessSetDuration(${si},this.value)"/></div>
-        <div style="flex:2;min-width:150px;"><label style="font-size:.61rem;font-weight:700;color:var(--gd);text-transform:uppercase;">📍 Ort</label>
+        <div style="flex:2;min-width:150px;"><label style="font-size:.61rem;font-weight:700;color:var(--gd);text-transform:uppercase;">${LOC_ICON} Ort</label>
           <div style="display:flex;gap:5px;">
             <input type="text" id="ss-e-loc" list="ssLocList" value="${escapeHtml(s.location||'')}" placeholder="Ort…" maxlength="80" style="flex:1;min-width:0;padding:6px;border:1.5px solid var(--gl);border-radius:6px;font-size:.8rem;outline:none;margin-bottom:0;" onchange="sessSetLocation(${si},this.value)"/>
             <datalist id="ssLocList"></datalist>
@@ -18533,6 +18535,13 @@ function _populateDatalist(datalistId){
 // Kept as a plain reusable list: a club trains on the same handful of
 // pitches, and retyping "Kunstrasen Platz 2" every week invites typos that
 // then read as different places on the players' screens.
+// Location marker as inline SVG rather than the emoji pin: emojis render
+// differently on every platform (Android draws a fat round balloon) and carry
+// their own colour, which fights the palette. currentColor makes this follow
+// whatever text it sits in.
+const LOC_ICON='<svg class="ico-loc" viewBox="0 0 24 24" width="1em" height="1em" fill="none" '
+  +'stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+  +'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>';
 function getLocations(){
   if(!Array.isArray(G.locationList))G.locationList=[];
   return G.locationList;
@@ -18567,16 +18576,18 @@ function openLocationManager(){
   openM('moLocations');
 }
 function renderLocationManager(){
+  const ico=document.getElementById('loc-mgr-ico');
+  if(ico&&!ico.innerHTML)ico.innerHTML=LOC_ICON;
   const box=document.getElementById('loc-mgr-list');
   if(!box)return;
   const list=getLocations();
   if(!list.length){
-    box.innerHTML='<div class="u-empty"><div class="u-empty-icon">\ud83d\udccd</div>'
+    box.innerHTML='<div class="u-empty"><div class="u-empty-icon">'+LOC_ICON+'</div>'
       +'<div class="u-empty-txt">Noch keine Orte gespeichert. Orte werden automatisch \u00fcbernommen, sobald du sie bei einem Termin eintr\u00e4gst.</div></div>';
     return;
   }
   box.innerHTML=list.map(l=>`<div class="loc-row">
-    <span class="loc-name">\ud83d\udccd ${escapeHtml(l)}</span>
+    <span class="loc-name">${LOC_ICON} ${escapeHtml(l)}</span>
     <button class="btn-mini" onclick="removeLocation('${escapeHtml(l).replace(/'/g,"\\'")}')" title="Entfernen">\u2715</button>
   </div>`).join('');
 }
@@ -23495,7 +23506,7 @@ checkAutoBackup();
 
 <div class="mo" id="moLocations"><div class="mob" style="width:420px;">
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-    <h3 style="margin:0;flex:1;">📍 Orte verwalten</h3>
+    <h3 style="margin:0;flex:1;"><span id="loc-mgr-ico"></span> Orte verwalten</h3>
   </div>
   <div style="display:flex;gap:6px;margin-bottom:10px;">
     <input type="text" id="loc-mgr-new" placeholder="Neuen Ort hinzufügen…" maxlength="80" style="flex:1;">
