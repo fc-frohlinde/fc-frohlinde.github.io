@@ -2069,6 +2069,36 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
   background:linear-gradient(90deg,hsl(155 70% 55%),hsl(78 70% 52%),hsl(38 85% 55%),hsl(0 72% 55%));}
 .pm-rpe-fb{font-size:.74rem;color:var(--gm);margin-top:9px;line-height:1.35;}
 .pm-rpe-done .pm-rpe-fb{color:var(--ok-fg);font-weight:600;}
+.load-warn{background:var(--warn-bg);border:1px solid rgba(243,156,18,.35);border-radius:10px;padding:9px 11px;margin-bottom:10px;}
+.load-warn-h{font-size:.76rem;font-weight:700;color:var(--warn-fg);margin-bottom:6px;}
+.load-warn-row{display:flex;align-items:center;gap:8px;font-size:.76rem;color:var(--gd);padding:2px 0;}
+.load-warn-row span:first-child{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.load-warn-chg{font-weight:700;color:var(--bad-fg);}
+.load-warn-num{font-size:.7rem;color:var(--gm);white-space:nowrap;}
+.load-quiet{background:var(--muted-bg);border-radius:10px;padding:9px 11px;margin-bottom:10px;}
+.load-quiet-h{font-size:.74rem;font-weight:700;color:var(--gm);margin-bottom:6px;}
+.load-quiet-list{display:flex;flex-wrap:wrap;gap:5px;}
+.load-table{overflow-x:auto;}
+.load-head,.load-row{display:grid;grid-template-columns:minmax(96px,1.4fr) repeat(6,minmax(46px,1fr));gap:3px;align-items:center;}
+.load-head{margin-bottom:4px;}
+.load-w{font-size:.62rem;text-align:center;color:var(--gm);font-weight:700;}
+.load-w.now{color:var(--bd);}
+.load-row{margin-bottom:3px;}
+.load-nm{font-size:.74rem;color:var(--gd);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:4px;}
+.load-c{font-size:.7rem;text-align:center;padding:5px 2px;border-radius:6px;background:var(--muted-bg);color:var(--gm);font-weight:600;}
+.load-c.spike{box-shadow:inset 0 0 0 2px var(--warn);}
+.load-note{font-size:.66rem;color:var(--gm);margin-top:8px;line-height:1.4;}
+.rpe-dur{display:flex;align-items:center;gap:6px;font-size:.74rem;color:var(--gm);margin-bottom:7px;}
+.rpe-dur input{width:66px;padding:4px 7px;border:1.5px solid var(--gl);border-radius:6px;
+  font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:600;color:var(--gd);}
+.rpe-dur-hint{font-size:.68rem;opacity:.8;}
+.rpe-list{display:flex;flex-direction:column;gap:4px;margin-top:6px;}
+.rpe-row{display:flex;align-items:center;gap:8px;font-size:.74rem;}
+.rpe-nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--gd);}
+.rpe-val{font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--bd);min-width:20px;text-align:center;}
+.rpe-min{width:58px;padding:3px 6px;border:1.5px solid var(--gl);border-radius:6px;
+  font-family:'Barlow',sans-serif;font-size:.74rem;text-align:center;color:var(--gd);}
+.rpe-load{min-width:46px;text-align:right;font-weight:700;color:var(--gm);}
 .am-week-block{margin-top:10px;padding-top:10px;border-top:1px solid var(--gl);}
 .am-week-title{font-size:.78rem;font-weight:700;color:var(--gd);margin-bottom:7px;}
 .am-week-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;width:100%;}
@@ -2696,6 +2726,7 @@ if(window._fbBlocked){
   </div>
   <label>Datum</label><input type="date" id="newDate"/>
   <label>Uhrzeit</label><input type="time" id="newTime" value="18:30"/>
+  <label>Dauer (Minuten)</label><input type="number" id="newDur" value="90" min="15" max="240" step="5"/>
   <label>Schwerpunkt</label>
   <select id="newFocus"><option value="">– Kein –</option></select>
   <p class="note">Chronologisch einsortiert.</p>
@@ -10396,16 +10427,149 @@ function rpeIsOpen(s,si,p,season){
 // Trainer view: how the squad experienced this session. Deliberately shows
 // the SPREAD, not just the mean — if a session lands at 8 for everyone the
 // plan was off, and if it splits 3/9 the intensity was unevenly distributed.
+function sessSetDuration(si,val){
+  if(!canEdit())return;
+  const D=cd();const s=D&&D.sessions&&D.sessions[si];
+  if(!s)return;
+  const n=Math.max(15,Math.min(240,parseInt(val,10)||90));
+  if(s.duration===n)return;
+  snap();s.duration=n;saveG();
+  logAudit('Dauer geändert',s.date||'?',n+' Min');
+  try{renderSessRpe(si);}catch(e){}
+}
+// Minutes actually played, per player. For a match the load of a substitute
+// who came on for 20 minutes is nothing like a starter's — without this the
+// whole計 calculation would treat them the same.
+function sessSetPlayerMinutes(si,pi,val){
+  if(!canEdit())return;
+  const D=cd();const p=D&&D.players&&D.players[pi];const s=D&&D.sessions&&D.sessions[si];
+  if(!p||!s)return;
+  if(!Array.isArray(p.rpeMin))p.rpeMin=[];
+  while(p.rpeMin.length<D.sessions.length)p.rpeMin.push(null);
+  const raw=String(val==null?'':val).trim();
+  const n=raw===''?null:Math.max(0,Math.min(240,parseInt(raw,10)||0));
+  if(p.rpeMin[si]===n)return;
+  snap();p.rpeMin[si]=n;saveG();
+  try{renderSessRpe(si);}catch(e){}
+}
+// ══ LOAD ANALYSIS ════════════════════════════════════════════
+// The point of collecting sRPE: weekly load per player, and how fast it
+// changes. A jump of more than ~30% over the previous week is the classic
+// warning sign for soft-tissue injuries; chronically low load flags players
+// who are drifting out of the squad's rhythm.
+const LOAD_SPIKE_PCT=30;
+function computeLoadMatrix(data,weeks){
+  const {block,season,players}=data;
+  weeks=weeks||6;
+  const weekKeys=[];
+  const perPlayer={};
+  const sessOf={};
+  (block.sessions||[]).forEach((s,si)=>{
+    if(!s||!s.date||!sessTookPlace(s,season))return;
+    const sk=_dbSortKey(s.date,season);
+    if(!sk||sk===99999999)return;
+    const y=Math.floor(sk/10000),m=Math.floor(sk/100)%100,d=sk%100;
+    const key=isoWeekKey(new Date(y,m-1,d));
+    if(!sessOf[key])sessOf[key]={sk,list:[]};
+    sessOf[key].list.push(si);
+    if(sessOf[key].sk>sk)sessOf[key].sk=sk;
+  });
+  Object.entries(sessOf).sort((a,b)=>a[1].sk-b[1].sk).forEach(([k])=>weekKeys.push(k));
+  const shown=weekKeys.slice(-weeks);
+  players.forEach((p,pi)=>{
+    if(!p)return;
+    const row=shown.map(k=>{
+      let load=0,rated=0,possible=0;
+      (sessOf[k]?sessOf[k].list:[]).forEach(si=>{
+        possible++;
+        const r=Array.isArray(p.rpe)?p.rpe[si]:null;
+        if(typeof r==='number'){
+          load+=r*rpeSessionMinutes(block.sessions[si],p,si);
+          rated++;
+        }
+      });
+      return {load:Math.round(load),rated,possible};
+    });
+    perPlayer[pi]={name:getDisplayName?getDisplayName(p):p.name,row};
+  });
+  return {weeks:shown.map(k=>parseInt(k.split('-W')[1],10)),perPlayer};
+}
+function dbRenderLoadCard(data){
+  const m=computeLoadMatrix(data,6);
+  if(!m.weeks.length)return '';
+  const rows=Object.entries(m.perPlayer)
+    .filter(([,v])=>v.row.some(c=>c.load>0));
+  if(!rows.length){
+    return '<div class="db-section"><div class="db-h">\ud83d\udcaa Belastung (sRPE)</div>'
+      +'<div class="u-empty"><div class="u-empty-icon">\ud83d\udcaa</div>'
+      +'<div class="u-empty-txt">Noch keine Belastungs-R\u00fcckmeldungen. Sobald Spieler nach dem Training bewerten, erscheint hier die Wochenauswertung.</div></div></div>';
+  }
+  const last=m.weeks.length-1,prev=last-1;
+  // Spikes: last week vs the one before, only where both weeks carry data
+  const spikes=[];
+  const quiet=[];
+  const lastLoads=[];
+  rows.forEach(([pi,v])=>{
+    const a=v.row[prev]?v.row[prev].load:0;
+    const b=v.row[last]?v.row[last].load:0;
+    if(b>0)lastLoads.push(b);
+    if(a>0&&b>0){
+      const chg=Math.round((b-a)/a*100);
+      if(chg>=LOAD_SPIKE_PCT)spikes.push({name:v.name,a,b,chg});
+    }
+  });
+  lastLoads.sort((x,y)=>x-y);
+  const median=lastLoads.length?lastLoads[Math.floor(lastLoads.length/2)]:0;
+  rows.forEach(([pi,v])=>{
+    const b=v.row[last]?v.row[last].load:0;
+    if(median>0&&b<median*0.6)quiet.push({name:v.name,load:b,median});
+  });
+  const maxLoad=Math.max(1,...rows.flatMap(([,v])=>v.row.map(c=>c.load)));
+  let html='<div class="db-section"><div class="db-h">\ud83d\udcaa Belastung (sRPE) \u00b7 Wochensummen</div>';
+  if(spikes.length){
+    html+='<div class="load-warn"><div class="load-warn-h">\u26a0\ufe0f Belastungssprung \u00fcber '+LOAD_SPIKE_PCT+'% \u2014 diese Woche dosieren</div>';
+    spikes.sort((a,b)=>b.chg-a.chg).forEach(s=>{
+      html+=`<div class="load-warn-row"><span>${escapeHtml(s.name)}</span>`
+        +`<span class="load-warn-chg">+${s.chg}%</span>`
+        +`<span class="load-warn-num">${s.a} \u2192 ${s.b}</span></div>`;
+    });
+    html+='</div>';
+  }
+  if(quiet.length){
+    html+='<div class="load-quiet"><div class="load-quiet-h">\ud83d\udd0b Deutlich unter dem Team-Median ('+median+')</div><div class="load-quiet-list">';
+    quiet.sort((a,b)=>a.load-b.load).forEach(q=>{
+      html+=`<span class="u-chip" style="font-size:.7rem;">${escapeHtml(q.name)} <b>${q.load}</b></span>`;
+    });
+    html+='</div></div>';
+  }
+  html+='<div class="load-table"><div class="load-head"><span class="load-nm"></span>'
+    +m.weeks.map((w,i)=>`<span class="load-w${i===last?' now':''}">KW${w}</span>`).join('')+'</div>';
+  rows.sort((a,b)=>(b[1].row[last]?.load||0)-(a[1].row[last]?.load||0)).forEach(([pi,v])=>{
+    html+='<div class="load-row"><span class="load-nm">'+escapeHtml(v.name)+'</span>';
+    v.row.forEach((c,i)=>{
+      const prevC=i>0?v.row[i-1].load:0;
+      const spike=(prevC>0&&c.load>0&&((c.load-prevC)/prevC*100)>=LOAD_SPIKE_PCT);
+      const inten=c.load?Math.max(.12,c.load/maxLoad):0;
+      const style=c.load?`background:rgba(22,89,184,${inten.toFixed(2)});color:${inten>.55?'#fff':'var(--gd)'};`:'';
+      html+=`<span class="load-c${spike?' spike':''}" style="${style}" title="${c.rated}/${c.possible} bewertet">${c.load||'\u2013'}</span>`;
+    });
+    html+='</div>';
+  });
+  html+='</div><div class="load-note">Load = Bewertung \u00d7 Minuten. Grau = keine R\u00fcckmeldung. '
+    +'Rahmen = Anstieg \u00fcber '+LOAD_SPIKE_PCT+'% zur Vorwoche.</div></div>';
+  return html;
+}
 function renderSessRpe(si){
   const box=document.getElementById('ss-rpe-wrap');
   if(!box)return;
   const D=cd();const s=D&&D.sessions&&D.sessions[si];
   if(!s||!canEdit()||!sessTookPlace(s,UI.currentSeason)){box.style.display='none';return;}
   const vals=[];
-  (D.players||[]).forEach(p=>{
+  (D.players||[]).forEach((p,_pi)=>{
     if(!p||!Array.isArray(p.rpe))return;
     const r=p.rpe[si];
-    if(typeof r==='number')vals.push({n:getDisplayName?getDisplayName(p):p.name,r,load:rpeLoad(s,p,si)});
+    if(typeof r==='number')vals.push({n:getDisplayName?getDisplayName(p):p.name,r,
+      load:rpeLoad(s,p,si),pi:_pi,min:(Array.isArray(p.rpeMin)?p.rpeMin[si]:null)});
   });
   const present=(D.players||[]).filter(p=>p&&p.s&&p.s[si]===1).length;
   if(!vals.length){
@@ -10419,17 +10583,31 @@ function renderSessRpe(si){
   const avgLoad=Math.round(vals.reduce((a,b)=>a+(b.load||0),0)/vals.length);
   const mins=rpeSessionMinutes(s,null,si);
   box.style.display='block';
+  const isMatch=s.type==='match';
   box.innerHTML=`<div class="u-card" style="padding:10px 12px;">
     <div class="u-sec-h" style="margin-bottom:6px;">\ud83d\udcaa Belastung (sRPE)</div>
+    <div class="rpe-dur">
+      <label>Dauer</label>
+      <input type="number" min="15" max="240" step="5" value="${mins}"
+        onchange="sessSetDuration(${si},this.value)"> <span>Min</span>
+      ${isMatch?'<span class="rpe-dur-hint">Einsatzminuten je Spieler unten</span>':''}
+    </div>
     <div style="display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;">
       <div><span style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--bd);">${avg.toFixed(1)}</span>
         <span style="font-size:.7rem;color:var(--gm);"> \u00d8 von ${vals.length}${present?'/'+present:''}</span></div>
       <div style="font-size:.74rem;color:var(--gm);">Spanne ${min}\u2013${max}</div>
       <div style="font-size:.74rem;color:var(--gm);">\u00d8 Load ${avgLoad} <span style="opacity:.7;">(${mins} Min)</span></div>
     </div>
-    <details style="margin-top:7px;"><summary style="font-size:.72rem;color:var(--gm);cursor:pointer;">Einzelwerte</summary>
-      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;">
-        ${vals.sort((a,b)=>b.r-a.r).map(v=>`<span class="u-chip" style="font-size:.7rem;">${escapeHtml(v.n)} <b>${v.r}</b></span>`).join('')}
+    <details style="margin-top:7px;"><summary style="font-size:.72rem;color:var(--gm);cursor:pointer;">Einzelwerte${isMatch?' &amp; Einsatzminuten':''}</summary>
+      <div class="rpe-list">
+        ${vals.sort((a,b)=>b.r-a.r).map(v=>`<div class="rpe-row">
+          <span class="rpe-nm">${escapeHtml(v.n)}</span>
+          <span class="rpe-val">${v.r}</span>
+          ${isMatch?`<input class="rpe-min" type="number" min="0" max="240" step="5" placeholder="${mins}"
+             value="${v.min==null?'':v.min}" title="Einsatzminuten"
+             onchange="sessSetPlayerMinutes(${si},${v.pi},this.value)">`:''}
+          <span class="rpe-load">${v.load==null?'\u2013':v.load}</span>
+        </div>`).join('')}
       </div></details>
   </div>`;
 }
@@ -12825,6 +13003,9 @@ function renderDashboard(){
   html+='<div class="db-card"><div class="db-h">📊 Status-Verteilung <span class="db-h-sub">(markiert)</span></div>'+dbRenderStatusBar(sb)+'</div>';
   html+='<div class="db-card"><div class="db-h">🗓 Termine-Übersicht</div>'+dbRenderSessionsOverview(so)+'</div>';
   html+='</div>';
+  // Belastung: weekly sRPE sums, spikes and under-loaded players
+  try{const loadCard=dbRenderLoadCard(data);if(loadCard)html+=loadCard;}
+  catch(e){console.error('loadCard:',e);}
   // Spiel-Themen: team development by evaluation topic
   const topicCard=dbRenderTopicCard(data);
   if(topicCard)html+=topicCard;
@@ -18133,7 +18314,11 @@ function addTraining(){
   if(!canEdit())return;
   const iso=document.getElementById('newDate').value;if(!iso)return alert('Datum auswählen.');
   const disp=isoToDisp(iso);const time=document.getElementById('newTime').value;const focus=document.getElementById('newFocus').value;
-  snap();insertSorted(ensureCd(),{date:disp,month:moFromDisp(disp),type:'training',focus,time:time||'18:30'});
+  // Duration drives the sRPE load (rating × minutes) — without it every
+  // session would count as the 90-minute default.
+  const durEl=document.getElementById('newDur');
+  const dur=durEl?Math.max(15,Math.min(240,parseInt(durEl.value,10)||90)):90;
+  snap();insertSorted(ensureCd(),{date:disp,month:moFromDisp(disp),type:'training',focus,time:time||'18:30',duration:dur});
   // Track template usage (only on actual session save)
   const tplSel=document.getElementById('tpl-training-sel');
   const tplId=tplSel?tplSel.value:'';
