@@ -11670,7 +11670,7 @@ function amCopyAllLinks(){
   }
 }
 // ── TRAINER DASHBOARD ────────────────────────────────────────
-let _dbState={team:null,season:null,weekdayTime:'past',weekdayType:'all',weekReportOffset:0,reportIncludePhotos:false};
+let _dbState={team:null,season:null,weekdayTime:'past',weekdayType:'all',weekReportOffset:0,reportIncludePhotos:false,reportIncludeDetail:false};
 function setDbWeekdayTime(t){_dbState.weekdayTime=t;renderDashboard();}
 function setDbWeekdayType(t){_dbState.weekdayType=t;renderDashboard();}
 function openDashboard(){
@@ -12175,10 +12175,40 @@ function _dbReportUrl(token){
   const base=location.origin+location.pathname.replace(/\/[^\/]*$/,'/');
   return base+'report.html?id='+encodeURIComponent(token);
 }
-function dbBuildReportSnapshot(data,offset,includePhotos){
+function dbBuildReportSnapshot(data,offset,includePhotos,includeDetail){
   const r=dbComputeWeekReport(data,offset);
   const seasonStats=_dbComputeSeasonStats(data);
   const players=data.players;
+  // Detail per player, computed with the SAME helpers the app's own player
+  // profile uses — one source of truth, so the report can never drift from
+  // what the trainer sees in the app.
+  const detailFor=(pi)=>{
+    if(!includeDetail)return null;
+    const p=players[pi];
+    if(!p)return null;
+    const occ=[{p,block:data.block,season:data.season}];
+    const ov=computePlayerOverallStats(occ);
+    const wd=computePlayerWeekday(occ).filter(x=>x.total>0);
+    // Current streak of attended sessions, most recent backwards
+    let streak=0;
+    const held=[];
+    (data.block.sessions||[]).forEach((s,si)=>{
+      if(s&&sessTookPlace(s,data.season))held.push({si,sk:_dbSortKey(s.date,data.season)});
+    });
+    held.sort((a,b)=>a.sk-b.sk);
+    for(let i=held.length-1;i>=0;i--){
+      const v=p.s&&p.s[held[i].si];
+      if(v===1)streak++;
+      else if(v===3||v===4||v==null)continue;
+      else break;
+    }
+    return {
+      tPct:ov.tPct,mPct:ov.mPct,
+      cA:ov.cA,cF:ov.cF,cE:ov.cE,
+      streak,
+      weekday:wd.map(x=>({day:x.day,pct:x.pct,total:x.total}))
+    };
+  };
   const playerEntries=r.playerRows.map(pr=>{
     const p=players[pr.pi]||{};
     const ss=seasonStats.perPlayer[pr.pi]||{present:0,total:0};
@@ -12191,11 +12221,13 @@ function dbBuildReportSnapshot(data,offset,includePhotos){
       photo:(includePhotos&&p.photo)?p.photo:null,
       wCells:pr.cells,
       wPresent:pr.present,wTotal:pr.total,wPct:wPct,
-      sPresent:ss.present,sTotal:ss.total,sPct:sPct
+      sPresent:ss.present,sTotal:ss.total,sPct:sPct,
+      detail:detailFor(pr.pi)
     };
   });
   return {
-    v:1,
+    v:2,
+    hasDetail:!!includeDetail,
     publishedAt:Date.now(),
     club:(G&&G.clubName)||'FC Frohlinde',
     clubLogo:(G&&G.clubLogo)||null,
@@ -12232,7 +12264,8 @@ function dbPublishWeekReport(){
   const r=dbComputeWeekReport(data,offset);
   // Empty weeks are allowed — the report then shows only the season standings.
   const includePhotos=!!_dbState.reportIncludePhotos;
-  const snapshot=dbBuildReportSnapshot(data,offset,includePhotos);
+  const includeDetail=!!_dbState.reportIncludeDetail;
+  const snapshot=dbBuildReportSnapshot(data,offset,includePhotos,includeDetail);
   if(!Array.isArray(G.reportLog))G.reportLog=[];
   // Reuse token if a report for this team+season+KW already exists (so the shared link stays valid)
   const existing=G.reportLog.find(e=>e&&e.team===snapshot.team&&e.season===snapshot.season&&e.kw===snapshot.week.kw);
@@ -12244,7 +12277,7 @@ function dbPublishWeekReport(){
     const logEntry={
       token:token,team:snapshot.team,season:snapshot.season,
       kw:snapshot.week.kw,from:snapshot.week.from,to:snapshot.week.to,
-      publishedAt:snapshot.publishedAt,hasPhotos:includePhotos,
+      publishedAt:snapshot.publishedAt,hasPhotos:includePhotos,hasDetail:includeDetail,
       sessionCount:r.weekSess.length,
       // Fields used by WhatsApp templates
       weekTrainCount:r.trainCount,
@@ -12269,6 +12302,9 @@ function dbPublishWeekReport(){
 }
 function dbToggleReportPhotos(cb){
   _dbState.reportIncludePhotos=!!cb.checked;
+}
+function dbToggleReportDetail(cb){
+  _dbState.reportIncludeDetail=!!cb.checked;
 }
 // ── WhatsApp announcement templates ──
 function _dbFmtSessCount(tc,mc){
@@ -12468,7 +12504,8 @@ function dbRenderWeekReportSection(data){
   // Find existing published report for this week (used to decide what to render)
   const existing=Array.isArray(G.reportLog)?G.reportLog.find(e=>e&&e.team===r.team&&e.season===r.season&&e.kw===r.kw):null;
   // Photo-toggle HTML — reused in both states (above publish button OR in published settings row)
-  const photoToggleHtml=`<label class="db-wr-photo-toggle"><input type="checkbox" ${_dbState.reportIncludePhotos?'checked':''} onchange="dbToggleReportPhotos(this)"><span class="db-wr-photo-txt">Spielerfotos einbeziehen</span><span class="db-wr-hint">gr\u00f6\u00dfere Datei</span></label>`;
+  const photoToggleHtml=`<label class="db-wr-photo-toggle"><input type="checkbox" ${_dbState.reportIncludePhotos?'checked':''} onchange="dbToggleReportPhotos(this)"><span class="db-wr-photo-txt">Spielerfotos einbeziehen</span><span class="db-wr-hint">gr\u00f6\u00dfere Datei</span></label>`
+    +`<label class="db-wr-photo-toggle"><input type="checkbox" ${_dbState.reportIncludeDetail?'checked':''} onchange="dbToggleReportDetail(this)"><span class="db-wr-photo-txt">Detailstatistik je Spieler</span><span class="db-wr-hint">Serie, Wochentage, Training/Spiel</span></label>`;
   // Publish area
   if(existing){
     const url=_dbReportUrl(existing.token);
