@@ -1400,12 +1400,20 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   .lp-topbar,.slp-topbar{padding:calc(6px + env(safe-area-inset-top,0px)) 10px 6px;gap:6px;}
   .lp-logo,.slp-logo{font-size:.9rem !important;}
   .lp-sub,.slp-sub,.lp-hint,.slp-hint{display:none !important;}
-  /* Planner topbar: the labels on Bearbeiten and Schließen were what broke the
-     row. Both collapse to their glyph; 36px keeps them thumb-sized. */
+  /* Planner topbar on phones: two rows by design — the title gets its own
+     line, every control shares the next one. Labels collapse to glyphs so the
+     control row never wraps. */
   .fb-long{display:none;}
   .fb-short{display:inline;}
-  .lp-close-btn,.slp-close-btn{padding:6px 12px;font-size:.9rem;min-height:36px;flex-shrink:0;}
-  .lp-fmt-btn,.slp-fmt-btn{padding:5px 10px;}
+  .lp-topbar,.slp-topbar{flex-wrap:wrap !important;align-items:center;gap:6px !important;}
+  .lp-title{flex:0 0 100%;order:0;min-width:0;}
+  .lp-logo,.slp-logo{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  #lp-fmt-btns,#slp-fmt-btns{order:1;flex:1 1 auto;margin-left:0 !important;min-width:0;}
+  .lp-kind-wrap{order:2;margin-left:0 !important;flex-shrink:0;}
+  #slp-conf-toggle,#slp-conf-toggle-lbl{order:2;flex-shrink:0;}
+  .lp-spacer,.slp-spacer,.slp-topbar>div[style*="flex:1"]{display:none !important;}
+  .lp-close-btn,.slp-close-btn{order:3;padding:6px 12px;font-size:.9rem;min-height:36px;flex-shrink:0;}
+  .lp-fmt-btn,.slp-fmt-btn{padding:5px 10px;flex-shrink:0;}
   /* Formation / match-kind buttons: one scrollable row, never wrapping */
   #lp-fmt-btns,#slp-fmt-btns{flex-wrap:nowrap !important;overflow-x:auto;margin-left:0 !important;
     -webkit-overflow-scrolling:touch;scrollbar-width:none;}
@@ -23117,9 +23125,9 @@ checkAutoBackup();
 <div class="lp-overlay" id="moLineup">
   <!-- Topbar -->
   <div class="lp-topbar">
-    <div><div class="lp-logo">⚽ Aufstellungsplaner <span id="lp-presence-inline" class="inline-presence"></span></div><div class="lp-sub" id="lp-context-info">FC Frohlinde 1949</div></div>
+    <div class="lp-title"><div class="lp-logo">⚽ Aufstellungsplaner <span id="lp-presence-inline" class="inline-presence"></span></div><div class="lp-sub" id="lp-context-info">FC Frohlinde 1949</div></div>
     <div id="lp-fmt-btns" style="display:flex;gap:5px;flex-wrap:wrap;margin-left:8px;"></div>
-    <div style="display:flex;gap:4px;margin-left:10px;align-items:center;" title="Spieltyp bestimmt die Bankgröße">
+    <div class="lp-kind-wrap" style="display:flex;gap:4px;margin-left:10px;align-items:center;" title="Spieltyp bestimmt die Bankgröße">
       <button class="lp-fmt-btn active" id="lp-kind-ms" onclick="lpSetMatchKind('meisterschaft')" title="Meisterschaftsspiel: 7 Bankplätze"><span class="lk-long">Meisterschaft</span><span class="lk-short">M</span> · 7</button>
       <button class="lp-fmt-btn" id="lp-kind-test" onclick="lpSetMatchKind('test')" title="Testspiel: 10 Bankplätze"><span class="lk-long">Testspiel</span><span class="lk-short">T</span> · 10</button>
     </div>
@@ -23764,7 +23772,7 @@ checkAutoBackup();
 </div>
 <div class="slp-overlay" id="moSeasonLineup">
   <div class="slp-topbar">
-    <div><div class="slp-logo">📋 Saisonkader-Planer <span id="slp-presence-inline" class="inline-presence"></span></div><div class="slp-sub" id="slp-context-info">Mehrere Spieler pro Position</div></div>
+    <div class="lp-title"><div class="slp-logo">📋 Saisonkader-Planer <span id="slp-presence-inline" class="inline-presence"></span></div><div class="slp-sub" id="slp-context-info">Mehrere Spieler pro Position</div></div>
     <div id="slp-fmt-btns" style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-left:8px;"></div>
     <div style="flex:1;"></div>
     <div id="slp-hint" style="display:none;"></div>
