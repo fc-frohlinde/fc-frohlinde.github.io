@@ -21558,7 +21558,10 @@ document.addEventListener('pointerup',(e)=>{
 function lpPointerEnter(e,targetSlot){/* legacy - no-op now, drag handled in move */}
 
 function lpClosePopup(){
-  if(_lpDragging||_lpDragGhost)_lpDragCleanup();
+  // No drag cleanup here: the drag START calls this to dismiss the picker,
+  // at which point the ghost has just been created — cleaning up here killed
+  // every drag the moment it began. Ending a drag is handled by the pointer
+  // handlers, and leaving the planner by closeLineupPlanner().
   const p=document.getElementById('lp-popup');
   if(p)p.style.display='none';
   lpState.openSlot=null;
