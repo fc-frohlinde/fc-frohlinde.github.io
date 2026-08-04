@@ -269,8 +269,14 @@ body{background:linear-gradient(140deg,var(--bg-dark) 0%,var(--bg-mid) 55%,var(-
 .inline-presence-pill.editing{background:rgba(241,196,15,.18);color:#9a6e00;border-color:rgba(241,196,15,.45);}
 .inline-presence-dot{width:6px;height:6px;border-radius:50%;background:#27ae60;flex-shrink:0;animation:presencePulse 2s ease-in-out infinite;}
 .inline-presence-pill.editing .inline-presence-dot{background:#f39c12;}
+/* Desktop defaults for the label/glyph pairs. They MUST stay above the mobile
+   media query: at equal specificity the later rule wins regardless of the
+   viewport, so putting them below silently disabled every mobile override. */
 .lk-short{display:none;}
 .lk-long{display:inline;}
+.fb-short{display:none;}
+.fb-long{display:inline;}
+.ss-btn-ico{display:none;}
 @media (max-width:767px){
   .presence-pill{padding:3px 7px;font-size:.7rem;}
 }
@@ -2116,9 +2122,6 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 .load-c{font-size:.7rem;text-align:center;padding:5px 2px;border-radius:6px;background:var(--muted-bg);color:var(--gm);font-weight:600;}
 .load-c.spike{box-shadow:inset 0 0 0 2px var(--warn);}
 .load-note{font-size:.66rem;color:var(--gm);margin-top:8px;line-height:1.4;}
-.fb-short{display:none;}
-.fb-long{display:inline;}
-.ss-btn-ico{display:none;}
 .ico-loc{vertical-align:-.13em;opacity:.85;}
 .u-empty-icon .ico-loc{width:1.8rem;height:1.8rem;}
 .loc-field{display:flex;align-items:center;gap:6px;}
