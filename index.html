@@ -1168,6 +1168,15 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
 .ma-sess-bar{display:flex;gap:6px;padding:10px 12px;background:var(--surface-mid);overflow-x:auto;-webkit-overflow-scrolling:touch;flex-shrink:0;border-bottom:2px solid var(--bd);}
 .ma-sess-bar::-webkit-scrollbar{display:none;}
 /* Season figures, previously in the desktop footer */
+.ma-sess-head{display:none;align-items:center;gap:10px;padding:8px 12px;
+  background:var(--surface-mid);border-bottom:1px solid rgba(255,255,255,.09);flex-shrink:0;}
+.ma-sh-txt{flex:1;min-width:0;}
+.ma-sh-date{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1px;color:#fff;line-height:1.15;}
+.ma-sh-sub{font-size:.68rem;color:rgba(255,255,255,.55);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ma-sh-btn{flex-shrink:0;background:rgba(255,255,255,.14);border:none;color:#fff;
+  padding:8px 13px;border-radius:var(--r-pill);font-family:'Barlow',sans-serif;
+  font-size:.74rem;font-weight:700;cursor:pointer;min-height:36px;}
+.ma-sh-btn:active{transform:scale(.96);}
 .ma-stats{display:flex;align-items:center;justify-content:space-around;gap:var(--sp-2);
   padding:7px 10px;background:var(--surface-mid);border-bottom:1px solid rgba(255,255,255,.09);flex-shrink:0;}
 .ma-stat{display:flex;align-items:baseline;gap:4px;}
@@ -2439,6 +2448,7 @@ if(window._fbBlocked){
 <!-- Mobile attendance view (replaces table on narrow screens) -->
 <div id="mobileAttView" class="mobile-att-view" style="display:none;">
   <div class="ma-sess-bar" id="maSessBar"></div>
+  <div class="ma-sess-head" id="maSessHead"></div>
   <div class="ma-stats" id="maStats"></div>
   <div class="ma-list-wrap" id="maListWrap">
     <div class="ma-ptr" id="maPtr"><span id="maPtrIcon">↓</span> <span id="maPtrText">Zum Aktualisieren ziehen</span></div>
@@ -8518,7 +8528,7 @@ function renderMobileAtt(){
     const isActive=si===_maSelectedSi;
     const cls='ma-sess'+(isMatch?' match':'')+(isActive?' active':'');
     const meta=isMatch?(s.label||'Spiel'):'Training';
-    barHtml+=`<div class="${cls}" onclick="maSelectSession(${si})">
+    barHtml+=`<div class="${cls}" onclick="${isActive?`openSessStats(${si})`:`maSelectSession(${si})`}">
       <div class="ma-sess-date">${s.date}</div>
       <div class="ma-sess-meta">${meta}${s.time?' · '+s.time:''}</div>
     </div>`;
@@ -8531,6 +8541,26 @@ function renderMobileAtt(){
     if(active)active.scrollIntoView({inline:'center',behavior:'smooth',block:'nearest'});
   },50);
   // Build player list for selected session
+  // The tab strip only SELECTS a session; there was no way to reach its
+  // details (notes, evaluation topic, roll-call, sRPE, Bearbeiten) because
+  // the desktop route is a click on the table header, and mobile has no
+  // table. This header names the shown session and opens it.
+  const headEl=document.getElementById('maSessHead');
+  if(headEl){
+    const hs=sessions[_maSelectedSi];
+    if(hs){
+      const isM=hs.type==='match';
+      const sub=[hs.time?hs.time+' Uhr':'',
+                 isM?(hs.label||'Spiel'):(hs.focus||'Training'),
+                 (hs.location||'').trim()].filter(Boolean).join(' \u00b7 ');
+      headEl.innerHTML=`<div class="ma-sh-txt">
+          <div class="ma-sh-date">${isM?'\u26bd':'\ud83c\udfc3'} ${escapeHtml(hs.date||'')}</div>
+          <div class="ma-sh-sub">${escapeHtml(sub)}</div>
+        </div>
+        <button class="ma-sh-btn" onclick="openSessStats(${_maSelectedSi})">Details \u203a</button>`;
+      headEl.style.display='flex';
+    }else headEl.style.display='none';
+  }
   const list=document.getElementById('maList');
   const si=_maSelectedSi;
   const past=typeof isSessPast==='function'?isSessPast(si):false;
