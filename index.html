@@ -21145,6 +21145,7 @@ function openLineupPlanner(sessIdx){
 }
 
 function closeLineupPlanner(){
+  if(typeof _lpDragCleanup==='function')_lpDragCleanup(); // never leave a ghost on screen
   const el=document.getElementById('moLineup');
   if(el)el.classList.remove('open');
 }
@@ -21504,6 +21505,33 @@ document.addEventListener('pointermove',(e)=>{
   }
 });
 
+// Cleanup was reachable only through pointerup. Touch devices routinely end a
+// gesture with pointercancel instead (system back-swipe, a second finger, the
+// browser taking over the scroll), and then the ghost stayed in the body
+// forever — surviving re-renders and screen changes, because nothing else ever
+// removed it. All ghosts are now torn down from one place, called by every way
+// a drag can end.
+function _lpDragCleanup(){
+  if(_lpDragTimeout){clearTimeout(_lpDragTimeout);_lpDragTimeout=null;}
+  // querySelectorAll, not just the tracked reference: earlier stuck ghosts
+  // from a previous session must disappear too.
+  document.querySelectorAll('.lp-drag-ghost').forEach(el=>el.remove());
+  _lpDragGhost=null;
+  document.body.style.cursor='';
+  document.body.style.userSelect='';
+  document.querySelectorAll('.drag-source,.drop-target').forEach(el=>el.classList.remove('drag-source','drop-target'));
+  _lpDragging=false;_lpDragSlot=null;_lpDragHover=null;
+}
+['pointercancel','touchcancel','blur'].forEach(evt=>{
+  window.addEventListener(evt,()=>{if(_lpDragging||_lpDragGhost)_lpDragCleanup();});
+});
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState!=='visible'&&(_lpDragging||_lpDragGhost))_lpDragCleanup();
+});
+// Pointer left the window entirely (dragged off the edge)
+document.addEventListener('pointerout',e=>{
+  if(!e.relatedTarget&&!e.toElement&&(_lpDragging||_lpDragGhost))_lpDragCleanup();
+});
 document.addEventListener('pointerup',(e)=>{
   if(_lpDragTimeout){clearTimeout(_lpDragTimeout);_lpDragTimeout=null;}
   if(_lpDragging&&_lpDragSlot){
@@ -21520,11 +21548,7 @@ document.addEventListener('pointerup',(e)=>{
       _lpSetSlotPlayer(_lpDragHover,fromOK?fromVal:null);
       _lpSetSlotPlayer(_lpDragSlot,toOK?toVal:null);
     }
-    if(_lpDragGhost){_lpDragGhost.remove();_lpDragGhost=null;}
-    document.body.style.cursor='';
-    document.body.style.userSelect='';
-    document.querySelectorAll('.drag-source,.drop-target').forEach(el=>el.classList.remove('drag-source','drop-target'));
-    _lpDragging=false;_lpDragSlot=null;_lpDragHover=null;
+    _lpDragCleanup();
     lpRender();
   } else {
     _lpDragSlot=null;_lpDragHover=null;
@@ -21534,6 +21558,7 @@ document.addEventListener('pointerup',(e)=>{
 function lpPointerEnter(e,targetSlot){/* legacy - no-op now, drag handled in move */}
 
 function lpClosePopup(){
+  if(_lpDragging||_lpDragGhost)_lpDragCleanup();
   const p=document.getElementById('lp-popup');
   if(p)p.style.display='none';
   lpState.openSlot=null;
