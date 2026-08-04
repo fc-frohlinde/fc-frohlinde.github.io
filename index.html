@@ -1474,6 +1474,13 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   #moDashboard .db-header{flex-wrap:wrap;gap:6px;}
   #moDashboard .db-header-actions{width:100%;flex-wrap:wrap;justify-content:flex-end;}
   #moDashboard .mob-close-x.mo-x-ingroup{margin-left:auto;}
+  /* Session modal header: title + Zurück + ✕ did not fit one line on a phone.
+     Zurück shrinks to its arrow (the label is redundant next to it) and both
+     buttons lose the desktop padding — still 36px tall, so they stay tappable. */
+  #moSession2 .ss-btn-lbl{display:none;}
+  #moSession2 .ss-btn-ico{display:inline;}
+  #ss-head-btns .btn{padding:6px 11px;font-size:.8rem;min-height:36px;flex-shrink:0;}
+  #ss-edit-toggle{font-size:.74rem !important;padding:7px 10px !important;min-height:38px;}
   /* Weekly invite block: on a phone the select and both buttons cannot share
      a row — the select shrinks to unreadable. Stack them full width. */
   .am-week-row{flex-direction:column;align-items:stretch;gap:6px;}
@@ -2104,6 +2111,7 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 .load-c{font-size:.7rem;text-align:center;padding:5px 2px;border-radius:6px;background:var(--muted-bg);color:var(--gm);font-weight:600;}
 .load-c.spike{box-shadow:inset 0 0 0 2px var(--warn);}
 .load-note{font-size:.66rem;color:var(--gm);margin-top:8px;line-height:1.4;}
+.ss-btn-ico{display:none;}
 .ico-loc{vertical-align:-.13em;opacity:.85;}
 .u-empty-icon .ico-loc{width:1.8rem;height:1.8rem;}
 .loc-field{display:flex;align-items:center;gap:6px;}
@@ -2633,7 +2641,7 @@ if(window._fbBlocked){
         <button class="btn" id="ss-anmeld-btn" style="display:none;" onclick="openAnmeldungen(_currentSessIdx)"></button>
       </div>
     </div>
-    <div style="display:flex;gap:6px;"><button class="btn" style="font-size:.76rem;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" onclick="sessGoBack()">← Zurück</button><button class="btn bs" onclick="closeM('moSession2')">✕</button></div>
+    <div style="display:flex;gap:6px;" id="ss-head-btns"><button class="btn" id="ss-back-btn" style="font-size:.76rem;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" onclick="sessGoBack()"><span class="ss-btn-lbl">← Zurück</span><span class="ss-btn-ico">←</span></button><button class="btn bs" id="ss-close-btn" onclick="closeM('moSession2')">✕</button></div>
   </div>
   <div id="ss-edit-wrap" style="margin-bottom:12px;">
     <button class="btn" id="ss-edit-toggle" style="width:100%;justify-content:center;background:var(--ow);color:var(--gd);border:1.5px solid var(--gl);margin-bottom:6px;display:none;" onclick="toggleSessEdit()">✎ Bearbeiten</button>
