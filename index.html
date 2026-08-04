@@ -21528,10 +21528,10 @@ function _lpDragCleanup(){
 document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState!=='visible'&&(_lpDragging||_lpDragGhost))_lpDragCleanup();
 });
-// Pointer left the window entirely (dragged off the edge)
-document.addEventListener('pointerout',e=>{
-  if(!e.relatedTarget&&!e.toElement&&(_lpDragging||_lpDragGhost))_lpDragCleanup();
-});
+// NOTE: no pointerout handler here. pointerout fires every time the pointer
+// crosses ANY element boundary — which during a drag across the pitch happens
+// constantly, and relatedTarget is null for touch and for SVG children. Using
+// it to detect "left the window" therefore aborted the drag mid-gesture.
 document.addEventListener('pointerup',(e)=>{
   if(_lpDragTimeout){clearTimeout(_lpDragTimeout);_lpDragTimeout=null;}
   if(_lpDragging&&_lpDragSlot){
