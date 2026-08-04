@@ -1394,7 +1394,12 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   .lp-topbar,.slp-topbar{padding:calc(6px + env(safe-area-inset-top,0px)) 10px 6px;gap:6px;}
   .lp-logo,.slp-logo{font-size:.9rem !important;}
   .lp-sub,.slp-sub,.lp-hint,.slp-hint{display:none !important;}
-  .lp-close-btn,.slp-close-btn{padding:6px 10px;font-size:.72rem;min-height:36px;}
+  /* Planner topbar: the labels on Bearbeiten and Schließen were what broke the
+     row. Both collapse to their glyph; 36px keeps them thumb-sized. */
+  .fb-long{display:none;}
+  .fb-short{display:inline;}
+  .lp-close-btn,.slp-close-btn{padding:6px 12px;font-size:.9rem;min-height:36px;flex-shrink:0;}
+  .lp-fmt-btn,.slp-fmt-btn{padding:5px 10px;}
   /* Formation / match-kind buttons: one scrollable row, never wrapping */
   #lp-fmt-btns,#slp-fmt-btns{flex-wrap:nowrap !important;overflow-x:auto;margin-left:0 !important;
     -webkit-overflow-scrolling:touch;scrollbar-width:none;}
@@ -2111,6 +2116,8 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 .load-c{font-size:.7rem;text-align:center;padding:5px 2px;border-radius:6px;background:var(--muted-bg);color:var(--gm);font-weight:600;}
 .load-c.spike{box-shadow:inset 0 0 0 2px var(--warn);}
 .load-note{font-size:.66rem;color:var(--gm);margin-top:8px;line-height:1.4;}
+.fb-short{display:none;}
+.fb-long{display:inline;}
 .ss-btn-ico{display:none;}
 .ico-loc{vertical-align:-.13em;opacity:.85;}
 .u-empty-icon .ico-loc{width:1.8rem;height:1.8rem;}
@@ -21026,7 +21033,11 @@ function renderFmtBtns(targetId,currentFmt,onSelect){
   // Edit button
   const editFn=isSlp?'slpToggleEdit()':'lpToggleEdit()';
   const editing=isSlp?(typeof slpState!=='undefined'&&slpState.editing===true):(typeof lpState!=='undefined'&&lpState.editing===true);
-  html+=`<button class="${cls}${editing?' active':''}" onclick="${editFn}" title="Formation bearbeiten">${editing?'✓ Fertig':'✎ Bearbeiten'}</button>`;
+  html+=`<button class="${cls}${editing?' active':''}" onclick="${editFn}" title="Formation bearbeiten">`
+    +(editing
+      ? '<span class="fb-long">\u2713 Fertig</span><span class="fb-short">\u2713</span>'
+      : '<span class="fb-long">\u270e Bearbeiten</span><span class="fb-short">\u270e</span>')
+    +'</button>';
   el.innerHTML=html;
 }
 
@@ -23111,7 +23122,7 @@ checkAutoBackup();
     </div>
     <div class="lp-spacer"></div>
     <div class="lp-hint" id="lp-hint">Slot wählen → Spieler klicken</div>
-    <button class="lp-close-btn" onclick="closeLineupPlanner()">✕ Schließen</button>
+    <button class="lp-close-btn" onclick="closeLineupPlanner()"><span class="fb-long">✕ Schließen</span><span class="fb-short">✕</span></button>
   </div>
   <!-- Body -->
   <!-- Match planner popup -->
@@ -23756,8 +23767,8 @@ checkAutoBackup();
     <div id="slp-hint" style="display:none;"></div>
     <input type="checkbox" id="slp-conf-toggle" onchange="slpToggleConfirmations(this.checked)" style="cursor:pointer;margin:0 4px 0 0;width:14px;height:14px;vertical-align:middle;"/>
     <span id="slp-conf-toggle-lbl" style="font-size:.75rem;color:rgba(255,255,255,.95);font-weight:600;margin-right:6px;user-select:none;cursor:pointer;" onclick="const _t=document.getElementById('slp-conf-toggle');_t.checked=!_t.checked;slpToggleConfirmations(_t.checked);">Bestätigungen</span>
-    <button class="slp-close-btn" id="slp-status-btn" onclick="slpOpenStatusList()" style="display:none;background:rgba(232,200,64,0.15);border-color:rgba(232,200,64,0.4);color:#e8c840;">📋 Status verwalten</button>
-    <button class="slp-close-btn" onclick="closeSeasonLineup()">✕ Schließen</button>
+    <button class="slp-close-btn" id="slp-status-btn" onclick="slpOpenStatusList()" style="display:none;background:rgba(232,200,64,0.15);border-color:rgba(232,200,64,0.4);color:#e8c840;"><span class="fb-long">📋 Status verwalten</span><span class="fb-short">📋</span></button>
+    <button class="slp-close-btn" onclick="closeSeasonLineup()"><span class="fb-long">✕ Schließen</span><span class="fb-short">✕</span></button>
   </div>
   <div class="slp-body">
     <div class="slp-roster-col" id="slp-roster-col">
