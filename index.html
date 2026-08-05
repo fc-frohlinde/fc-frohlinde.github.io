@@ -3061,12 +3061,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.0.9.5';
+const APP_VERSION='1.0.9.6';
 const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1780560000000; // v1.0.9.5: mobile rework, back-button navigation
+const APP_RELEASE_TS=1785888000000; // v1.0.9.6: sparse-array decode fix + sRPE repair — stale clients re-corrupt data, so this bump matters
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -10921,6 +10921,65 @@ function _pmSaveTargeted(){
     console.error('[PlayerSave]',e);
   });
 }
+// ── ADMIN REPAIR: window.repairRpe() ─────────────────────────
+// Why needed: the decode bug compacted sparse arrays, and any client running
+// the old build re-SAVED them compacted — the true indices are gone from
+// storage, so fixing the decoder alone cannot restore them. What survived is
+// the audit trail: every rating tap logged player, session DATE and value.
+// This rebuilds every affected player's rpe array from those entries.
+//   repairRpe()      → dry run, prints what would change
+//   repairRpe(true)  → applies + saves
+window.repairRpe=function(apply){
+  if(!isAdmin()){console.warn('Nur als Admin.');return;}
+  const D=cd();
+  if(!D||!Array.isArray(D.players)||!Array.isArray(D.sessions)){console.warn('Kein Team/Season-Block aktiv.');return;}
+  _mergePlayerAudit(()=>{
+    const ent=(G.auditLog||[]).filter(e=>e&&e.action==='Belastung bewertet');
+    if(!ent.length){console.warn('Keine RPE-Eintr\u00e4ge im Journal gefunden.');return;}
+    // Last entry per player+date wins (players corrected themselves by re-tapping)
+    const finals={};
+    ent.forEach(e=>{
+      const k=(e.user||'?')+'|'+(e.target||'?');
+      if(!finals[k]||(e.ts||0)>=(finals[k].ts||0))finals[k]=e;
+    });
+    // Date → session index; duplicate dates in one block are ambiguous
+    const dateToSi={},dupDates=new Set();
+    D.sessions.forEach((s,si)=>{
+      if(!s||!s.date)return;
+      if(dateToSi[s.date]!==undefined)dupDates.add(s.date);
+      else dateToSi[s.date]=si;
+    });
+    const nameToPi={};
+    D.players.forEach((p,pi)=>{if(p&&p.name)nameToPi[p.name]=pi;});
+    const plan=[],skipped=[];
+    Object.values(finals).forEach(e=>{
+      const pi=nameToPi[e.user];
+      if(pi===undefined){skipped.push({grund:'Spieler unbekannt',eintrag:e.user+' / '+e.target});return;}
+      if(dupDates.has(e.target)){skipped.push({grund:'Datum doppelt im Block',eintrag:e.user+' / '+e.target});return;}
+      const si=dateToSi[e.target];
+      if(si===undefined){skipped.push({grund:'Datum nicht gefunden',eintrag:e.user+' / '+e.target});return;}
+      const m=/RPE\s+(\d+)/.exec(e.detail||'');
+      const val=m?parseInt(m[1],10):null;   // "zur\u00fcckgenommen" → null
+      plan.push({Spieler:e.user,Datum:e.target,si,Wert:val===null?'(l\u00f6schen)':val,_pi:pi,_val:val});
+    });
+    console.table(plan.map(({_pi,_val,...r})=>r));
+    if(skipped.length){console.warn('\u00dcbersprungen:');console.table(skipped);}
+    if(!apply){
+      console.info('%cDry-Run. Anwenden mit: repairRpe(true)','font-weight:bold');
+      console.info('Achtung: rpe-Arrays der betroffenen Spieler werden komplett neu aufgebaut \u2014 verschobene Altwerte verschwinden dabei.');
+      return;
+    }
+    snap();
+    const touched=new Set(plan.map(x=>x._pi));
+    touched.forEach(pi=>{
+      D.players[pi].rpe=new Array(D.sessions.length).fill(null);
+    });
+    plan.forEach(x=>{if(x._val!==null)D.players[x._pi].rpe[x.si]=x._val;});
+    saveG();
+    logAudit('RPE repariert','aus Journal',plan.length+' Werte, '+touched.size+' Spieler');
+    console.info('\u2705 '+plan.length+' Werte gesetzt ('+touched.size+' Spieler). Modalen neu \u00f6ffnen.');
+  });
+};
 function _pmAppendAudit(entry){
   if(!fbDb||!entry)return;
   // A transaction READS the node before writing — the whole 500-entry audit
