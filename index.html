@@ -3864,9 +3864,20 @@ function fbDecodeValue(val){
     // __arr marker: v may be a real JS array OR a Firebase-converted object {0:x,1:y,...}
     if(val.__arr===1){
       if(!val.v)return []; // empty array stored as null
-      const arr=Array.isArray(val.v)
-        ? val.v
-        : Object.keys(val.v).sort((a,b)=>+a-+b).map(k=>val.v[k]);
+      let arr;
+      if(Array.isArray(val.v)){
+        arr=val.v;
+      }else{
+        // Firebase drops null entries, so a mostly-empty array such as
+        // [null,null,null,null,null,8] comes back as {5:8}. Mapping the keys
+        // in order COMPACTED it to [8] — the value silently moved to another
+        // session, which is why a rating showed up on the wrong date. Rebuild
+        // by numeric index instead and keep the holes.
+        const keys=Object.keys(val.v).filter(k=>/^\d+$/.test(k));
+        const max=keys.length?Math.max(...keys.map(Number)):-1;
+        arr=new Array(max+1).fill(null);
+        keys.forEach(k=>{arr[+k]=val.v[k];});
+      }
       return arr.map(x=>fbDecodeValue(x));
     }
     const out={};
@@ -10802,11 +10813,19 @@ function pmSetRpe(si,val){
   // Tapping the active value again clears it — a mis-tap must be correctable
   p.rpe[si]=(p.rpe[si]===val)?null:val;
   _pmSaveTargeted();
-  try{
-    _pmAppendAudit({ts:Date.now(),user:p.name||'Spieler',role:'player',
-      action:'Belastung bewertet',target:(s&&s.date)||'?',
-      detail:(p.rpe[si]==null?'zur\u00fcckgenommen':'RPE '+p.rpe[si])});
-  }catch(e){}
+  // Audit is debounced per session: a player trying 6, then 7, then 8 before
+  // settling produced one journal entry per tap. Only the value they end up
+  // with is worth recording.
+  if(!window._rpeAuditTimers)window._rpeAuditTimers={};
+  clearTimeout(window._rpeAuditTimers[si]);
+  window._rpeAuditTimers[si]=setTimeout(()=>{
+    try{
+      const cur=(Array.isArray(p.rpe)?p.rpe[si]:null);
+      _pmAppendAudit({ts:Date.now(),user:p.name||'Spieler',role:'player',
+        action:'Belastung bewertet',target:(s&&s.date)||'?',
+        detail:(cur==null?'zur\u00fcckgenommen':'RPE '+cur)});
+    }catch(e){}
+  },4000);
   // Repaint just this card: a full re-render would scroll the player away
   // Focus mode showed only this question — once answered, show the week
   if(document.querySelector('.pm-focus')&&p.rpe[si]!=null){
