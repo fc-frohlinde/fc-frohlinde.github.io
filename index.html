@@ -6974,7 +6974,34 @@ function openAuditLog(){
   // Show clear button only for admin
   const cb=document.getElementById('au-clear');
   if(cb)cb.style.display=isAdmin()?'inline-flex':'none';
+  const tsel=document.getElementById('au-type-sel');if(tsel)tsel._populated=false;
   renderAuditLog();
+}
+// Icon per action family — prefix match, so a new action of a known family
+// gets a sensible icon without another list to maintain.
+function _auActionIcon(a){
+  const s=String(a||'');
+  if(/^Status|^Sammel-Anwesenheit|^Bulk-Status/.test(s))return '\u2713';
+  if(/Spieler-App|^Anmeldung \(Spieler/.test(s))return '\ud83d\udcf1';
+  if(/^Belastung/.test(s))return '\ud83d\udcaa';
+  if(/^Leistungsnote|^Bewertungsthema/.test(s))return '\u2b50';
+  if(/^Training/.test(s))return '\ud83c\udfc3';
+  if(/^Spiel erstellt/.test(s))return '\u26bd';
+  if(/^Aufstellung|^Saisonkader/.test(s))return '\u26bd';
+  if(/^Spieler/.test(s))return '\ud83d\udc64';
+  if(/^Trainer/.test(s))return '\ud83d\udc65';
+  if(/^Mannschaft|^Saison/.test(s))return '\ud83c\udfdf';
+  if(/^Ort/.test(s))return '\ud83d\udccd';
+  if(/^Dauer|^Schwerpunkt/.test(s))return '\u23f1';
+  if(/^Notiz/.test(s))return '\ud83d\udcdd';
+  if(/^Vorlage|^Plan/.test(s))return '\ud83d\udccb';
+  if(/^Backup|^Wiederhergestellt|^Fotos/.test(s))return '\ud83d\udcbe';
+  if(/^PIN|^Passwort|^Passkey|^Temp/.test(s))return '\ud83d\udd10';
+  if(/^Anmeldung|^Abmeldung/.test(s))return '\ud83d\udeaa';
+  if(/^Gast/.test(s))return '\ud83d\udd17';
+  if(/^Konflikt|^Auto-Sync|^Daten|^RPE repariert/.test(s))return '\u2699';
+  if(/^Sitzung/.test(s))return '\ud83d\uddd1';
+  return '\u2022';
 }
 function renderAuditLog(){
   const el=document.getElementById('au-content');
@@ -6986,6 +7013,22 @@ function renderAuditLog(){
   if(userSel&&!userSel._populated){
     userSel.innerHTML='<option value="">Alle Benutzer</option>'+users.map(u=>`<option value="${escapeHtml(u)}">${escapeHtml(u)}</option>`).join('');
     userSel._populated=true;
+  }
+  // The action filter was a hand-written list and had drifted: two options
+  // ("Status (Spieler-App)", "Aufstellung gespeichert") matched no entry that
+  // is actually written, while newer actions — Belastung bewertet,
+  // Leistungsnote, Ort, Dauer, Bewertungsthema, Bulk-Aktionen — were missing.
+  // Building it from the log itself cannot go stale.
+  const typeSel=document.getElementById('au-type-sel');
+  if(typeSel&&!typeSel._populated){
+    const counts={};
+    all.forEach(e=>{if(e&&e.action)counts[e.action]=(counts[e.action]||0)+1;});
+    const actions=Object.keys(counts).sort((a,b)=>a.localeCompare(b,'de'));
+    const keep=typeSel.value;
+    typeSel.innerHTML='<option value="">Alle Aktionen</option>'
+      +actions.map(a=>`<option value="${escapeHtml(a)}">${escapeHtml(_auActionIcon(a))} ${escapeHtml(a)} (${counts[a]})</option>`).join('');
+    if(keep&&actions.includes(keep))typeSel.value=keep;
+    typeSel._populated=true;
   }
   const fType=document.getElementById('au-type-sel')?.value||'';
   const fUser=document.getElementById('au-user-sel')?.value||'';
@@ -24124,17 +24167,6 @@ checkAutoBackup();
     <h3 style="flex:1;margin:0;color:var(--bd);min-width:140px;">📜 Verlauf</h3>
     <select id="au-type-sel" onchange="renderAuditLog()" class="db-sel" style="font-size:.74rem;">
       <option value="">Alle Aktionen</option>
-      <option value="Status geändert">✓ Status</option>
-      <option value="Status (Spieler-App)">📱 Status (Spieler)</option>
-      <option value="Spieler hinzugefügt">➕ Spieler hinzu</option>
-      <option value="Spieler entfernt">🗑 Spieler entfernt</option>
-      <option value="Training erstellt">🏃 Training</option>
-      <option value="Spiel erstellt">⚽ Spiel</option>
-      <option value="Sitzung entfernt">🗑 Sitzung entfernt</option>
-      <option value="Aufstellung gespeichert">⚽ Aufstellung</option>
-      <option value="Anmeldung">🔐 Anmeldung</option>
-      <option value="Abmeldung">🚪 Abmeldung</option>
-      <option value="Gast-Link erstellt">🔗 Gast-Link</option>
     </select>
     <select id="au-user-sel" onchange="renderAuditLog()" class="db-sel" style="font-size:.74rem;"></select>
     <button id="au-clear" class="btn bd" onclick="clearAuditLog()" style="font-size:.7rem;padding:5px 10px;display:none;">🗑 Löschen</button>
