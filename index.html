@@ -3075,12 +3075,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.0.9.6';
+const APP_VERSION='1.0.9.7';
 const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1785888000000; // v1.0.9.6: sparse-array decode fix + sRPE repair — stale clients re-corrupt data, so this bump matters
+const APP_RELEASE_TS=1785902400000; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -3681,12 +3681,79 @@ function _fbWarn(scope,err,userMsg){
     if(userMsg&&typeof showSaveFlash==='function')showSaveFlash(userMsg);
   }
 }
+// ── Diff writer ─────────────────────────────────────────────
+// fbRef.set() at the root uploaded the ENTIRE database on every save — and
+// RTDB then delivered the full replaced node to every listening client. One
+// status click therefore cost (full DB up) + (full DB down × open tabs).
+// Instead we diff the encoded state against the last known remote state
+// (_fbShadow, kept current by the listener) and update() only what changed:
+// a status click now transfers a few hundred bytes in each direction.
+let _fbShadow=null;
+function _fbCollectDiff(oldV,newV,path,out,depth){
+  if(oldV===newV)return;
+  const isArrWrap=v=>v&&typeof v==='object'&&v.__arr===1;
+  // Wrapped arrays: diff per index so one edited player doesn't re-upload all.
+  if(isArrWrap(oldV)&&isArrWrap(newV)){
+    const a=Array.isArray(oldV.v)?oldV.v:[],b=Array.isArray(newV.v)?newV.v:[];
+    if(b.length<a.length){out[path]=newV;return;} // shrink can't be expressed as update
+    for(let i=0;i<b.length;i++){
+      _fbCollectDiff(i<a.length?a[i]:undefined,b[i],path+'/v/'+i,out,depth+1);
+    }
+    return;
+  }
+  const bothObj=oldV&&newV&&typeof oldV==='object'&&typeof newV==='object'
+    &&!Array.isArray(oldV)&&!Array.isArray(newV)&&!isArrWrap(oldV)&&!isArrWrap(newV);
+  if(!bothObj||depth>=8){
+    if(JSON.stringify(oldV===undefined?null:oldV)!==JSON.stringify(newV===undefined?null:newV)){
+      out[path]=(newV===undefined)?null:newV;
+    }
+    return;
+  }
+  const keys=new Set([...Object.keys(oldV),...Object.keys(newV)]);
+  keys.forEach(k=>{
+    if(!(k in newV)){
+      // Keys like __activity live under fcf_data but outside G — a save must
+      // never delete data it does not own.
+      if(depth===0&&k.startsWith('__'))return;
+      out[path?path+'/'+k:k]=null;
+      return;
+    }
+    _fbCollectDiff(oldV[k],newV[k],path?path+'/'+k:k,out,depth+1);
+  });
+}
 function _fbWriteWithStamp(data){
   if(!fbRef){return Promise.reject(new Error('No Firebase connection'));}
   data._lastSaveBy=(CU&&CU.name)||'?';
   data._lastSaveTs=Date.now();
+  const encoded=fbEncode(data);
   _fbSaving=true;
-  return fbRef.set(fbEncode(data)).then(()=>{
+  // No shadow yet (first save of the session) → full write, then diff from there
+  if(_fbShadow&&typeof _fbShadow==='object'){
+    const out={};
+    try{_fbCollectDiff(_fbShadow,encoded,'',out,0);}catch(e){console.warn('[FB] diff failed, full write:',e);}
+    const paths=Object.keys(out);
+    if(paths.length===0){
+      _fbSaving=false;
+      if(typeof _markSynced==='function')_markSynced();
+      return Promise.resolve();
+    }
+    if(paths.length<=300){
+      return fbRef.update(out).then(()=>{
+        _fbShadow=encoded;
+        setTimeout(()=>{_fbSaving=false;},500);
+        _localDirty=false;
+        if(typeof setFbStatus==='function')setFbStatus('connected');
+        if(typeof _markSynced==='function')_markSynced();
+      }).catch(e=>{
+        _fbSaving=false;
+        if(typeof setFbStatus==='function')setFbStatus('error');
+        throw e;
+      });
+    }
+    // Suspiciously large diff (season import, restore) → a single set is cheaper
+  }
+  return fbRef.set(encoded).then(()=>{
+    _fbShadow=encoded;
     setTimeout(()=>{_fbSaving=false;},500);
     _localDirty=false;
     if(typeof setFbStatus==='function')setFbStatus('connected');
@@ -4561,6 +4628,9 @@ function startFbListener(){
       return;
     }
     if(_fbSaving)return;
+    // The raw snapshot IS the encoded remote state — exactly what the diff
+    // writer needs as its baseline.
+    try{_fbShadow=snap.val();}catch(e){}
     // Capture initial-load flag BEFORE updating it
     const wasInitialLoad=!_fbInitialLoaded;
     // Decode remote first so we can inspect metadata
@@ -11137,6 +11207,37 @@ function _pmSaveTargeted(){
 // own evening cannot come from a player on that day: it is a preview tap (or
 // a correction made later). That timestamp is the only reliable signal —
 // preview entries carry the player's name and role like any other.
+// ── ADMIN: window.dbSizeReport() ─────────────────────────────
+// What actually costs traffic. Uses the already-synced snapshot (_fbShadow),
+// so running it downloads nothing. Every page open / reconnect transfers
+// roughly the fcf_data total; player links transfer it once per open.
+window.dbSizeReport=function(){
+  if(!isAdmin()){console.warn('Nur als Admin.');return;}
+  if(!_fbShadow){console.warn('Noch kein Snapshot empfangen \u2014 Seite mit aktivem Sync laden.');return;}
+  const kb=o=>Math.round(JSON.stringify(o===undefined?null:o).length/102.4)/10;
+  const rows=[];
+  Object.keys(_fbShadow).forEach(k=>rows.push({Knoten:'fcf_data/'+k,KB:kb(_fbShadow[k])}));
+  rows.sort((a,b)=>b.KB-a.KB);
+  console.table(rows);
+  if(_fbShadow.db&&typeof _fbShadow.db==='object'){
+    const blocks=[];
+    Object.keys(_fbShadow.db).forEach(k=>{
+      const bl=_fbShadow.db[k];
+      let photoKB=0;
+      try{
+        const pv=bl&&bl.players&&bl.players.v;
+        (Array.isArray(pv)?pv:Object.values(pv||{})).forEach(p=>{
+          if(p&&typeof p.photo==='string')photoKB+=p.photo.length/1024;
+        });
+      }catch(e){}
+      blocks.push({Block:k.replace(/__SL__/g,'/'),KB:kb(bl),'davon Fotos KB':Math.round(photoKB)});
+    });
+    blocks.sort((a,b)=>b.KB-a.KB);
+    console.table(blocks);
+  }
+  console.info('%cGesamt fcf_data: '+kb(_fbShadow)+' KB \u2014 das ist der Preis JEDES Seiten\u00f6ffnens/Reconnects.','font-weight:bold');
+  console.info('Spieler-Links laden diese Menge einmal pro \u00d6ffnen. Wenn Fotos dominieren, ist das Auslagern der Fotos der n\u00e4chste Schritt.');
+};
 window.checkRpeOrigin=function(){
   if(!isAdmin()){console.warn('Nur als Admin.');return;}
   const D=cd();
@@ -21267,22 +21368,37 @@ document.addEventListener('click',e=>{
 // the app on a 2nd device (or after localStorage was cleared) doesn't create
 // a duplicate auto-backup for the same day.
 function checkAutoBackup(){
+  // Traffic anatomy of the old version: it ran for EVERY visitor — including
+  // all player links — and downloaded the entire __backups node (15 full
+  // database snapshots) just to answer "does an auto backup exist today?".
+  // The first opener of the day, even a player, then created one: the
+  // transaction read the node again and re-uploaded all of it. That is
+  // megabytes per page open, multiplied by the whole squad.
+  // Now: players and logged-out visitors never touch backups, and the daily
+  // check reads a single date string from __backups_meta/lastAutoDay.
+  if(typeof isPlayerMode==='function'&&isPlayerMode())return;
+  if(!CU||!(typeof canEdit==='function'&&canEdit()))return;
   const today=new Date().toDateString();
+  if(localStorage.getItem('fcf_last_auto_bk')===today)return; // this device already knows
   const _hasAutoToday=(list)=>(list||[]).some(b=>{
     if(!b||b.kind!=='auto')return false;
     return new Date(b.ts||0).toDateString()===today;
   });
-  const _doCreate=(list)=>{
-    if(_hasAutoToday(list))return; // already exists today (here or another device)
-    createBackup({kind:'auto'});
+  const _markDone=()=>{
     localStorage.setItem('fcf_last_auto_bk',today);
+    if(fbDb)try{fbDb.ref('__backups_meta/lastAutoDay').set(today);}catch(e){}
   };
-  if(fbRef){
-    // Always pull latest from Firebase before deciding — this catches backups
-    // created from other devices/browsers for today.
-    loadBackupsFromFb((fbBks)=>{
-      _doCreate(fbBks||loadBackups());
-    });
+  const _doCreate=(list)=>{
+    if(_hasAutoToday(list)){_markDone();return;}
+    createBackup({kind:'auto'});
+    _markDone();
+  };
+  if(fbDb){
+    // Tiny marker first — only if it is stale do we fall back to the full read
+    fbDb.ref('__backups_meta/lastAutoDay').once('value').then(s=>{
+      if(s.val()===today){localStorage.setItem('fcf_last_auto_bk',today);return;}
+      loadBackupsFromFb((fbBks)=>{_doCreate(fbBks||loadBackups());});
+    }).catch(()=>{loadBackupsFromFb((fbBks)=>{_doCreate(fbBks||loadBackups());});});
   } else {
     _doCreate(loadBackups());
   }
