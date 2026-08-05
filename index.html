@@ -3738,6 +3738,7 @@ function _fbWriteWithStamp(data){
       return Promise.resolve();
     }
     if(paths.length<=300){
+      _fbCount('tx','fcf_data update() '+paths.length+' Pfad(e)',JSON.stringify(out).length);
       return fbRef.update(out).then(()=>{
         _fbShadow=encoded;
         setTimeout(()=>{_fbSaving=false;},500);
@@ -3752,6 +3753,7 @@ function _fbWriteWithStamp(data){
     }
     // Suspiciously large diff (season import, restore) → a single set is cheaper
   }
+  _fbCount('tx','fcf_data set() KOMPLETT',JSON.stringify(encoded).length);
   return fbRef.set(encoded).then(()=>{
     _fbShadow=encoded;
     setTimeout(()=>{_fbSaving=false;},500);
@@ -4627,10 +4629,12 @@ function startFbListener(){
       console.warn('[FB] Listener fired but autoSync is OFF — ignoring snapshot');
       return;
     }
+    try{
+      const _raw=snap.val();
+      _fbCount('rx','fcf_data (Haupt-Listener)',JSON.stringify(_raw||null).length);
+      if(!_fbSaving)_fbShadow=_raw;
+    }catch(e){}
     if(_fbSaving)return;
-    // The raw snapshot IS the encoded remote state — exactly what the diff
-    // writer needs as its baseline.
-    try{_fbShadow=snap.val();}catch(e){}
     // Capture initial-load flag BEFORE updating it
     const wasInitialLoad=!_fbInitialLoaded;
     // Decode remote first so we can inspect metadata
@@ -6563,7 +6567,9 @@ function applyRoleUI(){
 // ══════════════════════════════
 //  AUDIT LOG
 // ══════════════════════════════
-const AUDIT_MAX_ENTRIES=500;
+// 500 entries had grown to 91 KB — more than half of everything the app
+// transfers on each load, for a journal only admins ever open.
+const AUDIT_MAX_ENTRIES=200;
 function logAudit(action,target,details){
   if(!G)return;
   if(!Array.isArray(G.auditLog))G.auditLog=[];
@@ -11211,6 +11217,37 @@ function _pmSaveTargeted(){
 // What actually costs traffic. Uses the already-synced snapshot (_fbShadow),
 // so running it downloads nothing. Every page open / reconnect transfers
 // roughly the fcf_data total; player links transfer it once per open.
+// ── TRAFFIC MONITOR ──────────────────────────────────────────
+// 151 KB of data cannot become 500 MB through page opens — something repeats.
+// Guessing has cost us enough, so every inbound snapshot and every outbound
+// write is counted here, per node, with bytes. fbTraffic() prints the tally
+// and the rate since the page was loaded.
+window._fbTraffic={t0:Date.now(),rx:{},tx:{}};
+function _fbCount(dir,node,bytes){
+  try{
+    const b=window._fbTraffic[dir];
+    if(!b[node])b[node]={n:0,bytes:0,last:0};
+    b[node].n++;b[node].bytes+=bytes||0;b[node].last=Date.now();
+  }catch(e){}
+}
+window.fbTraffic=function(reset){
+  const T=window._fbTraffic;
+  const mins=Math.max(0.1,(Date.now()-T.t0)/60000);
+  const fmt=o=>Object.entries(o).map(([node,v])=>({
+    Knoten:node,Anzahl:v.n,MB:Math.round(v.bytes/104857.6)/10,
+    'pro Min':Math.round(v.n/mins*10)/10,
+    'MB/Std':Math.round(v.bytes/1048576/mins*60*10)/10
+  })).sort((a,b)=>b.MB-a.MB);
+  console.info('%cLaufzeit: '+Math.round(mins*10)/10+' Min','font-weight:bold');
+  console.info('%c⬇ EMPFANGEN (das ist der Download-Verbrauch)','font-weight:bold;color:#c0392b');
+  console.table(fmt(T.rx));
+  console.info('%c⬆ GESENDET','font-weight:bold;color:#2980b9');
+  console.table(fmt(T.tx));
+  const totalRx=Object.values(T.rx).reduce((a,v)=>a+v.bytes,0);
+  console.info('%cDownload gesamt: '+(Math.round(totalRx/104857.6)/10)+' MB \u2192 hochgerechnet '
+    +(Math.round(totalRx/1048576/mins*60*10)/10)+' MB/Std auf DIESEM Gerät.','font-weight:bold');
+  if(reset){window._fbTraffic={t0:Date.now(),rx:{},tx:{}};console.info('Zähler zurückgesetzt.');}
+};
 window.dbSizeReport=function(){
   if(!isAdmin()){console.warn('Nur als Admin.');return;}
   if(!_fbShadow){console.warn('Noch kein Snapshot empfangen \u2014 Seite mit aktivem Sync laden.');return;}
@@ -20599,6 +20636,9 @@ function _normalizeBkArray(raw){
 function modifyBackups(modifier,doneCb){
   if(fbRef){
     fbRef.parent.child('__backups').transaction(currentValue=>{
+      // A transaction READS before writing — and __backups holds full database
+      // snapshots, so this is the single most expensive call in the app.
+      try{_fbCount('rx','__backups (Transaktion liest)',JSON.stringify(currentValue||null).length);}catch(e){}
       let bks=_normalizeBkArray(currentValue);
       // Merge in any local entries that aren't yet in Firebase (e.g., auto-backup
       // created at startup before fbRef was initialized).
@@ -20928,6 +20968,7 @@ function startPresence(){
   if(CU.name==='Admin'){
     const actRef=fbRef.parent.child('__trainerActivity');
     _trainerActivityListener=actRef.on('value',snap=>{
+      try{_fbCount('rx','__activity',JSON.stringify(snap.val()||null).length);}catch(e){}
       _trainerActivity=snap.val()||{};
       renderPresence();
     },err=>{
@@ -20937,6 +20978,7 @@ function startPresence(){
   // Listen for all presence updates (admin can see others)
   const listRef=fbRef.parent.child('__presence');
   _presenceListener=listRef.on('value',snap=>{
+    try{_fbCount('rx','__presence',JSON.stringify(snap.val()||null).length);}catch(e){}
     const data=snap.val()||{};
     _presenceUsers={};
     const now=Date.now();
@@ -20977,7 +21019,12 @@ function startPresence(){
     // activity record must keep up. (Browsers throttle background timers to
     // ~1/min, which matches this interval anyway.) The "viewing" context is
     // only refreshed while visible — see writePresenceEntry.
-    _presenceHeartbeat=setInterval(()=>{writePresenceEntry();},60*1000);
+    // Every heartbeat is a write that wakes every other client's listener.
+    // 3 minutes is still well inside the staleness window used for "online".
+    _presenceHeartbeat=setInterval(()=>{
+      if(document.visibilityState!=='visible')return; // a background tab is not "present"
+      writePresenceEntry();
+    },3*60*1000);
     // Update immediately when the tab comes back to the foreground
     document.addEventListener('visibilitychange',()=>{
       if(document.visibilityState==='visible')writePresenceEntry();
