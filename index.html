@@ -11130,6 +11130,50 @@ function _pmSaveTargeted(){
 // This rebuilds every affected player's rpe array from those entries.
 //   repairRpe()      → dry run, prints what would change
 //   repairRpe(true)  → applies + saves
+// ── ADMIN: window.checkRpeOrigin() ───────────────────────────
+// A real player can only rate between the end of a session and midnight of
+// that same day — the app enforced that window. Trainer preview widened it to
+// 30 days, so any journal entry whose timestamp falls OUTSIDE the session's
+// own evening cannot come from a player on that day: it is a preview tap (or
+// a correction made later). That timestamp is the only reliable signal —
+// preview entries carry the player's name and role like any other.
+window.checkRpeOrigin=function(){
+  if(!isAdmin()){console.warn('Nur als Admin.');return;}
+  const D=cd();
+  if(!D||!Array.isArray(D.sessions)){console.warn('Kein Block aktiv.');return;}
+  _mergePlayerAudit(()=>{
+    const ent=(G.auditLog||[]).filter(e=>e&&e.action==='Belastung bewertet');
+    if(!ent.length){console.warn('Keine RPE-Journaleintr\u00e4ge.');return;}
+    const byDate={};
+    D.sessions.forEach((s,si)=>{if(s&&s.date&&byDate[s.date]===undefined)byDate[s.date]=si;});
+    const rows=[];
+    ent.forEach(e=>{
+      const si=byDate[e.target];
+      const s=si!==undefined?D.sessions[si]:null;
+      let verdict='?',fenster='';
+      if(s){
+        const sk=dispToSortKey(s.date);
+        const y=Math.floor(sk/10000),m=Math.floor(sk/100)%100,d=sk%100;
+        const hm=String(s.time||'').split(':').map(Number);
+        const start=new Date(y,m-1,d,(hm.length===2&&!isNaN(hm[0]))?hm[0]:18,(hm.length===2&&!isNaN(hm[1]))?hm[1]:0);
+        const endMs=start.getTime()+((typeof s.duration==='number'&&s.duration>0)?s.duration:90)*60000;
+        const midnight=new Date(y,m-1,d,23,59,59,999).getTime();
+        fenster=new Date(endMs).toLocaleString('de-DE')+' \u2013 24:00';
+        verdict=(e.ts>=endMs&&e.ts<=midnight)?'\u2705 plausibel':'\u26a0\ufe0f VORSCHAU/sp\u00e4ter';
+      }else verdict='\u2753 Datum unbekannt';
+      rows.push({
+        Spieler:e.user,Einheit:e.target,Wert:(e.detail||'').replace('RPE ',''),
+        Eingetragen:new Date(e.ts).toLocaleString('de-DE'),
+        Fenster:fenster,Bewertung:verdict
+      });
+    });
+    rows.sort((a,b)=>a.Bewertung.localeCompare(b.Bewertung)||a.Spieler.localeCompare(b.Spieler));
+    console.table(rows);
+    const bad=rows.filter(r=>r.Bewertung.indexOf('VORSCHAU')>=0);
+    console.info('%c'+rows.length+' Eintr\u00e4ge, davon '+bad.length+' au\u00dferhalb des m\u00f6glichen Zeitfensters.','font-weight:bold');
+    if(bad.length)console.info('Diese \u00fcber Dashboard \u2192 Alle Bewertungen \u2192 \u2715 entfernen, falls sie von dir stammen.');
+  });
+};
 window.repairRpe=function(apply){
   if(!isAdmin()){console.warn('Nur als Admin.');return;}
   const D=cd();
