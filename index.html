@@ -4532,7 +4532,13 @@ function stopFbListener(){
 function startFbListener(){
   if(!fbRef||fbListening||!getUserPref('autoSync',true))return;
   fbListening=true;
-  fbRef.on('value',(snap)=>{
+  // Player mode reads ONCE. A live listener re-downloads the entire fcf_data
+  // for every change anyone makes anywhere — with the weekly links out, that
+  // is 27 devices streaming the full database all evening. Players do not
+  // need live updates: they open the link, answer, and leave.
+  const _isPlayer=(typeof CU!=='undefined'&&CU&&CU.role==='player');
+  const _attach=_isPlayer?((cb)=>fbRef.once('value',cb)):((cb)=>fbRef.on('value',cb));
+  _attach((snap)=>{
     // DEFENSE-IN-DEPTH: if autoSync was turned off but stopFbListener was forgotten
     // (or hasn't run yet), bail out. Otherwise remote changes would silently
     // overwrite local edits the user made in manual mode.
@@ -6477,6 +6483,7 @@ const AUDIT_MAX_ENTRIES=500;
 function logAudit(action,target,details){
   if(!G)return;
   if(!Array.isArray(G.auditLog))G.auditLog=[];
+  // Player entries live in auditLogP (a push list, see _pmAppendAudit)
   // Skip when no user (e.g. before login) or in player/guest mode
   if(!CU||CU.role==='guest'||CU.role==='player')return;
   G.auditLog.push({
@@ -6934,9 +6941,33 @@ function relTime(ts){
   return new Date(ts).toLocaleDateString('de-DE');
 }
 
+// Player actions are appended to fcf_data/auditLogP (a push list) so writing
+// them costs no download. They are folded into G.auditLog only when an admin
+// actually opens the journal — once, on demand, instead of on every write.
+function _mergePlayerAudit(cb){
+  if(!fbDb){if(cb)cb();return;}
+  fbDb.ref('fcf_data/auditLogP').once('value').then(snap=>{
+    const val=snap.val();
+    if(val){
+      if(!Array.isArray(G.auditLog))G.auditLog=[];
+      const known=new Set(G.auditLog.map(e=>e&&e.ts+'|'+(e.user||'')+'|'+(e.action||'')));
+      Object.values(val).forEach(e=>{
+        if(!e||!e.ts)return;
+        const k=e.ts+'|'+(e.user||'')+'|'+(e.action||'');
+        if(known.has(k))return;
+        known.add(k);
+        G.auditLog.push(e);
+      });
+      G.auditLog.sort((a,b)=>(a.ts||0)-(b.ts||0));
+      if(G.auditLog.length>AUDIT_MAX_ENTRIES)G.auditLog=G.auditLog.slice(-AUDIT_MAX_ENTRIES);
+    }
+    if(cb)cb();
+  }).catch(err=>{_fbWarn('auditMerge',err);if(cb)cb();});
+}
 function openAuditLog(){
   if(!isAdmin())return;
   openM('moAuditLog');
+  _mergePlayerAudit(()=>{try{renderAuditLog();}catch(e){}});
   // Reset filters
   const ts=document.getElementById('au-type-sel');if(ts)ts.value='';
   const us=document.getElementById('au-user-sel');if(us){us.value='';us._populated=false;}
@@ -10892,6 +10923,14 @@ function _pmSaveTargeted(){
 }
 function _pmAppendAudit(entry){
   if(!fbDb||!entry)return;
+  // A transaction READS the node before writing — the whole 500-entry audit
+  // log, for every single player action, plus a re-read on every retry. With
+  // 27 players answering and rating in one evening that is the dominant
+  // source of download traffic. push() writes one child and reads nothing.
+  try{
+    fbDb.ref('fcf_data/auditLogP').push(entry);
+    return;
+  }catch(e){console.error('[PlayerAudit]',e);}
   try{
     fbDb.ref('fcf_data/auditLog').transaction(current=>{
       // Handle both raw arrays and the {__arr:1, v:[...]} encoded format
