@@ -2150,6 +2150,14 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 .loc-row{display:flex;align-items:center;gap:8px;padding:7px 2px;border-bottom:1px solid var(--gl);}
 .loc-name{flex:1;min-width:0;font-size:.8rem;color:var(--gd);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .home-next-loc{font-size:.72rem;color:rgba(255,255,255,.6);margin-top:4px;display:flex;align-items:center;gap:5px;}
+.rpe-ov-sum{font-size:.74rem;color:var(--gm);margin-bottom:10px;}
+.rpe-ov-sess{border:1px solid var(--gl);border-radius:10px;padding:9px 11px;margin-bottom:8px;}
+.rpe-ov-h{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.rpe-ov-date{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.8px;color:var(--bd);}
+.rpe-ov-meta{flex:1;font-size:.7rem;color:var(--gm);}
+.rpe-ov-vals{display:flex;flex-wrap:wrap;gap:5px;}
+.rpe-ov-chip{background:var(--muted-bg);border-radius:999px;padding:3px 9px;font-size:.72rem;color:var(--gd);}
+.rpe-ov-chip b{color:var(--bd);font-size:.8rem;margin-left:2px;}
 .rpe-dur{display:flex;align-items:center;gap:6px;font-size:.74rem;color:var(--gm);margin-bottom:7px;}
 .rpe-dur input{width:66px;padding:4px 7px;border:1.5px solid var(--gl);border-radius:6px;
   font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:600;color:var(--gd);}
@@ -10762,6 +10770,56 @@ function computeLoadMatrix(data,weeks){
   });
   return {weeks:shown.map(k=>parseInt(k.split('-W')[1],10)),perPlayer};
 }
+// Every rating in one place. The load table shows weekly SUMS; this shows the
+// raw values per session, which is what you need to check whether a figure is
+// plausible or a leftover from the index-shift bug.
+function openRpeOverview(){
+  if(!canEdit())return;
+  renderRpeOverview();
+  openM('moRpeOverview');
+}
+function renderRpeOverview(){
+  const box=document.getElementById('rpe-ov-content');
+  if(!box)return;
+  const data=dbGetData();
+  if(!data.block){box.innerHTML='<div class="u-empty"><div class="u-empty-txt">Kein Team/Saison aktiv.</div></div>';return;}
+  const {block,season,players}=data;
+  const rows=[];
+  (block.sessions||[]).forEach((s,si)=>{
+    if(!s||!sessTookPlace(s,season))return;
+    const vals=[];
+    players.forEach((p,pi)=>{
+      const r=(p&&Array.isArray(p.rpe))?p.rpe[si]:null;
+      if(typeof r!=='number')return;
+      vals.push({name:getDisplayName?getDisplayName(p):p.name,r,
+        min:(Array.isArray(p.rpeMin)?p.rpeMin[si]:null),
+        load:rpeLoad(s,p,si)});
+    });
+    if(vals.length)rows.push({s,si,vals});
+  });
+  if(!rows.length){
+    box.innerHTML='<div class="u-empty"><div class="u-empty-icon">\ud83d\udcaa</div>'
+      +'<div class="u-empty-txt">Noch keine Bewertungen erfasst.</div></div>';
+    return;
+  }
+  rows.sort((a,b)=>_dbSortKey(b.s.date,season)-_dbSortKey(a.s.date,season));
+  const total=rows.reduce((n,r)=>n+r.vals.length,0);
+  let html=`<div class="rpe-ov-sum">${total} Bewertungen auf ${rows.length} Einheiten</div>`;
+  rows.forEach(({s,si,vals})=>{
+    const avg=(vals.reduce((a,b)=>a+b.r,0)/vals.length).toFixed(1);
+    const present=(players||[]).filter(p=>p&&p.s&&p.s[si]===1).length;
+    html+=`<div class="rpe-ov-sess">
+      <div class="rpe-ov-h">
+        <span class="rpe-ov-date">${s.type==='match'?'\u26bd':'\ud83c\udfc3'} ${escapeHtml(s.date||'')}</span>
+        <span class="rpe-ov-meta">\u00d8 ${avg} \u00b7 ${vals.length}${present?'/'+present:''} \u00b7 ${rpeSessionMinutes(s,null,si)} Min</span>
+        <button class="btn-mini" onclick="closeM('moRpeOverview');jumpToSession(${si},{id:'moRpeOverview'})" title="Einheit öffnen">\u2197</button>
+      </div>
+      <div class="rpe-ov-vals">${vals.sort((a,b)=>b.r-a.r).map(v=>
+        `<span class="rpe-ov-chip" title="Load ${v.load==null?'?':v.load}${v.min!=null?' ('+v.min+' Min)':''}">${escapeHtml(v.name)} <b>${v.r}</b></span>`).join('')}</div>
+    </div>`;
+  });
+  box.innerHTML=html;
+}
 function dbRenderLoadCard(data){
   const m=computeLoadMatrix(data,6);
   if(!m.weeks.length)return '';
@@ -10793,7 +10851,9 @@ function dbRenderLoadCard(data){
     if(median>0&&b<median*0.6)quiet.push({name:v.name,load:b,median});
   });
   const maxLoad=Math.max(1,...rows.flatMap(([,v])=>v.row.map(c=>c.load)));
-  let html='<div class="db-section"><div class="db-h">\ud83d\udcaa Belastung (sRPE) \u00b7 Wochensummen</div>';
+  let html='<div class="db-section"><div class="db-h" style="display:flex;align-items:center;gap:8px;">'
+    +'<span style="flex:1;">\ud83d\udcaa Belastung (sRPE) \u00b7 Wochensummen</span>'
+    +'<button class="btn bs" style="font-size:.7rem;padding:4px 10px;" onclick="openRpeOverview()">\ud83d\udccb Alle Bewertungen</button></div>';
   if(spikes.length){
     html+='<div class="load-warn"><div class="load-warn-h">\u26a0\ufe0f Belastungssprung \u00fcber '+LOAD_SPIKE_PCT+'% \u2014 diese Woche dosieren</div>';
     spikes.sort((a,b)=>b.chg-a.chg).forEach(s=>{
@@ -10891,15 +10951,35 @@ function pmSetRpe(si,val){
   // settling produced one journal entry per tap. Only the value they end up
   // with is worth recording.
   if(!window._rpeAuditTimers)window._rpeAuditTimers={};
-  clearTimeout(window._rpeAuditTimers[si]);
-  window._rpeAuditTimers[si]=setTimeout(()=>{
+  const _flush=()=>{
+    if(!window._rpeAuditTimers[si])return;
+    clearTimeout(window._rpeAuditTimers[si]);
+    window._rpeAuditTimers[si]=null;
     try{
       const cur=(Array.isArray(p.rpe)?p.rpe[si]:null);
       _pmAppendAudit({ts:Date.now(),user:p.name||'Spieler',role:'player',
         action:'Belastung bewertet',target:(s&&s.date)||'?',
         detail:(cur==null?'zur\u00fcckgenommen':'RPE '+cur)});
     }catch(e){}
-  },4000);
+  };
+  clearTimeout(window._rpeAuditTimers[si]);
+  window._rpeAuditTimers[si]=setTimeout(_flush,2500);
+  // A player who taps once and closes the tab immediately would otherwise
+  // leave a saved rating with no journal entry — which is exactly the "value
+  // without a log line" case. Flush before the page goes away.
+  if(!window._rpeFlushBound){
+    window._rpeFlushBound=true;
+    const flushAll=()=>{
+      Object.keys(window._rpeAuditTimers||{}).forEach(k=>{
+        const t=window._rpeAuditTimers[k];
+        if(t&&window._rpeFlushFns&&window._rpeFlushFns[k])window._rpeFlushFns[k]();
+      });
+    };
+    window.addEventListener('pagehide',flushAll);
+    document.addEventListener('visibilitychange',()=>{if(document.visibilityState!=='visible')flushAll();});
+  }
+  if(!window._rpeFlushFns)window._rpeFlushFns={};
+  window._rpeFlushFns[si]=_flush;
   // Repaint just this card: a full re-render would scroll the player away
   // Focus mode showed only this question — once answered, show the week
   if(document.querySelector('.pm-focus')&&p.rpe[si]!=null){
@@ -23939,6 +24019,16 @@ checkAutoBackup();
     </div>
   </div>
 </div>
+
+<div class="mo" id="moRpeOverview"><div class="mob" style="width:560px;max-width:96vw;">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+    <h3 style="margin:0;flex:1;">💪 Alle Belastungs-Bewertungen</h3>
+  </div>
+  <div id="rpe-ov-content" style="max-height:60vh;overflow-y:auto;"></div>
+  <div class="mob-btns">
+    <button class="btn bs" onclick="closeM('moRpeOverview')">Schließen</button>
+  </div>
+</div></div>
 
 <div class="mo" id="moLocations"><div class="mob" style="width:420px;">
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
