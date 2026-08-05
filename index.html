@@ -4675,9 +4675,8 @@ function startFbListener(){
         // Fallback if dialog not ready: keep local edits ONLY if our base is
         // not older than the remote — a stale base must never win silently.
         if(G&&!(data._lastSaveTs>((G._lastSaveTs)||0))){
-          _fbSaving=true;
-          fbRef.set(fbEncode(G)).then(()=>{setTimeout(()=>{_fbSaving=false;},500);})
-            .catch(e=>{_fbSaving=false;_fbWarn('conflict-push',e,'\u26a0\ufe0f \u00c4nderungen nicht gespeichert \u2014 Verbindung pr\u00fcfen');});
+          _fbWriteWithStamp(G)
+            .catch(e=>{_fbWarn('conflict-push',e,'\u26a0\ufe0f \u00c4nderungen nicht gespeichert \u2014 Verbindung pr\u00fcfen');});
         } else if(data&&data.version>=14){
           console.warn('[FB] Stale local base — adopting newer remote instead of pushing.');
           G=sanitizeG(data);
@@ -4699,11 +4698,14 @@ function startFbListener(){
       // not ahead of our base (it's our own echo or an equal-base race), so
       // pushing our local state is safe.
       if(G){
-        _fbSaving=true;
+        // Was a raw full-root set(): it re-uploaded the whole database AND
+        // left _fbShadow stale, so the next diff write degenerated into
+        // another full write. Two clients each holding a pending flag could
+        // therefore bounce full snapshots off each other indefinitely.
+        // Routing through the diff writer keeps this to the changed paths and
+        // keeps the shadow correct.
         try{
-          fbRef.set(fbEncode(G)).then(()=>{
-            setTimeout(()=>{_fbSaving=false;},500);
-          }).catch(()=>{_fbSaving=false;});
+          _fbWriteWithStamp(G).catch(()=>{});
         }catch(e){_fbSaving=false;}
       }
       // Skip applying this incoming snapshot — our local state takes precedence.
@@ -4795,9 +4797,8 @@ function startFbListener(){
           Object.values(G.db||{}).some(b=>b&&typeof b==='object'&&Array.isArray(b.players)&&b.players.length>0)
         );
         if(hasRealContent){
-          _fbSaving=true;
-          fbRef.set(fbEncode(G))
-            .then(()=>{setTimeout(()=>{_fbSaving=false;},500);setFbStatus('connected');})
+          _fbWriteWithStamp(G)
+            .then(()=>{setFbStatus('connected');})
             .catch(e=>{_fbSaving=false;console.error('FB push:',e);});
           console.info('[FB] Remote was empty on initial sync — pushed local data to initialize.');
         } else {
@@ -7181,8 +7182,8 @@ function snap(){
   if(undoStack.length>40)undoStack.shift();
   redoStack.length=0;updateUndoBtns();
 }
-function undo(){if(!undoStack.length)return;redoStack.push(JSON.stringify(G));G=JSON.parse(undoStack.pop());safeLocalSave(SK,JSON.stringify(G));if(fbRef&&_fbInitialLoaded){clearTimeout(_fbDebounce);_fbDebounce=setTimeout(()=>{_fbSaving=true;fbRef.set(fbEncode(G)).then(()=>{_fbSaving=false;}).catch(e=>{_fbSaving=false;_fbWarn('undo-push',e,'\u26a0\ufe0f R\u00fcckg\u00e4ngig nicht synchronisiert');});},800);}render();updateUndoBtns();}
-function redo(){if(!redoStack.length)return;undoStack.push(JSON.stringify(G));G=JSON.parse(redoStack.pop());safeLocalSave(SK,JSON.stringify(G));if(fbRef&&_fbInitialLoaded){clearTimeout(_fbDebounce);_fbDebounce=setTimeout(()=>{_fbSaving=true;fbRef.set(fbEncode(G)).then(()=>{_fbSaving=false;}).catch(e=>{_fbSaving=false;_fbWarn('redo-push',e,'\u26a0\ufe0f Wiederholen nicht synchronisiert');});},800);}render();updateUndoBtns();}
+function undo(){if(!undoStack.length)return;redoStack.push(JSON.stringify(G));G=JSON.parse(undoStack.pop());safeLocalSave(SK,JSON.stringify(G));if(fbRef&&_fbInitialLoaded){clearTimeout(_fbDebounce);_fbDebounce=setTimeout(()=>{_fbWriteWithStamp(G).catch(e=>{_fbWarn('undo-push',e,'\u26a0\ufe0f R\u00fcckg\u00e4ngig nicht synchronisiert');});},800);}render();updateUndoBtns();}
+function redo(){if(!redoStack.length)return;undoStack.push(JSON.stringify(G));G=JSON.parse(redoStack.pop());safeLocalSave(SK,JSON.stringify(G));if(fbRef&&_fbInitialLoaded){clearTimeout(_fbDebounce);_fbDebounce=setTimeout(()=>{_fbWriteWithStamp(G).catch(e=>{_fbWarn('redo-push',e,'\u26a0\ufe0f Wiederholen nicht synchronisiert');});},800);}render();updateUndoBtns();}
 function updateUndoBtns(){
   const u=document.getElementById('undoBtn'),r=document.getElementById('redoBtn');
   if(u)u.disabled=!undoStack.length;if(r)r.disabled=!redoStack.length;
@@ -21291,8 +21292,13 @@ function resolveConflict(action){
     G._lastSaveBy=(CU&&CU.name)||'?';
     G._lastSaveTs=Date.now();
     if(fbRef){
+      // Deliberate full replacement (user chose "overwrite remote"), but the
+      // shadow must follow — otherwise the next diff compares against the
+      // discarded remote state and re-uploads everything again.
       _fbSaving=true;
-      fbRef.set(fbEncode(G)).then(()=>{
+      const _enc=fbEncode(G);
+      fbRef.set(_enc).then(()=>{
+        _fbShadow=_enc;
         _fbSaving=false;
         setFbStatus('connected');
         if(typeof showSaveFlash==='function')showSaveFlash('💪 Lokal gespeichert (überschrieben)');
