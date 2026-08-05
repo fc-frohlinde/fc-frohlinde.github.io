@@ -2166,6 +2166,8 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 .rpe-row{display:flex;align-items:center;gap:8px;font-size:.74rem;}
 .rpe-nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--gd);}
 .rpe-val{font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--bd);min-width:20px;text-align:center;}
+.rpe-val-in{width:46px;padding:3px 4px;border:1.5px solid var(--gl);border-radius:6px;
+  font-family:'Bebas Neue',sans-serif;font-size:.95rem;text-align:center;color:var(--bd);}
 .rpe-min{width:58px;padding:3px 6px;border:1.5px solid var(--gl);border-radius:6px;
   font-family:'Barlow',sans-serif;font-size:.74rem;text-align:center;color:var(--gd);}
 .rpe-load{min-width:46px;text-align:right;font-weight:700;color:var(--gm);}
@@ -10716,6 +10718,46 @@ function sessSetDuration(si,val){
 // Minutes actually played, per player. For a match the load of a substitute
 // who came on for 20 minutes is nothing like a starter's — without this the
 // whole計 calculation would treat them the same.
+// Ratings are the players' own input, but the trainer needs a way to correct
+// them: a value can be orphaned (no journal entry, wrong session) or a player
+// reports their number verbally. Every change is logged with the trainer's
+// name, so player input and trainer correction stay distinguishable.
+function sessSetPlayerRpe(si,pi,val){
+  if(!canEdit())return;
+  const D=cd();const p=D&&D.players&&D.players[pi];const s=D&&D.sessions&&D.sessions[si];
+  if(!p||!s)return;
+  const raw=String(val==null?'':val).trim();
+  let n=null;
+  if(raw!==''){
+    n=parseInt(raw,10);
+    if(isNaN(n)||n<0||n>10){alert('Bitte 0\u201310 eingeben (oder leer f\u00fcr l\u00f6schen).');renderSessRpe(si);return;}
+  }
+  if(!Array.isArray(p.rpe))p.rpe=[];
+  while(p.rpe.length<D.sessions.length)p.rpe.push(null);
+  const before=p.rpe[si];
+  if(before===n)return;
+  snap();
+  p.rpe[si]=n;
+  saveG();
+  logAudit('Belastung korrigiert',(getDisplayName?getDisplayName(p):p.name)+' \u00b7 '+(s.date||'?'),
+    (before==null?'\u2013':before)+' \u2192 '+(n==null?'gel\u00f6scht':n));
+  renderSessRpe(si);
+}
+function sessAddPlayerRpe(si){
+  if(!canEdit())return;
+  const D=cd();const s=D&&D.sessions&&D.sessions[si];
+  if(!s)return;
+  const cand=(D.players||[]).map((p,pi)=>({p,pi}))
+    .filter(x=>x.p&&!(Array.isArray(x.p.rpe)&&typeof x.p.rpe[si]==='number'));
+  if(!cand.length){alert('Alle Spieler haben bereits einen Wert.');return;}
+  const list=cand.map((x,i)=>(i+1)+' = '+(getDisplayName?getDisplayName(x.p):x.p.name)).join('\n');
+  const pick=prompt('Spieler w\u00e4hlen:\n\n'+list);
+  const idx=parseInt(pick,10);
+  if(!idx||idx<1||idx>cand.length)return;
+  const val=prompt('Belastung 0\u201310:');
+  if(val===null)return;
+  sessSetPlayerRpe(si,cand[idx-1].pi,val);
+}
 function sessSetPlayerMinutes(si,pi,val){
   if(!canEdit())return;
   const D=cd();const p=D&&D.players&&D.players[pi];const s=D&&D.sessions&&D.sessions[si];
@@ -10926,12 +10968,16 @@ function renderSessRpe(si){
       <div class="rpe-list">
         ${vals.sort((a,b)=>b.r-a.r).map(v=>`<div class="rpe-row">
           <span class="rpe-nm">${escapeHtml(v.n)}</span>
-          <span class="rpe-val">${v.r}</span>
+          <input class="rpe-val-in" type="number" min="0" max="10" step="1" value="${v.r}"
+             title="Bewertung ändern — leer lassen zum Löschen"
+             onchange="sessSetPlayerRpe(${si},${v.pi},this.value)">
           ${isMatch?`<input class="rpe-min" type="number" min="0" max="240" step="5" placeholder="${mins}"
              value="${v.min==null?'':v.min}" title="Einsatzminuten"
              onchange="sessSetPlayerMinutes(${si},${v.pi},this.value)">`:''}
           <span class="rpe-load">${v.load==null?'\u2013':v.load}</span>
+          <button class="btn-mini" title="Wert entfernen" onclick="sessSetPlayerRpe(${si},${v.pi},'')">\u2715</button>
         </div>`).join('')}
+        <button class="btn bs" style="font-size:.7rem;padding:4px 10px;margin-top:6px;" onclick="sessAddPlayerRpe(${si})">\uff0b Wert nachtragen</button>
       </div></details>
   </div>`;
 }
