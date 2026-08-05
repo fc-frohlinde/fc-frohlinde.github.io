@@ -11003,10 +11003,31 @@ function pmSetRpe(si,val){
   while(p.rpe.length<D.sessions.length)p.rpe.push(null);
   // Tapping the active value again clears it — a mis-tap must be correctable
   p.rpe[si]=(p.rpe[si]===val)?null:val;
-  _pmSaveTargeted();
+  // Trainer preview is for LOOKING at the screen. Writing real ratings under a
+  // player's name from a test session corrupts exactly the data the feature
+  // exists to collect — and produces values the player never gave. The UI
+  // still updates so the screen can be judged; nothing leaves the browser.
+  if(RPE_IS_PREVIEW){
+    if(typeof showSaveFlash==='function')showSaveFlash('\ud83d\udc41 Vorschau \u2014 nicht gespeichert');
+  }else{
+    _pmSaveTargeted();
+  }
   // Audit is debounced per session: a player trying 6, then 7, then 8 before
   // settling produced one journal entry per tap. Only the value they end up
   // with is worth recording.
+  if(RPE_IS_PREVIEW){
+    // Repaint the card, then stop — no journal entry either
+    const c=document.querySelector('.pm-rpe[data-si="'+si+'"]');
+    if(c){
+      c.classList.toggle('pm-rpe-done',p.rpe[si]!=null);
+      c.querySelectorAll('.pm-rpe-n').forEach((b,n)=>b.classList.toggle('on',p.rpe[si]===n));
+      const f=document.getElementById('pm-rpe-fb-'+si);
+      if(f)f.textContent=(p.rpe[si]!=null)
+        ?('\u2713 '+RPE_SCALE[p.rpe[si]][1]+' \u2014 danke!')
+        :'Keine Note, kein richtig oder falsch \u2014 dein ehrliches Gef\u00fchl z\u00e4hlt.';
+    }
+    return;
+  }
   if(!window._rpeAuditTimers)window._rpeAuditTimers={};
   const _flush=()=>{
     if(!window._rpeAuditTimers[si])return;
@@ -11734,7 +11755,7 @@ function renderPlayerMode(){
     </div>`;
   };
   if(RPE_IS_PREVIEW){
-    html+='<div class="pm-preview-banner">\ud83d\udc41 Trainer-Vorschau \u00b7 Eingaben werden echt gespeichert</div>';
+    html+='<div class="pm-preview-banner">\ud83d\udc41 Trainer-Vorschau \u00b7 Eingaben werden <b>nicht</b> gespeichert</div>';
   }
   // ── sRPE PROMPT ──
   const rpeOpen=[];
@@ -11928,6 +11949,12 @@ function pmSetStatus(si,val){
   // If switching to Angemeldet (Komme), clear any leftover reason
   if(targetStatus===4&&Array.isArray(p.preconfReason)&&si<p.preconfReason.length){
     p.preconfReason[si]='';
+  }
+  // Preview is for looking, not for answering on a player's behalf
+  if(RPE_IS_PREVIEW){
+    if(typeof showSaveFlash==='function')showSaveFlash('\ud83d\udc41 Vorschau \u2014 nicht gespeichert');
+    renderPlayerMode();
+    return;
   }
   _pmSaveTargeted();
   const sess=D.sessions[si];
