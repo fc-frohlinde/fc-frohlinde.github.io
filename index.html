@@ -830,6 +830,14 @@ input[type="date"]{cursor:pointer;}
 .lp-spacer{flex:1;}
 .lp-fmt-btn{padding:4px 13px;border-radius:20px;border:1.5px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:rgba(255,255,255,.92);font-family:'Barlow',sans-serif;font-size:.76rem;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;}
 .lp-fmt-btn.active{background:var(--bm);color:#fff;border-color:color-mix(in srgb,var(--bl) 60%,#fff);box-shadow:0 0 0 1px var(--bm);}
+/* The formation select now IS the state display (it shows the chosen
+   formation), so it gets the highlighted treatment the separate pill used to
+   have. Native dropdown lists render on the OS surface, hence the dark option
+   colours — otherwise white-on-white on Windows. */
+select.lp-fmt-sel,select.slp-fmt-sel{background-color:var(--bm);border-color:color-mix(in srgb,var(--bl) 60%,#fff);
+  color:#fff;font-weight:700;min-width:104px;}
+select.lp-fmt-sel option,select.slp-fmt-sel option{background:#fff;color:#12233f;font-weight:600;}
+select.lp-fmt-sel optgroup,select.slp-fmt-sel optgroup{background:#eef2f9;color:#5a6b85;font-style:normal;}
 .lp-fmt-btn:hover:not(.active){background:rgba(255,255,255,.13);}
 select.lp-fmt-btn{appearance:none;-webkit-appearance:none;-moz-appearance:none;background-image:linear-gradient(45deg,transparent 50%,rgba(255,255,255,.5) 50%),linear-gradient(135deg,rgba(255,255,255,.5) 50%,transparent 50%);background-position:calc(100% - 14px) 50%,calc(100% - 9px) 50%;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:24px;}
 select.lp-fmt-btn option{background:#1a3568;color:#fff;padding:8px;}
@@ -21568,27 +21576,18 @@ function renderFmtBtns(targetId,currentFmt,onSelect){
   const isSlp=targetId.startsWith('slp');
   const cls=isSlp?'slp-fmt-btn':'lp-fmt-btn';
   let html='';
-  const narrow=window.innerWidth<=767;
-  if(narrow){
-    // One grouped select instead of a dropdown per category: on a phone the
-    // separate selects wrapped into a second and third row and pushed the
-    // pitch off screen. Categories survive as <optgroup> labels.
-    const groups=Object.keys(FORMATION_CATEGORIES).map(catName=>{
-      const opts=FORMATION_CATEGORIES[catName]
-        .map(f=>`<option value="${f}"${f===currentFmt?' selected':''}>${f}</option>`).join('');
-      return `<optgroup label="${catName}">${opts}</optgroup>`;
-    }).join('');
-    html+=`<select class="${cls}" onchange="if(this.value)${onSelect}(this.value);">${groups}</select>`;
-  }else{
-    Object.keys(FORMATION_CATEGORIES).forEach(catName=>{
-      const opts=FORMATION_CATEGORIES[catName].map(f=>`<option value="${f}">${f}</option>`).join('');
-      html+=`<select class="${cls}" onchange="if(this.value){${onSelect}(this.value);this.selectedIndex=0;}">
-        <option value="" selected>${catName} ▾</option>${opts}
-      </select>`;
-    });
-  }
-  // Current formation pill (just before Edit button)
-  if(!narrow)html+=`<span class="${cls} active" style="cursor:default;">${currentFmt}</span>`;
+  // One grouped select on every viewport. The former desktop variant used a
+  // dropdown per category, each opening with a placeholder ("Viererkette ▾")
+  // and resetting itself afterwards — so the control never showed what was
+  // actually selected, and the separate pill next to it had to. A single
+  // select carries the current formation as its own value; the categories
+  // survive as <optgroup> labels.
+  const groups=Object.keys(FORMATION_CATEGORIES).map(catName=>{
+    const opts=FORMATION_CATEGORIES[catName]
+      .map(f=>`<option value="${f}"${f===currentFmt?' selected':''}>${f}</option>`).join('');
+    return `<optgroup label="${catName}">${opts}</optgroup>`;
+  }).join('');
+  html+=`<select class="${cls} lp-fmt-sel" title="Formation wählen" onchange="if(this.value)${onSelect}(this.value);">${groups}</select>`;
   // Edit button
   const editFn=isSlp?'slpToggleEdit()':'lpToggleEdit()';
   const editing=isSlp?(typeof slpState!=='undefined'&&slpState.editing===true):(typeof lpState!=='undefined'&&lpState.editing===true);
