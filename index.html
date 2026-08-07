@@ -839,6 +839,7 @@ input[type="date"]{cursor:pointer;}
   font-weight:700;min-height:34px;}
 .ps-cbtn:hover{background:var(--bd);}
 .ps-cbtn-wa{background:#25d366;}
+.ps-cbtn-mail{background:var(--surface-dark);}
 .ps-cbtn-wa:hover{background:#1da851;}
 .ps-cnum{font-size:.7rem;color:var(--gm);}
 @media (max-width:767px){
@@ -8272,7 +8273,13 @@ function renderPlayerContact(p){
   const box=document.getElementById('ps-contact');
   if(!box)return;
   const raw=String((p&&p.phone)||'').trim();
-  if(!raw){box.innerHTML='';box.style.display='none';return;}
+  if(!raw){
+    if(p&&p.email){
+      box.style.display='flex';
+      box.innerHTML=`<a class="ps-cbtn ps-cbtn-mail" href="mailto:${escapeHtml(p.email)}">\u2709\ufe0f E-Mail</a>`;
+    }else{box.innerHTML='';box.style.display='none';}
+    return;
+  }
   const tel=raw.replace(/[^0-9+]/g,'');
   // wa.me needs the international form without + or leading zero: a German
   // 0170… becomes 49170…
@@ -8282,6 +8289,7 @@ function renderPlayerContact(p){
   box.style.display='flex';
   box.innerHTML=`<a class="ps-cbtn" href="tel:${escapeHtml(tel)}">\ud83d\udcde Anrufen</a>`
     +`<a class="ps-cbtn ps-cbtn-wa" href="https://wa.me/${escapeHtml(wa)}" target="_blank" rel="noopener">\ud83d\udcac WhatsApp</a>`
+    +((p&&p.email)?`<a class="ps-cbtn ps-cbtn-mail" href="mailto:${escapeHtml(p.email)}">\u2709\ufe0f E-Mail</a>`:'')
     +`<span class="ps-cnum">${escapeHtml(raw)}</span>`;
 }
 function removePlayerPhoto(){
@@ -15552,18 +15560,12 @@ function openPlayerStats(pi){
   if(photoDelBtn)photoDelBtn.style.display=p.photo?'':'none';
   const noteEl=document.getElementById('ps-note-display');
   if(noteEl){
+    // Note lives in its own card below, phone and e-mail in the contact row.
+    // This line keeps only the identity facts nothing else displays.
     let info=[];
-    if(p.note&&!isGuest())info.push('📝 '+p.note);
     if(p.passnr)info.push('🎫 '+p.passnr);
     if(p.birthdate)info.push('🎂 '+new Date(p.birthdate).toLocaleDateString('de-DE'));
     if(p.foot)info.push('🦵 '+(p.foot==='right'?'Rechts':p.foot==='left'?'Links':'Beidfüßig'));
-    if(p.phone&&!isGuest()){
-      const tel=p.phone.replace(/[^\d+]/g,'');
-      info.push(`📞 <a href="tel:${tel}" style="color:var(--bl);text-decoration:none;" onclick="event.stopPropagation();">${p.phone}</a>`);
-    }
-    if(p.email&&!isGuest()){
-      info.push(`✉️ <a href="mailto:${p.email}" style="color:var(--bl);text-decoration:none;" onclick="event.stopPropagation();">${p.email}</a>`);
-    }
     if(info.length){noteEl.innerHTML=info.join(' &nbsp;·&nbsp; ');noteEl.style.display='block';}
     else{noteEl.style.display='none';}
   }
