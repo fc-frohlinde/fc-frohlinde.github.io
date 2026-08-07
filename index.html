@@ -802,6 +802,15 @@ input[type="date"]{cursor:pointer;}
 .tp-edit-btn:hover{border-color:var(--bl);color:var(--bd);}
 .tp-edit-btn.active{background:var(--ok);border-color:var(--ok);color:#fff;}
 .tp-empty{font-size:.78rem;color:var(--gm);text-align:center;padding:14px 8px;}
+.trainer-chip-btn{cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .12s;}
+.trainer-chip-btn:hover{background:rgba(255,255,255,.28);}
+.trainer-chip-av{width:20px;height:20px;border-radius:50%;object-fit:cover;margin-left:-3px;}
+/* Trainer statistics */
+.tp-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(80px,1fr));gap:7px;margin-top:2px;}
+.tp-stat{background:var(--muted-bg);border-radius:9px;padding:9px 6px;text-align:center;}
+.tp-stat-v{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--bd);line-height:1;}
+.tp-stat-l{font-size:.6rem;letter-spacing:.5px;text-transform:uppercase;color:var(--gm);margin-top:3px;}
+.tp-stat-s{font-size:.62rem;color:var(--gm);margin-top:2px;}
 .tp-av{width:72px;height:72px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--gl);}
 .tp-av-ph{display:flex;align-items:center;justify-content:center;background:var(--bm);color:#fff;
   font-family:'Bebas Neue',sans-serif;font-size:1.6rem;}
@@ -7436,7 +7445,11 @@ function renderHdrInfo(){
   // Trainer chips in header
   const tr=G.trainers.filter(t=>t.teams.includes(UI.currentTeam));
   const htr=document.getElementById('hTrainers');
-  if(htr)htr.innerHTML=tr.length?tr.map(t=>`<span class="trainer-chip">${escapeHtml(t.name)}</span>`).join(''):'';
+  if(htr)htr.innerHTML=tr.length?tr.map(t=>{
+    const gi=G.trainers.indexOf(t);
+    const av=t.photo?`<img class="trainer-chip-av" src="${t.photo}" alt="">`:'';
+    return `<span class="trainer-chip trainer-chip-btn" onclick="openTrainerProfile(${gi})" title="Profil ansehen">${av}${escapeHtml(t.name)}</span>`;
+  }).join(''):'';
   const lbl=document.getElementById('hTrainersLbl');
   const wrap=document.getElementById('hTrainersWrap');
   if(lbl)lbl.textContent=tr.length===1?'Trainer':(tr.length>1?'Trainerteam':'');
@@ -18326,6 +18339,22 @@ function renderTrainerProfile(){
   html+=sec('Pers\u00f6nlich',
       line('Geburtstag',t.birthdate,'birthdate','date')
       +line('Notiz',t.note,'note','area'));
+  if(!ed){
+    const st=tpComputeStats(t);
+    if(st&&(st.rollcalls||st.ratings||st.sessionsCreated||st.lineups)){
+      const cell=(v,l,s)=>`<div class="tp-stat"><div class="tp-stat-v">${v}</div><div class="tp-stat-l">${l}</div>${s?`<div class="tp-stat-s">${s}</div>`:''}</div>`;
+      let sHtml='<div class="tp-stats">';
+      if(st.sessionsCreated)sHtml+=cell(st.sessionsCreated,'Termine','angelegt');
+      if(st.rollcalls)sHtml+=cell(st.rollcalls,'Anwesenheit','erfasst');
+      if(st.ratings)sHtml+=cell(st.ratings,'Bewertungen','vergeben');
+      if(st.lineups)sHtml+=cell(st.lineups,'Aufstellungen','gespeichert');
+      if(st.attendance)sHtml+=cell(st.attendance.pct+'%','Beteiligung','eigene Einheiten');
+      sHtml+='</div>';
+      html+=`<div class="tp-sec"><div class="tp-sec-h">Aktivit\u00e4t</div>${sHtml}`
+        +(st.lastActive?`<div class="tp-stat-s" style="margin-top:7px;">Zuletzt aktiv: ${new Date(st.lastActive).toLocaleDateString('de-DE')}</div>`:'')
+        +'<div class="tp-stat-s" style="margin-top:3px;opacity:.75;">Aus dem Verlauf \u2014 zeigt nur, was dort noch gespeichert ist.</div></div>';
+    }
+  }
   if(!ed&&!t.phone&&!t.email&&!t.role&&!t.licence&&!t.note){
     html+='<div class="tp-empty">Noch keine Angaben hinterlegt.'
       +(mayEdit?' Mit \u201eBearbeiten\u201c erg\u00e4nzen.':'')+'</div>';
@@ -18340,6 +18369,48 @@ function renderTrainerProfile(){
     }
   }
   box.innerHTML=html;
+}
+// What a trainer actually did, derived from the journal rather than a new
+// counter: entries carry the user's name, so "who ran the roll call" and
+// "who rated" are already recorded. Nothing new is written for this.
+function tpComputeStats(t){
+  const name=(t&&t.name||'').toLowerCase();
+  if(!name)return null;
+  const out={rollcalls:0,ratings:0,sessionsCreated:0,lineups:0,lastActive:0};
+  (G.auditLog||[]).forEach(e=>{
+    if(!e||String(e.user||'').toLowerCase()!==name)return;
+    if(e.ts>out.lastActive)out.lastActive=e.ts;
+    const a=String(e.action||'');
+    if(/^Sammel-Anwesenheit|^Bulk-Status|^Status ge/.test(a))out.rollcalls++;
+    else if(/^Leistungsnote|^Bewertungsthema/.test(a))out.ratings++;
+    else if(/^Training erstellt|^Spiel erstellt/.test(a))out.sessionsCreated++;
+    else if(/^Aufstellung|^Saisonkader/.test(a))out.lineups++;
+  });
+  // Attendance on the sessions this trainer created — a fair proxy for
+  // "how well attended are his units", and it needs no extra bookkeeping.
+  const D=cd();
+  let att=null;
+  if(D&&Array.isArray(D.sessions)&&Array.isArray(D.players)){
+    const mine=[];
+    (G.auditLog||[]).forEach(e=>{
+      if(!e||String(e.user||'').toLowerCase()!==name)return;
+      if(!/^Training erstellt|^Spiel erstellt/.test(String(e.action||'')))return;
+      D.sessions.forEach((s,si)=>{if(s&&s.date===e.target)mine.push(si);});
+    });
+    const uniq=[...new Set(mine)].filter(si=>sessTookPlace(D.sessions[si],UI.currentSeason));
+    if(uniq.length){
+      let a=0,tot=0;
+      uniq.forEach(si=>{
+        D.players.forEach(p=>{
+          const v=p&&Array.isArray(p.s)?p.s[si]:null;
+          if(v===1||v===0||v===2){tot++;if(v===1)a++;}
+        });
+      });
+      if(tot)att={pct:Math.round(a/tot*100),sessions:uniq.length};
+    }
+  }
+  out.attendance=att;
+  return out;
 }
 function tpSet(field,val){
   if(!_tpCanEdit())return;
