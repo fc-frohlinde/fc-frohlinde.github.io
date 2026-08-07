@@ -802,10 +802,14 @@ input[type="date"]{cursor:pointer;}
 .tp-sub{font-size:.76rem;color:var(--gm);margin-top:2px;}
 .tp-av-wrap{cursor:pointer;line-height:0;}
 .tp-av-wrap::after{width:26px;height:26px;font-size:.78rem;bottom:0;right:0;}
-.tp-photo-rm{margin:-4px 0 10px 85px;}
-.tp-rm-link{background:none;border:none;padding:0;color:var(--gm);font-family:'Barlow',sans-serif;
-  font-size:.7rem;text-decoration:underline;cursor:pointer;}
-.tp-rm-link:hover{color:var(--bad-fg);}
+.photo-menu{position:fixed;z-index:1200;background:#fff;border:1px solid var(--gl);border-radius:10px;
+  box-shadow:0 8px 26px rgba(0,0,0,.22);padding:5px;min-width:186px;}
+.photo-menu-item{display:flex;align-items:center;gap:8px;width:100%;background:none;border:none;
+  padding:10px 12px;border-radius:7px;font-family:'Barlow',sans-serif;font-size:.8rem;font-weight:600;
+  color:var(--gd);cursor:pointer;text-align:left;min-height:42px;}
+.photo-menu-item:hover{background:var(--muted-bg);}
+.photo-menu-del{color:var(--bad-fg);}
+.photo-menu-del:hover{background:rgba(231,76,60,.1);}
 .tp-sec{border-top:1px solid var(--gl);padding-top:9px;margin-top:9px;}
 .tp-sec-h{font-size:.66rem;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--gm);margin-bottom:7px;}
 .tp-row{display:flex;align-items:center;gap:9px;margin-bottom:6px;}
@@ -2616,7 +2620,7 @@ if(window._fbBlocked){
 <!-- Player Stats -->
 <div class="mo" id="moPlayer"><div class="mob" style="width:530px;">
   <div style="display:flex;align-items:flex-start;gap:13px;margin-bottom:13px;">
-    <div id="ps-avatar-wrap" style="flex-shrink:0;cursor:pointer;" onclick="if(canEdit())pickPlayerPhoto()" title="Foto ändern"></div>
+    <div id="ps-avatar-wrap" style="flex-shrink:0;cursor:pointer;" onclick="if(canEdit())playerPhotoMenu(this)" title="Foto"></div>
     <div style="flex:1;min-width:0;">
       <div id="ps-name" style="font-family:'Bebas Neue',sans-serif;font-size:1.55rem;color:var(--bd);letter-spacing:2px;line-height:1;">–</div>
       <div id="ps-presence-inline" class="inline-presence" style="margin-top:4px;margin-left:0;"></div>
@@ -7915,6 +7919,12 @@ function renderPlayerAvatar(p,size,interactive){
 let _cropState={img:null,scale:1,minScale:1,offsetX:0,offsetY:0,stageSize:0,
   draggingFrom:null,onApply:null};
 
+function playerPhotoMenu(anchorEl){
+  if(!canEdit())return;
+  const pi=(typeof _resolveCurrentPI==='function')?_resolveCurrentPI():-1;
+  const p=(pi>=0)?cd().players[pi]:null;
+  photoMenu(anchorEl,!!(p&&p.photo),()=>pickPlayerPhoto(),()=>removePlayerPhoto());
+}
 function pickPlayerPhoto(callback){
   // callback: optional fn(dataUrl) - if not given, applies to current player
   if(!canEdit())return;
@@ -8097,6 +8107,32 @@ function cropApply(){
   const cb=_cropState.onApply;
   closeCropper();
   if(typeof cb==='function')cb(result);
+}
+// Clicking a photo used to open the file dialog immediately, so removing one
+// needed a second control somewhere else. A two-item menu makes both actions
+// reachable from the thing they act on — and stops a stray tap from opening
+// the file picker.
+function photoMenu(anchorEl,hasPhoto,onPick,onRemove){
+  document.querySelectorAll('.photo-menu').forEach(el=>el.remove());
+  const m=document.createElement('div');
+  m.className='photo-menu';
+  m.innerHTML=`<button class="photo-menu-item" data-act="pick">\ud83d\udcf7 ${hasPhoto?'Foto \u00e4ndern':'Foto hochladen'}</button>`
+    +(hasPhoto?'<button class="photo-menu-item photo-menu-del" data-act="del">\ud83d\uddd1 Foto entfernen</button>':'');
+  document.body.appendChild(m);
+  const close=()=>{m.remove();document.removeEventListener('pointerdown',onDoc,true);};
+  const onDoc=(ev)=>{if(!m.contains(ev.target))close();};
+  m.addEventListener('click',ev=>{
+    const b=ev.target.closest('.photo-menu-item');
+    if(!b)return;
+    const act=b.dataset.act;
+    close();
+    if(act==='pick'&&typeof onPick==='function')onPick();
+    if(act==='del'&&typeof onRemove==='function')onRemove();
+  });
+  // Must be in the DOM and visible before measuring — same rule as every
+  // other JS-positioned menu in the app.
+  try{_placePopup(m,anchorEl.getBoundingClientRect(),{align:'left',gap:6});}catch(e){}
+  setTimeout(()=>document.addEventListener('pointerdown',onDoc,true),0);
 }
 function removePlayerPhoto(){
   if(!canEdit())return;
@@ -18225,7 +18261,7 @@ function renderTrainerProfile(){
   // camera badge appearing on hover (always visible on touch, where there is
   // no hover). A separate button below the header was redundant.
   const av=ed
-    ?`<div class="photo-edit-wrap tp-av-wrap" onclick="tpEditPhoto()" title="Foto ändern">${avInner}</div>`
+    ?`<div class="photo-edit-wrap tp-av-wrap" onclick="tpPhotoMenu(this)" title="Foto">${avInner}</div>`
     :avInner;
   const line=(label,val,field,type,opts)=>{
     if(!ed&&!val)return '';
@@ -18251,11 +18287,7 @@ function renderTrainerProfile(){
       <div class="tp-sub">${esc(t.role||'Trainer')}${t.teams&&t.teams.length?' \u00b7 '+esc(t.teams.join(', ')):''}</div>
     </div>
   </div>`;
-  // Removal stays reachable but unobtrusive — a small link under the name,
-  // only when there is something to remove.
-  if(ed&&t.photo){
-    html+='<div class="tp-photo-rm"><button class="tp-rm-link" onclick="tpRemovePhoto()">Foto entfernen</button></div>';
-  }
+
   // Contact first: this is what the screen is opened for
   html+='<div class="tp-sec"><div class="tp-sec-h">Kontakt</div>';
   if(!ed&&(t.phone||t.email)){
@@ -18321,6 +18353,11 @@ function tpPhotoPick(){
 }
 // The cropper is gated on canEdit(); a trainer editing their OWN photo is a
 // legitimate case even without edit rights on team data.
+function tpPhotoMenu(anchorEl){
+  if(!_tpCanEdit())return;
+  const t=G.trainers&&G.trainers[_tpIdx];
+  photoMenu(anchorEl,!!(t&&t.photo),()=>tpEditPhoto(),()=>tpRemovePhoto());
+}
 function tpEditPhoto(){
   if(!_tpCanEdit())return;
   if(typeof canEdit==='function'&&!canEdit()){
