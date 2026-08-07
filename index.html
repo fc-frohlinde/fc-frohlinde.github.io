@@ -18243,7 +18243,7 @@ function renderTrainerProfile(){
   </div>`;
   if(ed){
     html+=`<div class="tp-photo-btns">
-      <button class="btn bs" onclick="document.getElementById('tp-photo-input').click()">\ud83d\udcf7 Foto ${t.photo?'\u00e4ndern':'hinzuf\u00fcgen'}</button>
+      <button class="btn bs" onclick="tpEditPhoto()">\ud83d\udcf7 Foto ${t.photo?'\u00e4ndern':'hinzuf\u00fcgen'}</button>
       ${t.photo?'<button class="btn bs" onclick="tpRemovePhoto()">\u2715 Foto entfernen</button>':''}
     </div>`;
   }
@@ -18293,33 +18293,32 @@ function tpSet(field,val){
   renderTrainerProfile();
   if(typeof renderMgrTrainers==='function')try{renderMgrTrainers();}catch(e){}
 }
-function tpPhotoPick(input){
-  if(!_tpCanEdit()||!input.files||!input.files[0])return;
-  const t=G.trainers&&G.trainers[_tpIdx];
-  if(!t)return;
-  const f=input.files[0];
-  if(!f.type.startsWith('image/')){alert('Bitte ein Bild ausw\u00e4hlen.');return;}
-  const rd=new FileReader();
-  rd.onload=()=>{
-    const img=new Image();
-    img.onload=()=>{
-      // Downscale before storing: a phone photo is several MB, and even in the
-      // media node that is paid for on every device that shows the avatar.
-      const max=320;
-      const sc=Math.min(1,max/Math.max(img.width,img.height));
-      const c=document.createElement('canvas');
-      c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);
-      c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-      snap();
-      t.photo=c.toDataURL('image/jpeg',0.8);
-      saveG();
-      logAudit('Trainerfoto ge\u00e4ndert',t.name,'');
-      renderTrainerProfile();
-    };
-    img.src=rd.result;
-  };
-  rd.readAsDataURL(f);
-  input.value='';
+function tpPhotoPick(){
+  // Same cropper the player photos use — square framing, zoom and drag, and
+  // the size/quality budget already tuned there. A plain downscale (what this
+  // did first) left portraits framed by luck.
+  if(!_tpCanEdit())return;
+  const gi=_tpIdx;
+  pickPlayerPhoto(dataUrl=>{
+    const t=G.trainers&&G.trainers[gi];
+    if(!t||!dataUrl)return;
+    snap();
+    t.photo=dataUrl;
+    saveG();
+    logAudit('Trainerfoto ge\u00e4ndert',t.name,'');
+    renderTrainerProfile();
+    if(typeof renderMgrTrainers==='function')try{renderMgrTrainers();}catch(e){}
+  });
+}
+// The cropper is gated on canEdit(); a trainer editing their OWN photo is a
+// legitimate case even without edit rights on team data.
+function tpEditPhoto(){
+  if(!_tpCanEdit())return;
+  if(typeof canEdit==='function'&&!canEdit()){
+    alert('Foto\u00e4nderung nur f\u00fcr Trainer mit Bearbeitungsrechten.');
+    return;
+  }
+  tpPhotoPick();
 }
 function tpRemovePhoto(){
   if(!_tpCanEdit())return;
@@ -24582,7 +24581,6 @@ checkAutoBackup();
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
     <h3 style="margin:0;flex:1;">👤 Trainerprofil</h3>
   </div>
-  <input type="file" id="tp-photo-input" accept="image/*" style="display:none;" onchange="tpPhotoPick(this)">
   <div id="tp-content" style="max-height:64vh;overflow-y:auto;"></div>
   <div class="mob-btns">
     <button class="btn bs" onclick="closeM('moTrainerProfile')">Schließen</button>
