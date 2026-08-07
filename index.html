@@ -795,6 +795,13 @@ input[type="date"]{cursor:pointer;}
   font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:.5px;}
 /* Trainer profile */
 .tp-head{display:flex;align-items:center;gap:13px;margin-bottom:12px;}
+.tp-head-txt{flex:1;min-width:0;}
+.tp-edit-btn{flex-shrink:0;align-self:flex-start;background:var(--ow);border:1.5px solid var(--gl);
+  color:var(--gd);border-radius:var(--r-pill);padding:6px 13px;font-family:'Barlow',sans-serif;
+  font-size:.74rem;font-weight:700;cursor:pointer;min-height:36px;}
+.tp-edit-btn:hover{border-color:var(--bl);color:var(--bd);}
+.tp-edit-btn.active{background:var(--ok);border-color:var(--ok);color:#fff;}
+.tp-empty{font-size:.78rem;color:var(--gm);text-align:center;padding:14px 8px;}
 .tp-av{width:72px;height:72px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--gl);}
 .tp-av-ph{display:flex;align-items:center;justify-content:center;background:var(--bm);color:#fff;
   font-family:'Bebas Neue',sans-serif;font-size:1.6rem;}
@@ -18232,13 +18239,21 @@ const TRAINER_ROLES=['Trainer','Co-Trainer','Torwarttrainer','Athletiktrainer','
 // Basis-Coach is kept as an explicit pre-licence — many club coaches hold it.
 const TRAINER_LICENCES=['Keine','DFB-Basis-Coach (Vorstufe)','C-Lizenz','B-Lizenz',
   'B+-Lizenz','A-Lizenz','A+-Lizenz','Pro-Lizenz'];
-let _tpIdx=null;
+let _tpIdx=null,_tpEditing=false;
 function openTrainerProfile(gi){
   const t=G.trainers&&G.trainers[gi];
   if(!t)return;
   _tpIdx=gi;
+  // Always opens read-only: a profile is looked at far more often than it is
+  // changed, and input fields everywhere make a card look like a form.
+  _tpEditing=false;
   renderTrainerProfile();
   openM('moTrainerProfile');
+}
+function tpToggleEdit(){
+  if(!_tpCanEdit())return;
+  _tpEditing=!_tpEditing;
+  renderTrainerProfile();
 }
 function _tpCanEdit(){
   if(isAdmin())return true;
@@ -18251,7 +18266,8 @@ function renderTrainerProfile(){
   if(!box)return;
   const t=G.trainers&&G.trainers[_tpIdx];
   if(!t){box.innerHTML='';return;}
-  const ed=_tpCanEdit();
+  const mayEdit=_tpCanEdit();
+  const ed=mayEdit&&_tpEditing;   // "ed" = fields are currently editable
   const esc=escapeHtml;
   const init=(t.name||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();
   const avInner=t.photo
@@ -18262,7 +18278,7 @@ function renderTrainerProfile(){
   // no hover). A separate button below the header was redundant.
   const av=ed
     ?`<div class="photo-edit-wrap tp-av-wrap" onclick="tpPhotoMenu(this)" title="Foto">${avInner}</div>`
-    :avInner;
+    :avInner;   // read mode shows the portrait, nothing clickable
   const line=(label,val,field,type,opts)=>{
     if(!ed&&!val)return '';
     let input;
@@ -18300,16 +18316,19 @@ function renderTrainerProfile(){
   html+=line('Telefon',t.phone,'phone','tel')
       +line('E-Mail',t.email,'email','email')
       +'</div>';
-  html+='<div class="tp-sec"><div class="tp-sec-h">Funktion</div>'
-      +line('Rolle',t.role,'role','select',TRAINER_ROLES)
+  const sec=(title,body)=>body.trim()?`<div class="tp-sec"><div class="tp-sec-h">${title}</div>${body}</div>`:'';
+  html+=sec('Funktion',
+      line('Rolle',t.role,'role','select',TRAINER_ROLES)
       +line('Lizenz',t.licence,'licence','select',TRAINER_LICENCES)
       +line('G\u00fcltig bis',t.licenceUntil,'licenceUntil','date')
-      +line('Im Verein seit',t.since,'since','text')
-      +'</div>';
-  html+='<div class="tp-sec"><div class="tp-sec-h">Pers\u00f6nlich</div>'
-      +line('Geburtstag',t.birthdate,'birthdate','date')
-      +line('Notiz',t.note,'note','area')
-      +'</div>';
+      +line('Im Verein seit',t.since,'since','text'));
+  html+=sec('Pers\u00f6nlich',
+      line('Geburtstag',t.birthdate,'birthdate','date')
+      +line('Notiz',t.note,'note','area'));
+  if(!ed&&!t.phone&&!t.email&&!t.role&&!t.licence&&!t.note){
+    html+='<div class="tp-empty">Noch keine Angaben hinterlegt.'
+      +(mayEdit?' Mit \u201eBearbeiten\u201c erg\u00e4nzen.':'')+'</div>';
+  }
   // Licence expiry is the one field that silently becomes a problem
   if(t.licenceUntil){
     const d=new Date(t.licenceUntil);
