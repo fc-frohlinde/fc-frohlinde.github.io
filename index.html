@@ -810,6 +810,29 @@ input[type="date"]{cursor:pointer;}
 #hTrainersWrap{min-width:0;max-width:100%;}
 /* Portraits in the name column. A placeholder keeps the text baseline aligned
    for players without a photo — otherwise the rows would stagger. */
+/* Compact front of the player card */
+.ps-next{display:flex;align-items:center;gap:9px;border-radius:10px;padding:9px 12px;margin-bottom:9px;
+  font-size:.8rem;border:1px solid var(--gl);background:var(--ow);}
+.ps-next-ic{font-size:1rem;}
+.ps-next-txt{flex:1;min-width:0;font-weight:700;color:var(--gd);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ps-next-st{font-size:.72rem;font-weight:700;padding:3px 9px;border-radius:var(--r-pill);white-space:nowrap;}
+.ps-next-ok .ps-next-st{background:rgba(39,174,96,.15);color:#1f7a45;}
+.ps-next-bad .ps-next-st{background:rgba(231,76,60,.13);color:#a5301f;}
+.ps-next-warn .ps-next-st{background:var(--warn-bg);color:var(--warn-fg);}
+.ps-dots{display:flex;align-items:center;gap:6px;margin-bottom:9px;padding-left:2px;}
+.ps-dot{width:13px;height:13px;border-radius:50%;flex-shrink:0;}
+.ps-dot.d-a{background:#27ae60;} .ps-dot.d-f{background:#e74c3c;}
+.ps-dot.d-e{background:#f39c12;} .ps-dot.d-q{background:var(--gl);}
+.ps-dots-lbl{font-size:.66rem;color:var(--gm);margin-left:3px;}
+.ps-note-card{background:rgba(241,196,15,.12);border-left:3px solid var(--ac);border-radius:8px;
+  padding:8px 11px;margin-bottom:10px;font-size:.78rem;color:var(--gd);line-height:1.4;}
+.ps-more{border-top:1px solid var(--gl);margin-bottom:10px;}
+.ps-more-sum{list-style:none;cursor:pointer;display:flex;align-items:center;gap:6px;padding:11px 2px;
+  font-size:.78rem;font-weight:700;color:var(--gm);}
+.ps-more-sum::-webkit-details-marker{display:none;}
+.ps-more-chev{margin-left:auto;transition:transform .16s;font-size:1rem;}
+.ps-more[open] .ps-more-chev{transform:rotate(90deg);}
+.ps-more-body{padding-top:4px;}
 .ps-contact{display:none;flex-wrap:wrap;align-items:center;gap:6px;margin-top:7px;}
 .ps-cbtn{display:inline-flex;align-items:center;gap:5px;background:var(--bm);color:#fff;text-decoration:none;
   border-radius:var(--r-pill);padding:6px 12px;font-family:'Barlow',sans-serif;font-size:.73rem;
@@ -2671,19 +2694,30 @@ if(window._fbBlocked){
     <div style="display:flex;gap:6px;flex-shrink:0;"><button class="btn" style="font-size:.76rem;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" onclick="playerGoBack()">← Zurück</button><button class="btn bs" onclick="closeM('moPlayer')">✕</button></div>
   </div>
   <div class="ps-cards" id="ps-cards"></div>
-  <div style="margin:0 0 12px;text-align:center;">
-    <button class="btn bp" id="ps-ext-btn" onclick="openPlayerStatsExt()" style="font-size:.78rem;padding:6px 14px;">📊 Detailstatistik (alle Saisons)</button>
+  <div id="ps-next"></div>
+  <div id="ps-dots"></div>
+  <div id="ps-note-card"></div>
+  <div style="margin:2px 0 12px;">
+    <button class="btn bp" id="ps-ext-btn" onclick="openPlayerStatsExt()" style="width:100%;justify-content:center;font-size:.8rem;padding:9px 14px;">📊 Alle Statistiken</button>
   </div>
-  <div class="sec" style="margin-bottom:6px;">📅 Monatliche Übersicht</div>
-  <div id="ps-months" style="margin-bottom:12px;"></div>
-  <div class="sec" style="margin-bottom:6px;">🎯 Schwerpunkte</div>
-  <div id="ps-focuses" style="margin-bottom:12px;"></div>
-  <div class="sec" id="ps-perf-sec" style="margin-bottom:6px;display:none;">⭐ Leistungsnote</div>
-  <div id="ps-perf" style="margin-bottom:12px;display:none;"></div>
-  <div class="sec" style="margin-bottom:6px;">📜 Notizen-Timeline <span id="ps-notes-count" style="font-size:.7rem;color:var(--gm);font-weight:500;margin-left:6px;"></span></div>
-  <div id="ps-notes-timeline" style="margin-bottom:12px;"></div>
-  <div class="sec" style="margin-bottom:6px;">📋 Alle Einheiten</div>
-  <div class="sess-list" id="ps-sessions"></div>
+  <!-- Everything below is the former front page: still here, still updated by
+       the same code, but folded away. The card should answer "who is this and
+       how do I reach him" first; the analysis is a deliberate second step. -->
+  <details class="ps-more">
+    <summary class="ps-more-sum"><span>Weitere Details</span><span class="ps-more-chev">›</span></summary>
+    <div class="ps-more-body">
+      <div class="sec" style="margin-bottom:6px;">📅 Monatliche Übersicht</div>
+      <div id="ps-months" style="margin-bottom:12px;"></div>
+      <div class="sec" style="margin-bottom:6px;">🎯 Schwerpunkte</div>
+      <div id="ps-focuses" style="margin-bottom:12px;"></div>
+      <div class="sec" id="ps-perf-sec" style="margin-bottom:6px;display:none;">⭐ Leistungsnote</div>
+      <div id="ps-perf" style="margin-bottom:12px;display:none;"></div>
+      <div class="sec" style="margin-bottom:6px;">📜 Notizen-Timeline <span id="ps-notes-count" style="font-size:.7rem;color:var(--gm);font-weight:500;margin-left:6px;"></span></div>
+      <div id="ps-notes-timeline" style="margin-bottom:12px;"></div>
+      <div class="sec" style="margin-bottom:6px;">📋 Alle Einheiten</div>
+      <div class="sess-list" id="ps-sessions"></div>
+    </div>
+  </details>
   <div id="ps-edit-wrap">
     <button class="btn" id="ps-edit-toggle" onclick="togglePlayerEdit()" style="width:100%;justify-content:center;background:var(--ow);color:var(--gd);border:1.5px solid var(--gl);margin-bottom:6px;">✎ Bearbeiten</button>
     <div id="ps-edit" style="display:none;background:var(--ow);border-radius:9px;padding:10px 12px;border:1px solid var(--gl);">
@@ -8178,6 +8212,62 @@ function photoMenu(anchorEl,hasPhoto,onPick,onRemove){
 // Reaching a player is the most common reason to open their card — a trainer
 // wants to call about an absence, not read statistics. Same shortcuts the
 // trainer profile has, built from the numbers already stored.
+// The three blocks the card leads with: what happens next, how the last few
+// went, and what the trainers noted. All derived from data already loaded.
+function renderPlayerFront(p,pi){
+  const D=cd();
+  const ss=(D&&D.sessions)||[];
+  // ── next session ──
+  const nx=document.getElementById('ps-next');
+  if(nx){
+    const today=todaySK();
+    let found=null;
+    ss.forEach((s,si)=>{
+      if(!s||!s.date)return;
+      const sk=dispToSortKey(s.date);
+      if(sk<today)return;
+      if(!found||sk<found.sk)found={s,si,sk};
+    });
+    if(!found){nx.innerHTML='';}
+    else{
+      const v=(p.s&&found.si<p.s.length)?p.s[found.si]:3;
+      const meta={1:['Anwesend','ok'],0:['Fehlend','bad'],2:['Entschuldigt','warn'],
+                  4:['Angemeldet','ok'],3:['Noch offen','warn']}[v]||['Noch offen','warn'];
+      const isM=found.s.type==='match';
+      nx.innerHTML=`<div class="ps-next ps-next-${meta[1]}">
+        <span class="ps-next-ic">${isM?'\u26bd':'\ud83c\udfc3'}</span>
+        <span class="ps-next-txt">${escapeHtml(found.s.date||'')}${found.s.time?' \u00b7 '+escapeHtml(found.s.time):''}</span>
+        <span class="ps-next-st">${meta[0]}</span>
+      </div>`;
+    }
+  }
+  // ── last five, as dots ──
+  const dt=document.getElementById('ps-dots');
+  if(dt){
+    const past=[];
+    ss.forEach((s,si)=>{
+      if(!s||!sessTookPlace(s,UI.currentSeason))return;
+      past.push({s,si,sk:dispToSortKey(s.date)});
+    });
+    past.sort((a,b)=>a.sk-b.sk);
+    const last5=past.slice(-5);
+    if(!last5.length){dt.innerHTML='';}
+    else{
+      dt.innerHTML='<div class="ps-dots">'+last5.map(({s,si})=>{
+        const v=(p.s&&si<p.s.length)?p.s[si]:3;
+        const cls=v===1?'d-a':v===0?'d-f':v===2?'d-e':'d-q';
+        const lbl=STLBL[v]||'Ausstehend';
+        return `<span class="ps-dot ${cls}" title="${escapeHtml(s.date||'')} \u2014 ${lbl}"></span>`;
+      }).join('')+'<span class="ps-dots-lbl">letzte 5</span></div>';
+    }
+  }
+  // ── trainer note ──
+  const nc=document.getElementById('ps-note-card');
+  if(nc){
+    const note=(p.note||'').trim();
+    nc.innerHTML=note?`<div class="ps-note-card">\ud83d\udcdd ${escapeHtml(note)}</div>`:'';
+  }
+}
 function renderPlayerContact(p){
   const box=document.getElementById('ps-contact');
   if(!box)return;
@@ -15492,6 +15582,7 @@ function openPlayerStats(pi){
     document.getElementById('pe-birthdate').value=p.birthdate||'';
     document.getElementById('pe-phone').value=p.phone||'';
     try{renderPlayerContact(p);}catch(e){}
+    try{renderPlayerFront(p,pi);}catch(e){}
     document.getElementById('pe-email').value=p.email||'';
     const hpEl=document.getElementById('pe-hidepos');
     if(hpEl)hpEl.checked=!!p.hidePos;
