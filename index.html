@@ -802,14 +802,16 @@ input[type="date"]{cursor:pointer;}
 .tp-edit-btn:hover{border-color:var(--bl);color:var(--bd);}
 .tp-edit-btn.active{background:var(--ok);border-color:var(--ok);color:#fff;}
 .tp-empty{font-size:.78rem;color:var(--gm);text-align:center;padding:14px 8px;}
-/* justify-content:flex-end used to right-align these. When the chips no
-   longer fit, that pushes the overflow to the START of the scroller — where
-   it is clipped and cannot be scrolled to, so the first chip was cut off.
-   Auto margin on the first child right-aligns while there is room and simply
-   stops doing so once the row overflows. */
-#hTrainers>:first-child{margin-inline-start:auto;}
+/* Horizontal scrolling clipped a chip at one end or the other — at the start
+   with flex-end (unreachable), at the end without it. With wrapping there is
+   no overflow to clip: a fourth trainer simply moves to a second line. */
+#hTrainers{row-gap:4px;}
 /* Portraits in the name column. A placeholder keeps the text baseline aligned
    for players without a photo — otherwise the rows would stagger. */
+.ma-card-av{width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0;}
+.ma-card-av-ph{display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.14);
+  color:rgba(255,255,255,.7);font-family:'Bebas Neue',sans-serif;font-size:.8rem;letter-spacing:.5px;}
+.ma-card-txt{flex:1;min-width:0;}
 .nm-av{width:22px;height:22px;border-radius:50%;object-fit:cover;flex-shrink:0;margin-right:7px;}
 .nm-av-ph{display:inline-block;background:rgba(0,0,0,.06);}
 .trainer-chip-btn{cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .12s;}
@@ -1286,7 +1288,7 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
 @keyframes maSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 .ma-card{background:#fff;border-radius:11px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px;box-shadow:0 1px 3px rgba(0,0,0,.08);border:1.5px solid transparent;transition:border-color .12s;}
 .ma-card.confirmed{border-color:rgba(39,174,96,.3);}
-.ma-card-info{flex:1;min-width:0;cursor:pointer;}
+.ma-card-info{flex:1;min-width:0;cursor:pointer;display:flex;align-items:center;gap:10px;}
 .ma-card-name{font-weight:700;color:var(--gd);font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .ma-card-meta{font-size:.7rem;color:var(--gm);margin-top:2px;display:flex;gap:8px;}
 .ma-card-pos{font-weight:600;}
@@ -2494,7 +2496,7 @@ if(window._fbBlocked){
       </div>
       <div id="hTrainersWrap" style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;max-width:100%;">
         <span id="hTrainersLbl" style="font-size:.55rem;font-weight:400;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.45);"></span>
-        <div id="hTrainers" style="display:flex;gap:4px;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;max-width:340px;scrollbar-width:none;"></div>
+        <div id="hTrainers" style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;max-width:340px;"></div>
       </div>
     </div>
   </div>
@@ -8935,10 +8937,16 @@ function renderMobileAtt(){
       const handler=editable?`onclick="maSetStatus(${pi},${si},${b.v})"`:'';
       btnsHtml+=`<button class="ma-btn ${b.cls}${active?'':' '+dim}" ${handler} ${editable?'':'disabled'}>${b.sym}</button>`;
     });
+    const avm=p.photo
+      ?`<img class="ma-card-av" src="${p.photo}" alt="" loading="lazy">`
+      :`<span class="ma-card-av ma-card-av-ph">${escapeHtml((nm||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase())}</span>`;
     lhtml+=`<div class="ma-card">
       <div class="ma-card-info" onclick="jumpToPlayer(${pi},'main')">
+        ${avm}
+        <div class="ma-card-txt">
         <div class="ma-card-name">${showName}</div>
         <div class="ma-card-meta"><span class="ma-card-nr">#${nr}</span>${pos?'<span class="ma-card-pos">'+pos+'</span>':''}</div>
+        </div>
       </div>
       <div class="ma-card-actions">${btnsHtml}</div>
     </div>`;
