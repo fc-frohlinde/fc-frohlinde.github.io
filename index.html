@@ -18302,6 +18302,7 @@ function renderTrainerProfile(){
       <div class="tp-name">${esc(t.name)}</div>
       <div class="tp-sub">${esc(t.role||'Trainer')}${t.teams&&t.teams.length?' \u00b7 '+esc(t.teams.join(', ')):''}</div>
     </div>
+    ${mayEdit?`<button class="tp-edit-btn${_tpEditing?' active':''}" onclick="tpToggleEdit()">${_tpEditing?'\u2713 Fertig':'\u270e Bearbeiten'}</button>`:''}
   </div>`;
 
   // Contact first: this is what the screen is opened for
