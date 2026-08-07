@@ -784,6 +784,40 @@ input[type="date"]{cursor:pointer;}
 .pl-btn-e{background:rgba(22,89,184,.1);color:var(--bm);}.pl-btn-e:hover{background:rgba(22,89,184,.2);}
 .pl-btn-d{background:rgba(231,76,60,.1);color:var(--ca);}.pl-btn-d:hover{background:rgba(231,76,60,.2);}
 .tr-row{display:flex;align-items:center;gap:7px;padding:7px 10px;background:var(--ow);border-radius:7px;margin-bottom:5px;}
+.tr-main{display:flex;align-items:center;gap:9px;flex:1;min-width:0;cursor:pointer;border-radius:6px;padding:2px;}
+.tr-main:hover{background:rgba(22,89,184,.07);}
+.tr-av{width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0;}
+.tr-av-ph{display:flex;align-items:center;justify-content:center;background:var(--bm);color:#fff;
+  font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:.5px;}
+/* Trainer profile */
+.tp-head{display:flex;align-items:center;gap:13px;margin-bottom:12px;}
+.tp-av{width:72px;height:72px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--gl);}
+.tp-av-ph{display:flex;align-items:center;justify-content:center;background:var(--bm);color:#fff;
+  font-family:'Bebas Neue',sans-serif;font-size:1.6rem;}
+.tp-name{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:1px;color:var(--bd);line-height:1.1;}
+.tp-sub{font-size:.76rem;color:var(--gm);margin-top:2px;}
+.tp-photo-btns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.tp-photo-btns .btn{font-size:.72rem;padding:5px 11px;}
+.tp-sec{border-top:1px solid var(--gl);padding-top:9px;margin-top:9px;}
+.tp-sec-h{font-size:.66rem;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--gm);margin-bottom:7px;}
+.tp-row{display:flex;align-items:center;gap:9px;margin-bottom:6px;}
+.tp-l{flex:0 0 118px;font-size:.74rem;color:var(--gm);}
+.tp-v{flex:1;min-width:0;font-size:.8rem;color:var(--gd);word-break:break-word;}
+.tp-in{flex:1;min-width:0;padding:5px 8px;border:1.5px solid var(--gl);border-radius:6px;
+  font-family:'Barlow',sans-serif;font-size:.78rem;color:var(--gd);background:#fff;margin-bottom:0;}
+.tp-quick{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px;}
+.tp-qbtn{display:inline-flex;align-items:center;gap:5px;background:var(--bm);color:#fff;text-decoration:none;
+  border-radius:var(--r-pill);padding:7px 13px;font-size:.75rem;font-weight:700;min-height:36px;}
+.tp-qbtn:hover{background:var(--bd);}
+.tp-warn{margin-top:10px;background:var(--warn-bg);color:var(--warn-fg);border-radius:8px;
+  padding:8px 11px;font-size:.75rem;font-weight:600;}
+.tp-warn-bad{background:rgba(231,76,60,.12);color:#a5301f;}
+@media (max-width:767px){
+  .tp-row{flex-direction:column;align-items:stretch;gap:3px;}
+  .tp-l{flex:none;}
+  .tp-in{min-height:40px;}
+  .tp-qbtn{flex:1;justify-content:center;}
+}
 .tr-nm{flex:1;font-weight:600;color:var(--bd);font-size:.8rem;}
 .tr-teams{font-size:.67rem;color:var(--gm);}
 .tr-del{background:none;border:none;cursor:pointer;color:var(--gm);font-size:.85rem;padding:2px 4px;border-radius:3px;}
@@ -18139,6 +18173,152 @@ async function mgrDelPl(pi){
   renderMgrPlayers();
 }
 
+// ══ TRAINER PROFILES ═════════════════════════════════════════
+// The trainer record held only name, teams and the password hash. Everything
+// a club actually needs to look up — who to call, which licence, what role —
+// lived in people's heads or in WhatsApp. Photos use the field name "photo"
+// on purpose: the media split already routes that key to the separate
+// fcf_media node, so a portrait never enters the hot data everyone downloads.
+const TRAINER_ROLES=['Cheftrainer','Co-Trainer','Torwarttrainer','Athletiktrainer','Betreuer','Physiotherapeut','Teammanager'];
+const TRAINER_LICENCES=['Keine','DFB C-Lizenz','DFB B-Lizenz','DFB A-Lizenz','DFB Elite-Jugend-Lizenz','UEFA B','UEFA A','UEFA Pro'];
+let _tpIdx=null;
+function openTrainerProfile(gi){
+  const t=G.trainers&&G.trainers[gi];
+  if(!t)return;
+  _tpIdx=gi;
+  renderTrainerProfile();
+  openM('moTrainerProfile');
+}
+function _tpCanEdit(){
+  if(isAdmin())return true;
+  const t=G.trainers&&G.trainers[_tpIdx];
+  // A trainer maintains their own entry; only admins touch other people's.
+  return !!(t&&CU&&CU.name&&t.name.toLowerCase()===String(CU.name).toLowerCase());
+}
+function renderTrainerProfile(){
+  const box=document.getElementById('tp-content');
+  if(!box)return;
+  const t=G.trainers&&G.trainers[_tpIdx];
+  if(!t){box.innerHTML='';return;}
+  const ed=_tpCanEdit();
+  const esc=escapeHtml;
+  const init=(t.name||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();
+  const av=t.photo
+    ?`<img class="tp-av" src="${t.photo}" alt="">`
+    :`<div class="tp-av tp-av-ph">${esc(init)}</div>`;
+  const line=(label,val,field,type,opts)=>{
+    if(!ed&&!val)return '';
+    let input;
+    if(!ed){
+      input=`<span class="tp-v">${esc(val)}</span>`;
+    }else if(type==='select'){
+      input=`<select class="tp-in" onchange="tpSet('${field}',this.value)">`
+        +opts.map(o=>`<option value="${esc(o)}"${o===(val||opts[0])?' selected':''}>${esc(o)}</option>`).join('')
+        +'</select>';
+    }else if(type==='area'){
+      input=`<textarea class="tp-in" rows="2" onchange="tpSet('${field}',this.value)">${esc(val||'')}</textarea>`;
+    }else{
+      input=`<input class="tp-in" type="${type||'text'}" value="${esc(val||'')}" onchange="tpSet('${field}',this.value)">`;
+    }
+    return `<div class="tp-row"><span class="tp-l">${esc(label)}</span>${input}</div>`;
+  };
+  const tel=(t.phone||'').replace(/[^0-9+]/g,'');
+  let html=`<div class="tp-head">
+    ${av}
+    <div class="tp-head-txt">
+      <div class="tp-name">${esc(t.name)}</div>
+      <div class="tp-sub">${esc(t.role||'Trainer')}${t.teams&&t.teams.length?' \u00b7 '+esc(t.teams.join(', ')):''}</div>
+    </div>
+  </div>`;
+  if(ed){
+    html+=`<div class="tp-photo-btns">
+      <button class="btn bs" onclick="document.getElementById('tp-photo-input').click()">\ud83d\udcf7 Foto ${t.photo?'\u00e4ndern':'hinzuf\u00fcgen'}</button>
+      ${t.photo?'<button class="btn bs" onclick="tpRemovePhoto()">\u2715 Foto entfernen</button>':''}
+    </div>`;
+  }
+  // Contact first: this is what the screen is opened for
+  html+='<div class="tp-sec"><div class="tp-sec-h">Kontakt</div>';
+  if(!ed&&(t.phone||t.email)){
+    html+='<div class="tp-quick">';
+    if(tel)html+=`<a class="tp-qbtn" href="tel:${esc(tel)}">\ud83d\udcde Anrufen</a>
+      <a class="tp-qbtn" href="https://wa.me/${esc(tel.replace(/^0/,'49').replace('+',''))}" target="_blank" rel="noopener">\ud83d\udcac WhatsApp</a>`;
+    if(t.email)html+=`<a class="tp-qbtn" href="mailto:${esc(t.email)}">\u2709\ufe0f E-Mail</a>`;
+    html+='</div>';
+  }
+  html+=line('Telefon',t.phone,'phone','tel')
+      +line('E-Mail',t.email,'email','email')
+      +'</div>';
+  html+='<div class="tp-sec"><div class="tp-sec-h">Funktion</div>'
+      +line('Rolle',t.role,'role','select',TRAINER_ROLES)
+      +line('Lizenz',t.licence,'licence','select',TRAINER_LICENCES)
+      +line('Lizenz g\u00fcltig bis',t.licenceUntil,'licenceUntil','date')
+      +line('Im Verein seit',t.since,'since','text')
+      +'</div>';
+  html+='<div class="tp-sec"><div class="tp-sec-h">Pers\u00f6nlich</div>'
+      +line('Geburtstag',t.birthdate,'birthdate','date')
+      +line('Notiz',t.note,'note','area')
+      +'</div>';
+  // Licence expiry is the one field that silently becomes a problem
+  if(t.licenceUntil){
+    const d=new Date(t.licenceUntil);
+    if(!isNaN(d)){
+      const days=Math.round((d-Date.now())/86400000);
+      if(days<0)html+='<div class="tp-warn tp-warn-bad">\u26a0\ufe0f Lizenz seit '+Math.abs(days)+' Tagen abgelaufen</div>';
+      else if(days<90)html+='<div class="tp-warn">\u23f3 Lizenz l\u00e4uft in '+days+' Tagen ab</div>';
+    }
+  }
+  box.innerHTML=html;
+}
+function tpSet(field,val){
+  if(!_tpCanEdit())return;
+  const t=G.trainers&&G.trainers[_tpIdx];
+  if(!t)return;
+  const v=String(val==null?'':val).trim().slice(0,300);
+  if((t[field]||'')===v)return;
+  snap();
+  if(v)t[field]=v;else delete t[field];
+  saveG();
+  logAudit('Trainerprofil ge\u00e4ndert',t.name,field);
+  renderTrainerProfile();
+  if(typeof renderMgrTrainers==='function')try{renderMgrTrainers();}catch(e){}
+}
+function tpPhotoPick(input){
+  if(!_tpCanEdit()||!input.files||!input.files[0])return;
+  const t=G.trainers&&G.trainers[_tpIdx];
+  if(!t)return;
+  const f=input.files[0];
+  if(!f.type.startsWith('image/')){alert('Bitte ein Bild ausw\u00e4hlen.');return;}
+  const rd=new FileReader();
+  rd.onload=()=>{
+    const img=new Image();
+    img.onload=()=>{
+      // Downscale before storing: a phone photo is several MB, and even in the
+      // media node that is paid for on every device that shows the avatar.
+      const max=320;
+      const sc=Math.min(1,max/Math.max(img.width,img.height));
+      const c=document.createElement('canvas');
+      c.width=Math.round(img.width*sc);c.height=Math.round(img.height*sc);
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+      snap();
+      t.photo=c.toDataURL('image/jpeg',0.8);
+      saveG();
+      logAudit('Trainerfoto ge\u00e4ndert',t.name,'');
+      renderTrainerProfile();
+    };
+    img.src=rd.result;
+  };
+  rd.readAsDataURL(f);
+  input.value='';
+}
+function tpRemovePhoto(){
+  if(!_tpCanEdit())return;
+  const t=G.trainers&&G.trainers[_tpIdx];
+  if(!t||!t.photo)return;
+  if(!confirm('Foto entfernen?'))return;
+  snap();delete t.photo;delete t._mid_photo;saveG();
+  logAudit('Trainerfoto entfernt',t.name,'');
+  renderTrainerProfile();
+}
 function renderMgrTrainers(){
   const myT=G.trainers.filter(t=>t.teams.includes(UI.currentTeam));
   const showLock=isAdmin();
@@ -18149,7 +18329,11 @@ function renderMgrTrainers(){
       // Lock icon visible only to admin — reveals security state, others don't need to see it
       const lockIcon=showLock?(hasPw?'<span title="Passwort gesetzt" style="margin-left:5px;color:#27ae60;">🔒</span>':'<span title="Kein Passwort" style="margin-left:5px;color:#aaa;opacity:.5;">🔓</span>'):'';
       const resetBtn=isAdmin()&&hasPw?`<button class="tr-del" style="background:rgba(241,196,15,.15);color:#9a6e00;margin-right:4px;font-size:.66rem;padding:3px 7px;" onclick="adminResetPasswordByIdx(${gi})" title="Passwort zurücksetzen">🔓 Reset</button>`:'';
-      return `<div class="tr-row"><div><div class="tr-nm">${escapeHtml(t.name)}${lockIcon}</div><div class="tr-teams">${escapeHtml(t.teams.join(', '))}</div></div>${resetBtn}${isAdmin()?`<button class="tr-del" onclick="delTrainer(${gi})">✕</button>`:''}</div>`;
+      const av=t.photo
+        ?`<img class="tr-av" src="${t.photo}" alt="">`
+        :`<div class="tr-av tr-av-ph">${escapeHtml((t.name||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase())}</div>`;
+      const sub=[t.role,t.teams.join(', ')].filter(Boolean).join(' \u00b7 ');
+      return `<div class="tr-row"><div class="tr-main" onclick="openTrainerProfile(${gi})" title="Profil öffnen">${av}<div><div class="tr-nm">${escapeHtml(t.name)}${lockIcon}</div><div class="tr-teams">${escapeHtml(sub)}</div></div></div>${resetBtn}${isAdmin()?`<button class="tr-del" onclick="delTrainer(${gi})">✕</button>`:''}</div>`;
     }).join('')
     :'<p style="font-size:.76rem;color:var(--gm);">Kein Trainer für dieses Team.</p>';
 }
@@ -24315,6 +24499,17 @@ checkAutoBackup();
     </div>
   </div>
 </div>
+
+<div class="mo" id="moTrainerProfile"><div class="mob" style="width:440px;max-width:96vw;">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+    <h3 style="margin:0;flex:1;">👤 Trainerprofil</h3>
+  </div>
+  <input type="file" id="tp-photo-input" accept="image/*" style="display:none;" onchange="tpPhotoPick(this)">
+  <div id="tp-content" style="max-height:64vh;overflow-y:auto;"></div>
+  <div class="mob-btns">
+    <button class="btn bs" onclick="closeM('moTrainerProfile')">Schließen</button>
+  </div>
+</div></div>
 
 <div class="mo" id="moRpeOverview"><div class="mob" style="width:560px;max-width:96vw;">
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
