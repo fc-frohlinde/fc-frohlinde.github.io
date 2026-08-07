@@ -784,6 +784,10 @@ input[type="date"]{cursor:pointer;}
 .pl-btn-e{background:rgba(22,89,184,.1);color:var(--bm);}.pl-btn-e:hover{background:rgba(22,89,184,.2);}
 .pl-btn-d{background:rgba(231,76,60,.1);color:var(--ca);}.pl-btn-d:hover{background:rgba(231,76,60,.2);}
 .tr-row{display:flex;align-items:center;gap:7px;padding:7px 10px;background:var(--ow);border-radius:7px;margin-bottom:5px;}
+.tr-grip{flex-shrink:0;cursor:grab;color:var(--gm);opacity:.55;font-size:1.05rem;line-height:1;
+  padding:6px 3px;touch-action:none;user-select:none;}
+.tr-grip:active{cursor:grabbing;opacity:1;}
+.tr-row.tr-dragging{opacity:.85;box-shadow:0 6px 18px rgba(0,0,0,.22);position:relative;z-index:5;}
 .tr-main{display:flex;align-items:center;gap:9px;flex:1;min-width:0;cursor:pointer;border-radius:6px;padding:2px;}
 .tr-main:hover{background:rgba(22,89,184,.07);}
 .tr-av{width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0;}
@@ -18179,8 +18183,14 @@ async function mgrDelPl(pi){
 // lived in people's heads or in WhatsApp. Photos use the field name "photo"
 // on purpose: the media split already routes that key to the separate
 // fcf_media node, so a portrait never enters the hot data everyone downloads.
-const TRAINER_ROLES=['Cheftrainer','Co-Trainer','Torwarttrainer','Athletiktrainer','Betreuer','Physiotherapeut','Teammanager'];
-const TRAINER_LICENCES=['Keine','DFB C-Lizenz','DFB B-Lizenz','DFB A-Lizenz','DFB Elite-Jugend-Lizenz','UEFA B','UEFA A','UEFA Pro'];
+const TRAINER_ROLES=['Trainer','Co-Trainer','Torwarttrainer','Athletiktrainer','Betreuer','Physiotherapeut','Teammanager'];
+// DFB licences ARE the UEFA licences — the earlier list wrongly showed
+// "DFB B-Lizenz" and "UEFA B" as two different things. The UEFA level is kept
+// in brackets because that is how it appears on the certificate.
+// Ladder after the 2022 reform: Basis-Coach → C → B → (B+) → A → (A+) → Pro.
+const TRAINER_LICENCES=['Keine','DFB-Basis-Coach','C-Lizenz (UEFA C)','B-Lizenz (UEFA B)',
+  'B+-Lizenz (UEFA Junioren B)','DFB-Elite-Jugend-Lizenz','A-Lizenz (UEFA A)',
+  'A+-Lizenz (UEFA Elite Youth A)','Pro-Lizenz (Fu\u00dfball-Lehrer)','Torwart-Lizenz (UEFA)'];
 let _tpIdx=null;
 function openTrainerProfile(gi){
   const t=G.trainers&&G.trainers[gi];
@@ -18319,6 +18329,72 @@ function tpRemovePhoto(){
   logAudit('Trainerfoto entfernt',t.name,'');
   renderTrainerProfile();
 }
+// Order in G.trainers drives every list in the app, including the home page.
+// The manager shows only the current team's trainers, so a move inside that
+// filtered view has to be translated back into the global array.
+function tpMove(fromGi,toGi){
+  if(!isAdmin())return;
+  if(fromGi===toGi||fromGi==null||toGi==null)return;
+  const arr=G.trainers;
+  if(!arr[fromGi]||!arr[toGi])return;
+  snap();
+  const [item]=arr.splice(fromGi,1);
+  arr.splice(toGi,0,item);
+  saveG();
+  logAudit('Trainer-Reihenfolge ge\u00e4ndert',item.name,'');
+  renderMgrTrainers();
+  if(typeof homeRender==='function')try{homeRender();}catch(e){}
+}
+let _trDrag=null;
+function trDragStart(e,gi){
+  if(!isAdmin())return;
+  _trDrag={gi,row:e.currentTarget.closest('.tr-row'),startY:e.clientY,moved:false};
+  _trDrag.row.classList.add('tr-dragging');
+  e.currentTarget.setPointerCapture&&e.currentTarget.setPointerCapture(e.pointerId);
+  e.preventDefault();
+}
+function trDragMove(e){
+  if(!_trDrag)return;
+  if(Math.abs(e.clientY-_trDrag.startY)>4)_trDrag.moved=true;
+  const list=document.getElementById('mgr-tr-list');
+  if(!list)return;
+  const rows=[..._trDrag.row.parentNode.querySelectorAll('.tr-row')];
+  // Swap as soon as the pointer passes a neighbour's midpoint — no placeholder
+  // maths, and it reads naturally because the row follows the finger.
+  for(const r of rows){
+    if(r===_trDrag.row)continue;
+    const b=r.getBoundingClientRect();
+    if(e.clientY>b.top&&e.clientY<b.bottom){
+      const mid=b.top+b.height/2;
+      if(e.clientY<mid)r.parentNode.insertBefore(_trDrag.row,r);
+      else r.parentNode.insertBefore(_trDrag.row,r.nextSibling);
+      break;
+    }
+  }
+}
+function trDragEnd(){
+  if(!_trDrag)return;
+  const row=_trDrag.row,moved=_trDrag.moved,fromGi=_trDrag.gi;
+  _trDrag=null;
+  row.classList.remove('tr-dragging');
+  if(!moved)return;
+  // Read the new visual order and rebuild the global array around it
+  const rows=[...row.parentNode.querySelectorAll('.tr-row')];
+  const order=rows.map(r=>parseInt(r.dataset.gi,10)).filter(n=>!isNaN(n));
+  if(order.length<2)return;
+  snap();
+  const moving=order.filter(gi=>G.trainers[gi]);
+  const objs=moving.map(gi=>G.trainers[gi]);
+  const slots=[...moving].sort((a,b)=>a-b);
+  slots.forEach((slot,i)=>{G.trainers[slot]=objs[i];});
+  saveG();
+  logAudit('Trainer-Reihenfolge ge\u00e4ndert',G.trainers[fromGi]?G.trainers[fromGi].name:'',''); 
+  renderMgrTrainers();
+  if(typeof homeRender==='function')try{homeRender();}catch(e){}
+}
+document.addEventListener('pointermove',trDragMove);
+document.addEventListener('pointerup',trDragEnd);
+document.addEventListener('pointercancel',trDragEnd);
 function renderMgrTrainers(){
   const myT=G.trainers.filter(t=>t.teams.includes(UI.currentTeam));
   const showLock=isAdmin();
@@ -18333,7 +18409,8 @@ function renderMgrTrainers(){
         ?`<img class="tr-av" src="${t.photo}" alt="">`
         :`<div class="tr-av tr-av-ph">${escapeHtml((t.name||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase())}</div>`;
       const sub=[t.role,t.teams.join(', ')].filter(Boolean).join(' \u00b7 ');
-      return `<div class="tr-row"><div class="tr-main" onclick="openTrainerProfile(${gi})" title="Profil öffnen">${av}<div><div class="tr-nm">${escapeHtml(t.name)}${lockIcon}</div><div class="tr-teams">${escapeHtml(sub)}</div></div></div>${resetBtn}${isAdmin()?`<button class="tr-del" onclick="delTrainer(${gi})">✕</button>`:''}</div>`;
+      const handle=isAdmin()?`<span class="tr-grip" title="Ziehen zum Sortieren" onpointerdown="trDragStart(event,${gi})">\u283f</span>`:'';
+      return `<div class="tr-row" data-gi="${gi}">${handle}<div class="tr-main" onclick="openTrainerProfile(${gi})" title="Profil öffnen">${av}<div><div class="tr-nm">${escapeHtml(t.name)}${lockIcon}</div><div class="tr-teams">${escapeHtml(sub)}</div></div></div>${resetBtn}${isAdmin()?`<button class="tr-del" onclick="delTrainer(${gi})">✕</button>`:''}</div>`;
     }).join('')
     :'<p style="font-size:.76rem;color:var(--gm);">Kein Trainer für dieses Team.</p>';
 }
