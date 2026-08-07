@@ -18184,13 +18184,14 @@ async function mgrDelPl(pi){
 // on purpose: the media split already routes that key to the separate
 // fcf_media node, so a portrait never enters the hot data everyone downloads.
 const TRAINER_ROLES=['Trainer','Co-Trainer','Torwarttrainer','Athletiktrainer','Betreuer','Physiotherapeut','Teammanager'];
-// DFB licences ARE the UEFA licences — the earlier list wrongly showed
-// "DFB B-Lizenz" and "UEFA B" as two different things. The UEFA level is kept
-// in brackets because that is how it appears on the certificate.
-// Ladder after the 2022 reform: Basis-Coach → C → B → (B+) → A → (A+) → Pro.
-const TRAINER_LICENCES=['Keine','DFB-Basis-Coach','C-Lizenz (UEFA C)','B-Lizenz (UEFA B)',
-  'B+-Lizenz (UEFA Junioren B)','DFB-Elite-Jugend-Lizenz','A-Lizenz (UEFA A)',
-  'A+-Lizenz (UEFA Elite Youth A)','Pro-Lizenz (Fu\u00dfball-Lehrer)','Torwart-Lizenz (UEFA)'];
+// Exactly the ladder the DFB-Akademie publishes: C, B, B+, A, A+, Pro.
+// Two earlier mistakes are corrected here: DFB and UEFA licences were listed
+// as if they were separate qualifications (they are the same one), and
+// "DFB-Elite-Jugend-Lizenz" was included although it is the pre-reform name
+// for what is now the B+/A+ youth track, not a separate current step.
+// Basis-Coach is kept as an explicit pre-licence — many club coaches hold it.
+const TRAINER_LICENCES=['Keine','DFB-Basis-Coach (Vorstufe)','C-Lizenz','B-Lizenz',
+  'B+-Lizenz','A-Lizenz','A+-Lizenz','Pro-Lizenz'];
 let _tpIdx=null;
 function openTrainerProfile(gi){
   const t=G.trainers&&G.trainers[gi];
@@ -18261,7 +18262,7 @@ function renderTrainerProfile(){
   html+='<div class="tp-sec"><div class="tp-sec-h">Funktion</div>'
       +line('Rolle',t.role,'role','select',TRAINER_ROLES)
       +line('Lizenz',t.licence,'licence','select',TRAINER_LICENCES)
-      +line('Lizenz g\u00fcltig bis',t.licenceUntil,'licenceUntil','date')
+      +line('G\u00fcltig bis',t.licenceUntil,'licenceUntil','date')
       +line('Im Verein seit',t.since,'since','text')
       +'</div>';
   html+='<div class="tp-sec"><div class="tp-sec-h">Pers\u00f6nlich</div>'
