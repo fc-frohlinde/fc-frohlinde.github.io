@@ -810,6 +810,18 @@ input[type="date"]{cursor:pointer;}
 #hTrainersWrap{min-width:0;max-width:100%;}
 /* Portraits in the name column. A placeholder keeps the text baseline aligned
    for players without a photo — otherwise the rows would stagger. */
+.ps-contact{display:none;flex-wrap:wrap;align-items:center;gap:6px;margin-top:7px;}
+.ps-cbtn{display:inline-flex;align-items:center;gap:5px;background:var(--bm);color:#fff;text-decoration:none;
+  border-radius:var(--r-pill);padding:6px 12px;font-family:'Barlow',sans-serif;font-size:.73rem;
+  font-weight:700;min-height:34px;}
+.ps-cbtn:hover{background:var(--bd);}
+.ps-cbtn-wa{background:#25d366;}
+.ps-cbtn-wa:hover{background:#1da851;}
+.ps-cnum{font-size:.7rem;color:var(--gm);}
+@media (max-width:767px){
+  .ps-contact .ps-cbtn{flex:1;justify-content:center;min-height:40px;}
+  .ps-cnum{display:none;}
+}
 .ma-card-av{width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0;}
 .ma-card-av-ph{display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.14);
   color:rgba(255,255,255,.7);font-family:'Bebas Neue',sans-serif;font-size:.8rem;letter-spacing:.5px;}
@@ -2654,6 +2666,7 @@ if(window._fbBlocked){
         <span id="ps-ctx" style="font-size:.65rem;color:var(--gm);margin-left:4px;"></span>
       </div>
       <div id="ps-note-display" style="margin-top:5px;font-size:.78rem;color:var(--gd);font-style:italic;display:none;"></div>
+      <div id="ps-contact" class="ps-contact"></div>
     </div>
     <div style="display:flex;gap:6px;flex-shrink:0;"><button class="btn" style="font-size:.76rem;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" onclick="playerGoBack()">← Zurück</button><button class="btn bs" onclick="closeM('moPlayer')">✕</button></div>
   </div>
@@ -8161,6 +8174,25 @@ function photoMenu(anchorEl,hasPhoto,onPick,onRemove){
   // other JS-positioned menu in the app.
   try{_placePopup(m,anchorEl.getBoundingClientRect(),{align:'left',gap:6});}catch(e){}
   setTimeout(()=>document.addEventListener('pointerdown',onDoc,true),0);
+}
+// Reaching a player is the most common reason to open their card — a trainer
+// wants to call about an absence, not read statistics. Same shortcuts the
+// trainer profile has, built from the numbers already stored.
+function renderPlayerContact(p){
+  const box=document.getElementById('ps-contact');
+  if(!box)return;
+  const raw=String((p&&p.phone)||'').trim();
+  if(!raw){box.innerHTML='';box.style.display='none';return;}
+  const tel=raw.replace(/[^0-9+]/g,'');
+  // wa.me needs the international form without + or leading zero: a German
+  // 0170… becomes 49170…
+  let wa=tel.replace(/^\+/,'');
+  if(wa.startsWith('00'))wa=wa.slice(2);
+  else if(wa.startsWith('0'))wa='49'+wa.slice(1);
+  box.style.display='flex';
+  box.innerHTML=`<a class="ps-cbtn" href="tel:${escapeHtml(tel)}">\ud83d\udcde Anrufen</a>`
+    +`<a class="ps-cbtn ps-cbtn-wa" href="https://wa.me/${escapeHtml(wa)}" target="_blank" rel="noopener">\ud83d\udcac WhatsApp</a>`
+    +`<span class="ps-cnum">${escapeHtml(raw)}</span>`;
 }
 function removePlayerPhoto(){
   if(!canEdit())return;
@@ -15459,6 +15491,7 @@ function openPlayerStats(pi){
     document.getElementById('pe-passnr').value=p.passnr||'';
     document.getElementById('pe-birthdate').value=p.birthdate||'';
     document.getElementById('pe-phone').value=p.phone||'';
+    try{renderPlayerContact(p);}catch(e){}
     document.getElementById('pe-email').value=p.email||'';
     const hpEl=document.getElementById('pe-hidepos');
     if(hpEl)hpEl.checked=!!p.hidePos;
