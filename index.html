@@ -802,10 +802,12 @@ input[type="date"]{cursor:pointer;}
 .tp-edit-btn:hover{border-color:var(--bl);color:var(--bd);}
 .tp-edit-btn.active{background:var(--ok);border-color:var(--ok);color:#fff;}
 .tp-empty{font-size:.78rem;color:var(--gm);text-align:center;padding:14px 8px;}
-/* Horizontal scrolling clipped a chip at one end or the other — at the start
-   with flex-end (unreachable), at the end without it. With wrapping there is
-   no overflow to clip: a fourth trainer simply moves to a second line. */
-#hTrainers{row-gap:4px;}
+/* One line, always, and nothing cut off. Scrolling clipped an end; wrapping
+   used a second line. The remaining option is to let the chips SHRINK: names
+   truncate with an ellipsis when the row gets tight, so every trainer stays
+   visible and the strip never overflows its container. */
+.trainer-chip{flex-shrink:1;min-width:0;overflow:hidden;text-overflow:ellipsis;}
+#hTrainersWrap{min-width:0;max-width:100%;}
 /* Portraits in the name column. A placeholder keeps the text baseline aligned
    for players without a photo — otherwise the rows would stagger. */
 .ma-card-av{width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0;}
@@ -2496,7 +2498,7 @@ if(window._fbBlocked){
       </div>
       <div id="hTrainersWrap" style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;max-width:100%;">
         <span id="hTrainersLbl" style="font-size:.55rem;font-weight:400;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.45);"></span>
-        <div id="hTrainers" style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;max-width:340px;"></div>
+        <div id="hTrainers" style="display:flex;gap:4px;flex-wrap:nowrap;justify-content:flex-end;max-width:100%;min-width:0;"></div>
       </div>
     </div>
   </div>
