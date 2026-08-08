@@ -846,15 +846,10 @@ input[type="date"]{cursor:pointer;}
    a full line of its own below the name. */
 /* The section frame now comes from .tp-sec itself */
 .ps-info{margin:0;}
-.ps-info-row{display:flex;align-items:center;gap:9px;margin-bottom:6px;}
-.ps-info-l{flex:0 0 118px;font-size:.74rem;color:var(--gm);}
-.ps-info-v{flex:1;min-width:0;font-size:.8rem;color:var(--gd);word-break:break-word;}
-.ps-info-sub{font-size:.72rem;color:var(--gm);}
 .ps-sec-h{font-size:.66rem;font-weight:700;letter-spacing:.9px;text-transform:uppercase;
   color:var(--gm);margin-bottom:7px;}
 @media (max-width:767px){
-  .ps-info-row{flex-direction:column;align-items:stretch;gap:3px;}
-  .ps-info-l{flex:none;}
+
 }
 /* Mirrors .tp-head so both profiles read as one design */
 .ps-head-row{display:flex;align-items:center;gap:13px;margin-bottom:12px;}
@@ -909,7 +904,7 @@ input[type="date"]{cursor:pointer;}
   border-top:none;margin-top:0;padding-top:0;}
 /* Nothing inside may exceed the modal width */
 #moPlayer .mob{overflow-x:hidden;}
-#moPlayer .tp-row{max-width:100%;}
+
 #moPlayer .tp-in,#moPlayer .tp-in-wrap{min-width:0;max-width:100%;box-sizing:border-box;}
 #moTrainerProfile .tp-head{position:sticky;top:0;z-index:2;background:#fff;
   padding-bottom:9px;margin-bottom:0;border-bottom:1px solid var(--gl);}
@@ -924,7 +919,6 @@ input[type="date"]{cursor:pointer;}
 
 /* The position and foot pickers are custom dropdowns rendered into a div, so
    they need the same slot the plain inputs occupy. */
-#ps-edit .tp-row{max-width:100%;}
 #ps-edit .tp-in{flex:1;min-width:0;width:100%;box-sizing:border-box;}
 .tp-in-wrap{flex:1;min-width:0;}
 .tp-in-wrap>*{width:100%;margin-bottom:0;}
@@ -932,15 +926,10 @@ input[type="date"]{cursor:pointer;}
 #ps-edit textarea.tp-in{width:100%;resize:vertical;font-family:'Barlow',sans-serif;line-height:1.4;}
 #ps-edit .tp-sec:first-child{border-top:none;margin-top:0;padding-top:9px;}
 @media (max-width:767px){
-  #ps-edit .tp-row{flex-direction:column;align-items:stretch;gap:3px;}
   #ps-edit .tp-l{flex:none;}
   #ps-edit .tp-in{min-height:40px;}
 }
-/* The rows sit INSIDE the flex container that holds the buttons, so its 6px
-   row-gap already separates them — any margin here is added on top of that.
-   The trainer profile has 9px in total (its rows are a sibling of .tp-quick,
-   with no gap involved), so 3px is what closes the difference. */
-.ps-crows{flex-basis:100%;margin-top:3px;}
+
 /* .mob h3 carries margin-bottom:12px and outranks .ps-title (class only), so
    the title kept its own gap ON TOP of the row's — the header came out twice
    as tall as intended. An id-scoped rule settles it. */
@@ -990,7 +979,9 @@ input[type="date"]{cursor:pointer;}
 .photo-menu-del:hover{background:rgba(231,76,60,.1);}
 .tp-sec{border-top:1px solid var(--gl);padding-top:9px;margin-top:9px;}
 .tp-sec-h{font-size:.66rem;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--gm);margin-bottom:7px;}
-.tp-row{display:flex;align-items:center;gap:9px;margin-bottom:6px;}
+/* Shared by both profile modals — view rows, edit rows and contact rows. */
+.tp-row{display:flex;align-items:center;gap:9px;margin-bottom:6px;max-width:100%;}
+.tp-note{font-size:.72rem;color:var(--gm);}
 .tp-l{flex:0 0 118px;font-size:.74rem;color:var(--gm);}
 .tp-v{flex:1;min-width:0;font-size:.8rem;color:var(--gd);word-break:break-word;}
 .tp-in{flex:1;min-width:0;padding:5px 8px;border:1.5px solid var(--gl);border-radius:6px;
@@ -2837,6 +2828,7 @@ if(window._fbBlocked){
   <div class="tp-sec" id="ps-sec-kontakt">
     <div class="tp-sec-h">Kontakt</div>
     <div id="ps-contact" class="tp-quick"></div>
+    <div id="ps-contact-rows"></div>
   </div>
   <div class="tp-sec" id="ps-sec-person">
     <div class="tp-sec-h">Person</div>
@@ -8395,8 +8387,9 @@ function renderPlayerContact(p){
   const raw=String((p&&p.phone)||'').trim();
   if(!raw){
     if(p&&p.email){
-      box.innerHTML=`<a class="tp-qbtn" href="mailto:${escapeHtml(p.email)}">\u2709\ufe0f E-Mail</a>`
-        +`<div class="ps-crows"><div class="tp-row"><span class="tp-l">E-Mail</span><span class="tp-v">${escapeHtml(p.email)}</span></div></div>`;
+      box.innerHTML=`<a class="tp-qbtn" href="mailto:${escapeHtml(p.email)}">\u2709\ufe0f E-Mail</a>`;
+      const rEl=document.getElementById('ps-contact-rows');
+      if(rEl)rEl.innerHTML=`<div class="tp-row"><span class="tp-l">E-Mail</span><span class="tp-v">${escapeHtml(p.email)}</span></div>`;
       if(sec)sec.style.display='';
     }else{box.innerHTML='';if(sec)sec.style.display='none';}
     return;
@@ -8412,10 +8405,11 @@ function renderPlayerContact(p){
   box.innerHTML=`<a class="tp-qbtn" href="tel:${escapeHtml(tel)}">\ud83d\udcde Anrufen</a>`
     +`<a class="tp-qbtn" href="https://wa.me/${escapeHtml(wa)}" target="_blank" rel="noopener">\ud83d\udcac WhatsApp</a>`
     +((p&&p.email)?`<a class="tp-qbtn" href="mailto:${escapeHtml(p.email)}">\u2709\ufe0f E-Mail</a>`:'')
-    +`<div class="ps-crows">`
-    +`<div class="tp-row"><span class="tp-l">Telefon</span><span class="tp-v">${escapeHtml(raw)}</span></div>`
-    +((p&&p.email)?`<div class="tp-row"><span class="tp-l">E-Mail</span><span class="tp-v">${escapeHtml(p.email)}</span></div>`:'')
-    +`</div>`;
+    ;
+  const rowsEl=document.getElementById('ps-contact-rows');
+  if(rowsEl)rowsEl.innerHTML=
+    `<div class="tp-row"><span class="tp-l">Telefon</span><span class="tp-v">${escapeHtml(raw)}</span></div>`
+    +((p&&p.email)?`<div class="tp-row"><span class="tp-l">E-Mail</span><span class="tp-v">${escapeHtml(p.email)}</span></div>`:'');
 }
 function removePlayerPhoto(){
   if(!canEdit())return;
@@ -15685,7 +15679,7 @@ function openPlayerStats(pi){
     // One labelled row per fact, like the trainer profile — a single line of
     // icons separated by dots made three unrelated things look like one
     // sentence. Empty fields are skipped entirely.
-    const _row=(l,v)=>`<div class="ps-info-row"><span class="ps-info-l">${l}</span><span class="ps-info-v">${v}</span></div>`;
+    const _row=(l,v)=>`<div class="tp-row"><span class="tp-l">${l}</span><span class="tp-v">${v}</span></div>`;
     let info=[];
     if(p.birthdate){
       const d=new Date(p.birthdate);
@@ -15695,7 +15689,7 @@ function openPlayerStats(pi){
         let a=t.getFullYear()-d.getFullYear();
         const m=t.getMonth()-d.getMonth();
         if(m<0||(m===0&&t.getDate()<d.getDate()))a--;
-        if(a>0&&a<120)age=` <span class="ps-info-sub">(${a} Jahre)</span>`;
+        if(a>0&&a<120)age=` <span class="tp-note">(${a} Jahre)</span>`;
       }
       info.push(_row('Geburtstag',d.toLocaleDateString('de-DE')+age));
     }
