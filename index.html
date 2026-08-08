@@ -3381,7 +3381,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786060800000; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786215584054; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -6179,6 +6179,35 @@ const IS_DEV_ORIGIN=(()=>{
     return location.protocol==='file:'||hn==='localhost'||hn==='127.0.0.1'||hn==='0.0.0.0'||hn===''||hn.endsWith('.local');
   }catch(e){return false;}
 })();
+// Detection used to depend on another client having opened the new build and
+// written its timestamp to Firebase. If nobody had, phones kept serving the
+// cached HTML indefinitely. This asks the server directly instead: fetch the
+// deployed file with cache bypassed and read the release stamp out of it.
+let _verProbeAt=0;
+async function _probeDeployedVersion(){
+  if(IS_DEV_ORIGIN)return;
+  const now=Date.now();
+  if(now-_verProbeAt<10*60*1000)return;   // at most every 10 minutes
+  _verProbeAt=now;
+  try{
+    const url=location.pathname.replace(/[^/]*$/,'')+'index.html?_p='+now.toString(36);
+    const res=await fetch(url,{cache:'no-store'});
+    if(!res.ok)return;
+    const txt=await res.text();
+    const m=txt.match(/APP_RELEASE_TS\s*=\s*(\d+)/);
+    const v=txt.match(/APP_VERSION\s*=\s*'([^']+)'/);
+    if(!m)return;
+    const served=Number(m[1])||0;
+    if(served>APP_RELEASE_TS){
+      _showUpdateBanner(v?v[1]:'',served);
+    }
+  }catch(e){/* offline or blocked — the Firebase path still applies */}
+}
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible')_probeDeployedVersion();
+});
+window.addEventListener('focus',()=>_probeDeployedVersion());
+setTimeout(_probeDeployedVersion,4000);
 function _checkRemoteAppVersion(){
   if(!G)return;
   const srvTs=Number(G._appReleaseTs)||0;
