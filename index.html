@@ -12414,9 +12414,15 @@ function renderPlayerMode(){
         const tel=String(t.phone).replace(/[^0-9+]/g,'');
         return `<a class="pm-call-btn" href="tel:${_amEscapeText(tel)}">\ud83d\udcde ${_amEscapeText(t.name)} anrufen</a>`;
       }).join('');
+      // Names come from the trainer list, not from the sentence: hard-coding
+      // them meant the message would keep naming people who had left.
+      const names=tr.map(t=>String(t.name||'').split(' ')[0]).filter(Boolean);
+      const who=names.length===0?'den Trainer'
+        :names.length===1?names[0]
+        :names.slice(0,-1).join(', ')+' oder '+names[names.length-1];
       feedback='<div class="pm-callout">'
         +'<div class="pm-callout-head">\u260e\ufe0f JETZT ANRUFEN</div>'
-        +'<div class="pm-callout-main">Ruf Thomas oder Jimmy an \u2014 <u>nicht schreiben</u>.</div>'
+        +'<div class="pm-callout-main">Ruf '+_amEscapeText(who)+' an \u2014 <u>nicht schreiben</u>.</div>'
         +'<div class="pm-callout-warn">Sonst fehlst du <b>unentschuldigt</b>.</div>'
         +(btns?'<div class="pm-callout-btns">'+btns+'</div>'
              :'<div class="pm-callout-note">Nummern beim Trainer erfragen.</div>')
