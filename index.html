@@ -879,9 +879,18 @@ input[type="date"]{cursor:pointer;}
 .tp-title-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
 /* Title row and identity block travel together, so one sticky wrapper is
    enough — no second offset to keep in sync with the first row's height. */
+/* The modal's own top padding sat ABOVE the sticky wrapper, so content
+   scrolling upward stayed visible in that strip. Moving the padding into the
+   wrapper means the wrapper itself covers the very top of the scrollport.
+   The background is full-bleed (it has to hide what passes underneath) but
+   the divider is drawn on the inner row, so it lines up with every other
+   divider instead of running edge to edge. */
+#moPlayer .mob{padding-top:0;}
 #moPlayer .ps-sticky{position:sticky;top:0;z-index:3;background:#fff;
-  margin:0 -24px;padding:0 24px;border-bottom:1px solid var(--gl);}
-#moPlayer .ps-sticky .ps-head-row{margin-bottom:9px;}
+  margin:0 -24px;padding:20px 24px 0;}
+#moPlayer .ps-sticky .ps-head-row{margin-bottom:0;padding-bottom:9px;
+  border-bottom:1px solid var(--gl);}
+#moPlayer #ps-card-view,#moPlayer #ps-edit{padding-top:9px;}
 #moTrainerProfile .tp-head{position:sticky;top:0;z-index:2;background:#fff;
   padding-bottom:9px;margin-bottom:0;border-bottom:1px solid var(--gl);}
 /* The first section draws a top border of its own, doubling the divider the
@@ -889,9 +898,9 @@ input[type="date"]{cursor:pointer;}
    header is also a div — so it never matched the section. Target the section
    that actually follows the header instead. */
 #moTrainerProfile .tp-head+.tp-sec,
-#ps-card-view>.tp-sec:first-child{border-top:none;margin-top:0;padding-top:9px;}
+#ps-card-view>.tp-sec:first-child{border-top:none;margin-top:0;padding-top:0;}
 @media (max-width:767px){
-  #moPlayer .ps-sticky{margin:0 -16px;padding:0 16px;}
+  #moPlayer .ps-sticky{margin:0 -16px;padding:16px 16px 0;}
 }
 /* The position and foot pickers are custom dropdowns rendered into a div, so
    they need the same slot the plain inputs occupy. */
@@ -899,7 +908,7 @@ input[type="date"]{cursor:pointer;}
 .tp-in-wrap>*{width:100%;margin-bottom:0;}
 #ps-edit .tp-in{margin-bottom:0;}
 #ps-edit textarea.tp-in{width:100%;resize:vertical;font-family:'Barlow',sans-serif;line-height:1.4;}
-#ps-edit .tp-sec:first-child{border-top:none;margin-top:0;padding-top:9px;}
+#ps-edit .tp-sec:first-child{border-top:none;margin-top:0;padding-top:0;}
 @media (max-width:767px){
   #ps-edit .tp-row{flex-direction:column;align-items:stretch;gap:3px;}
   #ps-edit .tp-l{flex:none;}
