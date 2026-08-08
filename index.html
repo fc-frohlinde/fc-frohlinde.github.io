@@ -683,7 +683,11 @@ input[type="date"]{cursor:pointer;}
 .pos-opt .pb{pointer-events:none;font-size:.66rem;}
 
 /* stat cards */
-.ps-cards{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+.ps-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(74px,1fr));gap:7px;margin-bottom:10px;}
+.ps-tile{background:var(--ow);border:1px solid var(--gl);border-radius:10px;padding:9px 5px;text-align:center;}
+.ps-tile-v{font-family:'Bebas Neue',sans-serif;font-size:1.35rem;color:var(--bd);line-height:1;}
+.ps-tile-l{font-size:.6rem;letter-spacing:.6px;text-transform:uppercase;color:var(--gm);margin-top:4px;}
+.ps-tile-s{font-size:.63rem;color:var(--gm);margin-top:2px;}
 .ps-card{flex:1;min-width:96px;background:var(--ow);border-radius:9px;padding:9px 11px;border:1px solid var(--gl);}
 .ps-card .ct{font-size:.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gm);margin-bottom:3px;}
 .ps-card .cv{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;line-height:1;}
@@ -15739,9 +15743,27 @@ function openPlayerStats(pi,opts){
   const mA=mIdx.filter(i=>p.s&&p.s[i]===1).length,mPl=mIdx.filter(i=>p.s&&_isFact(p.s[i])).length;
   const tPct=tPl?Math.round((tA/tPl)*100):0,mPct=mPl?Math.round((mA/mPl)*100):0;
   const tBc=pctColor(tPct),mBc=pctColor(mPct);
-  document.getElementById('ps-cards').innerHTML=`
-    <div class="ps-card"><div class="ct">Training</div><div class="cv" style="color:${tBc};">${tPl?tPct+'%':'–'}</div><div class="ca">${tA}/${tPl}</div><div class="cbw"><div class="cbar" style="width:${Math.min(tPct,100)}%;background:${tBc};"></div></div></div>
-    ${mPl?`<div class="ps-card"><div class="ct" style="color:var(--mc1);">⚽ Spiele</div><div class="cv" style="color:${mBc};">${mPct}%</div><div class="ca">${mA}/${mPl}</div><div class="cbw"><div class="cbar" style="width:${Math.min(mPct,100)}%;background:${mBc};"></div></div></div>`:''}`;
+  {
+    const allA=tA+mA,allPl=tPl+mPl;
+    const allPct=allPl?Math.round(allA/allPl*100):null;
+    // Current streak, counted backwards through the sessions that took place.
+    // tIdx/mIdx are the past trainings and matches available here; merged and
+    // ordered by date they give the real sequence.
+    let streak=0;
+    const pastAll=[...tIdx,...mIdx].sort((a,b)=>dispToSortKey(ss[a].date)-dispToSortKey(ss[b].date));
+    for(let k=pastAll.length-1;k>=0;k--){
+      const v=p.s?p.s[pastAll[k]]:null;
+      if(v===1)streak++;
+      else if(v===0||v===2)break;
+    }
+    const tile=(v,l,s,c)=>`<div class="ps-tile"><div class="ps-tile-v"${c?` style="color:${c};"`:''}>${v}</div>`
+      +`<div class="ps-tile-l">${l}</div>${s?`<div class="ps-tile-s">${s}</div>`:''}</div>`;
+    document.getElementById('ps-cards').innerHTML=
+      tile(allPct==null?'–':allPct+'%','Gesamt',allPl?allA+'/'+allPl:'')
+      +tile(tPl?tPct+'%':'–','Training',tPl?tA+'/'+tPl:'',tBc)
+      +(mPl?tile(mPct+'%','Spiele',mA+'/'+mPl,mBc):'')
+      +tile(streak,'Serie','in Folge');
+  }
   // Monthly — fact-based: only past sessions, only factual statuses
   const moMap={};
   ss.forEach((s,i)=>{
