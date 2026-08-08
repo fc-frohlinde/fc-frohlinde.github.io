@@ -884,9 +884,12 @@ input[type="date"]{cursor:pointer;}
 #moPlayer .ps-sticky .ps-head-row{margin-bottom:12px;}
 #moTrainerProfile .tp-head{position:sticky;top:0;z-index:2;background:#fff;
   padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid var(--gl);}
-/* The first section already draws a top border — with the sticky header's own
-   line that made two rules where one belongs. */
-#moTrainerProfile .tp-sec:first-of-type{border-top:none;padding-top:0;margin-top:0;}
+/* The first section draws a top border of its own, doubling the divider the
+   sticky header already has. NOTE: :first-of-type matches by TAG, and the
+   header is also a div — so it never matched the section. Target the section
+   that actually follows the header instead. */
+#moTrainerProfile .tp-head+.tp-sec,
+#ps-card-view>.tp-sec:first-child{border-top:none;padding-top:0;margin-top:0;}
 @media (max-width:767px){
   #moPlayer .ps-sticky{margin:0 -16px;padding:0 16px;}
 }
