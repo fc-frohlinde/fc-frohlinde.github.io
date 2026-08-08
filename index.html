@@ -2368,6 +2368,9 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
   opacity:.9;margin-bottom:6px;}
 .pm-callout-main{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;line-height:1.1;letter-spacing:.5px;}
 .pm-callout-main u{text-decoration-thickness:3px;text-underline-offset:3px;}
+/* Its own line and never broken: split across two lines the instruction
+   lost its force, and it is the one sentence that has to land. */
+.pm-callout-not{margin-top:5px;white-space:nowrap;}
 .pm-callout-warn{font-size:.9rem;margin-top:8px;line-height:1.3;}
 .pm-callout-warn b{background:rgba(0,0,0,.25);padding:1px 6px;border-radius:5px;}
 .pm-callout-btns{display:flex;flex-direction:column;gap:10px;margin-top:14px;}
@@ -12434,7 +12437,8 @@ function renderPlayerMode(){
         :names.slice(0,-1).join(', ')+' oder '+names[names.length-1];
       feedback='<div class="pm-callout">'
         +'<div class="pm-callout-head">\u260e\ufe0f JETZT ANRUFEN</div>'
-        +'<div class="pm-callout-main">Ruf '+_amEscapeText(who)+' an \u2014 <u>nicht schreiben</u>.</div>'
+        +'<div class="pm-callout-main">Ruf '+_amEscapeText(who)+' an</div>'
+        +'<div class="pm-callout-main pm-callout-not"><u>NICHT schreiben!</u></div>'
         +'<div class="pm-callout-warn">Sonst fehlst du <b>unentschuldigt</b>.</div>'
         +(btns?'<div class="pm-callout-btns">'+btns+'</div>'
              :'<div class="pm-callout-note">Nummern beim Trainer erfragen.</div>')
