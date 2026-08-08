@@ -862,13 +862,13 @@ input[type="date"]{cursor:pointer;}
 .ps-meta-row>*{white-space:nowrap;}
 #ps-ctx{font-size:.65rem;color:var(--gm);}
 #ps-note-display{font-size:.8rem;color:var(--gd);}
-.ps-head-right{display:flex;flex-direction:column;align-items:flex-end;gap:7px;flex-shrink:0;min-width:0;}
-.ps-head-btns{display:flex;gap:6px;flex-shrink:0;}
+.ps-head-right{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.ps-head-btns{display:flex;gap:6px;flex-shrink:0;align-items:center;}
 .ps-b-ico{display:none;}
-/* Stacked: three shortcuts side by side never had room next to the avatar,
-   and stacking makes each one a full-width target. */
-.ps-contact{display:none;flex-direction:column;align-items:stretch;gap:5px;min-width:132px;}
-.ps-contact .ps-cbtn{justify-content:center;}
+/* Full-width contact bar: equal columns on a wide screen, stacked on a phone
+   where three side by side would each be too narrow to label. */
+.ps-contact{display:none;gap:6px;margin:0 0 12px;}
+.ps-contact .ps-cbtn{flex:1;justify-content:center;min-height:38px;}
 .ps-cbtn{display:inline-flex;align-items:center;gap:5px;background:var(--bm);color:#fff;text-decoration:none;
   border-radius:var(--r-pill);padding:6px 12px;font-family:'Barlow',sans-serif;font-size:.73rem;
   font-weight:700;min-height:34px;}
@@ -1672,8 +1672,8 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   .ps-head-row{flex-wrap:wrap;}
   .ps-head-right{align-items:stretch;flex-basis:100%;min-width:0;}
   .ps-head-btns{justify-content:flex-end;}
-  .ps-contact{min-width:0;}
-  .ps-contact .ps-cbtn{width:100%;}
+  .ps-contact{flex-direction:column;}
+  .ps-contact .ps-cbtn{width:100%;min-height:42px;}
   #moSession2 .ss-btn-ico{display:inline;}
   #ss-head-btns .btn{padding:6px 11px;font-size:.8rem;min-height:36px;flex-shrink:0;}
   #ss-edit-toggle{font-size:.74rem !important;padding:7px 10px !important;min-height:38px;}
@@ -2749,10 +2749,10 @@ if(window._fbBlocked){
         <button class="btn" id="ps-back-btn" style="font-size:.76rem;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" onclick="playerGoBack()"><span class="ps-b-lbl">← Zurück</span><span class="ps-b-ico">←</span></button>
         <button class="btn bs" onclick="closeM('moPlayer')">✕</button>
       </div>
-      <div id="ps-contact" class="ps-contact"></div>
     </div>
   </div>
   <div id="ps-card-view">
+  <div id="ps-contact" class="ps-contact"></div>
   <div id="ps-note-display" class="ps-info"></div>
   <div class="ps-cards" id="ps-cards"></div>
   <div id="ps-next"></div>
