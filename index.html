@@ -862,6 +862,13 @@ input[type="date"]{cursor:pointer;}
 .ps-sub>*{white-space:nowrap;}
 #ps-nr{font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:var(--gm);}
 #ps-ctx{font-size:.7rem;color:var(--gm);}
+/* One reserved height for both views, so switching card ⇄ form never resizes
+   the window — and a sparse profile still gets a workable form area. The
+   modal body is the only scroller; inner ones would nest a second scrollbar. */
+#moPlayer .mob,#moTrainerProfile .mob{min-height:min(560px,82vh);}
+@media (max-width:767px){
+  #moPlayer .mob,#moTrainerProfile .mob{min-height:0;}
+}
 .ps-cnum{flex-basis:100%;font-size:.72rem;color:var(--gm);margin-top:2px;}
 .ps-title-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
 /* No size overrides: these are ordinary modal buttons and must match every
@@ -15955,25 +15962,7 @@ function psCloseGuard(){
     if(keep)_psCommitEdit();
   }
   _psSnapshot=null;
-  _psFreezeHeight(document.querySelector('#moPlayer .mob'),false);
   closeM('moPlayer');
-}
-// Card and form have different natural heights, so the window jumped on every
-// toggle. Freezing the height it already had keeps it still; the taller of the
-// two simply scrolls inside.
-function _psFreezeHeight(el,on){
-  if(!el)return;
-  if(on){
-    if(!el.dataset.frozen){
-      el.dataset.frozen=String(el.offsetHeight);
-      el.style.height=el.offsetHeight+'px';
-      el.style.overflowY='auto';
-    }
-  }else{
-    delete el.dataset.frozen;
-    el.style.height='';
-    el.style.overflowY='';
-  }
 }
 function togglePlayerEdit(){
   const box=document.getElementById('ps-edit');
@@ -15987,15 +15976,12 @@ function togglePlayerEdit(){
   });
   btn.innerHTML=open?'\u2713 Fertig':'\u270e Bearbeiten';
   btn.classList.toggle('active',open);
-  const shell=document.querySelector('#moPlayer .mob');
   if(open){
-    _psFreezeHeight(shell,true);
     _psSnapshot=_psReadForm();
     box.scrollIntoView({block:'nearest'});
   }else{
     if(_psIsDirty())_psCommitEdit();
     _psSnapshot=null;
-    _psFreezeHeight(shell,false);
   }
 }
 function savePlayerEdit(){
@@ -18605,17 +18591,13 @@ function openTrainerProfile(gi){
 }
 function tpToggleEdit(){
   if(!_tpCanEdit())return;
-  const shell=document.querySelector('#moTrainerProfile .mob');
   if(_tpEditing){
     _tpCommit();   // leaving edit mode = "Fertig"
     _tpEditing=false;
-    renderTrainerProfile();
-    _psFreezeHeight(shell,false);
-    return;
+  }else{
+    _tpDraft=null;
+    _tpEditing=true;
   }
-  _tpDraft=null;
-  _psFreezeHeight(shell,true);
-  _tpEditing=true;
   renderTrainerProfile();
 }
 function _tpCanEdit(){
@@ -18737,7 +18719,6 @@ function tpCloseGuard(){
     if(keep)_tpCommit();else _tpDraft=null;
   }
   _tpDraft=null;_tpEditing=false;
-  _psFreezeHeight(document.querySelector('#moTrainerProfile .mob'),false);
   closeM('moTrainerProfile');
 }
 function tpPhotoPick(){
@@ -25033,7 +25014,7 @@ checkAutoBackup();
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
     <h3 style="margin:0;flex:1;">👤 Trainerprofil</h3>
   </div>
-  <div id="tp-content" style="max-height:64vh;overflow-y:auto;"></div>
+  <div id="tp-content"></div>
   <div class="mob-btns">
     <button class="btn bs" onclick="tpCloseGuard()">Schließen</button>
   </div>
