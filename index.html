@@ -853,9 +853,12 @@ input[type="date"]{cursor:pointer;}
 @media (max-width:767px){
   .ps-info-l{flex:0 0 104px;}
 }
-.ps-title-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.ps-title-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.ps-close-btn{font-size:.85rem;padding:6px 12px;min-height:34px;line-height:1;}
+.ps-title-row .btn{font-size:.74rem;padding:6px 12px;min-height:34px;}
 .ps-title{margin:0;flex:1;min-width:0;}
 .ps-head-mid{flex:1;min-width:0;}
+#ps-edit-toggle{flex-shrink:0;align-self:flex-start;}
 /* The name is set in a wide display face — let it shorten rather than break
    across lines, which is what made the header look ragged. */
 #ps-name{font-family:'Bebas Neue',sans-serif;font-size:1.55rem;color:var(--bd);letter-spacing:2px;
@@ -2736,9 +2739,8 @@ if(window._fbBlocked){
   <div class="ps-title-row">
     <h3 class="ps-title">👤 Spielerprofil</h3>
     <div class="ps-head-btns">
-      <button class="tp-edit-btn" id="ps-edit-toggle" onclick="togglePlayerEdit()">✎ Bearbeiten</button>
       <button class="btn" id="ps-back-btn" style="font-size:.76rem;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" onclick="playerGoBack()"><span class="ps-b-lbl">← Zurück</span><span class="ps-b-ico">←</span></button>
-      <button class="btn bs" onclick="closeM('moPlayer')">✕</button>
+      <button class="btn bs ps-close-btn" onclick="closeM('moPlayer')">✕</button>
     </div>
   </div>
   <div class="ps-head-row" style="display:flex;align-items:flex-start;gap:13px;margin-bottom:13px;">
