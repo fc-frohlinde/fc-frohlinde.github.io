@@ -9138,8 +9138,11 @@ function openPreferences(){
   const regSwitch=document.getElementById('setRegStatus');
   if(regSwitch)regSwitch.checked=isRegStatusShown();
   if(typeof _automationSyncSettingsUI==='function')_automationSyncSettingsUI();
-  // Push toggle state is set elsewhere; ensure label refresh if function exists
-  if(typeof updatePushUI==='function')updatePushUI();
+  // The push switch lives in THIS modal, but its state is written by
+  // updateAppearanceUI. The old call named updatePushUI — a function that
+  // never existed — and the typeof guard swallowed it, so the switch always
+  // opened unchecked no matter what was stored or granted.
+  if(typeof updateAppearanceUI==='function')updateAppearanceUI();
   openM('moPreferences');
 }
 function setUserSessionExpiry(val){
