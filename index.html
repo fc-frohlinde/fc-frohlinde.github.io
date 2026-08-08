@@ -890,10 +890,14 @@ input[type="date"]{cursor:pointer;}
    its edge read as a second line. Only the TOP padding mattered: moved into
    the wrapper so nothing can pass above it. Structure now matches the trainer
    profile exactly: one sticky block, one inset divider. */
+/* The divider must be the LAST thing the sticky block paints. Drawing it on
+   the inner row left a strip of the block's white background below the line —
+   and the bottom edge of that strip read as a second border. Border on the
+   block itself: white area and line end at the same pixel. */
 #moPlayer .mob{padding-top:0;}
-#moPlayer .ps-sticky{position:sticky;top:0;z-index:3;background:#fff;padding-top:20px;}
-#moPlayer .ps-sticky .ps-head-row{margin-bottom:0;padding-bottom:9px;
-  border-bottom:1px solid var(--gl);}
+#moPlayer .ps-sticky{position:sticky;top:0;z-index:3;background:#fff;
+  padding:20px 0 9px;border-bottom:1px solid var(--gl);}
+#moPlayer .ps-sticky .ps-head-row{margin-bottom:0;padding-bottom:0;border-bottom:none;}
 #moPlayer #ps-card-view,#moPlayer #ps-edit{padding-top:9px;}
 #moTrainerProfile .tp-head{position:sticky;top:0;z-index:2;background:#fff;
   padding-bottom:9px;margin-bottom:0;border-bottom:1px solid var(--gl);}
@@ -906,7 +910,7 @@ input[type="date"]{cursor:pointer;}
 #moTrainerProfile .tp-head+.tp-sec{border-top:none;margin-top:0;padding-top:9px;}
 #ps-card-view>.tp-sec:first-child{border-top:none;margin-top:0;padding-top:0;}
 @media (max-width:767px){
-  #moPlayer .ps-sticky{padding-top:16px;}
+  #moPlayer .ps-sticky{padding:16px 0 9px;}
 }
 /* The position and foot pickers are custom dropdowns rendered into a div, so
    they need the same slot the plain inputs occupy. */
