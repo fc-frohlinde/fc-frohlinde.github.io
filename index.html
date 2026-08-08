@@ -2737,7 +2737,7 @@ if(window._fbBlocked){
     <h3 class="ps-title">👤 Spielerprofil</h3>
     <div class="ps-head-btns">
       <button class="btn" id="ps-back-btn" style="font-size:.76rem;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" onclick="playerGoBack()"><span class="ps-b-lbl">← Zurück</span><span class="ps-b-ico">←</span></button>
-      <button class="btn bs ps-close-btn" onclick="closeM('moPlayer')">✕</button>
+      <button class="btn bs ps-close-btn" onclick="psCloseGuard()">✕</button>
     </div>
   </div>
   <div class="ps-head-row">
@@ -15902,10 +15902,23 @@ function _psShowCard(){
   });
   if(btn){btn.innerHTML='\u270e Bearbeiten';btn.classList.remove('active');}
 }
-// With no Speichern button the form has to commit by itself. savePlayerEdit
-// re-renders the whole modal (which would throw the user back to the card
-// mid-typing), so autosave writes the same fields and stays put.
-function _psAutoSave(){
+// Edits are held in the form until "Fertig". _psSnapshot records the state on
+// entering edit mode so we can tell whether anything actually changed — that
+// is what decides if closing has to ask.
+const _PS_FIELDS=['pe-name','pe-nr','pe-shortname','pe-passnr','pe-birthdate','pe-phone','pe-email','pe-note'];
+let _psSnapshot=null;
+function _psReadForm(){
+  const o={};
+  _PS_FIELDS.forEach(id=>{const e=document.getElementById(id);o[id]=e?String(e.value||'').trim():'';});
+  o._foot=(typeof _currentFoot!=='undefined')?_currentFoot:'';
+  return o;
+}
+function _psIsDirty(){
+  if(!_psSnapshot)return false;
+  const now=_psReadForm();
+  return Object.keys(now).some(k=>now[k]!==_psSnapshot[k]);
+}
+function _psCommitEdit(){
   const pi=_resolveCurrentPI();
   if(pi<0)return;
   const D=cd(),p=D&&D.players[pi];
@@ -15933,19 +15946,16 @@ function _psAutoSave(){
   const psNr=document.getElementById('ps-nr');
   if(psNr)psNr.textContent='#'+(p.nr||'?');
 }
-function _psBindAutoSave(){
+// Closing the window mid-edit must not silently drop or silently keep work
+function psCloseGuard(){
   const box=document.getElementById('ps-edit');
-  if(!box||box._autoBound)return;
-  box._autoBound=true;
-  box.addEventListener('change',e=>{
-    if(e.target&&/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName))_psAutoSave();
-  });
-  // Typing in a textarea only fires change on blur — commit sooner
-  let t=null;
-  box.addEventListener('input',e=>{
-    if(!e.target||e.target.tagName!=='TEXTAREA')return;
-    clearTimeout(t);t=setTimeout(_psAutoSave,900);
-  });
+  const editing=box&&box.style.display!=='none'&&box.style.display!=='';
+  if(editing&&_psIsDirty()){
+    const keep=confirm('\u00c4nderungen speichern?\n\nOK = speichern, Abbrechen = verwerfen.');
+    if(keep)_psCommitEdit();
+  }
+  _psSnapshot=null;
+  closeM('moPlayer');
 }
 function togglePlayerEdit(){
   const box=document.getElementById('ps-edit');
@@ -15959,8 +15969,8 @@ function togglePlayerEdit(){
   });
   btn.innerHTML=open?'\u2713 Fertig':'\u270e Bearbeiten';
   btn.classList.toggle('active',open);
-  if(open){_psBindAutoSave();box.scrollIntoView({block:'nearest'});}
-  else _psAutoSave();   // catch a field edited but never blurred
+  if(open){_psSnapshot=_psReadForm();box.scrollIntoView({block:'nearest'});}
+  else{if(_psIsDirty())_psCommitEdit();_psSnapshot=null;}
 }
 function savePlayerEdit(){
   // Re-resolve before write — Anna's edits should land on Anna's record, even if
@@ -18560,6 +18570,7 @@ function openTrainerProfile(gi){
   const t=G.trainers&&G.trainers[gi];
   if(!t)return;
   _tpIdx=gi;
+  _tpDraft=null;
   // Always opens read-only: a profile is looked at far more often than it is
   // changed, and input fields everywhere make a card look like a form.
   _tpEditing=false;
@@ -18568,6 +18579,8 @@ function openTrainerProfile(gi){
 }
 function tpToggleEdit(){
   if(!_tpCanEdit())return;
+  if(_tpEditing)_tpCommit();   // leaving edit mode = "Fertig"
+  else _tpDraft=null;
   _tpEditing=!_tpEditing;
   renderTrainerProfile();
 }
@@ -18595,7 +18608,8 @@ function renderTrainerProfile(){
   const av=ed
     ?`<div class="photo-edit-wrap tp-av-wrap" onclick="tpPhotoMenu(this)" title="Foto">${avInner}</div>`
     :avInner;   // read mode shows the portrait, nothing clickable
-  const line=(label,val,field,type,opts)=>{
+  const line=(label,valStored,field,type,opts)=>{
+    const val=(ed&&_tpDraft&&field in _tpDraft)?_tpDraft[field]:valStored;
     if(!ed&&!val)return '';
     let input;
     if(!ed){
@@ -18657,18 +18671,39 @@ function renderTrainerProfile(){
   }
   box.innerHTML=html;
 }
+// Same rule as the player card: nothing is written until "Fertig". The draft
+// holds pending values so the fields keep what was typed without touching the
+// stored record.
+let _tpDraft=null;
 function tpSet(field,val){
   if(!_tpCanEdit())return;
   const t=G.trainers&&G.trainers[_tpIdx];
   if(!t)return;
   const v=String(val==null?'':val).trim().slice(0,300);
-  if((t[field]||'')===v)return;
+  if((t[field]||'')===v){if(_tpDraft)delete _tpDraft[field];return;}
+  if(!_tpDraft)_tpDraft={};
+  _tpDraft[field]=v;
+}
+function _tpIsDirty(){return !!(_tpDraft&&Object.keys(_tpDraft).length);}
+function _tpCommit(){
+  const t=G.trainers&&G.trainers[_tpIdx];
+  if(!t||!_tpIsDirty()){_tpDraft=null;return;}
   snap();
-  if(v)t[field]=v;else delete t[field];
+  const fields=Object.keys(_tpDraft);
+  fields.forEach(f=>{const v=_tpDraft[f];if(v)t[f]=v;else delete t[f];});
+  _tpDraft=null;
   saveG();
-  logAudit('Trainerprofil ge\u00e4ndert',t.name,field);
-  renderTrainerProfile();
+  logAudit('Trainerprofil ge\u00e4ndert',t.name,fields.join(', '));
   if(typeof renderMgrTrainers==='function')try{renderMgrTrainers();}catch(e){}
+  if(typeof homeRender==='function')try{homeRender();}catch(e){}
+}
+function tpCloseGuard(){
+  if(_tpEditing&&_tpIsDirty()){
+    const keep=confirm('\u00c4nderungen speichern?\n\nOK = speichern, Abbrechen = verwerfen.');
+    if(keep)_tpCommit();else _tpDraft=null;
+  }
+  _tpDraft=null;_tpEditing=false;
+  closeM('moTrainerProfile');
 }
 function tpPhotoPick(){
   // Same cropper the player photos use — square framing, zoom and drag, and
@@ -24965,7 +25000,7 @@ checkAutoBackup();
   </div>
   <div id="tp-content" style="max-height:64vh;overflow-y:auto;"></div>
   <div class="mob-btns">
-    <button class="btn bs" onclick="closeM('moTrainerProfile')">Schließen</button>
+    <button class="btn bs" onclick="tpCloseGuard()">Schließen</button>
   </div>
 </div></div>
 
