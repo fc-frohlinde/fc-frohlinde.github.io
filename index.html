@@ -853,6 +853,8 @@ input[type="date"]{cursor:pointer;}
 @media (max-width:767px){
   .ps-info-l{flex:0 0 104px;}
 }
+.ps-title-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.ps-title{margin:0;flex:1;min-width:0;}
 .ps-head-mid{flex:1;min-width:0;}
 /* The name is set in a wide display face — let it shorten rather than break
    across lines, which is what made the header look ragged. */
@@ -2731,6 +2733,14 @@ if(window._fbBlocked){
 
 <!-- Player Stats -->
 <div class="mo" id="moPlayer"><div class="mob" style="width:530px;max-width:96vw;">
+  <div class="ps-title-row">
+    <h3 class="ps-title">👤 Spielerprofil</h3>
+    <div class="ps-head-btns">
+      <button class="tp-edit-btn" id="ps-edit-toggle" onclick="togglePlayerEdit()">✎ Bearbeiten</button>
+      <button class="btn" id="ps-back-btn" style="font-size:.76rem;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" onclick="playerGoBack()"><span class="ps-b-lbl">← Zurück</span><span class="ps-b-ico">←</span></button>
+      <button class="btn bs" onclick="closeM('moPlayer')">✕</button>
+    </div>
+  </div>
   <div class="ps-head-row" style="display:flex;align-items:flex-start;gap:13px;margin-bottom:13px;">
     <div id="ps-avatar-wrap" style="flex-shrink:0;cursor:pointer;" onclick="if(canEdit())playerPhotoMenu(this)" title="Foto"></div>
     <div class="ps-head-mid">
@@ -2743,13 +2753,7 @@ if(window._fbBlocked){
       </div>
 
     </div>
-    <div class="ps-head-right">
-      <div class="ps-head-btns">
-        <button class="tp-edit-btn" id="ps-edit-toggle" onclick="togglePlayerEdit()">✎ Bearbeiten</button>
-        <button class="btn" id="ps-back-btn" style="font-size:.76rem;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" onclick="playerGoBack()"><span class="ps-b-lbl">← Zurück</span><span class="ps-b-ico">←</span></button>
-        <button class="btn bs" onclick="closeM('moPlayer')">✕</button>
-      </div>
-    </div>
+
   </div>
   <div id="ps-card-view">
   <div id="ps-contact" class="ps-contact"></div>
