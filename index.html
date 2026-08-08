@@ -844,6 +844,15 @@ input[type="date"]{cursor:pointer;}
 /* Right column of the player header: actions on top, contact shortcuts
    directly underneath. That area used to be empty while the contact row took
    a full line of its own below the name. */
+.ps-info{display:none;margin:0 0 12px;}
+.ps-info-row{display:flex;align-items:baseline;gap:10px;padding:5px 2px;border-bottom:1px solid var(--gl);}
+.ps-info-row:last-child{border-bottom:none;}
+.ps-info-l{flex:0 0 118px;font-size:.74rem;color:var(--gm);}
+.ps-info-v{flex:1;min-width:0;font-size:.8rem;color:var(--gd);}
+.ps-info-sub{font-size:.72rem;color:var(--gm);}
+@media (max-width:767px){
+  .ps-info-l{flex:0 0 104px;}
+}
 .ps-head-mid{flex:1;min-width:0;}
 /* The name is set in a wide display face — let it shorten rather than break
    across lines, which is what made the header look ragged. */
@@ -2732,7 +2741,6 @@ if(window._fbBlocked){
         <span id="ps-pos-badge"></span>
         <span id="ps-ctx" style="font-size:.65rem;color:var(--gm);margin-left:4px;"></span>
       </div>
-      <div id="ps-note-display" style="margin-top:5px;font-size:.78rem;color:var(--gd);font-style:italic;display:none;"></div>
 
     </div>
     <div class="ps-head-right">
@@ -2744,6 +2752,7 @@ if(window._fbBlocked){
       <div id="ps-contact" class="ps-contact"></div>
     </div>
   </div>
+  <div id="ps-note-display" class="ps-info"></div>
   <div class="ps-cards" id="ps-cards"></div>
   <div id="ps-next"></div>
   <div id="ps-dots"></div>
@@ -15611,13 +15620,26 @@ function openPlayerStats(pi){
   if(photoDelBtn)photoDelBtn.style.display=p.photo?'':'none';
   const noteEl=document.getElementById('ps-note-display');
   if(noteEl){
-    // Note lives in its own card below, phone and e-mail in the contact row.
-    // This line keeps only the identity facts nothing else displays.
+    // One labelled row per fact, like the trainer profile — a single line of
+    // icons separated by dots made three unrelated things look like one
+    // sentence. Empty fields are skipped entirely.
+    const _row=(l,v)=>`<div class="ps-info-row"><span class="ps-info-l">${l}</span><span class="ps-info-v">${v}</span></div>`;
     let info=[];
-    if(p.passnr)info.push('🎫 '+p.passnr);
-    if(p.birthdate)info.push('🎂 '+new Date(p.birthdate).toLocaleDateString('de-DE'));
-    if(p.foot)info.push('🦵 '+(p.foot==='right'?'Rechts':p.foot==='left'?'Links':'Beidfüßig'));
-    if(info.length){noteEl.innerHTML=info.join(' &nbsp;·&nbsp; ');noteEl.style.display='block';}
+    if(p.birthdate){
+      const d=new Date(p.birthdate);
+      let age='';
+      if(!isNaN(d)){
+        const t=new Date();
+        let a=t.getFullYear()-d.getFullYear();
+        const m=t.getMonth()-d.getMonth();
+        if(m<0||(m===0&&t.getDate()<d.getDate()))a--;
+        if(a>0&&a<120)age=` <span class="ps-info-sub">(${a} Jahre)</span>`;
+      }
+      info.push(_row('Geburtstag',d.toLocaleDateString('de-DE')+age));
+    }
+    if(p.foot)info.push(_row('Starker Fu\u00df',p.foot==='right'?'Rechts':p.foot==='left'?'Links':'Beidf\u00fc\u00dfig'));
+    if(p.passnr)info.push(_row('Pass-Nr.',escapeHtml(p.passnr)));
+    if(info.length){noteEl.innerHTML=info.join('');noteEl.style.display='block';}
     else{noteEl.style.display='none';}
   }
   // Reset edit section
@@ -15871,7 +15893,7 @@ let _currentFoot='right';
 // Same model as the trainer profile: the card is a card until you say
 // otherwise. Showing the form under the card meant scrolling past everything
 // to reach it, and left the modal looking like a form the whole time.
-const _PS_VIEW_BLOCKS=['ps-cards','ps-next','ps-dots','ps-note-card','ps-ext-btn-wrap','ps-more'];
+const _PS_VIEW_BLOCKS=['ps-note-display','ps-cards','ps-next','ps-dots','ps-note-card','ps-ext-btn-wrap','ps-more'];
 let _psShowAllUpcoming=false;
 function psToggleUpcoming(){
   _psShowAllUpcoming=!_psShowAllUpcoming;
