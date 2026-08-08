@@ -897,8 +897,18 @@ input[type="date"]{cursor:pointer;}
 #moPlayer .mob{padding-top:0;}
 #moPlayer .ps-sticky{position:sticky;top:0;z-index:3;background:#fff;
   padding:20px 0 9px;border-bottom:1px solid var(--gl);}
-#moPlayer .ps-sticky .ps-head-row{margin-bottom:0;padding-bottom:0;border-bottom:none;}
+#moPlayer .ps-sticky .ps-head-row{margin:0;padding:0;border-bottom:none;
+  flex-wrap:nowrap;align-items:center;}
+#moPlayer .ps-head-mid{flex:1;min-width:0;overflow:hidden;}
+#moPlayer #ps-edit-toggle{align-self:center;}
+/* 9px above the first heading, matching every other section gap */
 #moPlayer #ps-card-view,#moPlayer #ps-edit{padding-top:9px;}
+#moPlayer #ps-card-view>.tp-sec:first-child,#moPlayer #ps-edit .tp-sec:first-child{
+  border-top:none;margin-top:0;padding-top:0;}
+/* Nothing inside may exceed the modal width */
+#moPlayer .mob{overflow-x:hidden;}
+#moPlayer .tp-row{max-width:100%;}
+#moPlayer .tp-in,#moPlayer .tp-in-wrap{min-width:0;max-width:100%;box-sizing:border-box;}
 #moTrainerProfile .tp-head{position:sticky;top:0;z-index:2;background:#fff;
   padding-bottom:9px;margin-bottom:0;border-bottom:1px solid var(--gl);}
 /* The first section draws a top border of its own, doubling the divider the
@@ -928,7 +938,11 @@ input[type="date"]{cursor:pointer;}
 }
 .ps-crows{flex-basis:100%;margin-top:8px;}
 .ps-crows .tp-row{margin-bottom:4px;}
-.ps-title-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+/* .mob h3 carries margin-bottom:12px and outranks .ps-title (class only), so
+   the title kept its own gap ON TOP of the row's — the header came out twice
+   as tall as intended. An id-scoped rule settles it. */
+#moPlayer .ps-title{margin:0;}
+.ps-title-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
 /* No size overrides: these are ordinary modal buttons and must match every
    other modal in the app. */
 .ps-title{margin:0;flex:1;min-width:0;}
@@ -1733,11 +1747,8 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   #ps-edit-toggle{font-size:0;padding:7px 12px;}
   #ps-edit-toggle::before{content:'\270e';font-size:.95rem;}
   #ps-edit-toggle.active::before{content:'\2713';}
-  /* width:100% on a flex CHILD sitting next to the avatar and the name block
-     pushed the modal wider than the screen. Wrapping the header instead gives
-     the column its own line and keeps everything inside the viewport. */
-  .ps-head-row{flex-wrap:wrap;}
-  .ps-head-right{align-items:stretch;flex-basis:100%;min-width:0;}
+  /* .ps-head-right is gone; wrapping this row now breaks the layout instead
+     of saving it, because the edit button belongs beside the name. */
   .ps-head-btns{justify-content:flex-end;}
   /* Trainer profile already stacks its quick buttons on phones */
   #ps-contact.tp-quick .tp-qbtn{flex:1;justify-content:center;}
