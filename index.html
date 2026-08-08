@@ -12568,26 +12568,9 @@ function renderPlayerMode(){
   } else {
     html+='<div class="pm-empty">\ud83d\udcc5 Diese Woche sind keine Termine mehr geplant.</div>';
   }
-  // ── RECENT PAST ──
-  if(recent.length>0){
-    const showRecent=recent.slice(0,8);
-    html+=`<details class="pm-recent"><summary class="pm-section-h pm-section-summary"><span>\ud83d\udcdc Letzte Termine</span><span class="pm-count">${showRecent.length}</span><span class="pm-chevron">\u203a</span></summary>`;
-    html+='<div class="pm-recent-list">';
-    showRecent.forEach(({s,si,sk})=>{
-      const f=_pmFmtUpcoming(s,sk);
-      const v=(p.s&&si<p.s.length)?p.s[si]:3;
-      const iconCls=v===1?'pm-past-yes':v===0?'pm-past-no':v===2?'pm-past-exc':v===4?'pm-past-q':'pm-past-q';
-      const icon=v===1?'\u2705':v===0?'\u274c':v===2?'\ud83d\udccb':'\u2796';
-      const lbl=v===1?'Anwesend':v===0?'Gefehlt':v===2?'Entsch.':'\u2013';
-      html+=`<div class="pm-past-card ${iconCls}">
-        <div class="pm-past-date"><span class="pm-past-day">${f.day}.${f.mo}</span><span class="pm-past-dow">${f.dow}</span></div>
-        <div class="pm-past-title">${f.isMatch?'\u26bd':'\ud83c\udfc3'} ${_amEscapeText(f.title)}</div>
-        <div class="pm-past-status"><span class="pm-past-icon">${icon}</span><span class="pm-past-lbl">${lbl}</span></div>
-        ${(Array.isArray(p.rpe)&&typeof p.rpe[si]==='number')?`<div class="pm-past-rpe" title="Von dir bewertet">\ud83d\udcaa ${p.rpe[si]}</div>`:''}
-      </div>`;
-    });
-    html+='</div></details>';
-  }
+  // "Letzte Termine" removed: the player's screen exists to collect answers
+  // for the coming week. His own history is available on the personal
+  // statistics page, which is linked in every invitation.
   // ── FOOTER ──
   // Abmelden bewusst entfernt: Tab schliessen reicht.
   html+='</div>';
