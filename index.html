@@ -2374,8 +2374,7 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 .pm-callout-warn{font-size:.9rem;margin-top:8px;line-height:1.3;}
 .pm-callout-warn b{background:rgba(0,0,0,.25);padding:1px 6px;border-radius:5px;}
 .pm-callout-btns{display:flex;flex-direction:column;gap:10px;margin-top:14px;}
-.pm-call-pair{display:grid;grid-template-columns:1fr auto;gap:7px;}
-.pm-call-wa{background:#25d366;color:#fff;padding-left:18px;padding-right:18px;}
+.pm-call-wa{background:#25d366;color:#fff;}
 .pm-call-btn{display:flex;align-items:center;justify-content:center;gap:7px;background:#fff;
   color:#8e2318;text-decoration:none;border-radius:var(--r-pill);padding:13px 16px;
   font-family:'Barlow',sans-serif;font-size:1rem;font-weight:800;min-height:50px;}
@@ -12424,10 +12423,11 @@ function renderPlayerMode(){
         if(wa.startsWith('00'))wa=wa.slice(2);
         else if(wa.startsWith('0'))wa='49'+wa.slice(1);
         const first=_amEscapeText(String(t.name||'').split(' ')[0]);
-        return `<div class="pm-call-pair">`
-          +`<a class="pm-call-btn" href="tel:${_amEscapeText(tel)}">\ud83d\udcde ${first} anrufen</a>`
-          +`<a class="pm-call-btn pm-call-wa" href="https://wa.me/${_amEscapeText(wa)}" target="_blank" rel="noopener">\ud83d\udcac WhatsApp</a>`
-          +`</div>`;
+        // One button per trainer, opening WhatsApp. Note WhatsApp has no link
+        // that starts a voice call directly — this opens the conversation,
+        // where the call icon is one tap away. The label says "anrufen" on
+        // purpose: it is the instruction, not a description of the target.
+        return `<a class="pm-call-btn pm-call-wa" href="https://wa.me/${_amEscapeText(wa)}" target="_blank" rel="noopener">\ud83d\udcde ${first} anrufen</a>`;
       }).join('');
       // Names come from the trainer list, not from the sentence: hard-coding
       // them meant the message would keep naming people who had left.
