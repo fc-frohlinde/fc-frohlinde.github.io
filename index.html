@@ -15955,7 +15955,25 @@ function psCloseGuard(){
     if(keep)_psCommitEdit();
   }
   _psSnapshot=null;
+  _psFreezeHeight(document.querySelector('#moPlayer .mob'),false);
   closeM('moPlayer');
+}
+// Card and form have different natural heights, so the window jumped on every
+// toggle. Freezing the height it already had keeps it still; the taller of the
+// two simply scrolls inside.
+function _psFreezeHeight(el,on){
+  if(!el)return;
+  if(on){
+    if(!el.dataset.frozen){
+      el.dataset.frozen=String(el.offsetHeight);
+      el.style.height=el.offsetHeight+'px';
+      el.style.overflowY='auto';
+    }
+  }else{
+    delete el.dataset.frozen;
+    el.style.height='';
+    el.style.overflowY='';
+  }
 }
 function togglePlayerEdit(){
   const box=document.getElementById('ps-edit');
@@ -15969,8 +15987,16 @@ function togglePlayerEdit(){
   });
   btn.innerHTML=open?'\u2713 Fertig':'\u270e Bearbeiten';
   btn.classList.toggle('active',open);
-  if(open){_psSnapshot=_psReadForm();box.scrollIntoView({block:'nearest'});}
-  else{if(_psIsDirty())_psCommitEdit();_psSnapshot=null;}
+  const shell=document.querySelector('#moPlayer .mob');
+  if(open){
+    _psFreezeHeight(shell,true);
+    _psSnapshot=_psReadForm();
+    box.scrollIntoView({block:'nearest'});
+  }else{
+    if(_psIsDirty())_psCommitEdit();
+    _psSnapshot=null;
+    _psFreezeHeight(shell,false);
+  }
 }
 function savePlayerEdit(){
   // Re-resolve before write — Anna's edits should land on Anna's record, even if
@@ -18579,9 +18605,17 @@ function openTrainerProfile(gi){
 }
 function tpToggleEdit(){
   if(!_tpCanEdit())return;
-  if(_tpEditing)_tpCommit();   // leaving edit mode = "Fertig"
-  else _tpDraft=null;
-  _tpEditing=!_tpEditing;
+  const shell=document.querySelector('#moTrainerProfile .mob');
+  if(_tpEditing){
+    _tpCommit();   // leaving edit mode = "Fertig"
+    _tpEditing=false;
+    renderTrainerProfile();
+    _psFreezeHeight(shell,false);
+    return;
+  }
+  _tpDraft=null;
+  _psFreezeHeight(shell,true);
+  _tpEditing=true;
   renderTrainerProfile();
 }
 function _tpCanEdit(){
@@ -18703,6 +18737,7 @@ function tpCloseGuard(){
     if(keep)_tpCommit();else _tpDraft=null;
   }
   _tpDraft=null;_tpEditing=false;
+  _psFreezeHeight(document.querySelector('#moTrainerProfile .mob'),false);
   closeM('moTrainerProfile');
 }
 function tpPhotoPick(){
