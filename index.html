@@ -901,7 +901,9 @@ input[type="date"]{cursor:pointer;}
    sticky header already has. NOTE: :first-of-type matches by TAG, and the
    header is also a div — so it never matched the section. Target the section
    that actually follows the header instead. */
-#moTrainerProfile .tp-head+.tp-sec,
+/* Split on purpose: the trainer profile keeps its own 9px rhythm and must not
+   be changed by edits aimed at the player card. */
+#moTrainerProfile .tp-head+.tp-sec{border-top:none;margin-top:0;padding-top:9px;}
 #ps-card-view>.tp-sec:first-child{border-top:none;margin-top:0;padding-top:0;}
 @media (max-width:767px){
   #moPlayer .ps-sticky{padding-top:16px;}
