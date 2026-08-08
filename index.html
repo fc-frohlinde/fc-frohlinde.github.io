@@ -363,7 +363,7 @@ body.theme-dark .pl-row:nth-child(even){background:#15264a;}
    2px, not the 3px the table head uses: this line runs edge to edge across the
    window and meets a light surface below, which makes the same thickness read
    heavier than the table's, where it sits between two dark rows. */
-.header{border-bottom:2px solid var(--ac);}
+.header{border-bottom:2.5px solid var(--ac);}
 /* One row, scrollable rather than wrapping: a second line here would give
    back exactly the height the move was meant to save.
    The wrapper is the shrinking element — with a fixed max-width every added
@@ -430,7 +430,13 @@ body.theme-dark .pl-row:nth-child(even){background:#15264a;}
 .toolbar.hidden{display:none;}
 .toolbar-l{display:flex;gap:5px;align-items:center;flex-wrap:wrap;}
 .toolbar-r{margin-left:auto;display:flex;gap:5px;align-items:center;}
-.ssel{padding:4px 9px;border:1.5px solid rgba(255,255,255,.25);border-radius:7px;font-family:'Barlow',sans-serif;font-size:.74rem;font-weight:600;color:#fff;background:rgba(255,255,255,.1);cursor:pointer;outline:none;}
+.ssel{padding:4px 9px;border:1.5px solid rgba(255,255,255,.25);border-radius:7px;font-family:'Barlow',sans-serif;font-size:.74rem;font-weight:600;color:#fff;background:rgba(255,255,255,.1);cursor:pointer;outline:none;transition:background .12s,border-color .12s;}
+.ssel:hover{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.45);}
+.ssel:focus{border-color:var(--ac);}
+/* Inline styles on this button beat .btn:hover, so it needs its own rule. */
+#btn-slp{transition:background .12s,border-color .12s,color .12s;}
+#btn-slp:hover{background:color-mix(in srgb, var(--ac) 26%, transparent) !important;
+  border-color:color-mix(in srgb, var(--ac) 55%, transparent) !important;color:var(--ac) !important;}
 .ssel:focus{border-color:var(--ac);}
 .ssel option{color:#000;background:#fff;}
 .btn{padding:6px 13px;border-radius:7px;border:none;cursor:pointer;font-family:'Barlow',sans-serif;font-size:.82rem;font-weight:600;transition:all .12s;display:flex;align-items:center;gap:5px;white-space:nowrap;}
@@ -1014,6 +1020,7 @@ input[type="date"]{cursor:pointer;}
   color:rgba(255,255,255,.7);font-family:'Bebas Neue',sans-serif;font-size:.8rem;letter-spacing:.5px;}
 .ma-card-txt{flex:1;min-width:0;}
 .nm-av{width:22px;height:22px;border-radius:50%;object-fit:cover;flex-shrink:0;margin-right:7px;}
+body.no-photos .nm-av,body.no-photos .ma-card-av{display:none;}
 .nm-av-ph{display:inline-block;background:rgba(0,0,0,.06);}
 .trainer-chip-btn{cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .12s;}
 .trainer-chip-btn:hover{background:rgba(255,255,255,.28);}
@@ -2778,7 +2785,6 @@ if(window._fbBlocked){
       <div class="team-tabs" id="teamTabs"></div>
     </div>
     <div class="tsep"></div>
-    <div class="tsep"></div>
     <label style="color:rgba(255,255,255,.52);font-size:.68rem;font-weight:600;">SAISON:</label>
     <select class="ssel" id="seasonSel" onchange="switchSeason(this.value)"></select>
     <button class="btn bs" id="btn-addSeas" onclick="openM('moSeason')" style="display:none;">＋</button>
@@ -2871,6 +2877,7 @@ if(window._fbBlocked){
         <div class="view-dropdown" id="viewDropdown2" style="bottom:calc(100% + 5px);top:auto;left:auto;right:0;">
           <div class="vd-item" onclick="event.stopPropagation();toggleSec('hdr')"><span>Header</span><div class="vd-check on" id="vd2-hdr">✓</div></div>
           <div class="vd-item" onclick="event.stopPropagation();toggleSec('tools')"><span>Werkzeuge</span><div class="vd-check on" id="vd2-tools">✓</div></div>
+          <div class="vd-item" onclick="event.stopPropagation();toggleSec('photos')"><span>Spielerfotos</span><div class="vd-check on" id="vd2-photos">✓</div></div>
           <div class="vd-item" onclick="event.stopPropagation();toggleSec('legend')"><span>Legende</span><div class="vd-check on" id="vd2-legend">✓</div></div>
           <div class="vd-sep"></div>
           <div class="vd-item" onclick="event.stopPropagation();collapseAll()"><span>Nur Tabelle</span></div>
@@ -3424,7 +3431,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786219862902; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786220344226; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -7648,7 +7655,7 @@ document.addEventListener('click',e=>{
 });
 function updateViewChecks(){
   const lbl2=document.getElementById('zoomLbl2');if(lbl2)lbl2.textContent=zoomLvl+'%';
-  ['hdr','tools','legend','slpBtn'].forEach(k=>{
+  ['hdr','tools','legend','photos','slpBtn'].forEach(k=>{
     ['vd-','vd2-'].forEach(pfx=>{
       const eid=pfx+(k==='slpBtn'?'slpbtn':k);
       const el=document.getElementById(eid);
@@ -7668,6 +7675,10 @@ function toggleViewMenu(e){
 document.addEventListener('click',()=>document.getElementById('viewDropdown')?.classList.remove('open'));
 function applyCollapse(){
   colState.tabs=true;   // legacy state: the section no longer exists
+  // Portraits are a display choice: on a small screen or a long roster the
+  // name column reads faster without them.
+  if(colState.photos===undefined)colState.photos=true;
+  document.body.classList.toggle('no-photos',!colState.photos);
   document.getElementById('hdrEl').classList.toggle('collapsed',!colState.hdr);
   // 'tabs' is no longer a user-facing section: the picker lives in the
   // toolbar and shows itself based on how many teams exist.
