@@ -890,21 +890,15 @@ input[type="date"]{cursor:pointer;}
    its edge read as a second line. Only the TOP padding mattered: moved into
    the wrapper so nothing can pass above it. Structure now matches the trainer
    profile exactly: one sticky block, one inset divider. */
-/* The divider must be the LAST thing the sticky block paints. Drawing it on
-   the inner row left a strip of the block's white background below the line —
-   and the bottom edge of that strip read as a second border. Border on the
-   block itself: white area and line end at the same pixel. */
-#moPlayer .mob{padding-top:0;}
-#moPlayer .ps-sticky{position:sticky;top:0;z-index:3;background:#fff;
-  padding:20px 0 9px;border-bottom:1px solid var(--gl);}
+/* Sticky handling comes from ".mob > *:first-child:has(button.bs)" — the
+   app-wide rule. Nothing here may re-declare position, padding, margin or the
+   divider, or it stacks on top of that rule. */
 #moPlayer .ps-sticky .ps-head-row{margin:0;padding:0;border-bottom:none;
   flex-wrap:nowrap;align-items:center;}
 #moPlayer .ps-head-mid{flex:1;min-width:0;overflow:hidden;}
 #moPlayer #ps-edit-toggle{align-self:center;}
-/* 9px above the first heading, matching every other section gap */
-#moPlayer #ps-card-view,#moPlayer #ps-edit{padding-top:9px;}
 #moPlayer #ps-card-view>.tp-sec:first-child,#moPlayer #ps-edit .tp-sec:first-child{
-  border-top:none;margin-top:0;padding-top:0;}
+  border-top:none;margin-top:0;padding-top:9px;}
 /* Nothing inside may exceed the modal width */
 #moPlayer .mob{overflow-x:hidden;}
 #moPlayer .tp-row{max-width:100%;}
@@ -918,10 +912,8 @@ input[type="date"]{cursor:pointer;}
 /* Split on purpose: the trainer profile keeps its own 9px rhythm and must not
    be changed by edits aimed at the player card. */
 #moTrainerProfile .tp-head+.tp-sec{border-top:none;margin-top:0;padding-top:9px;}
-#ps-card-view>.tp-sec:first-child{border-top:none;margin-top:0;padding-top:0;}
-@media (max-width:767px){
-  #moPlayer .ps-sticky{padding:16px 0 9px;}
-}
+#ps-card-view>.tp-sec:first-child{border-top:none;margin-top:0;padding-top:9px;}
+
 /* The position and foot pickers are custom dropdowns rendered into a div, so
    they need the same slot the plain inputs occupy. */
 #ps-edit .tp-row{max-width:100%;}
@@ -930,7 +922,7 @@ input[type="date"]{cursor:pointer;}
 .tp-in-wrap>*{width:100%;margin-bottom:0;}
 #ps-edit .tp-in{margin-bottom:0;}
 #ps-edit textarea.tp-in{width:100%;resize:vertical;font-family:'Barlow',sans-serif;line-height:1.4;}
-#ps-edit .tp-sec:first-child{border-top:none;margin-top:0;padding-top:0;}
+#ps-edit .tp-sec:first-child{border-top:none;margin-top:0;padding-top:9px;}
 @media (max-width:767px){
   #ps-edit .tp-row{flex-direction:column;align-items:stretch;gap:3px;}
   #ps-edit .tp-l{flex:none;}
