@@ -9103,9 +9103,10 @@ function updateAppearanceUI(){
       } else if(perm==='granted'&&s.pushEnabled){
         psub.textContent='✓ Aktiv für Nachrichten und Geburtstage';
       } else if(s.pushEnabled&&perm!=='granted'){
-        psub.textContent='⚠️ Hier eingeschaltet, aber der Browser hat die Erlaubnis zurückgesetzt — bitte erneut aktivieren und im Dialog „Zulassen" wählen.';
+        psub.textContent='⚠️ Hier eingeschaltet, aber der Browser meldet „'+perm+'" — bitte erneut aktivieren und im Dialog „Zulassen" wählen.';
       } else {
-        psub.textContent='System-Benachrichtigungen für Nachrichten und Geburtstage';
+        psub.textContent='System-Benachrichtigungen für Nachrichten und Geburtstage'
+          +(perm!=='default'?' · Browser: '+perm:'');
       }
     }
   }
@@ -9390,6 +9391,22 @@ async function requestPushPermission(){
     return result;
   }catch(e){return 'denied';}
 }
+// Diagnostics: pushDiag() in the console prints everything that decides
+// whether notifications can work, so the cause can be read instead of guessed.
+window.pushDiag=function(){
+  const s=getAppearance();
+  const out={
+    'Notification API': ('Notification' in window),
+    'Berechtigung': ('Notification' in window)?Notification.permission:'—',
+    'Im Profil gespeichert': s.pushEnabled===true,
+    'Sicherer Kontext (https)': window.isSecureContext,
+    'Service Worker aktiv': !!(navigator.serviceWorker&&navigator.serviceWorker.controller),
+    'Als App installiert': window.matchMedia('(display-mode: standalone)').matches,
+    'Herkunft': location.origin
+  };
+  console.table(out);
+  return out;
+};
 async function setAppPushEnabled(checked){
   const s=getAppearance();
   if(checked){
@@ -9400,6 +9417,10 @@ async function setAppPushEnabled(checked){
       updateAppearanceUI();
       if(perm==='denied')alert('Benachrichtigungen sind in deinem Browser blockiert. Bitte erlaube sie in den Browsereinstellungen.');
       else if(perm==='unsupported')alert('Dein Browser unterstützt keine System-Benachrichtigungen.');
+      // "default" = the dialog was dismissed, or the browser suppressed it
+      // (Edge: "Benachrichtigungsanfragen werden stummgeschaltet"). Without a
+      // word here the switch simply flipped back and looked broken.
+      else alert('Der Browser hat keine Erlaubnis erteilt (Status: '+perm+').\n\nIn Edge: auf das Schloss-Symbol links in der Adressleiste klicken \u2192 Berechtigungen \u2192 Benachrichtigungen auf \u201eZulassen\u201c stellen. Falls dort nichts erscheint, ist unter Einstellungen \u2192 Cookies und Websiteberechtigungen \u2192 Benachrichtigungen die Option \u201eStummschalten\u201c aktiv.');
       return;
     }
   }
