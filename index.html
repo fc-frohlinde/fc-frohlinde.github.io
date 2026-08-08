@@ -839,12 +839,14 @@ input[type="date"]{cursor:pointer;}
   border-radius:8px;padding:8px 11px;line-height:1.35;}
 /* Grid rather than flex: both cells share one row and one baseline by
    construction, so the button cannot drift below the field. */
-.ps-nophone-add{display:grid;grid-template-columns:1fr auto;gap:6px;margin-top:7px;align-items:center;}
-.ps-nophone-add input,.ps-nophone-add .btn{height:34px;min-height:0;margin:0;
-  padding-top:0;padding-bottom:0;line-height:normal;box-sizing:border-box;
-  display:flex;align-items:center;}
-.ps-nophone-add input{min-width:0;}
-.ps-nophone-add .btn{padding-left:14px;padding-right:14px;font-size:.78rem;justify-content:center;}
+/* Field + button on one line. Used wherever a single value is entered next to
+   a confirm button. */
+.inline-field{display:grid;grid-template-columns:1fr auto;gap:6px;align-items:center;}
+.inline-field input:not([type=range]),.inline-field .btn{
+  height:34px;min-height:0;margin:0;padding-top:0;padding-bottom:0;line-height:normal;}
+.inline-field input:not([type=range]){min-width:0;}
+.inline-field .btn{padding-left:14px;padding-right:14px;font-size:.78rem;justify-content:center;}
+.ps-nophone-add{margin-top:7px;}
 .ps-sep-row{display:flex;align-items:center;gap:8px;padding:5px 9px;font-size:.62rem;font-weight:700;
   letter-spacing:1px;color:var(--gm);background:rgba(0,0,0,.04);text-transform:uppercase;
   border-top:1px solid var(--gl);border-bottom:1px solid var(--gl);}
@@ -3381,7 +3383,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786216690338; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786217566058; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -25486,8 +25488,8 @@ checkAutoBackup();
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
     <h3 style="margin:0;flex:1;"><span id="loc-mgr-ico"></span> Orte verwalten</h3>
   </div>
-  <div style="display:flex;gap:6px;margin-bottom:10px;">
-    <input type="text" id="loc-mgr-new" placeholder="Neuen Ort hinzufügen…" maxlength="80" style="flex:1;">
+  <div class="inline-field" style="margin-bottom:10px;">
+    <input type="text" id="loc-mgr-new" placeholder="Neuen Ort hinzufügen…" maxlength="80">
     <button class="btn bp" onclick="locAddManual()">＋</button>
   </div>
   <div id="loc-mgr-list"></div>
