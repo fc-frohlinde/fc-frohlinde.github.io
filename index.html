@@ -2437,7 +2437,13 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 .loc-field input{flex:1;min-width:0;}
 .loc-ic{font-size:.9rem;}
 .loc-mgr-btn{flex-shrink:0;padding:6px 10px;font-size:.8rem;}
-.loc-row{display:flex;align-items:center;gap:8px;padding:7px 2px;border-bottom:1px solid var(--gl);}
+.loc-row{display:flex;align-items:center;gap:8px;padding:8px 2px;border-bottom:1px solid var(--gl);}
+.loc-main{flex:1;min-width:0;}
+.loc-addr{width:100%;margin:4px 0 0;padding:5px 8px;border:1.5px solid var(--gl);border-radius:6px;
+  font-family:'Barlow',sans-serif;font-size:.74rem;color:var(--gd);}
+.loc-route{display:inline-flex;align-items:center;gap:4px;color:var(--bl);text-decoration:none;
+  font-size:.72rem;font-weight:700;white-space:nowrap;}
+.loc-route:hover{text-decoration:underline;}
 .loc-name{flex:1;min-width:0;font-size:.8rem;color:var(--gd);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .home-next-loc{font-size:.72rem;color:rgba(255,255,255,.6);margin-top:4px;display:flex;align-items:center;gap:5px;}
 .rpe-ov-sum{font-size:.74rem;color:var(--gm);margin-bottom:10px;}
@@ -10019,7 +10025,8 @@ function _amWeekCtx(p){
     list.push({
       sk,date:s.date,time:s.time||(isMatch?'15:00':'18:30'),isMatch,
       what:isMatch?(s.label||'Spiel'):'Training',
-      place:s.location||''
+      place:s.location||'',
+      map:(s.location&&typeof locMapsUrl==='function')?locMapsUrl(s.location):''
     });
   });
   list.sort((a,b)=>a.sk-b.sk);
@@ -10065,7 +10072,11 @@ const AM_WEEK_TEMPLATES={
     build:c=>{
       if(!c.list.length)return `Hi ${c.nm}! \uD83D\uDC4B\n\nDiese Woche ist trainingsfrei \u2014 geniesst die Pause! \uD83D\uDE0A\n\nDein Link bleibt derselbe:\n${c.url}`;
       const l=[`Hallo ${c.nm}! \uD83D\uDC4B`,'','So sieht unsere Woche aus:'];
-      c.list.forEach(e=>l.push(`${e.isMatch?'\u26bd':'\ud83c\udfc3'} ${e.dow}, ${e.dnum} um ${e.time} Uhr${e.place?' \u00b7 '+e.place:''}`));
+      c.list.forEach(e=>{
+        l.push(`${e.isMatch?'\u26bd':'\ud83c\udfc3'} ${e.dow}, ${e.dnum} um ${e.time} Uhr${e.place?' \u00b7 '+e.place:''}`);
+        // Route only for matches: away grounds are the ones nobody knows.
+        if(e.isMatch&&e.map)l.push(`   \ud83d\uddfa ${e.map}`);
+      });
       l.push('','Sag uns bitte einmal kurz Bescheid, wann du dabei bist \u2014 dann k\u00f6nnen wir richtig planen:',c.url);
       if(c.statsUrl)l.push('','Und hier deine pers\u00f6nliche Statistik \ud83d\udcca',c.statsUrl);
       l.push('','Bis bald! \u26BD');
@@ -10090,7 +10101,10 @@ const AM_WEEK_TEMPLATES={
     build:c=>{
       if(!c.list.length)return `${c.nm}: diese Woche keine Termine. Link: ${c.url}`;
       const l=[`Terminplanung${c.kw?' KW '+c.kw:''}`,''];
-      c.list.forEach(e=>l.push(`${e.dow} ${e.dnum}, ${e.time} Uhr \u2014 ${e.what}${e.place?', '+e.place:''}`));
+      c.list.forEach(e=>{
+        l.push(`${e.dow} ${e.dnum}, ${e.time} Uhr \u2014 ${e.what}${e.place?', '+e.place:''}`);
+        if(e.isMatch&&e.map)l.push(`   ${e.map}`);
+      });
       l.push('','R\u00fcckmeldung bitte \u00fcber diesen Link:',c.url);
       if(c.statsUrl)l.push('','Pers\u00f6nliche Statistik: '+c.statsUrl);
       return l.join('\n');
@@ -12450,7 +12464,9 @@ function renderPlayerMode(){
 
     const haInfo=f.isMatch&&s.homeAway?`<div class="pm-loc">${s.homeAway==='home'?'\ud83c\udfe0 Heim':'\ud83d\ude8c Ausw\u00e4rts'}</div>`:'';
     // Location line — only if the session has one defined
-    const locInfo=(s.location&&s.location.trim())?`<div class="pm-loc">${LOC_ICON} ${_amEscapeText(s.location.trim())}</div>`:'';
+    const locInfo=(s.location&&s.location.trim())
+      ?`<div class="pm-loc">${LOC_ICON} ${_amEscapeText(s.location.trim())} ${locRouteLink(s.location.trim())}</div>`
+      :'';
     // Trainer's note for this session — surfaced for the player (e.g. "Bring 2 pairs of cleats")
     const noteInfo=(s.note&&s.note.trim())?`<div class="pm-note">\ud83d\udccc ${_amEscapeText(s.note.trim())}</div>`:'';
     // Lineup position — only for matches where trainer has named player in the starting XI/bank
@@ -16581,7 +16597,9 @@ function openSessStats(si){
   const parts=s.date.split(' ');
   document.getElementById('ss-title').textContent=s.date+(isMat&&s.label?' – '+s.label:s.focus?' · '+s.focus:'');
   // Location belongs on the meta line: it is the second question after "when"
-  const _locMeta=(s.location&&s.location.trim())?' &nbsp;·&nbsp; '+LOC_ICON+' '+escapeHtml(s.location.trim()):'';
+  const _locMeta=(s.location&&s.location.trim())
+    ?' &nbsp;·&nbsp; '+LOC_ICON+' '+escapeHtml(s.location.trim())+' '+locRouteLink(s.location.trim())
+    :'';
   document.getElementById('ss-meta').innerHTML=(isMat?`⚽ Spiel &nbsp;·&nbsp; ${s.homeAway==='home'?'🏠 Heim':'🚌 Auswärts'}${s.label?' &nbsp;·&nbsp; '+escapeHtml(s.label):''}${s.time?' &nbsp;·&nbsp; ⏰ '+escapeHtml(s.time):''}`:`Training${s.focus?' &nbsp;·&nbsp; 🎯 '+escapeHtml(s.focus):''}${s.time?' &nbsp;·&nbsp; ⏰ '+escapeHtml(s.time):''}`)+_locMeta;
   try{renderEvalTopicRow(si);}catch(e){console.error('evalTopic:',e);}
   // Roll-call entry point: trainers only, and only once the session is
@@ -18524,7 +18542,7 @@ function homeRenderNext(){
         '<div class="home-next-date">'+escapeHtml(s.date||'')+(s.time?(' \u00b7 '+s.time):'')+'</div>'+
         '<div class="home-next-count">'+whenTxt(d)+'</div>'+
       '</div>'+
-      ((s.location&&s.location.trim())?'<div class="home-next-loc">'+LOC_ICON+' '+escapeHtml(s.location.trim())+'</div>':'')+
+      ((s.location&&s.location.trim())?'<div class="home-next-loc">'+LOC_ICON+' '+escapeHtml(s.location.trim())+' '+locRouteLink(s.location.trim())+'</div>':'')+
       rsvp(tIdx)+'</div>';
   }
   if(mIdx>=0){
@@ -18541,7 +18559,7 @@ function homeRenderNext(){
         '<span class="home-next-pill" style="'+haColor+'">'+ha+'</span>'+
         '<div class="home-next-count">'+whenTxt(d)+'</div>'+
       '</div>'+
-      ((s.location&&s.location.trim())?'<div class="home-next-loc">'+LOC_ICON+' '+escapeHtml(s.location.trim())+'</div>':'')+
+      ((s.location&&s.location.trim())?'<div class="home-next-loc">'+LOC_ICON+' '+escapeHtml(s.location.trim())+' '+locRouteLink(s.location.trim())+'</div>':'')+
       rsvp(mIdx)+'</div>';
   }
   _homeSetHtml(row,html);
@@ -20180,6 +20198,38 @@ function getLocations(){
   }catch(e){}
   return G.locationList;
 }
+function getLocationAddrs(){
+  if(!G.locationAddr||typeof G.locationAddr!=='object')G.locationAddr={};
+  return G.locationAddr;
+}
+function locAddr(name){
+  const v=getLocationAddrs()[String(name||'').trim()];
+  return (typeof v==='string')?v.trim():'';
+}
+function setLocAddr(name,addr){
+  const key=String(name||'').trim();
+  if(!key)return;
+  const map=getLocationAddrs();
+  const v=String(addr||'').trim().slice(0,160);
+  if((map[key]||'')===v)return;
+  snap();
+  if(v)map[key]=v;else delete map[key];
+  saveG();
+  logAudit('Ortsadresse ge\u00e4ndert',key,v||'entfernt');
+  if(typeof renderLocationManager==='function')renderLocationManager();
+}
+// Maps link. Falls back to the place name when no address is stored — a
+// search for "Kunstrasen Frohlinde" still gets most people there.
+function locMapsUrl(name){
+  const q=locAddr(name)||String(name||'').trim();
+  if(!q)return '';
+  return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q);
+}
+function locRouteLink(name,label){
+  const url=locMapsUrl(name);
+  if(!url)return '';
+  return `<a class="loc-route" href="${url}" target="_blank" rel="noopener" title="Route öffnen">${label||'\ud83d\uddfa Route'}</a>`;
+}
 function rememberLocation(name){
   const v=String(name||'').trim().slice(0,80);
   if(!v)return;
@@ -20261,10 +20311,19 @@ function renderLocationManager(){
       +'<div class="u-empty-txt">Noch keine Orte gespeichert. Orte werden automatisch \u00fcbernommen, sobald du sie bei einem Termin eintr\u00e4gst.</div></div>';
     return;
   }
-  box.innerHTML=list.map(l=>`<div class="loc-row">
-    <span class="loc-name">${LOC_ICON} ${escapeHtml(l)}</span>
-    <button class="btn-mini" onclick="removeLocation('${escapeHtml(l).replace(/'/g,"\\'")}')" title="Entfernen">\u2715</button>
-  </div>`).join('');
+  box.innerHTML=list.map(l=>{
+    const esc=escapeHtml(l).replace(/'/g,"\\'");
+    return `<div class="loc-row">
+      <div class="loc-main">
+        <span class="loc-name">${LOC_ICON} ${escapeHtml(l)}</span>
+        <input class="loc-addr" type="text" value="${escapeHtml(locAddr(l))}"
+          placeholder="Adresse f\u00fcr die Route, z.B. Sportplatz 1, 44379 Dortmund"
+          onchange="setLocAddr('${esc}',this.value)">
+      </div>
+      ${locAddr(l)?`<a class="btn-mini" href="${locMapsUrl(l)}" target="_blank" rel="noopener" title="Route prüfen">\ud83d\uddfa</a>`:''}
+      <button class="btn-mini" onclick="removeLocation('${esc}')" title="Entfernen">\u2715</button>
+    </div>`;
+  }).join('');
 }
 function locAddManual(){
   const inp=document.getElementById('loc-mgr-new');
