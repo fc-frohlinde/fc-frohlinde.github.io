@@ -844,8 +844,8 @@ input[type="date"]{cursor:pointer;}
 /* Right column of the player header: actions on top, contact shortcuts
    directly underneath. That area used to be empty while the contact row took
    a full line of its own below the name. */
-/* Same section frame and row metrics as .tp-sec / .tp-row */
-.ps-info{border-top:1px solid var(--gl);padding-top:9px;margin-top:9px;margin-bottom:12px;}
+/* The section frame now comes from .tp-sec itself */
+.ps-info{margin:0;}
 .ps-info-row{display:flex;align-items:center;gap:9px;margin-bottom:6px;}
 .ps-info-l{flex:0 0 118px;font-size:.74rem;color:var(--gm);}
 .ps-info-v{flex:1;min-width:0;font-size:.8rem;color:var(--gd);word-break:break-word;}
@@ -863,8 +863,8 @@ input[type="date"]{cursor:pointer;}
 #ps-nr{font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:var(--gm);}
 #ps-ctx{font-size:.7rem;color:var(--gm);}
 .ps-title-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
-.ps-close-btn{font-size:.85rem;padding:6px 12px;min-height:34px;line-height:1;}
-.ps-title-row .btn{font-size:.74rem;padding:6px 12px;min-height:34px;}
+/* No size overrides: these are ordinary modal buttons and must match every
+   other modal in the app. */
 .ps-title{margin:0;flex:1;min-width:0;}
 .ps-head-mid{flex:1;min-width:0;}
 #ps-edit-toggle{flex-shrink:0;align-self:flex-start;}
@@ -876,20 +876,10 @@ input[type="date"]{cursor:pointer;}
 .ps-head-right{display:flex;align-items:center;gap:6px;flex-shrink:0;}
 .ps-head-btns{display:flex;gap:6px;flex-shrink:0;align-items:center;}
 .ps-b-ico{display:none;}
-/* Full-width contact bar: equal columns on a wide screen, stacked on a phone
-   where three side by side would each be too narrow to label. */
-.ps-contact{display:none;gap:6px;margin:0 0 12px;}
-.ps-contact .ps-cbtn{flex:1;justify-content:center;min-height:38px;}
-.ps-cbtn{display:inline-flex;align-items:center;gap:5px;background:var(--bm);color:#fff;text-decoration:none;
-  border-radius:var(--r-pill);padding:6px 12px;font-family:'Barlow',sans-serif;font-size:.73rem;
-  font-weight:700;min-height:34px;}
-.ps-cbtn:hover{background:var(--bd);}
-.ps-cbtn-wa{background:#25d366;}
-.ps-cbtn-mail{background:var(--surface-dark);}
-.ps-cbtn-wa:hover{background:#1da851;}
-.ps-cnum{font-size:.7rem;color:var(--gm);}
+
+
 @media (max-width:767px){
-  .ps-contact .ps-cbtn{flex:1;justify-content:center;min-height:40px;}
+
   .ps-cnum{display:none;}
 }
 .ma-card-av{width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0;}
@@ -1683,8 +1673,8 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   .ps-head-row{flex-wrap:wrap;}
   .ps-head-right{align-items:stretch;flex-basis:100%;min-width:0;}
   .ps-head-btns{justify-content:flex-end;}
-  .ps-contact{flex-direction:column;}
-  .ps-contact .ps-cbtn{width:100%;min-height:42px;}
+  /* Trainer profile already stacks its quick buttons on phones */
+  #ps-contact.tp-quick .tp-qbtn{flex:1;justify-content:center;}
   #moSession2 .ss-btn-ico{display:inline;}
   #ss-head-btns .btn{padding:6px 11px;font-size:.8rem;min-height:36px;flex-shrink:0;}
   #ss-edit-toggle{font-size:.74rem !important;padding:7px 10px !important;min-height:38px;}
@@ -2763,11 +2753,20 @@ if(window._fbBlocked){
     <button class="tp-edit-btn" id="ps-edit-toggle" onclick="togglePlayerEdit()">✎ Bearbeiten</button>
   </div>
   <div id="ps-card-view">
-  <div id="ps-contact" class="ps-contact"></div>
-  <div id="ps-note-display" class="ps-info"></div>
-  <div class="ps-cards" id="ps-cards"></div>
-  <div id="ps-next"></div>
-  <div id="ps-dots"></div>
+  <div class="tp-sec" id="ps-sec-kontakt">
+    <div class="tp-sec-h">Kontakt</div>
+    <div id="ps-contact" class="tp-quick"></div>
+  </div>
+  <div class="tp-sec" id="ps-sec-person">
+    <div class="tp-sec-h">Person</div>
+    <div id="ps-note-display" class="ps-info"></div>
+  </div>
+  <div class="tp-sec" id="ps-sec-saison">
+    <div class="tp-sec-h">Saison</div>
+    <div class="ps-cards" id="ps-cards"></div>
+    <div id="ps-next"></div>
+    <div id="ps-dots"></div>
+  </div>
   <div id="ps-note-card"></div>
   <div id="ps-ext-btn-wrap" style="margin:2px 0 12px;">
     <button class="btn bp" id="ps-ext-btn" onclick="openPlayerStatsExt()" style="width:100%;justify-content:center;font-size:.8rem;padding:9px 14px;">📊 Alle Statistiken</button>
@@ -8345,25 +8344,26 @@ function renderPlayerFront(p,pi){
 function renderPlayerContact(p){
   const box=document.getElementById('ps-contact');
   if(!box)return;
+  const sec=document.getElementById('ps-sec-kontakt');
   const raw=String((p&&p.phone)||'').trim();
   if(!raw){
     if(p&&p.email){
-      box.style.display='flex';
-      box.innerHTML=`<a class="ps-cbtn ps-cbtn-mail" href="mailto:${escapeHtml(p.email)}">\u2709\ufe0f E-Mail</a>`;
-    }else{box.innerHTML='';box.style.display='none';}
+      box.innerHTML=`<a class="tp-qbtn" href="mailto:${escapeHtml(p.email)}">\u2709\ufe0f E-Mail</a>`;
+      if(sec)sec.style.display='';
+    }else{box.innerHTML='';if(sec)sec.style.display='none';}
     return;
   }
+  if(sec)sec.style.display='';
   const tel=raw.replace(/[^0-9+]/g,'');
   // wa.me needs the international form without + or leading zero: a German
   // 0170… becomes 49170…
   let wa=tel.replace(/^\+/,'');
   if(wa.startsWith('00'))wa=wa.slice(2);
   else if(wa.startsWith('0'))wa='49'+wa.slice(1);
-  box.style.display='flex';
-  box.innerHTML=`<a class="ps-cbtn" href="tel:${escapeHtml(tel)}">\ud83d\udcde Anrufen</a>`
-    +`<a class="ps-cbtn ps-cbtn-wa" href="https://wa.me/${escapeHtml(wa)}" target="_blank" rel="noopener">\ud83d\udcac WhatsApp</a>`
-    +((p&&p.email)?`<a class="ps-cbtn ps-cbtn-mail" href="mailto:${escapeHtml(p.email)}">\u2709\ufe0f E-Mail</a>`:'')
-    +`<span class="ps-cnum">${escapeHtml(raw)}</span>`;
+  // tp-qbtn: literally the same control the trainer profile uses
+  box.innerHTML=`<a class="tp-qbtn" href="tel:${escapeHtml(tel)}">\ud83d\udcde Anrufen</a>`
+    +`<a class="tp-qbtn" href="https://wa.me/${escapeHtml(wa)}" target="_blank" rel="noopener">\ud83d\udcac WhatsApp</a>`
+    +((p&&p.email)?`<a class="tp-qbtn" href="mailto:${escapeHtml(p.email)}">\u2709\ufe0f E-Mail</a>`:'');
 }
 function removePlayerPhoto(){
   if(!canEdit())return;
@@ -15652,8 +15652,9 @@ function openPlayerStats(pi){
     }
     if(p.foot)info.push(_row('Starker Fu\u00df',p.foot==='right'?'Rechts':p.foot==='left'?'Links':'Beidf\u00fc\u00dfig'));
     if(p.passnr)info.push(_row('Pass-Nr.',escapeHtml(p.passnr)));
-    if(info.length){noteEl.innerHTML=info.join('');noteEl.style.display='block';}
-    else{noteEl.style.display='none';}
+    const personSec=document.getElementById('ps-sec-person');
+    noteEl.innerHTML=info.join('');
+    if(personSec)personSec.style.display=info.length?'':'none';
   }
   // Reset edit section
   // Every open of the modal starts on the card, never in the form
