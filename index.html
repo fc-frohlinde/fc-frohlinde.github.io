@@ -398,8 +398,12 @@ body.theme-dark .pl-row:nth-child(even){background:#15264a;}
   background:none;text-align:left;border-top:1px solid rgba(255,255,255,.1);margin-top:3px;
   font-family:'Barlow',sans-serif;font-weight:700;min-height:36px;}
 .ttab-add:hover{color:var(--ac);}
-.tdelt{font-size:.52rem;color:rgba(255,255,255,.16);cursor:pointer;padding:1px 3px;border-radius:3px;}
-.tdelt:hover{background:rgba(231,76,60,.4);color:#fff;}
+/* Pushed to the right edge so every row has it in the same spot, and given a
+   real target size — at 0.52rem in 16% white it was nearly invisible next to
+   the name, which is exactly where a mis-tap deletes a team. */
+.tdelt{margin-left:auto;flex-shrink:0;font-size:.72rem;color:rgba(255,255,255,.35);
+  cursor:pointer;padding:4px 6px;border-radius:5px;line-height:1;transition:all .12s;}
+.tdelt:hover{background:rgba(231,76,60,.85);color:#fff;}
 /* Trainer chips on right of tab bar */
 .trainer-strip{display:none;}
 .trainer-chip{padding:2px 8px;background:color-mix(in srgb, var(--ac) 13%, transparent);border:1px solid color-mix(in srgb, var(--ac) 28%, transparent);border-radius:14px;font-size:.66rem;font-weight:600;color:rgba(255,255,255,.85);white-space:nowrap;flex-shrink:0;}
@@ -1020,7 +1024,10 @@ input[type="date"]{cursor:pointer;}
   color:rgba(255,255,255,.7);font-family:'Bebas Neue',sans-serif;font-size:.8rem;letter-spacing:.5px;}
 .ma-card-txt{flex:1;min-width:0;}
 .nm-av{width:22px;height:22px;border-radius:50%;object-fit:cover;flex-shrink:0;margin-right:7px;}
-body.no-photos .nm-av,body.no-photos .ma-card-av{display:none;}
+/* Covers every portrait in the working views: table rows, the mobile list,
+   the trainer strip on the Startseite and the trainer manager. */
+body.no-photos .nm-av,body.no-photos .ma-card-av,
+body.no-photos .trainer-chip-av,body.no-photos .tr-av{display:none;}
 .nm-av-ph{display:inline-block;background:rgba(0,0,0,.06);}
 .trainer-chip-btn{cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .12s;}
 .trainer-chip-btn:hover{background:rgba(255,255,255,.28);}
@@ -2877,8 +2884,8 @@ if(window._fbBlocked){
         <div class="view-dropdown" id="viewDropdown2" style="bottom:calc(100% + 5px);top:auto;left:auto;right:0;">
           <div class="vd-item" onclick="event.stopPropagation();toggleSec('hdr')"><span>Header</span><div class="vd-check on" id="vd2-hdr">✓</div></div>
           <div class="vd-item" onclick="event.stopPropagation();toggleSec('tools')"><span>Werkzeuge</span><div class="vd-check on" id="vd2-tools">✓</div></div>
-          <div class="vd-item" onclick="event.stopPropagation();toggleSec('photos')"><span>Spielerfotos</span><div class="vd-check on" id="vd2-photos">✓</div></div>
           <div class="vd-item" onclick="event.stopPropagation();toggleSec('legend')"><span>Legende</span><div class="vd-check on" id="vd2-legend">✓</div></div>
+          <div class="vd-item" onclick="event.stopPropagation();toggleSec('photos')"><span>Fotos</span><div class="vd-check on" id="vd2-photos">✓</div></div>
           <div class="vd-sep"></div>
           <div class="vd-item" onclick="event.stopPropagation();collapseAll()"><span>Nur Tabelle</span></div>
           <div class="vd-item" onclick="event.stopPropagation();resetCollapse()"><span>↺ Alles</span></div>
@@ -3431,7 +3438,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786220344226; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786220683596; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
