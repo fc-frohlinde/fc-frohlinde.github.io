@@ -11044,7 +11044,29 @@ function _pmWeekHorizon(now){
   const flipped=(d.getDay()===PM_SURVEY_DOW&&d.getHours()>=PM_SURVEY_HOUR);
   const end=new Date(d);
   end.setDate(end.getDate()+daysToSunday+(flipped?7:0));
-  return end.getFullYear()*10000+(end.getMonth()+1)*100+end.getDate();
+  const sk=e=>e.getFullYear()*10000+(e.getMonth()+1)*100+e.getDate();
+  let horizon=sk(end);
+  // The fixed Sunday-16:00 flip assumed invitations always go out then. Sent
+  // on a Saturday with the week already played, the window covered nothing —
+  // the message would have announced an empty week. If no session remains in
+  // the current window, move on to the next one; there is nothing left to ask
+  // about in this one anyway.
+  try{
+    const D=(typeof cd==='function')?cd():null;
+    const today=(typeof todaySK==='function')?todaySK():0;
+    if(D&&Array.isArray(D.sessions)&&today){
+      const any=D.sessions.some(s=>{
+        if(!s||!s.date)return false;
+        const k=dispToSortKey(s.date);
+        return k>=today&&k<=horizon;
+      });
+      if(!any){
+        end.setDate(end.getDate()+7);
+        horizon=sk(end);
+      }
+    }
+  }catch(e){}
+  return horizon;
 }
 function _pmComputeRank(p,D){
   // Compute player's rank among teammates by season attendance %.
