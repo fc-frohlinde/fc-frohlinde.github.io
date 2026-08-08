@@ -871,6 +871,22 @@ input[type="date"]{cursor:pointer;}
 @media (min-width:768px){
   #moPlayer,#moTrainerProfile{align-items:flex-start;padding-top:min(7vh,60px);}
 }
+/* Photo, name and the Fertig button stay put while the rest scrolls. Note the
+   two windows scroll different elements: the player modal scrolls its own
+   body, the trainer window scrolls #tp-content — so each header pins inside
+   the scroller that actually moves it. Backgrounds are opaque so content
+   cannot show through while passing underneath. */
+.tp-title-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+#moPlayer .ps-title-row{position:sticky;top:0;z-index:3;background:#fff;
+  margin:-20px -24px 0;padding:20px 24px 8px;}
+#moPlayer .ps-head-row{position:sticky;top:56px;z-index:2;background:#fff;
+  margin:0 -24px 12px;padding:0 24px 12px;border-bottom:1px solid var(--gl);}
+#moTrainerProfile .tp-head{position:sticky;top:0;z-index:2;background:#fff;
+  padding-bottom:12px;margin-bottom:12px;border-bottom:1px solid var(--gl);}
+@media (max-width:767px){
+  #moPlayer .ps-title-row{margin:-16px -16px 0;padding:14px 16px 6px;}
+  #moPlayer .ps-head-row{top:50px;margin:0 -16px 10px;padding:0 16px 10px;}
+}
 .ps-cnum{flex-basis:100%;font-size:.72rem;color:var(--gm);margin-top:2px;}
 .ps-title-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
 /* No size overrides: these are ordinary modal buttons and must match every
@@ -25013,7 +25029,7 @@ checkAutoBackup();
 </div>
 
 <div class="mo" id="moTrainerProfile"><div class="mob" style="width:440px;max-width:96vw;">
-  <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+  <div class="tp-title-row">
     <h3 style="margin:0;flex:1;">👤 Trainerprofil</h3>
   </div>
   <div id="tp-content" style="max-height:64vh;overflow-y:auto;"></div>
