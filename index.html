@@ -834,7 +834,6 @@ input[type="date"]{cursor:pointer;}
 .ps-sess-more button{background:none;border:none;color:var(--bl);font-family:'Barlow',sans-serif;
   font-size:.72rem;font-weight:600;cursor:pointer;padding:4px 8px;}
 .ps-sess-more button:hover{text-decoration:underline;}
-.ps-edit-active{background:var(--ok) !important;border-color:var(--ok) !important;color:#fff !important;}
 .ps-more{border-top:1px solid var(--gl);margin-bottom:10px;}
 .ps-more-sum{list-style:none;cursor:pointer;display:flex;align-items:center;gap:6px;padding:11px 2px;
   font-size:.78rem;font-weight:700;color:var(--gm);}
@@ -854,8 +853,6 @@ input[type="date"]{cursor:pointer;}
 .ps-meta-row>*{white-space:nowrap;}
 #ps-ctx{font-size:.65rem;color:var(--gm);}
 #ps-note-display{margin-top:5px;font-size:.78rem;color:var(--gd);font-style:italic;}
-.ps-icon-btn{font-size:.9rem;padding:6px 11px;background:var(--ow) !important;color:var(--gd) !important;
-  border:1.5px solid var(--gl) !important;min-width:38px;justify-content:center;}
 .ps-head-right{display:flex;flex-direction:column;align-items:flex-end;gap:7px;flex-shrink:0;min-width:0;}
 .ps-head-btns{display:flex;gap:6px;flex-shrink:0;}
 .ps-b-ico{display:none;}
@@ -1655,7 +1652,11 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
      overflowed and ran into each other ("Bearbeiten← Zurück"). Icons only. */
   .ps-b-lbl{display:none;}
   .ps-b-ico{display:inline;}
-  .ps-head-btns .btn{padding:7px 11px;min-height:38px;}
+  .ps-head-btns .btn,.ps-head-btns .tp-edit-btn{padding:7px 11px;min-height:38px;}
+  /* On a phone the label would push the row over the edge again */
+  #ps-edit-toggle{font-size:0;padding:7px 12px;}
+  #ps-edit-toggle::before{content:'\270e';font-size:.95rem;}
+  #ps-edit-toggle.active::before{content:'\2713';}
   /* width:100% on a flex CHILD sitting next to the avatar and the name block
      pushed the modal wider than the screen. Wrapping the header instead gives
      the column its own line and keeps everything inside the viewport. */
@@ -2736,8 +2737,8 @@ if(window._fbBlocked){
     </div>
     <div class="ps-head-right">
       <div class="ps-head-btns">
-        <button class="btn ps-icon-btn" id="ps-edit-toggle" onclick="togglePlayerEdit()" title="Bearbeiten">✎</button>
-        <button class="btn ps-icon-btn" onclick="playerGoBack()" title="Zurück">←</button>
+        <button class="tp-edit-btn" id="ps-edit-toggle" onclick="togglePlayerEdit()">✎ Bearbeiten</button>
+        <button class="btn" id="ps-back-btn" style="font-size:.76rem;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" onclick="playerGoBack()"><span class="ps-b-lbl">← Zurück</span><span class="ps-b-ico">←</span></button>
         <button class="btn bs" onclick="closeM('moPlayer')">✕</button>
       </div>
       <div id="ps-contact" class="ps-contact"></div>
@@ -15885,7 +15886,7 @@ function _psShowCard(){
     const el=document.getElementById(id);
     if(el)el.style.display='';
   });
-  if(btn){btn.innerHTML='\u270e Bearbeiten';btn.classList.remove('ps-edit-active');}
+  if(btn){btn.innerHTML='\u270e Bearbeiten';btn.classList.remove('active');}
 }
 function togglePlayerEdit(){
   const box=document.getElementById('ps-edit');
@@ -15898,7 +15899,7 @@ function togglePlayerEdit(){
     if(el)el.style.display=open?'none':'';
   });
   btn.innerHTML=open?'\u2713 Fertig':'\u270e Bearbeiten';
-  btn.classList.toggle('ps-edit-active',open);
+  btn.classList.toggle('active',open);
   if(open)box.scrollIntoView({block:'nearest'});
 }
 function savePlayerEdit(){
