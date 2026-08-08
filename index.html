@@ -899,13 +899,14 @@ input[type="date"]{cursor:pointer;}
 .tp-in-wrap>*{width:100%;margin-bottom:0;}
 #ps-edit .tp-in{margin-bottom:0;}
 #ps-edit textarea.tp-in{width:100%;resize:vertical;font-family:'Barlow',sans-serif;line-height:1.4;}
-#ps-edit .tp-sec:first-child{border-top:none;margin-top:0;padding-top:0;}
+#ps-edit .tp-sec:first-child{border-top:none;margin-top:0;padding-top:9px;}
 @media (max-width:767px){
   #ps-edit .tp-row{flex-direction:column;align-items:stretch;gap:3px;}
   #ps-edit .tp-l{flex:none;}
   #ps-edit .tp-in{min-height:40px;}
 }
-.ps-cnum{flex-basis:100%;font-size:.72rem;color:var(--gm);margin-top:2px;}
+.ps-crows{flex-basis:100%;margin-top:8px;}
+.ps-crows .tp-row{margin-bottom:4px;}
 .ps-title-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
 /* No size overrides: these are ordinary modal buttons and must match every
    other modal in the app. */
@@ -8360,7 +8361,8 @@ function renderPlayerContact(p){
   const raw=String((p&&p.phone)||'').trim();
   if(!raw){
     if(p&&p.email){
-      box.innerHTML=`<a class="tp-qbtn" href="mailto:${escapeHtml(p.email)}">\u2709\ufe0f E-Mail</a>`;
+      box.innerHTML=`<a class="tp-qbtn" href="mailto:${escapeHtml(p.email)}">\u2709\ufe0f E-Mail</a>`
+        +`<div class="ps-crows"><div class="tp-row"><span class="tp-l">E-Mail</span><span class="tp-v">${escapeHtml(p.email)}</span></div></div>`;
       if(sec)sec.style.display='';
     }else{box.innerHTML='';if(sec)sec.style.display='none';}
     return;
@@ -8376,7 +8378,10 @@ function renderPlayerContact(p){
   box.innerHTML=`<a class="tp-qbtn" href="tel:${escapeHtml(tel)}">\ud83d\udcde Anrufen</a>`
     +`<a class="tp-qbtn" href="https://wa.me/${escapeHtml(wa)}" target="_blank" rel="noopener">\ud83d\udcac WhatsApp</a>`
     +((p&&p.email)?`<a class="tp-qbtn" href="mailto:${escapeHtml(p.email)}">\u2709\ufe0f E-Mail</a>`:'')
-    +`<div class="ps-cnum">${escapeHtml(raw)}${(p&&p.email)?' \u00b7 '+escapeHtml(p.email):''}</div>`;
+    +`<div class="ps-crows">`
+    +`<div class="tp-row"><span class="tp-l">Telefon</span><span class="tp-v">${escapeHtml(raw)}</span></div>`
+    +((p&&p.email)?`<div class="tp-row"><span class="tp-l">E-Mail</span><span class="tp-v">${escapeHtml(p.email)}</span></div>`:'')
+    +`</div>`;
 }
 function removePlayerPhoto(){
   if(!canEdit())return;
