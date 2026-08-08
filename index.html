@@ -862,6 +862,7 @@ input[type="date"]{cursor:pointer;}
 .ps-sub>*{white-space:nowrap;}
 #ps-nr{font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:var(--gm);}
 #ps-ctx{font-size:.7rem;color:var(--gm);}
+.ps-cnum{flex-basis:100%;font-size:.72rem;color:var(--gm);margin-top:2px;}
 .ps-title-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
 /* No size overrides: these are ordinary modal buttons and must match every
    other modal in the app. */
@@ -2835,25 +2836,6 @@ if(window._fbBlocked){
       </div>
       <label>📝 Kommentar</label>
       <textarea id="pe-note" rows="2" placeholder="z.B. Verletzt bis KW 20, Schulnoten, ..." style="width:100%;padding:7px;border:1.5px solid var(--gl);border-radius:7px;font-family:'Barlow',sans-serif;font-size:.8rem;resize:vertical;margin-bottom:8px;"></textarea>
-      <label style="display:flex;align-items:center;gap:7px;font-size:.78rem;font-weight:600;color:var(--gd);cursor:pointer;margin-bottom:8px;padding:6px 8px;background:rgba(22,89,184,.04);border-radius:6px;border:1px solid rgba(22,89,184,.12);">
-        <input type="checkbox" id="pe-hidepos" style="margin:0;width:14px;height:14px;cursor:pointer;"/>
-        <span>🙈 Position auf Spieler-Seite verbergen</span>
-        <span style="color:var(--gm);font-weight:400;font-size:.7rem;margin-left:auto;">Für Spieler in Probe-Position</span>
-      </label>
-      <div id="pe-confirm-link-section" style="background:rgba(22,89,184,.05);border:1px solid rgba(22,89,184,.18);border-radius:8px;padding:9px 11px;margin-bottom:8px;font-size:.78rem;">
-        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
-          <span style="font-weight:700;color:var(--bd);">🔗 Bestätigungslink</span>
-          <span style="color:var(--gm);font-size:.7rem;">— Link für den Spieler zum Bestätigen der Anwesenheit</span>
-        </div>
-        <div id="pe-confirm-link-display"></div>
-      </div>
-      <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;">
-        <button class="btn bp" onclick="savePlayerEdit()">✓ Speichern</button>
-        <button class="btn" onclick="closeM('moPlayer')" style="background:#f0f4fc;color:var(--gd);border:1.5px solid var(--gl);">✕ Abbrechen</button>
-        <span style="flex:1;"></span>
-        <button class="btn bs" onclick="pickPlayerPhoto()" style="font-size:.74rem;">📷 Foto</button>
-        <button class="btn" id="pe-photo-del" onclick="removePlayerPhoto()" style="background:rgba(231,76,60,.1);color:#c0392b;border:1px solid rgba(231,76,60,.3);font-size:.74rem;display:none;">🗑 Entfernen</button>
-      </div>
     </div>
   </div>
 </div></div>
@@ -8363,7 +8345,8 @@ function renderPlayerContact(p){
   // tp-qbtn: literally the same control the trainer profile uses
   box.innerHTML=`<a class="tp-qbtn" href="tel:${escapeHtml(tel)}">\ud83d\udcde Anrufen</a>`
     +`<a class="tp-qbtn" href="https://wa.me/${escapeHtml(wa)}" target="_blank" rel="noopener">\ud83d\udcac WhatsApp</a>`
-    +((p&&p.email)?`<a class="tp-qbtn" href="mailto:${escapeHtml(p.email)}">\u2709\ufe0f E-Mail</a>`:'');
+    +((p&&p.email)?`<a class="tp-qbtn" href="mailto:${escapeHtml(p.email)}">\u2709\ufe0f E-Mail</a>`:'')
+    +`<div class="ps-cnum">${escapeHtml(raw)}${(p&&p.email)?' \u00b7 '+escapeHtml(p.email):''}</div>`;
 }
 function removePlayerPhoto(){
   if(!canEdit())return;
@@ -15628,9 +15611,6 @@ function openPlayerStats(pi){
   // Avatar
   const avEl=document.getElementById('ps-avatar-wrap');
   if(avEl)avEl.innerHTML=renderPlayerAvatar(p,72,true);
-  // Photo remove button visibility
-  const photoDelBtn=document.getElementById('pe-photo-del');
-  if(photoDelBtn)photoDelBtn.style.display=p.photo?'':'none';
   const noteEl=document.getElementById('ps-note-display');
   if(noteEl){
     // One labelled row per fact, like the trainer profile — a single line of
@@ -15673,8 +15653,6 @@ function openPlayerStats(pi){
     try{renderPlayerContact(p);}catch(e){}
     try{renderPlayerFront(p,pi);}catch(e){}
     document.getElementById('pe-email').value=p.email||'';
-    const hpEl=document.getElementById('pe-hidepos');
-    if(hpEl)hpEl.checked=!!p.hidePos;
     _currentFoot=p.foot||'right';
     setFoot(_currentFoot);
     document.getElementById('pe-name').value=p.name||'';
@@ -15924,6 +15902,51 @@ function _psShowCard(){
   });
   if(btn){btn.innerHTML='\u270e Bearbeiten';btn.classList.remove('active');}
 }
+// With no Speichern button the form has to commit by itself. savePlayerEdit
+// re-renders the whole modal (which would throw the user back to the card
+// mid-typing), so autosave writes the same fields and stays put.
+function _psAutoSave(){
+  const pi=_resolveCurrentPI();
+  if(pi<0)return;
+  const D=cd(),p=D&&D.players[pi];
+  if(!p)return;
+  const val=id=>{const e=document.getElementById(id);return e?String(e.value||'').trim():null;};
+  const before=JSON.stringify([p.name,p.nr,p.shortname,p.passnr,p.birthdate,p.phone,p.email,p.note]);
+  const nm=val('pe-name');
+  if(nm)p.name=nm;                      // never allow an empty name
+  const nr=val('pe-nr');
+  p.nr=nr===''?null:(parseInt(nr,10)||null);
+  ['shortname','passnr','birthdate','phone','email','note'].forEach(f=>{
+    const v=val('pe-'+f);
+    if(v===null)return;
+    if(v)p[f]=v;else delete p[f];
+  });
+  if(typeof _currentFoot!=='undefined')p.foot=_currentFoot;
+  if(JSON.stringify([p.name,p.nr,p.shortname,p.passnr,p.birthdate,p.phone,p.email,p.note])===before)return;
+  saveG();
+  if(typeof renderBody==='function')renderBody();
+  if(typeof renderTfoot==='function')renderTfoot();
+  // Keep the card underneath in step without leaving the form
+  try{renderPlayerContact(p);}catch(e){}
+  const psName=document.getElementById('ps-name');
+  if(psName)psName.textContent=(getDisplayName?getDisplayName(p):p.name)||'';
+  const psNr=document.getElementById('ps-nr');
+  if(psNr)psNr.textContent='#'+(p.nr||'?');
+}
+function _psBindAutoSave(){
+  const box=document.getElementById('ps-edit');
+  if(!box||box._autoBound)return;
+  box._autoBound=true;
+  box.addEventListener('change',e=>{
+    if(e.target&&/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName))_psAutoSave();
+  });
+  // Typing in a textarea only fires change on blur — commit sooner
+  let t=null;
+  box.addEventListener('input',e=>{
+    if(!e.target||e.target.tagName!=='TEXTAREA')return;
+    clearTimeout(t);t=setTimeout(_psAutoSave,900);
+  });
+}
 function togglePlayerEdit(){
   const box=document.getElementById('ps-edit');
   const btn=document.getElementById('ps-edit-toggle');
@@ -15936,7 +15959,8 @@ function togglePlayerEdit(){
   });
   btn.innerHTML=open?'\u2713 Fertig':'\u270e Bearbeiten';
   btn.classList.toggle('active',open);
-  if(open)box.scrollIntoView({block:'nearest'});
+  if(open){_psBindAutoSave();box.scrollIntoView({block:'nearest'});}
+  else _psAutoSave();   // catch a field edited but never blurred
 }
 function savePlayerEdit(){
   // Re-resolve before write — Anna's edits should land on Anna's record, even if
@@ -15954,8 +15978,7 @@ function savePlayerEdit(){
   p.birthdate=document.getElementById('pe-birthdate').value;
   p.phone=document.getElementById('pe-phone').value.trim();
   p.email=document.getElementById('pe-email').value.trim();
-  const hpEl=document.getElementById('pe-hidepos');
-  p.hidePos=hpEl?!!hpEl.checked:!!p.hidePos;
+  // "Position verbergen" control removed; keep any existing value untouched
   p.foot=_currentFoot;
   saveG();renderBody();renderTfoot();
   // Back to card view after saving — including the blocks the form hid
