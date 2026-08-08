@@ -838,7 +838,13 @@ input[type="date"]{cursor:pointer;}
 .ps-more-chev{margin-left:auto;transition:transform .16s;font-size:1rem;}
 .ps-more[open] .ps-more-chev{transform:rotate(90deg);}
 .ps-more-body{padding-top:4px;}
-.ps-contact{display:none;flex-wrap:wrap;align-items:center;gap:6px;margin-top:7px;}
+/* Right column of the player header: actions on top, contact shortcuts
+   directly underneath. That area used to be empty while the contact row took
+   a full line of its own below the name. */
+.ps-head-right{display:flex;flex-direction:column;align-items:flex-end;gap:7px;flex-shrink:0;min-width:0;}
+.ps-head-btns{display:flex;gap:6px;flex-shrink:0;}
+.ps-b-ico{display:none;}
+.ps-contact{display:none;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:6px;}
 .ps-cbtn{display:inline-flex;align-items:center;gap:5px;background:var(--bm);color:#fff;text-decoration:none;
   border-radius:var(--r-pill);padding:6px 12px;font-family:'Barlow',sans-serif;font-size:.73rem;
   font-weight:700;min-height:34px;}
@@ -1627,6 +1633,13 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
      Zurück shrinks to its arrow (the label is redundant next to it) and both
      buttons lose the desktop padding — still 36px tall, so they stay tappable. */
   #moSession2 .ss-btn-lbl{display:none;}
+  /* Three labelled buttons never fit next to the avatar on a phone — they
+     overflowed and ran into each other ("Bearbeiten← Zurück"). Icons only. */
+  .ps-b-lbl{display:none;}
+  .ps-b-ico{display:inline;}
+  .ps-head-btns .btn{padding:7px 11px;min-height:38px;}
+  .ps-head-right{align-items:stretch;width:100%;}
+  .ps-head-btns{justify-content:flex-end;}
   #moSession2 .ss-btn-ico{display:inline;}
   #ss-head-btns .btn{padding:6px 11px;font-size:.8rem;min-height:36px;flex-shrink:0;}
   #ss-edit-toggle{font-size:.74rem !important;padding:7px 10px !important;min-height:38px;}
@@ -2695,9 +2708,16 @@ if(window._fbBlocked){
         <span id="ps-ctx" style="font-size:.65rem;color:var(--gm);margin-left:4px;"></span>
       </div>
       <div id="ps-note-display" style="margin-top:5px;font-size:.78rem;color:var(--gd);font-style:italic;display:none;"></div>
+
+    </div>
+    <div class="ps-head-right">
+      <div class="ps-head-btns">
+        <button class="btn" id="ps-edit-toggle" onclick="togglePlayerEdit()" style="font-size:.76rem;background:var(--ow);color:var(--gd);border:1.5px solid var(--gl);"><span class="ps-b-lbl">✎ Bearbeiten</span><span class="ps-b-ico">✎</span></button>
+        <button class="btn" style="font-size:.76rem;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" onclick="playerGoBack()"><span class="ps-b-lbl">← Zurück</span><span class="ps-b-ico">←</span></button>
+        <button class="btn bs" onclick="closeM('moPlayer')">✕</button>
+      </div>
       <div id="ps-contact" class="ps-contact"></div>
     </div>
-    <div style="display:flex;gap:6px;flex-shrink:0;"><button class="btn" id="ps-edit-toggle" onclick="togglePlayerEdit()" style="font-size:.76rem;background:var(--ow);color:var(--gd);border:1.5px solid var(--gl);">✎ Bearbeiten</button><button class="btn" style="font-size:.76rem;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" onclick="playerGoBack()"><span class="ss-btn-lbl">← Zurück</span><span class="ss-btn-ico">←</span></button><button class="btn bs" onclick="closeM('moPlayer')">✕</button></div>
   </div>
   <div class="ps-cards" id="ps-cards"></div>
   <div id="ps-next"></div>
