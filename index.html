@@ -2441,6 +2441,11 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 .loc-route{display:inline-flex;align-items:center;gap:4px;color:var(--bl);text-decoration:none;
   font-size:.72rem;font-weight:700;white-space:nowrap;}
 .loc-route:hover{text-decoration:underline;}
+/* Underlined so it is visibly tappable, but in the surrounding colour — the
+   place name should not turn into a bright link inside a dark card. */
+.loc-link{color:inherit;text-decoration:underline;text-decoration-style:dotted;
+  text-underline-offset:3px;cursor:pointer;}
+.loc-link:hover{text-decoration-style:solid;}
 .loc-name{flex:1;min-width:0;font-size:.8rem;color:var(--gd);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .home-next-loc{font-size:.72rem;color:rgba(255,255,255,.6);margin-top:4px;display:flex;align-items:center;gap:5px;}
 .rpe-ov-sum{font-size:.74rem;color:var(--gm);margin-bottom:10px;}
@@ -12462,7 +12467,7 @@ function renderPlayerMode(){
     const haInfo=f.isMatch&&s.homeAway?`<div class="pm-loc">${s.homeAway==='home'?'\ud83c\udfe0 Heim':'\ud83d\ude8c Ausw\u00e4rts'}</div>`:'';
     // Location line — only if the session has one defined
     const locInfo=(s.location&&s.location.trim())
-      ?`<div class="pm-loc">${LOC_ICON} ${_amEscapeText(s.location.trim())} ${locRouteNeeded(s)?locRouteLink(s.location.trim()):''}</div>`
+      ?`<div class="pm-loc">${locNameHtml(s,_amEscapeText)}</div>`
       :'';
     // Trainer's note for this session — surfaced for the player (e.g. "Bring 2 pairs of cleats")
     const noteInfo=(s.note&&s.note.trim())?`<div class="pm-note">\ud83d\udccc ${_amEscapeText(s.note.trim())}</div>`:'';
@@ -16594,10 +16599,7 @@ function openSessStats(si){
   const parts=s.date.split(' ');
   document.getElementById('ss-title').textContent=s.date+(isMat&&s.label?' – '+s.label:s.focus?' · '+s.focus:'');
   // Location belongs on the meta line: it is the second question after "when"
-  const _locMeta=(s.location&&s.location.trim())
-    ?' &nbsp;·&nbsp; '+LOC_ICON+' '+escapeHtml(s.location.trim())
-      +(locRouteNeeded(s)?' '+locRouteLink(s.location.trim()):'')
-    :'';
+  const _locMeta=(s.location&&s.location.trim())?' &nbsp;·&nbsp; '+locNameHtml(s):'';
   document.getElementById('ss-meta').innerHTML=(isMat?`⚽ Spiel &nbsp;·&nbsp; ${s.homeAway==='home'?'🏠 Heim':'🚌 Auswärts'}${s.label?' &nbsp;·&nbsp; '+escapeHtml(s.label):''}${s.time?' &nbsp;·&nbsp; ⏰ '+escapeHtml(s.time):''}`:`Training${s.focus?' &nbsp;·&nbsp; 🎯 '+escapeHtml(s.focus):''}${s.time?' &nbsp;·&nbsp; ⏰ '+escapeHtml(s.time):''}`)+_locMeta;
   try{renderEvalTopicRow(si);}catch(e){console.error('evalTopic:',e);}
   // Roll-call entry point: trainers only, and only once the session is
@@ -18540,7 +18542,7 @@ function homeRenderNext(){
         '<div class="home-next-date">'+escapeHtml(s.date||'')+(s.time?(' \u00b7 '+s.time):'')+'</div>'+
         '<div class="home-next-count">'+whenTxt(d)+'</div>'+
       '</div>'+
-      ((s.location&&s.location.trim())?'<div class="home-next-loc">'+LOC_ICON+' '+escapeHtml(s.location.trim())+(locRouteNeeded(s)?' '+locRouteLink(s.location.trim()):'')+'</div>':'')+
+      ((s.location&&s.location.trim())?'<div class="home-next-loc">'+locNameHtml(s)+'</div>':'')+
       rsvp(tIdx)+'</div>';
   }
   if(mIdx>=0){
@@ -18557,7 +18559,7 @@ function homeRenderNext(){
         '<span class="home-next-pill" style="'+haColor+'">'+ha+'</span>'+
         '<div class="home-next-count">'+whenTxt(d)+'</div>'+
       '</div>'+
-      ((s.location&&s.location.trim())?'<div class="home-next-loc">'+LOC_ICON+' '+escapeHtml(s.location.trim())+(locRouteNeeded(s)?' '+locRouteLink(s.location.trim()):'')+'</div>':'')+
+      ((s.location&&s.location.trim())?'<div class="home-next-loc">'+locNameHtml(s)+'</div>':'')+
       rsvp(mIdx)+'</div>';
   }
   _homeSetHtml(row,html);
@@ -20230,6 +20232,16 @@ function locRouteLink(name,label){
   const url=locMapsUrl(name);
   if(!url)return '';
   return `<a class="loc-route" href="${url}" target="_blank" rel="noopener" title="Route öffnen">${label||'\ud83d\uddfa Route'}</a>`;
+}
+// Icon + name, linked to the map when directions are actually needed.
+function locNameHtml(s,esc){
+  const nm=(s&&s.location||'').trim();
+  if(!nm)return '';
+  const e=(esc||escapeHtml)(nm);
+  if(!locRouteNeeded(s))return LOC_ICON+' '+e;
+  const url=locMapsUrl(nm);
+  if(!url)return LOC_ICON+' '+e;
+  return `<a class="loc-link" href="${url}" target="_blank" rel="noopener" title="Route öffnen">${LOC_ICON} ${e}</a>`;
 }
 function rememberLocation(name){
   const v=String(name||'').trim().slice(0,80);
