@@ -840,9 +840,18 @@ input[type="date"]{cursor:pointer;}
 .ps-nophone{margin-top:2px;}
 .ps-nophone-txt{font-size:.75rem;color:var(--warn-fg);background:var(--warn-bg);
   border-radius:8px;padding:8px 11px;line-height:1.35;}
-.ps-nophone-add{display:flex;gap:6px;margin-top:7px;}
+.ps-nophone-add{display:flex;gap:6px;margin-top:7px;align-items:stretch;}
 .ps-nophone-add input{flex:1;min-width:0;margin-bottom:0;}
-.ps-nophone-add .btn{flex-shrink:0;}
+/* The default button is sized for modal footers; here it has to match the
+   input it stands beside. */
+.ps-nophone-add .btn{flex-shrink:0;padding:0 12px;font-size:.76rem;line-height:1;}
+.ps-sep-row{display:flex;align-items:center;gap:8px;padding:5px 9px;font-size:.62rem;font-weight:700;
+  letter-spacing:1px;color:var(--gm);background:rgba(0,0,0,.04);text-transform:uppercase;
+  border-top:1px solid var(--gl);border-bottom:1px solid var(--gl);}
+.ps-sep-row>span{flex:1;min-width:0;}
+.ps-sep-btn{background:none;border:none;color:var(--bl);font-family:'Barlow',sans-serif;font-size:.66rem;
+  font-weight:700;letter-spacing:.3px;text-transform:none;cursor:pointer;padding:2px 4px;white-space:nowrap;}
+.ps-sep-btn:hover{text-decoration:underline;}
 .ps-sess-more{padding:6px 9px;text-align:center;}
 .ps-sess-more button{background:none;border:none;color:var(--bl);font-family:'Barlow',sans-serif;
   font-size:.72rem;font-weight:600;cursor:pointer;padding:4px 8px;}
@@ -15890,10 +15899,13 @@ function openPlayerStats(pi,opts){
     : (_psShowAllUpcoming&&_upcomingAll.length>PS_UPCOMING_MAX
         ? '<div class="ps-sess-more"><button onclick="psToggleUpcoming()">\u2212 geplante Termine einklappen</button></div>'
         : '');
+  // Sits in the "Vergangene Einheiten" separator, not under the list: with
+  // the fold open the list is long, and a control at the very bottom means
+  // scrolling the whole season to collapse it again.
   const _pastNote=_pastHidden>0
-    ? `<div class="ps-sess-more"><button onclick="psTogglePast()">+ ${_pastHidden} weitere vergangene Einheiten</button></div>`
+    ? `<button class="ps-sep-btn" onclick="event.stopPropagation();psTogglePast()">+ ${_pastHidden} weitere</button>`
     : (_psShowAllPast&&_pastAll.length>PS_PAST_MAX
-        ? '<div class="ps-sess-more"><button onclick="psTogglePast()">\u2212 weniger anzeigen</button></div>'
+        ? '<button class="ps-sep-btn" onclick="event.stopPropagation();psTogglePast()">\u2212 weniger</button>'
         : '');
   document.getElementById('ps-sessions').innerHTML=_sessIdxs.map((i,outerIdx)=>{
     const s=ss[i];
@@ -15918,7 +15930,7 @@ function openPlayerStats(pi,opts){
       : `<span class="sr-st ${STCLS[v]}" style="margin-left:auto;">${SYM[v]}</span>`;
     // Separator row before the first past entry — visual cue trainer is now in history
     const sepRow=(outerIdx===_firstPastIdx&&_firstPastIdx>0)
-      ?_upcomingNote+'<div style="padding:5px 9px;font-size:.62rem;font-weight:700;letter-spacing:1px;color:var(--gm);background:rgba(0,0,0,.04);text-transform:uppercase;border-top:1px solid var(--gl);border-bottom:1px solid var(--gl);">\u2022 Vergangene Einheiten</div>'
+      ?_upcomingNote+`<div class="ps-sep-row"><span>\u2022 Vergangene Einheiten</span>${_pastNote}</div>`
       :'';
     return sepRow+`<div class="sr" onclick="navPush({id:'moPlayer',pi:currentPI});closeM('moPlayer');openSessStats(${i})">
       <span class="sr-date">${s.date}</span>
@@ -15926,7 +15938,7 @@ function openPlayerStats(pi,opts){
       ${lbl?`<span style="font-size:.64rem;color:var(--gm);">${lbl}${isMat&&s.homeAway?(s.homeAway==='home'?' \ud83c\udfe0':' \ud83d\ude8c'):''}</span>`:''}
       ${stBtn}
     </div>`;
-  }).join('')+_pastNote||'<p style="padding:9px;font-size:.72rem;color:var(--gm);">Keine Einheiten.</p>';
+  }).join('')||'<p style="padding:9px;font-size:.72rem;color:var(--gm);">Keine Einheiten.</p>';
   // Notes timeline
   renderPlayerNotesTimeline(currentPI);
   openM('moPlayer');
