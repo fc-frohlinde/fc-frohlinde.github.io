@@ -356,15 +356,19 @@ body.theme-dark .pl-row:nth-child(even){background:#15264a;}
 .season-chip{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;color:var(--ac);white-space:nowrap;}
 
 /* TEAM-TABS BAR – trainers on right */
-.team-bar-wrap{display:flex;align-items:stretch;flex-shrink:0;min-width:0;}
+.team-bar-wrap{display:flex;align-items:stretch;min-width:0;}
 .team-bar-wrap.hidden{display:none;}
-/* The accent line the dark strip used to carry now closes the toolbar, so the
-   separation between controls and table survives the move. */
-.toolbar{border-bottom:3px solid var(--ac);}
+/* Where the dark strip used to sit: between the header and the controls. */
+.toolbar{border-top:3px solid var(--ac);}
 /* One row, scrollable rather than wrapping: a second line here would give
-   back exactly the height the move was meant to save. */
+   back exactly the height the move was meant to save.
+   The wrapper is the shrinking element — with a fixed max-width every added
+   team pushed the season picker and the buttons further right until they left
+   the screen. Now the pill row gives way first and scrolls inside itself,
+   while everything else keeps its place however many teams exist. */
+.team-bar-wrap{flex:0 1 auto;min-width:0;overflow:hidden;}
 .team-tabs{display:flex;align-items:stretch;flex-wrap:nowrap;gap:3px;
-  overflow-x:auto;scrollbar-width:none;max-width:min(340px,42vw);}
+  overflow-x:auto;scrollbar-width:none;min-width:0;}
 .team-tabs::-webkit-scrollbar{display:none;}
 /* Pills rather than underlined tabs: inside the toolbar they sit next to
    ordinary buttons, where a bottom-border tab reads as a different system. */
@@ -3399,7 +3403,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786218342135; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786218653381; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
