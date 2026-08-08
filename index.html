@@ -366,22 +366,33 @@ body.theme-dark .pl-row:nth-child(even){background:#15264a;}
    team pushed the season picker and the buttons further right until they left
    the screen. Now the pill row gives way first and scrolls inside itself,
    while everything else keeps its place however many teams exist. */
-.team-bar-wrap{flex:0 1 auto;min-width:0;overflow:hidden;}
-.team-tabs{display:flex;align-items:stretch;flex-wrap:nowrap;gap:3px;
-  overflow-x:auto;scrollbar-width:none;min-width:0;}
-.team-tabs::-webkit-scrollbar{display:none;}
+.team-bar-wrap{flex:0 0 auto;}
+.team-pick{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.16);color:#fff;border-radius:var(--r-pill);
+  padding:4px 11px;font-family:'Barlow',sans-serif;font-size:.72rem;font-weight:700;
+  letter-spacing:.6px;text-transform:uppercase;cursor:pointer;min-height:26px;
+  max-width:180px;white-space:nowrap;overflow:hidden;}
+.team-pick:hover{background:rgba(255,255,255,.16);}
+.team-pick-caret{opacity:.6;font-size:.6rem;}
+/* The list itself is a popup, so team count changes its height, never the
+   width of the toolbar. */
+.team-tabs{display:none;position:fixed;z-index:600;flex-direction:column;gap:2px;
+  background:var(--surface-mid);border:1px solid rgba(255,255,255,.14);border-radius:10px;
+  padding:5px;box-shadow:0 10px 30px rgba(0,0,0,.4);min-width:170px;max-height:60vh;overflow-y:auto;}
+.team-tabs.open{display:flex;}
 /* Pills rather than underlined tabs: inside the toolbar they sit next to
    ordinary buttons, where a bottom-border tab reads as a different system. */
-.ttab{padding:4px 11px;font-family:'Barlow',sans-serif;font-weight:700;font-size:.7rem;letter-spacing:.6px;
-  color:rgba(255,255,255,.55);cursor:grab;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);
-  text-transform:uppercase;white-space:nowrap;border-radius:var(--r-pill);flex-shrink:0;min-height:26px;
-  display:inline-flex;align-items:center;gap:5px;transition:all .12s;}
+.ttab{padding:8px 11px;font-family:'Barlow',sans-serif;font-weight:700;font-size:.72rem;letter-spacing:.6px;
+  color:rgba(255,255,255,.75);cursor:grab;border:none;background:none;text-align:left;
+  text-transform:uppercase;white-space:nowrap;border-radius:7px;flex-shrink:0;min-height:36px;
+  display:flex;align-items:center;gap:8px;transition:all .12s;}
 .ttab:hover{color:#fff;background:rgba(255,255,255,.14);}
 .ttab.active{color:var(--bd);background:var(--ac);border-color:var(--ac);}
 .ttab.drag-over{background:color-mix(in srgb, var(--ac) 30%, transparent);}
 .ttab.dragging{opacity:.4;}
-.ttab-add{padding:4px 9px;font-size:.85rem;color:rgba(255,255,255,.35);cursor:pointer;border:none;
-  background:none;align-self:center;flex-shrink:0;}
+.ttab-add{padding:8px 11px;font-size:.72rem;color:rgba(255,255,255,.45);cursor:pointer;border:none;
+  background:none;text-align:left;border-top:1px solid rgba(255,255,255,.1);margin-top:3px;
+  font-family:'Barlow',sans-serif;font-weight:700;min-height:36px;}
 .ttab-add:hover{color:var(--ac);}
 .tdelt{font-size:.52rem;color:rgba(255,255,255,.16);cursor:pointer;padding:1px 3px;border-radius:3px;}
 .tdelt:hover{background:rgba(231,76,60,.4);color:#fff;}
@@ -2754,7 +2765,14 @@ if(window._fbBlocked){
 <div class="toolbar" id="toolbarEl">
   <div class="toolbar-l">
     <button class="btn bs" id="btn-home" onclick="homeOpen()" title="Startseite" style="font-size:.95rem;padding:4px 10px;">⌂</button>
-    <div class="team-bar-wrap" id="teamBarWrap"><div class="team-tabs" id="teamTabs"></div></div>
+    <div class="team-bar-wrap" id="teamBarWrap">
+      <button class="team-pick" id="teamPickBtn" onclick="event.stopPropagation();toggleTeamMenu()" title="Mannschaft wechseln">
+        <span id="teamPickLbl">–</span><span class="team-pick-caret">▾</span>
+      </button>
+      <!-- id kept: the render code and the drag-to-reorder handler both bind
+           to #teamTabs and .ttab, so the picker inherits both unchanged. -->
+      <div class="team-tabs" id="teamTabs"></div>
+    </div>
     <div class="tsep"></div>
     <div class="tsep"></div>
     <label style="color:rgba(255,255,255,.52);font-size:.68rem;font-weight:600;">SAISON:</label>
@@ -3403,7 +3421,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786218653381; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786218875796; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -7751,10 +7769,12 @@ function renderTeamBar(){
   // Team tabs
   const tabs=document.getElementById('teamTabs');
   tabs.innerHTML=G.teamList.map(t=>`
-    <button class="ttab${t===UI.currentTeam?' active':''}" data-team="${t}" draggable="true" onclick="switchTeam('${t}')">
+    <button class="ttab${t===UI.currentTeam?' active':''}" data-team="${t}" draggable="true" onclick="switchTeam('${t}');closeTeamMenu();">
       ${t}${isAdmin()?`<span class="tdelt" onclick="event.stopPropagation();delTeam('${t}')">✕</span>`:''}
     </button>`).join('')+
-    (isAdmin()?`<button class="ttab-add" onclick="openM('moNewTeam')">＋</button>`:'');
+    (isAdmin()?`<button class="ttab-add" onclick="closeTeamMenu();openM('moNewTeam')">＋ Neue Mannschaft</button>`:'');
+  const lbl=document.getElementById('teamPickLbl');
+  if(lbl)lbl.textContent=UI.currentTeam||'–';
   // Trainer chips on right
   const trainers=G.trainers.filter(t=>t.teams.includes(UI.currentTeam));
   // trainer strip removed
@@ -21503,6 +21523,22 @@ document.addEventListener('keydown',e=>{
 // ══════════════════════════════
 //  TAB DRAG
 // ══════════════════════════════
+// The picker keeps one width no matter how many teams exist — a row of tabs
+// grew sideways and eventually pushed the toolbar off the screen.
+function toggleTeamMenu(){
+  const m=document.getElementById('teamTabs');
+  if(!m)return;
+  const open=m.classList.toggle('open');
+  if(open){
+    try{_placePopup(m,document.getElementById('teamPickBtn').getBoundingClientRect(),{align:'left',gap:4});}catch(e){}
+    setTimeout(()=>document.addEventListener('click',_teamMenuDocClose,{once:true}),0);
+  }
+}
+function closeTeamMenu(){
+  const m=document.getElementById('teamTabs');
+  if(m)m.classList.remove('open');
+}
+function _teamMenuDocClose(){closeTeamMenu();}
 function initTabDrag(){
   const bar=document.getElementById('teamTabs');let src=null;
   bar.addEventListener('dragstart',e=>{const t=e.target.closest('.ttab');if(!t)return;src=t.dataset.team;t.classList.add('dragging');e.dataTransfer.effectAllowed='move';});
