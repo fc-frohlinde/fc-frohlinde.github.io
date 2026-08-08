@@ -16034,7 +16034,12 @@ function togglePlayerEdit(){
   btn.classList.toggle('active',open);
   if(open){
     _psSnapshot=_psReadForm();
-    box.scrollIntoView({block:'nearest'});
+    // scrollIntoView aligned the form against the viewport, which pushed its
+    // first rows up behind the pinned header — the form looked like it began
+    // somewhere in the middle. The modal body is the scroller, so simply
+    // returning it to the top shows the form from its first field.
+    const shell=document.querySelector('#moPlayer .mob');
+    if(shell)shell.scrollTop=0;
   }else{
     if(_psIsDirty())_psCommitEdit();
     _psSnapshot=null;
