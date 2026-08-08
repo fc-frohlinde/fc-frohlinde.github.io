@@ -840,12 +840,13 @@ input[type="date"]{cursor:pointer;}
 .ps-nophone{margin-top:2px;}
 .ps-nophone-txt{font-size:.75rem;color:var(--warn-fg);background:var(--warn-bg);
   border-radius:8px;padding:8px 11px;line-height:1.35;}
-.ps-nophone-add{display:flex;gap:6px;margin-top:7px;align-items:stretch;}
+.ps-nophone-add{display:flex;gap:6px;margin-top:7px;align-items:center;}
 .ps-nophone-add input{flex:1;min-width:0;margin-bottom:0;}
-/* A footer-sized button next to a single input looked oversized whatever the
-   padding, so it becomes a check mark the width of the field's own height. */
-.ps-nophone-add .btn{flex:0 0 auto;width:38px;padding:0;font-size:1rem;line-height:1;
-  justify-content:center;min-height:0;}
+/* Height is what made it look oversized — the button carries the modal-footer
+   padding while the input is compact. Pinning both to the same height settles
+   it; the label stays. */
+.ps-nophone-add input,.ps-nophone-add .btn{height:34px;min-height:0;padding-top:0;padding-bottom:0;}
+.ps-nophone-add .btn{flex:0 0 auto;padding-left:14px;padding-right:14px;font-size:.78rem;line-height:1;}
 .ps-sep-row{display:flex;align-items:center;gap:8px;padding:5px 9px;font-size:.62rem;font-weight:700;
   letter-spacing:1px;color:var(--gm);background:rgba(0,0,0,.04);text-transform:uppercase;
   border-top:1px solid var(--gl);border-bottom:1px solid var(--gl);}
@@ -8438,7 +8439,7 @@ function renderPlayerContact(p){
             <div class="ps-nophone-txt">\u26a0\ufe0f Keine Telefonnummer \u2014 dieser Spieler erh\u00e4lt keine Einladungen.</div>`
         +(canEdit()?`<div class="ps-nophone-add">
               <input type="tel" id="ps-quick-phone" placeholder="z.B. +49 170 1234567">
-              <button class="btn bp" onclick="psQuickSavePhone()" title="Speichern">\u2713</button>
+              <button class="btn bp" onclick="psQuickSavePhone()">Speichern</button>
             </div>`:'')
         +`</div>`;
     }
