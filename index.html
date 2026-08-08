@@ -1859,6 +1859,14 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
 @supports(padding:max(0px)){
   body{padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);}
   .header{padding-top:max(8px,env(safe-area-inset-top));}
+  /* The header reaches under the status bar, and its gradient runs up to the
+     bright --bm — so the bar looked dark at launch (theme colour) and turned
+     light once the app painted. A flat strip in the same colour the gradient
+     starts from keeps it constant. Height collapses to 0 where there is no
+     inset, so browser tabs are unaffected. */
+  body::before{content:'';position:fixed;top:0;left:0;right:0;
+    height:env(safe-area-inset-top,0px);background:var(--bg-dark);
+    z-index:1000;pointer-events:none;}
 }
 
 /* ════════════════════════════════════════
