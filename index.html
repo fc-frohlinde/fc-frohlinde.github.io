@@ -15929,7 +15929,10 @@ function openPlayerStats(pi,opts){
          </div>`
       : `<span class="sr-st ${STCLS[v]}" style="margin-left:auto;">${SYM[v]}</span>`;
     // Separator row before the first past entry — visual cue trainer is now in history
-    const sepRow=(outerIdx===_firstPastIdx&&_firstPastIdx>0)
+    // Was gated on _firstPastIdx>0, i.e. only drawn when upcoming dates came
+    // first. With none — end of season, or a player whose week is over — the
+    // separator never rendered, and with it the collapse control disappeared.
+    const sepRow=(outerIdx===_firstPastIdx&&_past.length>0)
       ?_upcomingNote+`<div class="ps-sep-row"><span>\u2022 Vergangene Einheiten</span>${_pastNote}</div>`
       :'';
     return sepRow+`<div class="sr" onclick="navPush({id:'moPlayer',pi:currentPI});closeM('moPlayer');openSessStats(${i})">
