@@ -842,9 +842,10 @@ input[type="date"]{cursor:pointer;}
   border-radius:8px;padding:8px 11px;line-height:1.35;}
 .ps-nophone-add{display:flex;gap:6px;margin-top:7px;align-items:stretch;}
 .ps-nophone-add input{flex:1;min-width:0;margin-bottom:0;}
-/* The default button is sized for modal footers; here it has to match the
-   input it stands beside. */
-.ps-nophone-add .btn{flex-shrink:0;padding:0 12px;font-size:.76rem;line-height:1;}
+/* A footer-sized button next to a single input looked oversized whatever the
+   padding, so it becomes a check mark the width of the field's own height. */
+.ps-nophone-add .btn{flex:0 0 auto;width:38px;padding:0;font-size:1rem;line-height:1;
+  justify-content:center;min-height:0;}
 .ps-sep-row{display:flex;align-items:center;gap:8px;padding:5px 9px;font-size:.62rem;font-weight:700;
   letter-spacing:1px;color:var(--gm);background:rgba(0,0,0,.04);text-transform:uppercase;
   border-top:1px solid var(--gl);border-bottom:1px solid var(--gl);}
@@ -8437,7 +8438,7 @@ function renderPlayerContact(p){
             <div class="ps-nophone-txt">\u26a0\ufe0f Keine Telefonnummer \u2014 dieser Spieler erh\u00e4lt keine Einladungen.</div>`
         +(canEdit()?`<div class="ps-nophone-add">
               <input type="tel" id="ps-quick-phone" placeholder="z.B. +49 170 1234567">
-              <button class="btn bp" onclick="psQuickSavePhone()">Speichern</button>
+              <button class="btn bp" onclick="psQuickSavePhone()" title="Speichern">\u2713</button>
             </div>`:'')
         +`</div>`;
     }
@@ -15894,11 +15895,18 @@ function openPlayerStats(pi,opts){
   const _sessIdxs=_upcoming.concat(_past);
   // Build a divider when transitioning from upcoming to past
   const _firstPastIdx=_upcoming.length;
-  const _upcomingNote=_upcomingHidden>0
-    ? `<div class="ps-sess-more"><button onclick="psToggleUpcoming()">+ ${_upcomingHidden} weitere geplante Termine anzeigen</button></div>`
+  // Same reasoning as for the past list: the control has to sit where the
+  // block starts, otherwise collapsing means scrolling past everything it
+  // just unfolded.
+  const _upBtn=_upcomingHidden>0
+    ? `<button class="ps-sep-btn" onclick="event.stopPropagation();psToggleUpcoming()">+ ${_upcomingHidden} weitere</button>`
     : (_psShowAllUpcoming&&_upcomingAll.length>PS_UPCOMING_MAX
-        ? '<div class="ps-sess-more"><button onclick="psToggleUpcoming()">\u2212 geplante Termine einklappen</button></div>'
+        ? '<button class="ps-sep-btn" onclick="event.stopPropagation();psToggleUpcoming()">\u2212 weniger</button>'
         : '');
+  const _upHead=_upcoming.length
+    ? `<div class="ps-sep-row"><span>\u2022 Geplante Termine</span>${_upBtn}</div>`
+    : '';
+  const _upcomingNote='';
   // Sits in the "Vergangene Einheiten" separator, not under the list: with
   // the fold open the list is long, and a control at the very bottom means
   // scrolling the whole season to collapse it again.
@@ -15907,7 +15915,7 @@ function openPlayerStats(pi,opts){
     : (_psShowAllPast&&_pastAll.length>PS_PAST_MAX
         ? '<button class="ps-sep-btn" onclick="event.stopPropagation();psTogglePast()">\u2212 weniger</button>'
         : '');
-  document.getElementById('ps-sessions').innerHTML=_sessIdxs.map((i,outerIdx)=>{
+  document.getElementById('ps-sessions').innerHTML=_upHead+_sessIdxs.map((i,outerIdx)=>{
     const s=ss[i];
     const v=p.s?p.s[i]:3;
     const isMat=s.type==='match';
