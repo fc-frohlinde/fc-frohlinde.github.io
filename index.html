@@ -2711,7 +2711,7 @@ if(window._fbBlocked){
   <details class="ps-more">
     <summary class="ps-more-sum"><span>Weitere Details</span><span class="ps-more-chev">›</span></summary>
     <div class="ps-more-body">
-      <div class="sec" style="margin-bottom:6px;">🎯 Schwerpunkte</div>
+      <div class="sec" id="ps-focuses-sec" style="margin-bottom:6px;">🎯 Schwerpunkte</div>
       <div id="ps-focuses" style="margin-bottom:12px;"></div>
       <!-- Monthly overview and grade history live in "Alle Statistiken", where
            they cover every season instead of just the current one. These two
@@ -2719,7 +2719,7 @@ if(window._fbBlocked){
       <div id="ps-months" hidden></div>
       <div class="sec" id="ps-perf-sec" hidden></div>
       <div id="ps-perf" hidden></div>
-      <div class="sec" style="margin-bottom:6px;">📜 Notizen-Timeline <span id="ps-notes-count" style="font-size:.7rem;color:var(--gm);font-weight:500;margin-left:6px;"></span></div>
+      <div class="sec" id="ps-notes-sec" style="margin-bottom:6px;">📜 Notizen-Timeline <span id="ps-notes-count" style="font-size:.7rem;color:var(--gm);font-weight:500;margin-left:6px;"></span></div>
       <div id="ps-notes-timeline" style="margin-bottom:12px;"></div>
       <div class="sec" style="margin-bottom:6px;">📋 Alle Einheiten</div>
       <div class="sess-list" id="ps-sessions"></div>
@@ -15632,10 +15632,18 @@ function openPlayerStats(pi){
   // Focuses
   const focMap={};foc.forEach(f=>focMap[f]={a:0,pl:0});
   tIdx.forEach(i=>{const f=ss[i].focus;if(f&&focMap[f]){const v=p.s?p.s[i]:3;if(v!==3)focMap[f].pl++;if(v===1)focMap[f].a++;}});
-  document.getElementById('ps-focuses').innerHTML=foc.filter(f=>focMap[f]&&focMap[f].pl>0).map(f=>{
+  // Same rule as the notes timeline: no data → no section, not a placeholder.
+  const focRows=foc.filter(f=>focMap[f]&&focMap[f].pl>0).map(f=>{
     const pct=focMap[f].pl?Math.round((focMap[f].a/focMap[f].pl)*100):0;
     return `<div class="fr"><div class="fr-nm">${f}</div><div class="fr-bw"><div class="fr-bar" style="width:${pct}%;background:var(--bm);"></div></div><div class="fr-val">${focMap[f].a}/${focMap[f].pl}</div><div style="min-width:28px;flex-shrink:0;text-align:right;font-size:.63rem;color:var(--gm);">${pct}%</div></div>`;
-  }).join('')||'<p style="font-size:.72rem;color:var(--gm);">Keine Schwerpunkt-Daten.</p>';
+  }).join('');
+  {
+    const fEl=document.getElementById('ps-focuses');
+    const fSec=document.getElementById('ps-focuses-sec');
+    fEl.innerHTML=focRows;
+    fEl.style.display=focRows?'':'none';
+    if(fSec)fSec.style.display=focRows?'':'none';
+  }
   // Leistungsnote — average + chronological history. Trainings AND matches,
   // only sessions that were actually graded. Section stays hidden entirely if
   // the player has no graded sessions yet, so teams not using the feature
@@ -15767,11 +15775,18 @@ function renderPlayerNotesTimeline(pi){
   const cntEl=document.getElementById('ps-notes-count');
   if(!container)return;
   const notes=_gatherPlayerNotes(pi);
+  const secEl=document.getElementById('ps-notes-sec');
   if(cntEl)cntEl.textContent=notes.length?'('+notes.length+')':'';
+  // Hide the heading too — a section whose only content is "there is nothing
+  // here" still costs a line and makes the card look fuller than it is.
   if(!notes.length){
-    container.innerHTML='<p style="font-size:.72rem;color:var(--gm);padding:6px 0;">Keine Notizen, die diesen Spieler namentlich erwähnen.</p>';
+    container.innerHTML='';
+    container.style.display='none';
+    if(secEl)secEl.style.display='none';
     return;
   }
+  container.style.display='';
+  if(secEl)secEl.style.display='';
   // Render each note as a card
   container.innerHTML=notes.map(n=>{
     const isMat=n.type==='match';
