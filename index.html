@@ -1258,9 +1258,10 @@ select.lp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   .home-hero-title{font-size:1.5rem;letter-spacing:1.5px;}
   .home-hero-sub{font-size:.66rem;letter-spacing:2px;margin-top:3px;}
   /* No hover on touch, so the desktop reveal-on-hover button would sit
-     permanently on the photo. Hidden here — the action lives in the user
-     menu instead (Mannschaftsfoto), out of the way. */
-  .home-hero-photobtn{display:none !important;}
+     permanently on the photo. It used to be hidden here because the action
+     lived in the user menu — that entry is gone, so this is now the only way
+     in and it stays visible, just small and unobtrusive. */
+  .home-hero-photobtn{opacity:1;pointer-events:auto;padding:4px 9px;font-size:.68rem;}
   .home-user-pill{top:8px;right:8px;padding:4px 9px;font-size:.7rem;}
   /* Tiles: natural height, two columns, real tap targets */
   .home-tiles{flex:0 0 auto;min-height:0;align-content:flex-start;gap:10px;margin-bottom:16px;}
@@ -2689,7 +2690,7 @@ if(window._fbBlocked){
 
 <div class="header" id="hdrEl">
   
-  <div class="logo-ring" id="logoRingWrap" onclick="if(canEdit())pickClubLogo()" style="cursor:pointer;" title="Logo ändern"><img id="clogo" alt="FC Frohlinde"/></div>
+  <div class="logo-ring" id="logoRingWrap" onclick="clubLogoMenu(this,event)" style="cursor:pointer;" title="Logo"><img id="clogo" alt="FC Frohlinde"/></div>
   <div class="htext" id="hTextHome" onclick="headerHome()" title="Zur Startseite" style="cursor:pointer;">
     <div class="hclub">FC Frohlinde<span class="hclub-suffix"> 1949 e.V.</span></div>
     <div class="hsub" id="hSub">U19 · Junioren</div>
@@ -6620,7 +6621,7 @@ function updateUserMenuState(){
   const canEditNow=(typeof canEdit==='function')&&canEdit();
   // ARBEIT group: header+sep+anmeldungen (canEdit) and dashboard (canEdit).
   // The whole "Arbeit" group is hidden if neither item is visible.
-  ['ud-work-sep','ud-work-group','ud-anmeld','ud-heroPhoto'].forEach(id=>{
+  ['ud-work-sep','ud-work-group','ud-anmeld'].forEach(id=>{
     const el=document.getElementById(id);
     if(el)el.style.display=canEditNow?'':'none';
   });
@@ -18693,6 +18694,30 @@ function homeUploadHeroPhoto(ev){
   inp.click();
   setTimeout(()=>inp.remove(),0);
 }
+// Photo targets on the Startseite behave like the player and trainer photos:
+// a tap offers upload or removal instead of opening the file dialog at once.
+function heroPhotoMenu(el,ev){
+  if(ev)ev.stopPropagation();
+  if(!canEdit())return;
+  photoMenu(el,!!(G&&G.heroPhoto),()=>homeUploadHeroPhoto(),()=>homeRemoveHeroPhoto());
+}
+function clubLogoMenu(el,ev){
+  if(ev)ev.stopPropagation();
+  if(!canEdit())return;
+  photoMenu(el,!!(G&&G.clubLogo),()=>pickClubLogo(),()=>removeClubLogo());
+}
+function removeClubLogo(){
+  if(!canEdit())return;
+  if(!G||!G.clubLogo)return;
+  if(!confirm('Vereinslogo entfernen?'))return;
+  snap();
+  delete G.clubLogo;
+  delete G._mid_clubLogo;
+  saveG();
+  if(typeof applyClubLogo==='function')try{applyClubLogo();}catch(e){}
+  if(typeof homeRender==='function')try{homeRender();}catch(e){}
+  logAudit('Vereinslogo entfernt','','');
+}
 function homeRemoveHeroPhoto(){
   if(!canEdit())return;
   if(!G||!G.heroPhoto)return;
@@ -25310,7 +25335,6 @@ checkAutoBackup();
   <div class="ud-group" id="ud-work-group" style="display:none;">Arbeit</div>
   <div class="ud-item" id="ud-anmeld" onclick="closeUserMenu();openAnmeldungen()" style="display:none;">📋 Anmeldungen &amp; Versand</div>
   <div class="ud-item" id="ud-dashboard" onclick="closeUserMenu();openDashboard();" style="display:none;">📊 Dashboard</div>
-  <div class="ud-item" id="ud-heroPhoto" onclick="closeUserMenu();homeUploadHeroPhoto();" style="display:none;">📷 Mannschaftsfoto</div>
 
   <!-- ── ADMIN ── -->
   <div class="ud-sep" id="ud-admin-sep" style="display:none;"></div>
@@ -25429,10 +25453,10 @@ checkAutoBackup();
       <div class="home-hero" id="home-hero">
         <div class="home-hero-photo" id="home-hero-photo" style="display:none;"></div>
         <div class="home-hero-shade"></div>
-        <button class="home-hero-photobtn" id="home-hero-photobtn" style="display:none;left:12px;right:auto;" onclick="homeUploadHeroPhoto(event)">📷 Foto</button>
+        <button class="home-hero-photobtn" id="home-hero-photobtn" style="display:none;left:12px;right:auto;" onclick="heroPhotoMenu(this,event)">📷 Foto</button>
         <button class="home-user-pill" id="home-user-pill" onclick="homeToggleUserMenu(event)">👤 <span id="home-user-name">–</span> <span style="opacity:.6;">▾</span></button>
         <div class="home-hero-content">
-          <div class="home-hero-logo" id="home-hero-logo" onclick="if(canEdit())pickClubLogo()" title="Logo ändern"></div>
+          <div class="home-hero-logo" id="home-hero-logo" onclick="clubLogoMenu(this,event)" title="Logo"></div>
           <div>
             <div class="home-hero-title" id="home-hero-title">FC FROHLINDE</div>
             <div class="home-hero-sub" id="home-hero-sub">U19 · Saison 2025/26</div>
