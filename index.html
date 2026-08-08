@@ -1261,7 +1261,9 @@ select.lp-fmt-btn option:checked{background:var(--bm);color:#fff;}
      permanently on the photo. Hidden again — on a phone the photo area itself
      opens the menu, so no button is needed. */
   .home-hero-photobtn{display:none !important;}
-  body.can-edit .home-hero{cursor:pointer;}
+  /* Long press opens the photo menu — stop the OS text/image selection popup
+     from appearing on top of it. */
+  .home-hero,#home-hero-logo,#logoRingWrap{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
   .home-user-pill{top:8px;right:8px;padding:4px 9px;font-size:.7rem;}
   /* Tiles: natural height, two columns, real tap targets */
   .home-tiles{flex:0 0 auto;min-height:0;align-content:flex-start;gap:10px;margin-bottom:16px;}
@@ -2690,7 +2692,7 @@ if(window._fbBlocked){
 
 <div class="header" id="hdrEl">
   
-  <div class="logo-ring" id="logoRingWrap" onclick="clubLogoMenu(this,event)" style="cursor:pointer;" title="Logo"><img id="clogo" alt="FC Frohlinde"/></div>
+  <div class="logo-ring" id="logoRingWrap" onclick="if(!window.matchMedia('(hover:none)').matches)clubLogoMenu(this,event)" style="cursor:pointer;" title="Logo"><img id="clogo" alt="FC Frohlinde"/></div>
   <div class="htext" id="hTextHome" onclick="headerHome()" title="Zur Startseite" style="cursor:pointer;">
     <div class="hclub">FC Frohlinde<span class="hclub-suffix"> 1949 e.V.</span></div>
     <div class="hsub" id="hSub">U19 · Junioren</div>
@@ -18430,6 +18432,9 @@ function homeData(){
 }
 function homeRender(){
   if(!homeEligible())return;
+  // Idempotent: bindLongPress marks the element, so repeated renders do not
+  // stack listeners.
+  try{_bindPhotoLongPress();}catch(e){}
   const D=homeData()||{players:[],sessions:[]};
   // ── Hero ──
   const heroTitle=document.getElementById('home-hero-title');
@@ -18700,6 +18705,38 @@ function heroPhotoMenu(el,ev){
   if(ev)ev.stopPropagation();
   if(!canEdit())return;
   photoMenu(el,!!(G&&G.heroPhoto),()=>homeUploadHeroPhoto(),()=>homeRemoveHeroPhoto());
+}
+// Long press on touch devices. Bound per element, cancelled by movement so a
+// scroll that starts on the photo never opens the menu.
+function bindLongPress(el,fn){
+  if(!el||el._lpBound)return;
+  el._lpBound=true;
+  let t=null,sx=0,sy=0,fired=false;
+  const clear=()=>{if(t){clearTimeout(t);t=null;}};
+  el.addEventListener('touchstart',e=>{
+    if(!canEdit())return;
+    const p=e.touches&&e.touches[0];
+    sx=p?p.clientX:0;sy=p?p.clientY:0;fired=false;
+    clear();
+    t=setTimeout(()=>{fired=true;fn(el);},550);
+  },{passive:true});
+  el.addEventListener('touchmove',e=>{
+    const p=e.touches&&e.touches[0];
+    if(!p)return;
+    if(Math.abs(p.clientX-sx)>10||Math.abs(p.clientY-sy)>10)clear();
+  },{passive:true});
+  el.addEventListener('touchend',e=>{
+    clear();
+    // Swallow the click the browser sends after a long press
+    if(fired){e.preventDefault();fired=false;}
+  });
+  el.addEventListener('touchcancel',clear);
+}
+function _bindPhotoLongPress(){
+  const hero=document.getElementById('home-hero');
+  if(hero)bindLongPress(hero,el=>heroPhotoMenu(el));
+  [document.getElementById('home-hero-logo'),document.getElementById('logoRingWrap')]
+    .forEach(el=>{if(el)bindLongPress(el,x=>clubLogoMenu(x));});
 }
 function clubLogoMenu(el,ev){
   if(ev)ev.stopPropagation();
@@ -25450,13 +25487,13 @@ checkAutoBackup();
 <div class="home-overlay" id="homeOverlay">
   <div class="home-scroll">
     <div class="home-inner">
-      <div class="home-hero" id="home-hero" onclick="if(window.matchMedia('(max-width:767px)').matches)heroPhotoMenu(this,event)">
+      <div class="home-hero" id="home-hero">
         <div class="home-hero-photo" id="home-hero-photo" style="display:none;"></div>
         <div class="home-hero-shade"></div>
         <button class="home-hero-photobtn" id="home-hero-photobtn" style="display:none;left:12px;right:auto;" onclick="heroPhotoMenu(this,event)">📷 Foto</button>
         <button class="home-user-pill" id="home-user-pill" onclick="homeToggleUserMenu(event)">👤 <span id="home-user-name">–</span> <span style="opacity:.6;">▾</span></button>
         <div class="home-hero-content">
-          <div class="home-hero-logo" id="home-hero-logo" onclick="clubLogoMenu(this,event)" title="Logo"></div>
+          <div class="home-hero-logo" id="home-hero-logo" onclick="if(!window.matchMedia('(hover:none)').matches)clubLogoMenu(this,event)" title="Logo"></div>
           <div>
             <div class="home-hero-title" id="home-hero-title">FC FROHLINDE</div>
             <div class="home-hero-sub" id="home-hero-sub">U19 · Saison 2025/26</div>
