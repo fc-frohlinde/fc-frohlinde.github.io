@@ -830,6 +830,10 @@ input[type="date"]{cursor:pointer;}
    not enough — this rule wins and keeps the duplicates out of the card while
    their code path stays untouched. */
 #ps-months,#ps-perf,#ps-perf-sec{display:none !important;}
+.ps-sess-more{padding:6px 9px;text-align:center;}
+.ps-sess-more button{background:none;border:none;color:var(--bl);font-family:'Barlow',sans-serif;
+  font-size:.72rem;font-weight:600;cursor:pointer;padding:4px 8px;}
+.ps-sess-more button:hover{text-decoration:underline;}
 .ps-edit-active{background:var(--ok) !important;border-color:var(--ok) !important;color:#fff !important;}
 .ps-more{border-top:1px solid var(--gl);margin-bottom:10px;}
 .ps-more-sum{list-style:none;cursor:pointer;display:flex;align-items:center;gap:6px;padding:11px 2px;
@@ -15698,15 +15702,27 @@ function openPlayerStats(pi){
   //   • Past (descending): most recent first
   // Sorted so the trainer's focus stays on what's coming, with history right below.
   const _today=todaySK();
-  const _upcoming=ss.map((_,i)=>i)
+  // Every remaining date of the season used to sit above the past ones, so the
+  // sessions a trainer actually corrects — the recent ones — were at the very
+  // bottom. Only the next few upcoming dates are worth the space here; the
+  // rest of the plan belongs in the calendar.
+  const PS_UPCOMING_MAX=3;
+  const _upcomingAll=ss.map((_,i)=>i)
     .filter(i=>ss[i]&&ss[i].date&&dispToSortKey(ss[i].date)>=_today)
     .sort((a,b)=>dispToSortKey(ss[a].date)-dispToSortKey(ss[b].date));
+  const _upcoming=_psShowAllUpcoming?_upcomingAll:_upcomingAll.slice(0,PS_UPCOMING_MAX);
+  const _upcomingHidden=_upcomingAll.length-_upcoming.length;
   const _past=ss.map((_,i)=>i)
     .filter(i=>ss[i]&&ss[i].date&&dispToSortKey(ss[i].date)<_today)
     .sort((a,b)=>dispToSortKey(ss[b].date)-dispToSortKey(ss[a].date));
   const _sessIdxs=_upcoming.concat(_past);
   // Build a divider when transitioning from upcoming to past
   const _firstPastIdx=_upcoming.length;
+  const _upcomingNote=_upcomingHidden>0
+    ? `<div class="ps-sess-more"><button onclick="psToggleUpcoming()">+ ${_upcomingHidden} weitere geplante Termine anzeigen</button></div>`
+    : (_psShowAllUpcoming&&_upcomingAll.length>PS_UPCOMING_MAX
+        ? '<div class="ps-sess-more"><button onclick="psToggleUpcoming()">\u2212 geplante Termine einklappen</button></div>'
+        : '');
   document.getElementById('ps-sessions').innerHTML=_sessIdxs.map((i,outerIdx)=>{
     const s=ss[i];
     const v=p.s?p.s[i]:3;
@@ -15730,7 +15746,7 @@ function openPlayerStats(pi){
       : `<span class="sr-st ${STCLS[v]}" style="margin-left:auto;">${SYM[v]}</span>`;
     // Separator row before the first past entry — visual cue trainer is now in history
     const sepRow=(outerIdx===_firstPastIdx&&_firstPastIdx>0)
-      ?'<div style="padding:5px 9px;font-size:.62rem;font-weight:700;letter-spacing:1px;color:var(--gm);background:rgba(0,0,0,.04);text-transform:uppercase;border-top:1px solid var(--gl);border-bottom:1px solid var(--gl);">\u2022 Vergangene Einheiten</div>'
+      ?_upcomingNote+'<div style="padding:5px 9px;font-size:.62rem;font-weight:700;letter-spacing:1px;color:var(--gm);background:rgba(0,0,0,.04);text-transform:uppercase;border-top:1px solid var(--gl);border-bottom:1px solid var(--gl);">\u2022 Vergangene Einheiten</div>'
       :'';
     return sepRow+`<div class="sr" onclick="navPush({id:'moPlayer',pi:currentPI});closeM('moPlayer');openSessStats(${i})">
       <span class="sr-date">${s.date}</span>
@@ -15835,6 +15851,12 @@ let _currentFoot='right';
 // otherwise. Showing the form under the card meant scrolling past everything
 // to reach it, and left the modal looking like a form the whole time.
 const _PS_VIEW_BLOCKS=['ps-cards','ps-next','ps-dots','ps-note-card','ps-ext-btn-wrap','ps-more'];
+let _psShowAllUpcoming=false;
+function psToggleUpcoming(){
+  _psShowAllUpcoming=!_psShowAllUpcoming;
+  const pi=(typeof _resolveCurrentPI==='function')?_resolveCurrentPI():-1;
+  if(pi>=0)openPlayerStats(pi);
+}
 function _psShowCard(){
   const box=document.getElementById('ps-edit');
   const btn=document.getElementById('ps-edit-toggle');
