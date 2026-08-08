@@ -3381,7 +3381,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786215840221; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786216465788; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -6639,10 +6639,13 @@ function updateUserMenuState(){
       if(typeof startFbListener==='function')startFbListener();
     }
   }catch(e){}
-  // Syncing is always on now. The manual buttons were tied to it being off —
-  // they stay as an admin diagnostic instead.
+  // Only offer the retry when the connection is actually in trouble; with a
+  // healthy listener it would just repeat what already happened.
   const mb=document.getElementById('ud-manual-btns');
-  if(mb)mb.style.display=isAdmin()?'block':'none';
+  if(mb){
+    const bad=(typeof _fbConnState!=='undefined')&&(_fbConnState==='error'||_fbConnState==='offline');
+    mb.style.display=(bad||_localDirty)?'block':'none';
+  }
   const bb=document.getElementById('ud-backup-item');
   if(bb)bb.style.display=isAdmin()?'block':'none';
   // Password change item: hide for guest / player
@@ -25420,9 +25423,10 @@ checkAutoBackup();
        it was added for disappeared once saves became diffs. The offline code
        paths stay in place, so re-adding the switch is a markup change.
        The manual buttons remain for admins as a diagnostic. -->
+  <!-- Saving and loading happen automatically; the only case left is a failed
+       connection, so this appears only then. -->
   <div id="ud-manual-btns" style="display:none;">
-    <div class="ud-item" onclick="event.stopPropagation();manualSyncSave();">☁️ Jetzt speichern</div>
-    <div class="ud-item" onclick="event.stopPropagation();manualSyncLoad();">⬇️ Jetzt laden</div>
+    <div class="ud-item" onclick="event.stopPropagation();manualSyncSave();" style="color:var(--warn-fg);">🔄 Erneut synchronisieren</div>
   </div>
 
   <div class="ud-sep"></div>
