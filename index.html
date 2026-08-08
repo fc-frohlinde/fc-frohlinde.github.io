@@ -358,8 +358,9 @@ body.theme-dark .pl-row:nth-child(even){background:#15264a;}
 /* TEAM-TABS BAR – trainers on right */
 .team-bar-wrap{display:flex;align-items:stretch;min-width:0;}
 .team-bar-wrap.hidden{display:none;}
-/* Where the dark strip used to sit: between the header and the controls. */
-.toolbar{border-top:3px solid var(--ac);}
+/* On the header, not the toolbar: the separation has to hold even when the
+   toolbar or the legend is switched off in the Ansicht menu. */
+.header{border-bottom:3px solid var(--ac);}
 /* One row, scrollable rather than wrapping: a second line here would give
    back exactly the height the move was meant to save.
    The wrapper is the shrinking element — with a fixed max-width every added
@@ -2866,7 +2867,6 @@ if(window._fbBlocked){
         <button class="view-menu-btn" onclick="toggleViewMenu2(event)" style="background:var(--bd);color:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.22);font-size:.78rem;padding:5px 12px;">⊞ Ansicht ▾</button>
         <div class="view-dropdown" id="viewDropdown2" style="bottom:calc(100% + 5px);top:auto;left:auto;right:0;">
           <div class="vd-item" onclick="event.stopPropagation();toggleSec('hdr')"><span>Header</span><div class="vd-check on" id="vd2-hdr">✓</div></div>
-          <div class="vd-item" onclick="event.stopPropagation();toggleSec('tabs')"><span>Tabs</span><div class="vd-check on" id="vd2-tabs">✓</div></div>
           <div class="vd-item" onclick="event.stopPropagation();toggleSec('tools')"><span>Werkzeuge</span><div class="vd-check on" id="vd2-tools">✓</div></div>
           <div class="vd-item" onclick="event.stopPropagation();toggleSec('legend')"><span>Legende</span><div class="vd-check on" id="vd2-legend">✓</div></div>
           <div class="vd-sep"></div>
@@ -3421,7 +3421,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786218875796; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786219333293; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -7645,7 +7645,7 @@ document.addEventListener('click',e=>{
 });
 function updateViewChecks(){
   const lbl2=document.getElementById('zoomLbl2');if(lbl2)lbl2.textContent=zoomLvl+'%';
-  ['hdr','tabs','tools','legend','slpBtn'].forEach(k=>{
+  ['hdr','tools','legend','slpBtn'].forEach(k=>{
     ['vd-','vd2-'].forEach(pfx=>{
       const eid=pfx+(k==='slpBtn'?'slpbtn':k);
       const el=document.getElementById(eid);
@@ -7664,16 +7664,18 @@ function toggleViewMenu(e){
 // Close dropdown on outside click
 document.addEventListener('click',()=>document.getElementById('viewDropdown')?.classList.remove('open'));
 function applyCollapse(){
+  colState.tabs=true;   // legacy state: the section no longer exists
   document.getElementById('hdrEl').classList.toggle('collapsed',!colState.hdr);
-  document.getElementById('teamBarWrap').classList.toggle('hidden',!colState.tabs);
+  // 'tabs' is no longer a user-facing section: the picker lives in the
+  // toolbar and shows itself based on how many teams exist.
   document.getElementById('toolbarEl').classList.toggle('hidden',!colState.tools);
   document.getElementById('legendEl').classList.toggle('hidden',!colState.legend);
   const slpBtn=document.getElementById('btn-slp');
   if(slpBtn)slpBtn.style.display=colState.slpBtn?'':'none';
-  ['hdr','tabs','tools','legend'].forEach(k=>document.getElementById('cb-'+k)?.classList.toggle('active',colState[k]));
+  ['hdr','tools','legend'].forEach(k=>document.getElementById('cb-'+k)?.classList.toggle('active',colState[k]));
 }
-function collapseAll(){['hdr','tabs','tools','legend'].forEach(k=>colState[k]=false);applyCollapse();saveVS();updateViewChecks();}
-function resetCollapse(){['hdr','tabs','tools','legend'].forEach(k=>colState[k]=true);applyCollapse();saveVS();updateViewChecks();}
+function collapseAll(){['hdr','tools','legend'].forEach(k=>colState[k]=false);applyCollapse();saveVS();updateViewChecks();}
+function resetCollapse(){['hdr','tools','legend'].forEach(k=>colState[k]=true);applyCollapse();saveVS();updateViewChecks();}
 function zoom(d){zoomLvl=d===0?100:Math.min(150,Math.max(50,zoomLvl+d));applyZoom();saveVS();const l2=document.getElementById('zoomLbl2');if(l2)l2.textContent=zoomLvl+'%';}
 function applyZoom(){document.getElementById('tableWrap').style.zoom=zoomLvl/100;const l=document.getElementById('zoomLbl');if(l)l.textContent=zoomLvl+'%';const l2=document.getElementById('zoomLbl2');if(l2)l2.textContent=zoomLvl+'%';}
 function setHA(v){newMatchHA=v;document.getElementById('ha-home').classList.toggle('sel',v==='home');document.getElementById('ha-away').classList.toggle('sel',v==='away');}
@@ -7775,6 +7777,14 @@ function renderTeamBar(){
     (isAdmin()?`<button class="ttab-add" onclick="closeTeamMenu();openM('moNewTeam')">＋ Neue Mannschaft</button>`:'');
   const lbl=document.getElementById('teamPickLbl');
   if(lbl)lbl.textContent=UI.currentTeam||'–';
+  // With a single team there is nothing to pick — the button would only take
+  // space and state the obvious. This replaces the old "Tabs" toggle, which
+  // could hide the picker and leave no way back to another team.
+  const wrap=document.getElementById('teamBarWrap');
+  if(wrap){
+    const many=(G.teamList||[]).length>1||isAdmin();
+    wrap.style.display=many?'':'none';
+  }
   // Trainer chips on right
   const trainers=G.trainers.filter(t=>t.teams.includes(UI.currentTeam));
   // trainer strip removed
