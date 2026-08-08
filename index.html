@@ -845,6 +845,17 @@ input[type="date"]{cursor:pointer;}
 /* Right column of the player header: actions on top, contact shortcuts
    directly underneath. That area used to be empty while the contact row took
    a full line of its own below the name. */
+.ps-head-mid{flex:1;min-width:0;}
+/* The name is set in a wide display face — let it shorten rather than break
+   across lines, which is what made the header look ragged. */
+#ps-name{font-family:'Bebas Neue',sans-serif;font-size:1.55rem;color:var(--bd);letter-spacing:2px;
+  line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ps-meta-row{display:flex;align-items:center;gap:7px;margin-top:5px;flex-wrap:wrap;}
+.ps-meta-row>*{white-space:nowrap;}
+#ps-ctx{font-size:.65rem;color:var(--gm);}
+#ps-note-display{margin-top:5px;font-size:.78rem;color:var(--gd);font-style:italic;}
+.ps-icon-btn{font-size:.9rem;padding:6px 11px;background:var(--ow) !important;color:var(--gd) !important;
+  border:1.5px solid var(--gl) !important;min-width:38px;justify-content:center;}
 .ps-head-right{display:flex;flex-direction:column;align-items:flex-end;gap:7px;flex-shrink:0;min-width:0;}
 .ps-head-btns{display:flex;gap:6px;flex-shrink:0;}
 .ps-b-ico{display:none;}
@@ -2712,10 +2723,10 @@ if(window._fbBlocked){
 <div class="mo" id="moPlayer"><div class="mob" style="width:530px;max-width:96vw;">
   <div class="ps-head-row" style="display:flex;align-items:flex-start;gap:13px;margin-bottom:13px;">
     <div id="ps-avatar-wrap" style="flex-shrink:0;cursor:pointer;" onclick="if(canEdit())playerPhotoMenu(this)" title="Foto"></div>
-    <div style="flex:1;min-width:0;">
-      <div id="ps-name" style="font-family:'Bebas Neue',sans-serif;font-size:1.55rem;color:var(--bd);letter-spacing:2px;line-height:1;">–</div>
+    <div class="ps-head-mid">
+      <div id="ps-name">–</div>
       <div id="ps-presence-inline" class="inline-presence" style="margin-top:4px;margin-left:0;"></div>
-      <div style="display:flex;align-items:center;gap:7px;margin-top:5px;">
+      <div class="ps-meta-row">
         <span id="ps-nr" style="font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:var(--gm);">#–</span>
         <span id="ps-pos-badge"></span>
         <span id="ps-ctx" style="font-size:.65rem;color:var(--gm);margin-left:4px;"></span>
@@ -2725,8 +2736,8 @@ if(window._fbBlocked){
     </div>
     <div class="ps-head-right">
       <div class="ps-head-btns">
-        <button class="btn" id="ps-edit-toggle" onclick="togglePlayerEdit()" style="font-size:.76rem;background:var(--ow);color:var(--gd);border:1.5px solid var(--gl);"><span class="ps-b-lbl">✎ Bearbeiten</span><span class="ps-b-ico">✎</span></button>
-        <button class="btn" style="font-size:.76rem;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" onclick="playerGoBack()"><span class="ps-b-lbl">← Zurück</span><span class="ps-b-ico">←</span></button>
+        <button class="btn ps-icon-btn" id="ps-edit-toggle" onclick="togglePlayerEdit()" title="Bearbeiten">✎</button>
+        <button class="btn ps-icon-btn" onclick="playerGoBack()" title="Zurück">←</button>
         <button class="btn bs" onclick="closeM('moPlayer')">✕</button>
       </div>
       <div id="ps-contact" class="ps-contact"></div>
