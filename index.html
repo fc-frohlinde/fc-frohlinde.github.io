@@ -699,7 +699,10 @@ input[type="date"]{cursor:pointer;}
 .fr-bw{flex:1;min-width:0;background:var(--gl);border-radius:3px;height:5px;overflow:hidden;display:flex;align-items:stretch;}
 .fr-bar{height:100%;border-radius:0;display:block;}
 .fr-val{text-align:right;font-weight:700;color:var(--bd);font-size:.72rem;}
-.sess-list{max-height:148px;overflow-y:auto;border:1px solid var(--gl);border-radius:7px;margin-bottom:12px;}
+/* The only user is the player card, where the list sits behind a fold inside
+   an already-scrolling modal — a 148px window here meant scrolling inside
+   scrolling. The team manager's session lists have their own styling. */
+.sess-list{border:1px solid var(--gl);border-radius:7px;margin-bottom:12px;}
 .sr{display:flex;align-items:center;gap:6px;padding:5px 10px;border-bottom:1px solid var(--gl);font-size:.74rem;cursor:pointer;transition:background .12s;}
 .sr:last-child{border-bottom:none;}
 .sr:hover{background:var(--ow);}
