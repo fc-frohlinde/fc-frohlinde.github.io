@@ -6627,12 +6627,11 @@ function updateUserMenuState(){
     const el=document.getElementById(id);
     if(el)el.style.display=canEditNow?'':'none';
   });
-  // ADMIN group: separator + header shown if at least one admin item visible
-  // (applyRoleUI sets ud-dashboard / ud-audit / ud-admin individually based on
-  // role). Mirror those: show group if any admin item is on.
-  const auditBtn=document.getElementById('ud-audit');
+  // Verlauf moved from Administration to Arbeit, so the admin group is now
+  // just the bin and the admin panel — counting Verlauf here would keep an
+  // empty "Administration" heading on screen for plain trainers.
   const adminBtn=document.getElementById('ud-admin');
-  const anyAdmin=[tr,auditBtn,adminBtn].some(el=>el&&el.style.display!=='none');
+  const anyAdmin=[tr,adminBtn].some(el=>el&&el.style.display!=='none');
   ['ud-admin-sep','ud-admin-group'].forEach(id=>{
     const el=document.getElementById(id);
     if(el)el.style.display=anyAdmin?'':'none';
@@ -25360,30 +25359,29 @@ checkAutoBackup();
   <!-- ── KONTO ── -->
   <div class="ud-group">Konto</div>
   <div class="ud-item" id="ud-password" onclick="closeUserMenu();openPasswordModal();">👤 Mein Konto</div>
-
-  <!-- ── NAVIGATION ── -->
-  <div class="ud-sep"></div>
-  <div class="ud-group">Navigation</div>
-  <div class="ud-item" onclick="closeUserMenu();openSearch();">🔎 Suchen <span style="margin-left:auto;font-size:.62rem;color:var(--gm);font-weight:600;">⌘K</span></div>
-  <div class="ud-item" onclick="closeUserMenu();openShortcutsHelp();">⌨️ Kürzel <span style="margin-left:auto;font-size:.62rem;color:var(--gm);font-weight:600;">?</span></div>
+  <div class="ud-item" onclick="closeUserMenu();confirmLogout()" style="color:#ff9080;">🚪 Abmelden</div>
 
   <!-- ── ARBEIT (canEdit) ── -->
   <div class="ud-sep" id="ud-work-sep" style="display:none;"></div>
   <div class="ud-group" id="ud-work-group" style="display:none;">Arbeit</div>
   <div class="ud-item" id="ud-anmeld" onclick="closeUserMenu();openAnmeldungen()" style="display:none;">📋 Anmeldungen &amp; Versand</div>
   <div class="ud-item" id="ud-dashboard" onclick="closeUserMenu();openDashboard();" style="display:none;">📊 Dashboard</div>
+  <div class="ud-item" id="ud-audit" onclick="closeUserMenu();openAuditLog();" style="display:none;">📜 Verlauf</div>
 
-  <!-- ── ADMIN ── -->
+  <!-- ── ADMINISTRATION (admin) ── -->
   <div class="ud-sep" id="ud-admin-sep" style="display:none;"></div>
   <div class="ud-group" id="ud-admin-group" style="display:none;">Administration</div>
   <div class="ud-item" id="ud-trash" onclick="closeUserMenu();openTrash();" style="display:none;">🗑 Papierkorb <span id="ud-trash-count" style="margin-left:auto;font-size:.62rem;color:var(--gm);font-weight:600;"></span></div>
-  <div class="ud-item" id="ud-audit" onclick="closeUserMenu();openAuditLog();" style="display:none;">📜 Verlauf</div>
   <div class="ud-item" id="ud-admin" onclick="closeUserMenu();openM('moAdmin')" style="display:none;">⚙ Administration</div>
 
-  <!-- ── SYSTEM ── -->
+  <!-- ── SYSTEM ──
+       Suchen and Kürzel used to sit under a "Navigation" heading of their own;
+       they are tools, and a two-item group was one heading too many. -->
   <div class="ud-sep"></div>
   <div class="ud-group">System</div>
   <div class="ud-item" onclick="closeUserMenu();openPreferences()">⚙️ Einstellungen</div>
+  <div class="ud-item" onclick="closeUserMenu();openSearch();">🔎 Suchen <span style="margin-left:auto;font-size:.62rem;color:var(--gm);font-weight:600;">⌘K</span></div>
+  <div class="ud-item" onclick="closeUserMenu();openShortcutsHelp();">⌨️ Kürzel <span style="margin-left:auto;font-size:.62rem;color:var(--gm);font-weight:600;">?</span></div>
   <div class="ud-toggle" onclick="event.stopPropagation();toggleAutoSync();">
     <span>🔄 Auto-Sync</span>
     <div class="ud-switch" id="ud-autosync-sw"></div>
@@ -25392,7 +25390,6 @@ checkAutoBackup();
     <div class="ud-item" onclick="event.stopPropagation();manualSyncSave();">☁️ Jetzt speichern</div>
     <div class="ud-item" onclick="event.stopPropagation();manualSyncLoad();">⬇️ Jetzt laden</div>
   </div>
-  <div class="ud-item" onclick="closeUserMenu();confirmLogout()" style="color:#ff9080;">🚪 Abmelden</div>
 
   <!-- ── FOOTER (about as fine print, not a regular menu item) ── -->
   <div class="ud-sep"></div>
