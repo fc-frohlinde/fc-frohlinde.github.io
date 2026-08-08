@@ -844,7 +844,7 @@ input[type="date"]{cursor:pointer;}
 /* Right column of the player header: actions on top, contact shortcuts
    directly underneath. That area used to be empty while the contact row took
    a full line of its own below the name. */
-.ps-info{display:none;margin:0 0 12px;}
+.ps-info{margin:0 0 12px;}
 .ps-info-row{display:flex;align-items:baseline;gap:10px;padding:5px 2px;border-bottom:1px solid var(--gl);}
 .ps-info-row:last-child{border-bottom:none;}
 .ps-info-l{flex:0 0 118px;font-size:.74rem;color:var(--gm);}
@@ -861,7 +861,7 @@ input[type="date"]{cursor:pointer;}
 .ps-meta-row{display:flex;align-items:center;gap:7px;margin-top:5px;flex-wrap:wrap;}
 .ps-meta-row>*{white-space:nowrap;}
 #ps-ctx{font-size:.65rem;color:var(--gm);}
-#ps-note-display{margin-top:5px;font-size:.78rem;color:var(--gd);font-style:italic;}
+#ps-note-display{font-size:.8rem;color:var(--gd);}
 .ps-head-right{display:flex;flex-direction:column;align-items:flex-end;gap:7px;flex-shrink:0;min-width:0;}
 .ps-head-btns{display:flex;gap:6px;flex-shrink:0;}
 .ps-b-ico{display:none;}
@@ -15906,7 +15906,8 @@ function _psShowCard(){
   if(box)box.style.display='none';
   _PS_VIEW_BLOCKS.forEach(id=>{
     const el=document.getElementById(id);
-    if(el)el.style.display='';
+    if(!el)return;
+    el.style.display=el.innerHTML.trim()?'':'none';
   });
   if(btn){btn.innerHTML='\u270e Bearbeiten';btn.classList.remove('active');}
 }
@@ -15918,7 +15919,11 @@ function togglePlayerEdit(){
   box.style.display=open?'block':'none';
   _PS_VIEW_BLOCKS.forEach(id=>{
     const el=document.getElementById(id);
-    if(el)el.style.display=open?'none':'';
+    if(!el)return;
+    // Clearing the inline style is not enough: a block with no content would
+    // reappear as an empty gap, and one whose CSS default is hidden would
+    // stay invisible. Emptiness decides.
+    el.style.display=open?'none':(el.innerHTML.trim()?'':'none');
   });
   btn.innerHTML=open?'\u2713 Fertig':'\u270e Bearbeiten';
   btn.classList.toggle('active',open);
