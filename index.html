@@ -862,12 +862,14 @@ input[type="date"]{cursor:pointer;}
 .ps-sub>*{white-space:nowrap;}
 #ps-nr{font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:var(--gm);}
 #ps-ctx{font-size:.7rem;color:var(--gm);}
-/* One reserved height for both views, so switching card ⇄ form never resizes
-   the window — and a sparse profile still gets a workable form area. The
-   modal body is the only scroller; inner ones would nest a second scrollbar. */
-#moPlayer .mob,#moTrainerProfile .mob{min-height:min(560px,82vh);}
-@media (max-width:767px){
-  #moPlayer .mob,#moTrainerProfile .mob{min-height:0;}
+/* Modals are vertically centred, so any height change moves the TOP edge as
+   well — switching card ⇄ form made the whole window shift under the cursor.
+   Anchoring these two to a fixed top means the content below can grow or
+   shrink while the header, the photo and the buttons stay exactly where they
+   are. Only on desktop: on phones the modals are bottom sheets, which are
+   anchored to the bottom edge by design. */
+@media (min-width:768px){
+  #moPlayer,#moTrainerProfile{align-items:flex-start;padding-top:min(7vh,60px);}
 }
 .ps-cnum{flex-basis:100%;font-size:.72rem;color:var(--gm);margin-top:2px;}
 .ps-title-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
@@ -25014,7 +25016,7 @@ checkAutoBackup();
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
     <h3 style="margin:0;flex:1;">👤 Trainerprofil</h3>
   </div>
-  <div id="tp-content"></div>
+  <div id="tp-content" style="max-height:64vh;overflow-y:auto;"></div>
   <div class="mob-btns">
     <button class="btn bs" onclick="tpCloseGuard()">Schließen</button>
   </div>
