@@ -826,6 +826,10 @@ input[type="date"]{cursor:pointer;}
 .ps-dots-lbl{font-size:.66rem;color:var(--gm);margin-left:3px;}
 .ps-note-card{background:rgba(241,196,15,.12);border-left:3px solid var(--ac);border-radius:8px;
   padding:8px 11px;margin-bottom:10px;font-size:.78rem;color:var(--gd);line-height:1.4;}
+/* The render code toggles style.display on these, so the attribute alone is
+   not enough — this rule wins and keeps the duplicates out of the card while
+   their code path stays untouched. */
+#ps-months,#ps-perf,#ps-perf-sec{display:none !important;}
 .ps-more{border-top:1px solid var(--gl);margin-bottom:10px;}
 .ps-more-sum{list-style:none;cursor:pointer;display:flex;align-items:center;gap:6px;padding:11px 2px;
   font-size:.78rem;font-weight:700;color:var(--gm);}
@@ -2707,12 +2711,14 @@ if(window._fbBlocked){
   <details class="ps-more">
     <summary class="ps-more-sum"><span>Weitere Details</span><span class="ps-more-chev">›</span></summary>
     <div class="ps-more-body">
-      <div class="sec" style="margin-bottom:6px;">📅 Monatliche Übersicht</div>
-      <div id="ps-months" style="margin-bottom:12px;"></div>
       <div class="sec" style="margin-bottom:6px;">🎯 Schwerpunkte</div>
       <div id="ps-focuses" style="margin-bottom:12px;"></div>
-      <div class="sec" id="ps-perf-sec" style="margin-bottom:6px;display:none;">⭐ Leistungsnote</div>
-      <div id="ps-perf" style="margin-bottom:12px;display:none;"></div>
+      <!-- Monthly overview and grade history live in "Alle Statistiken", where
+           they cover every season instead of just the current one. These two
+           containers stay so their existing render code needs no change. -->
+      <div id="ps-months" hidden></div>
+      <div class="sec" id="ps-perf-sec" hidden></div>
+      <div id="ps-perf" hidden></div>
       <div class="sec" style="margin-bottom:6px;">📜 Notizen-Timeline <span id="ps-notes-count" style="font-size:.7rem;color:var(--gm);font-weight:500;margin-left:6px;"></span></div>
       <div id="ps-notes-timeline" style="margin-bottom:12px;"></div>
       <div class="sec" style="margin-bottom:6px;">📋 Alle Einheiten</div>
