@@ -2874,14 +2874,14 @@ if(window._fbBlocked){
         <div class="tp-sec-h">Person</div>
         <div class="tp-row"><span class="tp-l">Name</span><input class="tp-in" type="text" id="pe-name"/></div>
         <div class="tp-row"><span class="tp-l">Kurzname</span><input class="tp-in" type="text" id="pe-shortname" placeholder="z.B. Maxi"/></div>
-        <div class="tp-row"><span class="tp-l">R\u00fcckennummer</span><input class="tp-in" type="number" id="pe-nr" min="1" max="99"/></div>
+        <div class="tp-row"><span class="tp-l">Rückennummer</span><input class="tp-in" type="number" id="pe-nr" min="1" max="99"/></div>
         <div class="tp-row"><span class="tp-l">Geburtsdatum</span><input class="tp-in" type="date" id="pe-birthdate"/></div>
       </div>
       <div class="tp-sec">
         <div class="tp-sec-h">Sportlich</div>
         <div class="tp-row"><span class="tp-l">Position 1</span><div class="tp-in-wrap" id="pe-pos1-sel"></div></div>
         <div class="tp-row"><span class="tp-l">Position 2</span><div class="tp-in-wrap" id="pe-pos2-sel"></div></div>
-        <div class="tp-row"><span class="tp-l">Starker Fu\u00df</span><div class="tp-in-wrap" id="pe-foot-sel"></div></div>
+        <div class="tp-row"><span class="tp-l">Starker Fuß</span><div class="tp-in-wrap" id="pe-foot-sel"></div></div>
         <div class="tp-row"><span class="tp-l">Pass-Nr.</span><input class="tp-in" type="text" id="pe-passnr" placeholder="z.B. 12345678"/></div>
       </div>
       <div class="tp-sec">
@@ -15653,7 +15653,9 @@ function applyClubLogo(){
   }
 }
 
-function openPlayerStats(pi){
+// opts.edit: open straight in the form — used by the pencil in the team
+// manager, where the icon already states the intent.
+function openPlayerStats(pi,opts){
   // Track identity for drift-safe action resolution (see _resolveCurrentPI)
   if(typeof _trackPlayerModal==='function')_trackPlayerModal(pi);
   else currentPI=pi;
@@ -15700,8 +15702,11 @@ function openPlayerStats(pi){
     if(personSec)personSec.style.display=info.length?'':'none';
   }
   // Reset edit section
-  // Every open of the modal starts on the card, never in the form
+  // Every open starts on the card, unless the caller asked for the form
   try{_psShowCard();}catch(e){const editBox=document.getElementById('ps-edit');if(editBox)editBox.style.display='none';}
+  if(opts&&opts.edit&&canEdit()){
+    try{togglePlayerEdit();}catch(e){}
+  }
   const editBtn=document.getElementById('ps-edit-toggle');
   if(editBtn)editBtn.textContent='✎ Bearbeiten';
   document.getElementById('ps-edit-wrap').style.display=canEdit()?'block':'none';
@@ -18603,7 +18608,7 @@ function renderMgrPlayers(){
       <div class="pl-name" style="cursor:pointer;" onclick="${openHandler}">${p.name||''}</div>
       <div class="pl-pos" style="cursor:pointer;" onclick="${openHandler}" title="Profil \u00f6ffnen">${pbHtml(p)}</div>
       <div class="pl-btns">
-        <button class="pl-btn pl-btn-e" onclick="event.stopPropagation();${openHandler}">✎</button>
+        <button class="pl-btn pl-btn-e" title="Bearbeiten" onclick="event.stopPropagation();navPush({id:'moTeamMgr',tab:'spieler'});closeM('moTeamMgr');openPlayerStats(${i},{edit:true});">✎</button>
         ${canEdit()?`<button class="pl-btn pl-btn-d" onclick="event.stopPropagation();mgrDelPl(${i})">✕</button>`:''}
       </div>
     </div>`;}).join('')
