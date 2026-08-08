@@ -13451,7 +13451,14 @@ function _dbWeekBounds(offsetWeeks){
 // summary of the week that just ended, not the empty week that just began.
 function _dbCompletedWeekOffset(now){
   const d=now||new Date();
-  return d.getDay()===0?0:-1;
+  const dow=d.getDay();            // 0 = Sunday … 6 = Saturday
+  // The ISO week runs Mon–Sun. Only Sunday used to count as "the week is
+  // done", so a reminder set to Friday or Saturday reported the week BEFORE
+  // the one just played — with the Saturday match missing from it.
+  // By Friday the week's trainings have happened and the match is today or
+  // tomorrow, so that week is the one worth reporting. Mon–Thu still look
+  // back, because the current week has barely started.
+  return (dow===0||dow>=5)?0:-1;
 }
 function _dbIsoWeek(d){
   const date=new Date(d.getTime());date.setHours(0,0,0,0);
@@ -13987,6 +13994,9 @@ function dbRenderPublishedList(){
 // ── Wochenbericht modal (standalone — uses UI.currentTeam/currentSeason) ──
 function openWeekReport(){
   if(!UI.currentTeam||!UI.currentSeason){alert('Bitte zuerst eine Mannschaft und Saison ausw\u00e4hlen.');return;}
+  // Open on the same week the reminder and the WhatsApp text talk about,
+  // otherwise the card announces one week and the modal shows another.
+  if(typeof _dbCompletedWeekOffset==='function')_dbState.weekReportOffset=_dbCompletedWeekOffset();
   renderWeekReportModal();
   if(typeof openM==='function')openM('moWeekReport');
 }
