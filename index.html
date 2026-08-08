@@ -837,6 +837,12 @@ input[type="date"]{cursor:pointer;}
    not enough — this rule wins and keeps the duplicates out of the card while
    their code path stays untouched. */
 #ps-months,#ps-perf,#ps-perf-sec{display:none !important;}
+.ps-nophone{margin-top:2px;}
+.ps-nophone-txt{font-size:.75rem;color:var(--warn-fg);background:var(--warn-bg);
+  border-radius:8px;padding:8px 11px;line-height:1.35;}
+.ps-nophone-add{display:flex;gap:6px;margin-top:7px;}
+.ps-nophone-add input{flex:1;min-width:0;margin-bottom:0;}
+.ps-nophone-add .btn{flex-shrink:0;}
 .ps-sess-more{padding:6px 9px;text-align:center;}
 .ps-sess-more button{background:none;border:none;color:var(--bl);font-family:'Barlow',sans-serif;
   font-size:.72rem;font-weight:600;cursor:pointer;padding:4px 8px;}
@@ -8387,18 +8393,45 @@ function renderPlayerFront(p,pi){
     nc.innerHTML=note?`<div class="ps-note-card">\ud83d\udcdd ${escapeHtml(note)}</div>`:'';
   }
 }
+function psQuickSavePhone(){
+  if(!canEdit())return;
+  const inp=document.getElementById('ps-quick-phone');
+  const pi=_resolveCurrentPI();
+  if(!inp||pi<0)return;
+  const v=String(inp.value||'').trim();
+  if(!v)return;
+  const D=cd(),p=D&&D.players[pi];
+  if(!p)return;
+  snap();
+  p.phone=v;
+  saveG();
+  logAudit('Telefonnummer erg\u00e4nzt',(getDisplayName?getDisplayName(p):p.name)||'',v);
+  renderPlayerContact(p);
+  const pe=document.getElementById('pe-phone');
+  if(pe)pe.value=v;   // keep the edit form in step
+}
 function renderPlayerContact(p){
   const box=document.getElementById('ps-contact');
   if(!box)return;
   const sec=document.getElementById('ps-sec-kontakt');
+  const rowsEl0=document.getElementById('ps-contact-rows');
   const raw=String((p&&p.phone)||'').trim();
   if(!raw){
-    if(p&&p.email){
-      box.innerHTML=`<a class="tp-qbtn" href="mailto:${escapeHtml(p.email)}">\u2709\ufe0f E-Mail</a>`;
-      const rEl=document.getElementById('ps-contact-rows');
-      if(rEl)rEl.innerHTML=`<div class="tp-row"><span class="tp-l">E-Mail</span><span class="tp-v">${escapeHtml(p.email)}</span></div>`;
-      if(sec)sec.style.display='';
-    }else{box.innerHTML='';if(sec)sec.style.display='none';}
+    // A missing number is not an empty state to hide — it is the reason the
+    // weekly invitation never reaches this player. Say so, and let it be
+    // fixed here instead of sending the trainer into the edit form.
+    if(sec)sec.style.display='';
+    box.innerHTML=(p&&p.email)?`<a class="tp-qbtn" href="mailto:${escapeHtml(p.email)}">\u2709\ufe0f E-Mail</a>`:'';
+    if(rowsEl0){
+      rowsEl0.innerHTML=((p&&p.email)?`<div class="tp-row"><span class="tp-l">E-Mail</span><span class="tp-v">${escapeHtml(p.email)}</span></div>`:'')
+        +`<div class="ps-nophone">
+            <div class="ps-nophone-txt">\u26a0\ufe0f Keine Telefonnummer \u2014 dieser Spieler erh\u00e4lt keine Einladungen.</div>`
+        +(canEdit()?`<div class="ps-nophone-add">
+              <input type="tel" id="ps-quick-phone" placeholder="z.B. +49 170 1234567">
+              <button class="btn bp" onclick="psQuickSavePhone()">Speichern</button>
+            </div>`:'')
+        +`</div>`;
+    }
     return;
   }
   if(sec)sec.style.display='';
@@ -15840,9 +15873,15 @@ function openPlayerStats(pi,opts){
     .sort((a,b)=>dispToSortKey(ss[a].date)-dispToSortKey(ss[b].date));
   const _upcoming=_psShowAllUpcoming?_upcomingAll:_upcomingAll.slice(0,PS_UPCOMING_MAX);
   const _upcomingHidden=_upcomingAll.length-_upcoming.length;
-  const _past=ss.map((_,i)=>i)
+  // Without the old 148px scroll window the list runs to full length, so the
+  // past needs a fold of its own — otherwise opening the card unrolls the
+  // whole season.
+  const PS_PAST_MAX=10;
+  const _pastAll=ss.map((_,i)=>i)
     .filter(i=>ss[i]&&ss[i].date&&dispToSortKey(ss[i].date)<_today)
     .sort((a,b)=>dispToSortKey(ss[b].date)-dispToSortKey(ss[a].date));
+  const _past=_psShowAllPast?_pastAll:_pastAll.slice(0,PS_PAST_MAX);
+  const _pastHidden=_pastAll.length-_past.length;
   const _sessIdxs=_upcoming.concat(_past);
   // Build a divider when transitioning from upcoming to past
   const _firstPastIdx=_upcoming.length;
@@ -15850,6 +15889,11 @@ function openPlayerStats(pi,opts){
     ? `<div class="ps-sess-more"><button onclick="psToggleUpcoming()">+ ${_upcomingHidden} weitere geplante Termine anzeigen</button></div>`
     : (_psShowAllUpcoming&&_upcomingAll.length>PS_UPCOMING_MAX
         ? '<div class="ps-sess-more"><button onclick="psToggleUpcoming()">\u2212 geplante Termine einklappen</button></div>'
+        : '');
+  const _pastNote=_pastHidden>0
+    ? `<div class="ps-sess-more"><button onclick="psTogglePast()">+ ${_pastHidden} weitere vergangene Einheiten</button></div>`
+    : (_psShowAllPast&&_pastAll.length>PS_PAST_MAX
+        ? '<div class="ps-sess-more"><button onclick="psTogglePast()">\u2212 weniger anzeigen</button></div>'
         : '');
   document.getElementById('ps-sessions').innerHTML=_sessIdxs.map((i,outerIdx)=>{
     const s=ss[i];
@@ -15882,7 +15926,7 @@ function openPlayerStats(pi,opts){
       ${lbl?`<span style="font-size:.64rem;color:var(--gm);">${lbl}${isMat&&s.homeAway?(s.homeAway==='home'?' \ud83c\udfe0':' \ud83d\ude8c'):''}</span>`:''}
       ${stBtn}
     </div>`;
-  }).join('')||'<p style="padding:9px;font-size:.72rem;color:var(--gm);">Keine Einheiten.</p>';
+  }).join('')+_pastNote||'<p style="padding:9px;font-size:.72rem;color:var(--gm);">Keine Einheiten.</p>';
   // Notes timeline
   renderPlayerNotesTimeline(currentPI);
   openM('moPlayer');
@@ -15979,9 +16023,14 @@ let _currentFoot='right';
 // otherwise. Showing the form under the card meant scrolling past everything
 // to reach it, and left the modal looking like a form the whole time.
 const _PS_VIEW_BLOCKS=['ps-card-view'];
-let _psShowAllUpcoming=false;
+let _psShowAllUpcoming=false,_psShowAllPast=false;
 function psToggleUpcoming(){
   _psShowAllUpcoming=!_psShowAllUpcoming;
+  const pi=(typeof _resolveCurrentPI==='function')?_resolveCurrentPI():-1;
+  if(pi>=0)openPlayerStats(pi);
+}
+function psTogglePast(){
+  _psShowAllPast=!_psShowAllPast;
   const pi=(typeof _resolveCurrentPI==='function')?_resolveCurrentPI():-1;
   if(pi>=0)openPlayerStats(pi);
 }
