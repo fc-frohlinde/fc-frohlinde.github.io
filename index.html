@@ -9092,11 +9092,18 @@ function updateAppearanceUI(){
     } else {
       const perm=pushPermission();
       pe.disabled=false;
+      // The switch reflects BOTH the stored preference and the browser
+      // permission. When a browser drops the permission (Edge does this when
+      // "Cookies und Websitedaten beim Schließen löschen" includes
+      // permissions, and always in InPrivate windows) the switch went back to
+      // off with no explanation — it looked like the app had forgotten it.
       pe.checked=s.pushEnabled===true&&perm==='granted';
       if(perm==='denied'){
         psub.textContent='⚠️ In Browser-Einstellungen blockiert';
       } else if(perm==='granted'&&s.pushEnabled){
         psub.textContent='✓ Aktiv für Nachrichten und Geburtstage';
+      } else if(s.pushEnabled&&perm!=='granted'){
+        psub.textContent='⚠️ Hier eingeschaltet, aber der Browser hat die Erlaubnis zurückgesetzt — bitte erneut aktivieren und im Dialog „Zulassen" wählen.';
       } else {
         psub.textContent='System-Benachrichtigungen für Nachrichten und Geburtstage';
       }
