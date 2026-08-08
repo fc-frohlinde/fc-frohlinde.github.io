@@ -893,6 +893,18 @@ input[type="date"]{cursor:pointer;}
 @media (max-width:767px){
   #moPlayer .ps-sticky{margin:0 -16px;padding:0 16px;}
 }
+/* The position and foot pickers are custom dropdowns rendered into a div, so
+   they need the same slot the plain inputs occupy. */
+.tp-in-wrap{flex:1;min-width:0;}
+.tp-in-wrap>*{width:100%;margin-bottom:0;}
+#ps-edit .tp-in{margin-bottom:0;}
+#ps-edit textarea.tp-in{width:100%;resize:vertical;font-family:'Barlow',sans-serif;line-height:1.4;}
+#ps-edit .tp-sec:first-child{border-top:none;margin-top:0;padding-top:0;}
+@media (max-width:767px){
+  #ps-edit .tp-row{flex-direction:column;align-items:stretch;gap:3px;}
+  #ps-edit .tp-l{flex:none;}
+  #ps-edit .tp-in{min-height:40px;}
+}
 .ps-cnum{flex-basis:100%;font-size:.72rem;color:var(--gm);margin-top:2px;}
 .ps-title-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
 /* No size overrides: these are ordinary modal buttons and must match every
@@ -2827,48 +2839,33 @@ if(window._fbBlocked){
   </details>
   </div><!-- /ps-card-view -->
   <div id="ps-edit-wrap">
-    <div id="ps-edit" style="display:none;background:var(--ow);border-radius:9px;padding:10px 12px;border:1px solid var(--gl);">
-      <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:8px;align-items:flex-end;">
-        <div style="width:58px;flex:none;"><label>Nr.</label><input type="number" id="pe-nr" min="1" max="99" style="margin-bottom:0;"/></div>
-        <div style="flex:2;min-width:110px;"><label>Name</label><input type="text" id="pe-name" style="margin-bottom:0;"/></div>
-        <div style="flex:1;min-width:90px;"><label>Kurzname</label><input type="text" id="pe-shortname" placeholder="z.B. Maxi" style="margin-bottom:0;"/></div>
+    <div id="ps-edit" style="display:none;">
+      <!-- Same section frame and label rows as the trainer profile, so both
+           forms read as one system. Ids are unchanged: every existing reader
+           and writer of these fields keeps working. -->
+      <div class="tp-sec">
+        <div class="tp-sec-h">Person</div>
+        <div class="tp-row"><span class="tp-l">Name</span><input class="tp-in" type="text" id="pe-name"/></div>
+        <div class="tp-row"><span class="tp-l">Kurzname</span><input class="tp-in" type="text" id="pe-shortname" placeholder="z.B. Maxi"/></div>
+        <div class="tp-row"><span class="tp-l">R\u00fcckennummer</span><input class="tp-in" type="number" id="pe-nr" min="1" max="99"/></div>
+        <div class="tp-row"><span class="tp-l">Geburtsdatum</span><input class="tp-in" type="date" id="pe-birthdate"/></div>
       </div>
-      <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 105px;gap:7px;margin-bottom:8px;align-items:end;">
-        <div>
-          <label>Position 1</label>
-          <div id="pe-pos1-sel"></div>
-        </div>
-        <div>
-          <label>Position 2</label>
-          <div id="pe-pos2-sel"></div>
-        </div>
-        <div>
-          <label>🦵 Fuß</label>
-          <div id="pe-foot-sel"></div>
-        </div>
+      <div class="tp-sec">
+        <div class="tp-sec-h">Sportlich</div>
+        <div class="tp-row"><span class="tp-l">Position 1</span><div class="tp-in-wrap" id="pe-pos1-sel"></div></div>
+        <div class="tp-row"><span class="tp-l">Position 2</span><div class="tp-in-wrap" id="pe-pos2-sel"></div></div>
+        <div class="tp-row"><span class="tp-l">Starker Fu\u00df</span><div class="tp-in-wrap" id="pe-foot-sel"></div></div>
+        <div class="tp-row"><span class="tp-l">Pass-Nr.</span><input class="tp-in" type="text" id="pe-passnr" placeholder="z.B. 12345678"/></div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px;">
-        <div>
-          <label>🎫 Spieler-Passnummer</label>
-          <input type="text" id="pe-passnr" placeholder="z.B. 12345678" style="margin-bottom:0;"/>
-        </div>
-        <div>
-          <label>🎂 Geburtsdatum</label>
-          <input type="date" id="pe-birthdate" style="margin-bottom:0;"/>
-        </div>
+      <div class="tp-sec">
+        <div class="tp-sec-h">Kontakt</div>
+        <div class="tp-row"><span class="tp-l">Telefon</span><input class="tp-in" type="tel" id="pe-phone" placeholder="z.B. +49 170 1234567"/></div>
+        <div class="tp-row"><span class="tp-l">E-Mail</span><input class="tp-in" type="email" id="pe-email" placeholder="z.B. spieler@email.de"/></div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px;">
-        <div>
-          <label>📞 Telefon</label>
-          <input type="tel" id="pe-phone" placeholder="z.B. +49 170 1234567" style="margin-bottom:0;"/>
-        </div>
-        <div>
-          <label>✉️ E-Mail</label>
-          <input type="email" id="pe-email" placeholder="z.B. spieler@email.de" style="margin-bottom:0;"/>
-        </div>
+      <div class="tp-sec">
+        <div class="tp-sec-h">Notiz</div>
+        <textarea class="tp-in" id="pe-note" rows="3" placeholder="z.B. Verletzt bis KW 20, Schulnoten, ..."></textarea>
       </div>
-      <label>📝 Kommentar</label>
-      <textarea id="pe-note" rows="2" placeholder="z.B. Verletzt bis KW 20, Schulnoten, ..." style="width:100%;padding:7px;border:1.5px solid var(--gl);border-radius:7px;font-family:'Barlow',sans-serif;font-size:.8rem;resize:vertical;margin-bottom:8px;"></textarea>
     </div>
   </div>
 </div></div>
