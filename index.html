@@ -885,9 +885,13 @@ input[type="date"]{cursor:pointer;}
    The background is full-bleed (it has to hide what passes underneath) but
    the divider is drawn on the inner row, so it lines up with every other
    divider instead of running edge to edge. */
+/* No negative margins. Content never enters the modal's horizontal padding,
+   so a full-bleed background was solving a problem that does not exist — and
+   its edge read as a second line. Only the TOP padding mattered: moved into
+   the wrapper so nothing can pass above it. Structure now matches the trainer
+   profile exactly: one sticky block, one inset divider. */
 #moPlayer .mob{padding-top:0;}
-#moPlayer .ps-sticky{position:sticky;top:0;z-index:3;background:#fff;
-  margin:0 -24px;padding:20px 24px 0;}
+#moPlayer .ps-sticky{position:sticky;top:0;z-index:3;background:#fff;padding-top:20px;}
 #moPlayer .ps-sticky .ps-head-row{margin-bottom:0;padding-bottom:9px;
   border-bottom:1px solid var(--gl);}
 #moPlayer #ps-card-view,#moPlayer #ps-edit{padding-top:9px;}
@@ -900,7 +904,7 @@ input[type="date"]{cursor:pointer;}
 #moTrainerProfile .tp-head+.tp-sec,
 #ps-card-view>.tp-sec:first-child{border-top:none;margin-top:0;padding-top:0;}
 @media (max-width:767px){
-  #moPlayer .ps-sticky{margin:0 -16px;padding:16px 16px 0;}
+  #moPlayer .ps-sticky{padding-top:16px;}
 }
 /* The position and foot pickers are custom dropdowns rendered into a div, so
    they need the same slot the plain inputs occupy. */
