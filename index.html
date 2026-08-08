@@ -2752,6 +2752,7 @@ if(window._fbBlocked){
       <div id="ps-contact" class="ps-contact"></div>
     </div>
   </div>
+  <div id="ps-card-view">
   <div id="ps-note-display" class="ps-info"></div>
   <div class="ps-cards" id="ps-cards"></div>
   <div id="ps-next"></div>
@@ -2780,6 +2781,7 @@ if(window._fbBlocked){
       <div class="sess-list" id="ps-sessions"></div>
     </div>
   </details>
+  </div><!-- /ps-card-view -->
   <div id="ps-edit-wrap">
     <div id="ps-edit" style="display:none;background:var(--ow);border-radius:9px;padding:10px 12px;border:1px solid var(--gl);">
       <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:8px;align-items:flex-end;">
@@ -15893,7 +15895,7 @@ let _currentFoot='right';
 // Same model as the trainer profile: the card is a card until you say
 // otherwise. Showing the form under the card meant scrolling past everything
 // to reach it, and left the modal looking like a form the whole time.
-const _PS_VIEW_BLOCKS=['ps-note-display','ps-cards','ps-next','ps-dots','ps-note-card','ps-ext-btn-wrap','ps-more'];
+const _PS_VIEW_BLOCKS=['ps-card-view'];
 let _psShowAllUpcoming=false;
 function psToggleUpcoming(){
   _psShowAllUpcoming=!_psShowAllUpcoming;
@@ -15906,8 +15908,7 @@ function _psShowCard(){
   if(box)box.style.display='none';
   _PS_VIEW_BLOCKS.forEach(id=>{
     const el=document.getElementById(id);
-    if(!el)return;
-    el.style.display=el.innerHTML.trim()?'':'none';
+    if(el)el.style.display='';
   });
   if(btn){btn.innerHTML='\u270e Bearbeiten';btn.classList.remove('active');}
 }
@@ -15919,11 +15920,7 @@ function togglePlayerEdit(){
   box.style.display=open?'block':'none';
   _PS_VIEW_BLOCKS.forEach(id=>{
     const el=document.getElementById(id);
-    if(!el)return;
-    // Clearing the inline style is not enough: a block with no content would
-    // reappear as an empty gap, and one whose CSS default is hidden would
-    // stay invisible. Emptiness decides.
-    el.style.display=open?'none':(el.innerHTML.trim()?'':'none');
+    if(el)el.style.display=open?'none':'';
   });
   btn.innerHTML=open?'\u2713 Fertig':'\u270e Bearbeiten';
   btn.classList.toggle('active',open);
