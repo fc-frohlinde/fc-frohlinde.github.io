@@ -10026,7 +10026,7 @@ function _amWeekCtx(p){
       sk,date:s.date,time:s.time||(isMatch?'15:00':'18:30'),isMatch,
       what:isMatch?(s.label||'Spiel'):'Training',
       place:s.location||'',
-      map:(s.location&&typeof locMapsUrl==='function')?locMapsUrl(s.location):''
+      map:(s.location&&typeof locRouteNeeded==='function'&&locRouteNeeded(s))?locMapsUrl(s.location):''
     });
   });
   list.sort((a,b)=>a.sk-b.sk);
@@ -10075,7 +10075,7 @@ const AM_WEEK_TEMPLATES={
       c.list.forEach(e=>{
         l.push(`${e.isMatch?'\u26bd':'\ud83c\udfc3'} ${e.dow}, ${e.dnum} um ${e.time} Uhr${e.place?' \u00b7 '+e.place:''}`);
         // Route only for matches: away grounds are the ones nobody knows.
-        if(e.isMatch&&e.map)l.push(`   \ud83d\uddfa ${e.map}`);
+        if(e.map)l.push(`   \ud83d\uddfa ${e.map}`);
       });
       l.push('','Sag uns bitte einmal kurz Bescheid, wann du dabei bist \u2014 dann k\u00f6nnen wir richtig planen:',c.url);
       if(c.statsUrl)l.push('','Und hier deine pers\u00f6nliche Statistik \ud83d\udcca',c.statsUrl);
@@ -10103,7 +10103,7 @@ const AM_WEEK_TEMPLATES={
       const l=[`Terminplanung${c.kw?' KW '+c.kw:''}`,''];
       c.list.forEach(e=>{
         l.push(`${e.dow} ${e.dnum}, ${e.time} Uhr \u2014 ${e.what}${e.place?', '+e.place:''}`);
-        if(e.isMatch&&e.map)l.push(`   ${e.map}`);
+        if(e.map)l.push(`   ${e.map}`);
       });
       l.push('','R\u00fcckmeldung bitte \u00fcber diesen Link:',c.url);
       if(c.statsUrl)l.push('','Pers\u00f6nliche Statistik: '+c.statsUrl);
@@ -12465,7 +12465,7 @@ function renderPlayerMode(){
     const haInfo=f.isMatch&&s.homeAway?`<div class="pm-loc">${s.homeAway==='home'?'\ud83c\udfe0 Heim':'\ud83d\ude8c Ausw\u00e4rts'}</div>`:'';
     // Location line — only if the session has one defined
     const locInfo=(s.location&&s.location.trim())
-      ?`<div class="pm-loc">${LOC_ICON} ${_amEscapeText(s.location.trim())} ${locRouteLink(s.location.trim())}</div>`
+      ?`<div class="pm-loc">${LOC_ICON} ${_amEscapeText(s.location.trim())} ${locRouteNeeded(s)?locRouteLink(s.location.trim()):''}</div>`
       :'';
     // Trainer's note for this session — surfaced for the player (e.g. "Bring 2 pairs of cleats")
     const noteInfo=(s.note&&s.note.trim())?`<div class="pm-note">\ud83d\udccc ${_amEscapeText(s.note.trim())}</div>`:'';
@@ -16598,7 +16598,8 @@ function openSessStats(si){
   document.getElementById('ss-title').textContent=s.date+(isMat&&s.label?' – '+s.label:s.focus?' · '+s.focus:'');
   // Location belongs on the meta line: it is the second question after "when"
   const _locMeta=(s.location&&s.location.trim())
-    ?' &nbsp;·&nbsp; '+LOC_ICON+' '+escapeHtml(s.location.trim())+' '+locRouteLink(s.location.trim())
+    ?' &nbsp;·&nbsp; '+LOC_ICON+' '+escapeHtml(s.location.trim())
+      +(locRouteNeeded(s)?' '+locRouteLink(s.location.trim()):'')
     :'';
   document.getElementById('ss-meta').innerHTML=(isMat?`⚽ Spiel &nbsp;·&nbsp; ${s.homeAway==='home'?'🏠 Heim':'🚌 Auswärts'}${s.label?' &nbsp;·&nbsp; '+escapeHtml(s.label):''}${s.time?' &nbsp;·&nbsp; ⏰ '+escapeHtml(s.time):''}`:`Training${s.focus?' &nbsp;·&nbsp; 🎯 '+escapeHtml(s.focus):''}${s.time?' &nbsp;·&nbsp; ⏰ '+escapeHtml(s.time):''}`)+_locMeta;
   try{renderEvalTopicRow(si);}catch(e){console.error('evalTopic:',e);}
@@ -18542,7 +18543,7 @@ function homeRenderNext(){
         '<div class="home-next-date">'+escapeHtml(s.date||'')+(s.time?(' \u00b7 '+s.time):'')+'</div>'+
         '<div class="home-next-count">'+whenTxt(d)+'</div>'+
       '</div>'+
-      ((s.location&&s.location.trim())?'<div class="home-next-loc">'+LOC_ICON+' '+escapeHtml(s.location.trim())+' '+locRouteLink(s.location.trim())+'</div>':'')+
+      ((s.location&&s.location.trim())?'<div class="home-next-loc">'+LOC_ICON+' '+escapeHtml(s.location.trim())+(locRouteNeeded(s)?' '+locRouteLink(s.location.trim()):'')+'</div>':'')+
       rsvp(tIdx)+'</div>';
   }
   if(mIdx>=0){
@@ -18559,7 +18560,7 @@ function homeRenderNext(){
         '<span class="home-next-pill" style="'+haColor+'">'+ha+'</span>'+
         '<div class="home-next-count">'+whenTxt(d)+'</div>'+
       '</div>'+
-      ((s.location&&s.location.trim())?'<div class="home-next-loc">'+LOC_ICON+' '+escapeHtml(s.location.trim())+' '+locRouteLink(s.location.trim())+'</div>':'')+
+      ((s.location&&s.location.trim())?'<div class="home-next-loc">'+LOC_ICON+' '+escapeHtml(s.location.trim())+(locRouteNeeded(s)?' '+locRouteLink(s.location.trim()):'')+'</div>':'')+
       rsvp(mIdx)+'</div>';
   }
   _homeSetHtml(row,html);
@@ -20224,6 +20225,9 @@ function locMapsUrl(name){
   const q=locAddr(name)||String(name||'').trim();
   if(!q)return '';
   return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q);
+}
+function locRouteNeeded(s){
+  return !!(s&&s.type==='match'&&s.homeAway==='away');
 }
 function locRouteLink(name,label){
   const url=locMapsUrl(name);
