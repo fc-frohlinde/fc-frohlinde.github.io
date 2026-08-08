@@ -893,8 +893,16 @@ input[type="date"]{cursor:pointer;}
 /* Sticky handling comes from ".mob > *:first-child:has(button.bs)" — the
    app-wide rule. Nothing here may re-declare position, padding, margin or the
    divider, or it stacks on top of that rule. */
-#moPlayer .ps-sticky .ps-head-row{margin:0;padding:0;border-bottom:none;
-  flex-wrap:nowrap;align-items:center;}
+/* The built-in rule bleeds its background past the modal padding and draws a
+   faint line across the full width. Keep the bleed (it must hide what scrolls
+   underneath) but move the divider onto the inner row so it lines up with the
+   section dividers. The block's own bottom padding and margin go to zero, so
+   the white area ends exactly at that line — otherwise the leftover strip
+   below it shows as a second edge. */
+#moPlayer .ps-sticky{padding-bottom:0;margin-bottom:0;border-bottom:none;}
+#moPlayer .ps-sticky .ps-head-row{margin:0;padding:0 0 9px;
+  border-bottom:1px solid var(--gl);flex-wrap:nowrap;align-items:center;}
+#moPlayer #ps-card-view,#moPlayer #ps-edit{padding-top:9px;}
 #moPlayer .ps-head-mid{flex:1;min-width:0;overflow:hidden;}
 #moPlayer #ps-edit-toggle{align-self:center;}
 #moPlayer #ps-card-view>.tp-sec:first-child,#moPlayer #ps-edit .tp-sec:first-child{
