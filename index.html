@@ -1258,10 +1258,10 @@ select.lp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   .home-hero-title{font-size:1.5rem;letter-spacing:1.5px;}
   .home-hero-sub{font-size:.66rem;letter-spacing:2px;margin-top:3px;}
   /* No hover on touch, so the desktop reveal-on-hover button would sit
-     permanently on the photo. It used to be hidden here because the action
-     lived in the user menu — that entry is gone, so this is now the only way
-     in and it stays visible, just small and unobtrusive. */
-  .home-hero-photobtn{opacity:1;pointer-events:auto;padding:4px 9px;font-size:.68rem;}
+     permanently on the photo. Hidden again — on a phone the photo area itself
+     opens the menu, so no button is needed. */
+  .home-hero-photobtn{display:none !important;}
+  body.can-edit .home-hero{cursor:pointer;}
   .home-user-pill{top:8px;right:8px;padding:4px 9px;font-size:.7rem;}
   /* Tiles: natural height, two columns, real tap targets */
   .home-tiles{flex:0 0 auto;min-height:0;align-content:flex-start;gap:10px;margin-bottom:16px;}
@@ -25450,7 +25450,7 @@ checkAutoBackup();
 <div class="home-overlay" id="homeOverlay">
   <div class="home-scroll">
     <div class="home-inner">
-      <div class="home-hero" id="home-hero">
+      <div class="home-hero" id="home-hero" onclick="if(window.matchMedia('(max-width:767px)').matches)heroPhotoMenu(this,event)">
         <div class="home-hero-photo" id="home-hero-photo" style="display:none;"></div>
         <div class="home-hero-shade"></div>
         <button class="home-hero-photobtn" id="home-hero-photobtn" style="display:none;left:12px;right:auto;" onclick="heroPhotoMenu(this,event)">📷 Foto</button>
