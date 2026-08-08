@@ -848,7 +848,10 @@ input[type="date"]{cursor:pointer;}
 .ps-head-right{display:flex;flex-direction:column;align-items:flex-end;gap:7px;flex-shrink:0;min-width:0;}
 .ps-head-btns{display:flex;gap:6px;flex-shrink:0;}
 .ps-b-ico{display:none;}
-.ps-contact{display:none;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:6px;}
+/* Stacked: three shortcuts side by side never had room next to the avatar,
+   and stacking makes each one a full-width target. */
+.ps-contact{display:none;flex-direction:column;align-items:stretch;gap:5px;min-width:132px;}
+.ps-contact .ps-cbtn{justify-content:center;}
 .ps-cbtn{display:inline-flex;align-items:center;gap:5px;background:var(--bm);color:#fff;text-decoration:none;
   border-radius:var(--r-pill);padding:6px 12px;font-family:'Barlow',sans-serif;font-size:.73rem;
   font-weight:700;min-height:34px;}
@@ -1642,8 +1645,14 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   .ps-b-lbl{display:none;}
   .ps-b-ico{display:inline;}
   .ps-head-btns .btn{padding:7px 11px;min-height:38px;}
-  .ps-head-right{align-items:stretch;width:100%;}
+  /* width:100% on a flex CHILD sitting next to the avatar and the name block
+     pushed the modal wider than the screen. Wrapping the header instead gives
+     the column its own line and keeps everything inside the viewport. */
+  .ps-head-row{flex-wrap:wrap;}
+  .ps-head-right{align-items:stretch;flex-basis:100%;min-width:0;}
   .ps-head-btns{justify-content:flex-end;}
+  .ps-contact{min-width:0;}
+  .ps-contact .ps-cbtn{width:100%;}
   #moSession2 .ss-btn-ico{display:inline;}
   #ss-head-btns .btn{padding:6px 11px;font-size:.8rem;min-height:36px;flex-shrink:0;}
   #ss-edit-toggle{font-size:.74rem !important;padding:7px 10px !important;min-height:38px;}
@@ -2700,8 +2709,8 @@ if(window._fbBlocked){
 <!-- ═══════════════ MODALS ═══════════════ -->
 
 <!-- Player Stats -->
-<div class="mo" id="moPlayer"><div class="mob" style="width:530px;">
-  <div style="display:flex;align-items:flex-start;gap:13px;margin-bottom:13px;">
+<div class="mo" id="moPlayer"><div class="mob" style="width:530px;max-width:96vw;">
+  <div class="ps-head-row" style="display:flex;align-items:flex-start;gap:13px;margin-bottom:13px;">
     <div id="ps-avatar-wrap" style="flex-shrink:0;cursor:pointer;" onclick="if(canEdit())playerPhotoMenu(this)" title="Foto"></div>
     <div style="flex:1;min-width:0;">
       <div id="ps-name" style="font-family:'Bebas Neue',sans-serif;font-size:1.55rem;color:var(--bd);letter-spacing:2px;line-height:1;">–</div>
