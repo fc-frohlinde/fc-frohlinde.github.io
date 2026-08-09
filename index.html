@@ -3470,7 +3470,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786287781387; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786288188835; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -11413,12 +11413,27 @@ function _pmSanitizeG(){
   if(Array.isArray(G.seasonList))G.seasonList=[mySeason];
   const D=G.db[myKey];
   if(D){
+    // Count physio bookings while the full player list still exists: the next
+    // line replaces it with nulls, and D is the same object the sessions are
+    // read from afterwards.
+    const _physioTaken={};
+    if(Array.isArray(D.players)&&Array.isArray(D.sessions)){
+      D.sessions.forEach((s,si)=>{
+        if(!s||typeof s.physio!=='number'||s.physio<=0)return;
+        let n=0;
+        D.players.forEach(pp=>{if(pp&&Array.isArray(pp.physio)&&pp.physio[si]===true)n++;});
+        if(n)_physioTaken[si]=n;
+      });
+    }
     if(Array.isArray(D.players)){
       D.players=D.players.map((p,idx)=>idx===myPi?p:null);
     }
     if(Array.isArray(D.sessions)){
-      D.sessions=D.sessions.map(s=>{
+      D.sessions=D.sessions.map((s,si)=>{
         if(!s)return s;
+        // A number, not the list of who booked: nothing about other players
+        // leaves the payload.
+        const taken=_physioTaken[si]||0;
         return{
           date:s.date,time:s.time,type:s.type,
           label:s.label||'',homeAway:s.homeAway||'',
@@ -11426,6 +11441,8 @@ function _pmSanitizeG(){
           focus:s.focus||'',
           // sRPE needs the session length: load = minutes × rating
           duration:typeof s.duration==='number'?s.duration:undefined,
+          physio:(typeof s.physio==='number'&&s.physio>0)?s.physio:undefined,
+          physioTaken:taken||undefined,
           // Player-visible session info — explicitly whitelisted
           location:s.location||'',
           note:s.note||''
@@ -11523,6 +11540,16 @@ function sessPhysioFree(si){
   const D=cd();const s=D&&D.sessions&&D.sessions[si];
   const slots=sessPhysioSlots(s);
   if(!slots)return 0;
+  // In player mode the other players are stripped, so counting them would
+  // always yield zero taken. The sanitiser leaves the tally behind instead.
+  if(typeof isPlayerMode==='function'&&isPlayerMode()){
+    let taken=(typeof s.physioTaken==='number')?s.physioTaken:0;
+    const me=_pmValidateIdx();
+    const mine=(me!=null&&D.players[me]&&Array.isArray(D.players[me].physio)&&D.players[me].physio[si]===true);
+    // The tally was made before this booking; count it only once
+    if(mine&&taken===0)taken=1;
+    return Math.max(0,slots-taken);
+  }
   return Math.max(0,slots-sessPhysioBooked(si).length);
 }
 function sessSetPhysio(si,val){
