@@ -2412,6 +2412,17 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 .pm-fb-sub{font-weight:600;font-size:.72rem;line-height:1.35;margin-top:4px;opacity:.85;}
 /* Deliberately loud: this is the one instruction that decides whether an
    absence counts as excused, and it is read on a phone in a hurry. */
+.pm-physio{margin-top:9px;}
+.pm-physio-btn{display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+  background:rgba(45,140,120,.10);border:1.5px solid rgba(45,140,120,.35);border-radius:12px;
+  padding:10px 12px;cursor:pointer;font-family:'Barlow',sans-serif;min-height:52px;}
+.pm-physio-btn:disabled{opacity:.5;cursor:default;}
+.pm-physio.on .pm-physio-btn{background:rgba(39,174,96,.16);border-color:#27ae60;}
+.pm-physio-ic{font-size:1.25rem;flex-shrink:0;}
+.pm-physio-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.pm-physio-txt b{font-size:.84rem;color:var(--gd);}
+.pm-physio-txt span{font-size:.7rem;color:var(--gm);}
+.pm-physio-mark{font-size:1.1rem;color:#27ae60;font-weight:800;}
 .pm-callout{margin-top:10px;background:linear-gradient(160deg,#c0392b,#8e2318);color:#fff;
   border-radius:14px;padding:18px 16px;text-align:center;box-shadow:0 6px 20px rgba(192,57,43,.35);}
 .pm-callout-head{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:2.5px;
@@ -3047,6 +3058,7 @@ if(window._fbBlocked){
       <div id="ss-meta" style="font-size:.76rem;color:var(--gm);margin-top:4px;"></div>
       <div id="ss-note-display" style="font-size:.78rem;color:var(--gd);font-style:italic;margin-top:4px;display:none;"></div>
       <div id="ss-plan-link" style="display:none;font-size:.78rem;margin-top:5px;"></div>
+      <div id="ss-physio-wrap" style="display:none;margin-top:8px;"></div>
       <div id="ss-rpe-wrap" style="display:none;margin-top:8px;"></div>
       <div id="ss-rollcall-wrap" style="display:none;margin-top:8px;">
         <button class="btn" style="background:var(--ok-bg);color:var(--ok-fg);border:1.5px solid rgba(39,174,96,.4);font-size:.78rem;font-weight:700;" onclick="rcOpen(_currentSessIdx)">✓ Anwesenheit erfassen</button>
@@ -3458,7 +3470,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786287049307; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786287781387; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -11492,6 +11504,56 @@ function rpeIsOpen(s,si,p,season){
 // Trainer view: how the squad experienced this session. Deliberately shows
 // the SPREAD, not just the mean — if a session lands at 8 for everyone the
 // plan was off, and if it splits 3/9 the intensity was unevenly distributed.
+// s.physio = number of slots (0/undefined = no physio that day)
+// p.physio[si] = true when this player booked one
+function sessPhysioSlots(s){
+  const n=s&&s.physio;
+  return (typeof n==='number'&&n>0)?n:0;
+}
+function sessPhysioBooked(si){
+  const D=cd();
+  if(!D||!Array.isArray(D.players))return [];
+  const out=[];
+  D.players.forEach((p,pi)=>{
+    if(p&&Array.isArray(p.physio)&&p.physio[si]===true)out.push({p,pi});
+  });
+  return out;
+}
+function sessPhysioFree(si){
+  const D=cd();const s=D&&D.sessions&&D.sessions[si];
+  const slots=sessPhysioSlots(s);
+  if(!slots)return 0;
+  return Math.max(0,slots-sessPhysioBooked(si).length);
+}
+function sessSetPhysio(si,val){
+  if(!canEdit())return;
+  const D=cd();const s=D&&D.sessions&&D.sessions[si];
+  if(!s)return;
+  const n=Math.max(0,Math.min(30,parseInt(val,10)||0));
+  if((s.physio||0)===n)return;
+  snap();
+  if(n)s.physio=n;else delete s.physio;
+  saveG();
+  logAudit('Physio ge\u00e4ndert',s.date||'?',n?n+' Pl\u00e4tze':'keine');
+  try{renderSessPhysio(si);}catch(e){}
+}
+// Trainer view: who booked, and how many places are left
+function renderSessPhysio(si){
+  const box=document.getElementById('ss-physio-wrap');
+  if(!box)return;
+  const D=cd();const s=D&&D.sessions&&D.sessions[si];
+  if(!s||!canEdit()||!sessPhysioSlots(s)){box.style.display='none';return;}
+  const booked=sessPhysioBooked(si);
+  const free=sessPhysioFree(si);
+  box.style.display='block';
+  box.innerHTML=`<div class="u-card" style="padding:10px 12px;">
+    <div class="u-sec-h" style="margin-bottom:6px;">\ud83e\uddd1\u200d\u2695\ufe0f Physiotherapie</div>
+    <div style="font-size:.76rem;color:var(--gm);margin-bottom:${booked.length?'7px':'0'};">
+      ${booked.length} von ${sessPhysioSlots(s)} Pl\u00e4tzen belegt${free?'':' \u00b7 ausgebucht'}</div>
+    ${booked.length?`<div style="display:flex;flex-wrap:wrap;gap:5px;">${booked.map(b=>
+      `<span class="u-chip" style="font-size:.72rem;">${escapeHtml(getDisplayName?getDisplayName(b.p):b.p.name)}</span>`).join('')}</div>`:''}
+  </div>`;
+}
 function sessSetLocation(si,val){
   if(!canEdit())return;
   const D=cd();const s=D&&D.sessions&&D.sessions[si];
@@ -11907,6 +11969,7 @@ function _pmSaveTargeted(){
   // minutes actually played. Both are the player's data, written on the same
   // whitelisted path as the rest.
   if(Array.isArray(p.rpe))updates[basePath+'rpe']=_wrapArr(p.rpe);
+  if(Array.isArray(p.physio))updates[basePath+'physio']=_wrapArr(p.physio);
   if(Array.isArray(p.rpeMin))updates[basePath+'rpeMin']=_wrapArr(p.rpeMin);
   if(Object.keys(updates).length===0)return;
   _fbSaving=true;
@@ -12604,6 +12667,26 @@ function renderPlayerMode(){
     // nicht" writes, so locking on it meant one tap was final. After the
     // deadline everything is closed anyway, which is what protects the
     // trainer's roll call.
+    // Physio is offered only after the player has said he is coming: there is
+    // no point booking treatment on a day he will not be there. It disappears
+    // again if he cancels, and the booking is cleared with it.
+    const _phSlots=(typeof sessPhysioSlots==='function')?sessPhysioSlots(s):0;
+    const _phBooked=!!(Array.isArray(p.physio)&&p.physio[si]===true);
+    const _phComing=(status===4||status===1);
+    let physioHtml='';
+    if(_phSlots&&_phComing&&!locked){
+      const free=(typeof sessPhysioFree==='function')?sessPhysioFree(si):0;
+      const full=!_phBooked&&free<=0;
+      physioHtml=`<div class="pm-physio${_phBooked?' on':''}">
+        <button type="button" class="pm-physio-btn" ${full?'disabled':''} onclick="pmTogglePhysio(${si})">
+          <span class="pm-physio-ic">\ud83e\uddd1\u200d\u2695\ufe0f</span>
+          <span class="pm-physio-txt">
+            <b>${_phBooked?'Physio gebucht':'Physio-Termin'}</b>
+            <span>${_phBooked?'Tippen zum Abmelden':(full?'Alle Pl\u00e4tze belegt':'Noch '+free+' von '+_phSlots+' Pl\u00e4tzen frei')}</span>
+          </span>
+          <span class="pm-physio-mark">${_phBooked?'\u2713':''}</span>
+        </button></div>`;
+    }
     const kommeActive=(status===4||status===1);
     const kannNichtActive=(status===2||status===0);
     const kommeDisabled=locked;
@@ -12682,6 +12765,7 @@ function renderPlayerMode(){
              justifications. Existing reasons stay in the data and remain
              visible to trainers; nothing new is collected here. -->
         ${feedback}
+        ${physioHtml}
       </div>
     </div>`;
   };
@@ -12826,6 +12910,37 @@ function pmSaveReason(si,text){
     details:sessLabel+(trimmed?': "'+trimmed.slice(0,60)+(trimmed.length>60?'…':'')+'"':': (entfernt)')
   });
 }
+function pmTogglePhysio(si){
+  if(!isPlayerMode())return;
+  const D=cd();const myPi=_pmValidateIdx();
+  if(myPi==null||!D||!D.players||!D.players[myPi])return;
+  const p=D.players[myPi];
+  const s=D.sessions&&D.sessions[si];
+  if(!s||!sessPhysioSlots(s))return;
+  if(_amRsvpLocked(si))return;
+  const st=(p.s&&si<p.s.length)?p.s[si]:3;
+  if(st!==4&&st!==1)return;
+  if(!Array.isArray(p.physio))p.physio=[];
+  while(p.physio.length<D.sessions.length)p.physio.push(null);
+  const now=p.physio[si]===true;
+  if(!now&&sessPhysioFree(si)<=0){
+    alert('Alle Physio-Pl\u00e4tze f\u00fcr diesen Tag sind belegt.');
+    return;
+  }
+  p.physio[si]=now?null:true;
+  if(RPE_IS_PREVIEW){
+    if(typeof showSaveFlash==='function')showSaveFlash('\ud83d\udc41 Vorschau \u2014 nicht gespeichert');
+    renderPlayerMode();
+    return;
+  }
+  _pmSaveTargeted();
+  try{
+    _pmAppendAudit({ts:Date.now(),user:p.name||'Spieler',role:'player',
+      action:'Physio-Termin',target:(s&&s.date)||'?',
+      detail:p.physio[si]?'gebucht':'abgesagt'});
+  }catch(e){}
+  renderPlayerMode();
+}
 function pmSetStatus(si,val){
   // val from UI: 1 = Komme, 0 = Kann nicht. Maps to p.s[si] status.
   if(!isPlayerMode())return;
@@ -12860,6 +12975,11 @@ function pmSetStatus(si,val){
   if(current===targetStatus)return; // no-op
   const oldVal=current;
   p.s[si]=targetStatus;
+  // A physio slot booked for a session he is no longer attending would block
+  // a place nobody can use.
+  if(targetStatus!==4&&targetStatus!==1&&Array.isArray(p.physio)&&p.physio[si]===true){
+    p.physio[si]=null;
+  }
   // If switching to Angemeldet (Komme), clear any leftover reason
   if(targetStatus===4&&Array.isArray(p.preconfReason)&&si<p.preconfReason.length){
     p.preconfReason[si]='';
@@ -16804,6 +16924,7 @@ function openSessStats(si){
   // actually running/past — capturing attendance for a future date is not
   // a thing (RSVP handles that).
   try{renderLocationDatalist();}catch(e){console.error('locList:',e);}
+  try{renderSessPhysio(si);}catch(e){console.error('sessPhysio:',e);}
   try{renderSessRpe(si);}catch(e){console.error('sessRpe:',e);}
   const rcw=document.getElementById('ss-rollcall-wrap');
   if(rcw)rcw.style.display=(canEdit()&&typeof _isSessRollCallTime==='function'&&_isSessRollCallTime(si))?'block':'none';
@@ -16846,6 +16967,8 @@ function openSessStats(si){
           <input type="time" id="ss-e-time" value="${s.time||''}" style="width:96px;padding:6px;border:1.5px solid var(--gl);border-radius:6px;font-size:.8rem;outline:none;margin-bottom:0;" onchange="updSessTime(${si},this.value)"/></div>
         <div style="flex:none;"><label style="font-size:.61rem;font-weight:700;color:var(--gd);text-transform:uppercase;">Dauer</label>
           <input type="number" id="ss-e-dur" min="15" max="240" step="5" value="${rpeSessionMinutes(s,null,si)}" style="width:78px;padding:6px;border:1.5px solid var(--gl);border-radius:6px;font-size:.8rem;outline:none;margin-bottom:0;" onchange="sessSetDuration(${si},this.value)"/></div>
+        <div style="flex:none;"><label style="font-size:.61rem;font-weight:700;color:var(--gd);text-transform:uppercase;" title="Freie Plätze beim Physiotherapeuten an diesem Tag — 0 = kein Physio">🧑‍⚕️ Physio</label>
+          <input type="number" id="ss-e-physio" min="0" max="30" step="1" value="${s.physio||0}" style="width:70px;padding:6px;border:1.5px solid var(--gl);border-radius:6px;font-size:.8rem;outline:none;margin-bottom:0;" onchange="sessSetPhysio(${si},this.value)"/></div>
         <div style="flex:2;min-width:150px;"><label style="font-size:.61rem;font-weight:700;color:var(--gd);text-transform:uppercase;">${LOC_ICON} Ort</label>
           <div style="display:flex;gap:5px;">
             ${locSelectHtml(s.location||'',`locHandleSelect(${si},this.value,this)`,'ss-e-loc')}
