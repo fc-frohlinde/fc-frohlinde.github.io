@@ -3479,7 +3479,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786290000460; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786305152492; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -8109,13 +8109,26 @@ function togPerfMenu(id,pi,si){
   _placePopup(m,btn.getBoundingClientRect(),{gap:3});
 }
 document.addEventListener('click',()=>document.querySelectorAll('[id^="pm_"]').forEach(m=>m.style.display='none'));
+// An Entschuldigung is a decision about a REASON — illness, holiday, exam.
+// It does not stop being true because the player briefly said "I can come
+// after all" and then changed back. p.excOK[si] records that a trainer once
+// granted it, so the player's "Kann nicht" restores the excuse instead of
+// dropping him to Fehlend and making the trainer grant it a second time.
+// Set on every trainer-side write, cleared as soon as a trainer picks
+// something else — so a later Fehlend really means Fehlend.
+function _noteExcuse(p,si){
+  if(!p||!Array.isArray(p.s))return;
+  if(!Array.isArray(p.excOK))p.excOK=[];
+  while(p.excOK.length<=si)p.excOK.push(null);
+  p.excOK[si]=(p.s[si]===2)?true:null;
+}
 function cycStPlayer(pi,si){
   if(!canEdit())return;
   const D=cd(),p=D.players[pi];if(!p||!p.s)return;
   const past=isSessPast(si);
   let cycle=past?SC.filter(v=>v!==3):SC;
   let cur=cycle.indexOf(p.s[si]);if(cur<0)cur=0;
-  p.s[si]=cycle[(cur+1)%cycle.length];
+  p.s[si]=cycle[(cur+1)%cycle.length];_noteExcuse(p,si);
   snap();saveG();
   // Refresh the player stats modal
   openPlayerStats(pi);
@@ -8125,7 +8138,7 @@ function setSessPlayerStatus(pi,si,val){
   const D=cd();if(!D.players[pi]||!D.players[pi].s)return;
   const oldVal=D.players[pi].s[si];
   if(oldVal===val)return;
-  snap();D.players[pi].s[si]=val;saveG();
+  snap();D.players[pi].s[si]=val;_noteExcuse(D.players[pi],si);saveG();
   const sess=D.sessions[si];
   const sessLabel=sess?(sess.date+(sess.type==='match'?' (Spiel)':' (Training)')):'?';
   logAudit('Status geändert',D.players[pi].name||'?',sessLabel+': '+_statusName(oldVal)+' → '+_statusName(val));
@@ -8177,7 +8190,7 @@ function cycStForce(pi,si){
   snap();
   const p=D.players[pi];
   const oldVal=p.s[si];
-  p.s[si]=SC[(SC.indexOf(p.s[si])+1)%SC.length];
+  p.s[si]=SC[(SC.indexOf(p.s[si])+1)%SC.length];_noteExcuse(p,si);
   const newVal=p.s[si];
   const cell=document.querySelector(`[data-pi="${pi}"][data-si="${si}"]`);
   if(cell){
@@ -8247,14 +8260,14 @@ function cycSt(pi,si){
   const rollCall=_isSessRollCallTime(si);
   if(rollCall&&(oldVal===4||oldVal===3)){
     // Roll-call kickoff: M or ? \u2192 A (trainer confirms attendance)
-    p.s[si]=1;
+    p.s[si]=1;_noteExcuse(p,si);
   } else {
     // Fehlend is part of the planning cycle: it is what a player's own
     // "Kann nicht" writes, so trainers cycle through and correct it here.
     const cycle=rollCall?[1,0,2]:[3,4,0,2];
     let curIdx=cycle.indexOf(p.s[si]);
     if(curIdx<0)curIdx=-1; // not in cycle (defensive) — start from beginning
-    p.s[si]=cycle[(curIdx+1)%cycle.length];
+    p.s[si]=cycle[(curIdx+1)%cycle.length];_noteExcuse(p,si);
   }
   const newVal=p.s[si];
   // Update cell in DOM directly
@@ -12991,12 +13004,14 @@ function pmSetStatus(si,val){
   const current=p.s[si];
   // Map UI input to status:
   //   val=1 (Komme)      -> status 4 (Angemeldet)
-  //   val=0 (Kann nicht) -> status 0 (Fehlend)
+  //   val=0 (Kann nicht) -> status 0 (Fehlend), or back to 2 when a trainer
+  //                          had already granted an excuse for this session
   // NOT 2 (Entschuldigt): an excuse is granted by the trainers after they
   // have spoken to the player. A player's own "no" is a plain absence until
   // then. Nothing changes on the player's screen — only what lands in the
   // table.
-  const targetStatus=(val===1)?4:0;
+  const _hadExcuse=Array.isArray(p.excOK)&&p.excOK[si]===true;
+  const targetStatus=(val===1)?4:(_hadExcuse?2:0);
   // Permission rules (relaxed in 1.0.4-beta after trainer feedback):
   //   Player can freely transition between 2 (Entschuldigt), 3 (Ausstehend), 4 (Angemeldet)
   //   before the RSVP deadline. Only blocked: 1 (Anwesend) and 0 (Fehlend) — those are
