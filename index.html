@@ -2413,16 +2413,25 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 /* Deliberately loud: this is the one instruction that decides whether an
    absence counts as excused, and it is read on a phone in a hurry. */
 .pm-physio{margin-top:9px;}
+/* Two shades of the same green read as one state. Unbooked is an open,
+   dashed outline — visibly an offer; booked is a solid green block with white
+   text, so the difference registers without reading the label. */
 .pm-physio-btn{display:flex;align-items:center;gap:10px;width:100%;text-align:left;
-  background:rgba(45,140,120,.10);border:1.5px solid rgba(45,140,120,.35);border-radius:12px;
-  padding:10px 12px;cursor:pointer;font-family:'Barlow',sans-serif;min-height:52px;}
-.pm-physio-btn:disabled{opacity:.5;cursor:default;}
-.pm-physio.on .pm-physio-btn{background:rgba(39,174,96,.16);border-color:#27ae60;}
+  background:#fff;border:1.5px dashed var(--gl);border-radius:12px;
+  padding:10px 12px;cursor:pointer;font-family:'Barlow',sans-serif;min-height:52px;
+  transition:background .15s,border-color .15s;}
+.pm-physio-btn:hover{border-color:#27ae60;background:rgba(39,174,96,.06);}
+.pm-physio-btn:disabled{opacity:.55;cursor:default;background:var(--muted-bg);}
+.pm-physio-btn:disabled:hover{border-color:var(--gl);background:var(--muted-bg);}
+.pm-physio.on .pm-physio-btn{background:#1f8a4c;border:1.5px solid #1f8a4c;
+  box-shadow:0 3px 12px rgba(31,138,76,.35);}
 .pm-physio-ic{font-size:1.25rem;flex-shrink:0;}
 .pm-physio-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
 .pm-physio-txt b{font-size:.84rem;color:var(--gd);}
 .pm-physio-txt span{font-size:.7rem;color:var(--gm);}
-.pm-physio-mark{font-size:1.1rem;color:#27ae60;font-weight:800;}
+.pm-physio.on .pm-physio-txt b{color:#fff;}
+.pm-physio.on .pm-physio-txt span{color:rgba(255,255,255,.85);}
+.pm-physio-mark{font-size:1.2rem;color:#fff;font-weight:800;flex-shrink:0;}
 .pm-callout{margin-top:10px;background:linear-gradient(160deg,#c0392b,#8e2318);color:#fff;
   border-radius:14px;padding:18px 16px;text-align:center;box-shadow:0 6px 20px rgba(192,57,43,.35);}
 .pm-callout-head{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:2.5px;
@@ -3470,7 +3479,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786288188835; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786290000460; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
