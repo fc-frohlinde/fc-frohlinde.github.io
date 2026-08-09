@@ -2528,7 +2528,14 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 .am-week-title{font-size:.78rem;font-weight:700;color:var(--gd);margin-bottom:7px;}
 .am-week-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;width:100%;}
 .am-week-hint{font-size:.68rem;color:var(--gm);margin-top:7px;line-height:1.35;}
-.am-week-toggle{display:flex;align-items:center;gap:7px;margin-top:9px;font-size:.74rem;
+.am-week-edit{margin-top:9px;}
+.am-week-edit textarea{width:100%;font-family:'Barlow',sans-serif;font-size:.8rem;line-height:1.45;
+  padding:9px 11px;border:1.5px solid var(--gl);border-radius:8px;resize:vertical;margin-bottom:0;}
+.am-week-edit-hint{font-size:.66rem;color:var(--gm);margin-top:5px;}
+.am-week-edit-hint code{background:var(--muted-bg);padding:1px 4px;border-radius:3px;font-size:.64rem;}
+.am-week-edit-btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px;}
+/* Sits at the end of the control row rather than on a line of its own. */
+.am-week-toggle{display:flex;align-items:center;gap:6px;margin-left:auto;font-size:.72rem;white-space:nowrap;
   color:var(--gd);cursor:pointer;flex-wrap:wrap;}
 .am-week-toggle input{width:16px;height:16px;cursor:pointer;}
 .am-week-toggle-hint{font-size:.66rem;color:var(--gm);}
@@ -3443,7 +3450,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786283513073; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786284297574; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -10322,10 +10329,52 @@ function amSetWeekTemplate(v){
   if(typeof setUserPref==='function')setUserPref('amWeekTemplate',v||'kompakt');
   if(typeof renderAnmeldungenModal==='function'){try{renderAnmeldungenModal();}catch(e){}}
 }
+// The text is built per player (name, own links), so an edited version cannot
+// simply be sent as-is to everyone. What CAN be personalised is the wording
+// around the placeholders: the edit is stored as an override with {name},
+// {link} and {stats} standing in for the per-player parts.
+let _amWeekOverride=null;
 function amPreviewWeekText(){
   const D=cd();const p=(D&&D.players||[]).find(x=>x&&x.confirmToken);
+  const sample=p||{name:'Max Mustermann'};
+  const box=document.getElementById('am-week-edit');
+  const ta=document.getElementById('am-week-text');
+  if(!box||!ta)return;
+  ta.value=_amWeekOverride||_amWeekTemplateWithPlaceholders(sample);
+  box.style.display='block';
+  ta.focus();
+}
+function _amWeekTemplateWithPlaceholders(sample){
   const tpl=AM_WEEK_TEMPLATES[amWeekTemplateKey()]||AM_WEEK_TEMPLATES.kompakt;
-  alert(tpl.build(_amWeekCtx(p||{name:'Max Mustermann'})));
+  const c=_amWeekCtx(sample);
+  let t=tpl.build(c);
+  // Replace this player's specifics with markers so the same text serves all
+  if(c.url)t=t.split(c.url).join('{link}');
+  if(c.statsUrl)t=t.split(c.statsUrl).join('{stats}');
+  if(c.nm)t=t.split(c.nm).join('{name}');
+  return t;
+}
+function amWeekEditReset(){
+  _amWeekOverride=null;
+  const ta=document.getElementById('am-week-text');
+  const D=cd();const p=(D&&D.players||[]).find(x=>x&&x.confirmToken);
+  if(ta)ta.value=_amWeekTemplateWithPlaceholders(p||{name:'Max Mustermann'});
+}
+function amWeekEditClose(){
+  const box=document.getElementById('am-week-edit');
+  if(box)box.style.display='none';
+}
+function amWeekEditApply(){
+  const ta=document.getElementById('am-week-text');
+  if(!ta)return;
+  const v=String(ta.value||'').trim();
+  _amWeekOverride=v||null;
+  if(v&&v.indexOf('{link}')<0){
+    alert('Der Text enth\u00e4lt kein {link} \u2014 ohne den Platzhalter bekommen die Spieler keinen Anmeldelink.');
+    return;
+  }
+  amWeekEditClose();
+  amSendWeekAll();
 }
 function _amBuildInviteText(p,sessIdx,kind){
   // kind: 'general' | 'session' | 'reminder'
@@ -12925,12 +12974,20 @@ function _amRenderOverview(){
         ${Object.entries(AM_WEEK_TEMPLATES).map(([k,v])=>
           `<option value="${k}"${k===_wk?' selected':''}>${v.label}</option>`).join('')}
       </select>
-      <button class="am-bc-btn" onclick="amPreviewWeekText()">\ud83d\udc41 Vorschau</button>
+      <button class="am-bc-btn" onclick="amPreviewWeekText()">\u270e Vorschau &amp; senden</button>
       <button class="am-bc-btn primary" onclick="amSendWeekAll()">\ud83d\udcf2 An alle senden</button>
+      <label class="am-week-toggle" title="Durchgehend entschuldigt \u2014 Urlaub, verletzt">
+        <input type="checkbox" ${_amState.hideOut?'checked':''} onchange="amToggleHideOut(this)">
+        <span>Abwesende ausblenden${_outCount?' ('+_outCount+')':''}</span></label>
+    <div id="am-week-edit" class="am-week-edit" style="display:none;">
+      <textarea id="am-week-text" rows="10" spellcheck="false"></textarea>
+      <div class="am-week-edit-hint">Platzhalter: <code>{name}</code> \u00b7 <code>{link}</code> \u00b7 <code>{stats}</code> \u2014 sie werden pro Spieler ersetzt.</div>
+      <div class="am-week-edit-btns">
+        <button class="am-bc-btn primary" onclick="amWeekEditApply()">\ud83d\udcf2 So senden</button>
+        <button class="am-bc-btn" onclick="amWeekEditReset()">\u21ba Vorlage</button>
+        <button class="am-bc-btn" onclick="amWeekEditClose()">Abbrechen</button>
+      </div>
     </div>
-    <label class="am-week-toggle"><input type="checkbox" ${_amState.hideOut?'checked':''} onchange="amToggleHideOut(this)">
-      <span>Abwesende ausblenden${_outCount?' ('+_outCount+')':''}</span>
-      <span class="am-week-toggle-hint">durchgehend entschuldigt \u2014 Urlaub, verletzt</span></label>
     <div class="am-week-hint">${_statsReady
       ? '\u2705 Pers\u00f6nliche Statistik-Links werden mitgeschickt.'
       : '\u2139\ufe0f Noch keine pers\u00f6nlichen Statistiken ver\u00f6ffentlicht \u2014 die Nachricht enth\u00e4lt nur den Anmeldelink.'}</div>
@@ -13221,6 +13278,19 @@ function amSendOne(pi,kind,sessIdx){
 }
 // Weekly invite to every player with a phone number. No session index: the
 // message is about the whole week.
+function _amApplyWeekOverride(tpl,p){
+  const c=_amWeekCtx(p);
+  let t=String(tpl);
+  // Order matters: drop the whole line first when there is no stats link,
+  // otherwise the marker is already gone and an empty line stays behind.
+  if(c.statsUrl)t=t.split('{stats}').join(c.statsUrl);
+  else t=t.replace(/^.*\{stats\}.*$/gm,'');
+  return t
+    .split('{name}').join(c.nm||'')
+    .split('{link}').join(c.url||'')
+    .replace(/\n{3,}/g,'\n\n')
+    .trim();
+}
 function amSendWeekAll(){
   const D=cd();
   const targets=[];
@@ -13238,7 +13308,9 @@ function amSendWeekAll(){
     +'\n\nFortfahren?'))return;
   targets.forEach(({p},i)=>{
     setTimeout(()=>{
-      const text=_amBuildInviteText(p,null,'week');
+      const text=_amWeekOverride
+        ? _amApplyWeekOverride(_amWeekOverride,p)
+        : _amBuildInviteText(p,null,'week');
       const link=_amWhatsAppLink(p.phone,text);
       if(link)window.open(link,'_blank','noopener');
     },i*350);
@@ -13306,7 +13378,7 @@ function amCopyAllLinks(){
   }
 }
 // ── TRAINER DASHBOARD ────────────────────────────────────────
-let _dbState={team:null,season:null,weekdayTime:'past',weekdayType:'all',weekReportOffset:0,reportIncludePhotos:false};
+let _dbState={team:null,season:null,weekdayTime:'past',weekdayType:'all',weekReportOffset:0,reportIncludePhotos:true};
 function setDbWeekdayTime(t){_dbState.weekdayTime=t;renderDashboard();}
 function setDbWeekdayType(t){_dbState.weekdayType=t;renderDashboard();}
 function openDashboard(){
@@ -13989,17 +14061,18 @@ function dbBuildReportSnapshot(data,offset,includePhotos){
     }
   };
 }
-function dbPublishPlayerStats(){
+function dbPublishPlayerStats(opts){
+  const silent=!!(opts&&opts.silent);   // called as part of publishing the report
   if(!canEdit())return;
-  if(!fbDb){alert('Keine Verbindung zur Datenbank.');return;}
+  if(!fbDb){if(!silent)alert('Keine Verbindung zur Datenbank.');return;}
   const data=dbGetData();
   if(!data.block)return;
   const offset=_dbState.weekReportOffset||0;
   const includePhoto=!!_dbState.reportIncludePhotos;
   const targets=[];
   data.players.forEach((p,pi)=>{if(p)targets.push(pi);});
-  if(!targets.length){alert('Keine Spieler.');return;}
-  if(!confirm(targets.length+' pers\u00f6nliche Statistik-Seiten ver\u00f6ffentlichen bzw. aktualisieren?'))return;
+  if(!targets.length){if(!silent)alert('Keine Spieler.');return;}
+  if(!silent&&!confirm(targets.length+' pers\u00f6nliche Statistik-Seiten ver\u00f6ffentlichen bzw. aktualisieren?'))return;
   snap();
   const updates={};
   let built=0;
@@ -14010,16 +14083,16 @@ function dbPublishPlayerStats(){
     updates['publishedReports/'+tok]=snapshot;
     built++;
   });
-  if(!built){alert('Nichts zu ver\u00f6ffentlichen.');return;}
+  if(!built){if(!silent)alert('Nichts zu ver\u00f6ffentlichen.');return;}
   saveG(); // persist the freshly created statsTokens
   fbDb.ref().update(updates).then(()=>{
     G.statsPublishedAt=Date.now();
     saveG();
-    if(typeof showSaveFlash==='function')showSaveFlash('\u2705 '+built+' Statistik-Seiten aktualisiert');
+    if(!silent&&typeof showSaveFlash==='function')showSaveFlash('\u2705 '+built+' Statistik-Seiten aktualisiert');
     if(typeof renderDashboard==='function')renderDashboard();
   }).catch(err=>{
     _fbWarn('playerStats',err,'\u26a0\ufe0f Statistik-Seiten nicht ver\u00f6ffentlicht');
-    alert('Ver\u00f6ffentlichung fehlgeschlagen. Bitte Verbindung pr\u00fcfen.');
+    if(!silent)alert('Ver\u00f6ffentlichung fehlgeschlagen. Bitte Verbindung pr\u00fcfen.');
   });
 }
 function dbPublishWeekReport(){
@@ -14058,6 +14131,10 @@ function dbPublishWeekReport(){
     _dbPublishing=false;
     _dbCopyText(_dbReportUrl(token));
     if(typeof showSaveFlash==='function')showSaveFlash('\u2705 Ver\u00f6ffentlicht & Link kopiert');
+    // The per-player pages belong to the same weekly act — as a separate
+    // button they could be forgotten, and the invitations would then carry a
+    // stale statistics link or none at all.
+    try{dbPublishPlayerStats({silent:true});}catch(e){console.error('playerStats:',e);}
     if(document.getElementById('wr-content'))renderWeekReportModal();
     else if(typeof renderDashboard==='function')renderDashboard();
   }).catch(err=>{
@@ -14329,10 +14406,9 @@ function dbRenderWeekReportSection(data){
   const existing=Array.isArray(G.reportLog)?G.reportLog.find(e=>e&&e.team===r.team&&e.season===r.season&&e.kw===r.kw):null;
   // Photo-toggle HTML — reused in both states (above publish button OR in published settings row)
   const photoToggleHtml=`<label class="db-wr-photo-toggle"><input type="checkbox" ${_dbState.reportIncludePhotos?'checked':''} onchange="dbToggleReportPhotos(this)"><span class="db-wr-photo-txt">Spielerfotos einbeziehen</span><span class="db-wr-hint">gr\u00f6\u00dfere Datei</span></label>`;
-  // Personal statistics: one document per player, published as its own step
+  // No separate button: publishing the report updates the personal pages too.
   const _spAt=G.statsPublishedAt?new Date(G.statsPublishedAt).toLocaleDateString('de-DE'):null;
-  const statsBtnHtml=`<button class="btn" style="font-size:.74rem;margin-left:8px;" onclick="dbPublishPlayerStats()">\ud83d\udcca Pers\u00f6nliche Statistiken ${_spAt?'aktualisieren':'ver\u00f6ffentlichen'}</button>`
-    +(_spAt?`<span class="db-wr-hint" style="margin-left:6px;">zuletzt ${_spAt}</span>`:'');
+  const statsBtnHtml=`<span class="db-wr-hint" style="margin-left:10px;">\ud83d\udcca Pers\u00f6nliche Statistiken werden mitver\u00f6ffentlicht${_spAt?' \u00b7 zuletzt '+_spAt:''}</span>`;
   // Publish area
   if(existing){
     const url=_dbReportUrl(existing.token);
