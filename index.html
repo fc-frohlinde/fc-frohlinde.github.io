@@ -2524,10 +2524,14 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 .rpe-min{width:58px;padding:3px 6px;border:1.5px solid var(--gl);border-radius:6px;
   font-family:'Barlow',sans-serif;font-size:.74rem;text-align:center;color:var(--gd);}
 .rpe-load{min-width:46px;text-align:right;font-weight:700;color:var(--gm);}
-.am-week-block{margin-top:10px;padding-top:10px;border-top:1px solid var(--gl);}
-.am-week-title{font-size:.78rem;font-weight:700;color:var(--gd);margin-bottom:7px;}
+/* Compact layout: this panel is a set of controls, not a page. */
+.am-bc-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.am-bc-head .am-broadcast-title{flex:1;min-width:0;}
+.am-bc-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
+.am-week-block{margin-top:8px;padding-top:8px;border-top:1px solid var(--gl);}
+.am-week-title{font-size:.76rem;font-weight:700;color:var(--gd);margin-bottom:6px;}
 .am-week-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;width:100%;}
-.am-week-hint{font-size:.68rem;color:var(--gm);margin-top:4px;line-height:1.35;}
+.am-week-hint{font-size:.66rem;color:var(--gm);margin-top:6px;line-height:1.3;}
 .am-week-edit{margin-top:9px;}
 .am-week-edit textarea{width:100%;font-family:'Barlow',sans-serif;font-size:.8rem;line-height:1.45;
   padding:9px 11px;border:1.5px solid var(--gl);border-radius:8px;resize:vertical;margin-bottom:0;}
@@ -2535,9 +2539,9 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 .am-week-edit-hint code{background:var(--muted-bg);padding:1px 4px;border-radius:3px;font-size:.64rem;}
 .am-week-edit-btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px;}
 /* Own line under the buttons, label first and the box at the right edge. */
-.am-week-toggle{display:flex;align-items:center;gap:8px;margin-top:8px;width:100%;font-size:.74rem;
+.am-week-toggle{display:flex;align-items:center;gap:6px;margin-left:auto;font-size:.72rem;white-space:nowrap;
   color:var(--gd);cursor:pointer;flex-wrap:wrap;}
-.am-week-toggle span{flex:1;min-width:0;}
+
 .am-week-toggle input{width:17px;height:17px;cursor:pointer;flex-shrink:0;margin:0;}
 .am-week-toggle-hint{font-size:.66rem;color:var(--gm);}
 .am-week-lbl{font-size:.72rem;font-weight:700;color:var(--gm);}
@@ -3451,7 +3455,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786286204442; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786286456761; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -12956,11 +12960,11 @@ function _amRenderOverview(){
   // showing this week's headline stats so trainer can see at a glance whether
   // there's anything to share.
   html+='<div class="am-broadcast-section">';
-  html+='<div class="am-broadcast-title">\ud83d\udce2 Mannschafts-Versand</div>';
-  html+='<div class="am-broadcast-sub">Nachrichten an die ganze Mannschafts-Gruppe</div>';
-  // Group 1: always-available actions
-  html+='<div class="am-broadcast-actions">';
-  html+='<button class="am-bc-btn" onclick="copyTeamLink()">\ud83d\udd17 Mannschafts-Link kopieren</button>';
+  // Title and the group-link button share one line: the sub-line repeated what
+  // the title already says, and a single button had a whole row to itself.
+  html+='<div class="am-bc-head">';
+  html+='<span class="am-broadcast-title">\ud83d\udce2 Mannschafts-Versand</span>';
+  html+='<button class="am-bc-btn" onclick="copyTeamLink()" title="Link für die Mannschafts-Gruppe">\ud83d\udd17 Gruppen-Link</button>';
   html+='</div>';
   // ── Weekly invite: one link covers the whole week, so this belongs to the
   //    overview rather than to any single session. Five text variants.
@@ -12970,18 +12974,17 @@ function _amRenderOverview(){
   html+=`<div class="am-week-block">
     <div class="am-week-title">\ud83d\udcc5 Wochen-Einladung an alle Spieler</div>
     <div class="am-week-row">
-      <span class="am-week-lbl">Textvariante:</span>
-      <select class="am-week-sel" onchange="amSetWeekTemplate(this.value)">
+      <select class="am-week-sel" onchange="amSetWeekTemplate(this.value)" title="Textvariante">
         ${Object.entries(AM_WEEK_TEMPLATES).map(([k,v])=>
           `<option value="${k}"${k===_wk?' selected':''}>${v.label}</option>`).join('')}
       </select>
-      <button class="am-bc-btn" onclick="amPreviewWeekText()">\u270e Vorschau &amp; senden</button>
-      <button class="am-bc-btn primary" onclick="amSendWeekAll()">\ud83d\udcf2 An alle senden</button>
+      <button class="am-bc-btn" onclick="amPreviewWeekText()" title="Text ansehen und anpassen">\u270e Text</button>
+      <button class="am-bc-btn primary" onclick="amSendWeekAll()">\ud83d\udcf2 Senden</button>
+      <label class="am-week-toggle" title="Durchgehend entschuldigte Spieler \u2014 Urlaub, verletzt">
+        <input type="checkbox" ${_amState.hideOut?'checked':''} onchange="amToggleHideOut(this)">
+        <span>Abwesende ausblenden${_outCount?' ('+_outCount+')':''}</span>
+      </label>
     </div>
-    <label class="am-week-toggle" title="Durchgehend entschuldigt \u2014 Urlaub, verletzt">
-      <span>Abwesende ausblenden${_outCount?' ('+_outCount+')':''}</span>
-      <input type="checkbox" ${_amState.hideOut?'checked':''} onchange="amToggleHideOut(this)">
-    </label>
     <div id="am-week-edit" class="am-week-edit" style="display:none;">
       <textarea id="am-week-text" rows="10" spellcheck="false"></textarea>
       <div class="am-week-edit-hint">Platzhalter: <code>{name}</code> \u00b7 <code>{link}</code> \u00b7 <code>{stats}</code> \u2014 sie werden pro Spieler ersetzt.</div>
@@ -13023,9 +13026,10 @@ function _amRenderOverview(){
         } else {
           html+='<div class="am-bc-week-status am-bc-unpublished">\u26a0 Noch nicht ver\u00f6ffentlicht \u2014 Link wird im Versand fehlen</div>';
         }
-        html+='<div class="am-broadcast-actions">';
-        html+='<button class="am-bc-btn" onclick="sendWeekReportWhatsApp()">\ud83d\udce4 In Gruppe senden</button>';
-        html+='<button class="am-bc-btn" onclick="closeM(\'moAnmeldungen\');openWeekReport()">\u2699 Bericht verwalten</button>';
+        // Shorter labels so both fit beside each other instead of stacking
+        html+='<div class="am-bc-row">';
+        html+='<button class="am-bc-btn" onclick="sendWeekReportWhatsApp()">\ud83d\udce4 In Gruppe</button>';
+        html+='<button class="am-bc-btn" onclick="closeM(\'moAnmeldungen\');openWeekReport()">\u2699 Bericht</button>';
         html+='</div>';
       } else {
         html+='<div class="am-bc-week-head">Wochenbericht KW '+(r&&r.kw?r.kw:'?')+': <span class="am-bc-week-empty">keine Sitzungen diese Woche</span></div>';
