@@ -3443,7 +3443,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786281637483; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786283513073; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -10191,22 +10191,27 @@ function _amWeekCtx(p){
   });
   const trainCount=list.filter(e=>!e.isMatch).length;
   const matchCount=list.filter(e=>e.isMatch).length;
-  return {nm,url,statsUrl,list,trainCount,matchCount,
+  // "2 Trainings und 1 Spiel" — what the message needs instead of the dates,
+  // which the link shows anyway.
+  const _p=(n,one,many)=>n+' '+(n===1?one:many);
+  const parts=[];
+  if(trainCount)parts.push(_p(trainCount,'Training','Trainings'));
+  if(matchCount)parts.push(_p(matchCount,'Spiel','Spiele'));
+  const summary=parts.length===2?parts.join(' und '):(parts[0]||'keine Termine');
+  return {nm,url,statsUrl,list,trainCount,matchCount,summary,
     kw:(typeof isoWeekKey==='function')?parseInt(isoWeekKey(new Date()).split('-W')[1],10):null};
 }
 const AM_WEEK_TEMPLATES={
-  // Ten variants so the weekly message can be rotated. A text that never
-  // changes stops being read after a month — the eye recognises the shape and
-  // skips it. Every variant carries the same three things: the week's dates,
-  // the RSVP link, and (once published) the personal statistics link.
+  // The link already shows every date of the week with its buttons, so listing
+  // them here says the same thing twice — and a long message is scrolled past.
+  // These give the reason to tap and how much is waiting: a count, not a list.
   kompakt:{
     label:'Kompakt',
     build:c=>{
-      if(!c.list.length)return `Hi ${c.nm}! \uD83D\uDC4B\n\nDiese Woche stehen keine Termine an. Dein Link bleibt gleich:\n${c.url}`;
-      const l=[`Hi ${c.nm}! \uD83D\uDC4B`,'','Termine der Woche:'];
-      c.list.forEach(e=>l.push(`${e.isMatch?'\u26bd':'\ud83c\udfc3'} ${e.dow} ${e.dnum} \u00b7 ${e.time} Uhr`));
-      l.push('','Bitte f\u00fcr alle kurz zu- oder absagen:',c.url);
-      if(c.statsUrl)l.push('','\ud83d\udcca Deine pers\u00f6nliche Statistik:',c.statsUrl);
+      if(!c.list.length)return `Hi ${c.nm}! \uD83D\uDC4B\n\nDiese Woche stehen keine Termine an.`;
+      const l=[`Hi ${c.nm}! \uD83D\uDC4B`,'',`Diese Woche: ${c.summary}.`,
+        'Bitte kurz zu- oder absagen:',c.url];
+      if(c.statsUrl)l.push('','\ud83d\udcca Deine Statistik:',c.statsUrl);
       l.push('','Danke! \uD83D\uDE4F');
       return l.join('\n');
     }
@@ -10214,14 +10219,10 @@ const AM_WEEK_TEMPLATES={
   freundlich:{
     label:'Freundlich',
     build:c=>{
-      if(!c.list.length)return `Hi ${c.nm}! \uD83D\uDC4B\n\nDiese Woche ist trainingsfrei \u2014 geniesst die Pause! \uD83D\uDE0A\n\nDein Link bleibt derselbe:\n${c.url}`;
-      const l=[`Hallo ${c.nm}! \uD83D\uDC4B`,'','So sieht unsere Woche aus:'];
-      c.list.forEach(e=>{
-        l.push(`${e.isMatch?'\u26bd':'\ud83c\udfc3'} ${e.dow}, ${e.dnum} um ${e.time} Uhr${e.place?' \u00b7 '+e.place:''}`);
-        // Route only for matches: away grounds are the ones nobody knows.
-        if(e.map)l.push(`   \ud83d\uddfa ${e.map}`);
-      });
-      l.push('','Sag uns bitte einmal kurz Bescheid, wann du dabei bist \u2014 dann k\u00f6nnen wir richtig planen:',c.url);
+      if(!c.list.length)return `Hi ${c.nm}! \uD83D\uDC4B\n\nDiese Woche ist frei \u2014 geniess die Pause! \uD83D\uDE0A`;
+      const l=[`Hallo ${c.nm}! \uD83D\uDC4B`,'',
+        `${c.summary} stehen an. Sag uns bitte kurz Bescheid, wann du dabei bist \u2014 dann k\u00f6nnen wir richtig planen:`,
+        c.url];
       if(c.statsUrl)l.push('','Und hier deine pers\u00f6nliche Statistik \ud83d\udcca',c.statsUrl);
       l.push('','Bis bald! \u26BD');
       return l.join('\n');
@@ -10230,11 +10231,10 @@ const AM_WEEK_TEMPLATES={
   motivierend:{
     label:'Motivierend',
     build:c=>{
-      if(!c.list.length)return `\uD83D\uDCAA ${c.nm}, diese Woche Pause \u2014 danach greifen wir wieder an!\n\n${c.url}`;
+      if(!c.list.length)return `\uD83D\uDCAA ${c.nm}, diese Woche Pause \u2014 danach greifen wir wieder an!`;
       const head=c.matchCount>0?'\uD83D\uDD25 Spieltag-Woche!':'\uD83D\uDCAA Neue Woche, neue Einheiten!';
-      const l=[head,'',`Hi ${c.nm}, das steht an:`];
-      c.list.forEach(e=>l.push(`${e.isMatch?'\u26bd':'\ud83c\udfc3'} ${e.dow} ${e.dnum} \u00b7 ${e.time} Uhr`));
-      l.push('','Wir z\u00e4hlen auf dich \u2014 trag kurz ein, wann du da bist:',c.url);
+      const l=[head,'',`Hi ${c.nm}, ${c.summary} \u2014 wir z\u00e4hlen auf dich.`,
+        'Trag kurz ein, wann du da bist:',c.url];
       if(c.statsUrl)l.push('','\ud83d\udcca Deine Zahlen:',c.statsUrl);
       l.push('','\uD83D\uDE80');
       return l.join('\n');
@@ -10243,13 +10243,9 @@ const AM_WEEK_TEMPLATES={
   sachlich:{
     label:'Sachlich',
     build:c=>{
-      if(!c.list.length)return `${c.nm}: diese Woche keine Termine. Link: ${c.url}`;
-      const l=[`Terminplanung${c.kw?' KW '+c.kw:''}`,''];
-      c.list.forEach(e=>{
-        l.push(`${e.dow} ${e.dnum}, ${e.time} Uhr \u2014 ${e.what}${e.place?', '+e.place:''}`);
-        if(e.map)l.push(`   ${e.map}`);
-      });
-      l.push('','R\u00fcckmeldung bitte \u00fcber diesen Link:',c.url);
+      if(!c.list.length)return `${c.nm}: diese Woche keine Termine.`;
+      const l=[`Terminplanung${c.kw?' KW '+c.kw:''}`,'',`${c.summary}.`,
+        'R\u00fcckmeldung bitte \u00fcber diesen Link:',c.url];
       if(c.statsUrl)l.push('','Pers\u00f6nliche Statistik: '+c.statsUrl);
       return l.join('\n');
     }
@@ -10257,19 +10253,18 @@ const AM_WEEK_TEMPLATES={
   kurz:{
     label:'Sehr kurz',
     build:c=>{
-      if(!c.list.length)return `Diese Woche frei. Link: ${c.url}`;
-      const parts=c.list.map(e=>`${e.dow} ${e.time}`);
-      return `Hi ${c.nm}! Diese Woche: ${parts.join(', ')}.\nKurz eintragen bitte \uD83D\uDC47\n${c.url}`
+      if(!c.list.length)return 'Diese Woche frei.';
+      return `Hi ${c.nm}! ${c.summary} diese Woche \u2014 kurz eintragen bitte \uD83D\uDC47\n${c.url}`
         +(c.statsUrl?`\n\n\ud83d\udcca ${c.statsUrl}`:'');
     }
   },
   checkliste:{
-    label:'Checkliste',
+    label:'Nachfassend',
     build:c=>{
-      if(!c.list.length)return `Hi ${c.nm}! Diese Woche keine Termine \u2713\n${c.url}`;
-      const l=[`Hi ${c.nm}! \uD83D\uDC4B`,'','Deine Woche \u2014 bitte alles abhaken:'];
-      c.list.forEach(e=>l.push(`\u2610 ${e.dow} ${e.dnum}, ${e.time} Uhr \u2014 ${e.what}`));
-      l.push('','Hier eintragen:',c.url);
+      if(!c.list.length)return `Hi ${c.nm}! Diese Woche keine Termine \u2713`;
+      const l=[`Hi ${c.nm}! \uD83D\uDC4B`,'',
+        `${c.summary} \u2014 im Link siehst du alles auf einen Blick und hakst es in zwei Klicks ab:`,
+        c.url];
       if(c.statsUrl)l.push('','\ud83d\udcca Statistik: '+c.statsUrl);
       return l.join('\n');
     }
@@ -10277,38 +10272,34 @@ const AM_WEEK_TEMPLATES={
   teamgeist:{
     label:'Teamgeist',
     build:c=>{
-      if(!c.list.length)return `${c.nm}, diese Woche Pause \u2014 erholt euch gut! \u26BD\n${c.url}`;
-      const l=[`\u26BD Hi ${c.nm}!`,'','Je fr\u00fcher wir wissen, wer dabei ist, desto besser wird das Training f\u00fcr alle.','','Diese Woche:'];
-      c.list.forEach(e=>l.push(`${e.isMatch?'\u26bd':'\ud83c\udfc3'} ${e.dow} ${e.dnum} \u00b7 ${e.time} Uhr`));
-      l.push('','Zwei Klicks, mehr nicht:',c.url);
+      if(!c.list.length)return `${c.nm}, diese Woche Pause \u2014 erhol dich gut! \u26BD`;
+      const l=[`\u26BD Hi ${c.nm}!`,'',
+        'Je fr\u00fcher wir wissen, wer dabei ist, desto besser wird das Training f\u00fcr alle.',
+        '',`${c.summary} \u2014 zwei Klicks, mehr nicht:`,c.url];
       if(c.statsUrl)l.push('','Deine Statistik: '+c.statsUrl);
       l.push('','Danke dir! \uD83D\uDE4F');
       return l.join('\n');
     }
   },
   countdown:{
-    label:'Countdown',
+    label:'N\u00e4chster Termin',
     build:c=>{
-      if(!c.list.length)return `Keine Termine diese Woche. \u26BD\n${c.url}`;
-      const first=c.list[0];
-      const l=[`Hi ${c.nm}!`,'',`N\u00e4chster Termin: ${first.dow} ${first.dnum}, ${first.time} Uhr \u2014 ${first.what}`];
-      if(c.list.length>1){
-        l.push('','Danach:');
-        c.list.slice(1).forEach(e=>l.push(`\u00b7 ${e.dow} ${e.dnum}, ${e.time} Uhr`));
-      }
-      l.push('','Bitte f\u00fcr die ganze Woche eintragen:',c.url);
+      if(!c.list.length)return `Keine Termine diese Woche. \u26BD`;
+      const f=c.list[0];
+      const l=[`Hi ${c.nm}!`,'',
+        `Als N\u00e4chstes: ${f.dow} ${f.dnum}, ${f.time} Uhr.`,
+        `Diese Woche ${c.summary} \u2014 bitte f\u00fcr alle eintragen:`,c.url];
       if(c.statsUrl)l.push('','\ud83d\udcca '+c.statsUrl);
       return l.join('\n');
     }
   },
   fokus:{
-    label:'Mit Schwerpunkt',
+    label:'Mit Hinweis',
     build:c=>{
-      if(!c.list.length)return `Hi ${c.nm}! Diese Woche keine Einheiten.\n${c.url}`;
-      const l=[`Hi ${c.nm}! \uD83D\uDC4B`,'','Das haben wir diese Woche vor:'];
-      c.list.forEach(e=>l.push(`${e.isMatch?'\u26bd':'\ud83c\udfc3'} ${e.dow} ${e.dnum}, ${e.time} Uhr \u2014 ${e.what}`));
-      const n=c.trainCount+c.matchCount;
-      l.push('',`${n} Termin${n===1?'':'e'} \u2014 sag uns bitte kurz, bei welchen du dabei bist:`,c.url);
+      if(!c.list.length)return `Hi ${c.nm}! Diese Woche keine Einheiten.`;
+      const l=[`Hi ${c.nm}! \uD83D\uDC4B`,'',`${c.summary} diese Woche.`,'',
+        'Wichtig: Absagen bitte immer \u00fcber den Link \u2014 so sieht das ganze Trainerteam Bescheid.',
+        c.url];
       if(c.statsUrl)l.push('','\ud83d\udcca Deine Entwicklung: '+c.statsUrl);
       return l.join('\n');
     }
@@ -10316,14 +10307,10 @@ const AM_WEEK_TEMPLATES={
   statsfokus:{
     label:'Statistik im Fokus',
     build:c=>{
-      if(!c.list.length)return `Hi ${c.nm}! Diese Woche Pause.`+(c.statsUrl?`\n\n\ud83d\udcca Dein Saison-Stand: ${c.statsUrl}`:`\n${c.url}`);
+      if(!c.list.length)return `Hi ${c.nm}! Diese Woche Pause.`+(c.statsUrl?`\n\n\ud83d\udcca Dein Saison-Stand: ${c.statsUrl}`:'');
       const l=[`Hi ${c.nm}! \uD83D\uDCCA`,''];
-      if(c.statsUrl){
-        l.push('Dein aktueller Stand \u2014 Anwesenheit, Serie und Verlauf:',c.statsUrl,'');
-      }
-      l.push('Und das steht diese Woche an:');
-      c.list.forEach(e=>l.push(`${e.isMatch?'\u26bd':'\ud83c\udfc3'} ${e.dow} ${e.dnum} \u00b7 ${e.time} Uhr`));
-      l.push('','Bitte eintragen:',c.url);
+      if(c.statsUrl)l.push('Dein aktueller Stand \u2014 Anwesenheit, Serie und Verlauf:',c.statsUrl,'');
+      l.push(`Und diese Woche: ${c.summary}. Bitte eintragen:`,c.url);
       return l.join('\n');
     }
   }
