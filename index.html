@@ -1825,7 +1825,9 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
      a row — the select shrinks to unreadable. Stack them full width. */
   .am-week-row{flex-direction:column;align-items:stretch;gap:6px;}
   .am-week-lbl{font-size:.7rem;}
-  .am-week-sel{width:100%;min-height:44px;font-size:.82rem;}
+  /* Must match the desktop rule's specificity, otherwise the auto width set
+     there would win here too and the dropdown would shrink on a phone. */
+  .mob select.am-week-sel{width:100%;max-width:none;min-height:44px;font-size:.82rem;}
   .am-week-row .am-bc-btn{width:100%;min-height:44px;justify-content:center;}
   .am-broadcast-actions .am-bc-btn{width:100%;min-height:44px;justify-content:center;}
   #moTeamMgr #tmgr-close-top{display:none;}
@@ -2545,7 +2547,8 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 .am-week-toggle input{width:17px;height:17px;cursor:pointer;flex-shrink:0;margin:0;}
 .am-week-toggle-hint{font-size:.66rem;color:var(--gm);}
 .am-week-lbl{font-size:.72rem;font-weight:700;color:var(--gm);}
-.am-week-sel{padding:5px 9px;border:1.5px solid var(--gl);border-radius:7px;background:#fff;
+.mob select.am-week-sel{width:auto;min-width:120px;max-width:170px;margin-bottom:0;
+  padding:5px 9px;border:1.5px solid var(--gl);border-radius:7px;background:#fff;
   font-family:'Barlow',sans-serif;font-size:.76rem;font-weight:600;color:var(--gd);cursor:pointer;}
 .pm-count-open{background:var(--warn-bg) !important;color:var(--warn-fg) !important;}
 .pm-focus-hint{margin:18px 16px 0;text-align:center;font-size:.74rem;color:rgba(255,255,255,.5);line-height:1.4;}
@@ -3455,7 +3458,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786286456761; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786287049307; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
