@@ -842,6 +842,9 @@ input[type="date"]{cursor:pointer;}
 .pl-btn-e{background:rgba(22,89,184,.1);color:var(--bm);}.pl-btn-e:hover{background:rgba(22,89,184,.2);}
 .pl-btn-d{background:rgba(231,76,60,.1);color:var(--ca);}.pl-btn-d:hover{background:rgba(231,76,60,.2);}
 .tr-row{display:flex;align-items:center;gap:7px;padding:7px 10px;background:var(--ow);border-radius:7px;margin-bottom:5px;}
+.tr-group{font-size:.62rem;font-weight:700;letter-spacing:.9px;text-transform:uppercase;
+  color:var(--gm);margin:10px 0 4px;}
+.tr-group:first-child{margin-top:0;}
 .tr-grip{flex-shrink:0;cursor:grab;color:var(--gm);opacity:.55;font-size:1.05rem;line-height:1;
   padding:6px 3px;touch-action:none;user-select:none;}
 .tr-grip:active{cursor:grabbing;opacity:1;}
@@ -3535,7 +3538,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786383633226; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786384752801; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -7964,7 +7967,7 @@ function renderHdrInfo(){
   document.getElementById('fDate').textContent=new Date().toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});
   document.getElementById('fTeam').textContent=UI.currentTeam+' · Saison '+UI.currentSeason;
   // Trainer chips in header
-  const tr=G.trainers.filter(t=>t&&Array.isArray(t.teams)&&t.teams.includes(UI.currentTeam));
+  const tr=G.trainers.filter(t=>t&&Array.isArray(t.teams)&&t.teams.includes(UI.currentTeam)&&isCoachRole(t));
   const htr=document.getElementById('hTrainers');
   if(htr)htr.innerHTML=tr.length?tr.map(t=>{
     const gi=G.trainers.indexOf(t);
@@ -19526,6 +19529,12 @@ const TRAINER_ROLES=['Trainer','Co-Trainer','Torwarttrainer','Athletiktrainer','
 // Roles are stored in one canonical form and displayed to match the person.
 // Every role in the list forms its feminine by appending "in", so no second
 // list has to be kept in step.
+// Not everyone in the staff list coaches: a physio, a kit manager or a team
+// manager belong to the team but not under a heading that says "Trainerteam".
+const COACH_ROLES=['Trainer','Co-Trainer','Torwarttrainer','Athletiktrainer'];
+function isCoachRole(t){
+  return COACH_ROLES.includes((t&&t.role)||'Trainer');
+}
 function trainerRoleLabel(t){
   const r=(t&&t.role)||'Trainer';
   return (t&&t.gender==='w')?r+'in':r;
@@ -19828,8 +19837,19 @@ document.addEventListener('pointermove',trDragMove);
 document.addEventListener('pointerup',trDragEnd);
 document.addEventListener('pointercancel',trDragEnd);
 function renderMgrTrainers(){
-  const myT=G.trainers.filter(t=>t&&Array.isArray(t.teams)&&t.teams.includes(UI.currentTeam));
+  const all=G.trainers.filter(t=>t&&Array.isArray(t.teams)&&t.teams.includes(UI.currentTeam));
+  // Coaches first, then the rest — with a heading only when both groups exist,
+  // so a club without support staff sees no empty labels.
+  const coaches=all.filter(isCoachRole);
+  const staff=all.filter(t=>!isCoachRole(t));
+  const myT=coaches.concat(staff);
   const showLock=isAdmin();
+  const _headBefore=t=>{
+    if(!coaches.length||!staff.length)return '';
+    if(t===coaches[0])return '<div class="tr-group">Trainerteam</div>';
+    if(t===staff[0])return '<div class="tr-group">Weiteres Personal</div>';
+    return '';
+  };
   document.getElementById('mgr-tr-list').innerHTML=myT.length?
     myT.map(t=>{
       const gi=G.trainers.indexOf(t);
@@ -19842,7 +19862,7 @@ function renderMgrTrainers(){
         :`<div class="tr-av tr-av-ph">${escapeHtml((t.name||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase())}</div>`;
       const sub=[t.role?trainerRoleLabel(t):'',t.teams.join(', ')].filter(Boolean).join(' \u00b7 ');
       const handle=isAdmin()?`<span class="tr-grip" title="Ziehen zum Sortieren" onpointerdown="trDragStart(event,${gi})">\u283f</span>`:'';
-      return `<div class="tr-row" data-gi="${gi}">${handle}<div class="tr-main" onclick="openTrainerProfile(${gi})" title="Profil öffnen">${av}<div><div class="tr-nm">${escapeHtml(t.name)}${lockIcon}</div><div class="tr-teams">${escapeHtml(sub)}</div></div></div>${resetBtn}${isAdmin()?`<button class="tr-del" onclick="delTrainer(${gi})">✕</button>`:''}</div>`;
+      return _headBefore(t)+`<div class="tr-row" data-gi="${gi}">${handle}<div class="tr-main" onclick="openTrainerProfile(${gi})" title="Profil öffnen">${av}<div><div class="tr-nm">${escapeHtml(t.name)}${lockIcon}</div><div class="tr-teams">${escapeHtml(sub)}</div></div></div>${resetBtn}${isAdmin()?`<button class="tr-del" onclick="delTrainer(${gi})">✕</button>`:''}</div>`;
     }).join('')
     :'<p style="font-size:.76rem;color:var(--gm);">Kein Trainer für dieses Team.</p>';
 }
