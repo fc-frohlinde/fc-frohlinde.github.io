@@ -1202,6 +1202,8 @@ select.lp-fmt-btn option:checked{background:var(--bm);color:#fff;}
 .lp-stat .sv{font-family:'Bebas Neue',sans-serif;font-size:1.18rem;line-height:1;color:#fff;letter-spacing:1px;}
 .lp-stat .sk{font-size:.55rem;color:rgba(255,255,255,.85);text-transform:uppercase;letter-spacing:.5px;margin-top:3px;}
 .lp-disc-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;}
+.lp-disc-badge{font-size:.55rem;background:rgba(192,57,43,.3);color:#ff9080;padding:1px 5px;
+  border-radius:7px;font-weight:700;white-space:nowrap;flex-shrink:0;cursor:help;}
 .lp-disc-h{color:#c0392b !important;}
 .lp-disc-chip{background:rgba(192,57,43,.16) !important;border-color:rgba(192,57,43,.5) !important;}
 .lp-unavail-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;
@@ -3541,7 +3543,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786386851591; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786387375909; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -24402,10 +24404,15 @@ function lpRenderSubs(){
       }
       const bcol=PB_COLORS[p.pos]||'#ddd;color:#333';
       const guestBadge=isGuest?`<span style="font-size:.55rem;background:color-mix(in srgb, var(--ac) 20%, transparent);color:var(--ac);padding:1px 5px;border-radius:7px;font-weight:700;">GAST</span>`:'';
-      return `<div style="display:flex;align-items:center;gap:6px;padding:5px 8px;background:${bg};border:1px solid rgba(255,255,255,.07);border-radius:7px;margin-bottom:3px;">
+      const _disc=isGuest?null:lpDisciplineState(id);
+      const discBadge=_disc
+        ? `<span class="lp-disc-badge" title="${escapeHtml(_disc.reason)} \u2014 ${escapeHtml(_disc.details.join(', '))}">\u26d4 ${_disc.miss?_disc.miss+'\u00d7U':_disc.exc+'\u00d7E'}</span>`
+        : '';
+      if(_disc)bg='rgba(192,57,43,.12)';
+      return `<div style="display:flex;align-items:center;gap:6px;padding:5px 8px;background:${bg};border:1px solid ${_disc?'rgba(192,57,43,.45)':'rgba(255,255,255,.07)'};border-radius:7px;margin-bottom:3px;">
         <span style="font-family:'Bebas Neue';color:var(--ac);font-size:.85rem;width:18px;text-align:center;">${p.nr||'–'}</span>
         <span style="font-size:.72rem;font-weight:600;color:#fff;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${getDisplayName(p)}</span>
-        ${guestBadge}
+        ${guestBadge}${discBadge}
         <span class="lp-card-pos1" style="background:${bcol.split(';')[0]};${bcol.split(';')[1]};font-size:.55rem;font-weight:700;padding:1px 5px;border-radius:7px;">${p.pos}</span>
         ${status}
       </div>`;
