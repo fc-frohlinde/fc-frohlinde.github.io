@@ -3538,7 +3538,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786385962940; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786386188856; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -6462,8 +6462,16 @@ function _checkRemoteAppVersion(){
     // Done by setting G fields directly; next saveG persists them.
     G._appVersion=APP_VERSION;
     G._appReleaseTs=APP_RELEASE_TS;
-    // Announcing a version is housekeeping, not an edit — see _sysSave
-    if(typeof saveG==='function'&&!_pendingSave)_sysSave(()=>saveG(false));
+    // Two fields, written on their own path — no full object, no edit marker,
+    // and nothing else can travel with them.
+    try{
+      if(fbDb&&!(G&&G.__sanitized)){
+        fbDb.ref('fcf_data').update({_appVersion:APP_VERSION,_appReleaseTs:APP_RELEASE_TS})
+          .catch(err=>console.warn('[Version] Ank\u00fcndigung fehlgeschlagen:',err));
+      }
+    }catch(e){}
+    // Keep the local copy in step without touching Firebase again
+    try{if(typeof safeLocalSave==='function'&&!(G&&G.__sanitized))safeLocalSave(SK,JSON.stringify(G));}catch(e){}
   } else if(srvTs>APP_RELEASE_TS){
     // Remote is newer → we are stale → show update banner
     _showUpdateBanner(srvVer,srvTs);
