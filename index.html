@@ -217,10 +217,10 @@ body{background:linear-gradient(140deg,var(--bg-dark) 0%,var(--bg-mid) 55%,var(-
    initials would repeat it. */
 .tr-initials{display:none;align-items:center;gap:4px;flex-shrink:0;}
 body.hdr-collapsed .tr-initials{display:flex;}
-.tr-ini{width:28px;height:24px;border-radius:var(--r-pill);border:1px solid rgba(255,255,255,.18);
-  background:rgba(255,255,255,.09);color:rgba(255,255,255,.8);cursor:pointer;
-  font-family:'Barlow',sans-serif;font-size:.65rem;font-weight:800;letter-spacing:.5px;
-  display:flex;align-items:center;justify-content:center;transition:all .12s;}
+.tr-ini{width:27px;height:23px;border-radius:var(--r-pill);border:1px solid rgba(255,255,255,.22);
+  background:rgba(255,255,255,.13);color:rgba(255,255,255,.85);cursor:pointer;
+  font-family:'Barlow',sans-serif;font-size:.64rem;font-weight:800;letter-spacing:.5px;
+  display:flex;align-items:center;justify-content:center;transition:all .12s;flex-shrink:0;}
 .tr-ini:hover{background:var(--ac);color:var(--bd);border-color:var(--ac);}
 .hmeta{margin-top:3px;font-size:.7rem;color:rgba(255,255,255,.45);}
 .hright{margin-left:auto;display:flex;align-items:center;gap:10px;z-index:2;flex-shrink:1;min-width:0;max-width:calc(100% - 280px);}
@@ -2791,6 +2791,9 @@ if(window._fbBlocked){
   <div class="hright">
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
       <div style="display:flex;align-items:center;gap:8px;">
+        <!-- Who is responsible for this team stays visible when the full
+             trainer strip below is folded away with the header. -->
+        <div class="tr-initials" id="trInitials"></div>
         <div class="season-chip" id="hSeason" onclick="mobSeasonTap()" title="Saison wechseln">2025/26</div>
         <div class="notif-wrap" id="notifWrap">
           <button class="notif-btn" id="notifBtn" onclick="toggleNotifPanel(event)" title="Benachrichtigungen">
@@ -2826,9 +2829,6 @@ if(window._fbBlocked){
 <div class="toolbar" id="toolbarEl">
   <div class="toolbar-l">
     <button class="btn bs" id="btn-home" onclick="homeOpen()" title="Startseite" style="font-size:.95rem;padding:4px 10px;">⌂</button>
-    <!-- Who is responsible for this team stays visible when the header with
-         the full trainer strip is folded away. -->
-    <div class="tr-initials" id="trInitials"></div>
     <div class="team-bar-wrap" id="teamBarWrap">
       <button class="team-pick" id="teamPickBtn" onclick="event.stopPropagation();toggleTeamMenu()" title="Mannschaft wechseln">
         <span id="teamPickLbl">–</span><span class="team-pick-caret">▾</span>
@@ -3491,7 +3491,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786370996498; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786371213441; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
