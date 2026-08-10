@@ -3535,7 +3535,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786378790400; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786379223930; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -22429,7 +22429,12 @@ window.listBackups=async function(){
 // older backup also rolls their answers back to that date. Every status change
 // is logged though — by trainers in auditLog, by players in auditLogP — and
 // those live outside the player records, so they survived. This replays them.
-window.repairAttendance=async function(apply){
+// opts.force=true replays every logged change. Off by default: the log is
+// capped at 200 entries, so a trainer's Entschuldigt granted earlier may no
+// longer be in it, and replaying would silently downgrade it to the player's
+// older "Fehlend". Only gaps are filled unless asked otherwise.
+window.repairAttendance=async function(apply,opts){
+  const force=!!(opts&&opts.force);
   const D=cd();
   if(!D||!Array.isArray(D.players)||!Array.isArray(D.sessions)){console.log('Keine Daten.');return;}
   const NAME2VAL={'Fehlend':0,'Anwesend':1,'Entschuldigt':2,'Ausstehend':3,'Angemeldet':4};
@@ -22468,22 +22473,32 @@ window.repairAttendance=async function(apply){
     const k=pi+'|'+si;
     if(!latest[k]||(e.ts||0)>latest[k].ts)latest[k]={ts:e.ts||0,val,pi,si,name:e.target||e.user};
   });
-  const rows=[];
+  const rows=[],skipped=[];
   Object.values(latest).forEach(r=>{
     const p=D.players[r.pi];
     const cur=(p&&Array.isArray(p.s))?p.s[r.si]:undefined;
     if(cur===r.val)return;
-    rows.push({Spieler:r.name,Termin:D.sessions[r.si].date,
-      jetzt:_statusName(cur===undefined?3:cur),ausLog:_statusName(r.val)});
+    const isGap=(cur===undefined||cur===3);   // no answer recorded
+    const row={Spieler:r.name,Termin:D.sessions[r.si].date,
+      jetzt:_statusName(cur===undefined?3:cur),ausLog:_statusName(r.val)};
+    if(isGap||force){rows.push(row);r._apply=true;}
+    else skipped.push(row);
   });
+  console.log('%cWird gesetzt ('+rows.length+'):','font-weight:bold');
   console.table(rows.slice(0,60));
-  console.log(rows.length+' Eintr\u00e4ge w\u00fcrden gesetzt (von '+entries.length+' Log-Zeilen).');
+  if(skipped.length){
+    console.log('%c\u00dcbersprungen ('+skipped.length+') \u2014 hier steht bereits eine Antwort, '
+      +'meist eine vom Trainer erteilte Entschuldigung:','color:#a5701f;font-weight:bold');
+    console.table(skipped);
+  }
   if(!apply){
     console.log('%cProbelauf. Zum Ausf\u00fchren:  repairAttendance(true)','font-weight:bold');
+    if(skipped.length)console.log('Wirklich alles \u00fcberschreiben (nicht empfohlen): repairAttendance(true,{force:true})');
     return rows;
   }
   snap_();
   Object.values(latest).forEach(r=>{
+    if(!r._apply)return;
     const p=D.players[r.pi];
     if(!p)return;
     if(!Array.isArray(p.s))p.s=[];
