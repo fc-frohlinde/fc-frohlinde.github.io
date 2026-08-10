@@ -3535,7 +3535,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786378186131; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786378407658; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -22378,15 +22378,18 @@ window.listBackups=async function(){
   const all=snap.val()||{};
   const rows=Object.keys(all).map(k=>{
     const b=all[k]||{};
-    const d=b.data||{};
+    let d={};
+    try{d=typeof b.data==='string'?JSON.parse(b.data):(b.data||{});}catch(e){}
     let players=0,teams=0;
     Object.keys(d.db||{}).forEach(key=>{
       const blk=d.db[key];
       if(blk&&Array.isArray(blk.players)){teams++;players+=blk.players.filter(Boolean).length;}
     });
     return {key:k,datum:b.ts?new Date(b.ts).toLocaleString('de-DE'):'?',
-      art:b.kind||'?',anlass:b.preOpLabel||'',spieler:players,bloecke:teams,
-      trainer:Array.isArray(d.trainers)?d.trainers.length:0};
+      art:b.kind||'?',anlass:b.label||'',spieler:players,bloecke:teams,
+      trainer:Array.isArray(d.trainers)?d.trainers.length:0,
+      // What the app recorded when the backup was written — a cross-check
+      lautStats:(b.stats&&b.stats.players)||0};
   }).sort((a,b)=>(a.datum<b.datum?1:-1));
   console.table(rows);
   console.log('Wiederherstellen mit:  restorePeople("<key>")   \u2014 nur Spieler und Trainer, Termine bleiben unangetastet.');
@@ -22467,7 +22470,8 @@ window.restorePeople=async function(key,apply){
   const snap=await fbRef.parent.child('__backups/'+key).once('value');
   const b=snap.val();
   if(!b||!b.data){console.log('Backup nicht gefunden.');return;}
-  const src=b.data;
+  let src={};
+  try{src=typeof b.data==='string'?JSON.parse(b.data):(b.data||{});}catch(e){console.log('Backup unlesbar.');return;}
   const report=[];
   Object.keys(src.db||{}).forEach(k=>{
     const from=src.db[k],to=G.db&&G.db[k];
