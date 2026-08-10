@@ -3535,7 +3535,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786378407658; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786378766143; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -11500,6 +11500,12 @@ function _pmSanitizeG(){
       // t.teams.includes(...) unconditionally.
       teams:Array.isArray(t.teams)?t.teams.slice():[]}));
   }
+  // Player mode blanks other players for privacy. That state must never be
+  // written back — doing so replaces the squad with a single player, which is
+  // exactly what happened. Non-enumerable so JSON.stringify and the encoder
+  // never carry it into the database.
+  try{Object.defineProperty(G,'__sanitized',{value:true,enumerable:false,configurable:true,writable:true});}
+  catch(e){G.__sanitized=true;}
   if(Array.isArray(G.exerciseLibrary))G.exerciseLibrary=[];
   delete G._lastSaveBy;
   delete G._lastSaveTs;
@@ -12041,6 +12047,17 @@ function _pmSaveTargeted(){
   // when team roster changed (another player was deleted, indices shifted).
   const myPi=_pmValidateIdx();
   if(!myTeam||!mySeason||myPi==null)return;
+  // Write only where this token's player actually sits right now. Without this
+  // a stale index writes past the end of the roster and Firebase creates a new
+  // entry there — which is how one player multiplied into several.
+  {
+    const chk=G.db&&G.db[myTeam+'__'+mySeason];
+    const target=chk&&Array.isArray(chk.players)?chk.players[myPi]:null;
+    if(!target||target.confirmToken!==CU.playerToken){
+      console.error('[SCHUTZ] Spieler-Schreibzugriff abgebrochen: Index passt nicht zum Token.');
+      return;
+    }
+  }
   const D=G.db[myTeam+'__'+mySeason];
   if(!D||!Array.isArray(D.players)||!D.players[myPi])return;
   const p=D.players[myPi];
