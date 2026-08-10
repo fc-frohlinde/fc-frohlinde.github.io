@@ -1057,6 +1057,14 @@ body.no-photos .trainer-chip-av,body.no-photos .tr-av{display:none;}
 .tp-av-ph{display:flex;align-items:center;justify-content:center;background:var(--bm);color:#fff;
   font-family:'Bebas Neue',sans-serif;font-size:1.6rem;}
 .tp-name{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:1px;color:var(--bd);line-height:1.1;}
+/* Hint that the name is editable, without a control of its own: it appears on
+   hover and points at the Bearbeiten button that actually does it. */
+.tp-name-pen{font-size:.8rem;color:var(--gm);margin-left:7px;opacity:0;transition:opacity .12s;}
+.tp-head:hover .tp-name-pen{opacity:.7;}
+.tp-name-in{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:1px;color:var(--bd);
+  line-height:1.1;width:100%;background:transparent;border:none;border-bottom:1.5px dashed var(--gl);
+  padding:0 0 2px;margin:0;outline:none;}
+.tp-name-in:focus{border-bottom-color:var(--bm);}
 .tp-sub{font-size:.76rem;color:var(--gm);margin-top:2px;}
 .tp-av-wrap{cursor:pointer;line-height:0;}
 .tp-av-wrap::after{width:26px;height:26px;font-size:.78rem;bottom:0;right:0;}
@@ -3527,7 +3535,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786377326401; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786377626663; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -7858,6 +7866,9 @@ function render(){
 function renderHdrInfo(){
   if(!G)return;
   if(!Array.isArray(G.trainers))G.trainers=[];
+  // Self-heal: a trainer without teams is invisible everywhere and used to
+  // throw in the header. Restore the club's teams so nobody silently vanishes.
+  G.trainers.forEach(t=>{if(t&&!Array.isArray(t.teams))t.teams=Array.isArray(G.teamList)?G.teamList.slice():[];});
   if(!Array.isArray(G.teamList))G.teamList=['U19'];
   if(!Array.isArray(G.seasonList))G.seasonList=[UI.currentSeason||'2025/26'];
   document.getElementById('hSeason').textContent=UI.currentSeason;
@@ -7865,7 +7876,7 @@ function renderHdrInfo(){
   document.getElementById('fDate').textContent=new Date().toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});
   document.getElementById('fTeam').textContent=UI.currentTeam+' · Saison '+UI.currentSeason;
   // Trainer chips in header
-  const tr=G.trainers.filter(t=>t.teams.includes(UI.currentTeam));
+  const tr=G.trainers.filter(t=>t&&Array.isArray(t.teams)&&t.teams.includes(UI.currentTeam));
   const htr=document.getElementById('hTrainers');
   if(htr)htr.innerHTML=tr.length?tr.map(t=>{
     const gi=G.trainers.indexOf(t);
@@ -7909,7 +7920,7 @@ function renderTeamBar(){
     wrap.style.display=many?'':'none';
   }
   // Trainer chips on right
-  const trainers=G.trainers.filter(t=>t.teams.includes(UI.currentTeam));
+  const trainers=G.trainers.filter(t=>t&&Array.isArray(t.teams)&&t.teams.includes(UI.currentTeam));
   // trainer strip removed
 }
 
@@ -11484,7 +11495,10 @@ function _pmSanitizeG(){
       // an excuse is granted by the head trainers.
       const role=(t.role||'Trainer');
       return role==='Trainer';
-    }).map(t=>({name:t.name,phone:t.phone,role:'Trainer'}));
+    }).map(t=>({name:t.name,phone:t.phone,role:'Trainer',
+      // teams must survive: the header and several other views call
+      // t.teams.includes(...) unconditionally.
+      teams:Array.isArray(t.teams)?t.teams.slice():[]}));
   }
   if(Array.isArray(G.exerciseLibrary))G.exerciseLibrary=[];
   delete G._lastSaveBy;
@@ -19467,7 +19481,10 @@ function renderTrainerProfile(){
   let html=`<div class="tp-head">
     ${av}
     <div class="tp-head-txt">
-      <div class="tp-name">${esc(t.name)}</div>
+      ${(ed&&isAdmin())
+        ?`<input class="tp-name-in" type="text" value="${esc(_tpDraft&&'name' in _tpDraft?_tpDraft.name:t.name)}"
+            onchange="tpSet('name',this.value)" title="Name ist zugleich der Login-Name">`
+        :`<div class="tp-name">${esc(t.name)}${isAdmin()?'<span class="tp-name-pen" title="Zum Bearbeiten auf ✎ Bearbeiten tippen">\u270e</span>':''}</div>`}
       <div class="tp-sub">${esc(trainerRoleLabel(t))}${t.teams&&t.teams.length?' \u00b7 '+esc(t.teams.join(', ')):''}</div>
     </div>
     ${mayEdit?`<button class="tp-edit-btn${_tpEditing?' active':''}" onclick="tpToggleEdit()">${_tpEditing?'\u2713 Fertig':'\u270e Bearbeiten'}</button>`:''}
@@ -19486,9 +19503,8 @@ function renderTrainerProfile(){
       +line('E-Mail',t.email,'email','email')
       +'</div>';
   const sec=(title,body)=>body.trim()?`<div class="tp-sec"><div class="tp-sec-h">${title}</div>${body}</div>`:'';
-  html+=(ed&&isAdmin())?sec('Name',line('Name',t.name,'name','text')):'';
   html+=sec('Funktion',
-      line('Rolle',t.role,'role','select',TRAINER_ROLES)
+      line('Rolle',ed?t.role:trainerRoleLabel(t),'role','select',TRAINER_ROLES)
       +(ed?line('Anrede',t.gender==='w'?'Weiblich':'M\u00e4nnlich','gender','select',['M\u00e4nnlich','Weiblich']):'')
       +line('Lizenz',t.licence,'licence','select',TRAINER_LICENCES)
       +line('G\u00fcltig bis',t.licenceUntil,'licenceUntil','date')
@@ -19687,7 +19703,7 @@ document.addEventListener('pointermove',trDragMove);
 document.addEventListener('pointerup',trDragEnd);
 document.addEventListener('pointercancel',trDragEnd);
 function renderMgrTrainers(){
-  const myT=G.trainers.filter(t=>t.teams.includes(UI.currentTeam));
+  const myT=G.trainers.filter(t=>t&&Array.isArray(t.teams)&&t.teams.includes(UI.currentTeam));
   const showLock=isAdmin();
   document.getElementById('mgr-tr-list').innerHTML=myT.length?
     myT.map(t=>{
