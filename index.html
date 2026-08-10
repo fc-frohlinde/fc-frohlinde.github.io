@@ -3140,6 +3140,7 @@ if(window._fbBlocked){
     <button style="display:none;" id="ss-edit-toggle-legacy" onclick="toggleSessEdit()">✎ Bearbeiten</button>
     <div id="ss-edit" style="display:none;background:var(--ow);border-radius:8px;padding:10px 12px;border:1px solid var(--gl);"></div>
   </div>
+  <div id="ss-card-view2">
   <div id="ss-evaltopic" style="display:none;margin:2px 0 8px;"></div>
   <div class="ps-cards" id="ss-cards"></div>
   <div id="ss-anmeld-summary" style="display:none;margin-bottom:10px;"></div>
@@ -3160,6 +3161,7 @@ if(window._fbBlocked){
     </div>
   </div>
   <div id="ss-comm-list"></div>
+  </div><!-- /ss-card-view2 -->
   <div style="display:flex;gap:7px;margin-top:8px;">
     <button class="btn bd" id="ss-del" onclick="delCurrSess()">🗑 Löschen</button>
     <button class="btn" id="ss-tpl-save" onclick="saveSessionAsTemplate()" style="font-size:.74rem;background:rgba(22,89,184,.1);color:var(--bm);border:1px solid rgba(22,89,184,.3);display:none;">📋 Als Vorlage</button>
@@ -3530,7 +3532,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786374744992; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786375232237; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -17568,7 +17570,7 @@ function updSessNote(si,v){if(!canEdit())return;snap();cd().sessions[si].note=v;
 // the card hides them too. Listing them separately would also mean restoring
 // them by hand — and each of those blocks decides for itself whether it has
 // anything to show.
-const _SS_VIEW=['ss-card-view'];
+const _SS_VIEW=['ss-card-view','ss-card-view2'];
 function _ssShowCard(){
   const box=document.getElementById('ss-edit-wrap');
   const btn=document.getElementById('ss-edit-toggle');
