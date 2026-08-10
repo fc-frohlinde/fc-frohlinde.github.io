@@ -446,7 +446,13 @@ body.theme-dark .pl-row:nth-child(even){background:#15264a;}
 .vd-sep{height:1px;background:rgba(255,255,255,.1);margin:3px 0;}
 
 /* TOOLBAR */
-.toolbar{background:linear-gradient(to right,var(--surface-mid),var(--surface-bright));padding:5px 20px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;flex-shrink:0;}
+/* Closes the toolbar against the table. On the toolbar rather than on the
+   table head: the head is sticky and scrolls up under the toolbar, so a line
+   drawn there travels with it and the boundary moves. This one stays put —
+   and when the toolbar is hidden it disappears with it, so nothing doubles up
+   against the header's own edge. */
+.toolbar{background:linear-gradient(to right,var(--surface-mid),var(--surface-bright));padding:5px 20px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;flex-shrink:0;
+  border-bottom:2px solid var(--ac);}
 .toolbar.hidden{display:none;}
 .toolbar-l{display:flex;gap:5px;align-items:center;flex-wrap:wrap;}
 .toolbar-r{margin-left:auto;display:flex;gap:5px;align-items:center;}
@@ -3568,7 +3574,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786393824203; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786394143096; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
