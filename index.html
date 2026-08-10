@@ -3543,7 +3543,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786387662566; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786388217422; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -22732,6 +22732,48 @@ window.repairAttendance=async function(apply,opts){
 // Lineups are stripped in player mode for privacy, so yesterday's overwrite
 // took them along with the squad. They live outside the player records, which
 // means they can be restored on their own without touching anything current.
+// Confirmations are nested: slpConfirmations[team__season].confirmed = {pi:val}.
+// Counting the outer keys compares "how many team-season blocks exist" — which
+// is 1 on both sides even when one of them holds 24 confirmations and the
+// other none. This looks inside.
+window.restoreConfirmations=async function(key,apply){
+  if(!fbRef){console.log('Keine Verbindung.');return;}
+  const snap=await fbRef.parent.child('__backups/'+key).once('value');
+  const b=snap.val();
+  if(!b||!b.data){console.log('Backup nicht gefunden.');return;}
+  let src={};
+  try{src=typeof b.data==='string'?JSON.parse(b.data):(b.data||{});}catch(e){console.log('Backup unlesbar.');return;}
+  const inner=o=>{
+    const out={};
+    Object.keys(o||{}).forEach(k=>{
+      const c=o[k]&&o[k].confirmed;
+      out[k]=c?Object.keys(c).length:0;
+    });
+    return out;
+  };
+  const now=inner(G.slpConfirmations),was=inner(src.slpConfirmations);
+  const rows=Object.keys(Object.assign({},now,was)).map(k=>({block:k,jetzt:now[k]||0,imBackup:was[k]||0}));
+  console.table(rows);
+  if(!apply){
+    console.log('%cProbelauf. Zum Ausfuehren:  restoreConfirmations("'+key+'",true)','font-weight:bold');
+    return rows;
+  }
+  snap_();
+  if(!G.slpConfirmations||typeof G.slpConfirmations!=='object')G.slpConfirmations={};
+  let restored=0;
+  Object.keys(src.slpConfirmations||{}).forEach(k=>{
+    const fromN=was[k]||0,toN=now[k]||0;
+    if(fromN<=toN)return;                       // never reduce
+    G.slpConfirmations[k]=JSON.parse(JSON.stringify(src.slpConfirmations[k]));
+    restored+=fromN;
+    console.log('\u2192 '+k+': '+fromN+' Bestaetigungen wiederhergestellt');
+  });
+  if(!restored){console.log('Nichts wiederherzustellen.');return;}
+  saveG();
+  logAudit('Wiederherstellung','Bestaetigungen','aus Backup '+key+': '+restored);
+  if(typeof render==='function')render();
+  console.log('%c'+restored+' Bestaetigungen wiederhergestellt.','color:green;font-weight:bold');
+};
 window.restoreLineups=async function(key,apply){
   if(!fbRef){console.log('Keine Verbindung.');return;}
   const snap=await fbRef.parent.child('__backups/'+key).once('value');
