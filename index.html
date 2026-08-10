@@ -3535,7 +3535,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786381072334; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786382423152; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -4176,14 +4176,39 @@ function _fbCollectDiff(oldV,newV,path,out,depth){
     _fbCollectDiff(oldV[k],newV[k],path?path+'/'+k:k,out,depth+1);
   });
 }
-function _fbWriteWithStamp(data){
-  // Hard stop, not a warning: a sanitised payload reaching this function
-  // replaces the whole squad with the one player who opened the link.
+// Single answer to "may this client write whole objects?". Player mode holds
+// a reduced copy of the database — other players blanked, journal cleared —
+// and writing that back replaces the real data with it. Every bulk writer asks
+// here first; leaf writes from the player app have their own token check.
+function _writeBlocked(what){
   if(G&&G.__sanitized){
-    console.error('[SCHUTZ] Schreiben blockiert: Daten sind auf Spieler-Ansicht reduziert.');
-    _fbSaving=false;
-    return Promise.resolve();
+    console.error('[SCHUTZ] '+(what||'Schreiben')+' blockiert: reduzierte Spieler-Ansicht.');
+    return true;
   }
+  return false;
+}
+function _fbWriteWithStamp(data){
+  if(_writeBlocked('Firebase-Schreiben')){_fbSaving=false;return Promise.resolve();}
+  // Plausibility check against the last known remote state: a write that would
+  // remove most of a squad is a bug, not an edit. Deleting players one by one
+  // stays possible; wiping a roster in one go does not.
+  try{
+    if(_fbShadow&&_fbShadow.db&&data&&data.db){
+      const cnt=blk=>{
+        const pl=blk&&(blk.players&&blk.players.v?blk.players.v:blk.players);
+        return Array.isArray(pl)?pl.filter(Boolean).length:0;
+      };
+      for(const k of Object.keys(_fbShadow.db||{})){
+        const was=cnt(_fbShadow.db[k]),now=cnt(data.db[k]);
+        if(was>=5&&now<Math.ceil(was/2)){
+          console.error('[SCHUTZ] Schreiben abgebrochen: '+k+' h\u00e4tte '+was+' \u2192 '+now+' Spieler.');
+          if(typeof showSaveFlash==='function')showSaveFlash('\u26d4 Schreiben blockiert \u2014 Datenverlust verhindert');
+          _fbSaving=false;
+          return Promise.resolve();
+        }
+      }
+    }
+  }catch(e){}
   if(!fbRef){return Promise.reject(new Error('No Firebase connection'));}
   data._lastSaveBy=(CU&&CU.name)||'?';
   data._lastSaveTs=Date.now();
@@ -5441,10 +5466,7 @@ function safeLocalSave(key,value){
 function saveG(badge=true){
   // Also guards localStorage: a sanitised copy cached there would corrupt the
   // next trainer session on this device.
-  if(G&&G.__sanitized){
-    console.error('[SCHUTZ] saveG blockiert: reduzierte Spieler-Ansicht.');
-    return;
-  }
+  if(_writeBlocked('saveG'))return;
   safeLocalSave(SK,JSON.stringify(G));
   if(badge){const b=document.getElementById('savedBadge');b.classList.add('show');clearTimeout(b._t);b._t=setTimeout(()=>b.classList.remove('show'),1600);}
   // Firebase: debounce writes (max 1 per 800ms)
@@ -11519,6 +11541,10 @@ function _pmSanitizeG(){
   // never carry it into the database.
   try{Object.defineProperty(G,'__sanitized',{value:true,enumerable:false,configurable:true,writable:true});}
   catch(e){G.__sanitized=true;}
+  // Detach the realtime listener as well: in player mode nothing may flow back,
+  // and an open listener is what kept a reduced copy alive long enough to be
+  // written by another code path.
+  try{if(typeof stopFbListener==='function')stopFbListener();}catch(e){}
   if(Array.isArray(G.exerciseLibrary))G.exerciseLibrary=[];
   delete G._lastSaveBy;
   delete G._lastSaveTs;
@@ -22184,6 +22210,7 @@ function saveBackups(bks,skipFb){
   // Firebase: keep more — no quota issue in the cloud
   if(fbRef&&!skipFb){
     const fbBks=bks.slice(0,BK_FB_MAX);
+    if(_writeBlocked('Backup-Schreiben'))return;
     fbRef.parent.child('__backups').set(fbBks.map(b=>({ts:b.ts,label:b.label,kind:b.kind||'manual',note:b.note||'',stats:b.stats||null,data:b.data}))).catch(err=>{
       console.error('[Backup] Firebase-Schreiben fehlgeschlagen:',err);
       if(typeof showSaveFlash==='function')showSaveFlash('\u26a0\ufe0f Backup konnte nicht in die Cloud geschrieben werden');
@@ -23166,6 +23193,7 @@ function resolveConflict(action){
     G._lastSaveBy=(CU&&CU.name)||'?';
     G._lastSaveTs=Date.now();
     if(fbRef){
+      if(_writeBlocked('\u00dcberschreiben'))return;
       // Deliberate full replacement (user chose "overwrite remote"), but the
       // shadow must follow — otherwise the next diff compares against the
       // discarded remote state and re-uploads everything again.
