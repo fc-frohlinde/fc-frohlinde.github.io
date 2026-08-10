@@ -375,7 +375,11 @@ body.theme-dark .pl-row:nth-child(even){background:#15264a;}
    2px, not the 3px the table head uses: this line runs edge to edge across the
    window and meets a light surface below, which makes the same thickness read
    heavier than the table's, where it sits between two dark rows. */
-.header{border-bottom:2.5px solid var(--ac);}
+/* The header no longer carries the accent: with the toolbar hidden it sat
+   directly against the table's own line and the two read as one thick band.
+   A quiet edge is enough here — the dark header already stands apart from the
+   lighter toolbar below it. */
+.header{border-bottom:1px solid rgba(255,255,255,.12);}
 /* One row, scrollable rather than wrapping: a second line here would give
    back exactly the height the move was meant to save.
    The wrapper is the shrinking element — with a fixed max-width every added
@@ -500,9 +504,7 @@ tbody tr:hover .c0,tbody tr:hover .c1,tbody tr:hover .c2{background:#cfe2ff !imp
 tfoot .c0,tfoot .c1,tfoot .c2{background:color-mix(in srgb,var(--bd) 50%,#000) !important;z-index:12 !important;}
 
 /* THEAD */
-/* Same accent line above the header row as below it, so the dates sit in a
-   band of their own rather than running into whatever is above the table. */
-thead th{background:var(--bd);color:#fff;position:sticky;top:0;z-index:4;padding:0;border-top:3px solid var(--ac);border-bottom:3px solid var(--ac);white-space:nowrap;}
+thead th{background:var(--bd);color:#fff;position:sticky;top:0;z-index:4;padding:0;border-bottom:3px solid var(--ac);white-space:nowrap;}
 /* Sticky-left headers on top */
 thead .c0,thead .c1{text-align:left;padding:8px 6px;font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:1.2px;z-index:12 !important;background:var(--bd) !important;}
 thead .c2{text-align:left;padding:8px 4px;font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:1.2px;z-index:12 !important;background:var(--bd) !important;}
@@ -3566,7 +3568,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786393497172; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786393824203; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
