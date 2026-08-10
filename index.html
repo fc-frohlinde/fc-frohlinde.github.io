@@ -1201,6 +1201,9 @@ select.lp-fmt-btn option:checked{background:var(--bm);color:#fff;}
 .lp-stat:hover{background:color-mix(in srgb,var(--bl) 26%,transparent);}
 .lp-stat .sv{font-family:'Bebas Neue',sans-serif;font-size:1.18rem;line-height:1;color:#fff;letter-spacing:1px;}
 .lp-stat .sk{font-size:.55rem;color:rgba(255,255,255,.85);text-transform:uppercase;letter-spacing:.5px;margin-top:3px;}
+.lp-disc-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;}
+.lp-disc-h{color:#c0392b !important;}
+.lp-disc-chip{background:rgba(192,57,43,.16) !important;border-color:rgba(192,57,43,.5) !important;}
 .lp-unavail-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;
   padding:7px 12px;background:rgba(231,76,60,.14);border-bottom:1px solid rgba(231,76,60,.3);flex-shrink:0;}
 .lp-un-h{font-size:.72rem;font-weight:700;color:#ffb3a7;letter-spacing:.4px;}
@@ -3538,7 +3541,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786386188856; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786386851591; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -23675,6 +23678,41 @@ function lpMaxSubs(){return lpState.matchKind==='test'?10:7;}
 // excuse granted by a trainer). Hiding them from the kader list is not enough:
 // they are already ON the pitch, and nothing told the trainer to replace them.
 // Returns 'F' (abgesagt/fehlend), 'E' (entschuldigt) or null.
+// ── Discipline rule ────────────────────────────────────────
+// A player is not eligible for a match if, in the week leading up to it, he
+// has any unexcused absence, or two or more excused ones. One excused absence
+// is fine. The week runs from Monday of the match's own week up to the match.
+function lpDisciplineState(playerRef,matchSi){
+  const si=(matchSi===undefined)?lpState.sessIdx:matchSi;
+  if(si===null||si===undefined||typeof playerRef!=='number')return null;
+  const D=cd();
+  const p=D&&D.players&&D.players[playerRef];
+  const match=D&&D.sessions&&D.sessions[si];
+  if(!p||!Array.isArray(p.s)||!match||!match.date)return null;
+  const mSk=dispToSortKey(match.date);
+  // Monday of that week, as a sort key
+  const md=new Date(String(mSk).slice(0,4),Number(String(mSk).slice(4,6))-1,String(mSk).slice(6,8));
+  const dow=(md.getDay()+6)%7;                 // 0 = Monday
+  md.setDate(md.getDate()-dow);
+  const monSk=md.getFullYear()*10000+(md.getMonth()+1)*100+md.getDate();
+  let miss=0,exc=0;
+  const details=[];
+  D.sessions.forEach((s,i)=>{
+    if(!s||!s.date||i===si)return;
+    if(s.type==='match')return;                // trainings decide this, not games
+    const k=dispToSortKey(s.date);
+    if(k<monSk||k>mSk)return;
+    const st=p.s[i];
+    if(st===0){miss++;details.push(s.date+': unentschuldigt');}
+    else if(st===2){exc++;details.push(s.date+': entschuldigt');}
+  });
+  const ok=(miss===0&&exc<=1);
+  if(ok)return null;
+  return {miss,exc,details,
+    reason:miss>0
+      ? (miss===1?'1 unentschuldigtes Fehlen':miss+' unentschuldigte Fehlzeiten')
+      : exc+' entschuldigte Fehlzeiten'};
+}
 function lpUnavailState(playerRef){
   const si=lpState.sessIdx;
   if(si===null||si===undefined)return null;
@@ -23960,6 +23998,32 @@ function lpRender(){
 
   // Summary strip: names the affected players and lets the trainer clear the
   // slot in one tap, which is the action they actually want next.
+  const discEl=document.getElementById('lp-disc-bar');
+  if(discEl){
+    const isMatch=(()=>{const D=cd();const s=D&&D.sessions&&D.sessions[lpState.sessIdx];return !!(s&&s.type==='match');})();
+    const hits=[];
+    if(isMatch){
+      Object.keys(lpState.slots||{}).forEach(slot=>{
+        const ref=lpState.slots[slot];
+        const d=lpDisciplineState(ref);
+        if(d)hits.push({where:'slot',slot,ref,d});
+      });
+      (lpState.subs||[]).forEach((ref,idx)=>{
+        const d=lpDisciplineState(ref);
+        if(d)hits.push({where:'sub',idx,ref,d});
+      });
+    }
+    if(!hits.length){discEl.style.display='none';discEl.innerHTML='';}
+    else{
+      const nameOf=r=>{const D=cd();const p=D&&D.players&&D.players[r];return p?(getDisplayName?getDisplayName(p):p.name):'?';};
+      discEl.style.display='flex';
+      discEl.innerHTML='<span class="lp-un-h lp-disc-h">\u26d4 Nicht spielberechtigt:</span>'
+        +hits.map(u=>`<button class="lp-un-chip lp-disc-chip"
+             onclick="lpClearUnavail('${u.where}','${u.where==='slot'?u.slot:u.idx}')"
+             title="${escapeHtml(u.d.reason)} \u2014 ${escapeHtml(u.d.details.join(', '))}">
+             ${escapeHtml(nameOf(u.ref))} <b>${u.d.miss?u.d.miss+'\u00d7U':u.d.exc+'\u00d7E'}</b> \u2715</button>`).join('');
+    }
+  }
   const warnEl=document.getElementById('lp-unavail-bar');
   if(warnEl){
     const un=lpUnavailInLineup();
@@ -25802,6 +25866,9 @@ checkAutoBackup();
     <button class="lp-close-btn" onclick="closeLineupPlanner()"><span class="fb-long">✕ Schließen</span><span class="fb-short">✕</span></button>
   </div>
   <div id="lp-unavail-bar" class="lp-unavail-bar" style="display:none;"></div>
+  <!-- Separate strip: "cannot play today" and "not eligible this week" are
+       different facts, and one line for both would hide which is which. -->
+  <div id="lp-disc-bar" class="lp-disc-bar" style="display:none;"></div>
   <!-- Body -->
   <!-- Match planner popup -->
   <div class="slp-popup" id="lp-popup" style="display:none;z-index:900;" onclick="event.stopPropagation()">
