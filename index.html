@@ -3543,7 +3543,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786388860689; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786389782075; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -4202,6 +4202,28 @@ function _sysSave(fn){
   _systemWrite=true;
   try{fn();}finally{setTimeout(()=>{_systemWrite=false;},0);}
 }
+// Adopt a snapshot as the working state. In player mode the shared object is
+// never reduced — a private copy is, so no code path can write the reduced
+// version back, and no trainer session can inherit it from this device.
+function _adoptData(data){
+  const clean=sanitizeG(data);
+  if(typeof isPlayerMode==='function'&&isPlayerMode()){
+    // Deep copy first: _pmSanitizeG mutates what it is given.
+    let copy;
+    try{copy=JSON.parse(JSON.stringify(clean));}catch(e){copy=clean;}
+    G=copy;
+    try{if(typeof _pmSanitizeG==='function')_pmSanitizeG();}catch(e){console.error('[PlayerPrivacy]',e);}
+    return;
+  }
+  G=clean;
+}
+// Player mode must not persist its reduced copy to this device either: the
+// next trainer session on the same browser reads that cache.
+function _persistLocal(){
+  if(typeof isPlayerMode==='function'&&isPlayerMode())return;
+  if(G&&G.__sanitized)return;
+  try{safeLocalSave(SK,JSON.stringify(G));}catch(e){}
+}
 function _fbWriteWithStamp(data){
   if(_writeBlocked('Firebase-Schreiben')){_fbSaving=false;return Promise.resolve();}
   // Plausibility check against the last known remote state: a write that would
@@ -4388,7 +4410,7 @@ function _mediaRefetchAll(){
         _mediaSaveLS();
         if(typeof G!=='undefined'&&G){
           _mediaReinject(G); // heal the live tree — nulls were baked in at decode time
-          if(typeof safeLocalSave==='function'&&typeof SK!=='undefined')safeLocalSave(SK,JSON.stringify(G));
+          if(typeof safeLocalSave==='function'&&typeof SK!=='undefined')_persistLocal();
         }
         if(typeof render==='function')render();
       }
@@ -5190,7 +5212,7 @@ function startFbListener(){
         } else if(data&&data.version>=14){
           console.warn('[FB] Stale local base — adopting newer remote instead of pushing.');
           G=sanitizeG(data);
-          safeLocalSave(SK,JSON.stringify(G));
+          _persistLocal();
           render();
         }
       }
@@ -5224,7 +5246,7 @@ function startFbListener(){
         if(_suspect){
           console.error('[SCHUTZ] Lokaler Stand verworfen \u2014 unvollst\u00e4ndig ('+_suspect+'). Server-Stand wird geladen.');
           G=sanitizeG(data);
-          safeLocalSave(SK,JSON.stringify(G));
+          _persistLocal();
           render();
           return;
         }
@@ -5260,10 +5282,7 @@ function startFbListener(){
         redoStack.length=0;
         if(typeof updateUndoBtns==='function')updateUndoBtns();
       }
-      G=sanitizeG(data);
-      if(typeof isPlayerMode==='function'&&isPlayerMode()&&typeof _pmSanitizeG==='function'){
-        try{_pmSanitizeG();}catch(e){console.error('[PlayerPrivacy resync]',e);}
-      }
+      _adoptData(data);
       // DRIFT-SAFE MODAL CHECK: if a modal is open and its target entity is gone
       // (deleted by another trainer), close the modal to prevent actions hitting
       // wrong entities via stale hardcoded onclick indices like "${pi}" / "${si}".
@@ -5408,11 +5427,8 @@ function forceSyncRefresh(){
     const raw=snap.val();
     const data=raw?fbDecode(raw):null;
     if(data&&data.version>=14){
-      G=sanitizeG(data);
-      if(typeof isPlayerMode==='function'&&isPlayerMode()&&typeof _pmSanitizeG==='function'){
-        try{_pmSanitizeG();}catch(e){}
-      }
-      safeLocalSave(SK,JSON.stringify(G));
+      _adoptData(data);
+      _persistLocal();
       if(typeof _checkRemoteAppVersion==='function')_checkRemoteAppVersion();
       _markSynced();
       if(typeof render==='function')render();
@@ -5515,7 +5531,7 @@ function saveG(badge=true){
   // Also guards localStorage: a sanitised copy cached there would corrupt the
   // next trainer session on this device.
   if(_writeBlocked('saveG'))return;
-  safeLocalSave(SK,JSON.stringify(G));
+  _persistLocal();
   if(badge){const b=document.getElementById('savedBadge');b.classList.add('show');clearTimeout(b._t);b._t=setTimeout(()=>b.classList.remove('show'),1600);}
   // Firebase: debounce writes (max 1 per 800ms)
   // BUT: don't write until we've completed the first read - otherwise we may overwrite fresh remote data with stale local data
@@ -5576,11 +5592,8 @@ function initAuth(){
         if(data&&data.version>=14){
           // Only adopt remote if user hasn't made local changes yet
           if(!_pendingSave){
-            G=sanitizeG(data);
-            if(typeof isPlayerMode==='function'&&isPlayerMode()&&typeof _pmSanitizeG==='function'){
-              try{_pmSanitizeG();}catch(e){}
-            }
-            safeLocalSave(SK,JSON.stringify(G));
+            _adoptData(data);
+            _persistLocal();
             // Check remote app version (compare to local APP_RELEASE_TS)
             if(typeof _checkRemoteAppVersion==='function')_checkRemoteAppVersion();
             // Initial fetch completed — data is fresh from Firebase
@@ -5656,20 +5669,35 @@ function initAuth(){
   try{
     const _qp=new URLSearchParams(location.search);
     if(_qp.get('player')){
-      const _st=localStorage.getItem(AUTH_SK);
-      if(_st){
+      // A player link must never run with trainer rights — but deleting the
+      // stored session logged the trainer out of the whole device, including
+      // other tabs, which is why opening a preview meant logging in again.
+      // The session is set aside instead: this page cannot use it, and the
+      // next trainer page picks it up unchanged.
+      const _park=(store)=>{
         try{
-          const _u=JSON.parse(_st);
-          if(_u&&_u.role&&_u.role!=='player')localStorage.removeItem(AUTH_SK);
-        }catch(e){localStorage.removeItem(AUTH_SK);}
-      }
-      const _ss=sessionStorage.getItem(AUTH_SK);
-      if(_ss){
+          const raw=store.getItem(AUTH_SK);
+          if(!raw)return;
+          const u=JSON.parse(raw);
+          if(!u||!u.role||u.role==='player')return;
+          store.setItem(AUTH_SK+'_parked',raw);
+          store.removeItem(AUTH_SK);
+        }catch(e){try{store.removeItem(AUTH_SK);}catch(_){}}
+      };
+      _park(localStorage);
+      _park(sessionStorage);
+    } else {
+      // Not a player link: give the trainer session back if one was parked.
+      const _unpark=(store)=>{
         try{
-          const _u2=JSON.parse(_ss);
-          if(_u2&&_u2.role&&_u2.role!=='player')sessionStorage.removeItem(AUTH_SK);
-        }catch(e){sessionStorage.removeItem(AUTH_SK);}
-      }
+          const parked=store.getItem(AUTH_SK+'_parked');
+          if(!parked)return;
+          if(!store.getItem(AUTH_SK))store.setItem(AUTH_SK,parked);
+          store.removeItem(AUTH_SK+'_parked');
+        }catch(e){}
+      };
+      _unpark(localStorage);
+      _unpark(sessionStorage);
     }
   }catch(e){}
   // localStorage = persistent (remember me), sessionStorage = tab-only (survives F5 but not new tab)
@@ -6476,7 +6504,7 @@ function _checkRemoteAppVersion(){
       }
     }catch(e){}
     // Keep the local copy in step without touching Firebase again
-    try{if(typeof safeLocalSave==='function'&&!(G&&G.__sanitized))safeLocalSave(SK,JSON.stringify(G));}catch(e){}
+    try{if(typeof safeLocalSave==='function'&&!(G&&G.__sanitized))_persistLocal();}catch(e){}
   } else if(srvTs>APP_RELEASE_TS){
     // Remote is newer → we are stale → show update banner
     _showUpdateBanner(srvVer,srvTs);
@@ -7788,8 +7816,8 @@ function snap(){
   if(undoStack.length>40)undoStack.shift();
   redoStack.length=0;updateUndoBtns();
 }
-function undo(){if(!undoStack.length)return;redoStack.push(JSON.stringify(G));G=JSON.parse(undoStack.pop());safeLocalSave(SK,JSON.stringify(G));if(fbRef&&_fbInitialLoaded){clearTimeout(_fbDebounce);_fbDebounce=setTimeout(()=>{_fbWriteWithStamp(G).catch(e=>{_fbWarn('undo-push',e,'\u26a0\ufe0f R\u00fcckg\u00e4ngig nicht synchronisiert');});},800);}render();updateUndoBtns();}
-function redo(){if(!redoStack.length)return;undoStack.push(JSON.stringify(G));G=JSON.parse(redoStack.pop());safeLocalSave(SK,JSON.stringify(G));if(fbRef&&_fbInitialLoaded){clearTimeout(_fbDebounce);_fbDebounce=setTimeout(()=>{_fbWriteWithStamp(G).catch(e=>{_fbWarn('redo-push',e,'\u26a0\ufe0f Wiederholen nicht synchronisiert');});},800);}render();updateUndoBtns();}
+function undo(){if(!undoStack.length)return;redoStack.push(JSON.stringify(G));G=JSON.parse(undoStack.pop());_persistLocal();if(fbRef&&_fbInitialLoaded){clearTimeout(_fbDebounce);_fbDebounce=setTimeout(()=>{_fbWriteWithStamp(G).catch(e=>{_fbWarn('undo-push',e,'\u26a0\ufe0f R\u00fcckg\u00e4ngig nicht synchronisiert');});},800);}render();updateUndoBtns();}
+function redo(){if(!redoStack.length)return;undoStack.push(JSON.stringify(G));G=JSON.parse(redoStack.pop());_persistLocal();if(fbRef&&_fbInitialLoaded){clearTimeout(_fbDebounce);_fbDebounce=setTimeout(()=>{_fbWriteWithStamp(G).catch(e=>{_fbWarn('redo-push',e,'\u26a0\ufe0f Wiederholen nicht synchronisiert');});},800);}render();updateUndoBtns();}
 function updateUndoBtns(){
   const u=document.getElementById('undoBtn'),r=document.getElementById('redoBtn');
   if(u)u.disabled=!undoStack.length;if(r)r.disabled=!redoStack.length;
@@ -23390,11 +23418,8 @@ function showConflictDialog(remoteData){
       console.info('[Conflict] Auto-resolving: '+(isStale?'stale local ('+Math.round(ageMs/1000)+'s)':'')+(isStale&&bigDiff?' + ':'')+(bigDiff?'large diff ('+diffCount+' categories)':''));
       // Adopt remote silently
       if(remoteData.version>=14){
-        G=sanitizeG(remoteData);
-        if(typeof isPlayerMode==='function'&&isPlayerMode()&&typeof _pmSanitizeG==='function'){
-          try{_pmSanitizeG();}catch(e){}
-        }
-        safeLocalSave(SK,JSON.stringify(G));
+        _adoptData(remoteData);
+        _persistLocal();
         if(typeof _markSynced==='function')_markSynced();
         initUI();
         if(typeof render==='function')render();
@@ -23455,7 +23480,7 @@ function resolveConflict(action){
     // Adopt remote, discard our local changes
     if(remote&&remote.version>=14){
       G=sanitizeG(remote);
-      safeLocalSave(SK,JSON.stringify(G));
+      _persistLocal();
       initUI();render();
       if(typeof showSaveFlash==='function')showSaveFlash('🔄 Daten neu geladen');
       setFbStatus('connected');
