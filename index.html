@@ -3527,7 +3527,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786376265224; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786376594687; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -17046,7 +17046,7 @@ function openSessStats(si){
   if(ssToggleBtn)ssToggleBtn.style.display=canEdit()?'':'none';
   try{_ssShowCard();}catch(e){}
   if(canEdit()){
-    ssDelBtn.style.display='';
+    if(ssDelBtn)ssDelBtn.style.display='';
     const focOpts=foc.map(f=>`<option value="${f}" ${f===s.focus?'selected':''}>${f}</option>`).join('');
     ssEdit.innerHTML=`
       <div class="tp-sec" style="border-top:none;margin-top:0;padding-top:0;">
@@ -17086,7 +17086,7 @@ function openSessStats(si){
       <div class="tp-sec">
         <button class="btn bd" id="ss-del" onclick="delCurrSess()" style="font-size:.76rem;">\ud83d\uddd1 ${isMat?'Spiel':'Training'} l\u00f6schen</button>
       </div>`;
-  }else{ssDelBtn.style.display='none';if(document.getElementById('ss-edit-toggle'))document.getElementById('ss-edit-toggle').style.display='none';}
+  }else{if(ssDelBtn)ssDelBtn.style.display='none';if(document.getElementById('ss-edit-toggle'))document.getElementById('ss-edit-toggle').style.display='none';}
   // Template and Duplicate buttons removed from this modal (unused). Their
   // functions saveSessionAsTemplate/duplicateCurrentSession stay in place —
   // templates are still applied when creating a session.
