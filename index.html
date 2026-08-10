@@ -3538,7 +3538,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786384752801; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786385335563; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -19624,19 +19624,21 @@ function renderTrainerProfile(){
     ${mayEdit?`<button class="tp-edit-btn${_tpEditing?' active':''}" onclick="tpToggleEdit()">${_tpEditing?'\u2713 Fertig':'\u270e Bearbeiten'}</button>`:''}
   </div>`;
 
-  // Contact first: this is what the screen is opened for
-  html+='<div class="tp-sec"><div class="tp-sec-h">Kontakt</div>';
-  if(!ed&&(t.phone||t.email)){
-    html+='<div class="tp-quick">';
-    if(tel)html+=`<a class="tp-qbtn" href="tel:${esc(tel)}">\ud83d\udcde Anrufen</a>
-      <a class="tp-qbtn" href="https://wa.me/${esc(tel.replace(/^0/,'49').replace('+',''))}" target="_blank" rel="noopener">\ud83d\udcac WhatsApp</a>`;
-    if(t.email)html+=`<a class="tp-qbtn" href="mailto:${esc(t.email)}">\u2709\ufe0f E-Mail</a>`;
-    html+='</div>';
-  }
-  html+=line('Telefon',t.phone,'phone','tel')
-      +line('E-Mail',t.email,'email','email')
-      +'</div>';
   const sec=(title,body)=>body.trim()?`<div class="tp-sec"><div class="tp-sec-h">${title}</div>${body}</div>`:'';
+  // Contact first: this is what the screen is opened for — but only when there
+  // is something to contact. In view mode with no number and no address the
+  // section said nothing and still took a heading.
+  let contact='';
+  if(!ed&&(t.phone||t.email)){
+    contact+='<div class="tp-quick">';
+    if(tel)contact+=`<a class="tp-qbtn" href="tel:${esc(tel)}">\ud83d\udcde Anrufen</a>
+      <a class="tp-qbtn" href="https://wa.me/${esc(tel.replace(/^0/,'49').replace('+',''))}" target="_blank" rel="noopener">\ud83d\udcac WhatsApp</a>`;
+    if(t.email)contact+=`<a class="tp-qbtn" href="mailto:${esc(t.email)}">\u2709\ufe0f E-Mail</a>`;
+    contact+='</div>';
+  }
+  contact+=line('Telefon',t.phone,'phone','tel')
+        +line('E-Mail',t.email,'email','email');
+  html+=sec('Kontakt',contact);
   html+=sec('Funktion',
       line('Rolle',ed?t.role:trainerRoleLabel(t),'role','select',TRAINER_ROLES)
       +(ed?line('Anrede',t.gender==='w'?'Weiblich':'M\u00e4nnlich','gender','select',['M\u00e4nnlich','Weiblich']):'')
