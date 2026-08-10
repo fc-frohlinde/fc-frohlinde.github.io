@@ -3535,7 +3535,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786382896211; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786383191173; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -12655,7 +12655,23 @@ function _renderTeamAuthForm(overlay,chosen){
         const teamKey=String(chosen.team+'__'+chosen.season)
           .replace(/\//g,'__SL__').replace(/\./g,'__DOT__')
           .replace(/#/g,'__HASH__').replace(/\[/g,'__LB__').replace(/\]/g,'__RB__');
-        await fbDb.ref('fcf_data/db/'+teamKey+'/players/v/'+x.idx+'/confirmToken').set(token);
+        // The index comes from the list rendered a moment ago. If the roster
+        // changed meanwhile — on another device — this would hand the token to
+        // a different player, who would then see that person's data. Confirm
+        // the slot still holds the expected name, and re-find it if not.
+        const _base='fcf_data/db/'+teamKey+'/players/v/';
+        let _idx=x.idx;
+        const _atIdx=await fbDb.ref(_base+_idx+'/name').once('value');
+        if(String(_atIdx.val()||'')!==String(x.name||'')){
+          const _all=await fbDb.ref(_base).once('value');
+          const _list=_all.val()||[];
+          _idx=-1;
+          (Array.isArray(_list)?_list:Object.values(_list)).forEach((p,i)=>{
+            if(p&&String(p.name||'')===String(x.name||''))_idx=i;
+          });
+          if(_idx<0)throw new Error('Spieler nicht mehr in der Mannschaft.');
+        }
+        await fbDb.ref(_base+_idx+'/confirmToken').set(token);
       }catch(e){
         console.error('[TeamAuth] Token generation failed',e);
         errEl.textContent='Anmeldung fehlgeschlagen. Bitte später erneut versuchen.';
@@ -22744,7 +22760,7 @@ function downloadBackup(i){
   document.body.appendChild(a);a.click();
   setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},500);
 }
-function restoreBackup(i){
+async function restoreBackup(i){
   // Use displayed list (may contain Firebase entries beyond local cache)
   const bks=_displayedBackups.length?_displayedBackups:loadBackups();
   if(!bks[i])return;
@@ -22778,8 +22794,20 @@ function restoreBackup(i){
   // Use confirm with simplified text (modal would be better but keep simple for now)
   const summary=diffRows.length?diffRows.map(r=>r.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim()).join('\n'):'Keine Datenänderungen.';
   if(!confirm(`Backup wiederherstellen?\n\n"${b.label}"\n${new Date(b.ts).toLocaleString('de-DE')}\n\nÄnderungen:\n${summary}\n\n⚠ Aktueller Stand wird vor dem Laden automatisch gesichert.`))return;
-  // Auto-backup current state before restore
-  autoBackupBeforeOp('Wiederherstellung von '+b.label);
+  // Auto-backup current state before restore.
+  // The write is asynchronous, and the line below replaces G immediately —
+  // so a restore that turns out wrong could find its safety copy never
+  // finished. Wait for confirmation, and stop if it failed: without that copy
+  // there is no way back.
+  let _safeOk=false;
+  try{
+    await new Promise(res=>{
+      createBackup({kind:'pre-restore',preOpLabel:'Wiederherstellung von '+b.label,
+        onDone:(arr,err)=>{_safeOk=!err;res();}});
+      setTimeout(res,8000);   // never hang the UI on a slow connection
+    });
+  }catch(e){}
+  if(!_safeOk&&!confirm('Die Sicherung des aktuellen Standes konnte nicht best\u00e4tigt werden.\n\nTrotzdem fortfahren? Ohne sie gibt es keinen Weg zur\u00fcck.'))return;
   try{
     G=parsed;
     // Photo-stripped backups (new format) carry _mid_* ids — fill the actual
