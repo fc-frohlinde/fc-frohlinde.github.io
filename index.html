@@ -3543,7 +3543,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786388217422; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786388860689; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -22736,6 +22736,39 @@ window.repairAttendance=async function(apply,opts){
 // Counting the outer keys compares "how many team-season blocks exist" — which
 // is 1 on both sides even when one of them holds 24 confirmations and the
 // other none. This looks inside.
+// One command instead of a separate one per data type: after the overwrite it
+// was not obvious what else player mode had blanked, and each discovery cost
+// another round trip. This compares everything player mode touches.
+window.checkLoss=async function(key){
+  if(!fbRef){console.log('Keine Verbindung.');return;}
+  const snap=await fbRef.parent.child('__backups/'+(key||'0')).once('value');
+  const b=snap.val();
+  if(!b||!b.data){console.log('Backup nicht gefunden.');return;}
+  let src={};
+  try{src=typeof b.data==='string'?JSON.parse(b.data):(b.data||{});}catch(e){console.log('Backup unlesbar.');return;}
+  const n=v=>Array.isArray(v)?v.filter(Boolean).length:(v&&typeof v==='object'?Object.keys(v).length:0);
+  const rows=[];
+  // Everything _pmSanitizeG clears, plus the squads themselves
+  ['seasonLineups','matchLineups','lineupSaves','sessionTemplates','exerciseLibrary',
+   'trash','locationList','trainers','teamList','seasonList','reportLog'].forEach(k=>{
+    rows.push({bereich:k,jetzt:n(G[k]),imBackup:n(src[k]),
+      fehlt:Math.max(0,n(src[k])-n(G[k]))});
+  });
+  // Confirmations live one level deeper
+  const conf=o=>{let t=0;Object.keys(o||{}).forEach(k=>{const c=o[k]&&o[k].confirmed;t+=c?Object.keys(c).length:0;});return t;};
+  rows.push({bereich:'Bestaetigungen',jetzt:conf(G.slpConfirmations),imBackup:conf(src.slpConfirmations),
+    fehlt:Math.max(0,conf(src.slpConfirmations)-conf(G.slpConfirmations))});
+  // Players and their answers, per block
+  Object.keys(src.db||{}).forEach(k=>{
+    const pf=(src.db[k]&&src.db[k].players)||[],pn=(G.db&&G.db[k]&&G.db[k].players)||[];
+    rows.push({bereich:'Spieler '+k,jetzt:n(pn),imBackup:n(pf),fehlt:Math.max(0,n(pf)-n(pn))});
+  });
+  console.table(rows);
+  const missing=rows.filter(r=>r.fehlt>0);
+  if(!missing.length)console.log('%cNichts fehlt gegenueber diesem Backup.','color:green;font-weight:bold');
+  else console.log('%cFehlt noch: '+missing.map(r=>r.bereich+' ('+r.fehlt+')').join(', '),'color:#a02525;font-weight:bold');
+  return rows;
+};
 window.restoreConfirmations=async function(key,apply){
   if(!fbRef){console.log('Keine Verbindung.');return;}
   const snap=await fbRef.parent.child('__backups/'+key).once('value');
