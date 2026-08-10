@@ -972,7 +972,16 @@ input[type="date"]{cursor:pointer;}
    section dividers. The block's own bottom padding and margin go to zero, so
    the white area ends exactly at that line — otherwise the leftover strip
    below it shows as a second edge. */
-#moPlayer .ps-sticky{padding-bottom:0;margin-bottom:0;border-bottom:none;}
+/* Both modals rely on the app-wide rule that pins the first child containing
+   a close button; these lines only correct its spacing and move the divider
+   onto the inner row so it lines up with the section dividers. */
+#moPlayer .ps-sticky,#moSession2 .ss-sticky{padding-bottom:0;margin-bottom:0;border-bottom:none;}
+#moSession2 .ss-head-row{display:flex;align-items:center;gap:12px;
+  margin:0;padding:0 0 9px;border-bottom:1px solid var(--gl);}
+#moSession2 .ss-head-mid{flex:1;min-width:0;}
+#moSession2 #ss-title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#moSession2 #ss-edit-toggle{flex-shrink:0;align-self:center;}
+#moSession2 #ss-card-view,#moSession2 #ss-edit-wrap{padding-top:9px;}
 #moPlayer .ps-sticky .ps-head-row{margin:0;padding:0 0 9px;
   border-bottom:1px solid var(--gl);flex-wrap:nowrap;align-items:center;}
 #moPlayer #ps-card-view,#moPlayer #ps-edit{padding-top:9px;}
@@ -3521,7 +3530,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786374240294; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786374269652; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
