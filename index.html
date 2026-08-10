@@ -3535,7 +3535,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786379223930; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786380832825; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -22433,6 +22433,30 @@ window.listBackups=async function(){
 // capped at 200 entries, so a trainer's Entschuldigt granted earlier may no
 // longer be in it, and replaying would silently downgrade it to the player's
 // older "Fehlend". Only gaps are filled unless asked otherwise.
+// Shows what a given person changed, straight from the journals. Attendance
+// is only part of what a trainer touches — grades, notes, topics and settings
+// live in the same log and can be re-entered by hand from this list.
+window.whoChanged=async function(name,hours){
+  const since=Date.now()-((hours||48)*3600*1000);
+  let entries=(G.auditLog||[]).slice();
+  try{
+    if(fbDb){
+      const s=await fbDb.ref('fcf_data/auditLogP').once('value');
+      const v=s.val()||{};
+      Object.keys(v).forEach(k=>{if(v[k])entries.push(v[k]);});
+    }
+  }catch(e){}
+  const needle=String(name||'').toLowerCase();
+  const rows=entries
+    .filter(e=>e&&(e.ts||0)>=since)
+    .filter(e=>!needle||String(e.user||'').toLowerCase().includes(needle))
+    .sort((a,b)=>(b.ts||0)-(a.ts||0))
+    .map(e=>({zeit:new Date(e.ts).toLocaleString('de-DE'),wer:e.user||'?',
+      was:e.action||'',betrifft:e.target||'',detail:(e.details||e.detail||'').slice(0,80)}));
+  console.table(rows.slice(0,120));
+  console.log(rows.length+' Eintr\u00e4ge. Andere Zeitspanne:  whoChanged("'+(name||'')+'",72)');
+  return rows;
+};
 window.repairAttendance=async function(apply,opts){
   const force=!!(opts&&opts.force);
   const D=cd();
