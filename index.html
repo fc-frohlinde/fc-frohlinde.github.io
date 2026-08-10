@@ -2428,13 +2428,13 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
    used to be repeated inline on each field, which is how the duration box
    ended up narrower than its neighbours: a number input also has to fit the
    browser's spinner arrows inside the same width. */
-.mob .ss-e-field{height:32px;padding:0 8px;border:1.5px solid var(--gl);border-radius:6px;
-  font-family:'Barlow',sans-serif;font-size:.8rem;color:var(--gd);background:#fff;
-  outline:none;margin-bottom:0;box-sizing:border-box;}
-.mob .ss-e-field:focus{border-color:var(--bm);}
-select.ss-e-field{cursor:pointer;}
+/* .tp-in is now the field style for the profiles AND the session panel, so
+   the three forms cannot drift apart again. */
+.mob .tp-in{margin-bottom:0;}
+.mob select.tp-in{cursor:pointer;background:#fff;}
+.mob textarea.tp-in{resize:vertical;font-family:'Barlow',sans-serif;line-height:1.4;}
 /* Checkbox row matches the field height so the row keeps one baseline */
-.ss-e-check{display:flex;align-items:center;gap:7px;height:32px;font-size:.78rem;
+.ss-e-check{display:flex;align-items:center;gap:7px;flex:1;min-width:0;font-size:.78rem;
   color:var(--gd);cursor:pointer;}
 .ss-e-check input{width:17px;height:17px;margin:0;cursor:pointer;}
 /* Field labels: same size, same spacing above every control */
@@ -3510,7 +3510,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786373611521; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786373759561; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -17026,53 +17026,40 @@ function openSessStats(si){
   if(canEdit()){
     ssDelBtn.style.display='';
     const focOpts=foc.map(f=>`<option value="${f}" ${f===s.focus?'selected':''}>${f}</option>`).join('');
-    ssEdit.innerHTML=`<div class="sec" style="margin-bottom:7px;">✎ Bearbeiten</div>
-      <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:flex-end;">
-        <div style="flex:none;"><label class="ss-e-lbl">Datum</label>
-          <input type="date" id="ss-e-date" value="${dispToISO(s.date)}" class="ss-e-field" style="width:140px;" onchange="updSessDate(${si},this.value)"/></div>
-        <div style="flex:none;"><label class="ss-e-lbl">Uhrzeit</label>
-          <input type="time" id="ss-e-time" value="${s.time||''}" class="ss-e-field" style="width:104px;" onchange="updSessTime(${si},this.value)"/></div>
-        <div style="flex:none;"><label class="ss-e-lbl">Dauer</label>
-          <input type="number" id="ss-e-dur" min="15" max="240" step="5" value="${rpeSessionMinutes(s,null,si)}" class="ss-e-field" style="width:92px;" onchange="sessSetDuration(${si},this.value)"/></div>
-        <div style="flex:none;"><label class="ss-e-lbl">🧑‍⚕️ Physio</label>
-          <label class="ss-e-check" title="Ist der Physiotherapeut an diesem Tag beim Training dabei?">
-            <input type="checkbox" id="ss-e-physio" ${sessPhysioOn(s)?'checked':''} onchange="sessSetPhysio(${si},this.checked)">
-            <span>dabei</span>
-          </label></div>
-        <div style="flex:2;min-width:150px;"><label class="ss-e-lbl">${LOC_ICON} Ort</label>
-          <div style="display:flex;gap:5px;">
-            ${locSelectHtml(s.location||'',`locHandleSelect(${si},this.value,this)`,'ss-e-loc')}
-            <button type="button" class="btn bs" style="padding:6px 9px;font-size:.76rem;flex-shrink:0;" onclick="openLocationManager()" title="Orte verwalten">⚙</button>
-          </div></div>
-        ${isMat?`
-          <div style="flex:2;min-width:120px;"><label class="ss-e-lbl">Gegner</label>
-            <input type="text" id="ss-e-lbl" value="${s.label||''}" class="ss-e-field" style="width:100%;" oninput="updSessLabel(${si},this.value)"/></div>
-          <div style="flex:none;"><label class="ss-e-lbl">Heim/Auswärts</label>
-            <select id="ss-e-ha" style="padding:6px;border:1.5px solid var(--gl);border-radius:6px;font-size:.8rem;outline:none;margin-bottom:0;" onchange="updSessHA(${si},this.value)">
-              <option value="home" ${s.homeAway==='home'?'selected':''}>🏠 Heim</option>
-              <option value="away" ${s.homeAway==='away'?'selected':''}>🚌 Auswärts</option>
-            </select></div>
-          <div style="flex:2;min-width:160px;"><label class="ss-e-lbl">🔗 Spielbericht-Link</label>
-            <input type="url" id="ss-e-link" value="${s.planLink||''}" placeholder="https://..." class="ss-e-field" style="width:100%;" oninput="updSessLink(${si},this.value)"/></div>`
-        :`<div style="flex:1;min-width:120px;"><label class="ss-e-lbl">Schwerpunkt</label>
-            <select id="ss-e-foc" class="ss-e-field" style="width:100%;" onchange="updSessFoc(${si},this.value)">
-              <option value="">– Kein –</option>${focOpts}
-            </select></div>
-          <div style="flex:2;min-width:160px;"><label class="ss-e-lbl">🔗 Trainingsplan-Link</label>
-            <input type="url" id="ss-e-link" value="${s.planLink||''}" placeholder="https://..." class="ss-e-field" style="width:100%;" oninput="updSessLink(${si},this.value)"/></div>`}
+    ssEdit.innerHTML=`
+      <div class="tp-sec" style="border-top:none;margin-top:0;padding-top:0;">
+        <div class="tp-sec-h">Termin</div>
+        <div class="tp-row"><span class="tp-l">Datum</span>
+          <input type="date" id="ss-e-date" value="${dispToISO(s.date)}" class="tp-in" onchange="updSessDate(${si},this.value)"/></div>
+        <div class="tp-row"><span class="tp-l">Uhrzeit</span>
+          <input type="time" id="ss-e-time" value="${s.time||''}" class="tp-in" onchange="updSessTime(${si},this.value)"/></div>
+        <div class="tp-row"><span class="tp-l">Dauer (Min.)</span>
+          <input type="number" id="ss-e-dur" min="15" max="240" step="5" value="${rpeSessionMinutes(s,null,si)}" class="tp-in" onchange="sessSetDuration(${si},this.value)"/></div>
+        <div class="tp-row"><span class="tp-l">Ort</span>
+          <div class="tp-in-wrap">${locSelectHtml(s.location||'',`locHandleSelect(${si},this.value,this)`,'ss-e-loc')}</div></div>
       </div>
-      ${(typeof dispToSortKey==='function'&&typeof todaySK==='function'&&dispToSortKey(s.date)<todaySK())?'':`
-      <div style="margin-top:10px;display:flex;gap:7px;flex-wrap:wrap;align-items:flex-end;">
-        <div style="flex:1;min-width:200px;">
-          <label style="font-size:.61rem;font-weight:700;color:var(--gd);text-transform:uppercase;display:block;margin-bottom:4px;">\u23f0 Anmeldungen offen bis</label>
-          <input type="datetime-local" id="ss-e-rsvp" value="${_amTsToDatetimeLocal(s.rsvpUntil)}" class="ss-e-field" style="width:100%;" onchange="updSessRsvp(${si},this.value)"/>
-        </div>
-        <button class="btn" style="font-size:.7rem;padding:6px 10px;background:rgba(255,255,255,.6);color:var(--gd);border:1px solid var(--gl);" onclick="updSessRsvpDefault(${si})" title="Standard: 2h vor Sitzungsbeginn">\u23f0 Standard (-2h)</button>
-        <button class="btn" style="font-size:.7rem;padding:6px 10px;background:rgba(255,255,255,.6);color:var(--gd);border:1px solid var(--gl);" onclick="updSessRsvp(${si},'')" title="Kein Deadline">\u2715 Frei</button>
-      </div>`}
-      <div style="margin-top:10px;">
-        <label style="font-size:.61rem;font-weight:700;color:var(--gd);text-transform:uppercase;display:block;margin-bottom:4px;">📝 Kommentar</label>
-        <textarea id="ss-e-note" rows="3" style="width:100%;padding:6px;border:1.5px solid var(--gl);border-radius:6px;font-family:'Barlow',sans-serif;font-size:.8rem;resize:vertical;outline:none;box-sizing:border-box;margin-bottom:0;" placeholder="z.B. Verletzungsstand, Besonderheiten..." oninput="updSessNote(${si},this.value)">${s.note||''}</textarea>
+      <div class="tp-sec">
+        <div class="tp-sec-h">${isMat?'Spiel':'Training'}</div>
+        ${isMat?`
+        <div class="tp-row"><span class="tp-l">Gegner</span>
+          <input type="text" id="ss-e-lbl" value="${escapeHtml(s.label||'')}" class="tp-in" placeholder="z.B. SV Musterstadt" onchange="updSessLabel(${si},this.value)"/></div>
+        <div class="tp-row"><span class="tp-l">Heim / Ausw\u00e4rts</span>
+          <select id="ss-e-ha" class="tp-in" onchange="updSessHA(${si},this.value)">
+            <option value="home"${s.homeAway!=='away'?' selected':''}>\ud83c\udfe0 Heim</option>
+            <option value="away"${s.homeAway==='away'?' selected':''}>\ud83d\ude8c Ausw\u00e4rts</option>
+          </select></div>`:`
+        <div class="tp-row"><span class="tp-l">Schwerpunkt</span>
+          <select id="ss-e-foc" class="tp-in" onchange="updSessFocus(${si},this.value)">
+            <option value="">\u2013 Kein \u2013</option>${focOpts}
+          </select></div>`}
+        <div class="tp-row"><span class="tp-l">Physio dabei</span>
+          <label class="ss-e-check"><input type="checkbox" id="ss-e-physio" ${sessPhysioOn(s)?'checked':''} onchange="sessSetPhysio(${si},this.checked)"><span>am Trainingstag verf\u00fcgbar</span></label></div>
+        <div class="tp-row"><span class="tp-l">${isMat?'Spielbericht':'Trainingsplan'}</span>
+          <input type="url" id="ss-e-link" value="${escapeHtml(s.link||'')}" class="tp-in" placeholder="https://..." onchange="updSessLink(${si},this.value)"/></div>
+      </div>
+      <div class="tp-sec">
+        <div class="tp-sec-h">Kommentar</div>
+        <textarea id="ss-e-note" class="tp-in" rows="3" placeholder="z.B. Verletzungsstand, Besonderheiten..." oninput="updSessNote(${si},this.value)">${s.note||''}</textarea>
       </div>`;
   }else{ssDelBtn.style.display='none';if(document.getElementById('ss-edit-toggle'))document.getElementById('ss-edit-toggle').style.display='none';}
   // Template / Duplicate buttons (canEdit only). Template button only for training (matches not templated)
@@ -20732,7 +20719,7 @@ function locSelectHtml(current,onchangeFn,id){
   const list=getLocations();
   const cur=String(current||'');
   const known=list.some(l=>l===cur);
-  let html=`<select id="${id||''}" onchange="${onchangeFn}" style="width:100%;padding:6px;border:1.5px solid var(--gl);border-radius:6px;font-size:.8rem;outline:none;margin-bottom:0;font-family:'Barlow',sans-serif;color:var(--gd);background:#fff;">`;
+  let html=`<select id="${id||''}" class="tp-in" onchange="${onchangeFn}">`;
   html+=`<option value=""${cur?'':' selected'}>\u2013 Kein Ort \u2013</option>`;
   list.forEach(l=>{
     html+=`<option value="${escapeHtml(l)}"${l===cur?' selected':''}>${escapeHtml(l)}</option>`;
