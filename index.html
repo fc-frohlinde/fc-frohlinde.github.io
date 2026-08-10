@@ -3494,7 +3494,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786372263779; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786372975140; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -12759,8 +12759,8 @@ function renderPlayerMode(){
         <button type="button" class="pm-physio-btn" ${full?'disabled':''} onclick="pmTogglePhysio(${si})">
           <span class="pm-physio-ic">\ud83e\uddd1\u200d\u2695\ufe0f</span>
           <span class="pm-physio-txt">
-            <b>${_phBooked?'Physio gebucht':'Physio-Termin'}</b>
-            <span>${_phBooked?'Tippen zum Abmelden':(full?'Alle Pl\u00e4tze belegt':'Noch '+free+' von '+_phSlots+' Pl\u00e4tzen frei')}</span>
+            <b>${_phBooked?'Beim Physio angemeldet':'Beim Physio anmelden'}</b>
+            <span>${_phBooked?'Tippen zum Abmelden':(full?'Alle Pl\u00e4tze belegt':'Beim Training \u00b7 noch '+free+' von '+_phSlots+' Pl\u00e4tzen frei')}</span>
           </span>
           <span class="pm-physio-mark">${_phBooked?'\u2713':''}</span>
         </button></div>`;
