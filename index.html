@@ -213,6 +213,15 @@ body{background:linear-gradient(140deg,var(--bg-dark) 0%,var(--bg-mid) 55%,var(-
 .header.collapsed .hclub{font-size:1rem;}
 .hsub{font-size:.76rem;font-weight:300;letter-spacing:3.5px;color:var(--ac);margin-top:2px;text-transform:uppercase;}
 .header.collapsed .hsub,.header.collapsed .hmeta,.header.collapsed #hTrainersWrap{display:none !important;}
+/* Only while the header is folded: with the full strip visible above, the
+   initials would repeat it. */
+.tr-initials{display:none;align-items:center;gap:4px;flex-shrink:0;}
+body.hdr-collapsed .tr-initials{display:flex;}
+.tr-ini{width:28px;height:24px;border-radius:var(--r-pill);border:1px solid rgba(255,255,255,.18);
+  background:rgba(255,255,255,.09);color:rgba(255,255,255,.8);cursor:pointer;
+  font-family:'Barlow',sans-serif;font-size:.65rem;font-weight:800;letter-spacing:.5px;
+  display:flex;align-items:center;justify-content:center;transition:all .12s;}
+.tr-ini:hover{background:var(--ac);color:var(--bd);border-color:var(--ac);}
 .hmeta{margin-top:3px;font-size:.7rem;color:rgba(255,255,255,.45);}
 .hright{margin-left:auto;display:flex;align-items:center;gap:10px;z-index:2;flex-shrink:1;min-width:0;max-width:calc(100% - 280px);}
 
@@ -2817,6 +2826,9 @@ if(window._fbBlocked){
 <div class="toolbar" id="toolbarEl">
   <div class="toolbar-l">
     <button class="btn bs" id="btn-home" onclick="homeOpen()" title="Startseite" style="font-size:.95rem;padding:4px 10px;">⌂</button>
+    <!-- Who is responsible for this team stays visible when the header with
+         the full trainer strip is folded away. -->
+    <div class="tr-initials" id="trInitials"></div>
     <div class="team-bar-wrap" id="teamBarWrap">
       <button class="team-pick" id="teamPickBtn" onclick="event.stopPropagation();toggleTeamMenu()" title="Mannschaft wechseln">
         <span id="teamPickLbl">–</span><span class="team-pick-caret">▾</span>
@@ -3479,7 +3491,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786361135593; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786370996498; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -7728,6 +7740,9 @@ function applyCollapse(){
   if(colState.photos===undefined)colState.photos=true;
   document.body.classList.toggle('no-photos',!colState.photos);
   document.getElementById('hdrEl').classList.toggle('collapsed',!colState.hdr);
+  // Mirrored on the body so the toolbar can react — the initials live outside
+  // the header element.
+  document.body.classList.toggle('hdr-collapsed',!colState.hdr);
   // 'tabs' is no longer a user-facing section: the picker lives in the
   // toolbar and shows itself based on how many teams exist.
   document.getElementById('toolbarEl').classList.toggle('hidden',!colState.tools);
@@ -7821,6 +7836,16 @@ function renderHdrInfo(){
     const av=t.photo?`<img class="trainer-chip-av" src="${t.photo}" alt="">`:'';
     return `<span class="trainer-chip trainer-chip-btn" onclick="openTrainerProfile(${gi})" title="Profil ansehen">${av}${escapeHtml(t.name)}</span>`;
   }).join(''):'';
+  // Same list, two forms: full names in the header, initials in the toolbar
+  const ini=document.getElementById('trInitials');
+  if(ini){
+    ini.innerHTML=tr.map(t=>{
+      const gi=G.trainers.indexOf(t);
+      const parts=String(t.name||'').trim().split(/\s+/).filter(Boolean);
+      const ab=(parts.length>1?parts[0][0]+parts[parts.length-1][0]:(parts[0]||'?').slice(0,2)).toUpperCase();
+      return `<button class="tr-ini" onclick="openTrainerProfile(${gi})" title="${escapeHtml(t.name)}">${escapeHtml(ab)}</button>`;
+    }).join('');
+  }
   const lbl=document.getElementById('hTrainersLbl');
   const wrap=document.getElementById('hTrainersWrap');
   if(lbl)lbl.textContent=tr.length===1?'Trainer':(tr.length>1?'Trainerteam':'');
