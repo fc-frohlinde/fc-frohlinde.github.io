@@ -3548,7 +3548,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786391704604; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786391932015; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -6713,6 +6713,9 @@ function _navArm(){
   // would push a guard outside any user gesture, and Chromium skips exactly
   // those — the extra entry then swallowed the following press.
   if(_navInPop)return;
+  // Player mode has somewhere to go back TO — the page it was opened from.
+  // This guard is what made Back need two presses there.
+  if(typeof isPlayerMode==='function'&&isPlayerMode())return;
   try{history.pushState({fcf:1},'');_navArmed=true;}catch(e){}
 }
 // Re-arming from INSIDE a popstate handler is unreliable on several Android
@@ -13064,7 +13067,6 @@ function renderPlayerMode(){
   };
   if(RPE_IS_PREVIEW){
     html+='<div class="pm-preview-banner">'
-      +'<button class="pm-preview-exit" onclick="pmExitPreview()" title="Zurueck zur App" aria-label="Zurueck zur App">\u2190</button>'
       +'\ud83d\udc41 Trainer-Vorschau \u00b7 Eingaben werden <b>nicht</b> gespeichert</div>';
   }
   // ── sRPE PROMPT ──
