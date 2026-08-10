@@ -3479,7 +3479,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786305152492; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786361135593; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -12019,6 +12019,7 @@ function _pmSaveTargeted(){
   // whitelisted path as the rest.
   if(Array.isArray(p.rpe))updates[basePath+'rpe']=_wrapArr(p.rpe);
   if(Array.isArray(p.physio))updates[basePath+'physio']=_wrapArr(p.physio);
+  if(Array.isArray(p.excOK))updates[basePath+'excOK']=_wrapArr(p.excOK);
   if(Array.isArray(p.rpeMin))updates[basePath+'rpeMin']=_wrapArr(p.rpeMin);
   if(Object.keys(updates).length===0)return;
   _fbSaving=true;
@@ -13010,6 +13011,11 @@ function pmSetStatus(si,val){
   // have spoken to the player. A player's own "no" is a plain absence until
   // then. Nothing changes on the player's screen — only what lands in the
   // table.
+  if(current===2){
+    if(!Array.isArray(p.excOK))p.excOK=[];
+    while(p.excOK.length<=si)p.excOK.push(null);
+    p.excOK[si]=true;
+  }
   const _hadExcuse=Array.isArray(p.excOK)&&p.excOK[si]===true;
   const targetStatus=(val===1)?4:(_hadExcuse?2:0);
   // Permission rules (relaxed in 1.0.4-beta after trainer feedback):
