@@ -466,11 +466,11 @@ body.theme-dark .pl-row:nth-child(even){background:#15264a;}
 /* Labels at .72 measured 4.34:1 against the toolbar while everything around
    them is solid white — they read as dimmed until hovered. Full white for the
    text, and a slightly stronger surface so the buttons still sit as buttons. */
-.toolbar .btb,.toolbar .bteam,.toolbar .bcfg,.toolbar .bundo,.toolbar .bs,.toolbar #btn-legend{
+.toolbar .btb,.toolbar .bteam,.toolbar .bcfg,.toolbar .bundo,.toolbar .bs{
   background:rgba(255,255,255,.08);color:#fff;
   border:1px solid rgba(255,255,255,.16);transition:background .12s,border-color .12s,color .12s;}
 .toolbar .btb:hover,.toolbar .bteam:hover,.toolbar .bcfg:hover,
-.toolbar .bs:hover,.toolbar #btn-legend:hover{
+.toolbar .bs:hover{
   background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.3);color:#fff;}
 /* Disabled undo/redo must stay visibly inert */
 .toolbar .bundo:disabled{color:rgba(255,255,255,.3);border-color:rgba(255,255,255,.08);}
@@ -872,7 +872,10 @@ input[type="date"]{cursor:pointer;}
   padding:3px 0;}
 .legend-pop-hint{font-size:.68rem;color:var(--gm);line-height:1.5;margin-top:9px;
   padding-top:8px;border-top:1px solid var(--gl);}
-#btn-legend{font-size:1rem;padding:3px 8px;line-height:1;}
+.toolbar #btn-legend{background:none;border:none;box-shadow:none;
+  font-size:1.05rem;padding:3px 6px;line-height:1;color:rgba(255,255,255,.75);
+  transition:color .12s;}
+.toolbar #btn-legend:hover{background:none;color:#fff;}
 .tr-group{font-size:.62rem;font-weight:700;letter-spacing:.9px;text-transform:uppercase;
   color:var(--gm);margin:10px 0 4px;}
 .tr-group:first-child{margin-top:0;}
@@ -3599,7 +3602,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786512581911; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786512994533; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
