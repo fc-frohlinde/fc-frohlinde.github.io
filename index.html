@@ -2481,6 +2481,10 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 .mob select.tp-in{cursor:pointer;background:#fff;}
 .mob textarea.tp-in{resize:vertical;font-family:'Barlow',sans-serif;line-height:1.4;}
 /* Checkbox row matches the field height so the row keeps one baseline */
+/* Hidden entirely when neither block has content — an empty fold is worse
+   than no fold. Managed in renderSessPhysio/renderSessRpe via _ssSyncMore. */
+.ss-more{border-top:1px solid var(--gl);margin-top:9px;}
+.ss-more[hidden]{display:none;}
 .ss-e-check{display:flex;align-items:center;gap:7px;flex:1;min-width:0;font-size:.78rem;
   color:var(--gd);cursor:pointer;}
 .ss-e-check input{width:17px;height:17px;margin:0;cursor:pointer;}
@@ -3164,8 +3168,13 @@ if(window._fbBlocked){
   <div id="ss-card-view">
       <div id="ss-note-display" style="font-size:.78rem;color:var(--gd);font-style:italic;margin-top:8px;display:none;"></div>
       <div id="ss-plan-link" style="display:none;font-size:.78rem;margin-top:5px;"></div>
-      <div id="ss-physio-wrap" style="display:none;margin-top:8px;"></div>
-      <div id="ss-rpe-wrap" style="display:none;margin-top:8px;"></div>
+      <details class="ss-more" id="ss-more">
+        <summary class="ps-more-sum"><span>Belastung &amp; Physio</span><span class="ps-more-chev">›</span></summary>
+        <div class="ps-more-body">
+          <div id="ss-physio-wrap" style="display:none;margin-top:8px;"></div>
+          <div id="ss-rpe-wrap" style="display:none;margin-top:8px;"></div>
+        </div>
+      </details>
       <div id="ss-rollcall-wrap" style="display:none;margin-top:8px;">
         <button class="btn" style="background:var(--ok-bg);color:var(--ok-fg);border:1.5px solid rgba(39,174,96,.4);font-size:.78rem;font-weight:700;" onclick="rcOpen(_currentSessIdx)">✓ Anwesenheit erfassen</button>
       </div>
@@ -3571,7 +3580,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786508123418; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786508348940; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -11931,6 +11940,14 @@ function sessSetPhysio(si,on){
   try{renderSessPhysio(si);}catch(e){}
 }
 // Trainer view: who booked, and how many places are left
+function _ssSyncMore(){
+  const more=document.getElementById('ss-more');
+  if(!more)return;
+  const a=document.getElementById('ss-physio-wrap');
+  const b=document.getElementById('ss-rpe-wrap');
+  const has=el=>el&&el.style.display!=='none'&&el.innerHTML.trim();
+  more.hidden=!(has(a)||has(b));
+}
 function renderSessPhysio(si){
   const box=document.getElementById('ss-physio-wrap');
   if(!box)return;
@@ -17375,6 +17392,7 @@ function openSessStats(si){
   try{renderLocationDatalist();}catch(e){console.error('locList:',e);}
   try{renderSessPhysio(si);}catch(e){console.error('sessPhysio:',e);}
   try{renderSessRpe(si);}catch(e){console.error('sessRpe:',e);}
+  try{_ssSyncMore();}catch(e){}
   const rcw=document.getElementById('ss-rollcall-wrap');
   if(rcw)rcw.style.display=(canEdit()&&typeof _isSessRollCallTime==='function'&&_isSessRollCallTime(si))?'block':'none';
   const ssDelBtn=document.getElementById('ss-del');const ssEdit=document.getElementById('ss-edit');
