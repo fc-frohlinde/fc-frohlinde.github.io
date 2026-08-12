@@ -2483,7 +2483,10 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 /* Checkbox row matches the field height so the row keeps one baseline */
 /* Hidden entirely when neither block has content — an empty fold is worse
    than no fold. Managed in renderSessPhysio/renderSessRpe via _ssSyncMore. */
-.ss-more{border-top:1px solid var(--gl);margin-top:9px;}
+/* The block above already closes with a line; a second one on the fold left an
+   empty band between them. */
+.ss-more{margin-top:2px;}
+#ss-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(74px,1fr));gap:7px;margin:10px 0;}
 .ss-more[hidden]{display:none;}
 .ss-e-check{display:flex;align-items:center;gap:7px;flex:1;min-width:0;font-size:.78rem;
   color:var(--gd);cursor:pointer;}
@@ -3580,7 +3583,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786508550100; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786508821840; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -17530,17 +17533,28 @@ function buildSessAtt(si){
   // Grading is only offered for sessions (training or match) that have
   // already taken place — future/not-yet-started sessions excluded.
   const _gradable=(typeof canGradeSession==='function')?canGradeSession(si):false;
-  const cardsEl=document.getElementById('ss-cards');
-  if(!_rollCall){
-    cardsEl.innerHTML='';
-    cardsEl.style.display='none';
-  } else {
-    cardsEl.style.display='';
-    cardsEl.innerHTML=`
-      <div class="ps-card"><div class="ct">Anwesend</div><div class="cv" style="color:var(--cp);">${pres}</div><div class="ca">${pct}%</div><div class="cbw"><div class="cbar" style="width:${pct}%;background:var(--cp);"></div></div></div>
-      <div class="ps-card"><div class="ct">Fehlend</div><div class="cv" style="color:var(--ca);">${abs}</div></div>
-      ${exc?`<div class="ps-card"><div class="ct">Entsch.</div><div class="cv" style="color:var(--ce);">${exc}</div></div>`:''}
-      ${ang?`<div class="ps-card"><div class="ct">Noch ausst.</div><div class="cv" style="color:#3b82c4;" title="Spieler die als Angemeldet markiert sind \u2014 Roll-call noch nicht durchgef\u00fchrt">${ang}</div></div>`:''}`;
+  {
+    const cardsEl=document.getElementById('ss-cards');
+    const tile=(v,l,s,c)=>`<div class="ps-tile"><div class="ps-tile-v"${c?` style="color:${c};"`:''}>${v}</div>`
+      +`<div class="ps-tile-l">${l}</div>${s?`<div class="ps-tile-s">${s}</div>`:''}</div>`;
+    let t='';
+    if(_rollCall){
+      // Session has taken place: who was actually there
+      t=tile(pres,'Anwesend',pct+'%','var(--cp)')
+       +tile(abs,'Fehlend','','var(--ca)')
+       +(exc?tile(exc,'Entschuldigt','','var(--ce)'):'')
+       +(ang?tile(ang,'Offen','nicht erfasst','#3b82c4'):'');
+    }else{
+      // Before the session the useful figure is how many have answered — this
+      // was shown nowhere, so the window was empty exactly when planning needs it
+      const openCnt=total-(ang+abs+exc);
+      t=tile(ang,'Zugesagt',total?Math.round(ang/total*100)+'%':'','var(--cp)')
+       +(abs?tile(abs,'Abgesagt','','var(--ca)'):'')
+       +(exc?tile(exc,'Entschuldigt','','var(--ce)'):'')
+       +tile(openCnt,'Offen','von '+total,openCnt?'#9a7000':'var(--gm)');
+    }
+    cardsEl.innerHTML=t;
+    cardsEl.style.display=t?'':'none';
   }
   // Groups by status (5-state model: 1=Anwesend, 0=Fehlend, 2=Entschuldigt, 4=Angemeldet, 3=Ausstehend)
   const byS={1:[],0:[],2:[],4:[],3:[]};
