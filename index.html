@@ -3574,7 +3574,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786503942124; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786504255450; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -12157,7 +12157,7 @@ function pmSetRpe(si,val){
   if(RPE_IS_PREVIEW){
     if(typeof showSaveFlash==='function')showSaveFlash('\ud83d\udc41 Vorschau \u2014 nicht gespeichert');
   }else{
-    _pmSaveTargeted();
+    _pmSaveTargeted(si);
   }
   // Audit is debounced per session: a player trying 6, then 7, then 8 before
   // settling produced one journal entry per tap. Only the value they end up
@@ -12222,7 +12222,7 @@ function pmSetRpe(si,val){
       :'Keine Note, kein richtig oder falsch \u2014 dein ehrliches Gef\u00fchl z\u00e4hlt.';
   }
 }
-function _pmSaveTargeted(){
+function _pmSaveTargeted(si){
   // CRITICAL: player-mode G is sanitized (other players = null) — never write it to
   // localStorage! That would corrupt the data for the next trainer who loads from
   // localStorage without re-sanitizing. Player mode is transient.
@@ -12264,15 +12264,25 @@ function _pmSaveTargeted(){
   // Wrap arrays as {__arr:1, v:[...]} to match fbEncodeValue's storage format
   const _wrapArr=arr=>({__arr:1,v:arr.map(x=>x===undefined?null:x)});
   const updates={};
-  if(Array.isArray(p.s))updates[basePath+'s']=_wrapArr(p.s);
-  if(Array.isArray(p.preconfReason))updates[basePath+'preconfReason']=_wrapArr(p.preconfReason);
+  // si is the session this action concerns. Writing just that index leaves a
+  // trainer's edit to any other session untouched; writing the whole array
+  // resurrected values the trainer had already deleted.
+  const one=(field,arr)=>{
+    if(!Array.isArray(arr))return;
+    if(typeof si==='number'&&si>=0){
+      updates[basePath+field+'/v/'+si]=(arr[si]===undefined?null:arr[si]);
+    }else{
+      updates[basePath+field]=_wrapArr(arr);   // no session context: full array
+    }
+  };
+  one('s',p.s);
+  one('preconfReason',p.preconfReason);
   // sRPE: the player's own perceived exertion (0–10) and, for matches, the
-  // minutes actually played. Both are the player's data, written on the same
-  // whitelisted path as the rest.
-  if(Array.isArray(p.rpe))updates[basePath+'rpe']=_wrapArr(p.rpe);
-  if(Array.isArray(p.physio))updates[basePath+'physio']=_wrapArr(p.physio);
-  if(Array.isArray(p.excOK))updates[basePath+'excOK']=_wrapArr(p.excOK);
-  if(Array.isArray(p.rpeMin))updates[basePath+'rpeMin']=_wrapArr(p.rpeMin);
+  // minutes actually played.
+  one('rpe',p.rpe);
+  one('physio',p.physio);
+  one('excOK',p.excOK);
+  one('rpeMin',p.rpeMin);
   if(Object.keys(updates).length===0)return;
   _fbSaving=true;
   fbDb.ref().update(updates).then(()=>{
@@ -13217,7 +13227,7 @@ function pmSaveReason(si,text){
   if((p.preconfReason[si]||'')===trimmed)return; // no change
   p.preconfReason[si]=trimmed;
   // VARIANT B: targeted write + Firebase-transaction audit
-  _pmSaveTargeted();
+  _pmSaveTargeted(si);
   const sess=D.sessions[si];
   const sessLabel=sess?(sess.date+(sess.type==='match'?' (Spiel)':' (Training)')):'?';
   _pmAppendAudit({
@@ -13246,7 +13256,7 @@ function pmTogglePhysio(si){
     renderPlayerMode();
     return;
   }
-  _pmSaveTargeted();
+  _pmSaveTargeted(si);
   try{
     _pmAppendAudit({ts:Date.now(),user:p.name||'Spieler',role:'player',
       action:'Physio-Termin',target:(s&&s.date)||'?',
@@ -13310,7 +13320,7 @@ function pmSetStatus(si,val){
     renderPlayerMode();
     return;
   }
-  _pmSaveTargeted();
+  _pmSaveTargeted(si);
   const sess=D.sessions[si];
   const sessLabel=sess?(sess.date+(sess.type==='match'?' (Spiel)':' (Training)')):'?';
   _pmAppendAudit({
