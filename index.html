@@ -2122,6 +2122,11 @@ mark.sr-hl{background:rgba(243,156,18,.35);color:inherit;border-radius:2px;paddi
 .am-tab:hover{color:var(--bd);}
 .am-tab.active{background:var(--bm);color:#fff;}
 .am-head-meta{font-size:.78rem;color:var(--gm);font-weight:600;flex-shrink:0;line-height:1;}
+/* The counts moved into the tiles above; what is left here is the deadline
+   and the reminder, which the tiles cannot show. */
+.ss-rsvp{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.ss-rsvp-none{font-size:.7rem;color:var(--gm);}
+.ss-rsvp-btn{margin-left:auto;font-size:.72rem;padding:4px 12px;background:var(--bm);color:#fff;font-weight:600;}
 .am-players{border-top:1px solid var(--gl);margin-top:12px;}
 .am-players .ps-more-body{padding-top:4px;}
 .am-stat-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
@@ -3585,7 +3590,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786509616552; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786509972719; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -17651,17 +17656,9 @@ function buildSessAtt(si){
         }
         // 2-row layout: chips on top (wrap if needed), deadline + Erinnern always on bottom right.
         // This avoids the cramped wrap when deadline gets long.
-        summaryEl.innerHTML=`<div style="padding:9px 12px;background:linear-gradient(135deg,color-mix(in srgb,var(--bd) 7%,#fff),color-mix(in srgb,var(--bm) 4%,#fff));border:1px solid color-mix(in srgb,var(--bd) 20%,#fff);border-radius:8px;">
-          <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;">
-            <span style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--bm);">Anmeldungen:</span>
-            <span class="am-resp-chip komme" style="padding:3px 8px;font-size:.7rem;background:rgba(59,130,196,.12);color:#1e5a8a;">\ud83d\udcdd ${stats.komme} Angemeldet</span>
-            ${stats.entsch>0?`<span class="am-resp-chip entsch" style="padding:3px 8px;font-size:.7rem;">\ud83d\udccb ${stats.entsch} Entschuldigt</span>`:''}
-            <span class="am-resp-chip offen" style="padding:3px 8px;font-size:.7rem;">\u2754 ${stats.offen} Ausstehend</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
-            ${deadlineHtml}
-            <button class="btn" style="margin-left:auto;font-size:.72rem;padding:4px 12px;background:var(--bm);color:#fff;font-weight:600;" onclick="openAnmeldungen(${si})">\ud83d\udcac Erinnern</button>
-          </div>
+        summaryEl.innerHTML=`<div class="ss-rsvp">
+          ${deadlineHtml||'<span class="ss-rsvp-none">Keine Frist gesetzt</span>'}
+          <button class="btn ss-rsvp-btn" onclick="openAnmeldungen(${si})">\ud83d\udcac Erinnern</button>
         </div>`;
       }
     }
