@@ -2122,6 +2122,8 @@ mark.sr-hl{background:rgba(243,156,18,.35);color:inherit;border-radius:2px;paddi
 .am-tab:hover{color:var(--bd);}
 .am-tab.active{background:var(--bm);color:#fff;}
 .am-head-meta{font-size:.78rem;color:var(--gm);font-weight:600;flex-shrink:0;line-height:1;}
+.am-players{border-top:1px solid var(--gl);margin-top:12px;}
+.am-players .ps-more-body{padding-top:4px;}
 .am-stat-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
 .am-stat{flex:1;min-width:120px;padding:9px 12px;background:color-mix(in srgb,var(--bd) 5%,#fff);border:1px solid color-mix(in srgb,var(--bd) 18%,#fff);border-radius:8px;}
 .am-stat-label{font-size:.66rem;text-transform:uppercase;letter-spacing:.4px;color:var(--gm);font-weight:700;margin-bottom:3px;}
@@ -3583,7 +3585,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786509098927; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786509616552; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -13637,7 +13639,6 @@ function _amRenderOverview(){
   html+='</div>';
   // Stat bar
   html+='<div class="am-stat-row">';
-  html+=`<div class="am-stat"><div class="am-stat-label">Spieler</div><div class="am-stat-value">${players.length}</div></div>`;
   html+=`<div class="am-stat"><div class="am-stat-label">Mit Link</div><div class="am-stat-value">${withLink}/${players.length}</div></div>`;
   html+=`<div class="am-stat"><div class="am-stat-label">Mit Telefon</div><div class="am-stat-value">${withPhone}/${players.length}</div></div>`;
   html+='</div>';
@@ -13647,7 +13648,10 @@ function _amRenderOverview(){
   else html+=`<button class="am-bulk-btn" disabled>\u2705 Alle Spieler haben einen Link</button>`;
   html+=`<button class="am-bulk-btn" onclick="amCopyAllLinks()">\ud83d\udccb Alle Links als Liste kopieren</button>`;
   html+='</div>';
-  // Player list
+  // Player list — reference, not the point of this screen
+  html+='<details class="am-players"><summary class="ps-more-sum">'
+    +'<span>Einzelne Spieler</span><span class="ps-more-chev">\u203a</span></summary>'
+    +'<div class="ps-more-body">';
   html+=_amRenderSortBar();
   html+='<div class="am-list">';
   if(players.length===0){
@@ -13704,6 +13708,7 @@ function _amRenderOverview(){
     });
   }
   html+='</div>';
+  html+='</div></details>';
   return html;
 }
 function _amRenderSessionView(sessIdx){
