@@ -3574,7 +3574,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786394273738; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786503942124; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -5212,10 +5212,18 @@ function startFbListener(){
     // Drop those flags and adopt remote; migrations re-run on the fresh G
     // and their next save pushes a correct merged state.
     if(wasInitialLoad&&(_fbDebounce||_pendingSave)){
-      console.warn('[FB] Discarding boot-time pending save — initial remote snapshot takes precedence over local cache.');
-      clearTimeout(_fbDebounce);
-      _fbDebounce=null;
-      _pendingSave=false;
+      // Only a cache from BEFORE this session is suspect. An edit made in this
+      // session, seconds ago, is exactly what must survive — discarding it is
+      // how deleted grades came back after a reload.
+      const _fresh=_sessionEditAt&&(Date.now()-_sessionEditAt)<5*60*1000;
+      if(_fresh){
+        console.info('[FB] Keeping this session\u2019s pending edit across the initial snapshot.');
+      }else{
+        console.warn('[FB] Discarding boot-time pending save — initial remote snapshot takes precedence over local cache.');
+        clearTimeout(_fbDebounce);
+        _fbDebounce=null;
+        _pendingSave=false;
+      }
     }
     // CONFLICT DETECTION (Phase 2):
     // If we have a pending local save (_fbDebounce active OR _pendingSave queued)
@@ -5224,30 +5232,14 @@ function startFbListener(){
     // (same trainer, two browsers — remote ts newer than our local base).
     const _remoteBy=data&&data._lastSaveBy;
     const _sameUser=!!(_remoteBy&&CU&&_remoteBy===CU.name);
-    if((_fbDebounce||_pendingSave)&&data&&CU&&!_sameUser&&(
-        (_remoteBy&&_remoteBy!==CU.name)||
-        (data._lastSaveTs&&data._lastSaveTs>((G&&G._lastSaveTs)||0))
-      )){
-      // Pause our save and show conflict dialog
-      clearTimeout(_fbDebounce);
-      _fbDebounce=null;
-      _pendingSave=false;
-      if(typeof showConflictDialog==='function'){
-        showConflictDialog(data);
-      } else {
-        // Fallback if dialog not ready: keep local edits ONLY if our base is
-        // not older than the remote — a stale base must never win silently.
-        if(G&&!(data._lastSaveTs>((G._lastSaveTs)||0))){
-          _fbWriteWithStamp(G)
-            .catch(e=>{_fbWarn('conflict-push',e,'\u26a0\ufe0f \u00c4nderungen nicht gespeichert \u2014 Verbindung pr\u00fcfen');});
-        } else if(data&&data.version>=14){
-          console.warn('[FB] Stale local base — adopting newer remote instead of pushing.');
-          G=sanitizeG(data);
-          _persistLocal();
-          render();
-        }
+    // Someone else saved while we have an edit queued. This is not a conflict
+    // in any useful sense: saves are written per path, so their change and
+    // ours land in different places. Keep ours — dropping it is what made
+    // deleted grades reappear — and let the diff writer merge.
+    if((_fbDebounce||_pendingSave)&&data&&CU&&!_sameUser){
+      if(typeof showSaveFlash==='function'){
+        showSaveFlash('\u21bb '+(_remoteBy||'Jemand')+' hat ebenfalls gespeichert \u2014 zusammengef\u00fchrt');
       }
-      return;
     }
     // CRITICAL: pending local changes (debounce active OR queued by _pendingSave)
     // mean the user just edited something locally that hasn't been pushed yet.
@@ -5558,10 +5550,12 @@ function safeLocalSave(key,value){
   }
 }
 
+let _sessionEditAt=0;
 function saveG(badge=true){
   // Also guards localStorage: a sanitised copy cached there would corrupt the
   // next trainer session on this device.
   if(_writeBlocked('saveG'))return;
+  _sessionEditAt=Date.now();
   _persistLocal();
   if(badge){const b=document.getElementById('savedBadge');b.classList.add('show');clearTimeout(b._t);b._t=setTimeout(()=>b.classList.remove('show'),1600);}
   // Firebase: debounce writes (max 1 per 800ms)
