@@ -462,9 +462,13 @@ body.theme-dark .pl-row:nth-child(even){background:#15264a;}
 .ssel:hover{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.45);}
 .ssel:focus{border-color:var(--ac);}
 /* Inline styles on this button beat .btn:hover, so it needs its own rule. */
-#btn-slp{transition:background .12s,border-color .12s,color .12s;}
-#btn-slp:hover{background:color-mix(in srgb, var(--ac) 26%, transparent) !important;
-  border-color:color-mix(in srgb, var(--ac) 55%, transparent) !important;color:var(--ac) !important;}
+/* One look for every toolbar button that opens something. The accent stays
+   reserved for the primary action (＋ Hinzufügen), so it means one thing. */
+.toolbar .btb,.toolbar .bteam,.toolbar .bcfg,.toolbar .bundo{
+  background:rgba(255,255,255,.07);color:rgba(255,255,255,.68);
+  border:1px solid rgba(255,255,255,.14);transition:background .12s,border-color .12s,color .12s;}
+.toolbar .btb:hover,.toolbar .bteam:hover,.toolbar .bcfg:hover{
+  background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.3);color:#fff;}
 .ssel:focus{border-color:var(--ac);}
 .ssel option{color:#000;background:#fff;}
 .btn{padding:6px 13px;border-radius:7px;border:none;cursor:pointer;font-family:'Barlow',sans-serif;font-size:.82rem;font-weight:600;transition:all .12s;display:flex;align-items:center;gap:5px;white-space:nowrap;}
@@ -479,7 +483,7 @@ body.theme-dark .pl-row:nth-child(even){background:#15264a;}
 .bs-dark:hover{background:rgba(255,255,255,.18);}.bs:hover{background:rgba(255,255,255,.2);}
 .bd{background:rgba(231,76,60,.13);color:#ff9080;border:1px solid rgba(231,76,60,.27);}.bd:hover{background:rgba(231,76,60,.27);}
 .bm{background:rgba(176,48,0,.15);color:#ffc0a0;border:1px solid rgba(176,48,0,.3);}.bm:hover{background:rgba(176,48,0,.3);}
-.bteam{background:color-mix(in srgb, var(--ac) 11%, transparent);color:var(--ac);border:1px solid color-mix(in srgb, var(--ac) 25%, transparent);}.bteam:hover{background:color-mix(in srgb, var(--ac) 22%, transparent);}
+.bteam{background:rgba(255,255,255,.07);color:rgba(255,255,255,.68);border:1px solid rgba(255,255,255,.14);}.bteam:hover{background:color-mix(in srgb, var(--ac) 22%, transparent);}
 .bcfg{background:rgba(255,255,255,.07);color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.14);}.bcfg:hover{background:rgba(255,255,255,.18);}
 .bundo{background:rgba(255,255,255,.07);color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.13);}.bundo:hover{background:rgba(255,255,255,.15);}.bundo:disabled{opacity:.25;cursor:default;}
 .tsep{width:1px;height:18px;background:rgba(255,255,255,.15);margin:0 1px;}
@@ -2947,7 +2951,7 @@ if(window._fbBlocked){
     <span class="saved" id="savedBadge">✓</span>
     <button class="btn" id="btn-legend" onclick="event.stopPropagation();toggleLegendPop(this)" title="Legende" aria-label="Legende">ⓘ</button>
     <div class="tsep"></div>
-    <button class="btn" id="btn-slp" style="background:color-mix(in srgb, var(--ac) 12%, transparent);color:#c8a820;border:1px solid color-mix(in srgb, var(--ac) 30%, transparent);" onclick="openSeasonLineup()">📋 Saisonkader</button>
+    <button class="btn btb" id="btn-slp" onclick="openSeasonLineup()">📋 Saisonkader</button>
     <button class="btn bteam" onclick="openTeamMgr('spieler')">🏆 Mannschaft</button>
     <div class="view-menu-wrap" id="linksMenuWrap">
       <button class="btn bcfg" onclick="toggleLinksMenu(event)" title="Nützliche Links">🔗 Links ▾</button>
@@ -3592,7 +3596,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786511031940; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786511172573; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
