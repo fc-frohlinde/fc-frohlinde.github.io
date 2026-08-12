@@ -3574,7 +3574,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786504981565; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786505293965; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -17409,8 +17409,13 @@ function buildSessAtt(si){
       const p=D.players[pi];const v=p.s?p.s[si]:3;const ro=!canEdit()?'ro':'';
       // Leistungsnote badge — only for players marked Anwesend (key===1), and
       // only when the session itself is gradable (past/started training or match).
-      const curGrade=(key===1&&_gradable)?getPerf(pi,si):null;
-      const gradeHtml=(key===1&&_gradable)?`
+      // A grade already given must stay reachable even if the status has since
+      // changed away from "Anwesend": otherwise the star disappears and the
+      // value is stuck in the data with no way to remove it — which is exactly
+      // what happened to grades set on a phone before the status was edited.
+      const _existing=_gradable?getPerf(pi,si):null;
+      const curGrade=((key===1||_existing!=null)&&_gradable)?_existing:null;
+      const gradeHtml=((key===1||_existing!=null)&&_gradable)?`
         <div style="position:relative;display:inline-block;">
           <button class="perf-btn ${curGrade?'perf-'+curGrade:'perf-none'}" style="cursor:${canEdit()?'pointer':'default'};border:none;" title="${curGrade?PERF_LABEL[curGrade]:'Note vergeben'}" onclick="${canEdit()?`event.stopPropagation();togPerfMenu('pm_${pi}_${si}',${pi},${si})`:'event.stopPropagation()'}">${curGrade?PERF_ICON[curGrade]:'☆'}</button>
           <div id="pm_${pi}_${si}" style="display:none;position:fixed;z-index:600;background:var(--surface-dark);border:1px solid rgba(255,255,255,.2);border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.4);overflow:hidden;min-width:160px;">
