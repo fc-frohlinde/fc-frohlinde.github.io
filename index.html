@@ -3574,7 +3574,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786505293965; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786505464425; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -8332,6 +8332,12 @@ function togAttMenu(id,pi,si,v){
   _placePopup(m,btn.getBoundingClientRect(),{gap:3});
 }
 document.addEventListener('click',()=>document.querySelectorAll('[id^="am_"]').forEach(m=>m.style.display='none'));
+// perfDebug() then click a star: the console reports what the click did.
+window.perfDebug=function(on){
+  window._perfDebug=(on!==false);
+  console.log('%c[setPerf] Diagnose '+(window._perfDebug?'AN':'AUS'),'font-weight:bold');
+  if(window._perfDebug)console.log('Jetzt auf einen Stern klicken und "Kein Eintrag" wählen.');
+};
 function togPerfMenu(id,pi,si){
   document.querySelectorAll('[id^="pm_"]').forEach(m=>{if(m.id!==id)m.style.display='none';});
   const m=document.getElementById(id);if(!m)return;
@@ -8399,15 +8405,21 @@ function canGradeSession(si){
   return typeof _isSessRollCallTime==='function'?_isSessRollCallTime(si):false;
 }
 function setPerf(pi,si,val){
-  if(!canEdit())return;
-  if(!canGradeSession(si))return;
+  // Diagnostics: this call has been failing silently — every early return
+  // below now says which one it was.
+  if(window._perfDebug)console.log('[setPerf] pi='+pi+' si='+si+' val='+val,
+    {canEdit:canEdit(),gradable:canGradeSession(si),team:UI.currentTeam,season:UI.currentSeason});
+  if(!canEdit()){if(window._perfDebug)console.log('[setPerf] ABBRUCH: keine Bearbeitungsrechte');return;}
+  if(!canGradeSession(si)){if(window._perfDebug)console.log('[setPerf] ABBRUCH: Sitzung nicht bewertbar');return;}
   const D=cd();const p=D&&D.players&&D.players[pi];
-  if(!p)return;
+  if(!p){if(window._perfDebug)console.log('[setPerf] ABBRUCH: Spieler nicht gefunden an Index '+pi);return;}
   if(!Array.isArray(p.perf))p.perf=[];
   while(p.perf.length<=si)p.perf.push(null);
   const oldVal=p.perf[si]??null;
   const newVal=(val===1||val===2||val===3)?val:null;
-  if(oldVal===newVal)return;
+  if(window._perfDebug)console.log('[setPerf] '+(p.name||'?')+': '+oldVal+' → '+newVal,
+    {perfArray:JSON.stringify(p.perf)});
+  if(oldVal===newVal){if(window._perfDebug)console.log('[setPerf] ABBRUCH: Wert ist bereits '+newVal);return;}
   snap();
   p.perf[si]=newVal;
   saveG();
