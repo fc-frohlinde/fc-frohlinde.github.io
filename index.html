@@ -3169,7 +3169,7 @@ if(window._fbBlocked){
       <div id="ss-note-display" style="font-size:.78rem;color:var(--gd);font-style:italic;margin-top:8px;display:none;"></div>
       <div id="ss-plan-link" style="display:none;font-size:.78rem;margin-top:5px;"></div>
       <details class="ss-more" id="ss-more">
-        <summary class="ps-more-sum"><span>Belastung &amp; Physio</span><span class="ps-more-chev">›</span></summary>
+        <summary class="ps-more-sum"><span id="ss-more-lbl">Weitere Details</span><span class="ps-more-chev">›</span></summary>
         <div class="ps-more-body">
           <div id="ss-physio-wrap" style="display:none;margin-top:8px;"></div>
           <div id="ss-rpe-wrap" style="display:none;margin-top:8px;"></div>
@@ -3580,7 +3580,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786508348940; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786508550100; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -11946,7 +11946,16 @@ function _ssSyncMore(){
   const a=document.getElementById('ss-physio-wrap');
   const b=document.getElementById('ss-rpe-wrap');
   const has=el=>el&&el.style.display!=='none'&&el.innerHTML.trim();
-  more.hidden=!(has(a)||has(b));
+  const hasPhysio=has(a),hasLoad=has(b);
+  more.hidden=!(hasPhysio||hasLoad);
+  // A fold labelled "Belastung & Physio" claimed both even when it held one:
+  // the physio is not there every week. Say what is actually inside.
+  const lbl=document.getElementById('ss-more-lbl');
+  if(lbl){
+    lbl.textContent=(hasPhysio&&hasLoad)?'Belastung & Physio'
+      :hasLoad?'Belastung'
+      :hasPhysio?'Physiotherapie':'Weitere Details';
+  }
 }
 function renderSessPhysio(si){
   const box=document.getElementById('ss-physio-wrap');
@@ -17377,14 +17386,25 @@ function openSessStats(si){
   }
   const isMat=s.type==='match';
   const parts=s.date.split(' ');
-  document.getElementById('ss-title').textContent=s.date+(isMat&&s.label?' – '+s.label:s.focus?' · '+s.focus:'');
+  // Date leads, opponent qualifies it. The focus belongs on the meta line with
+  // the other training details, not in the heading.
+  document.getElementById('ss-title').textContent=s.date+((isMat&&s.label)?' \u2013 '+s.label:'');
   // "Termin" is the generic word the app uses for a slot in the week; the
   // window should say which kind it is looking at.
   const kindEl=document.getElementById('ss-kind');
   if(kindEl)kindEl.textContent=isMat?'\u26bd Spiel':'\ud83c\udfc3 Training';
   // Location belongs on the meta line: it is the second question after "when"
   const _locMeta=(s.location&&s.location.trim())?' &nbsp;·&nbsp; '+locNameHtml(s):'';
-  document.getElementById('ss-meta').innerHTML=(isMat?`⚽ Spiel &nbsp;·&nbsp; ${s.homeAway==='home'?'🏠 Heim':'🚌 Auswärts'}${s.label?' &nbsp;·&nbsp; '+escapeHtml(s.label):''}${s.time?' &nbsp;·&nbsp; ⏰ '+escapeHtml(s.time):''}`:`Training${s.focus?' &nbsp;·&nbsp; 🎯 '+escapeHtml(s.focus):''}${s.time?' &nbsp;·&nbsp; ⏰ '+escapeHtml(s.time):''}`)+_locMeta;
+  {
+    // Only facts not already carried by the title or the window heading.
+    const bits=[];
+    if(s.time)bits.push('\u23f0 '+escapeHtml(s.time));
+    if(isMat)bits.push(s.homeAway==='home'?'\ud83c\udfe0 Heim':'\ud83d\ude8c Ausw\u00e4rts');
+    else if(s.focus)bits.push('\ud83c\udfaf '+escapeHtml(s.focus));
+    const dur=(typeof rpeSessionMinutes==='function')?rpeSessionMinutes(s,null,si):null;
+    if(dur)bits.push(dur+' Min.');
+    document.getElementById('ss-meta').innerHTML=bits.join(' &nbsp;\u00b7&nbsp; ')+_locMeta;
+  }
   try{renderEvalTopicRow(si);}catch(e){console.error('evalTopic:',e);}
   // Roll-call entry point: trainers only, and only once the session is
   // actually running/past — capturing attendance for a future date is not
