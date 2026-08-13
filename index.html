@@ -3430,7 +3430,7 @@ if(window._fbBlocked){
     <div class="mob-btns">
       <button class="btn bp" id="btn-mgr-addpl" onclick="closeM('moTeamMgr');openM('moAddPlayer');" style="display:none;">＋ Spieler</button>
       <button class="btn" onclick="exportPlayersCSV()" style="background:var(--gd);color:#fff;" title="Spielerdaten als CSV exportieren (Trikotverwaltung-Format)">⬇ CSV-Export</button>
-      <button class="btn bs" onclick="closeM('moTeamMgr')">Schließen</button>
+      
     </div>
   </div>
   <div class="tpanel" id="tab-trainer">
@@ -3447,7 +3447,7 @@ if(window._fbBlocked){
       </label>
       <div class="mob-btns">
         <button class="btn bp" onclick="addTrainer()">Hinzufügen</button>
-        <button class="btn bs" onclick="closeM('moTeamMgr')">Schließen</button>
+        
       </div>
     </div>
   </div>
@@ -3459,29 +3459,29 @@ if(window._fbBlocked){
       <button class="btn bp" onclick="addFocus()" style="flex:none;">＋</button>
     </div>
     <div class="mob-btns" style="margin-top:10px;">
-      <button class="btn bs" onclick="closeM('moTeamMgr')">Schließen</button>
+      
     </div>
   </div>
   <div class="tpanel" id="tab-statistik">
     <div id="tmgr-stats"></div>
     <div class="mob-btns" style="margin-top:10px;">
-      <button class="btn bs" onclick="closeM('moTeamMgr')">Schließen</button>
+      
     </div>
   </div>
   <div class="tpanel" id="tab-trainings">
     <div style="border:1px solid var(--gl);border-radius:8px;max-height:340px;overflow-y:auto;" id="tmgr-sess-list"></div>
     <div class="mob-btns" style="margin-top:10px;">
-      <button class="btn bs" onclick="closeM('moTeamMgr')">Schließen</button>
+      
     </div>
   </div>
   <div class="tpanel" id="tab-spiele">
     <div style="border:1px solid var(--gl);border-radius:8px;max-height:340px;overflow-y:auto;" id="tmgr-match-list"></div>
     <div class="mob-btns" style="margin-top:10px;">
-      <button class="btn bs" onclick="closeM('moTeamMgr')">Schließen</button>
+      
     </div>
   </div>
   <div class="tmgr-foot" id="tmgr-foot">
-    <button class="btn bs" onclick="closeM('moTeamMgr')">Schließen</button>
+    
   </div>
 </div></div>
 
@@ -3518,7 +3518,7 @@ if(window._fbBlocked){
     </label>
     <div class="mob-btns">
       <button class="btn bp" onclick="addTrainerGlobal()">Hinzufügen</button>
-      <button class="btn bs" onclick="closeM('moAdmin')">Schließen</button>
+      
     </div>
   </div>
   <div class="tpanel" id="atab-teams">
@@ -3530,7 +3530,7 @@ if(window._fbBlocked){
     <div class="mob-hr"></div>
     <div id="admin-teams-list"></div>
     <div class="mob-btns" style="margin-top:10px;">
-      <button class="btn bs" onclick="closeM('moAdmin')">Schließen</button>
+      
     </div>
   </div>
   <div class="tpanel" id="atab-guest">
@@ -3554,7 +3554,7 @@ if(window._fbBlocked){
       <button class="btn" onclick="createBackup()" style="margin-top:6px;background:var(--bm);color:#fff;">＋ Backup jetzt erstellen</button>
     </div>
     <div class="mob-btns" style="margin-top:10px;">
-      <button class="btn bs" onclick="closeM('moAdmin')">Schließen</button>
+      
     </div>
   </div>
   <div class="tpanel" id="atab-firebase">
@@ -3579,7 +3579,7 @@ if(window._fbBlocked){
     <div class="mob-btns" style="margin-top:4px;">
       <button class="btn bp" onclick="saveFbConfig()">🌐 Verbinden</button>
       <button class="btn bd" onclick="disconnectFb()">✕ Trennen</button>
-      <button class="btn bs" onclick="closeM('moAdmin')">Schließen</button>
+      
     </div>
 
   </div>
@@ -3606,7 +3606,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786647173455; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786647623199; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -26665,7 +26665,7 @@ checkAutoBackup();
   <div style="display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--gl);">
     <button class="btn bd" onclick="emptyTrash()" style="font-size:.74rem;padding:5px 10px;">🗑 Alles leeren</button>
     <span style="flex:1;"></span>
-    <button class="btn bs" onclick="closeM('moTrash')">Schließen</button>
+    
   </div>
 </div></div>
 
@@ -26744,7 +26744,10 @@ checkAutoBackup();
 
 <!-- Password Change Modal -->
 <div class="mo" id="moPassword" style="z-index:99998;"><div class="mob" style="width:420px;max-width:96vw;max-height:88vh;overflow-y:auto;">
-  <h3 style="margin:0 0 8px;color:var(--bd);">👤 Mein Konto</h3>
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+    <h3 style="margin:0;flex:1;color:var(--bd);">👤 Mein Konto</h3>
+    <button class="btn bs" onclick="closeM('moPassword')" aria-label="Schließen">✕</button>
+  </div>
   <p style="font-size:.78rem;color:var(--gm);margin:0 0 14px;">Persönliche Sicherheits- und Sitzungseinstellungen.</p>
 
   <!-- ─ Passwort ─ -->
@@ -26817,7 +26820,7 @@ checkAutoBackup();
   </div>
 
   <div class="mob-btns" style="margin-top:6px;">
-    <button class="btn bs" onclick="closeM('moPassword')" style="margin-left:auto;">Schließen</button>
+    
   </div>
 </div></div>
 
@@ -26910,21 +26913,17 @@ checkAutoBackup();
 <div class="mo" id="moTrainerProfile"><div class="mob" style="width:440px;max-width:96vw;">
   <div class="tp-title-row">
     <h3 style="margin:0;flex:1;">👤 Trainerprofil</h3>
+    <button class="btn bs" onclick="tpCloseGuard()" aria-label="Schließen">✕</button>
   </div>
   <div id="tp-content" style="max-height:64vh;overflow-y:auto;"></div>
-  <div class="mob-btns">
-    <button class="btn bs" onclick="tpCloseGuard()">Schließen</button>
-  </div>
 </div></div>
 
 <div class="mo" id="moRpeOverview"><div class="mob" style="width:560px;max-width:96vw;">
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
     <h3 style="margin:0;flex:1;">💪 Alle Belastungs-Bewertungen</h3>
+    <button class="btn bs" onclick="closeM('moRpeOverview')" aria-label="Schließen">✕</button>
   </div>
   <div id="rpe-ov-content" style="max-height:60vh;overflow-y:auto;"></div>
-  <div class="mob-btns">
-    <button class="btn bs" onclick="closeM('moRpeOverview')">Schließen</button>
-  </div>
 </div></div>
 
 <div class="mo" id="moLocations"><div class="mob" style="width:420px;">
@@ -26936,9 +26935,6 @@ checkAutoBackup();
     <button class="btn bp" onclick="locAddManual()">＋</button>
   </div>
   <div id="loc-mgr-list"></div>
-  <div class="mob-btns">
-    <button class="btn bs" onclick="closeM('moLocations')">Schließen</button>
-  </div>
 </div></div>
 
 <!-- Roll-call: fullscreen attendance capture -->
@@ -27363,7 +27359,7 @@ checkAutoBackup();
   </div>
   <div id="moAbout-changelog"></div>
   <div class="mob-btns" style="margin-top:18px;">
-    <button class="btn bs" onclick="closeM('moAbout')" style="margin-left:auto;">Schließen</button>
+    
   </div>
 </div></div>
 
@@ -27377,7 +27373,7 @@ checkAutoBackup();
   <div id="slp-status-list" style="max-height:60vh;overflow-y:auto;border:1px solid var(--gl);border-radius:8px;"></div>
   <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-size:.78rem;color:var(--gm);">
     <span id="slp-status-stats"></span>
-    <button class="btn bs" onclick="closeM('moSlpStatus')">Schließen</button>
+    
   </div>
 </div></div>
 
