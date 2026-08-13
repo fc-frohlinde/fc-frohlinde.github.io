@@ -3596,7 +3596,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786647918965; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786648166095; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -24159,8 +24159,8 @@ function lpDisciplineState(playerRef,matchSi){
   if(ok)return null;
   return {miss,exc,details,
     reason:miss>0
-      ? (miss===1?'1 unentschuldigtes Fehlen':miss+' unentschuldigte Fehlzeiten')
-      : exc+' entschuldigte Fehlzeiten'};
+      ? (miss===1?'1x unentschuldigt gefehlt':miss+'x unentschuldigt gefehlt')
+      : exc+'x entschuldigt gefehlt'};
 }
 function lpUnavailState(playerRef){
   const si=lpState.sessIdx;
@@ -24466,7 +24466,7 @@ function lpRender(){
     else{
       const nameOf=r=>{const D=cd();const p=D&&D.players&&D.players[r];return p?(getDisplayName?getDisplayName(p):p.name):'?';};
       discEl.style.display='flex';
-      discEl.innerHTML='<span class="lp-un-h lp-disc-h">\u26d4 Nicht spielberechtigt:</span>'
+      discEl.innerHTML='<span class="lp-un-h lp-disc-h">\u26a0 Trainingsregel nicht erf\u00fcllt:</span>'
         +hits.map(u=>`<button class="lp-un-chip lp-disc-chip"
              onclick="lpClearUnavail('${u.where}','${u.where==='slot'?u.slot:u.idx}')"
              title="${escapeHtml(u.d.reason)} \u2014 ${escapeHtml(u.d.details.join(', '))}">
@@ -24853,7 +24853,7 @@ function lpRenderSubs(){
       const guestBadge=isGuest?`<span style="font-size:.55rem;background:color-mix(in srgb, var(--ac) 20%, transparent);color:var(--ac);padding:1px 5px;border-radius:7px;font-weight:700;">GAST</span>`:'';
       const _disc=isGuest?null:lpDisciplineState(id);
       const discBadge=_disc
-        ? `<span class="lp-disc-badge" title="${escapeHtml(_disc.reason)} \u2014 ${escapeHtml(_disc.details.join(', '))}">\u26d4 ${_disc.miss?_disc.miss+'\u00d7U':_disc.exc+'\u00d7E'}</span>`
+        ? `<span class="lp-disc-badge" title="Trainingsregel: ${escapeHtml(_disc.reason)} \u2014 ${escapeHtml(_disc.details.join(', '))}">\u26d4 ${_disc.miss?_disc.miss+'\u00d7U':_disc.exc+'\u00d7E'}</span>`
         : '';
       if(_disc)bg='rgba(192,57,43,.12)';
       return `<div style="display:flex;align-items:center;gap:6px;padding:5px 8px;background:${bg};border:1px solid ${_disc?'rgba(192,57,43,.45)':'rgba(255,255,255,.07)'};border-radius:7px;margin-bottom:3px;">
