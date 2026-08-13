@@ -740,7 +740,17 @@ input[type="date"]{cursor:pointer;}
 .tcheck{padding:4px 10px;border:1.5px solid var(--gl);border-radius:6px;cursor:pointer;font-size:.74rem;font-weight:600;color:var(--gd);transition:all .12s;user-select:none;}
 .tcheck.sel{border-color:var(--bm);background:rgba(22,89,184,.09);color:var(--bm);}
 .tbar{display:flex;gap:0;border-bottom:2px solid var(--gl);margin-bottom:12px;
-  overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;
+  /* A thin visible scrollbar where a mouse is the input device, and a fade at
+     the right edge so it is obvious something continues past it. */
+  scrollbar-width:thin;scrollbar-color:var(--gl) transparent;}
+.tbar::-webkit-scrollbar{height:6px;}
+.tbar::-webkit-scrollbar-thumb{background:var(--gl);border-radius:3px;}
+.tbar::-webkit-scrollbar-track{background:transparent;}
+@media (hover:none){
+  .tbar{scrollbar-width:none;}
+  .tbar::-webkit-scrollbar{height:0;}
+}
 .tbar::-webkit-scrollbar{display:none;}
 .tmgr-foot{display:none;}
 .tbtn{flex-shrink:0;white-space:nowrap;}
@@ -3602,7 +3612,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786645534760; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786646456605; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -19735,6 +19745,15 @@ function renderMgrSessions(type){
     </div>`;
   }).join('');
 }
+// Wheel over the tab strip scrolls it sideways: a mouse has no horizontal
+// gesture, so without this the tabs past the edge stay unreachable.
+document.addEventListener('wheel',e=>{
+  const bar=e.target&&e.target.closest&&e.target.closest('.tbar');
+  if(!bar||bar.scrollWidth<=bar.clientWidth)return;
+  if(Math.abs(e.deltaY)<=Math.abs(e.deltaX))return;
+  bar.scrollLeft+=e.deltaY;
+  e.preventDefault();
+},{passive:false});
 function switchTab(t){
   ['spieler','trainer','schwerpunkte','statistik','trainings','spiele'].forEach((n,i)=>{
     document.querySelectorAll('#moTeamMgr .tbtn')[i]?.classList.toggle('active',n===t);
