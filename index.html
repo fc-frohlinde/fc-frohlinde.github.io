@@ -3602,7 +3602,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786644952861; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1786645534760; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -11848,6 +11848,7 @@ function _pmSanitizeG(){
           label:s.label||'',homeAway:s.homeAway||'',
           rsvpUntil:typeof s.rsvpUntil==='number'?s.rsvpUntil:undefined,
           focus:s.focus||'',
+          focus2:s.focus2||'',
           // sRPE needs the session length: load = minutes × rating
           duration:typeof s.duration==='number'?s.duration:undefined,
           // Availability only — the player needs to know the physio is there,
@@ -16952,6 +16953,7 @@ function _gatherPlayerNotes(pi){
         date:s.date,
         type:s.type||'training',
         focus:s.focus||'',
+          focus2:s.focus2||'',
         label:s.label||'',
         homeAway:s.homeAway||'',
         comment:c,
@@ -17425,7 +17427,7 @@ function openSessStats(si){
     const bits=[];
     if(s.time)bits.push('\u23f0 '+escapeHtml(s.time));
     if(isMat)bits.push(s.homeAway==='home'?'\ud83c\udfe0 Heim':'\ud83d\ude8c Ausw\u00e4rts');
-    else if(s.focus)bits.push('\ud83c\udfaf '+escapeHtml(s.focus));
+    else if(s.focus)bits.push('\ud83c\udfaf '+escapeHtml(s.focus)+(s.focus2?' + '+escapeHtml(s.focus2):''));
     const dur=(typeof rpeSessionMinutes==='function')?rpeSessionMinutes(s,null,si):null;
     if(dur)bits.push(dur+' Min.');
     document.getElementById('ss-meta').innerHTML=bits.join(' &nbsp;\u00b7&nbsp; ')+_locMeta;
@@ -17500,9 +17502,13 @@ function openSessStats(si){
             <option value="home"${s.homeAway!=='away'?' selected':''}>\ud83c\udfe0 Heim</option>
             <option value="away"${s.homeAway==='away'?' selected':''}>\ud83d\ude8c Ausw\u00e4rts</option>
           </select></div>`:`
-        <div class="tp-row"><span class="tp-l">Schwerpunkt</span>
+        <div class="tp-row"><span class="tp-l" title="Prim\u00e4rer Schwerpunkt">Schwerpunkt 1</span>
           <select id="ss-e-foc" class="tp-in" onchange="updSessFoc(${si},this.value)">
             <option value="">\u2013 Kein \u2013</option>${focOpts}
+          </select></div>
+        <div class="tp-row"><span class="tp-l" title="Sekund\u00e4rer Schwerpunkt \u2014 optional">Schwerpunkt 2</span>
+          <select id="ss-e-foc2" class="tp-in" onchange="updSessFoc2(${si},this.value)">
+            <option value="">\u2013 Kein \u2013</option>${foc.map(f=>`<option value="${f}" ${f===s.focus2?'selected':''}>${f}</option>`).join('')}
           </select></div>`}
         <div class="tp-row"><span class="tp-l">Physio dabei</span>
           <label class="ss-e-check"><input type="checkbox" id="ss-e-physio" ${sessPhysioOn(s)?'checked':''} onchange="sessSetPhysio(${si},this.checked)"><span>am Trainingstag verf\u00fcgbar</span></label></div>
@@ -18033,6 +18039,19 @@ function toggleSessEdit(){
   if(open&&shell)shell.scrollTop=0;
 }
 function updSessFoc(si,v){snap();cd().sessions[si].focus=v;saveG();renderHead();}
+// "Aufgabe" would mean a task handed to someone; the word for what a session
+// concentrates on is Schwerpunkt, which the app already uses. A second one is
+// therefore Schwerpunkt 2, not a differently-named thing.
+function updSessFoc2(si,v){
+  if(!canEdit())return;
+  const D=cd();const s=D&&D.sessions&&D.sessions[si];
+  if(!s)return;
+  const val=String(v||'').trim();
+  if((s.focus2||'')===val)return;
+  snap();
+  if(val)s.focus2=val;else delete s.focus2;
+  saveG();renderHead();
+}
 function _amTsToDatetimeLocal(ts){
   // Converts ms-timestamp to 'YYYY-MM-DDTHH:MM' for datetime-local input
   if(!ts||typeof ts!=='number')return '';
