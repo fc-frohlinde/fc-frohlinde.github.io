@@ -3596,7 +3596,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1786899875738; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787007282641; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -4290,6 +4290,32 @@ window.perfForce=async function(pi,si,val){
   if(p){if(!Array.isArray(p.perf))p.perf=[];while(p.perf.length<=si)p.perf.push(null);p.perf[si]=v;}
   console.log('%cGesetzt: '+path+' = '+v,'color:green;font-weight:bold');
   if(typeof render==='function')render();
+};
+// Ratings a player gives himself (sRPE) live in p.rpe, separate from the
+// trainer's grade in p.perf. Compares browser against server for one session.
+window.rpeServer=async function(si){
+  if(!fbDb){console.log('Keine Verbindung.');return;}
+  const key=(UI.currentTeam+'__'+UI.currentSeason).replace(/\//g,'__SL__').replace(/\./g,'__DOT__');
+  const snap=await fbDb.ref('fcf_data/db/'+key+'/players').once('value');
+  const raw=snap.val();
+  const list=(raw&&raw.v)?raw.v:raw;
+  const D=cd();
+  const rows=[];
+  (Array.isArray(list)?list:Object.values(list||{})).forEach((p,i)=>{
+    if(!p)return;
+    const arr=(p.rpe&&p.rpe.v)?p.rpe.v:p.rpe;
+    const server=Array.isArray(arr)?arr[si]:(arr?arr[si]:undefined);
+    const lp=D&&D.players&&D.players[i];
+    const local=(lp&&Array.isArray(lp.rpe))?lp.rpe[si]:undefined;
+    const st=(lp&&Array.isArray(lp.s))?lp.s[si]:undefined;
+    rows.push({idx:i,name:p.name||'?',status:st,
+      imBrowser:local===undefined?'-':local,
+      aufServer:server===undefined?'-':server});
+  });
+  console.table(rows);
+  const withVal=rows.filter(r=>r.aufServer!=='-'&&r.aufServer!=null).length;
+  console.log('Werte auf dem Server:',withVal,'von',rows.length,'Spielern');
+  return rows;
 };
 window.perfServer=async function(si){
   if(!fbDb){console.log('Keine Verbindung.');return;}
