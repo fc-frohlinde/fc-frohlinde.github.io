@@ -3596,7 +3596,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787007282641; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787007528455; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -4293,6 +4293,21 @@ window.perfForce=async function(pi,si,val){
 };
 // Ratings a player gives himself (sRPE) live in p.rpe, separate from the
 // trainer's grade in p.perf. Compares browser against server for one session.
+// Why a value present on the server is missing in the browser: usually the
+// local array is shorter than the index being read.
+window.rpeDiag=function(si){
+  const D=cd();
+  const rows=(D.players||[]).map((p,i)=>({
+    idx:i,name:p&&p.name||'?',
+    laenge:(p&&Array.isArray(p.rpe))?p.rpe.length:'kein Array',
+    wert:(p&&Array.isArray(p.rpe))?(p.rpe[si]===undefined?'ausserhalb':p.rpe[si]):'-',
+    sitzungen:(D.sessions||[]).length
+  })).filter(r=>r.wert==='ausserhalb'||r.wert!=='-');
+  console.table(rows);
+  const short=rows.filter(r=>typeof r.laenge==='number'&&r.laenge<=si);
+  console.log('Arrays kuerzer als Index '+si+':',short.length,'von',(D.players||[]).length);
+  return rows;
+};
 window.rpeServer=async function(si){
   if(!fbDb){console.log('Keine Verbindung.');return;}
   const key=(UI.currentTeam+'__'+UI.currentSeason).replace(/\//g,'__SL__').replace(/\./g,'__DOT__');
