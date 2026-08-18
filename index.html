@@ -2693,6 +2693,8 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
   border-radius:11px;color:var(--bd);}
 .rpo-full{margin-top:9px;font-size:.74rem;padding:8px 14px;border-radius:10px;
   border:1px solid var(--gl);background:var(--ow);color:var(--gd);cursor:pointer;}
+.rpo-prev{background:var(--ac);color:var(--bd);font-size:.76rem;font-weight:700;
+  padding:8px 14px;border-radius:10px;max-width:420px;width:100%;text-align:center;}
 .rpo-who{display:flex;flex-direction:column;gap:6px;max-height:56vh;overflow-y:auto;margin-top:6px;}
 .rpo-who-b{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:11px;
   border:1.5px solid var(--gl);background:var(--ow);color:var(--gd);cursor:pointer;
@@ -3343,6 +3345,7 @@ if(window._fbBlocked){
       </div>
       <div id="ss-rpe-ask-wrap" style="display:none;">
         <button class="btn" style="background:rgba(155,89,182,.15);color:#7d3c98;border:1.5px solid rgba(155,89,182,.4);font-size:.78rem;" onclick="ssSendRpe(_currentSessIdx)">💪 Belastung abfragen</button>
+        <button class="btn" style="background:var(--ow);color:var(--gd);border:1.5px solid var(--gl);font-size:.78rem;flex:0 0 auto;padding-left:12px;padding-right:12px;" onclick="previewRpe(_currentSessIdx)" title="Ansehen, ohne zu speichern">👁</button>
       </div>
       <div id="ss-lineup-view-wrap" style="display:none;">
         <button class="btn" style="background:rgba(52,152,219,.15);color:#1f6ea8;border:1.5px solid rgba(52,152,219,.4);font-size:.78rem;" onclick="openLineupForSess()">📋 Aufstellung ansehen</button>
@@ -3732,7 +3735,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787065430305; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787065861488; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -13720,7 +13723,9 @@ function renderRpeTeam(){
   const cand=(D.players||[]).map((p,pi)=>({p,pi}))
     .filter(x=>x.p&&x.p.confirmToken&&(si==null||![0,2].includes((x.p.s&&si<x.p.s.length)?x.p.s[si]:3)))
     .sort((a,b)=>String(a.p.name||'').localeCompare(String(b.p.name||'')));
-  wrap.innerHTML=`<div class="rpo-wrap"><div class="rpo-card">
+  wrap.innerHTML=`<div class="rpo-wrap">
+    ${RPE_IS_PREVIEW?'<div class="rpo-prev">\ud83d\udc41 Vorschau \u00b7 Eingaben werden <b>nicht</b> gespeichert</div>':''}
+    <div class="rpo-card">
     <div class="rpo-h">${s?escapeHtml(s.date):''}</div>
     <div class="rpo-q">Wer bist du?</div>
     <div class="rpo-who">${cand.map(x=>
@@ -13731,7 +13736,9 @@ function renderRpeTeam(){
 }
 function rpeTeamPick(token){
   window._rpeTeamPick=token;
-  try{localStorage.setItem('fcf_rpe_me',token);}catch(e){}
+  // Not remembered in preview: a trainer testing as one player would otherwise
+  // find that name preselected on his own phone afterwards.
+  if(!RPE_IS_PREVIEW){try{localStorage.setItem('fcf_rpe_me',token);}catch(e){}}
   renderRpeTeam();
 }
 function renderRpeOnly(){
@@ -13775,6 +13782,7 @@ function renderRpeOnly(){
   const labels={1:'sehr leicht',2:'leicht',3:'locker',4:'etwas fordernd',5:'mittel',
     6:'fordernd',7:'hart',8:'sehr hart',9:'extrem hart',10:'maximal'};
   wrap.innerHTML=`<div class="rpo-wrap">
+    ${RPE_IS_PREVIEW?'<div class="rpo-prev">\ud83d\udc41 Vorschau \u00b7 Eingaben werden <b>nicht</b> gespeichert</div>':''}
     <div class="rpo-card">
       <div class="rpo-hi">Hi ${escapeHtml(nm)}!</div>
       <div class="rpo-h">${isMatch?'\u26bd':'\ud83c\udfc3'} ${escapeHtml(s.date)}${isMatch&&s.label?' \u2013 '+escapeHtml(s.label):''}</div>
@@ -15300,11 +15308,22 @@ function buildRpeLink(token,sessIdx){
   return base+'?rpe='+encodeURIComponent(token||'')+(sessIdx!=null?('&s='+sessIdx):'');
 }
 // Group link: no token, so the screen has to ask who is answering.
-function buildRpeTeamLink(sessIdx){
+function buildRpeTeamLink(sessIdx,preview){
   const base=location.origin+location.pathname;
   return base+'?rpeteam='+encodeURIComponent(UI.currentTeam||'')
     +'&season='+encodeURIComponent(UI.currentSeason||'')
-    +(sessIdx!=null?('&s='+sessIdx):'');
+    +(sessIdx!=null?('&s='+sessIdx):'')
+    +(preview?'&preview=1':'');
+}
+// Opens the survey exactly as a player sees it, with saving switched off.
+function previewRpe(si){
+  if(!canEdit())return;
+  const url=buildRpeTeamLink(si,true);
+  try{sessionStorage.setItem('fcf_preview_back',location.href);}catch(e){}
+  const standalone=window.matchMedia('(display-mode: standalone)').matches
+    ||window.navigator.standalone===true;
+  if(standalone)location.href=url;
+  else window.open(url,'_blank','noopener');
 }
 function buildStatsLink(token){
   const base=location.origin+location.pathname.replace(/\/[^\/]*$/,'/');
