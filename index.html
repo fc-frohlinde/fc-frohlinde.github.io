@@ -2652,6 +2652,18 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
   font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:600;color:var(--gd);}
 .rpe-dur-hint{font-size:.68rem;opacity:.8;}
 .rpe-list{display:flex;flex-direction:column;gap:4px;margin-top:6px;}
+/* One tile on the card; the per-player grid lives a level down. */
+.rpe-card{display:flex;align-items:center;gap:11px;width:100%;text-align:left;
+  padding:11px 13px;border-radius:12px;border:1px solid transparent;cursor:pointer;
+  font-family:'Barlow',sans-serif;transition:transform .1s,box-shadow .12s;}
+.rpe-card:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.12);}
+.rpe-card-ic{font-size:1.3rem;flex-shrink:0;}
+.rpe-card-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.rpe-card-txt b{font-size:.86rem;}
+.rpe-card-txt span{font-size:.68rem;opacity:.75;}
+.rpe-card-v{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;line-height:1;letter-spacing:1px;flex-shrink:0;}
+.rpe-card-chev{font-size:1.2rem;opacity:.5;flex-shrink:0;}
+.rpe-all-sub{font-size:.72rem;color:var(--gm);margin:-4px 0 12px;}
 /* ── Load tiles ──────────────────────────────────────────── */
 .rpe-sum{display:flex;align-items:baseline;justify-content:space-between;gap:10px;
   flex-wrap:wrap;margin-bottom:9px;}
@@ -3650,7 +3662,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787019147799; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787019457573; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -12678,24 +12690,40 @@ function renderSessRpe(si){
   const mins=rpeSessionMinutes(s,null,si);
   const isMatch=s.type==='match';
   box.style.display='block';
-  // A rating is a number on a scale — a tile carrying its own colour says more
-  // at a glance than a row of text, and tapping one opens the editor for that
-  // player instead of hunting for the right box in a list.
+  // On the card this is one summary tile — the squad's average with a hint of
+  // its spread. The per-player tiles are a level down, where they have room
+  // and do not push everything else off the screen.
+  box.innerHTML=`<button class="rpe-card ${_rpeBand(Math.round(avg))}" onclick="rpeAllOpen(${si})">
+    <span class="rpe-card-ic">\ud83d\udcaa</span>
+    <span class="rpe-card-txt">
+      <b>Belastung</b>
+      <span>${vals.length}${present?' von '+present:''} bewertet \u00b7 Spanne ${min}\u2013${max}</span>
+    </span>
+    <span class="rpe-card-v">${avg.toFixed(1)}</span>
+    <span class="rpe-card-chev">\u203a</span>
+  </button>`;
+  // Kept for the detail view, which reads them when it opens
+  _rpeCache={si,vals,avg,min,max,avgLoad,mins,present,isMatch};
+}
+let _rpeCache=null;
+// Every player's rating, one tile each — opened from the summary tile.
+function rpeAllOpen(si){
+  if(!_rpeCache||_rpeCache.si!==si){try{renderSessRpe(si);}catch(e){}}
+  const c=_rpeCache;
+  if(!c)return;
+  const body=document.getElementById('rpe-all-body');
+  const ttl=document.getElementById('rpe-all-sub');
+  if(!body)return;
+  if(ttl)ttl.textContent=`\u00d8 ${c.avg.toFixed(1)} \u00b7 Spanne ${c.min}\u2013${c.max} \u00b7 \u00d8 Load ${c.avgLoad} \u00b7 ${c.mins} Min`;
   const tile=v=>`<button class="rpe-tile ${_rpeBand(v.r)}" onclick="rpeEditOpen(${si},${v.pi})"
       title="${escapeHtml(v.n)} \u2014 ${v.r}/10${v.min!=null?', '+v.min+' Min':''}">
       <span class="rpe-tile-v">${v.r}</span>
       <span class="rpe-tile-n">${escapeHtml(v.n)}</span>
-      <span class="rpe-tile-m">${isMatch?(v.min!=null?v.min+'\u2032':'\u2013'):(v.load==null?'':v.load)}</span>
+      <span class="rpe-tile-m">${c.isMatch?(v.min!=null?v.min+'\u2032':'\u2013'):(v.load==null?'':v.load)}</span>
     </button>`;
-  box.innerHTML=`<div class="u-card" style="padding:10px 12px;">
-    <div class="u-sec-h" style="margin-bottom:8px;">\ud83d\udcaa Belastung (sRPE)</div>
-    <div class="rpe-sum">
-      <div class="rpe-sum-main"><b>${avg.toFixed(1)}</b><span>\u00d8 von ${vals.length}${present?' / '+present:''}</span></div>
-      <div class="rpe-sum-side">Spanne ${min}\u2013${max} \u00b7 \u00d8 Load ${avgLoad} \u00b7 ${mins} Min</div>
-    </div>
-    <div class="rpe-grid">${vals.sort((a,b)=>b.r-a.r).map(tile).join('')}</div>
-    ${isMatch?'<div class="rpe-hint">Auf eine Kachel tippen, um Einsatzminuten zu \u00e4ndern</div>':''}
-  </div>`;
+  body.innerHTML=`<div class="rpe-grid">${c.vals.slice().sort((a,b)=>b.r-a.r).map(tile).join('')}</div>`
+    +(c.isMatch?'<div class="rpe-hint">Auf eine Kachel tippen, um Bewertung und Einsatzminuten zu \u00e4ndern</div>':'');
+  openM('moRpeAll');
 }
 // Colour band for a 0–10 rating: low is calm, high is loud.
 function _rpeBand(r){
@@ -27396,6 +27424,15 @@ checkAutoBackup();
     <button class="btn bs" onclick="tpCloseGuard()" aria-label="Schließen">✕</button>
   </div>
   <div id="tp-content" style="max-height:64vh;overflow-y:auto;"></div>
+</div></div>
+
+<div class="mo" id="moRpeAll" style="z-index:875;"><div class="mob" style="width:420px;max-width:94vw;">
+  <div class="ps-title-row">
+    <h3 class="ps-title">💪 Belastung</h3>
+    <button class="btn bs" onclick="closeM('moRpeAll')" aria-label="Schließen">✕</button>
+  </div>
+  <div id="rpe-all-sub" class="rpe-all-sub"></div>
+  <div id="rpe-all-body"></div>
 </div></div>
 
 <div class="mo" id="moRpeEdit" style="z-index:880;"><div class="mob" style="width:340px;max-width:94vw;">
