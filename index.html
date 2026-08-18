@@ -3596,7 +3596,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787014352391; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787014496273; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -4306,6 +4306,25 @@ window.perfForce=async function(pi,si,val){
 // rpeServer (node read) sees twelve, rpeBlock (whole-block read) sees four.
 // Compares the two reads side by side to see whether the data differs or the
 // decoding does.
+// Runs sanitizeG's own conversion over the CURRENT G and reports what it finds,
+// to tell "the fix does not run" from "the fix runs but something undoes it".
+window.rpeFix=function(si){
+  const D=cd();
+  if(!D||!Array.isArray(D.players)){console.log('Keine Daten.');return;}
+  const rows=[];
+  D.players.forEach((p,i)=>{
+    if(!p)return;
+    const t=Array.isArray(p.rpe)?'Array['+p.rpe.length+']':(p.rpe&&typeof p.rpe==='object'?'OBJEKT':(p.rpe==null?'fehlt':typeof p.rpe));
+    const v=p.rpe?p.rpe[si]:undefined;
+    if(v==null&&t!=='OBJEKT')return;
+    rows.push({idx:i,name:p.name,typ:t,wert:v===undefined?'-':v});
+  });
+  console.table(rows);
+  const objs=rows.filter(r=>r.typ==='OBJEKT').length;
+  console.log(objs?('%c'+objs+' Spieler haben rpe noch als OBJEKT \u2014 die Umwandlung greift nicht.'):'%cAlle rpe sind Arrays.',
+    objs?'color:#c0392b;font-weight:bold':'color:green');
+  return rows;
+};
 window.rpeCompare=async function(si){
   if(!fbDb){console.log('Keine Verbindung.');return;}
   const key=(UI.currentTeam+'__'+UI.currentSeason).replace(/\//g,'__SL__').replace(/\./g,'__DOT__');
