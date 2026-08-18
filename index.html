@@ -2695,6 +2695,16 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
   border:1px solid var(--gl);background:var(--ow);color:var(--gd);cursor:pointer;}
 .rpo-prev{background:var(--ac);color:var(--bd);font-size:.76rem;font-weight:700;
   padding:8px 14px;border-radius:10px;max-width:420px;width:100%;text-align:center;}
+.rpo-verify{background:var(--ow);border:1.5px solid var(--gl);border-radius:12px;
+  padding:14px;margin-bottom:10px;text-align:center;}
+.rpo-verify-h{font-size:.92rem;font-weight:700;color:var(--gd);}
+.rpo-verify-s{font-size:.74rem;color:var(--gm);margin:4px 0 9px;}
+.mob #rpo-verify-in,#rpo-verify-in{width:100%;height:44px;text-align:center;margin:0;
+  border:1.5px solid var(--gl);border-radius:10px;font-size:.95rem;color:var(--bd);background:#fff;}
+.rpo-verify-e{font-size:.74rem;color:var(--ca);min-height:1.1em;margin-top:6px;font-weight:600;}
+.rpo-verify-b{display:flex;gap:8px;align-items:center;justify-content:center;margin-top:8px;}
+.rpo-verify-ok{width:auto;padding:0 20px;background:var(--bm);color:#fff;border:none;
+  font-family:'Barlow',sans-serif;font-size:.84rem;font-weight:700;}
 .rpo-who{display:flex;flex-direction:column;gap:6px;max-height:56vh;overflow-y:auto;margin-top:6px;}
 .rpo-who-b{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:11px;
   border:1.5px solid var(--gl);background:var(--ow);color:var(--gd);cursor:pointer;
@@ -3735,7 +3745,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787065861488; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787068116537; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -13695,6 +13705,8 @@ function _pmSanitizeGTeam(){
       players:(blk.players||[]).map(p=>p?{name:p.name,shortname:p.shortname||'',
         nr:p.nr||'',rpe:Array.isArray(p.rpe)?p.rpe.slice():[],
         rpeMin:Array.isArray(p.rpeMin)?p.rpeMin.slice():[],
+        // Needed to verify who is answering; nothing else personal is kept.
+        birthdate:p.birthdate||'',
         s:Array.isArray(p.s)?p.s.slice():[],confirmToken:p.confirmToken}:p)
     }};
     G.trainers=[];G.auditLog=[];G.trash=[];G.backups=[];
@@ -13728,6 +13740,16 @@ function renderRpeTeam(){
     <div class="rpo-card">
     <div class="rpo-h">${s?escapeHtml(s.date):''}</div>
     <div class="rpo-q">Wer bist du?</div>
+    <div id="rpo-verify" class="rpo-verify" style="display:none;">
+      <div class="rpo-verify-h">Bist du <b id="rpo-verify-name"></b>?</div>
+      <div class="rpo-verify-s">Zur Sicherheit: dein Geburtsdatum</div>
+      <input id="rpo-verify-in" type="date" onkeydown="if(event.key==='Enter')rpeVerifySubmit()">
+      <div id="rpo-verify-err" class="rpo-verify-e"></div>
+      <div class="rpo-verify-b">
+        <button class="rpo-mbtn rpo-verify-ok" onclick="rpeVerifySubmit()">Weiter</button>
+        <button class="rpo-full" onclick="rpeVerifyCancel()">Abbrechen</button>
+      </div>
+    </div>
     <div class="rpo-who">${cand.map(x=>
       `<button class="rpo-who-b" onclick="rpeTeamPick('${x.p.confirmToken}')">
         <span class="rpo-who-nr">${x.p.nr||''}</span>${escapeHtml(getDisplayName?getDisplayName(x.p):x.p.name)}</button>`).join('')}</div>
@@ -13735,10 +13757,64 @@ function renderRpeTeam(){
   <div class="rpo-foot">Deine Auswahl wird auf diesem Ger\u00e4t gespeichert.</div></div>`;
 }
 function rpeTeamPick(token){
+  const D=cd();
+  const idx=(D.players||[]).findIndex(p=>p&&p.confirmToken===token);
+  const p=idx>=0?D.players[idx]:null;
+  if(!p)return;
+  // Same check the team link uses: a name on its own would let anyone rate for
+  // anyone. Players without a birthdate on file cannot be verified, so they
+  // pass — the trainer sees who is missing one in the squad list.
+  if(p.birthdate){
+    _rpePendingToken=token;
+    const box=document.getElementById('rpo-verify');
+    const nm=document.getElementById('rpo-verify-name');
+    if(box&&nm){
+      nm.textContent=(getDisplayName?getDisplayName(p):p.name)||'';
+      box.style.display='';
+      const inp=document.getElementById('rpo-verify-in');
+      if(inp){inp.value='';setTimeout(()=>inp.focus(),50);}
+      const err=document.getElementById('rpo-verify-err');
+      if(err)err.textContent='';
+      return;
+    }
+  }
+  _rpeConfirmPick(token);
+}
+let _rpePendingToken=null;
+function rpeVerifySubmit(){
+  const inp=document.getElementById('rpo-verify-in');
+  const err=document.getElementById('rpo-verify-err');
+  const D=cd();
+  const p=(D.players||[]).find(x=>x&&x.confirmToken===_rpePendingToken);
+  if(!p||!inp)return;
+  // The field yields YYYY-MM-DD; stored values may be DD.MM.YYYY. Comparing
+  // digit strings would put 20080314 against 14032008, so parse both.
+  const parse=v=>{
+    const n=String(v||'').match(/\d+/g);
+    if(!n||n.length<3)return null;
+    const a=n.map(Number);
+    // Four-digit part is the year; its position tells the order
+    return (String(n[0]).length===4)?{y:a[0],m:a[1],d:a[2]}:{d:a[0],m:a[1],y:a[2]};
+  };
+  const g=parse(inp.value),b=parse(p.birthdate);
+  if(g&&b&&g.y===b.y&&g.m===b.m&&g.d===b.d){
+    _rpeConfirmPick(_rpePendingToken);
+    return;
+  }
+  if(err)err.textContent='Das Geburtsdatum stimmt nicht.';
+}
+function rpeVerifyCancel(){
+  _rpePendingToken=null;
+  const box=document.getElementById('rpo-verify');
+  if(box)box.style.display='none';
+}
+function _rpeConfirmPick(token){
   window._rpeTeamPick=token;
   // Not remembered in preview: a trainer testing as one player would otherwise
   // find that name preselected on his own phone afterwards.
   if(!RPE_IS_PREVIEW){try{localStorage.setItem('fcf_rpe_me',token);}catch(e){}}
+  const box=document.getElementById('rpo-verify');
+  if(box)box.style.display='none';
   renderRpeTeam();
 }
 function renderRpeOnly(){
@@ -13791,16 +13867,7 @@ function renderRpeOnly(){
         `<button class="rpo-n ${_rpeBand(n)}${n===cur?' on':''}" onclick="rpoSet(${si},${n})">${n}</button>`).join('')}</div>
       <div class="rpo-legend"><span>leicht</span><span>maximal</span></div>
       <div class="rpo-echo" id="rpo-echo">${cur?('\u2713 '+cur+' \u2014 '+labels[cur]):'&nbsp;'}</div>
-      ${isMatch?`
-      <div class="rpo-min-h">Wie viele Minuten hast du gespielt?</div>
-      <div class="rpo-min">
-        <button class="rpo-mbtn" onclick="rpoMin(${si},-5)">\u2212</button>
-        <input id="rpo-min-in" type="number" min="0" max="240" step="5"
-          value="${(Array.isArray(p.rpeMin)&&p.rpeMin[si]!=null)?p.rpeMin[si]:''}"
-          placeholder="${rpeSessionMinutes(s,null,si)}" onchange="rpoMin(${si},0,this.value)">
-        <button class="rpo-mbtn" onclick="rpoMin(${si},5)">+</button>
-      </div>
-      <button class="rpo-full" onclick="rpoMin(${si},0,${rpeSessionMinutes(s,null,si)})">Ganzes Spiel (${rpeSessionMinutes(s,null,si)} Min)</button>`:''}
+
     </div>
     <div class="rpo-foot">Deine Angabe sehen nur die Trainer.</div>
   </div>`;
