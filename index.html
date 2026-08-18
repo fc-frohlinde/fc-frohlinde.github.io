@@ -2693,6 +2693,12 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
   border-radius:11px;color:var(--bd);}
 .rpo-full{margin-top:9px;font-size:.74rem;padding:8px 14px;border-radius:10px;
   border:1px solid var(--gl);background:var(--ow);color:var(--gd);cursor:pointer;}
+.rpo-who{display:flex;flex-direction:column;gap:6px;max-height:56vh;overflow-y:auto;margin-top:6px;}
+.rpo-who-b{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:11px;
+  border:1.5px solid var(--gl);background:var(--ow);color:var(--gd);cursor:pointer;
+  font-family:'Barlow',sans-serif;font-size:.9rem;font-weight:600;text-align:left;}
+.rpo-who-b:active{background:#fff;border-color:var(--bm);}
+.rpo-who-nr{font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--gm);min-width:22px;}
 .rpo-ok{font-size:2.4rem;color:var(--cp);}
 .rpo-sub{font-size:.82rem;color:var(--gm);margin-top:6px;line-height:1.5;}
 .rpo-foot{font-size:.7rem;color:rgba(255,255,255,.6);text-align:center;}
@@ -3726,7 +3732,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787064794958; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787065430305; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -13205,6 +13211,18 @@ function tryPlayerUrlAuth(){
   // ?rpe=<token>&s=<index> opens the load survey only. Same token, same auth
   // path, different screen — sRPE is asked ~30 min after the session, which is
   // a different errand from the weekly invitation.
+  const rpeTeam=params.get('rpeteam');
+  if(rpeTeam){
+    window._rpeTeamMode={team:rpeTeam,season:params.get('season')||''};
+    const si=parseInt(params.get('s'),10);
+    window._rpeOnlySi=isNaN(si)?null:si;
+    window._rpeOnly=true;
+    // A remembered choice makes the second visit a single tap
+    let saved=null;
+    try{saved=localStorage.getItem('fcf_rpe_me');}catch(e){}
+    if(saved)window._rpeTeamPick=saved;
+    return _rpeTeamStart();
+  }
   const rpeToken=params.get('rpe');
   const token=rpeToken||params.get('player');
   if(!token)return false;
@@ -13628,6 +13646,93 @@ function _pmFmtUpcoming(s,sk){
   // For matches: opponent label remains.
   const title=isMatch?(s.label||'Spiel'):'Training';
   return{day,mo,yr,dow,monName:monNames[mo-1],isMatch,time,title};
+}
+// Group mode: no personal token, so the app cannot log anyone in. It waits for
+// the data, then shows the name picker followed by the same rating screen.
+function _rpeTeamStart(){
+  const overlay=document.getElementById('authOverlay');
+  if(overlay){
+    overlay.innerHTML='<div class="auth-box"><div style="text-align:center;padding:34px 16px;color:#fff;">Lade \u2026</div></div>';
+    overlay.classList.add('open');
+  }
+  let tries=0;
+  const go=()=>{
+    tries++;
+    if(!_fbInitialLoaded&&tries<=50){setTimeout(go,200);return;}
+    const tm=window._rpeTeamMode;
+    UI.currentTeam=tm.team;
+    if(tm.season)UI.currentSeason=tm.season;
+    CU={role:'player',name:'',teams:[tm.team],playerToken:null,playerIdx:null};
+    try{_pmSanitizeGTeam();}catch(e){console.error('[RpeTeam]',e);}
+    if(overlay){overlay.classList.remove('open');overlay.innerHTML='';}
+    document.body.classList.add('player-mode','rpe-only');
+    let wrap=document.getElementById('playerModeWrap');
+    if(!wrap){
+      wrap=document.createElement('div');
+      wrap.id='playerModeWrap';
+      document.body.appendChild(wrap);
+    }
+    wrap.style.display='';
+    renderRpeTeam();
+  };
+  go();
+  return true;
+}
+// Strips everything the rating screen does not need. Names and shirt numbers
+// stay — the picker cannot work without them — but nothing else about a player
+// leaves the device.
+function _pmSanitizeGTeam(){
+  try{
+    const key=UI.currentTeam+'__'+UI.currentSeason;
+    const blk=G.db&&G.db[key];
+    if(!blk)return;
+    G.db={[key]:{
+      sessions:(blk.sessions||[]).map(s=>s?{date:s.date,time:s.time,type:s.type,
+        label:s.label||'',duration:s.duration}:s),
+      players:(blk.players||[]).map(p=>p?{name:p.name,shortname:p.shortname||'',
+        nr:p.nr||'',rpe:Array.isArray(p.rpe)?p.rpe.slice():[],
+        rpeMin:Array.isArray(p.rpeMin)?p.rpeMin.slice():[],
+        s:Array.isArray(p.s)?p.s.slice():[],confirmToken:p.confirmToken}:p)
+    }};
+    G.trainers=[];G.auditLog=[];G.trash=[];G.backups=[];
+    G.matchLineups=[];G.seasonLineups=[];G.lineupSaves=[];
+    try{Object.defineProperty(G,'__sanitized',{value:true,enumerable:false,configurable:true,writable:true});}
+    catch(e){G.__sanitized=true;}
+  }catch(e){console.error('[RpeTeamPrivacy]',e);}
+}
+function renderRpeTeam(){
+  const wrap=document.getElementById('playerModeWrap');
+  if(!wrap)return;
+  const D=cd();
+  const si=window._rpeOnlySi;
+  const s=(si!=null)?(D.sessions||[])[si]:null;
+  // Already picked on this device: straight to the rating
+  if(window._rpeTeamPick){
+    const idx=(D.players||[]).findIndex(p=>p&&p.confirmToken===window._rpeTeamPick);
+    if(idx>=0){
+      CU.playerIdx=idx;CU.playerToken=window._rpeTeamPick;
+      CU.name=(D.players[idx].name)||'';
+      renderRpeOnly();
+      return;
+    }
+    window._rpeTeamPick=null;   // player left the squad
+  }
+  const cand=(D.players||[]).map((p,pi)=>({p,pi}))
+    .filter(x=>x.p&&x.p.confirmToken&&(si==null||![0,2].includes((x.p.s&&si<x.p.s.length)?x.p.s[si]:3)))
+    .sort((a,b)=>String(a.p.name||'').localeCompare(String(b.p.name||'')));
+  wrap.innerHTML=`<div class="rpo-wrap"><div class="rpo-card">
+    <div class="rpo-h">${s?escapeHtml(s.date):''}</div>
+    <div class="rpo-q">Wer bist du?</div>
+    <div class="rpo-who">${cand.map(x=>
+      `<button class="rpo-who-b" onclick="rpeTeamPick('${x.p.confirmToken}')">
+        <span class="rpo-who-nr">${x.p.nr||''}</span>${escapeHtml(getDisplayName?getDisplayName(x.p):x.p.name)}</button>`).join('')}</div>
+  </div>
+  <div class="rpo-foot">Deine Auswahl wird auf diesem Ger\u00e4t gespeichert.</div></div>`;
+}
+function rpeTeamPick(token){
+  window._rpeTeamPick=token;
+  try{localStorage.setItem('fcf_rpe_me',token);}catch(e){}
+  renderRpeTeam();
 }
 function renderRpeOnly(){
   const wrap=document.getElementById('playerModeWrap');
@@ -15193,6 +15298,13 @@ function ensureStatsToken(pi){
 function buildRpeLink(token,sessIdx){
   const base=location.origin+location.pathname;
   return base+'?rpe='+encodeURIComponent(token||'')+(sessIdx!=null?('&s='+sessIdx):'');
+}
+// Group link: no token, so the screen has to ask who is answering.
+function buildRpeTeamLink(sessIdx){
+  const base=location.origin+location.pathname;
+  return base+'?rpeteam='+encodeURIComponent(UI.currentTeam||'')
+    +'&season='+encodeURIComponent(UI.currentSeason||'')
+    +(sessIdx!=null?('&s='+sessIdx):'');
 }
 function buildStatsLink(token){
   const base=location.origin+location.pathname.replace(/\/[^\/]*$/,'/');
@@ -17834,7 +17946,23 @@ const SS_ATT_META={
   4:{n:'Angemeldet',  i:'M',cls:'csm'},
   3:{n:'Ausstehend',  i:'?',cls:'csq'}
 };
+// One message for the group chat. Copied to the clipboard and opened in
+// WhatsApp — the trainer picks the team chat there.
 function ssSendRpe(si){
+  if(!canEdit())return;
+  const D=cd();const s=D&&D.sessions&&D.sessions[si];
+  if(!s)return;
+  const isMatch=s.type==='match';
+  const txt='\ud83d\udcaa Wie anstrengend war '
+    +(isMatch?('das Spiel'+(s.label?' gegen '+s.label:'')):'das Training')
+    +' heute f\u00fcr euch?\n\nKurz antippen \u2014 dauert 10 Sekunden:\n'
+    +buildRpeTeamLink(si);
+  _dbCopyText(txt);
+  if(typeof showSaveFlash==='function')showSaveFlash('\ud83d\udccb Nachricht kopiert');
+  window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank','noopener');
+  logAudit('Belastungs-Abfrage',s.date||'?','Gruppen-Link');
+}
+function ssSendRpeIndividual(si){
   if(!canEdit())return;
   const D=cd();const s=D&&D.sessions&&D.sessions[si];
   if(!s)return;
