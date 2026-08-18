@@ -2668,6 +2668,34 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .ssa-pos{flex-shrink:0;font-size:.58rem;min-width:30px;}
 .ssa-pos2{opacity:.62;}
+/* ── Load survey (own link) ──────────────────────────────── */
+.rpo-wrap{min-height:100dvh;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:20px 16px;gap:14px;}
+.rpo-card{background:#fff;border-radius:18px;padding:22px 20px;width:100%;max-width:420px;
+  box-shadow:0 12px 40px rgba(0,0,0,.22);text-align:center;}
+.rpo-hi{font-size:.8rem;color:var(--gm);margin-bottom:2px;}
+.rpo-h{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:1px;color:var(--bd);}
+.rpo-q{font-size:.94rem;font-weight:700;color:var(--gd);margin:16px 0 12px;}
+.rpo-scale{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;}
+.rpo-n{height:52px;border-radius:11px;border:1px solid transparent;cursor:pointer;
+  font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:1px;transition:all .1s;}
+.rpo-n:active{transform:scale(.95);}
+.rpo-n.on{outline:3px solid var(--bd);outline-offset:1px;}
+.rpo-legend{display:flex;justify-content:space-between;font-size:.66rem;color:var(--gm);margin-top:5px;}
+.rpo-echo{font-size:.8rem;font-weight:700;color:var(--cp);margin-top:12px;min-height:1.2em;}
+.rpo-min-h{font-size:.8rem;font-weight:700;color:var(--gd);margin:18px 0 8px;
+  padding-top:16px;border-top:1px solid var(--gl);}
+.rpo-min{display:flex;align-items:center;justify-content:center;gap:8px;}
+.rpo-mbtn{width:44px;height:44px;border-radius:11px;border:1.5px solid var(--gl);
+  background:var(--ow);color:var(--gd);font-size:1.2rem;cursor:pointer;}
+.mob input#rpo-min-in,#rpo-min-in{width:88px;height:44px;text-align:center;margin:0;
+  font-family:'Bebas Neue',sans-serif;font-size:1.3rem;border:1.5px solid var(--gl);
+  border-radius:11px;color:var(--bd);}
+.rpo-full{margin-top:9px;font-size:.74rem;padding:8px 14px;border-radius:10px;
+  border:1px solid var(--gl);background:var(--ow);color:var(--gd);cursor:pointer;}
+.rpo-ok{font-size:2.4rem;color:var(--cp);}
+.rpo-sub{font-size:.82rem;color:var(--gm);margin-top:6px;line-height:1.5;}
+.rpo-foot{font-size:.7rem;color:rgba(255,255,255,.6);text-align:center;}
 .cmt-link{color:var(--bm);text-decoration:underline;text-underline-offset:2px;
   word-break:break-all;}
 .cmt-link:hover{color:var(--bd);}
@@ -3307,6 +3335,9 @@ if(window._fbBlocked){
       <div id="ss-lineup-btn-wrap" style="display:none;">
         <button class="btn" style="background:rgba(39,174,96,.15);color:#1a7a40;border:1.5px solid rgba(39,174,96,.4);font-size:.78rem;" onclick="openLineupForSess()">⚽ Aufstellung planen</button>
       </div>
+      <div id="ss-rpe-ask-wrap" style="display:none;">
+        <button class="btn" style="background:rgba(155,89,182,.15);color:#7d3c98;border:1.5px solid rgba(155,89,182,.4);font-size:.78rem;" onclick="ssSendRpe(_currentSessIdx)">💪 Belastung abfragen</button>
+      </div>
       <div id="ss-lineup-view-wrap" style="display:none;">
         <button class="btn" style="background:rgba(52,152,219,.15);color:#1f6ea8;border:1.5px solid rgba(52,152,219,.4);font-size:.78rem;" onclick="openLineupForSess()">📋 Aufstellung ansehen</button>
       </div>
@@ -3695,7 +3726,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787024217375; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787064794958; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -6214,7 +6245,7 @@ function initAuth(){
   // With the token present the app can only ever enter player mode.
   try{
     const _qp=new URLSearchParams(location.search);
-    if(_qp.get('player')){
+    if(_qp.get('player')||_qp.get('rpe')){
       // A player link must never run with trainer rights — but deleting the
       // stored session logged the trainer out of the whole device, including
       // other tabs, which is why opening a preview meant logging in again.
@@ -13171,8 +13202,17 @@ function _pmAppendAudit(entry){
 }
 function tryPlayerUrlAuth(){
   const params=new URLSearchParams(location.search);
-  const token=params.get('player');
+  // ?rpe=<token>&s=<index> opens the load survey only. Same token, same auth
+  // path, different screen — sRPE is asked ~30 min after the session, which is
+  // a different errand from the weekly invitation.
+  const rpeToken=params.get('rpe');
+  const token=rpeToken||params.get('player');
   if(!token)return false;
+  if(rpeToken){
+    window._rpeOnly=true;
+    const si=parseInt(params.get('s'),10);
+    window._rpeOnlySi=isNaN(si)?null:si;
+  }
   // Optional ?sess=YYYY-MM-DD or ?date=... — focuses Player Mode on that session
   const sessParam=params.get('sess')||params.get('date');
   if(sessParam)try{sessionStorage.setItem('_pmFocusSess',sessParam);}catch(e){}
@@ -13197,6 +13237,7 @@ function tryPlayerUrlAuth(){
         }catch(e){}
         if(overlay){overlay.classList.remove('open');overlay.innerHTML='';}
         document.body.classList.add('player-mode');
+        if(window._rpeOnly)document.body.classList.add('rpe-only');
         let wrap=document.getElementById('playerModeWrap');
         if(!wrap){wrap=document.createElement('div');wrap.id='playerModeWrap';document.body.appendChild(wrap);}
         renderPlayerMode();
@@ -13588,9 +13629,92 @@ function _pmFmtUpcoming(s,sk){
   const title=isMatch?(s.label||'Spiel'):'Training';
   return{day,mo,yr,dow,monName:monNames[mo-1],isMatch,time,title};
 }
+function renderRpeOnly(){
+  const wrap=document.getElementById('playerModeWrap');
+  if(!wrap)return;
+  const D=cd();
+  const pi=_pmValidateIdx();
+  const p=(pi!=null)?D.players[pi]:null;
+  if(!p){wrap.innerHTML='<div class="rpo-wrap"><div class="rpo-card">Daten konnten nicht geladen werden.</div></div>';return;}
+  // Which session: the one named in the link, else the most recent that took
+  // place and is still inside the answer window.
+  let si=window._rpeOnlySi;
+  if(si==null||!D.sessions[si]){
+    let best=null;
+    (D.sessions||[]).forEach((s,idx)=>{
+      if(!s||!rpeIsOpen(s,idx,p,UI.currentSeason))return;
+      if(best==null||dispToSortKey(s.date)>dispToSortKey(D.sessions[best].date))best=idx;
+    });
+    si=best;
+  }
+  const s=(si!=null)?D.sessions[si]:null;
+  if(!s){
+    wrap.innerHTML=`<div class="rpo-wrap"><div class="rpo-card">
+      <div class="rpo-ok">\u2713</div>
+      <div class="rpo-h">Gerade nichts zu bewerten</div>
+      <div class="rpo-sub">Nach dem n\u00e4chsten Training oder Spiel bekommst du wieder einen Link.</div>
+    </div></div>`;
+    return;
+  }
+  const open=rpeIsOpen(s,si,p,UI.currentSeason);
+  const cur=(Array.isArray(p.rpe))?p.rpe[si]:null;
+  const isMatch=s.type==='match';
+  const nm=(getDisplayName?getDisplayName(p):p.name)||'';
+  if(!open){
+    wrap.innerHTML=`<div class="rpo-wrap"><div class="rpo-card">
+      <div class="rpo-h">${escapeHtml(s.date)}</div>
+      <div class="rpo-sub">Die Bewertung f\u00fcr diesen Termin ist abgeschlossen.</div>
+    </div></div>`;
+    return;
+  }
+  const labels={1:'sehr leicht',2:'leicht',3:'locker',4:'etwas fordernd',5:'mittel',
+    6:'fordernd',7:'hart',8:'sehr hart',9:'extrem hart',10:'maximal'};
+  wrap.innerHTML=`<div class="rpo-wrap">
+    <div class="rpo-card">
+      <div class="rpo-hi">Hi ${escapeHtml(nm)}!</div>
+      <div class="rpo-h">${isMatch?'\u26bd':'\ud83c\udfc3'} ${escapeHtml(s.date)}${isMatch&&s.label?' \u2013 '+escapeHtml(s.label):''}</div>
+      <div class="rpo-q">Wie anstrengend war es f\u00fcr dich?</div>
+      <div class="rpo-scale">${[1,2,3,4,5,6,7,8,9,10].map(n=>
+        `<button class="rpo-n ${_rpeBand(n)}${n===cur?' on':''}" onclick="rpoSet(${si},${n})">${n}</button>`).join('')}</div>
+      <div class="rpo-legend"><span>leicht</span><span>maximal</span></div>
+      <div class="rpo-echo" id="rpo-echo">${cur?('\u2713 '+cur+' \u2014 '+labels[cur]):'&nbsp;'}</div>
+      ${isMatch?`
+      <div class="rpo-min-h">Wie viele Minuten hast du gespielt?</div>
+      <div class="rpo-min">
+        <button class="rpo-mbtn" onclick="rpoMin(${si},-5)">\u2212</button>
+        <input id="rpo-min-in" type="number" min="0" max="240" step="5"
+          value="${(Array.isArray(p.rpeMin)&&p.rpeMin[si]!=null)?p.rpeMin[si]:''}"
+          placeholder="${rpeSessionMinutes(s,null,si)}" onchange="rpoMin(${si},0,this.value)">
+        <button class="rpo-mbtn" onclick="rpoMin(${si},5)">+</button>
+      </div>
+      <button class="rpo-full" onclick="rpoMin(${si},0,${rpeSessionMinutes(s,null,si)})">Ganzes Spiel (${rpeSessionMinutes(s,null,si)} Min)</button>`:''}
+    </div>
+    <div class="rpo-foot">Deine Angabe sehen nur die Trainer.</div>
+  </div>`;
+}
+function rpoSet(si,n){
+  pmSetRpe(si,n);
+  renderRpeOnly();
+}
+function rpoMin(si,delta,abs){
+  const D=cd();const pi=_pmValidateIdx();
+  if(pi==null)return;
+  const p=D.players[pi];
+  const cur=(Array.isArray(p.rpeMin)?p.rpeMin[si]:null);
+  const base=(abs!==undefined&&abs!=='')?parseInt(abs,10)
+    :(cur==null?rpeSessionMinutes(D.sessions[si],null,si):cur);
+  const next=Math.max(0,Math.min(240,(isNaN(base)?0:base)+(delta||0)));
+  if(!Array.isArray(p.rpeMin))p.rpeMin=[];
+  while(p.rpeMin.length<D.sessions.length)p.rpeMin.push(null);
+  p.rpeMin[si]=next;
+  if(!RPE_IS_PREVIEW)_pmSaveTargeted(si);
+  const inp=document.getElementById('rpo-min-in');
+  if(inp)inp.value=next;
+}
 function renderPlayerMode(){
   const wrap=document.getElementById('playerModeWrap');
   if(!wrap||!isPlayerMode())return;
+  if(window._rpeOnly)return renderRpeOnly();
   const D=cd();
   const pi=CU.playerIdx;
   const p=D&&D.players&&D.players[pi];
@@ -13787,10 +13911,10 @@ function renderPlayerMode(){
       +'\ud83d\udc41 Trainer-Vorschau \u00b7 Eingaben werden <b>nicht</b> gespeichert</div>';
   }
   // ── sRPE PROMPT ──
+  // Moved to its own link (?rpe=…): the survey is sent right after a session,
+  // while this screen is about the week ahead. Two places for one answer only
+  // confused matters.
   const rpeOpen=[];
-  (D.sessions||[]).forEach((s,si)=>{
-    if(rpeIsOpen(s,si,p,UI.currentSeason))rpeOpen.push({s,si});
-  });
   if(rpeOpen.length){
     rpeOpen.sort((a,b)=>dispToSortKey(b.s.date)-dispToSortKey(a.s.date));
     rpeOpen.forEach(({s,si})=>{
@@ -15065,6 +15189,10 @@ function ensureStatsToken(pi){
     p.statsToken='s_'+Array.from(arr).map(b=>b.toString(16).padStart(2,'0')).join('');
   }
   return p.statsToken;
+}
+function buildRpeLink(token,sessIdx){
+  const base=location.origin+location.pathname;
+  return base+'?rpe='+encodeURIComponent(token||'')+(sessIdx!=null?('&s='+sessIdx):'');
 }
 function buildStatsLink(token){
   const base=location.origin+location.pathname.replace(/\/[^\/]*$/,'/');
@@ -17706,6 +17834,29 @@ const SS_ATT_META={
   4:{n:'Angemeldet',  i:'M',cls:'csm'},
   3:{n:'Ausstehend',  i:'?',cls:'csq'}
 };
+function ssSendRpe(si){
+  if(!canEdit())return;
+  const D=cd();const s=D&&D.sessions&&D.sessions[si];
+  if(!s)return;
+  // Those who took part: sRPE from someone who was not there means nothing.
+  const targets=(D.players||[]).map((p,pi)=>({p,pi}))
+    .filter(x=>x.p&&x.p.phone&&String(x.p.phone).trim()
+      &&![0,2].includes((x.p.s&&si<x.p.s.length)?x.p.s[si]:3));
+  if(!targets.length){alert('Keine Spieler mit Telefonnummer.');return;}
+  if(!confirm(targets.length+' Spieler nach der Belastung fragen?\n\nAm besten ca. 30 Minuten nach Schluss \u2014 dann bewertet man die ganze Einheit und nicht nur das Ende.'))return;
+  targets.forEach((x,i)=>{
+    if(!x.p.confirmToken)ensurePlayerToken(x.pi);
+    setTimeout(()=>{
+      const nm=(getDisplayName?getDisplayName(x.p):x.p.name)||'';
+      const isMatch=s.type==='match';
+      const txt=`Hi ${nm}! \ud83d\udcaa\n\nWie anstrengend war ${isMatch?('das Spiel'+(s.label?' gegen '+s.label:'')):'das Training'} heute f\u00fcr dich?\n`
+        +`Kurz antippen \u2014 dauert 10 Sekunden:\n${buildRpeLink(x.p.confirmToken,si)}`;
+      const link=_amWhatsAppLink(x.p.phone,txt);
+      if(link)window.open(link,'_blank','noopener');
+    },i*350);
+  });
+  logAudit('Belastungs-Abfrage',s.date||'?',targets.length+' Spieler');
+}
 function ssAttOpen(si,status){
   _ssAttFilter=status;
   _ssAttSi=si;
@@ -18077,6 +18228,10 @@ function openSessStats(si){
   // actually running/past — capturing attendance for a future date is not
   // a thing (RSVP handles that).
   try{renderLocationDatalist();}catch(e){console.error('locList:',e);}
+  try{
+    const askW=document.getElementById('ss-rpe-ask-wrap');
+    if(askW)askW.style.display=(canEdit()&&sessTookPlace(s,UI.currentSeason))?'':'none';
+  }catch(e){}
   try{renderSessPhysio(si);}catch(e){console.error('sessPhysio:',e);}
   try{renderSessRpe(si);}catch(e){console.error('sessRpe:',e);}
   try{_ssSyncMore();}catch(e){}
