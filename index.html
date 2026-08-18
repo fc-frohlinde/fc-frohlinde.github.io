@@ -3596,7 +3596,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787013116945; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787013439527; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -4295,6 +4295,22 @@ window.perfForce=async function(pi,si,val){
 // trainer's grade in p.perf. Compares browser against server for one session.
 // Why a value present on the server is missing in the browser: usually the
 // local array is shorter than the index being read.
+// Follows one value through every stage: raw snapshot → decode → sanitise →
+// pad → G. Values present on the server were arriving as null in the app.
+window.rpeTrace=async function(pi,si){
+  if(!fbDb){console.log('Keine Verbindung.');return;}
+  const key=(UI.currentTeam+'__'+UI.currentSeason).replace(/\//g,'__SL__').replace(/\./g,'__DOT__');
+  const snap=await fbDb.ref('fcf_data/db/'+key+'/players/v/'+pi+'/rpe').once('value');
+  const raw=snap.val();
+  console.log('1. roh vom Server :', JSON.stringify(raw).slice(0,160));
+  let dec;
+  try{dec=fbDecodeValue(raw);}catch(e){dec='FEHLER: '+e.message;}
+  console.log('2. dekodiert      :', Array.isArray(dec)?('Array['+dec.length+'] Index '+si+' = '+dec[si]):JSON.stringify(dec).slice(0,120));
+  const D=cd();const p=D&&D.players&&D.players[pi];
+  console.log('3. in der App     :', (p&&Array.isArray(p.rpe))?('Array['+p.rpe.length+'] Index '+si+' = '+p.rpe[si]):'kein Array');
+  console.log('   Spieler        :', p&&p.name);
+  return {raw,dec};
+};
 window.rpeDiag=function(si){
   const D=cd();
   const rows=(D.players||[]).map((p,i)=>({
