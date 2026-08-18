@@ -3596,7 +3596,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787014052062; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787014184845; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -4303,6 +4303,37 @@ window.perfForce=async function(pi,si,val){
 // rpeServer sees values the app does not. Reads the same node the app reads —
 // the whole block, exactly as the listener gets it — and decodes it the same
 // way, to find which stage drops them.
+// rpeServer (node read) sees twelve, rpeBlock (whole-block read) sees four.
+// Compares the two reads side by side to see whether the data differs or the
+// decoding does.
+window.rpeCompare=async function(si){
+  if(!fbDb){console.log('Keine Verbindung.');return;}
+  const key=(UI.currentTeam+'__'+UI.currentSeason).replace(/\//g,'__SL__').replace(/\./g,'__DOT__');
+  const nodeSnap=await fbDb.ref('fcf_data/db/'+key+'/players').once('value');
+  const blockSnap=await fbDb.ref('fcf_data/db/'+key).once('value');
+  const nodeRaw=nodeSnap.val();
+  const blockRaw=blockSnap.val();
+  const nodeList=(nodeRaw&&nodeRaw.v)?nodeRaw.v:nodeRaw;
+  const blkPlayers=blockRaw&&blockRaw.players;
+  const blkList=(blkPlayers&&blkPlayers.v)?blkPlayers.v:blkPlayers;
+  const asArr=v=>Array.isArray(v)?v:(v&&typeof v==='object'?Object.values(v):[]);
+  const a=asArr(nodeList),b=asArr(blkList);
+  console.log('players-Knoten direkt :',a.length,'Eintraege');
+  console.log('players im Block      :',b.length,'Eintraege');
+  const rows=[];
+  a.forEach((p,i)=>{
+    if(!p)return;
+    const pa=(p.rpe&&p.rpe.v)?p.rpe.v:p.rpe;
+    const pb=b[i]&&((b[i].rpe&&b[i].rpe.v)?b[i].rpe.v:b[i].rpe);
+    const va=pa?pa[si]:undefined, vb=pb?pb[si]:undefined;
+    if(va==null&&vb==null)return;
+    rows.push({name:p.name,ausKnoten:va===undefined?'-':va,ausBlock:vb===undefined?'-':vb,
+      typKnoten:Array.isArray(pa)?'Array['+pa.length+']':(pa?'Objekt':'-'),
+      typBlock:Array.isArray(pb)?'Array['+pb.length+']':(pb?'Objekt':'-')});
+  });
+  console.table(rows);
+  return rows;
+};
 window.rpeBlock=async function(si){
   if(!fbDb){console.log('Keine Verbindung.');return;}
   const key=(UI.currentTeam+'__'+UI.currentSeason).replace(/\//g,'__SL__').replace(/\./g,'__DOT__');
