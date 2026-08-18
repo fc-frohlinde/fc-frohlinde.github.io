@@ -2654,6 +2654,20 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
   font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:600;color:var(--gd);}
 .rpe-dur-hint{font-size:.68rem;opacity:.8;}
 .rpe-list{display:flex;flex-direction:column;gap:4px;margin-top:6px;}
+/* Rows inside the attendance window: avatar, number, name, status chip. */
+.ssa-list{display:flex;flex-direction:column;gap:5px;}
+.ssa-row{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:10px;
+  background:var(--ow);border:1px solid var(--gl);}
+.ssa-av{width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0;}
+.ssa-av-ph{display:flex;align-items:center;justify-content:center;background:var(--bd);
+  color:#fff;font-size:.66rem;font-weight:700;font-family:'Barlow',sans-serif;}
+.ssa-nr{font-family:'Bebas Neue',sans-serif;font-size:.9rem;color:var(--gm);
+  min-width:18px;text-align:center;flex-shrink:0;}
+.ssa-nm{flex:1;min-width:0;font-size:.82rem;font-weight:600;color:var(--gd);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ssa-st{flex-shrink:0;font-size:.68rem;font-weight:700;padding:4px 10px;border-radius:var(--r-pill);
+  background:#fff;border:1.5px solid;cursor:pointer;font-family:'Barlow',sans-serif;white-space:nowrap;}
+.ssa-st:hover{filter:brightness(.94);}
 /* Attendance tiles are buttons now — same look as before, plus the lift the
    load tiles use, so everything clickable on the card behaves alike. */
 .ps-tile-btn{cursor:pointer;border:1px solid transparent;font-family:'Barlow',sans-serif;
@@ -3293,10 +3307,7 @@ if(window._fbBlocked){
   <div id="ss-evaltopic" style="display:none;margin:2px 0 8px;"></div>
   <div class="ps-cards" id="ss-cards"></div>
   <div id="ss-anmeld-summary" style="display:none;margin-bottom:10px;"></div>
-  <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-    <div class="sec" style="margin:0;flex:1;">Anwesenheit</div>
-    <div id="ss-bulk-bar" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
-  </div>
+  <div id="ss-bulk-bar" style="display:none;"></div>
   <!-- Rendered here, then moved into the window: the card shows the tiles. -->
   <div id="ss-att" style="display:none;"></div>
   <div style="display:flex;align-items:center;gap:8px;margin-top:14px;margin-bottom:6px;">
@@ -3665,7 +3676,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787020422604; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787020702884; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -17668,29 +17679,63 @@ function evalTopics(D){
   return D.evalTopics;
 }
 let _ssAttFilter=null;
+const SS_ATT_META={
+  1:{n:'Anwesend',   i:'\u2705',c:'var(--cp)'},
+  0:{n:'Fehlend',    i:'\u274c',c:'var(--ca)'},
+  2:{n:'Entschuldigt',i:'\ud83d\udccb',c:'var(--ce)'},
+  4:{n:'Angemeldet', i:'\ud83d\udcdd',c:'#3b82c4'},
+  3:{n:'Ausstehend', i:'\u2754',c:'var(--gm)'}
+};
 function ssAttOpen(si,status){
   _ssAttFilter=status;
-  const win=document.getElementById('ss-att-body');
-  const src=document.getElementById('ss-att');
-  if(!win||!src)return;
-  try{buildSessAtt(si);}catch(e){}
-  win.innerHTML=src.innerHTML;
-  // Show only the requested group; null means all of them
-  if(status!=null){
-    win.querySelectorAll('.att-grp').forEach(g=>{
-      const hdr=g.querySelector('.att-grp-hdr');
-      const cls=hdr?hdr.className:'';
-      const want={1:'agt-a',0:'agt-f',2:'agt-e',4:'agt-m',3:'agt-q'}[status];
-      if(want&&cls.indexOf(want)<0)g.style.display='none';
-    });
-  }
-  const ttl=document.getElementById('ss-att-title');
-  if(ttl){
-    const names={1:'\u2705 Anwesend',0:'\u274c Fehlend',2:'\ud83d\udccb Entschuldigt',
-      4:'\ud83d\udcdd Angemeldet',3:'\u2754 Ausstehend'};
-    ttl.textContent=(status==null?'Anwesenheit':names[status]||'Anwesenheit');
-  }
+  _ssAttSi=si;
+  ssAttRender();
   openM('moSessAtt');
+}
+let _ssAttSi=null;
+// Built here rather than copied from the card: the window has its own title,
+// and the old markup carried a second heading and a different visual language
+// into it.
+function ssAttRender(){
+  const si=_ssAttSi;
+  const body=document.getElementById('ss-att-body');
+  const ttl=document.getElementById('ss-att-title');
+  if(body==null||si==null)return;
+  const D=cd();
+  const meta=SS_ATT_META[_ssAttFilter];
+  if(ttl)ttl.textContent=meta?(meta.i+' '+meta.n):'Anwesenheit';
+  const pis=[];
+  (D.players||[]).forEach((p,pi)=>{
+    if(!p)return;
+    const v=(p.s&&si<p.s.length)?p.s[si]:3;
+    if(_ssAttFilter==null||v===_ssAttFilter)pis.push({p,pi,v});
+  });
+  if(!pis.length){
+    body.innerHTML='<div class="u-empty" style="padding:16px;"><div class="u-empty-txt">Niemand in dieser Gruppe.</div></div>';
+    return;
+  }
+  pis.sort((a,b)=>String(a.p.name||'').localeCompare(String(b.p.name||'')));
+  // One row per player: avatar, name, and the status as a chip that cycles on
+  // tap — the same action the table cell offers, without a separate menu.
+  body.innerHTML='<div class="ssa-list">'+pis.map(({p,pi,v})=>{
+    const m=SS_ATT_META[v]||SS_ATT_META[3];
+    const av=p.photo
+      ? `<img class="ssa-av" src="${p.photo}" alt="">`
+      : `<span class="ssa-av ssa-av-ph">${escapeHtml(String(p.name||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase())}</span>`;
+    return `<div class="ssa-row">
+      ${av}
+      <span class="ssa-nr">${p.nr||''}</span>
+      <span class="ssa-nm">${escapeHtml(getDisplayName?getDisplayName(p):p.name)}</span>
+      <button class="ssa-st" style="color:${m.c};border-color:${m.c};"
+        onclick="ssAttCycle(${pi})" title="Status \u00e4ndern">${m.i} ${m.n}</button>
+    </div>`;
+  }).join('')+'</div>';
+}
+function ssAttCycle(pi){
+  if(!canEdit()||_ssAttSi==null)return;
+  try{cycStForce(pi,_ssAttSi);}catch(e){}
+  ssAttRender();
+  try{buildSessAtt(_ssAttSi);}catch(e){}
 }
 function renderEvalTopicRow(si){
   const el=document.getElementById('ss-evaltopic');
