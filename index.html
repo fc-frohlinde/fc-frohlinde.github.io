@@ -2655,19 +2655,30 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 .rpe-dur-hint{font-size:.68rem;opacity:.8;}
 .rpe-list{display:flex;flex-direction:column;gap:4px;margin-top:6px;}
 /* Rows inside the attendance window: avatar, number, name, status chip. */
-.ssa-list{display:flex;flex-direction:column;gap:5px;}
-.ssa-row{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:10px;
-  background:var(--ow);border:1px solid var(--gl);}
-.ssa-av{width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0;}
-.ssa-av-ph{display:flex;align-items:center;justify-content:center;background:var(--bd);
-  color:#fff;font-size:.66rem;font-weight:700;font-family:'Barlow',sans-serif;}
-.ssa-nr{font-family:'Bebas Neue',sans-serif;font-size:.9rem;color:var(--gm);
-  min-width:18px;text-align:center;flex-shrink:0;}
-.ssa-nm{flex:1;min-width:0;font-size:.82rem;font-weight:600;color:var(--gd);
+/* Tight rows: a full squad has to fit one phone screenshot, so the avatar is
+   dropped and the status shrinks to its icon — the colour already says which. */
+.ssa-list{display:flex;flex-direction:column;gap:2px;}
+.ssa-row{display:flex;align-items:center;gap:8px;padding:4px 8px;border-radius:7px;}
+.ssa-row:nth-child(odd){background:var(--ow);}
+.ssa-nr{font-family:'Bebas Neue',sans-serif;font-size:.86rem;color:var(--gm);
+  min-width:20px;text-align:center;flex-shrink:0;}
+.ssa-nm{flex:1;min-width:0;font-size:.8rem;font-weight:600;color:var(--gd);
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.ssa-st{flex-shrink:0;font-size:.68rem;font-weight:700;padding:4px 10px;border-radius:var(--r-pill);
-  background:#fff;border:1.5px solid;cursor:pointer;font-family:'Barlow',sans-serif;white-space:nowrap;}
+.ssa-pos{flex-shrink:0;font-size:.58rem;font-weight:800;padding:1px 6px;border-radius:var(--r-pill);
+  letter-spacing:.3px;}
+.ssa-st{flex-shrink:0;display:flex;align-items:center;gap:2px;font-size:.8rem;
+  padding:2px 7px;border-radius:var(--r-pill);background:#fff;border:1.5px solid;
+  cursor:pointer;line-height:1.2;}
+.ssa-st-x{font-size:.6rem;opacity:.6;}
 .ssa-st:hover{filter:brightness(.94);}
+.ssa-menu{display:none;position:fixed;z-index:900;background:#fff;border:1px solid var(--gl);
+  border-radius:10px;box-shadow:0 10px 28px rgba(0,0,0,.2);padding:5px;min-width:160px;}
+.ssa-menu.open{display:block;}
+.ssa-menu-i{display:block;width:100%;text-align:left;padding:7px 11px;border:none;
+  background:none;border-radius:7px;font-family:'Barlow',sans-serif;font-size:.8rem;
+  font-weight:600;cursor:pointer;}
+.ssa-menu-i:hover{background:var(--ow);}
+.ssa-menu-i.on{background:var(--ow);outline:1.5px solid currentColor;outline-offset:-2px;}
 /* Attendance tiles are buttons now — same look as before, plus the lift the
    load tiles use, so everything clickable on the card behaves alike. */
 .ps-tile-btn{cursor:pointer;border:1px solid transparent;font-family:'Barlow',sans-serif;
@@ -3676,7 +3687,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787020702884; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787021563855; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -17719,21 +17730,42 @@ function ssAttRender(){
   // tap — the same action the table cell offers, without a separate menu.
   body.innerHTML='<div class="ssa-list">'+pis.map(({p,pi,v})=>{
     const m=SS_ATT_META[v]||SS_ATT_META[3];
-    const av=p.photo
-      ? `<img class="ssa-av" src="${p.photo}" alt="">`
-      : `<span class="ssa-av ssa-av-ph">${escapeHtml(String(p.name||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase())}</span>`;
+    const bcol=(typeof PB_COLORS!=='undefined'&&PB_COLORS[p.pos])||'#e6ecf5;color:#4a5b75';
+    const pos=p.pos?`<span class="ssa-pos" style="background:${bcol.split(';')[0]};${bcol.split(';')[1]||''}">${escapeHtml(p.pos)}</span>`:'';
     return `<div class="ssa-row">
-      ${av}
-      <span class="ssa-nr">${p.nr||''}</span>
+      <span class="ssa-nr">${p.nr||'\u2013'}</span>
       <span class="ssa-nm">${escapeHtml(getDisplayName?getDisplayName(p):p.name)}</span>
+      ${pos}
       <button class="ssa-st" style="color:${m.c};border-color:${m.c};"
-        onclick="ssAttCycle(${pi})" title="Status \u00e4ndern">${m.i} ${m.n}</button>
+        onclick="event.stopPropagation();ssAttMenu(${pi},this)" title="Status \u00e4ndern">${m.i}<span class="ssa-st-x">\u25be</span></button>
     </div>`;
-  }).join('')+'</div>';
+  }).join('')+'</div>'
+  +'<div class="ssa-menu" id="ssa-menu"></div>';
 }
-function ssAttCycle(pi){
+// Pick the status from a list — a mis-tap in a long list is silent otherwise.
+function ssAttMenu(pi,btn){
   if(!canEdit()||_ssAttSi==null)return;
-  try{cycStForce(pi,_ssAttSi);}catch(e){}
+  const menu=document.getElementById('ssa-menu');
+  if(!menu)return;
+  const D=cd();const p=D&&D.players&&D.players[pi];
+  const cur=(p&&p.s&&_ssAttSi<p.s.length)?p.s[_ssAttSi]:3;
+  menu.innerHTML=[1,4,2,0,3].map(st=>{
+    const m=SS_ATT_META[st];
+    return `<button class="ssa-menu-i${st===cur?' on':''}" style="color:${m.c};"
+      onclick="ssAttSet(${pi},${st})">${m.i} ${m.n}</button>`;
+  }).join('');
+  menu.classList.add('open');
+  try{_placePopup(menu,btn.getBoundingClientRect(),{align:'right',gap:4});}catch(e){}
+  setTimeout(()=>document.addEventListener('click',_ssAttMenuClose,{once:true}),0);
+}
+function _ssAttMenuClose(){
+  const m=document.getElementById('ssa-menu');
+  if(m)m.classList.remove('open');
+}
+function ssAttSet(pi,st){
+  if(!canEdit()||_ssAttSi==null)return;
+  _ssAttMenuClose();
+  try{setSessPlayerStatus(pi,_ssAttSi,st);}catch(e){}
   ssAttRender();
   try{buildSessAtt(_ssAttSi);}catch(e){}
 }
