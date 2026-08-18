@@ -3596,7 +3596,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787007703379; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787013116945; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -4379,14 +4379,11 @@ function _perfWatchReport(src,data){
 }
 function _adoptData(data){
   _perfWatchReport('Snapshot empfangen',data);
-  // Sparse arrays arrive shorter than the season; extend them before anything
-  // reads them by session index.
-  try{_padPlayerArrays(data);}catch(e){}
-  // Re-anchor the diff writer on what the server actually has. Without this a
-  // stale shadow silently swallows edits: the diff compares against a value
-  // that only exists locally and concludes there is nothing to send.
+  // Re-anchor the diff writer on what the server actually has, BEFORE padding:
+  // otherwise the padding itself looks like a change and uploads a null for
+  // every session of the season.
   try{if(data)_fbShadow=fbEncode(data);}catch(e){}
-  const clean=sanitizeG(data);
+  const clean=_padPlayerArrays(sanitizeG(data));
   if(typeof isPlayerMode==='function'&&isPlayerMode()){
     // Deep copy first: _pmSanitizeG mutates what it is given.
     let copy;
