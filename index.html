@@ -3596,7 +3596,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787013439527; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787013739844; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -4297,6 +4297,31 @@ window.perfForce=async function(pi,si,val){
 // local array is shorter than the index being read.
 // Follows one value through every stage: raw snapshot → decode → sanitise →
 // pad → G. Values present on the server were arriving as null in the app.
+// The audit log names fifteen ratings for a date while the session index holds
+// four. Shows which index each player's values actually sit at, and what date
+// that index is — a value written to the wrong slot lands on another day.
+window.rpeWhere=async function(dateStr){
+  const D=cd();
+  if(!D)return;
+  const target=(D.sessions||[]).findIndex(s=>s&&s.date&&s.date.indexOf(dateStr)>=0);
+  console.log('Sitzung "'+dateStr+'" hat Index',target,
+    target>=0?('('+D.sessions[target].date+', '+D.sessions[target].type+')'):'\u2014 NICHT GEFUNDEN');
+  const rows=[];
+  (D.players||[]).forEach((p,pi)=>{
+    if(!p||!Array.isArray(p.rpe))return;
+    p.rpe.forEach((v,idx)=>{
+      if(v==null)return;
+      const s=(D.sessions||[])[idx];
+      rows.push({spieler:p.name,index:idx,wert:v,
+        datum:s?s.date:'kein Termin an diesem Index',
+        typ:s?s.type:'-'});
+    });
+  });
+  rows.sort((a,b)=>a.index-b.index);
+  console.table(rows);
+  console.log('Insgesamt',rows.length,'Bewertungen in der ganzen Saison.');
+  return rows;
+};
 window.rpeTrace=async function(pi,si){
   if(!fbDb){console.log('Keine Verbindung.');return;}
   const key=(UI.currentTeam+'__'+UI.currentSeason).replace(/\//g,'__SL__').replace(/\./g,'__DOT__');
