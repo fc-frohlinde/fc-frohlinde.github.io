@@ -2652,6 +2652,47 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
   font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:600;color:var(--gd);}
 .rpe-dur-hint{font-size:.68rem;opacity:.8;}
 .rpe-list{display:flex;flex-direction:column;gap:4px;margin-top:6px;}
+/* ── Load tiles ──────────────────────────────────────────── */
+.rpe-sum{display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  flex-wrap:wrap;margin-bottom:9px;}
+.rpe-sum-main b{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;color:var(--bd);letter-spacing:1px;}
+.rpe-sum-main span{font-size:.7rem;color:var(--gm);margin-left:5px;}
+.rpe-sum-side{font-size:.7rem;color:var(--gm);}
+.rpe-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:6px;}
+.rpe-tile{display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 4px 6px;
+  border-radius:10px;border:1px solid transparent;cursor:pointer;font-family:'Barlow',sans-serif;
+  transition:transform .1s,box-shadow .12s;}
+.rpe-tile:hover{transform:translateY(-1px);box-shadow:0 3px 10px rgba(0,0,0,.13);}
+.rpe-tile-v{font-family:'Bebas Neue',sans-serif;font-size:1.35rem;line-height:1;letter-spacing:1px;}
+.rpe-tile-n{font-size:.64rem;font-weight:600;max-width:100%;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap;opacity:.85;}
+.rpe-tile-m{font-size:.58rem;opacity:.6;font-weight:600;}
+/* Low load reads calm, high load reads loud — the colour carries the meaning
+   so a full squad can be scanned without reading a single number. */
+.rpe-low{background:rgba(39,174,96,.14);border-color:rgba(39,174,96,.3);color:#1a7a40;}
+.rpe-mid{background:rgba(52,152,219,.14);border-color:rgba(52,152,219,.3);color:#1f6ea8;}
+.rpe-high{background:rgba(243,156,18,.16);border-color:rgba(243,156,18,.35);color:#9a6000;}
+.rpe-max{background:rgba(231,76,60,.16);border-color:rgba(231,76,60,.38);color:#b03024;}
+.rpe-hint{font-size:.66rem;color:var(--gm);margin-top:8px;}
+/* ── Editor ──────────────────────────────────────────────── */
+.rpe-ed-sec{font-size:.64rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
+  color:var(--gm);margin:12px 0 6px;}
+.rpe-ed-scale{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;}
+.rpe-ed-n{height:42px;border-radius:9px;border:1px solid transparent;cursor:pointer;
+  font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:1px;transition:all .1s;}
+.rpe-ed-n:hover{transform:translateY(-1px);}
+.rpe-ed-n.on{outline:2.5px solid var(--bd);outline-offset:1px;font-weight:700;}
+.rpe-ed-legend{display:flex;justify-content:space-between;font-size:.62rem;color:var(--gm);margin-top:4px;}
+.rpe-ed-min{display:flex;align-items:center;gap:6px;}
+.mob input#rpe-ed-min-in{width:74px;flex:0 0 74px;text-align:center;margin:0;
+  font-family:'Bebas Neue',sans-serif;font-size:1.1rem;padding:6px;}
+.rpe-ed-step{width:38px;height:38px;flex-shrink:0;border-radius:9px;border:1.5px solid var(--gl);
+  background:var(--ow);color:var(--gd);font-size:1.1rem;cursor:pointer;}
+.rpe-ed-step:hover{border-color:var(--bm);color:var(--bd);}
+.rpe-ed-full{margin-left:auto;font-size:.7rem;padding:6px 10px;border-radius:8px;
+  border:1px solid var(--gl);background:var(--ow);color:var(--gd);cursor:pointer;white-space:nowrap;}
+.rpe-ed-load{font-size:.74rem;color:var(--gm);margin-top:12px;text-align:right;}
+.rpe-ed-load b{color:var(--bd);font-size:.9rem;}
 .rpe-row{display:flex;align-items:center;gap:8px;font-size:.74rem;
   padding:2px 6px;margin:0 -6px;border-radius:6px;transition:background .12s;}
 /* While a minutes box has focus its whole row lifts, so the name being edited
@@ -3609,7 +3650,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787018539557; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787018852354; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -12635,33 +12676,95 @@ function renderSessRpe(si){
   const min=Math.min(...vals.map(v=>v.r)),max=Math.max(...vals.map(v=>v.r));
   const avgLoad=Math.round(vals.reduce((a,b)=>a+(b.load||0),0)/vals.length);
   const mins=rpeSessionMinutes(s,null,si);
-  box.style.display='block';
   const isMatch=s.type==='match';
+  box.style.display='block';
+  // A rating is a number on a scale — a tile carrying its own colour says more
+  // at a glance than a row of text, and tapping one opens the editor for that
+  // player instead of hunting for the right box in a list.
+  const tile=v=>`<button class="rpe-tile ${_rpeBand(v.r)}" onclick="rpeEditOpen(${si},${v.pi})"
+      title="${escapeHtml(v.n)} \u2014 ${v.r}/10${v.min!=null?', '+v.min+' Min':''}">
+      <span class="rpe-tile-v">${v.r}</span>
+      <span class="rpe-tile-n">${escapeHtml(v.n)}</span>
+      <span class="rpe-tile-m">${isMatch?(v.min!=null?v.min+'\u2032':'\u2013'):(v.load==null?'':v.load)}</span>
+    </button>`;
   box.innerHTML=`<div class="u-card" style="padding:10px 12px;">
-    <div class="u-sec-h" style="margin-bottom:6px;">\ud83d\udcaa Belastung (sRPE)</div>
-    <div class="rpe-dur"><span>Dauer: ${mins} Min \u00b7 \u00e4nderbar unter \u201eBearbeiten\u201c</span>
-      ${isMatch?'<span class="rpe-dur-hint">Einsatzminuten je Spieler unten</span>':''}</div>
-    <div style="display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;">
-      <div><span style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--bd);">${avg.toFixed(1)}</span>
-        <span style="font-size:.7rem;color:var(--gm);"> \u00d8 von ${vals.length}${present?'/'+present:''}</span></div>
-      <div style="font-size:.74rem;color:var(--gm);">Spanne ${min}\u2013${max}</div>
-      <div style="font-size:.74rem;color:var(--gm);">\u00d8 Load ${avgLoad} <span style="opacity:.7;">(${mins} Min)</span></div>
+    <div class="u-sec-h" style="margin-bottom:8px;">\ud83d\udcaa Belastung (sRPE)</div>
+    <div class="rpe-sum">
+      <div class="rpe-sum-main"><b>${avg.toFixed(1)}</b><span>\u00d8 von ${vals.length}${present?' / '+present:''}</span></div>
+      <div class="rpe-sum-side">Spanne ${min}\u2013${max} \u00b7 \u00d8 Load ${avgLoad} \u00b7 ${mins} Min</div>
     </div>
-    <details id="ss-rpe-details" style="margin-top:7px;" ${_ssRpeOpen?'open':''}><summary
-      onclick="setTimeout(()=>{_ssRpeOpen=!!document.getElementById('ss-rpe-details').open;},0)" style="font-size:.72rem;color:var(--gm);cursor:pointer;">Einzelwerte${isMatch?' &amp; Einsatzminuten':''}</summary>
-      <div class="rpe-list">
-        ${vals.sort((a,b)=>b.r-a.r).map(v=>`<div class="rpe-row">
-          <span class="rpe-nm">${escapeHtml(v.n)}</span>
-          <span class="rpe-val">${v.r}</span>
-          ${isMatch?`<input class="rpe-min" type="number" min="0" max="240" step="5" placeholder="${mins}" data-pi="${v.pi}"
-             value="${v.min==null?'':v.min}" title="Einsatzminuten \u2014 ${escapeHtml(v.n)}"
-             aria-label="Einsatzminuten ${escapeHtml(v.n)}"
-             oninput="sessSetPlayerMinutes(${si},${v.pi},this.value)"
-             onblur="renderSessRpe(${si})">`:''}
-          <span class="rpe-load">${v.load==null?'\u2013':v.load}</span>
-        </div>`).join('')}
-      </div></details>
+    <div class="rpe-grid">${vals.sort((a,b)=>b.r-a.r).map(tile).join('')}</div>
+    ${isMatch?'<div class="rpe-hint">Auf eine Kachel tippen, um Einsatzminuten zu \u00e4ndern</div>':''}
   </div>`;
+}
+// Colour band for a 0–10 rating: low is calm, high is loud.
+function _rpeBand(r){
+  if(r<=3)return 'rpe-low';
+  if(r<=6)return 'rpe-mid';
+  if(r<=8)return 'rpe-high';
+  return 'rpe-max';
+}
+// Editor for one player: the rating scale and, for a match, the minutes —
+// large enough to hit on a phone, and nothing else competing for attention.
+function rpeEditOpen(si,pi){
+  const D=cd();const p=D&&D.players&&D.players[pi];const s=D&&D.sessions&&D.sessions[si];
+  if(!p||!s)return;
+  _rpeEdit={si,pi};
+  const box=document.getElementById('rpe-edit-body');
+  const ttl=document.getElementById('rpe-edit-title');
+  if(!box||!ttl)return;
+  const cur=Array.isArray(p.rpe)?p.rpe[si]:null;
+  const curMin=Array.isArray(p.rpeMin)?p.rpeMin[si]:null;
+  const isMatch=s.type==='match';
+  const defMin=rpeSessionMinutes(s,null,si);
+  ttl.textContent=(getDisplayName?getDisplayName(p):p.name)||'?';
+  box.innerHTML=`
+    <div class="rpe-ed-sec">Belastung</div>
+    <div class="rpe-ed-scale">${[1,2,3,4,5,6,7,8,9,10].map(n=>
+      `<button class="rpe-ed-n ${_rpeBand(n)}${n===cur?' on':''}" onclick="rpeEditSet(${n})">${n}</button>`).join('')}</div>
+    <div class="rpe-ed-legend"><span>leicht</span><span>sehr hart</span></div>
+    ${isMatch?`
+    <div class="rpe-ed-sec">Einsatzminuten</div>
+    <div class="rpe-ed-min">
+      <button class="rpe-ed-step" onclick="rpeEditMin(-5)">\u2212</button>
+      <input id="rpe-ed-min-in" type="number" min="0" max="240" step="5" placeholder="${defMin}"
+        value="${curMin==null?'':curMin}" onchange="rpeEditMin(0,this.value)">
+      <button class="rpe-ed-step" onclick="rpeEditMin(5)">+</button>
+      <button class="rpe-ed-full" onclick="rpeEditMin(0,${defMin})">volle ${defMin}\u2032</button>
+    </div>`:''}
+    <div class="rpe-ed-load" id="rpe-ed-load"></div>`;
+  _rpeEditLoad();
+  openM('moRpeEdit');
+}
+let _rpeEdit=null;
+function _rpeEditLoad(){
+  const el=document.getElementById('rpe-ed-load');
+  if(!el||!_rpeEdit)return;
+  const D=cd();const p=D.players[_rpeEdit.pi];const s=D.sessions[_rpeEdit.si];
+  const l=rpeLoad(s,p,_rpeEdit.si);
+  el.innerHTML=l==null?'':`Load <b>${l}</b>`;
+}
+function rpeEditSet(n){
+  if(!_rpeEdit)return;
+  sessSetPlayerRpe(_rpeEdit.si,_rpeEdit.pi,n);
+  rpeEditOpen(_rpeEdit.si,_rpeEdit.pi);
+}
+function rpeEditMin(delta,abs){
+  if(!_rpeEdit)return;
+  const D=cd();const p=D.players[_rpeEdit.pi];
+  const cur=(Array.isArray(p.rpeMin)?p.rpeMin[_rpeEdit.si]:null);
+  const base=(abs!==undefined&&abs!=='')?parseInt(abs,10):(cur==null?rpeSessionMinutes(D.sessions[_rpeEdit.si],null,_rpeEdit.si):cur);
+  const next=Math.max(0,Math.min(240,(isNaN(base)?0:base)+(delta||0)));
+  sessSetPlayerMinutes(_rpeEdit.si,_rpeEdit.pi,next);
+  const inp=document.getElementById('rpe-ed-min-in');
+  if(inp)inp.value=next;
+  _rpeEditLoad();
+}
+function rpeEditClose(){
+  const si=_rpeEdit&&_rpeEdit.si;
+  _rpeEdit=null;
+  closeM('moRpeEdit');
+  if(si!=null){try{renderSessRpe(si);}catch(e){}}
 }
 function pmSetRpe(si,val){
   if(!isPlayerMode())return;
@@ -27280,6 +27383,14 @@ checkAutoBackup();
     <button class="btn bs" onclick="tpCloseGuard()" aria-label="Schließen">✕</button>
   </div>
   <div id="tp-content" style="max-height:64vh;overflow-y:auto;"></div>
+</div></div>
+
+<div class="mo" id="moRpeEdit" style="z-index:880;"><div class="mob" style="width:340px;max-width:94vw;">
+  <div class="ps-title-row">
+    <h3 class="ps-title">\ud83d\udcaa <span id="rpe-edit-title">–</span></h3>
+    <button class="btn bs" onclick="rpeEditClose()" aria-label="Schließen">✕</button>
+  </div>
+  <div id="rpe-edit-body"></div>
 </div></div>
 
 <div class="mo" id="moRpeOverview"><div class="mob" style="width:560px;max-width:96vw;">
