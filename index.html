@@ -2668,6 +2668,9 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .ssa-pos{flex-shrink:0;font-size:.58rem;min-width:30px;}
 .ssa-pos2{opacity:.62;}
+.cmt-link{color:var(--bm);text-decoration:underline;text-underline-offset:2px;
+  word-break:break-all;}
+.cmt-link:hover{color:var(--bd);}
 .ssa-pos-none{background:transparent;}
 /* Same square badge as a table cell, in the same colours. */
 .ssa-st{flex-shrink:0;width:26px;height:22px;display:inline-flex;align-items:center;
@@ -3692,7 +3695,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787022938258; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787024217375; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -17777,9 +17780,15 @@ function ssAttMenu(pi,btn){
   if(menu.parentElement!==document.body)document.body.appendChild(menu);
   menu.classList.add('open');
   try{_placePopup(menu,btn.getBoundingClientRect(),{align:'right',gap:4});}catch(e){}
-  setTimeout(()=>document.addEventListener('click',_ssAttMenuClose,{once:true}),0);
+  setTimeout(()=>document.addEventListener('click',_ssAttMenuDoc,true),0);
+}
+function _ssAttMenuDoc(e){
+  const m=document.getElementById('ssa-menu');
+  if(m&&m.contains(e.target))return;   // inside the menu: let the item handle it
+  _ssAttMenuClose();
 }
 function _ssAttMenuClose(){
+  document.removeEventListener('click',_ssAttMenuDoc,true);
   const m=document.getElementById('ssa-menu');
   if(m)m.classList.remove('open');
 }
@@ -18375,10 +18384,25 @@ function renderComments(si){
         ${canModify?`<button class="ss-comm-act" onclick="startEditComment(${si},'${escapeHtml(id)}')" style="background:transparent;border:none;cursor:pointer;color:var(--gm);font-size:.78rem;padding:2px 4px;" title="Bearbeiten">✏️</button>
         <button class="ss-comm-act" onclick="deleteComment(${si},'${escapeHtml(id)}')" style="background:transparent;border:none;cursor:pointer;color:#a02525;font-size:.78rem;padding:2px 4px;" title="Löschen">🗑</button>`:''}
       </div>
-      <div class="ss-comm-text" style="font-size:.82rem;color:var(--gd);line-height:1.45;white-space:pre-wrap;word-wrap:break-word;">${escapeHtml(c.text||'')}</div>
+      <div class="ss-comm-text" style="font-size:.82rem;color:var(--gd);line-height:1.45;white-space:pre-wrap;word-wrap:break-word;">${linkifyEscaped(escapeHtml(c.text||''))}</div>
     </div>`;
   });
   list.innerHTML=html;
+}
+// Turns bare URLs in an already-escaped string into links. Never call this on
+// raw user input — escapeHtml must run first, or the anchor becomes a way to
+// inject markup.
+function linkifyEscaped(safe){
+  return String(safe||'').replace(
+    /(https?:\/\/[^\s<>"']+)/g,
+    m=>{
+      // Trailing punctuation usually belongs to the sentence, not the address
+      const tail=m.match(/[.,;:!?)\]]+$/);
+      const url=tail?m.slice(0,-tail[0].length):m;
+      const rest=tail?tail[0]:'';
+      const label=url.replace(/^https?:\/\//,'').replace(/\/$/,'');
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="cmt-link">${label}</a>${rest}`;
+    });
 }
 function toggleAddComment(){
   if(!canEdit())return;
