@@ -3596,7 +3596,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787014496273; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787014672872; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -4308,6 +4308,29 @@ window.perfForce=async function(pi,si,val){
 // decoding does.
 // Runs sanitizeG's own conversion over the CURRENT G and reports what it finds,
 // to tell "the fix does not run" from "the fix runs but something undoes it".
+// The app reads through a listener; the diagnostics used one-off reads. This
+// reports what the listener itself last delivered, so the two can be compared.
+window.rpeListener=function(si){
+  if(!_fbShadow){console.log('Kein Schatten \u2014 noch kein Snapshot empfangen.');return;}
+  const key=(UI.currentTeam+'__'+UI.currentSeason).replace(/\//g,'__SL__').replace(/\./g,'__DOT__');
+  const blk=_fbShadow.db&&(_fbShadow.db[key]||_fbShadow.db[UI.currentTeam+'__'+UI.currentSeason]);
+  if(!blk){console.log('Block nicht im Schatten:',key,'| vorhanden:',Object.keys(_fbShadow.db||{}));return;}
+  const pls=(blk.players&&blk.players.v)?blk.players.v:blk.players;
+  const list=Array.isArray(pls)?pls:Object.values(pls||{});
+  const rows=[];
+  list.forEach((p,i)=>{
+    if(!p)return;
+    const r=p.rpe;
+    const inner=r&&r.v!==undefined?r.v:r;
+    const val=inner?inner[si]:undefined;
+    if(val==null)return;
+    rows.push({idx:i,name:p.name,imSnapshot:val,
+      form:Array.isArray(inner)?'Array['+inner.length+']':(inner?'Objekt':'-')});
+  });
+  console.table(rows);
+  console.log('Im letzten Snapshot:',rows.length,'Bewertungen fuer Index',si);
+  return rows;
+};
 window.rpeFix=function(si){
   const D=cd();
   if(!D||!Array.isArray(D.players)){console.log('Keine Daten.');return;}
