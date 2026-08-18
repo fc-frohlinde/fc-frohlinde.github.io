@@ -3601,7 +3601,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787017069975; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787017334694; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -12419,7 +12419,13 @@ function sessSetPlayerMinutes(si,pi,val){
   const n=raw===''?null:Math.max(0,Math.min(240,parseInt(raw,10)||0));
   if(p.rpeMin[si]===n)return;
   snap();p.rpeMin[si]=n;saveG();
-  try{renderSessRpe(si);}catch(e){}
+  try{
+    renderSessRpe(si);
+    // Return focus to the same player's box: without this every spinner click
+    // dropped the caret and the next click had to find the field again.
+    const back=document.querySelector('#ss-rpe-wrap .rpe-min[data-pi="'+pi+'"]');
+    if(back)back.focus();
+  }catch(e){}
 }
 // ══ LOAD ANALYSIS ════════════════════════════════════════════
 // The point of collecting sRPE: weekly load per player, and how fast it
@@ -12591,6 +12597,9 @@ function dbRenderLoadCard(data){
     +'Rahmen = Anstieg \u00fcber '+LOAD_SPIKE_PCT+'% zur Vorwoche.</div></div>';
   return html;
 }
+// Remembers whether the individual-values fold is open, so a redraw does not
+// collapse it under the cursor.
+let _ssRpeOpen=false;
 function renderSessRpe(si){
   const box=document.getElementById('ss-rpe-wrap');
   if(!box)return;
@@ -12626,12 +12635,13 @@ function renderSessRpe(si){
       <div style="font-size:.74rem;color:var(--gm);">Spanne ${min}\u2013${max}</div>
       <div style="font-size:.74rem;color:var(--gm);">\u00d8 Load ${avgLoad} <span style="opacity:.7;">(${mins} Min)</span></div>
     </div>
-    <details style="margin-top:7px;"><summary style="font-size:.72rem;color:var(--gm);cursor:pointer;">Einzelwerte${isMatch?' &amp; Einsatzminuten':''}</summary>
+    <details id="ss-rpe-details" style="margin-top:7px;" ${_ssRpeOpen?'open':''}><summary
+      onclick="setTimeout(()=>{_ssRpeOpen=!!document.getElementById('ss-rpe-details').open;},0)" style="font-size:.72rem;color:var(--gm);cursor:pointer;">Einzelwerte${isMatch?' &amp; Einsatzminuten':''}</summary>
       <div class="rpe-list">
         ${vals.sort((a,b)=>b.r-a.r).map(v=>`<div class="rpe-row">
           <span class="rpe-nm">${escapeHtml(v.n)}</span>
           <span class="rpe-val">${v.r}</span>
-          ${isMatch?`<input class="rpe-min" type="number" min="0" max="240" step="5" placeholder="${mins}"
+          ${isMatch?`<input class="rpe-min" type="number" min="0" max="240" step="5" placeholder="${mins}" data-pi="${v.pi}"
              value="${v.min==null?'':v.min}" title="Einsatzminuten \u2014 ${escapeHtml(v.n)}"
              aria-label="Einsatzminuten ${escapeHtml(v.n)}"
              onchange="sessSetPlayerMinutes(${si},${v.pi},this.value)">`:''}
