@@ -2512,10 +2512,12 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
    empty band between them. */
 /* Actions share one row; each still hides itself when it does not apply, and
    an empty row collapses to nothing. */
-.ss-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+/* Full-width actions sit flush with the tiles under them; two side by side
+   when both apply, one across when only one does. */
+.ss-actions{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0;}
 .ss-actions:empty{display:none;}
-.ss-actions > div{margin:0;}
-.ss-actions .btn{width:auto;}
+.ss-actions > div{margin:0;flex:1 1 160px;}
+.ss-actions .btn{width:100%;justify-content:center;padding:10px 12px;border-radius:12px;font-weight:700;}
 .ss-more{margin-top:2px;}
 #ss-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(74px,1fr));gap:7px;margin:10px 0;}
 .ss-more[hidden]{display:none;}
@@ -2652,6 +2654,11 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
   font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:600;color:var(--gd);}
 .rpe-dur-hint{font-size:.68rem;opacity:.8;}
 .rpe-list{display:flex;flex-direction:column;gap:4px;margin-top:6px;}
+/* Attendance tiles are buttons now — same look as before, plus the lift the
+   load tiles use, so everything clickable on the card behaves alike. */
+.ps-tile-btn{cursor:pointer;border:1px solid transparent;font-family:'Barlow',sans-serif;
+  transition:transform .1s,box-shadow .12s;width:100%;}
+.ps-tile-btn:hover{transform:translateY(-1px);box-shadow:0 3px 10px rgba(0,0,0,.12);}
 /* One tile on the card; the per-player grid lives a level down. */
 .rpe-card{display:flex;align-items:center;gap:11px;width:100%;text-align:left;
   padding:11px 13px;border-radius:12px;border:1px solid transparent;cursor:pointer;
@@ -3260,13 +3267,6 @@ if(window._fbBlocked){
   <div id="ss-card-view">
       <div id="ss-note-display" style="font-size:.78rem;color:var(--gd);font-style:italic;margin-top:8px;display:none;"></div>
       <div id="ss-plan-link" style="display:none;font-size:.78rem;margin-top:5px;"></div>
-      <details class="ss-more" id="ss-more">
-        <summary class="ps-more-sum"><span id="ss-more-lbl">Weitere Details</span><span class="ps-more-chev">›</span></summary>
-        <div class="ps-more-body">
-          <div id="ss-physio-wrap" style="display:none;margin-top:8px;"></div>
-          <div id="ss-rpe-wrap" style="display:none;margin-top:8px;"></div>
-        </div>
-      </details>
       <div class="ss-actions">
       <div id="ss-rollcall-wrap" style="display:none;">
         <button class="btn" style="background:var(--ok-bg);color:var(--ok-fg);border:1.5px solid rgba(39,174,96,.4);font-size:.78rem;font-weight:700;" onclick="rcOpen(_currentSessIdx)">✓ Anwesenheit erfassen</button>
@@ -3275,9 +3275,11 @@ if(window._fbBlocked){
         <button class="btn" style="background:rgba(39,174,96,.15);color:#1a7a40;border:1.5px solid rgba(39,174,96,.4);font-size:.78rem;" onclick="openLineupForSess()">⚽ Aufstellung planen</button>
       </div>
       <div id="ss-lineup-view-wrap" style="display:none;">
-        <button class="btn" style="background:rgba(255,255,255,.6);color:var(--gd);border:1px solid var(--gl);font-size:.78rem;" onclick="openLineupForSess()">📋 Aufstellung ansehen</button>
+        <button class="btn" style="background:rgba(52,152,219,.15);color:#1f6ea8;border:1.5px solid rgba(52,152,219,.4);font-size:.78rem;" onclick="openLineupForSess()">📋 Aufstellung ansehen</button>
       </div>
       </div><!-- /ss-actions -->
+      <div id="ss-rpe-wrap" style="display:none;"></div>
+      <div id="ss-physio-wrap" style="display:none;"></div>
       <div style="margin-top:8px;">
         <!-- ss-anmeld-btn removed: redundant with Erinnern button in Anmeldungen-bar. Kept ID for any legacy refs. -->
         <button class="btn" id="ss-anmeld-btn" style="display:none;" onclick="openAnmeldungen(_currentSessIdx)"></button>
@@ -3295,7 +3297,8 @@ if(window._fbBlocked){
     <div class="sec" style="margin:0;flex:1;">Anwesenheit</div>
     <div id="ss-bulk-bar" style="display:flex;gap:4px;flex-wrap:wrap;"></div>
   </div>
-  <div id="ss-att"></div>
+  <!-- Rendered here, then moved into the window: the card shows the tiles. -->
+  <div id="ss-att" style="display:none;"></div>
   <div style="display:flex;align-items:center;gap:8px;margin-top:14px;margin-bottom:6px;">
     <div class="sec" style="margin:0;flex:1;">💬 Notizen <span id="ss-comm-count" style="font-size:.7rem;color:var(--gm);font-weight:500;"></span></div>
     <button id="ss-comm-add-btn" class="btn" style="font-size:.7rem;padding:3px 9px;background:var(--bm);color:#fff;display:none;" onclick="toggleAddComment()">+ Notiz</button>
@@ -3662,7 +3665,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787019457573; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787020422604; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -17664,6 +17667,31 @@ function evalTopics(D){
   if(!Array.isArray(D.evalTopics))D.evalTopics=[];
   return D.evalTopics;
 }
+let _ssAttFilter=null;
+function ssAttOpen(si,status){
+  _ssAttFilter=status;
+  const win=document.getElementById('ss-att-body');
+  const src=document.getElementById('ss-att');
+  if(!win||!src)return;
+  try{buildSessAtt(si);}catch(e){}
+  win.innerHTML=src.innerHTML;
+  // Show only the requested group; null means all of them
+  if(status!=null){
+    win.querySelectorAll('.att-grp').forEach(g=>{
+      const hdr=g.querySelector('.att-grp-hdr');
+      const cls=hdr?hdr.className:'';
+      const want={1:'agt-a',0:'agt-f',2:'agt-e',4:'agt-m',3:'agt-q'}[status];
+      if(want&&cls.indexOf(want)<0)g.style.display='none';
+    });
+  }
+  const ttl=document.getElementById('ss-att-title');
+  if(ttl){
+    const names={1:'\u2705 Anwesend',0:'\u274c Fehlend',2:'\ud83d\udccb Entschuldigt',
+      4:'\ud83d\udcdd Angemeldet',3:'\u2754 Ausstehend'};
+    ttl.textContent=(status==null?'Anwesenheit':names[status]||'Anwesenheit');
+  }
+  openM('moSessAtt');
+}
 function renderEvalTopicRow(si){
   const el=document.getElementById('ss-evaltopic');
   if(!el)return;
@@ -18073,23 +18101,26 @@ function buildSessAtt(si){
   const _gradable=(typeof canGradeSession==='function')?canGradeSession(si):false;
   {
     const cardsEl=document.getElementById('ss-cards');
-    const tile=(v,l,s,c)=>`<div class="ps-tile"><div class="ps-tile-v"${c?` style="color:${c};"`:''}>${v}</div>`
-      +`<div class="ps-tile-l">${l}</div>${s?`<div class="ps-tile-s">${s}</div>`:''}</div>`;
+    // Tapping a tile opens just that group — the full list at the bottom of the
+    // card ran to 24 rows and pushed everything else away.
+    const tile=(v,l,s,c,st)=>`<button class="ps-tile ps-tile-btn" onclick="ssAttOpen(${si},${st==null?'null':st})">`
+      +`<div class="ps-tile-v"${c?` style="color:${c};"`:''}>${v}</div>`
+      +`<div class="ps-tile-l">${l}</div>${s?`<div class="ps-tile-s">${s}</div>`:''}</button>`;
     let t='';
     if(_rollCall){
       // Session has taken place: who was actually there
-      t=tile(pres,'Anwesend',pct+'%','var(--cp)')
-       +tile(abs,'Fehlend','','var(--ca)')
-       +(exc?tile(exc,'Entschuldigt','','var(--ce)'):'')
-       +(ang?tile(ang,'Offen','nicht erfasst','#3b82c4'):'');
+      t=tile(pres,'Anwesend',pct+'%','var(--cp)',1)
+       +tile(abs,'Fehlend','','var(--ca)',0)
+       +(exc?tile(exc,'Entschuldigt','','var(--ce)',2):'')
+       +(ang?tile(ang,'Offen','nicht erfasst','#3b82c4',4):'');
     }else{
       // Before the session the useful figure is how many have answered — this
       // was shown nowhere, so the window was empty exactly when planning needs it
       const openCnt=total-(ang+abs+exc);
-      t=tile(ang,'Zugesagt',total?Math.round(ang/total*100)+'%':'','var(--cp)')
-       +(abs?tile(abs,'Abgesagt','','var(--ca)'):'')
-       +(exc?tile(exc,'Entschuldigt','','var(--ce)'):'')
-       +tile(openCnt,'Offen','von '+total,openCnt?'#9a7000':'var(--gm)');
+      t=tile(ang,'Zugesagt',total?Math.round(ang/total*100)+'%':'','var(--cp)',4)
+       +(abs?tile(abs,'Abgesagt','','var(--ca)',0):'')
+       +(exc?tile(exc,'Entschuldigt','','var(--ce)',2):'')
+       +tile(openCnt,'Offen','von '+total,openCnt?'#9a7000':'var(--gm)',3);
     }
     cardsEl.innerHTML=t;
     cardsEl.style.display=t?'':'none';
@@ -27424,6 +27455,14 @@ checkAutoBackup();
     <button class="btn bs" onclick="tpCloseGuard()" aria-label="Schließen">✕</button>
   </div>
   <div id="tp-content" style="max-height:64vh;overflow-y:auto;"></div>
+</div></div>
+
+<div class="mo" id="moSessAtt" style="z-index:875;"><div class="mob" style="width:440px;max-width:94vw;">
+  <div class="ps-title-row">
+    <h3 class="ps-title" id="ss-att-title">Anwesenheit</h3>
+    <button class="btn bs" onclick="closeM('moSessAtt')" aria-label="Schließen">✕</button>
+  </div>
+  <div id="ss-att-body"></div>
 </div></div>
 
 <div class="mo" id="moRpeAll" style="z-index:875;"><div class="mob" style="width:420px;max-width:94vw;">
