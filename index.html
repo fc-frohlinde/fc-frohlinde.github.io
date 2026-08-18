@@ -2660,8 +2660,8 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 .rpe-ov-x{background:none;border:none;color:var(--gm);cursor:pointer;font-size:.75rem;padding:0 2px;line-height:1;}
 .rpe-ov-x:hover{color:var(--bad-fg);}
 .rpe-ov-add{font-size:.68rem;padding:3px 9px;}
-.rpe-min{width:58px;padding:3px 6px;border:1.5px solid var(--gl);border-radius:6px;
-  font-family:'Barlow',sans-serif;font-size:.74rem;text-align:center;color:var(--gd);}
+.mob input.rpe-min,.rpe-min{width:58px;flex:0 0 58px;padding:3px 6px;border:1.5px solid var(--gl);border-radius:6px;
+  font-family:'Barlow',sans-serif;font-size:.74rem;text-align:center;color:var(--gd);margin:0;}
 .rpe-load{min-width:46px;text-align:right;font-weight:700;color:var(--gm);}
 /* Compact layout: this panel is a set of controls, not a page. */
 .am-bc-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
@@ -3601,7 +3601,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787016874613; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787017069975; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
