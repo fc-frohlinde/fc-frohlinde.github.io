@@ -2683,8 +2683,6 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
    load tiles use, so everything clickable on the card behaves alike. */
 .ps-tile-btn{position:relative;cursor:pointer;border:1.5px solid var(--gl);
   font-family:'Barlow',sans-serif;transition:transform .1s,box-shadow .12s,border-color .12s;width:100%;}
-.ps-tile-btn::after{content:'\203a';position:absolute;top:4px;right:7px;
-  font-size:.9rem;line-height:1;color:var(--gm);opacity:.55;}
 .ps-tile-btn:hover{transform:translateY(-1px);border-color:var(--bl);
   box-shadow:0 3px 10px rgba(0,0,0,.12);}
 .ps-tile-btn:active{transform:translateY(0);}
@@ -3691,7 +3689,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787022087957; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787022631641; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -17756,13 +17754,29 @@ function ssAttMenu(pi,btn){
   if(!menu)return;
   const D=cd();const p=D&&D.players&&D.players[pi];
   const cur=(p&&p.s&&_ssAttSi<p.s.length)?p.s[_ssAttSi]:3;
-  menu.innerHTML=[1,4,2,0,3].map(st=>{
+  const rollCall=(typeof _isSessRollCallTime==='function')?_isSessRollCallTime(_ssAttSi):false;
+  const allowed=rollCall?[1,0,2]:[4,2,0,3];
+  // A value already stored outside the current phase stays selectable, so a
+  // status set earlier can still be corrected.
+  const opts=allowed.slice();
+  if(!opts.includes(cur))opts.push(cur);
+  menu.innerHTML=opts.map(st=>{
     const m=SS_ATT_META[st];
+    if(!m)return '';
     return `<button class="ssa-menu-i${st===cur?' on':''}" onclick="ssAttSet(${pi},${st})">
       <span class="ssa-st ${m.cls}">${m.i}</span> ${m.n}</button>`;
   }).join('');
   menu.classList.add('open');
-  try{_placePopup(menu,btn.getBoundingClientRect(),{align:'right',gap:4});}catch(e){}
+  try{
+    _placePopup(menu,btn.getBoundingClientRect(),{align:'right',gap:4});
+    // _placePopup positions against the button; with few rows the modal is
+    // short and the menu still ended up near the bottom of the screen, or
+    // past it. Pull it back inside the viewport.
+    const r=menu.getBoundingClientRect();
+    const vh=window.innerHeight||document.documentElement.clientHeight;
+    if(r.bottom>vh-8)menu.style.top=Math.max(8,vh-r.height-8)+'px';
+    if(r.top<8)menu.style.top='8px';
+  }catch(e){}
   setTimeout(()=>document.addEventListener('click',_ssAttMenuClose,{once:true}),0);
 }
 function _ssAttMenuClose(){
