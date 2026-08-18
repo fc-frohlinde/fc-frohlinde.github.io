@@ -2646,7 +2646,12 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
   font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:600;color:var(--gd);}
 .rpe-dur-hint{font-size:.68rem;opacity:.8;}
 .rpe-list{display:flex;flex-direction:column;gap:4px;margin-top:6px;}
-.rpe-row{display:flex;align-items:center;gap:8px;font-size:.74rem;}
+.rpe-row{display:flex;align-items:center;gap:8px;font-size:.74rem;
+  padding:2px 6px;margin:0 -6px;border-radius:6px;transition:background .12s;}
+/* While a minutes box has focus its whole row lifts, so the name being edited
+   is unmistakable even with the eye on the input. */
+.rpe-row:has(.rpe-min:focus){background:color-mix(in srgb,var(--bm) 10%,transparent);}
+.rpe-row:has(.rpe-min:focus) .rpe-nm{color:var(--bd);font-weight:700;}
 .rpe-nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--gd);}
 .rpe-val{font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--bd);min-width:20px;text-align:center;}
 .rpe-ov-chip{display:inline-flex;align-items:center;gap:5px;}
@@ -3596,7 +3601,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787016032841; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787016348500; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -12589,7 +12594,8 @@ function renderSessRpe(si){
           <span class="rpe-nm">${escapeHtml(v.n)}</span>
           <span class="rpe-val">${v.r}</span>
           ${isMatch?`<input class="rpe-min" type="number" min="0" max="240" step="5" placeholder="${mins}"
-             value="${v.min==null?'':v.min}" title="Einsatzminuten"
+             value="${v.min==null?'':v.min}" title="Einsatzminuten \u2014 ${escapeHtml(v.n)}"
+             aria-label="Einsatzminuten ${escapeHtml(v.n)}"
              onchange="sessSetPlayerMinutes(${si},${v.pi},this.value)">`:''}
           <span class="rpe-load">${v.load==null?'\u2013':v.load}</span>
         </div>`).join('')}
