@@ -2681,10 +2681,7 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
    player sees should feel like one application. */
 body.hub-mode{--hb0:#080f22;--hb1:#131f3d;--hbr:#22335f;
   --htx:#eef2fb;--hdim:#9aa8c8;--hacc:#2e7de4;
-  background:
-    radial-gradient(900px 500px at 20% -5%, rgba(46,125,228,.10), transparent 70%),
-    radial-gradient(700px 400px at 90% 0%, rgba(245,197,66,.05), transparent 65%),
-    linear-gradient(180deg,#0a1329 0%,#080f22 40%,#070d1d 100%) !important;
+  background:#080f22 !important;
   background-attachment:fixed !important;
   color:var(--htx);}
 /* Painted before the data arrives, so the first frame is not a different
@@ -3801,7 +3798,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787397837311; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787398165012; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -13990,12 +13987,14 @@ function renderHub(){
   const statsUrl=(p.statsToken&&G.statsPublishedAt)?buildStatsLink(p.statsToken):'';
   const rep=(Array.isArray(G.reportLog)&&G.reportLog.length)?G.reportLog[0]:null;
   const repUrl=rep?_dbReportUrl(rep.token):'';
-  const card=(icon,title,sub,badge,href)=>{
+  // Same tab for the two screens inside this app, a new one only for the two
+  // published pages, which are separate documents.
+  const card=(icon,title,sub,badge,href,newTab)=>{
     const inner=`<span class="hub-ic">${icon}</span>
       <span class="hub-txt"><b>${title}</b><span>${sub}</span></span>
       ${badge?`<span class="hub-badge">${badge}</span>`:''}
       <span class="hub-chev">\u203a</span>`;
-    return `<a class="hub-card" href="${href}" target="_blank" rel="noopener">${inner}</a>`;
+    return `<a class="hub-card" href="${href}"${newTab?' target="_blank" rel="noopener"':''}>${inner}</a>`;
   };
   const tok=p.confirmToken||'';
   let cards='';
@@ -14009,15 +14008,15 @@ function renderHub(){
     cards+=card('\ud83d\udcaa','Belastung bewerten',
       escapeHtml(d.s.date)+' \u00b7 noch offen',rpeDue.length,buildHubLink(tok,'rpe',d.si));
   }
-  if(statsUrl)cards+=card('\ud83d\udcca','Meine Statistik','Anwesenheit, Serie, Verlauf','',statsUrl);
-  if(repUrl)cards+=card('\ud83d\udccb','Wochenbericht','KW '+(rep.kw||'')+' \u00b7 die ganze Mannschaft','',repUrl);
+  if(statsUrl)cards+=card('\ud83d\udcca','Meine Statistik','Anwesenheit, Serie, Verlauf','',statsUrl,true);
+  if(repUrl)cards+=card('\ud83d\udccb','Wochenbericht','KW '+(rep.kw||'')+' \u00b7 die ganze Mannschaft','',repUrl,true);
   const av=p.photo
     ? `<img class="hub-av" src="${p.photo}" alt="">`
     : `<div class="hub-av hub-av-ph">${escapeHtml(String(p.name||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase())}</div>`;
   wrap.innerHTML=`<div class="hub">
     <div class="hub-hero">
       ${av}
-      <div class="hub-name">${escapeHtml(p.name||'')}</div>
+      <div class="hub-name">${escapeHtml(getDisplayName?getDisplayName(p):p.name)}</div>
       <div class="hub-sub">${escapeHtml(UI.currentTeam||'')} \u00b7 ${escapeHtml(UI.currentSeason||'')}</div>
     </div>
     ${cards||'<div class="hub-empty">\u2713<span>Gerade nichts zu tun</span></div>'}
