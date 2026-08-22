@@ -3799,7 +3799,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787398460496; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787402706181; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -25473,6 +25473,7 @@ function openLineupPlanner(sessIdx){
     }
     lpSyncKindBtns();
   }
+  _lpOpenSnap=_lpSnapshot();
   el.classList.add('open');
   // Presence: notify others we're editing the lineup
   if(typeof setPresenceContext==='function'){
@@ -25502,8 +25503,35 @@ function openLineupPlanner(sessIdx){
   lpRender();
 }
 
+// Snapshot taken when the planner opens; compared on close.
+let _lpOpenSnap=null;
+function _lpSnapshot(){
+  try{
+    return JSON.stringify({
+      f:lpState.formation,
+      s:lpState.slots||{},
+      subs:lpState.subs||[],
+      cs:lpState.customSlots||null
+    });
+  }catch(e){return null;}
+}
+function _lpIsDirty(){
+  if(_lpOpenSnap==null)return false;
+  return _lpSnapshot()!==_lpOpenSnap;
+}
 function closeLineupPlanner(){
   if(typeof _lpDragCleanup==='function')_lpDragCleanup(); // never leave a ghost on screen
+  if(_lpIsDirty()&&typeof canEdit==='function'&&canEdit()){
+    const named=Object.values(lpState.slots||{}).filter(v=>v!=null).length;
+    const subs=(lpState.subs||[]).filter(v=>v!=null).length;
+    const what=named+' Spieler'+(subs?' und '+subs+' auf der Bank':'');
+    const keep=confirm('Aufstellung speichern?\n\n'+what
+      +'\n\nOK = speichern, Abbrechen = verwerfen.');
+    if(keep){
+      try{lpSave();}catch(e){console.error('lpSave:',e);}
+    }
+  }
+  _lpOpenSnap=null;
   const el=document.getElementById('moLineup');
   if(el)el.classList.remove('open');
 }
@@ -26291,7 +26319,7 @@ function lpSave(){
       sessDate:sess?sess.date:null,  // for migration safety
       season:UI.currentSeason
     };
-    saveG();lpRenderSaves();showSaveFlash('✓ Aufstellung gespeichert');
+    saveG();lpRenderSaves();_lpOpenSnap=_lpSnapshot();showSaveFlash('✓ Aufstellung gespeichert');
   } else {
     const name='Aufstellung '+new Date().toLocaleDateString('de-DE');
     const lus=lpGetLineups();
@@ -26300,7 +26328,7 @@ function lpSave(){
     if(ex>=0)lus[ex]=lu;else lus.unshift(lu);
     if(lus.length>20)lus.length=20;
     lpState.currentLineupId=lu.id;
-    saveG();lpRenderSaves();showSaveFlash('✓ Aufstellung gespeichert');
+    saveG();lpRenderSaves();_lpOpenSnap=_lpSnapshot();showSaveFlash('✓ Aufstellung gespeichert');
   }
 }
 
