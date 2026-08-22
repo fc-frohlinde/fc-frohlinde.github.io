@@ -2670,6 +2670,44 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .ssa-pos{flex-shrink:0;font-size:.58rem;min-width:30px;}
 .ssa-pos2{opacity:.62;}
+/* ── Player hub ──────────────────────────────────────────────
+   Built on the report page's palette rather than the light cards used
+   elsewhere: cards a shade lighter than the background read as one surface,
+   while white cards on blue read as stickers pasted onto it. Everything the
+   player sees should feel like one application. */
+body.hub-mode{--hb0:#080f22;--hb1:#131f3d;--hbr:#22335f;
+  --htx:#eef2fb;--hdim:#9aa8c8;--hacc:#2e7de4;}
+.hub{min-height:100dvh;background:var(--hb0);padding:0 16px 34px;}
+.hub-hero{text-align:center;padding:34px 8px 24px;}
+.hub-av{width:74px;height:74px;border-radius:50%;object-fit:cover;
+  border:2px solid var(--hbr);}
+.hub-av-ph{display:inline-flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--hacc),#1659b8);color:#fff;
+  font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:1px;}
+.hub-name{font-family:'Bebas Neue',sans-serif;font-size:2.1rem;letter-spacing:1.2px;
+  color:var(--htx);margin-top:10px;line-height:1;}
+.hub-sub{font-size:.76rem;color:var(--hdim);margin-top:5px;}
+.hub-card{display:flex;align-items:center;gap:13px;width:100%;max-width:520px;
+  margin:0 auto 9px;padding:15px 16px;border-radius:16px;text-align:left;
+  background:var(--hb1);border:1px solid var(--hbr);cursor:pointer;
+  color:var(--htx);text-decoration:none;font-family:'Barlow',sans-serif;
+  transition:transform .1s,border-color .12s;}
+.hub-card:hover{transform:translateY(-1px);border-color:var(--hacc);}
+.hub-card:active{transform:translateY(0);}
+.hub-ic{font-size:1.45rem;flex-shrink:0;}
+.hub-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.hub-txt b{font-size:.94rem;}
+.hub-txt span{font-size:.74rem;color:var(--hdim);}
+.hub-badge{flex-shrink:0;min-width:24px;height:24px;padding:0 7px;border-radius:999px;
+  background:var(--hacc);color:#fff;font-size:.76rem;font-weight:800;
+  display:inline-flex;align-items:center;justify-content:center;}
+.hub-chev{font-size:1.3rem;color:var(--hdim);opacity:.6;flex-shrink:0;}
+.hub-empty{text-align:center;color:var(--hdim);padding:30px 0;font-size:1.6rem;}
+.hub-empty span{display:block;font-size:.84rem;margin-top:6px;}
+.hub-back{display:inline-flex;align-items:center;gap:6px;background:none;border:none;
+  color:rgba(255,255,255,.7);font-family:'Barlow',sans-serif;font-size:.82rem;
+  font-weight:600;cursor:pointer;padding:14px 4px;}
+.hub-back:hover{color:#fff;}
 /* ── Load survey (own link) ──────────────────────────────── */
 .rpo-wrap{min-height:100dvh;display:flex;flex-direction:column;align-items:center;
   justify-content:center;padding:20px 16px;gap:14px;}
@@ -3750,7 +3788,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787395781471; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787396980335; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -13237,8 +13275,21 @@ function tryPlayerUrlAuth(){
     if(saved)window._rpeTeamPick=saved;
     return _rpeTeamStart();
   }
+  // ?p=<token> is the hub. &do= deep-links straight to one screen, and that
+  // screen's back button returns here instead of leaving the app.
+  const hubToken=params.get('p');
+  if(hubToken){
+    window._hubMode=true;
+    window._hubAction=params.get('do')||'';
+    const hs=parseInt(params.get('s'),10);
+    window._hubSi=isNaN(hs)?null:hs;
+    if(window._hubAction==='rpe'){
+      window._rpeOnly=true;
+      window._rpeOnlySi=window._hubSi;
+    }
+  }
   const rpeToken=params.get('rpe');
-  const token=rpeToken||params.get('player');
+  const token=hubToken||rpeToken||params.get('player');
   if(!token)return false;
   if(rpeToken){
     window._rpeOnly=true;
@@ -13270,6 +13321,7 @@ function tryPlayerUrlAuth(){
         if(overlay){overlay.classList.remove('open');overlay.innerHTML='';}
         document.body.classList.add('player-mode');
         if(window._rpeOnly)document.body.classList.add('rpe-only');
+        if(window._hubMode)document.body.classList.add('hub-mode');
         let wrap=document.getElementById('playerModeWrap');
         if(!wrap){wrap=document.createElement('div');wrap.id='playerModeWrap';document.body.appendChild(wrap);}
         renderPlayerMode();
@@ -13859,6 +13911,7 @@ function renderRpeOnly(){
   const labels={1:'sehr leicht',2:'leicht',3:'locker',4:'etwas fordernd',5:'mittel',
     6:'fordernd',7:'hart',8:'sehr hart',9:'extrem hart',10:'maximal'};
   wrap.innerHTML=`<div class="rpo-wrap">
+    ${window._hubMode?'<button class="hub-back" onclick="hubBack()">\u2039 \u00dcbersicht</button>':''}
     ${RPE_IS_PREVIEW?'<div class="rpo-prev">\ud83d\udc41 Vorschau \u00b7 Eingaben werden <b>nicht</b> gespeichert</div>':''}
     <div class="rpo-card">
       <div class="rpo-hi">Hi ${escapeHtml(nm)}!</div>
@@ -13892,9 +13945,88 @@ function rpoMin(si,delta,abs){
   const inp=document.getElementById('rpo-min-in');
   if(inp)inp.value=next;
 }
+// The hub: what is waiting, and what can be looked at. Cards disappear when
+// they have nothing to offer, so the screen is only ever as long as it needs
+// to be.
+function renderHub(){
+  const wrap=document.getElementById('playerModeWrap');
+  if(!wrap)return;
+  const D=cd();
+  const pi=_pmValidateIdx();
+  const p=(pi!=null)?D.players[pi]:null;
+  if(!p){wrap.innerHTML='<div class="hub"><div class="hub-card">Daten konnten nicht geladen werden.</div></div>';return;}
+  const today=todaySK();
+  const weekStart=(typeof _pmWeekStart==='function')?_pmWeekStart():today;
+  const horizon=(typeof _pmWeekHorizon==='function')?_pmWeekHorizon():today;
+  // Open registrations this week
+  let weekOpen=0,weekTotal=0;
+  (D.sessions||[]).forEach((s,si)=>{
+    if(!s||!s.date)return;
+    const sk=dispToSortKey(s.date);
+    if(sk<weekStart||sk>horizon)return;
+    weekTotal++;
+    const v=(p.s&&si<p.s.length)?p.s[si]:3;
+    if(v===3)weekOpen++;
+  });
+  // Sessions still awaiting a load rating
+  const rpeDue=[];
+  (D.sessions||[]).forEach((s,si)=>{
+    if(!s)return;
+    if(rpeIsOpen(s,si,p,UI.currentSeason)&&!(Array.isArray(p.rpe)&&typeof p.rpe[si]==='number'))rpeDue.push({s,si});
+  });
+  const statsUrl=(p.statsToken&&G.statsPublishedAt)?buildStatsLink(p.statsToken):'';
+  const rep=(Array.isArray(G.reportLog)&&G.reportLog.length)?G.reportLog[0]:null;
+  const repUrl=rep?_dbReportUrl(rep.token):'';
+  const card=(icon,title,sub,badge,onclick,href)=>{
+    const inner=`<span class="hub-ic">${icon}</span>
+      <span class="hub-txt"><b>${title}</b><span>${sub}</span></span>
+      ${badge?`<span class="hub-badge">${badge}</span>`:''}
+      <span class="hub-chev">\u203a</span>`;
+    return href
+      ? `<a class="hub-card" href="${href}" target="_blank" rel="noopener">${inner}</a>`
+      : `<button class="hub-card" onclick="${onclick}">${inner}</button>`;
+  };
+  let cards='';
+  if(weekTotal){
+    cards+=card('\ud83d\udcc5','Meine Woche',
+      weekOpen?(weekOpen+' von '+weekTotal+' offen'):('alle '+weekTotal+' beantwortet'),
+      weekOpen||'', "hubGo('week')");
+  }
+  if(rpeDue.length){
+    const d=rpeDue[rpeDue.length-1];
+    cards+=card('\ud83d\udcaa','Belastung bewerten',
+      escapeHtml(d.s.date)+' \u00b7 noch offen',rpeDue.length,"hubGo('rpe',"+d.si+")");
+  }
+  if(statsUrl)cards+=card('\ud83d\udcca','Meine Statistik','Anwesenheit, Serie, Verlauf','','',statsUrl);
+  if(repUrl)cards+=card('\ud83d\udccb','Wochenbericht','KW '+(rep.kw||'')+' \u00b7 die ganze Mannschaft','','',repUrl);
+  const av=p.photo
+    ? `<img class="hub-av" src="${p.photo}" alt="">`
+    : `<div class="hub-av hub-av-ph">${escapeHtml(String(p.name||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase())}</div>`;
+  wrap.innerHTML=`<div class="hub">
+    <div class="hub-hero">
+      ${av}
+      <div class="hub-name">${escapeHtml(p.name||'')}</div>
+      <div class="hub-sub">${escapeHtml(UI.currentTeam||'')} \u00b7 ${escapeHtml(UI.currentSeason||'')}</div>
+    </div>
+    ${cards||'<div class="hub-empty">\u2713<span>Gerade nichts zu tun</span></div>'}
+  </div>`;
+}
+function hubGo(action,si){
+  window._hubAction=action;
+  window._hubSi=(si==null)?null:si;
+  if(action==='rpe'){window._rpeOnly=true;window._rpeOnlySi=si;}
+  renderPlayerMode();
+}
+function hubBack(){
+  window._hubAction='';
+  window._rpeOnly=false;
+  renderPlayerMode();
+}
 function renderPlayerMode(){
   const wrap=document.getElementById('playerModeWrap');
   if(!wrap||!isPlayerMode())return;
+  // Hub without a deep link: show the overview
+  if(window._hubMode&&!window._hubAction)return renderHub();
   if(window._rpeOnly)return renderRpeOnly();
   const D=cd();
   const pi=CU.playerIdx;
@@ -15370,6 +15502,12 @@ function ensureStatsToken(pi){
     p.statsToken='s_'+Array.from(arr).map(b=>b.toString(16).padStart(2,'0')).join('');
   }
   return p.statsToken;
+}
+function buildHubLink(token,action,sessIdx){
+  const base=location.origin+location.pathname;
+  return base+'?p='+encodeURIComponent(token||'')
+    +(action?('&do='+action):'')
+    +(sessIdx!=null?('&s='+sessIdx):'');
 }
 function buildRpeLink(token,sessIdx){
   const base=location.origin+location.pathname;
