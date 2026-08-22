@@ -3745,7 +3745,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787394434396; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787394831415; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -17916,7 +17916,8 @@ function _psCommitEdit(){
   const D=cd(),p=D&&D.players[pi];
   if(!p)return;
   const val=id=>{const e=document.getElementById(id);return e?String(e.value||'').trim():null;};
-  const before=JSON.stringify([p.name,p.nr,p.shortname,p.passnr,p.birthdate,p.phone,p.email,p.note]);
+  const before=JSON.stringify([p.name,p.nr,p.shortname,p.passnr,p.birthdate,p.phone,p.email,p.note,
+    p.pos,p.pos2,p.foot]);
   const nm=val('pe-name');
   if(nm)p.name=nm;                      // never allow an empty name
   const nr=val('pe-nr');
@@ -17931,7 +17932,8 @@ function _psCommitEdit(){
   if(typeof editP1!=='undefined'&&editP1)p.pos=editP1;
   if(typeof editP2!=='undefined'){if(editP2)p.pos2=editP2;else delete p.pos2;}
   if(typeof _currentFoot!=='undefined')p.foot=_currentFoot;
-  if(JSON.stringify([p.name,p.nr,p.shortname,p.passnr,p.birthdate,p.phone,p.email,p.note])===before)return;
+  if(JSON.stringify([p.name,p.nr,p.shortname,p.passnr,p.birthdate,p.phone,p.email,p.note,
+    p.pos,p.pos2,p.foot])===before)return;
   saveG();
   if(typeof renderBody==='function')renderBody();
   if(typeof renderTfoot==='function')renderTfoot();
