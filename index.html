@@ -3799,7 +3799,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787402706181; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787402950985; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -23588,7 +23588,21 @@ function openM(id){
   if(id==='moAdmin'){switchAdminTab('trainers');}
   if(id==='moTeamMgr')switchTab('spieler');
 }
+var _closingPlanner=false;   // var: closeM runs before the planners are defined
 function closeM(id){
+  // Planners hold work that is not saved as it is made; their own close
+  // functions ask before discarding. Reached here via the back gesture,
+  // navBack or a backdrop path, the question would otherwise be skipped.
+  if(id==='moLineup'&&typeof closeLineupPlanner==='function'&&!_closingPlanner){
+    _closingPlanner=true;
+    try{closeLineupPlanner();}finally{_closingPlanner=false;}
+    return;
+  }
+  if(id==='moSeasonLineup'&&typeof closeSeasonLineup==='function'&&!_closingPlanner){
+    _closingPlanner=true;
+    try{closeSeasonLineup();}finally{_closingPlanner=false;}
+    return;
+  }
   document.getElementById(id).classList.remove('open');
   // Reset presence context when closing main editing modals
   if(['moSession2','moLineup','moSeasonLineup','moPlayer','moCalendar'].includes(id)){
