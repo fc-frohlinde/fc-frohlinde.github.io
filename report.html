@@ -152,7 +152,13 @@
   .ps-name{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:1.5px;color:#fff;line-height:1.1;}
   .ps-meta{font-size:.76rem;color:rgba(255,255,255,.6);margin-top:2px;}
   .ps-kw{font-size:.72rem;color:rgba(255,255,255,.5);margin-bottom:16px;}
-  .ps-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(78px,1fr));gap:8px;margin-bottom:16px;}
+  .ps-kpis{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:16px;}
+/* Four to a row at most, and a short last row sits centred rather than
+   leaving a gap on the right. */
+.ps-kpis .ps-kpi{flex:1 1 calc(25% - 8px);min-width:78px;max-width:calc(50% - 4px);}
+@media (max-width:420px){
+  .ps-kpis .ps-kpi{flex:1 1 calc(33.333% - 8px);}
+}
   .ps-kpi{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
     border-radius:12px;padding:11px 6px;text-align:center;}
   .ps-kpi-v{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:#fff;line-height:1;}
@@ -637,8 +643,8 @@ function renderReport(r){
       <div class="ps-kpi"><div class="ps-kpi-v ${pctCls(p.sPct)}">${p.sPct==null?'\u2013':p.sPct+'%'}</div><div class="ps-kpi-l">Saison</div><div class="ps-kpi-s">${p.sPresent}/${p.sTotal}</div></div>
       <div class="ps-kpi"><div class="ps-kpi-v ${pctCls(p.wPct)}">${p.wPct==null?'\u2013':p.wPct+'%'}</div><div class="ps-kpi-l">Diese Woche</div><div class="ps-kpi-s">${p.wPresent}/${p.wTotal}</div></div>
       <div class="ps-kpi"><div class="ps-kpi-v">${det.streak||0}</div><div class="ps-kpi-l">Serie</div><div class="ps-kpi-s">in Folge</div></div>
-      ${d.scorer?`<div class="ps-kpi"><div class="ps-kpi-v">${d.scorer.goals||0}</div><div class="ps-kpi-l">Tore</div><div class="ps-kpi-s">Saison</div></div>
-      <div class="ps-kpi"><div class="ps-kpi-v">${d.scorer.assists||0}</div><div class="ps-kpi-l">Vorlagen</div><div class="ps-kpi-s">Saison</div></div>`:''}
+      ${(d.scorer&&d.scorer.goals)?`<div class="ps-kpi"><div class="ps-kpi-v">${d.scorer.goals}</div><div class="ps-kpi-l">Tore</div><div class="ps-kpi-s">Saison</div></div>`:''}
+      ${(d.scorer&&d.scorer.assists)?`<div class="ps-kpi"><div class="ps-kpi-v">${d.scorer.assists}</div><div class="ps-kpi-l">Vorlagen</div><div class="ps-kpi-s">Saison</div></div>`:''}
       ${det.rank?`<div class="ps-kpi"><div class="ps-kpi-v">#${det.rank}</div><div class="ps-kpi-l">Platz</div><div class="ps-kpi-s">von ${det.ranked}</div></div>`:''}
     </div>
     <div class="ps-sec">
