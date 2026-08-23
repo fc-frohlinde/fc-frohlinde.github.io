@@ -3880,7 +3880,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787506809363; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787507185449; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -14037,6 +14037,7 @@ function renderRpeOnly(){
 function rpoSet(si,n){
   pmSetRpe(si,n);
   renderRpeOnly();
+  try{_hubCheckDone('rpe');}catch(e){}
 }
 function rpoMin(si,delta,abs){
   const D=cd();const pi=_pmValidateIdx();
@@ -14101,10 +14102,15 @@ function renderHub(){
       weekOpen?(weekOpen+' von '+weekTotal+' offen'):('alle '+weekTotal+' beantwortet'),
       weekOpen||'', buildHubLink(tok,'week'));
   }
-  if(rpeDue.length){
-    const d=rpeDue[rpeDue.length-1];
+  // Shown for as long as the rating window is open, so a player can revise a
+  // value he already gave — it disappeared the moment he answered before.
+  const cnt=_hubOpenCounts();
+  if(cnt.rpeTotal){
+    const si2=cnt.rpeLast;
+    const s2=D.sessions[si2];
     cards+=card('\ud83d\udcaa','Belastung bewerten',
-      escapeHtml(d.s.date)+' \u00b7 noch offen',rpeDue.length,buildHubLink(tok,'rpe',d.si));
+      escapeHtml(s2.date)+(cnt.rpe?' \u00b7 noch offen':' \u00b7 beantwortet'),
+      cnt.rpe||'',buildHubLink(tok,'rpe',si2));
   }
   if(statsUrl)cards+=card('\ud83d\udcca','Meine Statistik','Anwesenheit, Serie, Verlauf','',statsUrl);
   if(repUrl)cards+=card('\ud83d\udccb','Wochenbericht','KW '+(rep.kw||'')+' \u00b7 die ganze Mannschaft','',repUrl);
@@ -14124,30 +14130,65 @@ function renderHub(){
 // back has to navigate to the hub rather than pop a state that is not there.
 // Straight to the registration when something is unanswered — the reason the
 // link was sent. Runs once, before the first render.
-function _hubAutoRoute(){
-  if(!window._hubDecide)return;
-  window._hubDecide=false;
+// How many answers are outstanding, by kind. One source for the routing, the
+// hub cards and the thank-you.
+function _hubOpenCounts(){
   const D=cd();
   const pi=_pmValidateIdx();
   const p=(pi!=null)?D.players[pi]:null;
-  if(!p)return;
+  const out={week:0,weekTotal:0,rpe:0,rpeTotal:0};
+  if(!p)return out;
   const weekStart=(typeof _pmWeekStart==='function')?_pmWeekStart():todaySK();
   const horizon=(typeof _pmWeekHorizon==='function')?_pmWeekHorizon():todaySK();
-  let open=0;
   (D.sessions||[]).forEach((s,si)=>{
-    if(!s||!s.date)return;
-    const sk=dispToSortKey(s.date);
-    if(sk<weekStart||sk>horizon)return;
-    const v=(p.s&&si<p.s.length)?p.s[si]:3;
-    if(v===3)open++;
+    if(!s)return;
+    if(s.date){
+      const sk=dispToSortKey(s.date);
+      if(sk>=weekStart&&sk<=horizon){
+        out.weekTotal++;
+        const v=(p.s&&si<p.s.length)?p.s[si]:3;
+        if(v===3)out.week++;
+      }
+    }
+    // A session whose rating window is still open, rated or not
+    if(rpeIsOpen(s,si,p,UI.currentSeason)){
+      out.rpeTotal++;
+      out.rpeLast=si;
+      if(!(Array.isArray(p.rpe)&&typeof p.rpe[si]==='number'))out.rpe++;
+    }
   });
-  if(open>0)window._hubAction='week';
+  return out;
+}
+// Remembered on entry: the thank-you belongs to someone who arrived with work
+// to do and finished it, not to someone changing an answer he already gave.
+let _hubEntry={week:null,rpe:null};
+function _hubAutoRoute(){
+  if(!window._hubDecide)return;
+  window._hubDecide=false;
+  const c=_hubOpenCounts();
+  // Load first: it is asked about a session just finished and its window
+  // closes, while the registration stays open all week.
+  if(c.rpe>0){
+    window._hubAction='rpe';
+    window._rpeOnly=true;
+    window._rpeOnlySi=c.rpeLast;
+    _hubEntry.rpe=c.rpe;
+    return;
+  }
+  if(c.week>0){
+    window._hubAction='week';
+    _hubEntry.week=c.week;
+  }
 }
 // Shown when the last answer lands: a moment of acknowledgement, then the
 // overview. Without it the screen would simply swap and look like a glitch.
-function _hubThanks(){
+function _hubThanks(kind){
   if(document.getElementById('hubThanks'))return;   // never twice
   const onHub=!!window._hubMode;
+  const isRpe=(kind==='rpe');
+  const icon=isRpe?'\ud83d\udcaa':'\u2713';
+  const head=isRpe?'Danke dir!':'Danke!';
+  const sub=isRpe?'Deine Belastung ist gespeichert':'Alles beantwortet';
   const el=document.createElement('div');
   el.id='hubThanks';
   el.setAttribute('style',
@@ -14159,10 +14200,10 @@ function _hubThanks(){
     '<div style="text-align:center;max-width:340px;">'
     +'<div style="width:78px;height:78px;margin:0 auto;border-radius:50%;'
     +'background:#3ddc84;color:#08210f;font-size:2.6rem;display:flex;'
-    +'align-items:center;justify-content:center;">\u2713</div>'
+    +'align-items:center;justify-content:center;">'+icon+'</div>'
     +'<div style="font-family:\'Bebas Neue\',sans-serif;font-size:2.1rem;'
-    +'letter-spacing:1.2px;color:#eef2fb;margin-top:16px;">Danke!</div>'
-    +'<div style="font-size:.88rem;color:#9aa8c8;margin-top:4px;">Alles beantwortet</div>'
+    +'letter-spacing:1.2px;color:#eef2fb;margin-top:16px;">'+head+'</div>'
+    +'<div style="font-size:.88rem;color:#9aa8c8;margin-top:4px;">'+sub+'</div>'
     +'<button id="hubThanksBtn" style="margin-top:24px;padding:13px 32px;'
     +'border-radius:12px;border:none;background:#2e7de4;color:#fff;'
     +'font-family:\'Barlow\',sans-serif;font-size:.94rem;font-weight:700;'
@@ -14223,6 +14264,12 @@ function renderPlayerMode(){
   const wrap=document.getElementById('playerModeWrap');
   if(!wrap||!isPlayerMode())return;
   if(window._hubDecide)_hubAutoRoute();
+  // Entering a screen records what was outstanding, so the thank-you can tell
+  // "finished the task" from "changed an answer".
+  if(window._hubAction){
+    const k=(window._hubAction==='rpe')?'rpe':'week';
+    if(_hubEntry[k]===null)_hubEntry[k]=_hubOpenCounts()[k];
+  }
   // Only the overview scrolls the page itself; the other screens keep the
   // pinned layout they were built for.
   document.body.classList.toggle('hub-home',!!(window._hubMode&&!window._hubAction));
