@@ -3889,7 +3889,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787508186696; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787508421902; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -11252,119 +11252,64 @@ function _amWeekCtx(p){
     kw:(typeof isoWeekKey==='function')?parseInt(isoWeekKey(new Date()).split('-W')[1],10):null};
 }
 const AM_WEEK_TEMPLATES={
-  // The link already shows every date of the week with its buttons, so listing
-  // them here says the same thing twice — and a long message is scrolled past.
-  // These give the reason to tap and how much is waiting: a count, not a list.
+  // The link opens on whatever is outstanding — registration, load rating,
+  // physio — and carries the statistics and the weekly report as cards. So the
+  // message no longer announces any of that: it gives the reason to tap and
+  // how much is waiting.
   kompakt:{
     label:'Kompakt',
     build:c=>{
       if(!c.list.length)return `Hi ${c.nm}! \uD83D\uDC4B\n\nDiese Woche stehen keine Termine an.`;
-      const l=[`Hi ${c.nm}! \uD83D\uDC4B`,'',`Diese Woche: ${c.summary}.`,
-        'Bitte kurz zu- oder absagen:',c.url];
-      if(c.statsUrl)l.push('','\ud83d\udcca Deine Statistik:',c.statsUrl);
-      l.push('','Danke! \uD83D\uDE4F');
-      return l.join('\n');
+      return [`Hi ${c.nm}! \uD83D\uDC4B`,'',`Diese Woche: ${c.summary}.`,
+        'Bitte kurz zu- oder absagen:',c.url,'','Danke! \uD83D\uDE4F'].join('\n');
+    }
+  },
+  // For players who were at yesterday's match: they have just been thanked and
+  // spoken to. Opening with a greeting reads like a form letter, so this one
+  // starts with the name and gets to the point.
+  nachSpiel:{
+    label:'Nach dem Spiel',
+    build:c=>{
+      if(!c.list.length)return `${c.nm}, diese Woche stehen keine Termine an.`;
+      return [`${c.nm}, kurz f\u00fcr die neue Woche:`,'',
+        `${c.summary}. Bitte zu- oder absagen:`,c.url].join('\n');
     }
   },
   freundlich:{
     label:'Freundlich',
     build:c=>{
       if(!c.list.length)return `Hi ${c.nm}! \uD83D\uDC4B\n\nDiese Woche ist frei \u2014 geniess die Pause! \uD83D\uDE0A`;
-      const l=[`Hallo ${c.nm}! \uD83D\uDC4B`,'',
+      return [`Hallo ${c.nm}! \uD83D\uDC4B`,'',
         `${c.summary} stehen an. Sag uns bitte kurz Bescheid, wann du dabei bist \u2014 dann k\u00f6nnen wir richtig planen:`,
-        c.url];
-      if(c.statsUrl)l.push('','Und hier deine pers\u00f6nliche Statistik \ud83d\udcca',c.statsUrl);
-      l.push('','Bis bald! \u26BD');
-      return l.join('\n');
+        c.url,'','Bis bald! \u26BD'].join('\n');
+    }
+  },
+  knapp:{
+    label:'Sehr kurz',
+    build:c=>{
+      if(!c.list.length)return `${c.nm}: diese Woche nichts geplant.`;
+      return `${c.nm}, ${c.summary} diese Woche. Zu-/absagen:\n${c.url}`;
     }
   },
   motivierend:{
     label:'Motivierend',
     build:c=>{
-      if(!c.list.length)return `\uD83D\uDCAA ${c.nm}, diese Woche Pause \u2014 danach greifen wir wieder an!`;
-      const head=c.matchCount>0?'\uD83D\uDD25 Spieltag-Woche!':'\uD83D\uDCAA Neue Woche, neue Einheiten!';
-      const l=[head,'',`Hi ${c.nm}, ${c.summary} \u2014 wir z\u00e4hlen auf dich.`,
-        'Trag kurz ein, wann du da bist:',c.url];
-      if(c.statsUrl)l.push('','\ud83d\udcca Deine Zahlen:',c.statsUrl);
-      l.push('','\uD83D\uDE80');
-      return l.join('\n');
+      if(!c.list.length)return `${c.nm}, diese Woche Pause \u2014 danach greifen wir wieder an! \uD83D\uDCAA`;
+      return [`${c.nm}! \uD83D\uDD25`,'',
+        `${c.summary} \u2014 wir brauchen dich dabei.`,
+        'Kurz antippen, dauert 10 Sekunden:',c.url].join('\n');
     }
   },
   sachlich:{
     label:'Sachlich',
     build:c=>{
-      if(!c.list.length)return `${c.nm}: diese Woche keine Termine.`;
-      const l=[`Terminplanung${c.kw?' KW '+c.kw:''}`,'',`${c.summary}.`,
-        'R\u00fcckmeldung bitte \u00fcber diesen Link:',c.url];
-      if(c.statsUrl)l.push('','Pers\u00f6nliche Statistik: '+c.statsUrl);
-      return l.join('\n');
-    }
-  },
-  kurz:{
-    label:'Sehr kurz',
-    build:c=>{
-      if(!c.list.length)return 'Diese Woche frei.';
-      return `Hi ${c.nm}! ${c.summary} diese Woche \u2014 kurz eintragen bitte \uD83D\uDC47\n${c.url}`
-        +(c.statsUrl?`\n\n\ud83d\udcca ${c.statsUrl}`:'');
-    }
-  },
-  checkliste:{
-    label:'Nachfassend',
-    build:c=>{
-      if(!c.list.length)return `Hi ${c.nm}! Diese Woche keine Termine \u2713`;
-      const l=[`Hi ${c.nm}! \uD83D\uDC4B`,'',
-        `${c.summary} \u2014 im Link siehst du alles auf einen Blick und hakst es in zwei Klicks ab:`,
-        c.url];
-      if(c.statsUrl)l.push('','\ud83d\udcca Statistik: '+c.statsUrl);
-      return l.join('\n');
-    }
-  },
-  teamgeist:{
-    label:'Teamgeist',
-    build:c=>{
-      if(!c.list.length)return `${c.nm}, diese Woche Pause \u2014 erhol dich gut! \u26BD`;
-      const l=[`\u26BD Hi ${c.nm}!`,'',
-        'Je fr\u00fcher wir wissen, wer dabei ist, desto besser wird das Training f\u00fcr alle.',
-        '',`${c.summary} \u2014 zwei Klicks, mehr nicht:`,c.url];
-      if(c.statsUrl)l.push('','Deine Statistik: '+c.statsUrl);
-      l.push('','Danke dir! \uD83D\uDE4F');
-      return l.join('\n');
-    }
-  },
-  countdown:{
-    label:'N\u00e4chster Termin',
-    build:c=>{
-      if(!c.list.length)return `Keine Termine diese Woche. \u26BD`;
-      const f=c.list[0];
-      const l=[`Hi ${c.nm}!`,'',
-        `Als N\u00e4chstes: ${f.dow} ${f.dnum}, ${f.time} Uhr.`,
-        `Diese Woche ${c.summary} \u2014 bitte f\u00fcr alle eintragen:`,c.url];
-      if(c.statsUrl)l.push('','\ud83d\udcca '+c.statsUrl);
-      return l.join('\n');
-    }
-  },
-  fokus:{
-    label:'Mit Hinweis',
-    build:c=>{
-      if(!c.list.length)return `Hi ${c.nm}! Diese Woche keine Einheiten.`;
-      const l=[`Hi ${c.nm}! \uD83D\uDC4B`,'',`${c.summary} diese Woche.`,'',
-        'Wichtig: Absagen bitte immer \u00fcber den Link \u2014 so sieht das ganze Trainerteam Bescheid.',
-        c.url];
-      if(c.statsUrl)l.push('','\ud83d\udcca Deine Entwicklung: '+c.statsUrl);
-      return l.join('\n');
-    }
-  },
-  statsfokus:{
-    label:'Statistik im Fokus',
-    build:c=>{
-      if(!c.list.length)return `Hi ${c.nm}! Diese Woche Pause.`+(c.statsUrl?`\n\n\ud83d\udcca Dein Saison-Stand: ${c.statsUrl}`:'');
-      const l=[`Hi ${c.nm}! \uD83D\uDCCA`,''];
-      if(c.statsUrl)l.push('Dein aktueller Stand \u2014 Anwesenheit, Serie und Verlauf:',c.statsUrl,'');
-      l.push(`Und diese Woche: ${c.summary}. Bitte eintragen:`,c.url);
-      return l.join('\n');
+      if(!c.list.length)return `${c.nm}, in dieser Woche finden keine Termine statt.`;
+      return [`${c.nm},`,'',`diese Woche: ${c.summary}.`,
+        'Bitte um R\u00fcckmeldung \u00fcber deinen pers\u00f6nlichen Link:',c.url].join('\n');
     }
   }
 };
+
 function amWeekTemplateKey(){
   return (typeof getUserPref==='function')?getUserPref('amWeekTemplate','kompakt'):'kompakt';
 }
@@ -11436,6 +11381,22 @@ function amWeekEditApply(){
   amWeekEditClose();
   amSendWeekAll();
 }
+// Was this player at a match in the last two days?
+function _amPlayedRecently(p){
+  const D=cd();
+  if(!p||!Array.isArray(D.sessions))return false;
+  const today=todaySK();
+  const y=Math.floor(today/10000),m=Math.floor(today/100)%100,d=today%100;
+  const cutoff=new Date(y,m-1,d);
+  cutoff.setDate(cutoff.getDate()-2);
+  const cutSk=cutoff.getFullYear()*10000+(cutoff.getMonth()+1)*100+cutoff.getDate();
+  return (D.sessions||[]).some((s,si)=>{
+    if(!s||s.type!=='match'||!s.date)return false;
+    const sk=dispToSortKey(s.date);
+    if(sk<cutSk||sk>today)return false;
+    return ((p.s&&si<p.s.length)?p.s[si]:3)===1;
+  });
+}
 function _amBuildInviteText(p,sessIdx,kind){
   // kind: 'general' | 'session' | 'reminder'
   const D=cd();
@@ -11445,7 +11406,11 @@ function _amBuildInviteText(p,sessIdx,kind){
   const nm=(getDisplayName?getDisplayName(p):p.name)||'Spieler';
   if(kind==='general'||kind==='week'){
     // The link covers the whole week — the message does too.
-    const tpl=AM_WEEK_TEMPLATES[amWeekTemplateKey()]||AM_WEEK_TEMPLATES.kompakt;
+    // Whoever was on the pitch at the weekend gets the version without the
+    // greeting — unless the trainer picked a variant on purpose.
+    const _key=amWeekTemplateKey();
+    const _auto=(_key==='kompakt'&&_amPlayedRecently(p))?'nachSpiel':_key;
+    const tpl=AM_WEEK_TEMPLATES[_auto]||AM_WEEK_TEMPLATES.kompakt;
     return tpl.build(_amWeekCtx(p));
   }
   if(D&&Array.isArray(D.sessions)&&sessIdx!=null){
