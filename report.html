@@ -643,9 +643,9 @@ function renderReport(r){
       <div class="ps-kpi"><div class="ps-kpi-v ${pctCls(p.sPct)}">${p.sPct==null?'\u2013':p.sPct+'%'}</div><div class="ps-kpi-l">Saison</div><div class="ps-kpi-s">${p.sPresent}/${p.sTotal}</div></div>
       <div class="ps-kpi"><div class="ps-kpi-v ${pctCls(p.wPct)}">${p.wPct==null?'\u2013':p.wPct+'%'}</div><div class="ps-kpi-l">Diese Woche</div><div class="ps-kpi-s">${p.wPresent}/${p.wTotal}</div></div>
       <div class="ps-kpi"><div class="ps-kpi-v">${det.streak||0}</div><div class="ps-kpi-l">Serie</div><div class="ps-kpi-s">in Folge</div></div>
+      ${det.rank?`<div class="ps-kpi"><div class="ps-kpi-v">#${det.rank}</div><div class="ps-kpi-l">Platz</div><div class="ps-kpi-s">von ${det.ranked}</div></div>`:''}
       ${(d.scorer&&d.scorer.goals)?`<div class="ps-kpi"><div class="ps-kpi-v">${d.scorer.goals}</div><div class="ps-kpi-l">Tore</div><div class="ps-kpi-s">Saison</div></div>`:''}
       ${(d.scorer&&d.scorer.assists)?`<div class="ps-kpi"><div class="ps-kpi-v">${d.scorer.assists}</div><div class="ps-kpi-l">Vorlagen</div><div class="ps-kpi-s">Saison</div></div>`:''}
-      ${det.rank?`<div class="ps-kpi"><div class="ps-kpi-v">#${det.rank}</div><div class="ps-kpi-l">Platz</div><div class="ps-kpi-s">von ${det.ranked}</div></div>`:''}
     </div>
     <div class="ps-sec">
       <div class="ps-h">Training &amp; Spiele</div>
