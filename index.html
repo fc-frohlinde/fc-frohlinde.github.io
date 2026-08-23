@@ -2176,6 +2176,13 @@ mark.sr-hl{background:rgba(243,156,18,.35);color:inherit;border-radius:2px;paddi
 .ss-rsvp{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;}
 .ss-rsvp-none{font-size:.7rem;color:var(--gm);}
 .ss-rsvp-btn{margin-left:auto;font-size:.72rem;padding:4px 12px;background:var(--bm);color:#fff;font-weight:600;}
+/* Reads like the message itself: same shape as a chat bubble, not a form. */
+.am-week-preview{margin-top:8px;background:var(--ow);border:1px solid var(--gl);
+  border-radius:10px;padding:10px 12px;}
+.am-week-prev-h{font-size:.68rem;color:var(--gm);margin-bottom:7px;}
+.am-week-prev-body{white-space:pre-wrap;word-break:break-word;font-size:.8rem;
+  line-height:1.5;color:var(--gd);background:#fff;border:1px solid var(--gl);
+  border-radius:8px;padding:9px 11px;}
 .am-players{border-top:1px solid var(--gl);margin-top:12px;}
 .am-players .ps-more-body{padding-top:4px;}
 .am-stat-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
@@ -3889,7 +3896,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787508762945; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787508906195; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -11366,6 +11373,28 @@ function amSetWeekTemplate(v){
 // around the placeholders: the edit is stored as an override with {name},
 // {link} and {stats} standing in for the per-player parts.
 let _amWeekOverride=null;
+// Read-only look at the text as one player would receive it, including the
+// greeting rule — the point is to judge the wording before sending.
+function amShowWeekPreview(){
+  const box=document.getElementById('am-week-preview');
+  if(!box)return;
+  if(box.style.display!=='none'){box.style.display='none';return;}
+  const D=cd();
+  const p=(D&&D.players||[]).find(x=>x&&x.confirmToken)||{name:'Max Mustermann'};
+  const nm=(getDisplayName?getDisplayName(p):p.name)||'Spieler';
+  const txt=_amWeekOverride
+    ? _amApplyWeekOverride(_amWeekOverride,p)
+    : _amBuildInviteText(p,null,'week');
+  const edited=!!_amWeekOverride;
+  const greetDropped=(typeof _amPlayedRecently==='function')&&_amPlayedRecently(p);
+  box.innerHTML='<div class="am-week-prev-h">So sieht es bei '+_dbEscapeHtml(nm)+' aus'
+    +(edited?' \u00b7 <b>angepasster Text</b>':'')
+    +(greetDropped?' \u00b7 ohne Begr\u00fc\u00dfung (war beim Spiel)':'')
+    +'</div><div class="am-week-prev-body">'+_dbEscapeHtml(txt)+'</div>';
+  box.style.display='block';
+  const ed=document.getElementById('am-week-edit');
+  if(ed)ed.style.display='none';
+}
 function amPreviewWeekText(){
   const D=cd();const p=(D&&D.players||[]).find(x=>x&&x.confirmToken);
   const sample=p||{name:'Max Mustermann'};
@@ -14920,13 +14949,15 @@ function _amRenderOverview(){
         ${Object.entries(AM_WEEK_TEMPLATES).map(([k,v])=>
           `<option value="${k}"${k===_wk?' selected':''}>${v.label}</option>`).join('')}
       </select>
-      <button class="am-bc-btn" onclick="amPreviewWeekText()" title="Text ansehen und anpassen">\u270e Text</button>
+      <button class="am-bc-btn" onclick="amShowWeekPreview()" title="Text ansehen">\ud83d\udc41 Vorschau</button>
+      <button class="am-bc-btn" onclick="amPreviewWeekText()" title="Text anpassen">\u270e Text</button>
       <button class="am-bc-btn primary" onclick="amSendWeekAll()">\ud83d\udcf2 Senden</button>
       <label class="am-week-toggle" title="Durchgehend entschuldigte Spieler \u2014 Urlaub, verletzt">
         <input type="checkbox" ${_amState.hideOut?'checked':''} onchange="amToggleHideOut(this)">
         <span>Abwesende ausblenden${_outCount?' ('+_outCount+')':''}</span>
       </label>
     </div>
+    <div id="am-week-preview" class="am-week-preview" style="display:none;"></div>
     <div id="am-week-edit" class="am-week-edit" style="display:none;">
       <textarea id="am-week-text" rows="10" spellcheck="false"></textarea>
       <div class="am-week-edit-hint">Platzhalter: <code>{name}</code> \u00b7 <code>{link}</code> \u00b7 <code>{stats}</code> \u2014 sie werden pro Spieler ersetzt.</div>
