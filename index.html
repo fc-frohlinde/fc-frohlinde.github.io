@@ -2837,6 +2837,11 @@ html:has(body.hub-mode){background:#080f22;}
 .rpo-verify-b{display:flex;gap:8px;align-items:center;justify-content:center;margin-top:8px;}
 .rpo-verify-ok{width:auto;padding:0 20px;background:var(--bm);color:#fff;border:none;
   font-family:'Barlow',sans-serif;font-size:.84rem;font-weight:700;}
+.phy-btns{display:flex;flex-direction:column;gap:9px;margin-top:18px;}
+.phy-b{padding:15px;border-radius:12px;border:1.5px solid var(--gl);cursor:pointer;
+  font-family:'Barlow',sans-serif;font-size:.94rem;font-weight:700;background:#fff;color:var(--gd);}
+.phy-yes{background:var(--cp);border-color:var(--cp);color:#fff;}
+.phy-b:active{transform:scale(.98);}
 .rpo-who{display:flex;flex-direction:column;gap:6px;max-height:56vh;overflow-y:auto;margin-top:6px;}
 .rpo-who-b{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:11px;
   border:1.5px solid var(--gl);background:var(--ow);color:var(--gd);cursor:pointer;
@@ -3880,7 +3885,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787507593642; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787507937320; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -13978,6 +13983,50 @@ function _rpeConfirmPick(token){
   if(box)box.style.display='none';
   renderRpeTeam();
 }
+function renderPhysioAsk(){
+  const wrap=document.getElementById('playerModeWrap');
+  if(!wrap)return;
+  const D=cd();
+  const pi=_pmValidateIdx();
+  const p=(pi!=null)?D.players[pi]:null;
+  const c=_hubOpenCounts();
+  const si=(c.physioList&&c.physioList.length)?c.physioList[0]:null;
+  const s=(si!=null)?D.sessions[si]:null;
+  if(!p||!s){window._hubAction='';return renderPlayerMode();}
+  const left=c.physio-1;
+  wrap.innerHTML=`<div class="rpo-wrap">
+    ${RPE_IS_PREVIEW?'<div class="rpo-prev">\ud83d\udc41 Vorschau \u00b7 Eingaben werden <b>nicht</b> gespeichert</div>':''}
+    <div class="rpo-card">
+      <div class="rpo-hi">\ud83e\uddd1\u200d\u2695\ufe0f Physiotherapie</div>
+      <div class="rpo-h">${escapeHtml(s.date)}</div>
+      <div class="rpo-q">An diesem Tag ist der Physio beim Training dabei.<br>M\u00f6chtest du einen Termin?</div>
+      <div class="phy-btns">
+        <button class="phy-b phy-yes" onclick="pmAnswerPhysio(${si},true)">\u2713 Ja, bitte</button>
+        <button class="phy-b phy-no" onclick="pmAnswerPhysio(${si},false)">Nein, danke</button>
+      </div>
+      ${left>0?`<div class="rpo-sub">Noch ${left} weitere${left===1?'r':''} Termin${left===1?'':'e'}</div>`:''}
+    </div>
+    <div class="rpo-foot">Du kannst das jederzeit wieder \u00e4ndern.</div>
+  </div>`;
+}
+function pmAnswerPhysio(si,yes){
+  if(!isPlayerMode())return;
+  const D=cd();const pi=_pmValidateIdx();
+  if(pi==null)return;
+  const p=D.players[pi];
+  if(!Array.isArray(p.physio))p.physio=[];
+  while(p.physio.length<D.sessions.length)p.physio.push(null);
+  p.physio[si]=yes?true:false;
+  if(!RPE_IS_PREVIEW)_pmSaveTargeted(si);
+  else if(typeof showSaveFlash==='function')showSaveFlash('\ud83d\udc41 Vorschau \u2014 nicht gespeichert');
+  const c=_hubOpenCounts();
+  if(c.physio>0){renderPhysioAsk();return;}
+  try{_hubCheckDone('physio');}catch(e){}
+  if(!document.getElementById('hubThanks')){
+    window._hubAction='';
+    renderPlayerMode();
+  }
+}
 function renderRpeOnly(){
   const wrap=document.getElementById('playerModeWrap');
   if(!wrap)return;
@@ -14112,6 +14161,10 @@ function renderHub(){
       escapeHtml(s2.date)+(cnt.rpe?' \u00b7 noch offen':' \u00b7 beantwortet'),
       cnt.rpe||'',buildHubLink(tok,'rpe',si2));
   }
+  if(cnt.physio>0){
+    cards+=card('\ud83e\uddd1\u200d\u2695\ufe0f','Physiotherapie',
+      cnt.physio+' offen',cnt.physio,buildHubLink(tok,'physio'));
+  }
   if(statsUrl)cards+=card('\ud83d\udcca','Meine Statistik','Anwesenheit, Serie, Verlauf','',statsUrl);
   if(repUrl)cards+=card('\ud83d\udccb','Wochenbericht','KW '+(rep.kw||'')+' \u00b7 die ganze Mannschaft','',repUrl);
   const av=p.photo
@@ -14132,11 +14185,18 @@ function renderHub(){
 // link was sent. Runs once, before the first render.
 // How many answers are outstanding, by kind. One source for the routing, the
 // hub cards and the thank-you.
+// true = booked, false = declined, null/undefined = not asked yet.
+function _physioState(p,si){
+  const v=Array.isArray(p.physio)?p.physio[si]:undefined;
+  if(v===true)return 'ja';
+  if(v===false)return 'nein';
+  return 'offen';
+}
 function _hubOpenCounts(){
   const D=cd();
   const pi=_pmValidateIdx();
   const p=(pi!=null)?D.players[pi]:null;
-  const out={week:0,weekTotal:0,rpe:0,rpeTotal:0};
+  const out={week:0,weekTotal:0,rpe:0,rpeTotal:0,physio:0,physioTotal:0,physioList:[]};
   if(!p)return out;
   const weekStart=(typeof _pmWeekStart==='function')?_pmWeekStart():todaySK();
   const horizon=(typeof _pmWeekHorizon==='function')?_pmWeekHorizon():todaySK();
@@ -14156,12 +14216,22 @@ function _hubOpenCounts(){
       out.rpeLast=si;
       if(!(Array.isArray(p.rpe)&&typeof p.rpe[si]==='number'))out.rpe++;
     }
+    // Physio: only where it is offered, the player is coming, and the deadline
+    // has not passed. The button on the session card is easy to miss, so this
+    // is asked as its own step.
+    if(typeof sessPhysioOn==='function'&&sessPhysioOn(s)&&!_amRsvpLocked(si)){
+      const st=(p.s&&si<p.s.length)?p.s[si]:3;
+      if(st===4||st===1){
+        out.physioTotal++;
+        if(_physioState(p,si)==='offen'){out.physio++;out.physioList.push(si);}
+      }
+    }
   });
   return out;
 }
 // Remembered on entry: the thank-you belongs to someone who arrived with work
 // to do and finished it, not to someone changing an answer he already gave.
-let _hubEntry={week:null,rpe:null};
+let _hubEntry={week:null,rpe:null,physio:null};
 function _hubAutoRoute(){
   if(!window._hubDecide)return;
   window._hubDecide=false;
@@ -14178,6 +14248,11 @@ function _hubAutoRoute(){
   if(c.week>0){
     window._hubAction='week';
     _hubEntry.week=c.week;
+    return;
+  }
+  if(c.physio>0){
+    window._hubAction='physio';
+    _hubEntry.physio=c.physio;
   }
 }
 // Shown when the last answer lands: a moment of acknowledgement, then the
@@ -14185,10 +14260,11 @@ function _hubAutoRoute(){
 function _hubThanks(kind){
   if(document.getElementById('hubThanks'))return;   // never twice
   const onHub=!!window._hubMode;
-  const isRpe=(kind==='rpe');
-  const icon=isRpe?'\ud83d\udcaa':'\u2713';
-  const head=isRpe?'Danke dir!':'Danke!';
-  const sub=isRpe?'Deine Belastung ist gespeichert':'Alles beantwortet';
+  const icon=(kind==='rpe')?'\ud83d\udcaa':(kind==='physio')?'\ud83e\uddd1\u200d\u2695\ufe0f':'\u2713';
+  const head=(kind==='rpe')?'Danke dir!':'Danke!';
+  const sub=(kind==='rpe')?'Deine Belastung ist gespeichert'
+    :(kind==='physio')?'Deine Physio-Antwort ist gespeichert'
+    :'Alles beantwortet';
   const el=document.createElement('div');
   el.id='hubThanks';
   el.setAttribute('style',
@@ -14232,11 +14308,15 @@ function _hubThanksClose(){
     window._hubAction='rpe';
     window._rpeOnly=true;
     window._rpeOnlySi=c.rpeLast;
-    if(_hubEntry.rpe===null||_hubEntry.rpe===0)_hubEntry.rpe=c.rpe;
+    if(!_hubEntry.rpe)_hubEntry.rpe=c.rpe;
   }else if(c.week>0){
     window._hubAction='week';
     window._rpeOnly=false;
-    if(_hubEntry.week===null||_hubEntry.week===0)_hubEntry.week=c.week;
+    if(!_hubEntry.week)_hubEntry.week=c.week;
+  }else if(c.physio>0){
+    window._hubAction='physio';
+    window._rpeOnly=false;
+    if(!_hubEntry.physio)_hubEntry.physio=c.physio;
   }else{
     window._hubAction='';
     window._rpeOnly=false;
@@ -14246,7 +14326,7 @@ function _hubThanksClose(){
 // Called after a status is set: if that was the last one, move on.
 function _hubCheckDone(kind){
   if(!isPlayerMode())return;
-  kind=(kind==='rpe')?'rpe':'week';
+  kind=(kind==='rpe'||kind==='physio')?kind:'week';
   const c=_hubOpenCounts();
   const had=_hubEntry[kind];
   if(window._thanksDebug)console.log('[Danke]',kind,'offen:',c[kind],'| beim Start:',had);
@@ -14276,6 +14356,7 @@ function renderPlayerMode(){
   // pinned layout they were built for.
   document.body.classList.toggle('hub-home',!!(window._hubMode&&!window._hubAction));
   // Hub without a deep link: show the overview
+  if(window._hubAction==='physio')return renderPhysioAsk();
   if(window._hubMode&&!window._hubAction)return renderHub();
   if(window._rpeOnly)return renderRpeOnly();
   const D=cd();
