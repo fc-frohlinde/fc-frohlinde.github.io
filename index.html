@@ -3821,7 +3821,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787503223547; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787503910822; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -14289,7 +14289,7 @@ function renderPlayerMode(){
       ?`<div class="pm-loc">${locNameHtml(s,_amEscapeText)}</div>`
       :'';
     // Trainer's note for this session — surfaced for the player (e.g. "Bring 2 pairs of cleats")
-    const noteInfo=(s.note&&s.note.trim())?`<div class="pm-note">\ud83d\udccc ${_amEscapeText(s.note.trim())}</div>`:'';
+    const noteInfo='';   // trainers' note, not player-facing
     // Lineup position — only for matches where trainer has named player in the starting XI/bank
     const lineupInfo=f.isMatch?_pmLookupLineupRole(si,p):'';
     const cls=`pm-card pm-${f.isMatch?'match':'train'}${locked?' pm-locked':''}${isHero?' pm-hero-card':''}${status!==3?' pm-answered':''}`;
