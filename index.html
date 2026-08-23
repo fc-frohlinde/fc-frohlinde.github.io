@@ -2842,6 +2842,10 @@ html:has(body.hub-mode){background:#080f22;}
   font-family:'Barlow',sans-serif;font-size:.94rem;font-weight:700;background:#fff;color:var(--gd);}
 .phy-yes{background:var(--cp);border-color:var(--cp);color:#fff;}
 .phy-b:active{transform:scale(.98);}
+/* Read-only note: the choice is made in the physio step now. */
+.pm-physio-ro{display:flex;align-items:center;gap:9px;padding:9px 12px;
+  border-radius:12px;background:rgba(39,174,96,.16);border:1px solid rgba(39,174,96,.4);
+  color:#1a7a40;font-size:.8rem;font-weight:700;font-family:'Barlow',sans-serif;}
 .rpo-who{display:flex;flex-direction:column;gap:6px;max-height:56vh;overflow-y:auto;margin-top:6px;}
 .rpo-who-b{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:11px;
   border:1.5px solid var(--gl);background:var(--ow);color:var(--gd);cursor:pointer;
@@ -3885,7 +3889,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787507937320; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787508186696; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -14326,15 +14330,16 @@ function _hubThanksClose(){
 // Called after a status is set: if that was the last one, move on.
 function _hubCheckDone(kind){
   if(!isPlayerMode())return;
-  kind=(kind==='rpe'||kind==='physio')?kind:'week';
   const c=_hubOpenCounts();
-  const had=_hubEntry[kind];
-  if(window._thanksDebug)console.log('[Danke]',kind,'offen:',c[kind],'| beim Start:',had);
-  // Only for someone who arrived with something outstanding and has just
-  // finished it — revising an answer already given is no occasion to thank.
-  if(!had||had<=0)return;
-  if(c[kind]>0)return;
-  _hubEntry[kind]=0;
+  // Only once nothing at all is outstanding — a thank-you between two
+  // questions is not an ending, and one per step is three interruptions.
+  if(c.rpe>0||c.week>0||c.physio>0)return;
+  // And only for someone who arrived with work to do: revising an answer
+  // already given is no occasion to thank anyone.
+  const arrived=(_hubEntry.rpe||0)+(_hubEntry.week||0)+(_hubEntry.physio||0);
+  if(window._thanksDebug)console.log('[Danke] offen:0 | beim Start:',arrived);
+  if(arrived<=0)return;
+  _hubEntry={week:0,rpe:0,physio:0};
   _hubThanks(kind);
 }
 function hubBack(){
@@ -14457,17 +14462,14 @@ function renderPlayerMode(){
     const _phBooked=!!(Array.isArray(p.physio)&&p.physio[si]===true);
     const _phComing=(status===4||status===1);
     let physioHtml='';
-    if(_phOn&&_phComing&&!locked){
-      physioHtml=`<div class="pm-physio${_phBooked?' on':''}">
-        <button type="button" class="pm-physio-btn" onclick="pmTogglePhysio(${si})">
-          <span class="pm-physio-ic">\ud83e\uddd1\u200d\u2695\ufe0f</span>
-          <span class="pm-physio-txt">
-            <b>${_phBooked?'Beim Physio angemeldet':'Beim Physio anmelden'}</b>
-            <span>${_phBooked?'Tippen zum Abmelden':'An diesem Tag ist der Physio beim Training dabei'}</span>
-          </span>
-          <span class="pm-physio-mark">${_phBooked?'\u2713':''}</span>
-        </button></div>`;
+    // Booking moved to its own step after the registration; the card only
+    // reports what was chosen there.
+    if(_phOn&&_phComing&&_phBooked){
+      physioHtml='<div class="pm-physio on pm-physio-ro">'
+        +'<span class="pm-physio-ic">\ud83e\uddd1\u200d\u2695\ufe0f</span>'
+        +'<span>Physio-Termin gebucht</span></div>';
     }
+
     const kommeActive=(status===4||status===1);
     const kannNichtActive=(status===2||status===0);
     const kommeDisabled=locked;
