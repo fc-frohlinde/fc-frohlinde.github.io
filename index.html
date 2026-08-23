@@ -2380,13 +2380,17 @@ mark.sr-hl{background:rgba(243,156,18,.35);color:inherit;border-radius:2px;paddi
 body.player-mode>:not(#playerModeWrap):not(#authOverlay){display:none !important;}
 body.player-mode{padding:0;background:linear-gradient(160deg,var(--bg-dark) 0%,var(--bg-mid) 50%,var(--bg-dark) 100%);}
 body.player-mode.hub-mode{background:#080f22;}
+/* Every player screen, not just the overview. */
+body.player-mode{background:#080f22 !important;}
+body.player-mode #playerModeWrap{background:#080f22 !important;}
 body.hub-mode #playerModeWrap{background:#080f22;}
 body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
   overscroll-behavior:none;
   /* Opaque fill = the compositor's fallback for unpainted regions during a
-     fast fling. Transparent here meant the body's flat dark gradient flashed
-     through from the second/third swipe on, once Edge's toolbar animated. */
-  background:linear-gradient(160deg,var(--bg-dark) 0%,var(--bg-mid) 50%,var(--bg-dark) 100%);}
+     fast fling. Transparent here meant the background flashed through from
+     the second or third swipe on, once Edge's toolbar animated. Same flat
+     colour as the rest of the player screens. */
+  background:#080f22;}
 /* ═══════════ PLAYER MODE — Athlete-app redesign ═══════════ */
 .pm-wrap{max-width:560px;margin:0 auto;padding:0 0 32px;color:var(--gd);}
 
@@ -3821,7 +3825,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787504605767; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787504742594; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
