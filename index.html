@@ -2675,6 +2675,15 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .ssa-pos{flex-shrink:0;font-size:.58rem;min-width:30px;}
 .ssa-pos2{opacity:.62;}
+/* Tap adds one, long press removes one — no separate editor for a number that
+   is usually 0 or 1. */
+.ssa-gs{display:flex;gap:3px;flex-shrink:0;}
+.ssa-gs-b{display:inline-flex;align-items:center;gap:2px;padding:2px 6px;height:22px;
+  border-radius:var(--r-pill);border:1px solid var(--gl);background:#fff;
+  font-size:.72rem;cursor:pointer;line-height:1;user-select:none;}
+.ssa-gs-b b{font-family:'Bebas Neue',sans-serif;font-size:.82rem;color:var(--bd);}
+.ssa-gs-b:hover{border-color:var(--bm);}
+.ssa-gs-b:active{transform:scale(.94);}
 /* ── Player hub ──────────────────────────────────────────────
    Built on the report page's palette rather than the light cards used
    elsewhere: cards a shade lighter than the background read as one surface,
@@ -3799,7 +3808,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787403442637; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787502317116; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -5505,7 +5514,7 @@ function _padPlayerArrays(g){
       const need=blk.sessions.length;
       blk.players.forEach(p=>{
         if(!p)return;
-        ['rpe','rpeMin','perf','physio','excOK','preconfReason'].forEach(f=>{
+        ['rpe','rpeMin','perf','physio','excOK','preconfReason','goals','assists'].forEach(f=>{
           if(!Array.isArray(p[f]))return;
           while(p[f].length<need)p[f].push(null);
         });
@@ -5589,7 +5598,7 @@ function sanitizeG(data){
         keys.forEach(k=>{out[k]=inner[k];});
         return out;
       };
-      ['rpe','rpeMin','perf','physio','excOK'].forEach(f=>{
+      ['rpe','rpeMin','perf','physio','excOK','goals','assists'].forEach(f=>{
         if(p[f]!=null&&!Array.isArray(p[f]))p[f]=_byIndex(p[f]);
       });
       // Validate preconfReason: must be array of strings if present
@@ -15619,11 +15628,19 @@ function dbBuildPlayerStatsSnapshot(data,pi,offset,includePhoto){
     rpeWeeks[key].load+=v*rpeSessionMinutes(s,p,si);
     rpeWeeks[key].n++;
   });
+  // Season totals, and per match for the detail list
+  let _goals=0,_assists=0;
+  (block.sessions||[]).forEach((s,si)=>{
+    if(!s||s.type!=='match')return;
+    _goals+=(Array.isArray(p.goals)?p.goals[si]:0)||0;
+    _assists+=(Array.isArray(p.assists)?p.assists[si]:0)||0;
+  });
   const rpeSeries=Object.entries(rpeWeeks).sort((a,b)=>a[1].sk-b[1].sk).slice(-8)
     .map(([k,v])=>({kw:parseInt(k.split('-W')[1],10),load:Math.round(v.load),n:v.n}));
   return {
     v:2,kind:'player',
     publishedAt:Date.now(),
+    scorer:{goals:_goals,assists:_assists},
     club:(G&&G.clubName)||'FC Frohlinde',
     clubLogo:(G&&G.clubLogo)||null,
     team,season,
@@ -15647,7 +15664,8 @@ function dbBuildPlayerStatsSnapshot(data,pi,offset,includePhoto){
       streak,rank,ranked,
       weekday:wd.map(x=>({day:x.day,pct:x.pct,total:x.total})),
       trend:_psWeekSeries(p,block,season,10),
-      rpe:rpeSeries
+      // Load deliberately not published: it is a coaching instrument, and the
+    // player page no longer shows it.
     }
   };
 }
@@ -18250,6 +18268,10 @@ let _ssAttSi=null;
 // into it.
 function ssAttRender(){
   const si=_ssAttSi;
+  // Goals only make sense for a match that has been played.
+  const _ssD=cd();const _ssS=_ssD&&_ssD.sessions&&_ssD.sessions[si];
+  const _ssAttGoalsOn=!!(_ssS&&_ssS.type==='match'&&canEdit()
+    &&(typeof sessTookPlace!=='function'||sessTookPlace(_ssS,UI.currentSeason)));
   const body=document.getElementById('ss-att-body');
   const ttl=document.getElementById('ss-att-title');
   if(body==null||si==null)return;
@@ -18271,6 +18293,8 @@ function ssAttRender(){
   // tap — the same action the table cell offers, without a separate menu.
   body.innerHTML='<div class="ssa-list">'+pis.map(({p,pi,v})=>{
     const m=SS_ATT_META[v]||SS_ATT_META[3];
+    const g=(Array.isArray(p.goals)?p.goals[si]:0)||0;
+    const a=(Array.isArray(p.assists)?p.assists[si]:0)||0;
     const bcol=(typeof PB_COLORS!=='undefined'&&PB_COLORS[p.pos])||'#e6ecf5;color:#4a5b75';
     // .pb is the app-wide position badge: fixed width, so every badge is the
     // same size whatever the text inside.
@@ -18281,6 +18305,14 @@ function ssAttRender(){
       <span class="ssa-nr">${p.nr||'\u2013'}</span>
       <span class="ssa-nm">${escapeHtml(getDisplayName?getDisplayName(p):p.name)}</span>
       ${pos}${pos2}
+      ${_ssAttGoalsOn&&v===1?`<span class="ssa-gs">
+        <button class="ssa-gs-b" onclick="event.stopPropagation();ssAttStat(${pi},'goals',1)"
+          oncontextmenu="event.preventDefault();ssAttStat(${pi},'goals',-1)"
+          title="Tor \u2014 tippen +1, lange dr\u00fccken \u22121">\u26bd${g?'<b>'+g+'</b>':''}</button>
+        <button class="ssa-gs-b" onclick="event.stopPropagation();ssAttStat(${pi},'assists',1)"
+          oncontextmenu="event.preventDefault();ssAttStat(${pi},'assists',-1)"
+          title="Vorlage \u2014 tippen +1, lange dr\u00fccken \u22121">\ud83c\udfaf${a?'<b>'+a+'</b>':''}</button>
+      </span>`:''}
       <button class="ssa-st ${m.cls}" onclick="event.stopPropagation();ssAttMenu(${pi},this)"
         title="${m.n} \u2014 antippen zum \u00c4ndern">${m.i}</button>
     </div>`;
@@ -18288,6 +18320,26 @@ function ssAttRender(){
   +'<div class="ssa-menu" id="ssa-menu"></div>';
 }
 // Pick the status from a list — a mis-tap in a long list is silent otherwise.
+// p.goals[si] / p.assists[si] — same shape as rpe and perf, so the sparse-array
+// handling and the write path already cover them.
+function ssAttStat(pi,field,delta){
+  if(!canEdit()||_ssAttSi==null)return;
+  const D=cd();const p=D&&D.players&&D.players[pi];
+  const s=D&&D.sessions&&D.sessions[_ssAttSi];
+  if(!p||!s)return;
+  if(!Array.isArray(p[field]))p[field]=[];
+  while(p[field].length<D.sessions.length)p[field].push(null);
+  const cur=p[field][_ssAttSi]||0;
+  const next=Math.max(0,Math.min(20,cur+delta));
+  if(next===cur)return;
+  snap();
+  p[field][_ssAttSi]=next||null;
+  saveG();
+  logAudit(field==='goals'?'Tor erfasst':'Vorlage erfasst',
+    (getDisplayName?getDisplayName(p):p.name)+' \u00b7 '+(s.date||'?'),
+    cur+' \u2192 '+next);
+  ssAttRender();
+}
 function ssAttMenu(pi,btn){
   if(!canEdit()||_ssAttSi==null)return;
   const menu=document.getElementById('ssa-menu');
