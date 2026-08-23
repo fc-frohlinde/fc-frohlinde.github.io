@@ -176,8 +176,7 @@
   .ps-bar-wrap{flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center;min-height:0;}
   .ps-bar{width:62%;max-width:26px;background:#3ddc84;border-radius:4px 4px 0 0;min-height:3px;}
   .ps-bar-alt{background:#4d9fff;}
-  .ps-bar-load{background:#ffb020;}
-  .ps-col-l{font-size:.58rem;color:rgba(255,255,255,.45);margin-top:4px;}
+    .ps-col-l{font-size:.58rem;color:rgba(255,255,255,.45);margin-top:4px;}
   .ps-col-v{font-size:.6rem;color:rgba(255,255,255,.75);font-weight:700;}
   .ps-note{font-size:.66rem;color:rgba(255,255,255,.45);margin-top:8px;line-height:1.4;}
   .ps-foot{font-size:.66rem;color:rgba(255,255,255,.35);text-align:center;margin-top:18px;}
@@ -626,7 +625,6 @@ function renderReport(r){
       :`<div class="ps-av ps-av-ph">${esc((p.name||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase())}</div>`;
     const wdMax=Math.max(1,...(det.weekday||[]).map(w=>w.pct||0));
     const trMax=Math.max(1,...(det.trend||[]).map(t=>t.pct||0));
-    const loadMax=Math.max(1,...(det.rpe||[]).map(r=>r.load||0));
     let html=`<div class="ps-hero">
       ${av}
       <div class="ps-hero-txt">
@@ -639,6 +637,8 @@ function renderReport(r){
       <div class="ps-kpi"><div class="ps-kpi-v ${pctCls(p.sPct)}">${p.sPct==null?'\u2013':p.sPct+'%'}</div><div class="ps-kpi-l">Saison</div><div class="ps-kpi-s">${p.sPresent}/${p.sTotal}</div></div>
       <div class="ps-kpi"><div class="ps-kpi-v ${pctCls(p.wPct)}">${p.wPct==null?'\u2013':p.wPct+'%'}</div><div class="ps-kpi-l">Diese Woche</div><div class="ps-kpi-s">${p.wPresent}/${p.wTotal}</div></div>
       <div class="ps-kpi"><div class="ps-kpi-v">${det.streak||0}</div><div class="ps-kpi-l">Serie</div><div class="ps-kpi-s">in Folge</div></div>
+      ${d.scorer?`<div class="ps-kpi"><div class="ps-kpi-v">${d.scorer.goals||0}</div><div class="ps-kpi-l">Tore</div><div class="ps-kpi-s">Saison</div></div>
+      <div class="ps-kpi"><div class="ps-kpi-v">${d.scorer.assists||0}</div><div class="ps-kpi-l">Vorlagen</div><div class="ps-kpi-s">Saison</div></div>`:''}
       ${det.rank?`<div class="ps-kpi"><div class="ps-kpi-v">#${det.rank}</div><div class="ps-kpi-l">Platz</div><div class="ps-kpi-s">von ${det.ranked}</div></div>`:''}
     </div>
     <div class="ps-sec">
@@ -660,13 +660,6 @@ function renderReport(r){
         <div class="ps-chart">${det.weekday.map(w=>
           `<div class="ps-col"><div class="ps-bar-wrap"><div class="ps-bar ps-bar-alt" style="height:${Math.round(((w.pct||0)/wdMax)*100)}%"></div></div>
            <div class="ps-col-l">${esc(w.day)}</div><div class="ps-col-v">${w.pct==null?'\u2013':w.pct+'%'}</div></div>`).join('')}</div></div>`;
-    }
-    if(det.rpe&&det.rpe.length){
-      html+=`<div class="ps-sec"><div class="ps-h">Deine Belastung (eigene Einsch\u00e4tzung)</div>
-        <div class="ps-chart">${det.rpe.map(r=>
-          `<div class="ps-col"><div class="ps-bar-wrap"><div class="ps-bar ps-bar-load" style="height:${Math.round((r.load/loadMax)*100)}%"></div></div>
-           <div class="ps-col-l">KW${r.kw}</div><div class="ps-col-v">${r.load}</div></div>`).join('')}</div>
-        <div class="ps-note">Belastung = deine Bewertung \u00d7 Minuten. Nur deine eigenen Angaben.</div></div>`;
     }
     html+=`<div class="ps-foot">Stand: ${new Date(d.publishedAt).toLocaleDateString('de-DE')} \u00b7 ${esc(d.club||'')}</div>`;
     const root=document.getElementById('app')||document.body;
