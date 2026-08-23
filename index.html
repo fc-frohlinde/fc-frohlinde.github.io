@@ -2848,6 +2848,7 @@ html:has(body.hub-mode){background:#080f22;}
 .phy-b{padding:15px;border-radius:12px;border:1.5px solid var(--gl);cursor:pointer;
   font-family:'Barlow',sans-serif;font-size:.94rem;font-weight:700;background:#fff;color:var(--gd);}
 .phy-yes{background:var(--cp);border-color:var(--cp);color:#fff;}
+.phy-b.on{outline:3px solid var(--bd);outline-offset:2px;}
 .phy-b:active{transform:scale(.98);}
 /* Read-only note: the choice is made in the physio step now. */
 .pm-physio-ro{display:flex;align-items:center;gap:9px;padding:9px 12px;
@@ -3896,7 +3897,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787508998516; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787509205278; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -14061,10 +14062,25 @@ function renderPhysioAsk(){
   const pi=_pmValidateIdx();
   const p=(pi!=null)?D.players[pi]:null;
   const c=_hubOpenCounts();
-  const si=(c.physioList&&c.physioList.length)?c.physioList[0]:null;
+  let si=(c.physioList&&c.physioList.length)?c.physioList[0]:null;
+  // Nothing unanswered: show the offer he already answered, so the choice can
+  // be revised rather than the screen closing under him.
+  if(si==null){
+    const weekStart=(typeof _pmWeekStart==='function')?_pmWeekStart():todaySK();
+    const horizon=(typeof _pmWeekHorizon==='function')?_pmWeekHorizon():todaySK();
+    (D.sessions||[]).forEach((s2,i2)=>{
+      if(si!=null||!s2||!s2.date)return;
+      if(typeof sessPhysioOn!=='function'||!sessPhysioOn(s2))return;
+      const k=dispToSortKey(s2.date);
+      if(k<weekStart||k>horizon)return;
+      const st=(p.s&&i2<p.s.length)?p.s[i2]:3;
+      if(st===4||st===1)si=i2;
+    });
+  }
   const s=(si!=null)?D.sessions[si]:null;
   if(!p||!s){window._hubAction='';return renderPlayerMode();}
-  const left=c.physio-1;
+  const cur=_physioState(p,si);
+  const left=Math.max(0,c.physio-1);
   wrap.innerHTML=`<div class="rpo-wrap">
     ${RPE_IS_PREVIEW?'<div class="rpo-prev">\ud83d\udc41 Vorschau \u00b7 Eingaben werden <b>nicht</b> gespeichert</div>':''}
     <div class="rpo-card">
@@ -14072,8 +14088,8 @@ function renderPhysioAsk(){
       <div class="rpo-h">${escapeHtml(s.date)}</div>
       <div class="rpo-q">An diesem Tag ist der Physio beim Training dabei.<br>M\u00f6chtest du einen Termin?</div>
       <div class="phy-btns">
-        <button class="phy-b phy-yes" onclick="pmAnswerPhysio(${si},true)">\u2713 Ja, bitte</button>
-        <button class="phy-b phy-no" onclick="pmAnswerPhysio(${si},false)">Nein, danke</button>
+        <button class="phy-b phy-yes${cur==='ja'?' on':''}" onclick="pmAnswerPhysio(${si},true)">\u2713 Ja, bitte</button>
+        <button class="phy-b phy-no${cur==='nein'?' on':''}" onclick="pmAnswerPhysio(${si},false)">Nein, danke</button>
       </div>
       ${left>0?`<div class="rpo-sub">Noch ${left} weitere${left===1?'r':''} Termin${left===1?'':'e'}</div>`:''}
     </div>
@@ -14226,9 +14242,12 @@ function renderHub(){
       escapeHtml(s2.date)+(cnt.rpe?' \u00b7 noch offen':' \u00b7 beantwortet'),
       cnt.rpe||'',buildHubLink(tok,'rpe',si2));
   }
-  if(cnt.physio>0){
+  // Visible while the offer stands, so a booking can be cancelled or added —
+  // it used to disappear the moment he answered.
+  if(cnt.physioTotal>0){
     cards+=card('\ud83e\uddd1\u200d\u2695\ufe0f','Physiotherapie',
-      cnt.physio+' offen',cnt.physio,buildHubLink(tok,'physio'));
+      cnt.physio?(cnt.physio+' offen'):'beantwortet',
+      cnt.physio||'',buildHubLink(tok,'physio'));
   }
   if(statsUrl)cards+=card('\ud83d\udcca','Meine Statistik','Anwesenheit, Serie, Verlauf','',statsUrl);
   if(repUrl)cards+=card('\ud83d\udccb','Wochenbericht','KW '+(rep.kw||'')+' \u00b7 die ganze Mannschaft','',repUrl);
@@ -14825,11 +14844,16 @@ function pmSetStatus(si,val){
   if(current===targetStatus)return; // no-op
   const oldVal=current;
   p.s[si]=targetStatus;
-  // A physio slot booked for a session he is no longer attending would block
-  // a place nobody can use.
-  if(targetStatus!==4&&targetStatus!==1&&Array.isArray(p.physio)&&p.physio[si]===true){
-    p.physio[si]=null;
-  }
+  // Any change of status on a physio day resets the physio answer: a booking
+  // for a session he is no longer attending blocks a place nobody can use, and
+  // a "no thanks" given while he was out should not silently carry over to a
+  // day he is now attending. Cleared either way, so the question comes back.
+  try{
+    const _s=D.sessions&&D.sessions[si];
+    if(_s&&typeof sessPhysioOn==='function'&&sessPhysioOn(_s)&&Array.isArray(p.physio)&&p.physio[si]!=null){
+      p.physio[si]=null;
+    }
+  }catch(e){}
   // If switching to Angemeldet (Komme), clear any leftover reason
   if(targetStatus===4&&Array.isArray(p.preconfReason)&&si<p.preconfReason.length){
     p.preconfReason[si]='';
