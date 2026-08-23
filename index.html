@@ -3880,7 +3880,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787507185449; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787507204611; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -14232,28 +14232,18 @@ function _hubThanksClose(){
   }
 }
 // Called after a status is set: if that was the last one, move on.
-function _hubCheckDone(){
-  const _dbg=(m,v)=>{if(window._thanksDebug)console.log('[Danke]',m,v);};
-  _dbg('aufgerufen','isPlayerMode='+(typeof isPlayerMode==='function'?isPlayerMode():'?'));
-  if(!isPlayerMode()){_dbg('abbruch','nicht im Spielermodus');return;}
-  if(window._hubMode&&window._hubAction&&window._hubAction!=='week'){
-    _dbg('abbruch','_hubAction='+window._hubAction);return;}
-  const D=cd();
-  const pi=_pmValidateIdx();
-  const p=(pi!=null)?D.players[pi]:null;
-  if(!p)return;
-  const weekStart=(typeof _pmWeekStart==='function')?_pmWeekStart():todaySK();
-  const horizon=(typeof _pmWeekHorizon==='function')?_pmWeekHorizon():todaySK();
-  let open=0;
-  (D.sessions||[]).forEach((s,si)=>{
-    if(!s||!s.date)return;
-    const sk=dispToSortKey(s.date);
-    if(sk<weekStart||sk>horizon)return;
-    const v=(p.s&&si<p.s.length)?p.s[si]:3;
-    if(v===3)open++;
-  });
-  _dbg('offene Antworten',open);
-  if(open===0)_hubThanks();
+function _hubCheckDone(kind){
+  if(!isPlayerMode())return;
+  kind=(kind==='rpe')?'rpe':'week';
+  const c=_hubOpenCounts();
+  const had=_hubEntry[kind];
+  if(window._thanksDebug)console.log('[Danke]',kind,'offen:',c[kind],'| beim Start:',had);
+  // Only for someone who arrived with something outstanding and has just
+  // finished it — revising an answer already given is no occasion to thank.
+  if(!had||had<=0)return;
+  if(c[kind]>0)return;
+  _hubEntry[kind]=0;
+  _hubThanks(kind);
 }
 function hubBack(){
   const tok=(CU&&CU.playerToken)||'';
