@@ -3904,7 +3904,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787509724344; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787509849243; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -13473,8 +13473,12 @@ function tryPlayerUrlAuth(){
   if(hubToken){
     window._hubMode=true;
     window._hubAction=params.get('do')||'';
-    // No explicit destination: decide once the data is in, in _hubAutoRoute
-    if(!window._hubAction)window._hubDecide=true;
+    // No explicit destination: decide once the data is in, in _hubAutoRoute.
+    // Only on the first arrival in this browser session — a reload should land
+    // on the overview, not re-enter a chain the player already walked.
+    let _walked=false;
+    try{_walked=sessionStorage.getItem('fcf_hub_walked')===hubToken;}catch(e){}
+    if(!window._hubAction&&!_walked)window._hubDecide=true;
     const hs=parseInt(params.get('s'),10);
     window._hubSi=isNaN(hs)?null:hs;
     if(window._hubAction==='rpe'){
@@ -14338,6 +14342,11 @@ let _hubEntry={week:null,rpe:null,physio:null};
 function _hubAutoRoute(){
   if(!window._hubDecide)return;
   window._hubDecide=false;
+  // Remember that the chain ran, so a reload stays on the overview
+  try{
+    const t=(CU&&CU.playerToken)||'';
+    if(t)sessionStorage.setItem('fcf_hub_walked',t);
+  }catch(e){}
   const c=_hubOpenCounts();
   if(c.rpe>0){window._hubAction='rpe';window._rpeOnly=true;window._rpeOnlySi=c.rpeLast;_hubEntry.rpe=c.rpe;}
   else if(c.week>0){window._hubAction='week';_hubEntry.week=c.week;}
