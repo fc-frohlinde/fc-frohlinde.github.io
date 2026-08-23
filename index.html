@@ -173,6 +173,9 @@ body{background:linear-gradient(140deg,var(--bg-dark) 0%,var(--bg-mid) 55%,var(-
    space under the cards and cut off anything past the fold. */
 body.player-mode.hub-mode.hub-home{position:static;height:auto;max-height:none;overflow:visible;}
 html:has(body.hub-mode.hub-home){overflow:auto;}
+/* Painted before anything else, so the first frame is not a white page that
+   then turns dark. */
+html:has(body.player-mode){background:#080f22;}
   body.player-mode #playerModeWrap{height:100lvh;}
   body.player-mode .pm-wrap{padding-bottom:104px;}
 }
@@ -2380,6 +2383,50 @@ mark.sr-hl{background:rgba(243,156,18,.35);color:inherit;border-radius:2px;paddi
 body.player-mode>:not(#playerModeWrap):not(#authOverlay){display:none !important;}
 body.player-mode{padding:0;background:linear-gradient(160deg,var(--bg-dark) 0%,var(--bg-mid) 50%,var(--bg-dark) 100%);}
 body.player-mode.hub-mode{background:#080f22;}
+/* ── Player palette (from the weekly report) ─────────────────
+   Declared on the mode itself so every screen inherits it, instead of each
+   one carrying its own colours. */
+body.player-mode{
+  --p-bg:#080f22;--p-bg1:#0c1733;
+  --p-card:#131f3d;--p-br:#22335f;
+  --p-txt:#eef2fb;--p-dim:#9aa8c8;--p-faint:#6478a0;
+  --p-blue:#2e7de4;--p-green:#3ddc84;--p-amber:#f5a623;--p-red:#ff5c5c;
+}
+/* Cards and controls: the report's surface, not white */
+body.player-mode .pm-card,
+body.player-mode .pm-physio-btn,
+body.player-mode .rpo-card,
+body.player-mode .rpo-verify,
+body.player-mode .rpo-who-b{
+  background:var(--p-card) !important;border-color:var(--p-br) !important;
+  color:var(--p-txt) !important;box-shadow:none !important;}
+body.player-mode .pm-btn,
+body.player-mode .pm-rpe-n,
+body.player-mode .rpo-mbtn,
+body.player-mode .rpo-full,
+body.player-mode .pm-call-btn{
+  background:rgba(255,255,255,.06) !important;border-color:var(--p-br) !important;
+  color:var(--p-txt) !important;}
+body.player-mode .pm-btn.on,
+body.player-mode .pm-rpe-n.on{border-color:var(--p-blue) !important;}
+body.player-mode .pm-rpe{background:transparent !important;}
+body.player-mode .pm-avatar{background:var(--p-card) !important;}
+/* The hero was a blue gradient block; flat and quiet lets the content lead */
+body.player-mode .pm-hero{background:none !important;padding-top:30px;}
+body.player-mode .pm-name{color:var(--p-txt);}
+body.player-mode .pm-count{background:rgba(255,255,255,.1);}
+/* Text that was dark-on-white */
+body.player-mode .pm-card *,
+body.player-mode .rpo-card *{border-color:var(--p-br);}
+body.player-mode .pm-sess-date,
+body.player-mode .pm-sess-t,
+body.player-mode .rpo-h{color:var(--p-txt) !important;}
+body.player-mode .pm-sess-sub,
+body.player-mode .pm-sub,
+body.player-mode .rpo-hi,
+body.player-mode .rpo-sub,
+body.player-mode .rpo-legend,
+body.player-mode .rpo-min-h{color:var(--p-dim) !important;}
 /* Every player screen, not just the overview. */
 body.player-mode{background:#080f22 !important;}
 body.player-mode #playerModeWrap{background:#080f22 !important;}
@@ -3825,7 +3872,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787504742594; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787505122903; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
