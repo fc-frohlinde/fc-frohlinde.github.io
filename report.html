@@ -644,9 +644,15 @@ function renderReport(r){
       <div class="ps-kpi"><div class="ps-kpi-v ${pctCls(p.wPct)}">${p.wPct==null?'\u2013':p.wPct+'%'}</div><div class="ps-kpi-l">Diese Woche</div><div class="ps-kpi-s">${p.wPresent}/${p.wTotal}</div></div>
       <div class="ps-kpi"><div class="ps-kpi-v">${det.streak||0}</div><div class="ps-kpi-l">Serie</div><div class="ps-kpi-s">in Folge</div></div>
       ${det.rank?`<div class="ps-kpi"><div class="ps-kpi-v">#${det.rank}</div><div class="ps-kpi-l">Platz</div><div class="ps-kpi-s">von ${det.ranked}</div></div>`:''}
-      ${(d.scorer&&d.scorer.goals)?`<div class="ps-kpi"><div class="ps-kpi-v">${d.scorer.goals}</div><div class="ps-kpi-l">Tore</div><div class="ps-kpi-s">Saison</div></div>`:''}
-      ${(d.scorer&&d.scorer.assists)?`<div class="ps-kpi"><div class="ps-kpi-v">${d.scorer.assists}</div><div class="ps-kpi-l">Vorlagen</div><div class="ps-kpi-s">Saison</div></div>`:''}
     </div>
+    ${(d.scorer&&(d.scorer.goals||d.scorer.assists))?`
+    <div class="ps-sec">
+      <div class="ps-h">Deine Scorer-Bilanz</div>
+      <div class="ps-split">
+        <div class="ps-split-item"><span class="ps-split-ic">\u26bd</span><span class="ps-split-v">${d.scorer.goals||0}</span><span class="ps-split-l">${d.scorer.goals===1?'Tor':'Tore'}</span></div>
+        <div class="ps-split-item"><span class="ps-split-ic">\ud83c\udfaf</span><span class="ps-split-v">${d.scorer.assists||0}</span><span class="ps-split-l">${d.scorer.assists===1?'Vorlage':'Vorlagen'}</span></div>
+      </div>
+    </div>`:''}
     <div class="ps-sec">
       <div class="ps-h">Training &amp; Spiele</div>
       <div class="ps-split">
