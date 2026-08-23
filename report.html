@@ -152,12 +152,13 @@
   .ps-name{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:1.5px;color:#fff;line-height:1.1;}
   .ps-meta{font-size:.76rem;color:rgba(255,255,255,.6);margin-top:2px;}
   .ps-kw{font-size:.72rem;color:rgba(255,255,255,.5);margin-bottom:16px;}
-  .ps-kpis{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:16px;}
-/* Four to a row at most, and a short last row sits centred rather than
-   leaving a gap on the right. */
-.ps-kpis .ps-kpi{flex:1 1 calc(25% - 8px);min-width:78px;max-width:calc(50% - 4px);}
-@media (max-width:420px){
-  .ps-kpis .ps-kpi{flex:1 1 calc(33.333% - 8px);}
+  /* Always one row: four columns of equal width, however narrow the screen.
+   A minimum width here is what pushed the fourth tile onto its own line. */
+.ps-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:16px;}
+.ps-kpis .ps-kpi{min-width:0;padding:11px 3px;}
+@media (max-width:360px){
+  .ps-kpis{gap:4px;}
+  .ps-kpi-l{font-size:.56rem;}
 }
   .ps-kpi{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
     border-radius:12px;padding:11px 6px;text-align:center;}
@@ -649,8 +650,8 @@ function renderReport(r){
     <div class="ps-sec">
       <div class="ps-h">Deine Scorer-Bilanz</div>
       <div class="ps-split">
-        <div class="ps-split-item"><span class="ps-split-ic">\u26bd</span><span class="ps-split-v">${d.scorer.goals||0}</span><span class="ps-split-l">${d.scorer.goals===1?'Tor':'Tore'}</span></div>
-        <div class="ps-split-item"><span class="ps-split-ic">\ud83c\udfaf</span><span class="ps-split-v">${d.scorer.assists||0}</span><span class="ps-split-l">${d.scorer.assists===1?'Vorlage':'Vorlagen'}</span></div>
+        ${d.scorer.goals?`<div class="ps-split-item"><span class="ps-split-ic">\u26bd</span><span class="ps-split-v">${d.scorer.goals}</span><span class="ps-split-l">${d.scorer.goals===1?'Tor':'Tore'}</span></div>`:''}
+        ${d.scorer.assists?`<div class="ps-split-item"><span class="ps-split-ic">\ud83c\udfaf</span><span class="ps-split-v">${d.scorer.assists}</span><span class="ps-split-l">${d.scorer.assists===1?'Vorlage':'Vorlagen'}</span></div>`:''}
       </div>
     </div>`:''}
     <div class="ps-sec">
