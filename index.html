@@ -3889,7 +3889,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787508421902; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787508590679; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -13988,13 +13988,7 @@ function pmAnswerPhysio(si,yes){
   p.physio[si]=yes?true:false;
   if(!RPE_IS_PREVIEW)_pmSaveTargeted(si);
   else if(typeof showSaveFlash==='function')showSaveFlash('\ud83d\udc41 Vorschau \u2014 nicht gespeichert');
-  const c=_hubOpenCounts();
-  if(c.physio>0){renderPhysioAsk();return;}
   try{_hubCheckDone('physio');}catch(e){}
-  if(!document.getElementById('hubThanks')){
-    window._hubAction='';
-    renderPlayerMode();
-  }
 }
 function renderRpeOnly(){
   const wrap=document.getElementById('playerModeWrap');
@@ -14188,11 +14182,16 @@ function _hubOpenCounts(){
     // Physio: only where it is offered, the player is coming, and the deadline
     // has not passed. The button on the session card is easy to miss, so this
     // is asked as its own step.
-    if(typeof sessPhysioOn==='function'&&sessPhysioOn(s)&&!_amRsvpLocked(si)){
-      const st=(p.s&&si<p.s.length)?p.s[si]:3;
-      if(st===4||st===1){
-        out.physioTotal++;
-        if(_physioState(p,si)==='offen'){out.physio++;out.physioList.push(si);}
+    if(typeof sessPhysioOn==='function'&&sessPhysioOn(s)&&s.date&&!_amRsvpLocked(si)){
+      const sk2=dispToSortKey(s.date);
+      // Still ahead, and inside the week being asked about — an offer for a
+      // session already played is not a question.
+      if(sk2>=weekStart&&sk2<=horizon){
+        const st=(p.s&&si<p.s.length)?p.s[si]:3;
+        if(st===4||st===1){
+          out.physioTotal++;
+          if(_physioState(p,si)==='offen'){out.physio++;out.physioList.push(si);}
+        }
       }
     }
   });
@@ -14205,24 +14204,9 @@ function _hubAutoRoute(){
   if(!window._hubDecide)return;
   window._hubDecide=false;
   const c=_hubOpenCounts();
-  // Load first: it is asked about a session just finished and its window
-  // closes, while the registration stays open all week.
-  if(c.rpe>0){
-    window._hubAction='rpe';
-    window._rpeOnly=true;
-    window._rpeOnlySi=c.rpeLast;
-    _hubEntry.rpe=c.rpe;
-    return;
-  }
-  if(c.week>0){
-    window._hubAction='week';
-    _hubEntry.week=c.week;
-    return;
-  }
-  if(c.physio>0){
-    window._hubAction='physio';
-    _hubEntry.physio=c.physio;
-  }
+  if(c.rpe>0){window._hubAction='rpe';window._rpeOnly=true;window._rpeOnlySi=c.rpeLast;_hubEntry.rpe=c.rpe;}
+  else if(c.week>0){window._hubAction='week';_hubEntry.week=c.week;}
+  else if(c.physio>0){window._hubAction='physio';_hubEntry.physio=c.physio;}
 }
 // Shown when the last answer lands: a moment of acknowledgement, then the
 // overview. Without it the screen would simply swap and look like a glitch.
@@ -14268,44 +14252,56 @@ function _hubThanks(kind){
       '| sichtbar:',getComputedStyle(el).display);
   }
 }
+
+// Called after a status is set: if that was the last one, move on.
+
+// The chain in one place. Two blocks, each ending in its own acknowledgement:
+//   load rating  → Danke
+//   registration → physio (if offered) → Danke
+//   → overview
+// Physio sits inside the second block because it only applies to sessions the
+// player has just said he is attending.
+function _hubGoNext(){
+  const c=_hubOpenCounts();
+  if(c.rpe>0){
+    window._hubAction='rpe';window._rpeOnly=true;window._rpeOnlySi=c.rpeLast;
+    if(!_hubEntry.rpe)_hubEntry.rpe=c.rpe;
+  }else if(c.week>0){
+    window._hubAction='week';window._rpeOnly=false;
+    if(!_hubEntry.week)_hubEntry.week=c.week;
+  }else if(c.physio>0){
+    window._hubAction='physio';window._rpeOnly=false;
+    if(!_hubEntry.physio)_hubEntry.physio=c.physio;
+  }else{
+    window._hubAction='';window._rpeOnly=false;
+  }
+  try{renderPlayerMode();}catch(e){}
+}
+// Called after an answer. `kind` says which screen it came from.
+function _hubCheckDone(kind){
+  if(!isPlayerMode())return;
+  const c=_hubOpenCounts();
+  if(window._thanksDebug)console.log('[Danke]',kind,'offen:',JSON.stringify(c),'| Start:',JSON.stringify(_hubEntry));
+  // Load block: thanks as soon as every rating is in.
+  if(kind==='rpe'){
+    if(c.rpe>0)return _hubGoNext();
+    if(_hubEntry.rpe>0){_hubEntry.rpe=0;return _hubThanks('rpe');}
+    return _hubGoNext();
+  }
+  // Registration + physio: thanks only once both are settled.
+  if(c.week>0||c.physio>0)return _hubGoNext();
+  const arrived=(_hubEntry.week||0)+(_hubEntry.physio||0);
+  if(arrived>0){
+    _hubEntry.week=0;_hubEntry.physio=0;
+    return _hubThanks(kind==='physio'?'physio':'week');
+  }
+  _hubGoNext();
+}
 function _hubThanksClose(){
   const el=document.getElementById('hubThanks');
   if(el){el.style.opacity='0';setTimeout(()=>el.remove(),260);}
   if(!window._hubMode)return;
-  const c=_hubOpenCounts();
-  if(c.rpe>0){
-    window._hubAction='rpe';
-    window._rpeOnly=true;
-    window._rpeOnlySi=c.rpeLast;
-    if(!_hubEntry.rpe)_hubEntry.rpe=c.rpe;
-  }else if(c.week>0){
-    window._hubAction='week';
-    window._rpeOnly=false;
-    if(!_hubEntry.week)_hubEntry.week=c.week;
-  }else if(c.physio>0){
-    window._hubAction='physio';
-    window._rpeOnly=false;
-    if(!_hubEntry.physio)_hubEntry.physio=c.physio;
-  }else{
-    window._hubAction='';
-    window._rpeOnly=false;
-  }
-  try{renderPlayerMode();}catch(e){}
-}
-// Called after a status is set: if that was the last one, move on.
-function _hubCheckDone(kind){
-  if(!isPlayerMode())return;
-  const c=_hubOpenCounts();
-  // Only once nothing at all is outstanding — a thank-you between two
-  // questions is not an ending, and one per step is three interruptions.
-  if(c.rpe>0||c.week>0||c.physio>0)return;
-  // And only for someone who arrived with work to do: revising an answer
-  // already given is no occasion to thank anyone.
-  const arrived=(_hubEntry.rpe||0)+(_hubEntry.week||0)+(_hubEntry.physio||0);
-  if(window._thanksDebug)console.log('[Danke] offen:0 | beim Start:',arrived);
-  if(arrived<=0)return;
-  _hubEntry={week:0,rpe:0,physio:0};
-  _hubThanks(kind);
+  _hubGoNext();
 }
 function hubBack(){
   const tok=(CU&&CU.playerToken)||'';
