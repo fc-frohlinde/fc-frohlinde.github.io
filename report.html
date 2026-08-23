@@ -170,7 +170,8 @@
     border-radius:14px;padding:14px;margin-bottom:12px;}
   .ps-h{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1.4px;
     color:rgba(255,255,255,.9);margin-bottom:10px;text-transform:uppercase;}
-  .ps-split{display:flex;gap:10px;margin-bottom:9px;}
+  .ps-split{display:flex;gap:8px;margin-bottom:9px;}
+.ps-split>.ps-split-item{flex:1 1 0;min-width:0;}
   .ps-split-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
     background:rgba(255,255,255,.06);border-radius:10px;padding:10px 6px;}
   .ps-split-ic{font-size:1.1rem;}
@@ -646,10 +647,11 @@ function renderReport(r){
       <div class="ps-kpi"><div class="ps-kpi-v">${det.streak||0}</div><div class="ps-kpi-l">Serie</div><div class="ps-kpi-s">in Folge</div></div>
       ${det.rank?`<div class="ps-kpi"><div class="ps-kpi-v">#${det.rank}</div><div class="ps-kpi-l">Platz</div><div class="ps-kpi-s">von ${det.ranked}</div></div>`:''}
     </div>
-    ${(d.scorer&&(d.scorer.goals||d.scorer.assists))?`
+    ${(d.scorer&&(d.scorer.apps||d.scorer.goals||d.scorer.assists))?`
     <div class="ps-sec">
       <div class="ps-h">Deine Scorer-Bilanz</div>
       <div class="ps-split">
+        <div class="ps-split-item"><span class="ps-split-ic">\ud83d\udc5f</span><span class="ps-split-v">${d.scorer.apps||0}</span><span class="ps-split-l">${d.scorer.apps===1?'Spiel':'Spiele'}</span></div>
         ${d.scorer.goals?`<div class="ps-split-item"><span class="ps-split-ic">\u26bd</span><span class="ps-split-v">${d.scorer.goals}</span><span class="ps-split-l">${d.scorer.goals===1?'Tor':'Tore'}</span></div>`:''}
         ${d.scorer.assists?`<div class="ps-split-item"><span class="ps-split-ic">\ud83c\udfaf</span><span class="ps-split-v">${d.scorer.assists}</span><span class="ps-split-l">${d.scorer.assists===1?'Vorlage':'Vorlagen'}</span></div>`:''}
       </div>
