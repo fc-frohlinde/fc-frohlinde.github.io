@@ -3880,7 +3880,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787507204611; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787507448074; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -14226,10 +14226,22 @@ function _hubThanks(kind){
 function _hubThanksClose(){
   const el=document.getElementById('hubThanks');
   if(el){el.style.opacity='0';setTimeout(()=>el.remove(),260);}
-  if(window._hubMode){
+  if(!window._hubMode)return;
+  const c=_hubOpenCounts();
+  if(c.rpe>0){
+    window._hubAction='rpe';
+    window._rpeOnly=true;
+    window._rpeOnlySi=c.rpeLast;
+    if(_hubEntry.rpe===null||_hubEntry.rpe===0)_hubEntry.rpe=c.rpe;
+  }else if(c.week>0){
+    window._hubAction='week';
+    window._rpeOnly=false;
+    if(_hubEntry.week===null||_hubEntry.week===0)_hubEntry.week=c.week;
+  }else{
     window._hubAction='';
-    try{renderPlayerMode();}catch(e){}
+    window._rpeOnly=false;
   }
+  try{renderPlayerMode();}catch(e){}
 }
 // Called after a status is set: if that was the last one, move on.
 function _hubCheckDone(kind){
