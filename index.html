@@ -2778,10 +2778,16 @@ html:has(body.hub-mode){background:#080f22;}
 .hub-chev{font-size:1.3rem;color:var(--hdim);opacity:.6;flex-shrink:0;}
 .hub-empty{text-align:center;color:var(--hdim);padding:30px 0;font-size:1.6rem;}
 .hub-empty span{display:block;font-size:.84rem;margin-top:6px;}
-.hub-thanks{position:fixed;inset:0;z-index:950;display:flex;align-items:center;
-  justify-content:center;background:rgba(8,15,34,.86);opacity:0;
-  transition:opacity .26s;pointer-events:none;}
+/* Fixed to the viewport and above everything the player screens draw, so it
+   is centred whatever the page is scrolled to. */
+.hub-thanks{position:fixed;inset:0;z-index:100001;display:flex;align-items:center;
+  justify-content:center;background:rgba(8,15,34,.92);opacity:0;
+  transition:opacity .26s;padding:20px;}
 .hub-thanks.on{opacity:1;}
+.hub-thanks-b{margin-top:22px;padding:12px 30px;border-radius:12px;border:none;
+  background:var(--bm);color:#fff;font-family:'Barlow',sans-serif;font-size:.92rem;
+  font-weight:700;cursor:pointer;}
+.hub-thanks-b:active{transform:scale(.97);}
 .hub-thanks-box{text-align:center;transform:scale(.9);transition:transform .26s cubic-bezier(.22,1,.36,1);}
 .hub-thanks.on .hub-thanks-box{transform:scale(1);}
 .hub-thanks-ic{width:74px;height:74px;margin:0 auto;border-radius:50%;
@@ -3874,7 +3880,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787505855254; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1787505965677; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -14140,23 +14146,33 @@ function _hubAutoRoute(){
 // Shown when the last answer lands: a moment of acknowledgement, then the
 // overview. Without it the screen would simply swap and look like a glitch.
 function _hubThanks(){
+  if(document.querySelector('.hub-thanks'))return;   // never twice
   const el=document.createElement('div');
   el.className='hub-thanks';
+  const onHub=!!window._hubMode;
   el.innerHTML='<div class="hub-thanks-box"><div class="hub-thanks-ic">\u2713</div>'
     +'<div class="hub-thanks-h">Danke!</div>'
-    +'<div class="hub-thanks-s">Alles beantwortet</div></div>';
+    +'<div class="hub-thanks-s">Alles beantwortet</div>'
+    +'<button class="hub-thanks-b" onclick="_hubThanksClose()">'
+    +(onHub?'Zur \u00dcbersicht':'Schlie\u00dfen')+'</button></div>';
   document.body.appendChild(el);
   requestAnimationFrame(()=>el.classList.add('on'));
-  setTimeout(()=>{
-    el.classList.remove('on');
-    setTimeout(()=>el.remove(),260);
+}
+function _hubThanksClose(){
+  const el=document.querySelector('.hub-thanks');
+  if(el){el.classList.remove('on');setTimeout(()=>el.remove(),260);}
+  if(window._hubMode){
     window._hubAction='';
     try{renderPlayerMode();}catch(e){}
-  },1500);
+  }
 }
 // Called after a status is set: if that was the last one, move on.
 function _hubCheckDone(){
-  if(!window._hubMode||window._hubAction!=='week')return;
+  // Also for the older ?player= links already sitting in players' chats: the
+  // acknowledgement is worth having there too, it just returns to the same
+  // screen instead of an overview.
+  if(!isPlayerMode())return;
+  if(window._hubMode&&window._hubAction&&window._hubAction!=='week')return;
   const D=cd();
   const pi=_pmValidateIdx();
   const p=(pi!=null)?D.players[pi]:null;
