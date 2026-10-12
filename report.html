@@ -330,6 +330,12 @@
   .empty-week-txt b{color:var(--txt);}
   .fade-seq{opacity:0;animation:fadeUp .55s ease forwards;}
   @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+  .live-back{position:fixed;top:calc(10px + env(safe-area-inset-top));left:10px;z-index:50;
+    padding:7px 13px;border-radius:999px;border:1px solid rgba(255,255,255,.18);
+    background:rgba(19,31,61,.85);color:#eef2fb;font:600 .8rem 'Barlow',sans-serif;cursor:pointer;
+    -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);}
+  body.live{padding-top:46px;}
+  .live-back:hover{background:rgba(34,51,95,.95);}
 </style>
 </head>
 <body>
@@ -595,6 +601,25 @@ function renderReport(r){
 
 // ── Load ──
 (function(){
+  // Opened from the player hub: the hub built this report live and handed it
+  // over in sessionStorage — nothing to load, nothing published.
+  const local=getParam('local');
+  if(local){
+    let d=null;
+    try{d=JSON.parse(sessionStorage.getItem('fcf_live_'+local)||'null');}catch(e){}
+    if(!d){
+      showError('\u26a0\ufe0f','Nicht verf\u00fcgbar','Bitte \u00fcber dein Spieler-Men\u00fc erneut \u00f6ffnen.');
+    }else{
+      try{(d.kind==='player')?renderPlayerStats(d):renderReport(d);}
+      catch(e){showError('\u26a0\ufe0f','Anzeigefehler','Der Bericht konnte nicht dargestellt werden.');}
+    }
+    const b=document.createElement('button');
+    document.body.classList.add('live');
+    b.className='live-back';b.type='button';b.textContent='\u2039 Zur\u00fcck';
+    b.onclick=()=>{if(history.length>1)history.back();else location.href='./';};
+    document.body.appendChild(b);
+    return;
+  }
   const id=getParam('id');
   if(!id){
     showError('\ud83d\udd17','Kein Bericht angegeben',

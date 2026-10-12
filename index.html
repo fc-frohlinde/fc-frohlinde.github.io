@@ -2816,6 +2816,8 @@ html:has(body.hub-mode){background:#080f22;}
   color:rgba(255,255,255,.7);font-family:'Barlow',sans-serif;font-size:.82rem;
   font-weight:600;cursor:pointer;padding:14px 4px;}
 .hub-back:hover{color:#fff;}
+.db-wr-live{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--ow);
+  border:1px solid var(--gl);font-size:.78rem;color:var(--gd);line-height:1.45;}
 .hub-switch{display:block;margin:18px auto 4px;background:none;border:none;cursor:pointer;
   color:rgba(255,255,255,.45);font-family:'Barlow',sans-serif;font-size:.74rem;
   text-decoration:underline;text-underline-offset:2px;}
@@ -3525,8 +3527,7 @@ if(window._fbBlocked){
         <button class="btn" style="background:rgba(39,174,96,.15);color:#1a7a40;border:1.5px solid rgba(39,174,96,.4);font-size:.78rem;" onclick="openLineupForSess()">⚽ Aufstellung planen</button>
       </div>
       <div id="ss-rpe-ask-wrap" style="display:none;">
-        <button class="btn" style="background:rgba(155,89,182,.15);color:#7d3c98;border:1.5px solid rgba(155,89,182,.4);font-size:.78rem;" onclick="ssSendRpe(_currentSessIdx)">💪 Belastung abfragen</button>
-        <button class="btn" style="background:var(--ow);color:var(--gd);border:1.5px solid var(--gl);font-size:.78rem;flex:0 0 auto;padding-left:12px;padding-right:12px;" onclick="previewRpe(_currentSessIdx)" title="Ansehen, ohne zu speichern">👁</button>
+        <button class="btn" style="background:rgba(155,89,182,.15);color:#7d3c98;border:1.5px solid rgba(155,89,182,.4);font-size:.78rem;" onclick="previewRpe(_currentSessIdx)" title="So sieht die Abfrage im Spieler-Menü aus — ohne zu speichern">💪 Belastungs-Abfrage ansehen</button>
       </div>
       <div id="ss-lineup-view-wrap" style="display:none;">
         <button class="btn" style="background:rgba(52,152,219,.15);color:#1f6ea8;border:1.5px solid rgba(52,152,219,.4);font-size:.78rem;" onclick="openLineupForSess()">📋 Aufstellung ansehen</button>
@@ -3926,7 +3927,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791840516721; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791841971033; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -12091,53 +12092,8 @@ function _automationRenderCards(){
   if(!wrap)return;
   if(!canEdit()){wrap.innerHTML='';wrap.style.display='none';return;}
   let html='';
-  // Week report card
-  const wr=_automationShouldShowWeekReport();
-  if(wr){
-    const r=wr.report;
-    const parts=[];
-    if(r.trainCount)parts.push(r.trainCount+' Training'+(r.trainCount>1?'s':'')+' \u00b7 \u00d8 '+(r.teamAgg?r.teamAgg.overallPct:0)+'%');
-    if(r.matchCount)parts.push(r.matchCount+' Spiel'+(r.matchCount>1?'e':''));
-    let published=null;
-    try{
-      if(Array.isArray(G.reportLog)){
-        published=G.reportLog.find(e=>e&&e.team===UI.currentTeam&&e.season===UI.currentSeason&&e.kw===r.kw);
-      }
-    }catch(e){}
-    html+='<div class="auto-card">';
-    html+='<div class="auto-card-head"><span class="auto-card-icon">\ud83d\udcca</span>'
-      +'<div class="auto-card-title">Wochenbericht KW '+r.kw+' bereit</div>'
-      +'<button class="auto-card-x" onclick="_automationDismissWeekReport()" title="Diese Erinnerung schlie\u00dfen">\u2715</button>'
-      +'</div>';
-    html+='<div class="auto-card-meta">'+parts.join(' \u00b7 ')+'</div>';
-    if(!published){
-      html+='<div class="auto-card-note">\u26a0 Noch nicht ver\u00f6ffentlicht \u2014 zuerst im Dashboard ver\u00f6ffentlichen, damit der Link im Versand erscheint.</div>';
-    }
-    html+='<div class="auto-card-actions">';
-    html+='<button class="auto-card-btn primary" onclick="_automationSendWeekReport()">\ud83d\udce4 In Gruppe senden</button>';
-    html+='<button class="auto-card-btn" onclick="closeUserMenu();openWeekReport()">\u2699 Verwalten</button>';
-    html+='<button class="auto-card-btn ghost" onclick="_automationDismissWeekReport()">Schon erledigt</button>';
-    html+='</div>';
-    html+='</div>';
-  }
-  // RSVP reminder cards (one per session)
-  const rsvpCards=_automationListRsvpCards();
-  rsvpCards.forEach(c=>{
-    const isMatch=c.sess.type==='match';
-    const tt=isMatch?(c.sess.label?'Spiel gegen '+c.sess.label:'Spiel'):'Training';
-    html+='<div class="auto-card">';
-    html+='<div class="auto-card-head"><span class="auto-card-icon">\ud83d\udcc5</span>'
-      +'<div class="auto-card-title">'+_dbEscapeHtml(tt)+' \u00b7 '+_dbEscapeHtml(c.sess.date)+'</div>'
-      +'<button class="auto-card-x" onclick="_automationDismissRsvp(\''+c.key+'\')" title="Diese Erinnerung schlie\u00dfen">\u2715</button>'
-      +'</div>';
-    html+='<div class="auto-card-meta">'+c.pending+' Spieler haben noch nicht geantwortet</div>';
-    html+='<div class="auto-card-actions">';
-    html+='<button class="auto-card-btn primary" onclick="_automationSendRsvp('+c.si+',\''+c.key+'\')">\ud83d\udce4 In Gruppe senden</button>';
-    html+='<button class="auto-card-btn" onclick="openAnmeldungen('+c.si+')">\ud83d\udccb Details</button>';
-    html+='<button class="auto-card-btn ghost" onclick="_automationDismissRsvp(\''+c.key+'\')">Schon erledigt</button>';
-    html+='</div>';
-    html+='</div>';
-  });
+  // Week-report and RSVP-reminder cards removed: players use the hub
+  // themselves, nothing is sent from here any more.
   // Roll-call reminder cards (post-session attendance entry)
   const rcCards=_automationListRollCallCards();
   rcCards.forEach(c=>{
@@ -13492,6 +13448,33 @@ function _pmAppendAudit(entry){
     },()=>{},false);
   }catch(e){console.error('[PlayerAudit]',e);}
 }
+let _hubLive=null;
+function _hubBuildLive(found){
+  const block=G.db&&G.db[found.team+'__'+found.season];
+  if(!block||!Array.isArray(block.players)||!Array.isArray(block.sessions))return;
+  const data={team:found.team,season:found.season,block,sessions:block.sessions,players:block.players};
+  const off=(typeof _dbCompletedWeekOffset==='function')?_dbCompletedWeekOffset():-1;
+  let report=null,stats=null;
+  try{report=dbBuildReportSnapshot(data,off,false);}catch(e){console.error('[HubLive report]',e);}
+  try{stats=dbBuildPlayerStatsSnapshot(data,found.pi,off,true);}catch(e){console.error('[HubLive stats]',e);}
+  _hubLive={report,stats};
+}
+// Hands a live snapshot to report.html in the same tab (sessionStorage is
+// per tab and origin, so it never leaves this device).
+function hubOpenLive(kind){
+  const d=_hubLive&&_hubLive[kind];
+  if(!d)return;
+  let ok=false;
+  try{sessionStorage.setItem('fcf_live_'+kind,JSON.stringify(d));ok=true;}
+  catch(e){
+    // Quota: a photo too large — retry without it
+    try{const c=Object.assign({},d,{players:(d.players||[]).map(p=>Object.assign({},p,{photo:null}))});
+      sessionStorage.setItem('fcf_live_'+kind,JSON.stringify(c));ok=true;}catch(e2){}
+  }
+  if(!ok){alert('Bericht konnte nicht ge\u00f6ffnet werden.');return;}
+  allowLeaveOnce&&allowLeaveOnce();
+  location.href=location.origin+location.pathname.replace(/\/[^\/]*$/,'/')+'report.html?local='+kind;
+}
 function tryPlayerUrlAuth(){
   const params=new URLSearchParams(location.search);
   // ?rpe=<token>&s=<index> opens the load survey only. Same token, same auth
@@ -13553,6 +13536,10 @@ function tryPlayerUrlAuth(){
         CU={role:'player',name:found.player.name||'Spieler',teams:[found.team],playerToken:token,playerIdx:found.pi};
         UI.currentTeam=found.team;
         UI.currentSeason=found.season;
+        // Wochenbericht and personal statistics are built here, live, from the
+        // full roster — before privacy strips the other players. Nothing has to
+        // be published any more.
+        if(window._hubMode)try{_hubBuildLive(found);}catch(e){console.error('[HubLive]',e);}
         try{_pmSanitizeG();}catch(e){console.error('[PlayerPrivacy auth]',e);}
         try{
           localStorage.setItem('fcf_currentTeam',found.team);
@@ -14306,11 +14293,9 @@ function renderHub(){
     if(!s)return;
     if(rpeIsOpen(s,si,p,UI.currentSeason)&&!(Array.isArray(p.rpe)&&typeof p.rpe[si]==='number'))rpeDue.push({s,si});
   });
-  const statsUrl=(p.statsToken&&G.statsPublishedAt)?buildStatsLink(p.statsToken):'';
-  const rep=(Array.isArray(G.reportLog)&&G.reportLog.length)?G.reportLog[0]:null;
-  const repUrl=rep?_dbReportUrl(rep.token):'';
-  // Same tab for the two screens inside this app, a new one only for the two
-  // published pages, which are separate documents.
+  // Built live when the hub opened — nothing is published any more.
+  const live=_hubLive||{};
+  const rep=live.report;
   const card=(icon,title,sub,badge,href)=>{
     const inner=`<span class="hub-ic">${icon}</span>
       <span class="hub-txt"><b>${title}</b><span>${sub}</span></span>
@@ -14342,8 +14327,8 @@ function renderHub(){
       cnt.physio?(cnt.physio+' offen'):'beantwortet',
       cnt.physio||'',buildHubLink(tok,'physio'));
   }
-  if(statsUrl)cards+=card('\ud83d\udcca','Meine Statistik','Anwesenheit, Serie, Verlauf','',statsUrl);
-  if(repUrl)cards+=card('\ud83d\udccb','Wochenbericht','KW '+(rep.kw||'')+' \u00b7 die ganze Mannschaft','',repUrl);
+  if(live.stats)cards+=card('\ud83d\udcca','Meine Statistik','Anwesenheit, Serie, Verlauf','',"javascript:hubOpenLive('stats')");
+  if(rep)cards+=card('\ud83d\udccb','Wochenbericht','KW '+((rep.week&&rep.week.kw)||'')+' \u00b7 die ganze Mannschaft','',"javascript:hubOpenLive('report')");
   const av=p.photo
     ? `<img class="hub-av" src="${p.photo}" alt="">`
     : `<div class="hub-av hub-av-ph">${escapeHtml(String(p.name||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase())}</div>`;
@@ -15077,87 +15062,14 @@ function _amRenderOverview(){
   // Two groups: (1) team-link copy, (2) Wochenbericht with inline mini-preview
   // showing this week's headline stats so trainer can see at a glance whether
   // there's anything to share.
+  // One link for the whole squad, given once. Everything else — registration,
+  // load, physio, report, statistics — players do in the hub themselves.
   html+='<div class="am-broadcast-section">';
-  // Title and the group-link button share one line: the sub-line repeated what
-  // the title already says, and a single button had a whole row to itself.
   html+='<div class="am-bc-head">';
-  html+='<span class="am-broadcast-title">\ud83d\udce2 Mannschafts-Versand</span>';
-  html+='<button class="am-bc-btn" onclick="copyTeamLink()" title="Link für die Mannschafts-Gruppe">\ud83d\udd17 Gruppen-Link</button>';
+  html+='<span class="am-broadcast-title">\ud83d\udd17 Spieler-Men\u00fc</span>';
+  html+='<button class="am-bc-btn" onclick="copyTeamLink()" title="Ein Link f\u00fcr alle Spieler">\ud83d\udd17 Link kopieren</button>';
   html+='</div>';
-  // ── Weekly invite: one link covers the whole week, so this belongs to the
-  //    overview rather than to any single session. Five text variants.
-  const _wk=amWeekTemplateKey();
-  const _statsReady=!!G.statsPublishedAt;
-  const _outCount=players.filter(p=>p&&_amOutForWeek(p)).length;
-  html+=`<div class="am-week-block">
-    <div class="am-week-title">\ud83d\udcc5 Wochen-Einladung an alle Spieler</div>
-    <div class="am-week-row">
-      <select class="am-week-sel" onchange="amSetWeekTemplate(this.value)" title="Textvariante">
-        ${Object.entries(AM_WEEK_TEMPLATES).map(([k,v])=>
-          `<option value="${k}"${k===_wk?' selected':''}>${v.label}</option>`).join('')}
-      </select>
-      <button class="am-bc-btn" onclick="amShowWeekPreview()" title="Text ansehen">\ud83d\udc41 Vorschau</button>
-      <button class="am-bc-btn" onclick="amPreviewWeekText()" title="Text anpassen">\u270e Text</button>
-      <button class="am-bc-btn primary" onclick="amSendWeekAll()">\ud83d\udcf2 Senden</button>
-      <label class="am-week-toggle" title="Durchgehend entschuldigte Spieler \u2014 Urlaub, verletzt">
-        <input type="checkbox" ${_amState.hideOut?'checked':''} onchange="amToggleHideOut(this)">
-        <span>Abwesende ausblenden${_outCount?' ('+_outCount+')':''}</span>
-      </label>
-    </div>
-    <div id="am-week-preview" class="am-week-preview" style="display:none;"></div>
-    <div id="am-week-edit" class="am-week-edit" style="display:none;">
-      <textarea id="am-week-text" rows="10" spellcheck="false"></textarea>
-      <div class="am-week-edit-hint">Platzhalter: <code>{name}</code> \u00b7 <code>{link}</code> \u00b7 <code>{stats}</code> \u2014 sie werden pro Spieler ersetzt.</div>
-      <div class="am-week-edit-btns">
-        <button class="am-bc-btn primary" onclick="amWeekEditApply()">\ud83d\udcf2 An alle senden</button>
-        <button class="am-bc-btn" onclick="amWeekEditKeep()" title="Text merken \u2014 dann unten einzelne Spieler anschreiben">\u2713 Text \u00fcbernehmen</button>
-        <button class="am-bc-btn" onclick="amWeekEditReset()">\u21ba Vorlage</button>
-        <button class="am-bc-btn" onclick="amWeekEditClose()">Abbrechen</button>
-      </div>
-    </div>
-    <div class="am-week-hint">${_statsReady
-      ? '\u2705 Pers\u00f6nliche Statistik-Links werden mitgeschickt.'
-      : '\u2139\ufe0f Noch keine pers\u00f6nlichen Statistiken ver\u00f6ffentlicht \u2014 die Nachricht enth\u00e4lt nur den Anmeldelink.'}</div>
-  </div>`;
-  // Group 2: Wochenbericht — only if this week actually has sessions
-  try{
-    const data={team:UI.currentTeam,season:UI.currentSeason,block:G.db[UI.currentTeam+'__'+UI.currentSeason],sessions:D.sessions,players:D.players};
-    if(typeof dbComputeWeekReport==='function'){
-      const r=dbComputeWeekReport(data,_dbCompletedWeekOffset());
-      const hasContent=r&&(r.trainCount>0||r.matchCount>0);
-      html+='<div class="am-bc-week">';
-      if(hasContent){
-        const parts=[];
-        if(r.trainCount){
-          parts.push(r.trainCount+' Training'+(r.trainCount>1?'s':'')+' \u00b7 \u00d8 '+(r.teamAgg?r.teamAgg.overallPct:0)+'%');
-        }
-        if(r.matchCount){
-          parts.push(r.matchCount+' Spiel'+(r.matchCount>1?'e':''));
-        }
-        html+=`<div class="am-bc-week-head">Wochenbericht KW ${r.kw||'?'}: <span class="am-bc-week-meta">${parts.join(' \u00b7 ')}</span></div>`;
-        // Show whether a published report exists for this week
-        let published=null;
-        try{
-          if(Array.isArray(G.reportLog)){
-            published=G.reportLog.find(e=>e&&e.team===UI.currentTeam&&e.season===UI.currentSeason&&e.kw===r.kw);
-          }
-        }catch(e){}
-        if(published){
-          html+='<div class="am-bc-week-status am-bc-published">\u2713 Bereits ver\u00f6ffentlicht</div>';
-        } else {
-          html+='<div class="am-bc-week-status am-bc-unpublished">\u26a0 Noch nicht ver\u00f6ffentlicht \u2014 Link wird im Versand fehlen</div>';
-        }
-        // Shorter labels so both fit beside each other instead of stacking
-        html+='<div class="am-bc-row">';
-        html+='<button class="am-bc-btn" onclick="sendWeekReportWhatsApp()">\ud83d\udce4 In Gruppe</button>';
-        html+='<button class="am-bc-btn" onclick="closeM(\'moAnmeldungen\');openWeekReport()">\u2699 Bericht</button>';
-        html+='</div>';
-      } else {
-        html+='<div class="am-bc-week-head">Wochenbericht KW '+(r&&r.kw?r.kw:'?')+': <span class="am-bc-week-empty">keine Sitzungen diese Woche</span></div>';
-      }
-      html+='</div>';
-    }
-  }catch(e){console.error('[Anmeldungen] Wochenbericht preview failed',e);}
+  html+='<div class="am-week-hint">Einmal an die Mannschaft geben. Jeder w\u00e4hlt sich beim ersten \u00d6ffnen selbst aus und erledigt danach alles dort: Anmeldung, Belastung, Physio, Wochenbericht, Statistik.</div>';
   html+='</div>';
   // Stat bar
   html+='<div class="am-stat-row">';
@@ -15218,11 +15130,6 @@ function _amRenderOverview(){
       if(hasTok){
         html+=`<button class="btn-mini" onclick="copyPlayerLink('${_dbEscapeHtml(p.confirmToken)}')" title="Link kopieren">\ud83d\udd17</button>`;
         html+=`<button class="btn-mini" onclick="previewPlayer('${_dbEscapeHtml(p.confirmToken)}')" title="Spieleransicht \u00f6ffnen (Vorschau)">\ud83d\udc41</button>`;
-        if(phone){
-          html+=`<button class="btn-mini btn-wa" onclick="amSendOne(${pi},'general')" title="\u00dcber WhatsApp senden">\ud83d\udcac WA</button>`;
-        } else {
-          html+=`<button class="btn-mini btn-wa disabled" disabled title="Kein Telefon">\ud83d\udcac</button>`;
-        }
       } else {
         html+=`<button class="btn-mini" onclick="amCreateOne(${pi})">\u2795 Link</button>`;
       }
@@ -15267,10 +15174,6 @@ function _amRenderSessionView(sessIdx){
     const v=_amSessResponse(p,sessIdx);
     if(v===3||v==null)openPi.push(pi);
   });
-  if(openPi.length>0)html+=`<button class="am-bulk-btn primary" onclick="amSendBulk(${sessIdx},'open','reminder')">\u23f0 Erinnerung an Ausstehende (${openPi.length})</button>`;
-  if(allPi.length>0)html+=`<button class="am-bulk-btn" onclick="amSendBulk(${sessIdx},'all','session')">\ud83d\udcf2 Alle anschreiben (${allPi.length})</button>`;
-  // Broadcast: single wa.me link, trainer picks the WhatsApp group, no phone needed
-  html+=`<button class="am-bulk-btn" onclick="amBroadcastSession(${sessIdx})">\ud83d\udce2 In Gruppe broadcast</button>`;
 
   // (Adopt button removed in v1.0.4-beta+: Angemeldet is now a real status, no separate "adopt" step)
   html+='</div>';
@@ -15329,10 +15232,6 @@ function _amRenderSessionView(sessIdx){
       html+=`<div class="am-row-actions">`;
       if(!hasTok){
         html+=`<button class="btn-mini" onclick="amCreateOne(${pi})">\u2795 Link</button>`;
-      } else if(phone){
-        const kind=(v===3||v==null)?'reminder':'session';
-        const lbl=(v===3||v==null)?'\u23f0 Erinnerung':'\ud83d\udcac WA';
-        html+=`<button class="btn-mini btn-wa" onclick="amSendOne(${pi},'${kind}',${sessIdx})" title="WhatsApp senden">${lbl}</button>`;
       } else {
         html+=`<button class="btn-mini" onclick="copyPlayerLink('${_dbEscapeHtml(p.confirmToken)}')" title="Link kopieren">\ud83d\udd17</button>`;
         html+=`<button class="btn-mini" onclick="previewPlayer('${_dbEscapeHtml(p.confirmToken)}')" title="Spieleransicht öffnen (Vorschau)">\ud83d\udc41</button>`;
@@ -16588,55 +16487,8 @@ function dbRenderWeekReportSection(data){
     html+=`<div class="db-wr-teampct"><b>${r.teamAgg.overallPct==null?'\u2013':r.teamAgg.overallPct+'%'}</b><span>Team</span></div>`;
     html+='</div>';
   }
-  // Settings row (photo toggle + WhatsApp style if published) — assembled below
-  // Find existing published report for this week (used to decide what to render)
-  const existing=Array.isArray(G.reportLog)?G.reportLog.find(e=>e&&e.team===r.team&&e.season===r.season&&e.kw===r.kw):null;
-  // Photo-toggle HTML — reused in both states (above publish button OR in published settings row)
-  const photoToggleHtml=`<label class="db-wr-photo-toggle"><input type="checkbox" ${_dbState.reportIncludePhotos?'checked':''} onchange="dbToggleReportPhotos(this)"><span class="db-wr-photo-txt">Spielerfotos einbeziehen</span><span class="db-wr-hint">gr\u00f6\u00dfere Datei</span></label>`;
-  // No separate button: publishing the report updates the personal pages too.
-  const _spAt=G.statsPublishedAt?new Date(G.statsPublishedAt).toLocaleDateString('de-DE'):null;
-  const statsBtnHtml=`<span class="db-wr-hint" style="margin-left:10px;">\ud83d\udcca Pers\u00f6nliche Statistiken werden mitver\u00f6ffentlicht${_spAt?' \u00b7 zuletzt '+_spAt:''}</span>`;
-  // Publish area
-  if(existing){
-    const url=_dbReportUrl(existing.token);
-    const d=new Date(existing.publishedAt);
-    const ds=d.toLocaleDateString('de-DE')+' '+d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
-    const waTpl=(typeof getUserPref==='function')?getUserPref('waTemplate','hype'):'hype';
-    const previewText=_dbBuildWhatsAppText(existing.token,waTpl)||'';
-    html+='<div class="db-wr-published">';
-    html+=`<div class="db-wr-pub-status">\u2705 Ver\u00f6ffentlicht \u00b7 <span>${ds}</span></div>`;
-    html+=`<div class="db-wr-link">${_dbEscapeHtml(url)}</div>`;
-    // Settings under the link: photo toggle + WhatsApp style selector
-    html+='<div class="db-wr-settings">';
-    html+=photoToggleHtml+statsBtnHtml;
-    html+='<div class="db-wr-wa-stil"><label class="db-wr-wa-lbl">WhatsApp-Stil:</label>';
-    html+=`<select class="db-wr-wa-sel" onchange="dbSetWaTemplate(this)">`;
-    Object.entries(_waTemplates).forEach(([k,v])=>{
-      html+=`<option value="${k}" ${k===waTpl?'selected':''}>${_dbEscapeHtml(v.label)}</option>`;
-    });
-    html+='</select></div>';
-    html+='</div>';
-    // Live preview of WhatsApp text
-    html+=`<div class="db-wr-wa-preview-wrap">
-      <div class="db-wr-wa-preview-h">Vorschau (wird kopiert):</div>
-      <div class="db-wr-wa-preview" id="db-wr-wa-preview" data-token="${_dbEscapeHtml(existing.token)}">${_dbEscapeHtml(previewText)}</div>
-    </div>`;
-    html+='<div class="db-wr-pub-actions">';
-    html+=`<button class="btn bp db-wr-copy" onclick="dbCopyReportLink('${_dbEscapeHtml(existing.token)}',this)">\ud83d\udd17 Link kopieren</button>`;
-    html+=`<button class="btn bp db-wr-wa-btn" onclick="dbCopyWhatsAppText('${_dbEscapeHtml(existing.token)}',this)">\ud83d\udcac WhatsApp-Text</button>`;
-    html+=`<button class="btn bs db-wr-publish" onclick="dbPublishWeekReport()">\ud83d\udd04 Aktualisieren</button>`;
-    html+='</div></div>';
-  } else {
-    // Not yet published: photo toggle as standalone setting above the publish button
-    html+='<div class="db-wr-prepublish">';
-    html+=photoToggleHtml+statsBtnHtml;
-    html+='</div>';
-    html+='<div class="db-wr-pub-actions">';
-    const pubLbl=emptyWeek?'\ud83d\udce4 Ver\u00f6ffentlichen (nur Saison-Wertung)':'\ud83d\udce4 Bericht ver\u00f6ffentlichen';
-    html+=`<button class="btn bp db-wr-publish" onclick="dbPublishWeekReport()">${pubLbl}</button>`;
-    html+='</div>';
-  }
-  html+=dbRenderPublishedList();
+  // Nothing to publish: players see this report live in their hub.
+  html+='<div class="db-wr-live">\ud83d\udc65 Die Spieler sehen diesen Bericht <b>live</b> in ihrem Spieler-Men\u00fc \u2014 nichts zu ver\u00f6ffentlichen oder zu versenden.</div>';
   html+='</div>';
   return html;
 }
@@ -19481,7 +19333,6 @@ function buildSessAtt(si){
         // This avoids the cramped wrap when deadline gets long.
         summaryEl.innerHTML=`<div class="ss-rsvp">
           ${deadlineHtml||'<span class="ss-rsvp-none">Keine Frist gesetzt</span>'}
-          <button class="btn ss-rsvp-btn" onclick="openAnmeldungen(${si})">\ud83d\udcac Erinnern</button>
         </div>`;
       }
     }
@@ -28710,7 +28561,7 @@ checkAutoBackup();
   <!-- ── ARBEIT (canEdit) ── -->
   <div class="ud-sep" id="ud-work-sep" style="display:none;"></div>
   <div class="ud-group" id="ud-work-group" style="display:none;">Arbeit</div>
-  <div class="ud-item" id="ud-anmeld" onclick="closeUserMenu();openAnmeldungen()" style="display:none;">📋 Anmeldungen &amp; Versand</div>
+  <div class="ud-item" id="ud-anmeld" onclick="closeUserMenu();openAnmeldungen()" style="display:none;">📋 Anmeldungen &amp; Spieler-Menü</div>
   <div class="ud-item" id="ud-dashboard" onclick="closeUserMenu();openDashboard();" style="display:none;">📊 Dashboard</div>
   <div class="ud-item" id="ud-audit" onclick="closeUserMenu();openAuditLog();" style="display:none;">📜 Verlauf</div>
 
