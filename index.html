@@ -2727,7 +2727,7 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
    dropped and the status shrinks to its icon — the colour already says which. */
 .ssa-list{display:flex;flex-direction:column;gap:2px;}
 .ssa-row{display:flex;align-items:center;gap:8px;padding:4px 8px;border-radius:7px;}
-.ssa-row:nth-child(odd){background:var(--ow);}
+.ssa-row.ssa-z{background:var(--ow);} /* class, not nth-child: line headers sit between rows */
 /* Bebas sits high in its line box; nudged down so the number lines up with
    the name beside it. */
 .ssa-nr{font-family:'Bebas Neue',sans-serif;font-size:.86rem;color:var(--gm);
@@ -2736,6 +2736,15 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .ssa-pos{flex-shrink:0;font-size:.58rem;min-width:30px;}
 .ssa-pos2{opacity:.62;}
+/* Sort switch + position-line headers in the attendance window */
+.ssa-sort{display:flex;align-items:center;gap:5px;margin:0 0 8px;flex-wrap:wrap;}
+.ssa-sort-l{font-size:.68rem;font-weight:700;color:var(--gm);text-transform:uppercase;letter-spacing:.4px;margin-right:2px;}
+.ssa-sort .seg-btn{padding:4px 10px;font-size:.72rem;}
+.ssa-line{display:flex;align-items:center;gap:6px;margin:8px 2px 3px;font-size:.66rem;font-weight:700;
+  color:var(--gm);text-transform:uppercase;letter-spacing:.5px;}
+.ssa-line:first-child{margin-top:0;}
+.ssa-line::after{content:'';flex:1;height:1px;background:var(--gl);}
+.ssa-line b{font-family:'Bebas Neue',sans-serif;font-size:.84rem;color:var(--bd);letter-spacing:0;}
 /* Tap adds one, long press removes one — no separate editor for a number that
    is usually 0 or 1. */
 .ssa-gs{display:flex;gap:3px;flex-shrink:0;}
@@ -3913,7 +3922,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791838772381; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791839850921; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -18750,6 +18759,19 @@ function ssSendRpeIndividual(si){
   });
   logAudit('Belastungs-Abfrage',s.date||'?',targets.length+' Spieler');
 }
+// Sort order of the attendance window — remembered per device.
+let _ssAttSort=(()=>{try{return localStorage.getItem('fcf_ssa_sort')||'pos';}catch(e){return 'pos';}})();
+function ssAttSetSort(k){
+  _ssAttSort=k;
+  try{localStorage.setItem('fcf_ssa_sort',k);}catch(e){}
+  ssAttRender();
+}
+// Lines on the pitch, goalkeeper → forward; used for grouping by position.
+const SSA_LINES=[['Tor',['TW']],['Abwehr',['RV','IV','LV']],['Mittelfeld',['6er','8er','10er']],['Angriff',['RF','LF','ST']]];
+function _ssaLineOf(p){
+  for(let i=0;i<SSA_LINES.length;i++)if(SSA_LINES[i][1].includes(p.pos))return i;
+  return SSA_LINES.length; // no position
+}
 function ssAttOpen(si,status){
   _ssAttFilter=status;
   _ssAttSi=si;
@@ -18782,11 +18804,27 @@ function ssAttRender(){
     body.innerHTML='<div class="u-empty" style="padding:16px;"><div class="u-empty-txt">Niemand in dieser Gruppe.</div></div>';
     return;
   }
-  pis.sort((a,b)=>String(a.p.name||'').localeCompare(String(b.p.name||'')));
+  const _nm=a=>String((getDisplayName?getDisplayName(a.p):a.p.name)||'');
+  const _pIdx=x=>{const i=POS.indexOf(x);return i<0?99:i;};
+  if(_ssAttSort==='nr')pis.sort((a,b)=>((+a.p.nr||999)-(+b.p.nr||999))||_nm(a).localeCompare(_nm(b)));
+  else if(_ssAttSort==='name')pis.sort((a,b)=>_nm(a).localeCompare(_nm(b)));
+  else pis.sort((a,b)=>(_pIdx(a.p.pos)-_pIdx(b.p.pos))||(_pIdx(a.p.pos2)-_pIdx(b.p.pos2))||_nm(a).localeCompare(_nm(b)));
+  const _sb=(k,l)=>`<button class="seg-btn${_ssAttSort===k?' active':''}" onclick="ssAttSetSort('${k}')">${l}</button>`;
+  const sortBar=`<div class="ssa-sort"><span class="ssa-sort-l">Sortieren</span>${_sb('pos','Position')}${_sb('name','Name')}${_sb('nr','Nr.')}</div>`;
+  // When sorted by position, a header per line with its head count — the
+  // question before a session is usually "do we have enough defenders?"
+  const _lineCnt={};
+  if(_ssAttSort==='pos')pis.forEach(x=>{const l=_ssaLineOf(x.p);_lineCnt[l]=(_lineCnt[l]||0)+1;});
+  let _lastLine=-1;
   // One row per player: avatar, name, and the status as a chip that cycles on
   // tap — the same action the table cell offers, without a separate menu.
-  body.innerHTML='<div class="ssa-list">'+pis.map(({p,pi,v})=>{
+  body.innerHTML=sortBar+'<div class="ssa-list">'+pis.map(({p,pi,v},_i)=>{
     const m=SS_ATT_META[v]||SS_ATT_META[3];
+    let lineHdr='';
+    if(_ssAttSort==='pos'){
+      const l=_ssaLineOf(p);
+      if(l!==_lastLine){_lastLine=l;lineHdr=`<div class="ssa-line">${l<SSA_LINES.length?SSA_LINES[l][0]:'Ohne Position'} <b>${_lineCnt[l]}</b></div>`;}
+    }
     const g=(Array.isArray(p.goals)?p.goals[si]:0)||0;
     const a=(Array.isArray(p.assists)?p.assists[si]:0)||0;
     const bcol=(typeof PB_COLORS!=='undefined'&&PB_COLORS[p.pos])||'#e6ecf5;color:#4a5b75';
@@ -18795,7 +18833,7 @@ function ssAttRender(){
     const pos=p.pos?`<span class="pb ssa-pos" style="background:${bcol.split(';')[0]};${bcol.split(';')[1]||''}">${escapeHtml(p.pos)}</span>`:'<span class="pb ssa-pos ssa-pos-none"></span>';
     const bcol2=(typeof PB_COLORS!=='undefined'&&PB_COLORS[p.pos2])||'';
     const pos2=p.pos2?`<span class="pb ssa-pos ssa-pos2" style="background:${bcol2.split(';')[0]};${bcol2.split(';')[1]||''}">${escapeHtml(p.pos2)}</span>`:'<span class="pb ssa-pos ssa-pos-none"></span>';
-    return `<div class="ssa-row">
+    return `${lineHdr}<div class="ssa-row${_i%2?'':' ssa-z'}">
       <span class="ssa-nr">${p.nr||'\u2013'}</span>
       <span class="ssa-nm">${escapeHtml(getDisplayName?getDisplayName(p):p.name)}</span>
       ${pos}${pos2}
