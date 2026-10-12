@@ -3139,6 +3139,7 @@ body.guest-mode{padding-top:24px;}
 .db-pos-val{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--bd);line-height:1;margin-top:2px;}
 .db-pos-cell.pos-empty .db-pos-val{color:#c0392b;}
 .db-pos-cell.pos-thin .db-pos-val{color:#d68910;}
+.cs.cs-prejoin{background:transparent!important;color:var(--gm,#9aa3b2)!important;opacity:.45;cursor:default;font-weight:400;}
 </style>
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -3466,6 +3467,7 @@ if(window._fbBlocked){
         <div class="tp-row"><span class="tp-l">Position 2</span><div class="tp-in-wrap" id="pe-pos2-sel"></div></div>
         <div class="tp-row"><span class="tp-l">Starker Fuß</span><div class="tp-in-wrap" id="pe-foot-sel"></div></div>
         <div class="tp-row"><span class="tp-l">Pass-Nr.</span><input class="tp-in" type="text" id="pe-passnr" placeholder="z.B. 12345678"/></div>
+        <div class="tp-row" title="Einheiten vor diesem Datum zählen nicht in seine Statistik. Leer = von Saisonbeginn an."><span class="tp-l">Dabei seit</span><input class="tp-in" type="date" id="pe-joinDate"/></div>
       </div>
       <div class="tp-sec">
         <div class="tp-sec-h">Kontakt</div>
@@ -3619,6 +3621,13 @@ if(window._fbBlocked){
       <label>✉️ E-Mail</label>
       <input type="email" id="newEmail" placeholder="z.B. spieler@email.de" style="margin-bottom:0;"/>
     </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px;align-items:end;">
+    <div>
+      <label>📅 Dabei seit</label>
+      <input type="date" id="newJoinDate" style="margin-bottom:0;"/>
+    </div>
+    <div style="font-size:.68rem;color:var(--mu,#8a93a6);line-height:1.3;padding-bottom:6px;">Einheiten vor diesem Datum zählen nicht in seine Statistik.</div>
   </div>
   <label>📝 Kommentar</label>
   <textarea id="newNote" rows="2" placeholder="z.B. Verletzt bis KW 20, Schulnoten, ..." style="width:100%;padding:7px;border:1.5px solid var(--gl);border-radius:7px;font-family:'Barlow',sans-serif;font-size:.8rem;resize:vertical;margin-bottom:8px;"></textarea>
@@ -3904,7 +3913,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1787510805477; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791838772381; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -4170,6 +4179,13 @@ function getSeasonYears(){
   const y1=parseInt(m[1]);
   return{y1,y2:y1+1};
 }
+// Player joined mid-season: sessions before p.joinDate (ISO) don't count anywhere.
+function _sessAfterJoin(p,s,season){
+  if(!p||!p.joinDate||!s||!s.date)return true;
+  const k=season?_dbSortKey(s.date,season):dispToSortKey(s.date);
+  return k>=isoToSortKey(p.joinDate);
+}
+function _todayISO(){const n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');}
 function dispToSortKey(s){
   if(!s||typeof s!=='string')return 99999999;
   const m=s.match(/(\d+)\.(\d+)/);
@@ -8962,6 +8978,12 @@ function renderBody(){
       const isMat=ss[si].type==='match';
       const isNext=realSi===nextIdx;
       const isPast=isSessPast(realSi);
+      if(!_sessAfterJoin(p,ss[si])){
+        // Not on the team yet — nothing to mark, nothing that counts.
+        const jd=String(p.joinDate).split('-').reverse().join('.');
+        cells+=`<td class="cs cs-prejoin${isNext?' next-col':''}" data-pi="${origPi}" data-si="${realSi}" title="Noch nicht im Team (dabei seit ${jd})">–</td>`;
+        continue;
+      }
       const cls=`cs ${CLS[sVal]}${isNext?' next-col':''}${ro?' ro':''}${isPast?' past-locked':''}`;
       // For Angemeldet (4) and Entschuldigt-by-player (2), show reason in tooltip
       let title='';
@@ -9002,6 +9024,7 @@ function renderTfoot(){
     p.s.forEach((v,si)=>{
       const s2=D.sessions[si];
       if(!s2||!sessTookPlace(s2))return; // held sessions only (incl. today's started)
+      if(!_sessAfterJoin(p,s2))return; // before he was on the team
       if(v===1){totA++;totPl++;}
       else if(v===0||v===2){totPl++;}
     });
@@ -9011,8 +9034,9 @@ function renderTfoot(){
   let cells='';
   for(let si=0;si<ss.length;si++){
     const realSi=D.sessions.indexOf(ss[si]);
-    const c=D.players.filter(p=>p.s&&realSi<p.s.length&&p.s[realSi]===1).length;
-    const pct=D.players.length?Math.round((c/D.players.length)*100):0;
+    const onTeam=D.players.filter(p=>p&&_sessAfterJoin(p,ss[si])); // not yet joined → not in the base
+    const c=onTeam.filter(p=>p.s&&realSi<p.s.length&&p.s[realSi]===1).length;
+    const pct=onTeam.length?Math.round((c/onTeam.length)*100):0;
     const isMat=ss[si].type==='match';
     const isNext=realSi===nextIdx;
     cells+=`<td class="${isMat?'match-col':''}${isNext?' next-col':''}">
@@ -9043,6 +9067,7 @@ function renderFooter(){
       const s2=D.sessions[si];
       if(!s2||!s2.date)return;
       if(!sessTookPlace(s2))return; // held sessions only
+      if(!_sessAfterJoin(p,s2))return; // before he was on the team
       if(v===1){totA++;totPl++;}
       else if(v===0||v===2){totPl++;}
     });
@@ -9613,6 +9638,7 @@ function renderPlayerFront(p,pi){
     const past=[];
     ss.forEach((s,si)=>{
       if(!s||!sessTookPlace(s,UI.currentSeason))return;
+      if(!_sessAfterJoin(p,s))return; // before he was on the team
       past.push({s,si,sk:dispToSortKey(s.date)});
     });
     past.sort((a,b)=>a.sk-b.sk);
@@ -12429,6 +12455,7 @@ function _pmComputeRank(p,D){
       // different set of sessions is what makes equal percentages look
       // unequally ranked.
       if(typeof sessTookPlace==='function'&&!sessTookPlace(s,D.season||UI.currentSeason))return;
+      if(!_sessAfterJoin(pp,s))return; // before he was on the team
       const v=si<pp.s.length?pp.s[si]:3;
       if(v===1||v===0||v===2){mk++;if(v===1)pr++;}
     });
@@ -12494,6 +12521,7 @@ function _pmSanitizeG(){
         return (fullD.sessions||[]).some((s,si)=>{
           if(!s)return false;
           if(typeof sessTookPlace==='function'&&!sessTookPlace(s,UI.currentSeason))return false;
+          if(!_sessAfterJoin(pp,s))return false; // before he was on the team
           const v=si<pp.s.length?pp.s[si]:3;
           return v===1||v===0||v===2;
         });
@@ -12833,6 +12861,7 @@ function computeLoadMatrix(data,weeks){
     const row=shown.map(k=>{
       let load=0,rated=0,possible=0;
       (sessOf[k]?sessOf[k].list:[]).forEach(si=>{
+        if(!_sessAfterJoin(p,block.sessions[si],season))return; // before he was on the team
         possible++;
         const r=Array.isArray(p.rpe)?p.rpe[si]:null;
         if(typeof r==='number'){
@@ -13854,6 +13883,7 @@ function _pmCalcStats(p,D){
   sessions.forEach((s,si)=>{
     if(!s)return;
     if(typeof sessTookPlace==='function'&&!sessTookPlace(s,UI.currentSeason))return;
+    if(!_sessAfterJoin(p,s))return; // before he was on the team
     const v=(p.s&&si<p.s.length)?p.s[si]:3;
     if(v===1||v===0||v===2){marked++;if(v===1)present++;}
   });
@@ -13864,7 +13894,7 @@ function _pmCalcStats(p,D){
   sessions.forEach((s,si)=>{
     if(!s||!s.date)return;
     const sk=dispToSortKey(s.date);
-    if(sk<today)pastIdxs.push({si,sk});
+    if(sk<today&&_sessAfterJoin(p,s))pastIdxs.push({si,sk});
   });
   pastIdxs.sort((a,b)=>a.sk-b.sk);
   // STREAK: count only CONSECUTIVE Anwesend sessions from most recent backwards.
@@ -15509,13 +15539,13 @@ function dbComputeMetrics(data){
   let tA=0,tT=0,mA=0,mT=0,oA=0,oT=0;
   players.forEach(p=>{
     if(!p)return;
-    tPastIdx.forEach(i=>{const v=p.s&&p.s[i];if(v===3||v==null||v===4)return;tT++;oT++;if(v===1){tA++;oA++;}});
-    mPastIdx.forEach(i=>{const v=p.s&&p.s[i];if(v===3||v==null||v===4)return;mT++;oT++;if(v===1){mA++;oA++;}});
+    tPastIdx.forEach(i=>{if(!_sessAfterJoin(p,sessions[i],season))return;const v=p.s&&p.s[i];if(v===3||v==null||v===4)return;tT++;oT++;if(v===1){tA++;oA++;}});
+    mPastIdx.forEach(i=>{if(!_sessAfterJoin(p,sessions[i],season))return;const v=p.s&&p.s[i];if(v===3||v==null||v===4)return;mT++;oT++;if(v===1){mA++;oA++;}});
   });
   // Avg group size — ONLY past sessions (otherwise future "0 anwesend" drags it down)
   const sessionPresent=sessions.map((s,i)=>{
     if(!s)return 0;
-    return players.filter(p=>p&&p.s&&p.s[i]===1).length;
+    return players.filter(p=>p&&p.s&&p.s[i]===1&&_sessAfterJoin(p,s,season)).length;
   });
   const tGroup=tPastIdx.length?tPastIdx.map(i=>sessionPresent[i]).reduce((a,b)=>a+b,0)/tPastIdx.length:null;
   const mGroup=mPastIdx.length?mPastIdx.map(i=>sessionPresent[i]).reduce((a,b)=>a+b,0)/mPastIdx.length:null;
@@ -15547,6 +15577,7 @@ function dbRankPlayers(data){
     sessions.forEach((s,i)=>{
       if(!s)return;
       if(!sessTookPlace(s,season))return; // future sessions are not facts
+      if(!_sessAfterJoin(p,s,season))return; // before he was on the team
       const v=p.s&&p.s[i];
       if(v===3||v==null||v===4)return; // 4 = Angemeldet = pre-state
       taken++;
@@ -15586,6 +15617,7 @@ function dbComputeStatusBreakdown(data){
     const isMatch=s.type==='match';
     players.forEach(p=>{
       if(!p)return;
+      if(!_sessAfterJoin(p,s,season))return; // before he was on the team
       const v=p.s&&p.s[si];
       if(v===1){a++;if(isMatch)aM++;else aT++;}
       else if(v===0){f++;if(isMatch)fM++;else fT++;}
@@ -15641,6 +15673,7 @@ function dbComputeWeekday(data){
     wd[dow].sess++;
     players.forEach(p=>{
       if(!p)return;
+      if(!_sessAfterJoin(p,s,season))return; // before he was on the team
       const v=p.s&&p.s[si];
       if(v===3||v==null)return;
       wd[dow].t++;
@@ -15704,6 +15737,7 @@ function dbComputeMonthlyTrend(data){
     if(s.type==='match')monthly[key].matches++;else monthly[key].trains++;
     players.forEach(p=>{
       if(!p)return;
+      if(!_sessAfterJoin(p,s,season))return; // before he was on the team
       const v=p.s&&p.s[si];
       if(v===3||v==null)return;
       monthly[key].taken++;
@@ -15878,7 +15912,8 @@ function dbComputeWeekReport(data,offsetWeeks){
   players.forEach((p,pi)=>{
     if(!p)return;
     let present=0,marked=0;
-    const cells=weekSess.map(({i})=>{
+    const cells=weekSess.map(({s,i})=>{
+      if(!_sessAfterJoin(p,s,season))return 3; // not on the team yet
       const v=p.s&&p.s[i];
       if(v===1){present++;marked++;return 1;}
       if(v===0){marked++;return 0;}
@@ -15898,6 +15933,7 @@ function dbComputeWeekReport(data,offsetWeeks){
     const isMatch=s.type==='match';
     players.forEach(p=>{
       if(!p)return;
+      if(!_sessAfterJoin(p,s,season))return; // before he was on the team
       const v=p.s&&p.s[i];
       if(v==null||v===3||v===4||v===4)return; // 4 = Angemeldet = pre-state, not yet marked
       if(isMatch){mT++;if(v===1)mA++;}else{tT++;if(v===1)tA++;}
@@ -15931,6 +15967,7 @@ function _dbComputeSeasonStats(data){
     sessions.forEach((s,si)=>{
       if(!s)return;
       if(!sessTookPlace(s,season))return; // future sessions are not facts
+      if(!_sessAfterJoin(p,s,season))return; // before he was on the team
       const v=p.s&&p.s[si];
       if(v==null||v===3||v===4||v===4)return; // 4 = Angemeldet = pre-state, not yet marked
       tot++;teamT++;
@@ -16006,6 +16043,7 @@ function _psWeekSeries(p,block,season,weeks){
   const buckets={};
   (block.sessions||[]).forEach((s,si)=>{
     if(!s||!s.date||!sessTookPlace(s,season))return;
+    if(!_sessAfterJoin(p,s,season))return; // before he was on the team 
     const sk=_dbSortKey(s.date,season);
     if(!sk||sk===99999999)return;
     const y=Math.floor(sk/10000),m=Math.floor(sk/100)%100,d=sk%100;
@@ -16033,7 +16071,7 @@ function dbBuildPlayerStatsSnapshot(data,pi,offset,includePhoto){
   // Current streak, most recent backwards
   const held=[];
   (block.sessions||[]).forEach((s,si)=>{
-    if(s&&sessTookPlace(s,season))held.push({si,sk:_dbSortKey(s.date,season)});
+    if(s&&sessTookPlace(s,season)&&_sessAfterJoin(p,s,season))held.push({si,sk:_dbSortKey(s.date,season)});
   });
   held.sort((a,b)=>a.sk-b.sk);
   let streak=0;
@@ -16049,6 +16087,7 @@ function dbBuildPlayerStatsSnapshot(data,pi,offset,includePhoto){
     let a=0,t=0;
     (block.sessions||[]).forEach((s,si)=>{
       if(!s||!sessTookPlace(s,season))return;
+      if(!_sessAfterJoin(pp,s,season))return; // before he was on the team
       const v=pp.s[si];
       if(v===1||v===0||v===2){t++;if(v===1)a++;}
     });
@@ -16074,6 +16113,7 @@ function dbBuildPlayerStatsSnapshot(data,pi,offset,includePhoto){
   let _goals=0,_assists=0,_apps=0;
   (block.sessions||[]).forEach((s,si)=>{
     if(!s||s.type!=='match')return;
+    if(!_sessAfterJoin(p,s,season))return; // before he was on the team
     // Matches he was actually there for — a squad list would count games he
     // never played.
     const v=(p.s&&si<p.s.length)?p.s[si]:3;
@@ -17119,6 +17159,7 @@ function computeMonthlyAttendance(occurrences){
       const mo=+m[2];
       const year=_psYearForMonth(mo,season);
       const key=year+'-'+String(mo).padStart(2,'0');
+      if(!_sessAfterJoin(p,s,season))return; // before he was on the team
       const status=(p.s&&si<p.s.length)?p.s[si]:3;
       if(status===3||status==null)return; // pending or empty — exclude
       if(!monthly[key])monthly[key]={tA:0,tT:0,mA:0,mT:0};
@@ -17205,6 +17246,7 @@ function computePlayerOverallStats(occurrences){
     block.sessions.forEach((s,si)=>{
       if(!s)return;
       if(!sessTookPlace(s,season))return; // held sessions only
+      if(!_sessAfterJoin(p,s,season))return; // before he was on the team
       const v=p.s&&p.s[si];
       const isMatch=s.type==='match';
       if(v===1){cA++;if(isMatch){mA++;mT++;}else{tA++;tT++;}}
@@ -17290,6 +17332,7 @@ function computePlayerWeekday(occurrences){
       if(!sessTookPlace(s,season))return; // held sessions only
       const dow=s.date.split(' ')[0];
       if(!wd[dow])return;
+      if(!_sessAfterJoin(p,s,season))return; // before he was on the team
       const v=p.s&&p.s[si];
       if(v===3||v==null||v===4||v===4)return; // 4 = Angemeldet — pre-state, not a fact
       wd[dow].t++;
@@ -17351,8 +17394,10 @@ function computeTeamComparison(occurrences){
     const tIdx=sessions.map((s,i)=>s.type==='training'&&_xsPast(i)?i:-1).filter(i=>i>=0);
     const mIdx=sessions.map((s,i)=>s.type==='match'&&_xsPast(i)?i:-1).filter(i=>i>=0);
     function pct(idxs,p){
-      const taken=idxs.filter(i=>p.s&&_xsFact(p.s[i])).length;
-      const att=idxs.filter(i=>p.s&&p.s[i]===1).length;
+      if(!p)return null;
+      const own=idxs.filter(i=>_sessAfterJoin(p,sessions[i],o.season)); // before he was on the team
+      const taken=own.filter(i=>p.s&&_xsFact(p.s[i])).length;
+      const att=own.filter(i=>p.s&&p.s[i]===1).length;
       return taken?(att/taken)*100:null;
     }
     // Player
@@ -18209,6 +18254,7 @@ function openPlayerStats(pi,opts){
     document.getElementById('pe-shortname').value=p.shortname||'';
     document.getElementById('pe-passnr').value=p.passnr||'';
     document.getElementById('pe-birthdate').value=p.birthdate||'';
+    {const jd=document.getElementById('pe-joinDate');if(jd)jd.value=p.joinDate||'';}
     document.getElementById('pe-phone').value=p.phone||'';
     try{renderPlayerContact(p);}catch(e){}
     try{renderPlayerFront(p,pi);}catch(e){}
@@ -18513,7 +18559,7 @@ function _psShowCard(){
 // Edits are held in the form until "Fertig". _psSnapshot records the state on
 // entering edit mode so we can tell whether anything actually changed — that
 // is what decides if closing has to ask.
-const _PS_FIELDS=['pe-name','pe-nr','pe-shortname','pe-passnr','pe-birthdate','pe-phone','pe-email','pe-note'];
+const _PS_FIELDS=['pe-name','pe-nr','pe-shortname','pe-passnr','pe-birthdate','pe-joinDate','pe-phone','pe-email','pe-note'];
 let _psSnapshot=null;
 function _psReadForm(){
   const o={};
@@ -18534,13 +18580,13 @@ function _psCommitEdit(){
   const D=cd(),p=D&&D.players[pi];
   if(!p)return;
   const val=id=>{const e=document.getElementById(id);return e?String(e.value||'').trim():null;};
-  const before=JSON.stringify([p.name,p.nr,p.shortname,p.passnr,p.birthdate,p.phone,p.email,p.note,
+  const before=JSON.stringify([p.name,p.nr,p.shortname,p.passnr,p.birthdate,p.joinDate,p.phone,p.email,p.note,
     p.pos,p.pos2,p.foot]);
   const nm=val('pe-name');
   if(nm)p.name=nm;                      // never allow an empty name
   const nr=val('pe-nr');
   p.nr=nr===''?null:(parseInt(nr,10)||null);
-  ['shortname','passnr','birthdate','phone','email','note'].forEach(f=>{
+  ['shortname','passnr','birthdate','joinDate','phone','email','note'].forEach(f=>{
     const v=val('pe-'+f);
     if(v===null)return;
     if(v)p[f]=v;else delete p[f];
@@ -18550,11 +18596,12 @@ function _psCommitEdit(){
   if(typeof editP1!=='undefined'&&editP1)p.pos=editP1;
   if(typeof editP2!=='undefined'){if(editP2)p.pos2=editP2;else delete p.pos2;}
   if(typeof _currentFoot!=='undefined')p.foot=_currentFoot;
-  if(JSON.stringify([p.name,p.nr,p.shortname,p.passnr,p.birthdate,p.phone,p.email,p.note,
+  if(JSON.stringify([p.name,p.nr,p.shortname,p.passnr,p.birthdate,p.joinDate,p.phone,p.email,p.note,
     p.pos,p.pos2,p.foot])===before)return;
   saveG();
   if(typeof renderBody==='function')renderBody();
   if(typeof renderTfoot==='function')renderTfoot();
+  if(typeof renderFooter==='function')try{renderFooter();}catch(e){}
   // Keep the card underneath in step without leaving the form
   try{renderPlayerContact(p);}catch(e){}
   const psName=document.getElementById('ps-name');
@@ -18617,6 +18664,7 @@ function savePlayerEdit(){
   p.shortname=document.getElementById('pe-shortname').value.trim();
   p.passnr=document.getElementById('pe-passnr').value.trim();
   p.birthdate=document.getElementById('pe-birthdate').value;
+  {const jd=document.getElementById('pe-joinDate');if(jd){if(jd.value)p.joinDate=jd.value;else delete p.joinDate;}}
   p.phone=document.getElementById('pe-phone').value.trim();
   p.email=document.getElementById('pe-email').value.trim();
   // "Position verbergen" control removed; keep any existing value untouched
@@ -20174,6 +20222,7 @@ function initAddPos(){
     const el=document.getElementById(id);
     if(el)el.value='';
   });
+  const jd=document.getElementById('newJoinDate');if(jd)jd.value=_todayISO();
   // Live-update avatar initials when name is typed
   const nameEl=document.getElementById('newName');
   if(nameEl&&!nameEl._addAvatarBound){
@@ -21233,6 +21282,7 @@ function homeRenderBottom(){
   (D.sessions||[]).forEach((s,si)=>{
     if(!s||!sessTookPlace(s,seas))return;
     (D.players||[]).forEach(p=>{
+      if(!_sessAfterJoin(p,s))return; // before he was on the team
       const v=p&&p.s?p.s[si]:3;
       if(v===1)a++;else if(v===0)f++;else if(v===2)e++;
     });
@@ -22094,6 +22144,7 @@ function renderMgrStats(){
     if(!p.s)return;
     p.s.forEach((v,si)=>{
       if(!_isPast(si))return;
+      if(!_sessAfterJoin(p,ss[si]))return; // before he was on the team
       if(v===1){totA++;totPl++;}
       else if(v===0||v===2){totPl++;}
     });
@@ -22105,6 +22156,7 @@ function renderMgrStats(){
   (D.players||[]).forEach(p=>{
     ss.forEach((s,i)=>{
       if(!_isPast(i))return;
+      if(!_sessAfterJoin(p,s))return; // before he was on the team
       const mo=moFromDisp(s.date);
       const v=p.s?p.s[i]:3;
       const isFact=(v===1||v===0||v===2);
@@ -22114,8 +22166,9 @@ function renderMgrStats(){
   });
   // Per player — same: only past sessions, factual statuses for denominator
   const rows=(D.players||[]).map(p=>{
-    const tIdx=ss.map((s,i)=>s.type==='training'&&_isPast(i)?i:-1).filter(i=>i>=0);
-    const mIdx=ss.map((s,i)=>s.type==='match'&&_isPast(i)?i:-1).filter(i=>i>=0);
+    const ownIdx=i=>_isPast(i)&&_sessAfterJoin(p,ss[i]); // before he was on the team → out
+    const tIdx=ss.map((s,i)=>s.type==='training'&&ownIdx(i)?i:-1).filter(i=>i>=0);
+    const mIdx=ss.map((s,i)=>s.type==='match'&&ownIdx(i)?i:-1).filter(i=>i>=0);
     const isFact=v=>(v===1||v===0||v===2);
     const tA=tIdx.filter(i=>p.s&&p.s[i]===1).length,tPl=tIdx.filter(i=>p.s&&isFact(p.s[i])).length;
     const mA=mIdx.filter(i=>p.s&&p.s[i]===1).length,mPl=mIdx.filter(i=>p.s&&isFact(p.s[i])).length;
@@ -23281,6 +23334,8 @@ function addPlayer(){
   const phone=document.getElementById('newPhone').value.trim();
   const email=document.getElementById('newEmail').value.trim();
   const note=document.getElementById('newNote').value.trim();
+  const jdEl=document.getElementById('newJoinDate');
+  const joinDate=jdEl?jdEl.value:'';
   const foot=_addFoot||'right';
   snap();
   const newP={nr,name,pos:selP1||'8er',pos2:selP2||'',s:new Array(cd().sessions.length).fill(3)};
@@ -23290,11 +23345,12 @@ function addPlayer(){
   if(phone)newP.phone=phone;
   if(email)newP.email=email;
   if(note)newP.note=note;
+  if(joinDate)newP.joinDate=joinDate;
   if(foot)newP.foot=foot;
   if(_addPhoto)newP.photo=_addPhoto;
   ensureCd().players.push(newP);
   saveG();render();closeM('moAddPlayer');
-  logAudit('Spieler hinzugefügt',name,'#'+nr+' · '+(selP1||'8er'));
+  logAudit('Spieler hinzugefügt',name,'#'+nr+' · '+(selP1||'8er')+(joinDate?' · dabei seit '+joinDate.split('-').reverse().join('.'):''));
   // Clear form fields for next add
   ['newNr','newName','newShortname','newPassnr','newBirthdate','newPhone','newEmail','newNote'].forEach(id=>{
     const el=document.getElementById(id);
@@ -26117,6 +26173,7 @@ function _lpLastWeekAttendance(pi){
     const y=Math.floor(sk/10000),mo=Math.floor(sk/100)%100,day=sk%100;
     const ts=new Date(y,mo-1,day).getTime();
     if(ts<windowStart||ts>matchTs)return;
+    if(!_sessAfterJoin(p,s))return; // before he was on the team
     entries.push({si,type:s.type,status:p.s[si]});
   });
   if(!entries.length)return '';
