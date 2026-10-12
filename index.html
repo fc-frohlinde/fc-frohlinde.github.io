@@ -8,7 +8,7 @@
 // Before anything renders: a player link must not flash a white page.
 try{
   var _q=new URLSearchParams(location.search);
-  if(_q.get('p')||_q.get('player')||_q.get('rpe')||_q.get('rpeteam')){
+  if(_q.get('p')||_q.get('player')||_q.get('rpe')||_q.get('rpeteam')||_q.get('team')){
     document.documentElement.style.background='#080f22';
     var _tc=document.querySelector('meta[name="theme-color"]');
     if(_tc)_tc.setAttribute('content','#080f22');
@@ -2816,6 +2816,10 @@ html:has(body.hub-mode){background:#080f22;}
   color:rgba(255,255,255,.7);font-family:'Barlow',sans-serif;font-size:.82rem;
   font-weight:600;cursor:pointer;padding:14px 4px;}
 .hub-back:hover{color:#fff;}
+.hub-switch{display:block;margin:18px auto 4px;background:none;border:none;cursor:pointer;
+  color:rgba(255,255,255,.45);font-family:'Barlow',sans-serif;font-size:.74rem;
+  text-decoration:underline;text-underline-offset:2px;}
+.hub-switch:hover{color:rgba(255,255,255,.8);}
 /* ── Load survey (own link) ──────────────────────────────── */
 .rpo-wrap{min-height:100dvh;display:flex;flex-direction:column;align-items:center;
   justify-content:center;padding:20px 16px;gap:14px;}
@@ -3922,7 +3926,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791839850921; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791840516721; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -13501,7 +13505,7 @@ function tryPlayerUrlAuth(){
     window._rpeOnly=true;
     // A remembered choice makes the second visit a single tap
     let saved=null;
-    try{saved=localStorage.getItem('fcf_rpe_me');}catch(e){}
+    try{saved=localStorage.getItem('fcf_rpe_me')||_meGet(rpeTeam);}catch(e){}
     if(saved)window._rpeTeamPick=saved;
     return _rpeTeamStart();
   }
@@ -13554,6 +13558,8 @@ function tryPlayerUrlAuth(){
           localStorage.setItem('fcf_currentTeam',found.team);
           localStorage.setItem('fcf_currentSeason',found.season);
         }catch(e){}
+        // Opened via a personal link: the group link recognises him from now on.
+        if(window._hubMode&&!RPE_IS_PREVIEW)_meSet(found.team,token);
         if(overlay){overlay.classList.remove('open');overlay.innerHTML='';}
         document.body.classList.add('player-mode');
         if(window._rpeOnly)document.body.classList.add('rpe-only');
@@ -13563,6 +13569,17 @@ function tryPlayerUrlAuth(){
         renderPlayerMode();
         if(typeof _bootVeilHide==='function')_bootVeilHide();
       } else {
+        // The remembered choice no longer exists (link renewed, player moved):
+        // forget it and go back to the list instead of a dead end.
+        try{
+          const mt=localStorage.getItem('fcf_me_team');
+          if(mt&&localStorage.getItem('fcf_me__'+mt)===token){
+            _meClear(mt);
+            allowLeaveOnce();
+            location.replace(buildTeamLink(mt)+'&pick=1');
+            return;
+          }
+        }catch(e){}
         if(overlay){
           overlay.innerHTML=`<div class="auth-box"><div style="text-align:center;padding:34px 18px;color:#fff;">
             <div style="font-size:2rem;margin-bottom:14px;">⚠️</div>
@@ -13585,6 +13602,51 @@ function tryPlayerUrlAuth(){
 // clicks it is asked "Wer bist du? + Geburtsdatum". On match, they get their
 // personal token saved in localStorage and are redirected to the normal
 // ?player=<token> flow, so future opens recognize them automatically.
+// Who this device belongs to, per team. Set once via the group link; the hub
+// and the group rating link both read it, so a player is never asked twice.
+function _meGet(team){
+  try{
+    return localStorage.getItem('fcf_me__'+team)
+      ||(localStorage.getItem('fcf_me_team')===team?localStorage.getItem('fcf_playerToken'):null)
+      ||null;
+  }catch(e){return null;}
+}
+function _meSet(team,token){
+  try{
+    localStorage.setItem('fcf_me__'+team,token);
+    localStorage.setItem('fcf_me_team',team);
+    localStorage.setItem('fcf_playerToken',token);
+    localStorage.setItem('fcf_rpe_me',token);
+  }catch(e){}
+}
+function _meClear(team){
+  try{
+    const t=localStorage.getItem('fcf_me__'+team);
+    localStorage.removeItem('fcf_me__'+team);
+    if(localStorage.getItem('fcf_playerToken')===t)localStorage.removeItem('fcf_playerToken');
+    if(localStorage.getItem('fcf_rpe_me')===t)localStorage.removeItem('fcf_rpe_me');
+  }catch(e){}
+}
+// Birthdates are stored as YYYY-MM-DD (date field) or DD.MM.YYYY (older
+// entries); compare the dates, not the strings.
+function _bdayEq(a,b){
+  const parse=v=>{
+    const n=String(v||'').match(/\d+/g);
+    if(!n||n.length<3)return null;
+    const x=n.map(Number);
+    return (String(n[0]).length===4)?{y:x[0],m:x[1],d:x[2]}:{d:x[0],m:x[1],y:x[2]};
+  };
+  const g=parse(a),h=parse(b);
+  return !!(g&&h&&g.y===h.y&&g.m===h.m&&g.d===h.d);
+}
+// "Nicht du?" in the hub: forget the choice and show the list again.
+function hubSwitchPlayer(){
+  let team='';
+  try{team=UI.currentTeam||localStorage.getItem('fcf_me_team')||'';}catch(e){team=UI.currentTeam||'';}
+  if(team)_meClear(team);
+  allowLeaveOnce&&allowLeaveOnce();
+  location.replace(buildTeamLink(team)+'&pick=1');
+}
 function tryTeamUrlAuth(){
   const params=new URLSearchParams(location.search);
   const teamParam=params.get('team');
@@ -13612,15 +13674,13 @@ function tryTeamUrlAuth(){
     }
     return true;
   }
-  // Returning visitor — already auth'd on this device. Redirect to personal link.
+  // Returning visitor — chose himself on this device before: straight into
+  // his hub, no second check. ?pick=1 (from "Nicht du?") forces the list.
   try{
-    const savedToken=localStorage.getItem('fcf_playerToken');
+    const savedToken=params.get('pick')?null:_meGet(teamParam);
     if(savedToken){
-      const u=new URL(location.href);
-      u.searchParams.delete('team');
-      u.searchParams.set('player',savedToken);
       allowLeaveOnce();
-      location.replace(u.toString());
+      location.replace(buildHubLink(savedToken));
       return true;
     }
   }catch(e){}
@@ -13739,146 +13799,119 @@ function tryTeamUrlAuth(){
   return true;
 }
 function _renderTeamAuthForm(overlay,chosen){
-  // Diagnose roster state — categorize so we can tell user exactly what's missing
-  const allPlayers=chosen.block.players.filter(p=>p&&p.name);
-  // Eligible = name + birthdate. Token will be auto-generated on successful auth.
-  const eligibleArr=allPlayers
-    .filter(p=>p.birthdate)
-    .map(p=>({p,idx:chosen.block.players.indexOf(p)}))
-    .sort((a,b)=>{
-      const an=(typeof getDisplayName==='function')?getDisplayName(a.p):(a.p.name||'');
-      const bn=(typeof getDisplayName==='function')?getDisplayName(b.p):(b.p.name||'');
-      return String(an).localeCompare(String(bn));
-    });
-  const noBday=allPlayers.filter(p=>!p.birthdate);
-  const eligible=eligibleArr;
+  // Same dark surface as the hub the player lands in afterwards.
+  if(overlay){overlay.classList.remove('open');overlay.innerHTML='';}
+  document.body.classList.add('player-mode','hub-mode');
+  let wrap=document.getElementById('playerModeWrap');
+  if(!wrap){wrap=document.createElement('div');wrap.id='playerModeWrap';document.body.appendChild(wrap);}
+  wrap.style.display='';
+  if(typeof _bootVeilHide==='function')try{_bootVeilHide();}catch(e){}
+  const all=(chosen.block.players||[]).map((p,idx)=>({p,idx})).filter(x=>x.p&&x.p.name);
+  // Full name: short names repeat in a squad (two "Max"), and the list is
+  // the one place where that would make someone tap the wrong player.
+  const nm=p=>String(p.name||'');
+  // Without a birthdate there is nothing to check against — the trainer has to
+  // add it first, otherwise anyone could answer for that player.
+  const eligible=all.filter(x=>x.p.birthdate).sort((a,b)=>nm(a.p).localeCompare(nm(b.p)));
+  const missing=all.length-eligible.length;
   if(!eligible.length){
-    let detail='';
-    if(allPlayers.length===0){
-      detail='Diese Mannschaft hat keine Spieler.';
-    } else {
-      detail='Bei allen Spielern fehlt das Geburtsdatum.<br><br><b>An den Trainer:</b> Geburtsdaten ergänzen (Mannschaft → Spieler → ✎ Bearbeiten).';
-    }
-    overlay.innerHTML=`<div class="auth-box" style="padding:28px 28px;">
-      <div style="text-align:center;color:var(--gd);">
-        <div style="font-size:2rem;margin-bottom:12px;">⚠️</div>
-        <div style="font-size:1.05rem;margin-bottom:10px;font-weight:700;color:var(--bd);">Noch nicht eingerichtet</div>
-        <div style="font-size:.84rem;line-height:1.55;color:var(--gd);text-align:left;background:rgba(0,80,180,.06);padding:12px 14px;border-radius:8px;">
-          ${detail}
-        </div>
-      </div>
-    </div>`;
+    wrap.innerHTML=`<div class="rpo-wrap"><div class="rpo-card">
+      <div class="rpo-h">${escapeHtml(chosen.team)}</div>
+      <div class="rpo-sub" style="margin-top:12px;">${all.length?'Noch nicht eingerichtet: bei allen Spielern fehlt das Geburtsdatum. Bitte den Trainer fragen.':'Diese Mannschaft hat keine Spieler.'}</div>
+    </div></div>`;
     return;
   }
-  const missingCount=noBday.length;
-  // Identify selection by INDEX in eligible array (token may not exist yet)
-  const opts=eligible.map((x,i)=>`<option value="${i}">${escapeHtml(x.p.name)}</option>`).join('');
-  const missingHint=missingCount>0
-    ? `<div style="margin-top:10px;padding:8px 10px;background:rgba(255,200,100,.12);border-radius:6px;font-size:.74rem;color:var(--gd);line-height:1.4;">⚠️ ${missingCount} weiterer Spieler ohne Geburtsdatum. Wenn du dich nicht findest → Trainer fragen.</div>`
-    : '';
-  overlay.innerHTML=`<div class="auth-box" style="padding:28px 32px;">
-    <div style="text-align:center;color:var(--gd);margin-bottom:22px;">
-      <div style="font-size:1.4rem;margin-bottom:4px;font-weight:800;color:var(--bd);">${escapeHtml(chosen.team)}</div>
-      <div style="font-size:.82rem;color:var(--gm);">Bestätige deine Identität</div>
+  let pending=null,attempts=0;
+  wrap.innerHTML=`<div class="rpo-wrap"><div class="rpo-card">
+    <div class="rpo-h">${escapeHtml(chosen.team)}</div>
+    <div class="rpo-q">Wer bist du?</div>
+    <div id="tau-verify" class="rpo-verify" style="display:none;">
+      <div class="rpo-verify-h">Bist du <b id="tau-verify-name"></b>?</div>
+      <div class="rpo-verify-s">Einmalig zur Sicherheit: dein Geburtsdatum</div>
+      <input id="rpo-verify-in" type="date">
+      <div id="tau-verify-err" class="rpo-verify-e"></div>
+      <div class="rpo-verify-b">
+        <button class="rpo-mbtn rpo-verify-ok" id="tau-ok">Weiter</button>
+        <button class="rpo-full" id="tau-cancel">Abbrechen</button>
+      </div>
     </div>
-    <div style="margin-bottom:14px;text-align:left;">
-      <label style="display:block;color:var(--gd);font-size:.72rem;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;">Wer bist du?</label>
-      <select id="_tauthName" style="width:100%;padding:12px 12px;border-radius:10px;border:2px solid var(--gl);background:#fff;color:var(--gd);font-size:.95rem;outline:none;font-family:'Barlow',sans-serif;">
-        <option value="">-- Name wählen --</option>
-        ${opts}
-      </select>
-    </div>
-    <div style="margin-bottom:18px;text-align:left;">
-      <label style="display:block;color:var(--gd);font-size:.72rem;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;">Geburtsdatum</label>
-      <input type="date" id="_tauthBday" style="width:100%;padding:12px 12px;border-radius:10px;border:2px solid var(--gl);background:#fff;color:var(--gd);font-size:.95rem;outline:none;font-family:'Barlow',sans-serif;"/>
-    </div>
-    <button id="_tauthSubmit" style="width:100%;padding:13px;border-radius:10px;border:none;background:var(--bd);color:#fff;font-weight:700;font-size:1rem;cursor:pointer;font-family:'Bebas Neue',sans-serif;letter-spacing:2px;">ANMELDEN</button>
-    <div id="_tauthErr" style="margin-top:12px;color:#c00;font-size:.82rem;text-align:center;min-height:20px;font-weight:600;"></div>
-    ${missingHint}
-    <div style="margin-top:14px;text-align:center;color:var(--gm);font-size:.7rem;line-height:1.5;">Dein Gerät merkt sich dich für die nächsten Besuche.</div>
-  </div>`;
-  let attempts=0;
-  const onSubmit=async()=>{
-    const sel=document.getElementById('_tauthName');
-    const bdayEl=document.getElementById('_tauthBday');
-    const errEl=document.getElementById('_tauthErr');
-    if(!sel||!bdayEl||!errEl)return;
-    errEl.textContent='';
-    const selIdx=sel.value;
-    const bdayInput=bdayEl.value;
-    if(selIdx===''){errEl.textContent='Bitte deinen Namen wählen.';return;}
-    if(!bdayInput){errEl.textContent='Bitte dein Geburtsdatum eingeben.';return;}
-    const x=eligible[parseInt(selIdx,10)];
-    if(!x){errEl.textContent='Spieler nicht gefunden.';return;}
-    const stored=String(x.p.birthdate||'').trim();
-    const provided=bdayInput.trim();
-    if(stored!==provided){
+    <div class="rpo-who" id="tau-who">${eligible.map((x,i)=>
+      `<button class="rpo-who-b" data-i="${i}"><span class="rpo-who-nr">${escapeHtml(String(x.p.nr||''))}</span>${escapeHtml(nm(x.p))}</button>`).join('')}</div>
+    ${missing?`<div class="rpo-sub" style="margin-top:10px;">Nicht in der Liste? Dann fehlt noch dein Geburtsdatum — sag deinem Trainer Bescheid.</div>`:''}
+  </div>
+  <div class="rpo-foot">Nur beim ersten Mal — danach erkennt dich dieses Gerät.</div></div>`;
+  const box=document.getElementById('tau-verify');
+  const inp=document.getElementById('rpo-verify-in');
+  const err=document.getElementById('tau-verify-err');
+  const okBtn=document.getElementById('tau-ok');
+  document.getElementById('tau-who').addEventListener('click',e=>{
+    const b=e.target.closest('.rpo-who-b');if(!b)return;
+    pending=eligible[+b.dataset.i];
+    document.getElementById('tau-verify-name').textContent=nm(pending.p);
+    box.style.display='';inp.value='';err.textContent='';
+    window.scrollTo({top:0,behavior:'smooth'});
+    setTimeout(()=>inp.focus(),60);
+  });
+  document.getElementById('tau-cancel').addEventListener('click',()=>{pending=null;box.style.display='none';});
+  const submit=async()=>{
+    if(!pending)return;
+    if(!inp.value){err.textContent='Bitte dein Geburtsdatum eingeben.';return;}
+    if(!_bdayEq(inp.value,pending.p.birthdate)){
       attempts++;
       if(attempts>=5){
-        errEl.textContent='Zu viele Fehlversuche. Bitte 60 Sekunden warten.';
-        const btn=document.getElementById('_tauthSubmit');
-        if(btn)btn.disabled=true;
-        setTimeout(()=>{
-          attempts=0;
-          errEl.textContent='';
-          if(btn)btn.disabled=false;
-        },60000);
+        err.textContent='Zu viele Fehlversuche. Bitte 60 Sekunden warten.';
+        okBtn.disabled=true;
+        setTimeout(()=>{attempts=0;err.textContent='';okBtn.disabled=false;},60000);
         return;
       }
-      errEl.textContent='Geburtsdatum stimmt nicht. ('+attempts+'/5)';
+      err.textContent='Das Geburtsdatum stimmt nicht.';
       return;
     }
-    // Match — get existing token, or generate + persist a new one
+    const x=pending;
     let token=x.p.confirmToken;
-    const btnEl=document.getElementById('_tauthSubmit');
     if(!token){
-      if(btnEl){btnEl.disabled=true;btnEl.textContent='ANMELDEN...';}
+      okBtn.disabled=true;okBtn.textContent='…';
       try{
         token=(typeof generatePlayerToken==='function')
           ? generatePlayerToken()
           : ('tok_'+Date.now()+'_'+Math.random().toString(36).slice(2,10));
         if(!fbDb)throw new Error('Keine Datenbank-Verbindung.');
-        // Targeted Firebase update — write only the new token field. Path
-        // accounts for fbEncode array-wrap: players → {__arr:1, v:[...]}.
+        // Targeted write of the token only. Path accounts for fbEncode's
+        // array wrap: players → {__arr:1, v:[...]}.
         const teamKey=String(chosen.team+'__'+chosen.season)
           .replace(/\//g,'__SL__').replace(/\./g,'__DOT__')
           .replace(/#/g,'__HASH__').replace(/\[/g,'__LB__').replace(/\]/g,'__RB__');
         // The index comes from the list rendered a moment ago. If the roster
-        // changed meanwhile — on another device — this would hand the token to
-        // a different player, who would then see that person's data. Confirm
-        // the slot still holds the expected name, and re-find it if not.
+        // changed on another device meanwhile, re-find the slot by name so the
+        // token cannot land on someone else.
         const _base='fcf_data/db/'+teamKey+'/players/v/';
         let _idx=x.idx;
         const _atIdx=await fbDb.ref(_base+_idx+'/name').once('value');
-        if(String(_atIdx.val()||'')!==String(x.name||'')){
+        if(String(_atIdx.val()||'')!==String(x.p.name||'')){
           const _all=await fbDb.ref(_base).once('value');
           const _list=_all.val()||[];
           _idx=-1;
-          (Array.isArray(_list)?_list:Object.values(_list)).forEach((p,i)=>{
-            if(p&&String(p.name||'')===String(x.name||''))_idx=i;
+          Object.entries(_list).forEach(([k,p])=>{
+            if(p&&String(p.name||'')===String(x.p.name||''))_idx=k;
           });
-          if(_idx<0)throw new Error('Spieler nicht mehr in der Mannschaft.');
+          if(_idx===-1)throw new Error('Spieler nicht mehr in der Mannschaft.');
         }
         await fbDb.ref(_base+_idx+'/confirmToken').set(token);
       }catch(e){
         console.error('[TeamAuth] Token generation failed',e);
-        errEl.textContent='Anmeldung fehlgeschlagen. Bitte später erneut versuchen.';
-        if(btnEl){btnEl.disabled=false;btnEl.textContent='ANMELDEN';}
+        err.textContent='Anmeldung fehlgeschlagen. Bitte später erneut versuchen.';
+        okBtn.disabled=false;okBtn.textContent='Weiter';
         return;
       }
     }
-    try{localStorage.setItem('fcf_playerToken',token);}catch(e){}
-    const u=new URL(location.href);
-    u.searchParams.delete('team');
-    u.searchParams.set('player',token);
+    _meSet(chosen.team,token);
     allowLeaveOnce();
-    location.replace(u.toString());
+    location.replace(buildHubLink(token));
   };
-  const btn=document.getElementById('_tauthSubmit');
-  if(btn)btn.addEventListener('click',onSubmit);
-  const bdayEl=document.getElementById('_tauthBday');
-  if(bdayEl)bdayEl.addEventListener('keydown',e=>{if(e.key==='Enter')onSubmit();});
+  okBtn.addEventListener('click',submit);
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')submit();});
 }
+
 
 function _pmCalcStats(p,D){
   // Compute player's season attendance %, streak, and rank among teammates.
@@ -14102,7 +14135,10 @@ function _rpeConfirmPick(token){
   window._rpeTeamPick=token;
   // Not remembered in preview: a trainer testing as one player would otherwise
   // find that name preselected on his own phone afterwards.
-  if(!RPE_IS_PREVIEW){try{localStorage.setItem('fcf_rpe_me',token);}catch(e){}}
+  if(!RPE_IS_PREVIEW){
+    try{localStorage.setItem('fcf_rpe_me',token);}catch(e){}
+    if(window._rpeTeamMode&&window._rpeTeamMode.team)_meSet(window._rpeTeamMode.team,token);
+  }
   const box=document.getElementById('rpo-verify');
   if(box)box.style.display='none';
   renderRpeTeam();
@@ -14318,6 +14354,7 @@ function renderHub(){
       <div class="hub-sub">${escapeHtml(UI.currentTeam||'')} \u00b7 ${escapeHtml(UI.currentSeason||'')}</div>
     </div>
     ${cards||'<div class="hub-empty">\u2713<span>Gerade nichts zu tun</span></div>'}
+    ${RPE_IS_PREVIEW?'':'<button class="hub-switch" onclick="hubSwitchPlayer()">Nicht '+escapeHtml(getDisplayName?getDisplayName(p):p.name)+'? Anderen Spieler w\u00e4hlen</button>'}
   </div>`;
 }
 // Each card opens a tab, so a deep-linked screen has no history behind it —
