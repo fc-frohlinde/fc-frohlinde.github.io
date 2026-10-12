@@ -2816,6 +2816,61 @@ html:has(body.hub-mode){background:#080f22;}
   color:rgba(255,255,255,.7);font-family:'Barlow',sans-serif;font-size:.82rem;
   font-weight:600;cursor:pointer;padding:14px 4px;}
 .hub-back:hover{color:#fff;}
+/* Trainer week view */
+.wr2{display:flex;flex-direction:column;gap:14px;padding-bottom:6px;}
+.wr2-top{display:flex;justify-content:flex-end;margin-bottom:-6px;}
+.wr2-pv{font-size:.78rem;}
+.wr2-sec{background:#fff;border:1px solid var(--gl);border-radius:10px;padding:12px 14px;}
+.wr2-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;}
+.wr2-d{font-size:.68rem;font-weight:700;color:var(--gm);white-space:nowrap;}
+.wr2-d.up{color:#1a7a40;}.wr2-d.down{color:#c0392b;}
+.wr2-muted{font-size:.72rem;color:var(--gm);}
+.wr2-ok{font-size:.8rem;color:#1a7a40;font-weight:600;}
+.wr2-flags{display:flex;flex-direction:column;gap:5px;}
+.wr2-flag{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;font-size:.8rem;
+  cursor:pointer;border:1px solid var(--gl);background:var(--ow);color:var(--gd);}
+.wr2-flag b{font-weight:700;color:var(--bd);}
+.wr2-flag span:last-child{color:var(--gm);margin-left:auto;text-align:right;}
+.wr2-flag.bad{border-color:rgba(192,57,43,.35);background:rgba(192,57,43,.06);}
+.wr2-flag.warn{border-color:rgba(243,156,18,.4);background:rgba(243,156,18,.07);}
+.wr2-flag:hover{border-color:var(--bm);}
+.wr2-grid-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.wr2-grid{border-collapse:collapse;width:100%;font-size:.76rem;}
+.wr2-grid tr,.wr2-grid tr:nth-child(even),.wr2-grid td{background:transparent;}
+.wr2-grid thead th{background:transparent!important;color:var(--gm)!important;}
+.wr2-grid th{font-size:.64rem;font-weight:700;color:var(--gm);padding:4px 5px;white-space:nowrap;text-align:center;border-bottom:1px solid var(--gl);}
+.wr2-grid td{padding:3px 5px;text-align:center;border-bottom:1px solid var(--ow);}
+.wr2-grid .wr2-nm{text-align:left;position:sticky;left:0;background:#fff;white-space:nowrap;cursor:pointer;font-weight:600;color:var(--gd);}
+.wr2-grid td.wr2-nm:hover{color:var(--bm);}
+.wr2-nr{display:inline-block;min-width:20px;font-family:'Bebas Neue',sans-serif;color:var(--gm);font-size:.84rem;}
+.wr2-fut{opacity:.55;}
+.wr2-st{cursor:default;width:24px;height:20px;font-size:.72rem;}
+.wr2-st:hover{transform:none;}
+.wr2-pre{display:inline-block;color:var(--gm);opacity:.5;}
+.wr2-pct{font-weight:700;}
+.wr2-pct.good{color:#1a7a40;}.wr2-pct.mid{color:#a56a0a;}.wr2-pct.bad{color:#c0392b;}
+.wr2-match{display:flex;flex-direction:column;gap:8px;}
+.wr2-scorers{display:flex;flex-wrap:wrap;gap:6px;}
+.wr2-sc{padding:4px 10px;border-radius:var(--r-pill,999px);background:var(--ow);border:1px solid var(--gl);font-size:.78rem;font-weight:600;cursor:pointer;}
+.wr2-perf{display:flex;gap:12px;font-size:.8rem;font-weight:700;align-items:center;}
+.wr2-load{display:flex;flex-direction:column;gap:4px;}
+.wr2-lrow{display:flex;align-items:center;gap:8px;font-size:.78rem;cursor:pointer;}
+.wr2-lnm{width:120px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;color:var(--gd);}
+.wr2-lbar{flex:1;height:8px;background:var(--ow);border-radius:4px;overflow:hidden;}
+.wr2-lbar span{display:block;height:100%;background:#9b59b6;border-radius:4px;}
+.wr2-lbar span.hot{background:#e67e22;}
+.wr2-lv{width:44px;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:.9rem;color:var(--bd);}
+.wr2-lch{width:44px;text-align:right;font-size:.68rem;color:var(--gm);font-weight:700;}
+.wr2-lch.hot{color:#e67e22;}
+.wr2-lnk{color:var(--bm);cursor:pointer;text-decoration:underline;}
+body.theme-dark .wr2-sec{background:#1a2f5a;border-color:#2a3e6e;}
+body.theme-dark .wr2-grid .wr2-nm{background:#1a2f5a;color:#dde5f0;}
+body.theme-dark .wr2-flag{background:rgba(255,255,255,.04);border-color:#2a3e6e;color:#dde5f0;}
+body.theme-dark .wr2-flag b{color:#fff;}
+body.theme-dark .wr2-grid td{border-bottom-color:rgba(255,255,255,.06);}
+body.theme-dark .wr2-sc,body.theme-dark .wr2-lbar{background:rgba(255,255,255,.06);border-color:#2a3e6e;}
+body.theme-dark .wr2-lnm,body.theme-dark .wr2-lv{color:#dde5f0;}
+
 .db-wr-live{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--ow);
   border:1px solid var(--gl);font-size:.78rem;color:var(--gd);line-height:1.45;}
 .hub-switch{display:block;margin:18px auto 4px;background:none;border:none;cursor:pointer;
@@ -3927,7 +3982,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791841971033; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791844237266; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -16467,30 +16522,183 @@ function _dbBuildWeekNav(data){
 }
 function dbRenderWeekReportSection(data){
   const offset=_dbState.weekReportOffset||0;
-  const r=dbComputeWeekReport(data,offset);
-  const isCurrentWeek=offset===0;
-  const weekLbl=`KW ${r.kw} \u00b7 ${_dbFmtDM(r.bounds.monday)}\u2013${_dbFmtDM(r.bounds.sunday)}`;
-  let html='<div class="db-section db-wr" style="padding-top:0;">';
-  // Header/nav are rendered separately in the modal header slot (see _dbBuildWeekNav)
-  const emptyWeek=r.weekSess.length===0;
-  // Week summary — compact session strip, or an empty-week note
-  if(emptyWeek){
-    html+='<div class="db-wr-empty">In dieser Woche gibt es keine Termine. Der Bericht kann trotzdem ver\u00f6ffentlicht werden \u2014 er zeigt dann nur die Saison-Wertung.</div>';
-  } else {
-    html+='<div class="db-wr-summary">';
-    html+='<div class="db-wr-sess">';
-    r.weekSess.forEach(({s})=>{
-      const ico=s.type==='match'?'\u26bd':'\ud83c\udfc3';
-      html+=`<span class="db-wr-chip">${ico} ${_dbEscapeHtml(s.date)}</span>`;
+  const {sessions,players,season}=data;
+  const esc=_dbEscapeHtml;
+  const nm=p=>(typeof getDisplayName==='function'?getDisplayName(p):p.name)||p.name||'?';
+  const open=pi=>`onclick="closeM('moWeekReport');jumpToPlayer(${pi},{id:'moWeekReport'})"`;
+  const inWeek=(off)=>{
+    const b=_dbWeekBounds(off);
+    const out=[];
+    sessions.forEach((s,si)=>{
+      if(!s||!s.date)return;
+      const k=_dbSortKey(s.date,season);
+      if(k>=b.mondayYSK&&k<=b.sundayYSK)out.push({s,si,k,held:sessTookPlace(s,season)});
     });
-    html+='</div>';
-    html+=`<div class="db-wr-teampct"><b>${r.teamAgg.overallPct==null?'\u2013':r.teamAgg.overallPct+'%'}</b><span>Team</span></div>`;
+    return out.sort((a,b2)=>a.k-b2.k);
+  };
+  const wk=inWeek(offset),prev=inWeek(offset-1);
+  const held=wk.filter(x=>x.held),prevHeld=prev.filter(x=>x.held);
+  const stat=(p,si)=>(p.s&&si<p.s.length)?p.s[si]:3;
+  const pctOf=(p,list)=>{
+    let a=0,t=0;
+    list.forEach(({s,si})=>{
+      if(!_sessAfterJoin(p,s,season))return;
+      const v=stat(p,si);
+      if(v===1||v===0||v===2){t++;if(v===1)a++;}
+    });
+    return t?Math.round(a/t*100):null;
+  };
+  const loadOf=(p,list)=>{
+    let l=0;
+    list.forEach(({s,si})=>{if(!_sessAfterJoin(p,s,season))return;const x=rpeLoad(s,p,si);if(typeof x==='number')l+=x;});
+    return l;
+  };
+  let html='<div class="wr2">';
+  // ── Top row: player view + headline ──
+  html+=`<div class="wr2-top">
+    <button class="btn bs wr2-pv" onclick="dbOpenPlayerReport()" title="Genau das, was die Spieler in ihrem Menü sehen">👁 Spieleransicht</button>
+  </div>`;
+  if(!wk.length){
+    html+='<div class="db-wr-empty">In dieser Woche gibt es keine Termine.</div></div>';
+    return html;
+  }
+  // ── 3. Team ──
+  const teamPct=(list,type)=>{
+    let a=0,t=0;
+    list.filter(x=>!type||(type==='match')===(x.s.type==='match')).forEach(({s,si})=>{
+      players.forEach(p=>{
+        if(!p||!_sessAfterJoin(p,s,season))return;
+        const v=stat(p,si);
+        if(v===1||v===0||v===2){t++;if(v===1)a++;}
+      });
+    });
+    return t?Math.round(a/t*100):null;
+  };
+  const avgPresent=list=>{
+    const tr=list.filter(x=>x.s.type!=='match');
+    if(!tr.length)return null;
+    return Math.round(tr.reduce((n,{si})=>n+players.filter(p=>p&&stat(p,si)===1).length,0)/tr.length);
+  };
+  const tNow=teamPct(held,'training'),tPrev=teamPct(prevHeld,'training');
+  const mNow=teamPct(held,'match');
+  const allNow=teamPct(held),allPrev=teamPct(prevHeld);
+  const seasonPct=_dbComputeSeasonStats(data).teamPct;
+  const delta=(a,b)=>{
+    if(a==null||b==null)return '';
+    const d=a-b;
+    if(!d)return '<span class="wr2-d">±0</span>';
+    return `<span class="wr2-d ${d>0?'up':'down'}">${d>0?'▲':'▼'} ${Math.abs(d)}</span>`;
+  };
+  const tile=(v,l,sub)=>`<div class="ps-tile"><div class="ps-tile-v">${v==null?'–':v}</div><div class="ps-tile-l">${l}</div>${sub?`<div class="ps-tile-s">${sub}</div>`:''}</div>`;
+  html+='<div class="wr2-sec"><div class="db-h">👥 Mannschaft</div><div class="wr2-tiles">';
+  html+=tile(allNow==null?null:allNow+'%','Woche',delta(allNow,allPrev)+(allPrev!=null?' <span class="wr2-muted">Vorwoche '+allPrev+'%</span>':''));
+  html+=tile(tNow==null?null:tNow+'%','Training',delta(tNow,tPrev));
+  if(held.some(x=>x.s.type==='match'))html+=tile(mNow==null?null:mNow+'%','Spiel','');
+  html+=tile(avgPresent(held),'Ø im Training',avgPresent(prevHeld)!=null?'Vorwoche '+avgPresent(prevHeld):'');
+  html+=tile(seasonPct==null?null:seasonPct+'%','Saison','');
+  html+='</div></div>';
+  // ── 2. Attention ──
+  const flags=[];
+  players.forEach((p,pi)=>{
+    if(!p)return;
+    const own=wk.filter(x=>_sessAfterJoin(p,x.s,season));
+    const miss=own.filter(x=>x.held&&stat(p,x.si)===0).length;
+    if(miss>=2)flags.push({pi,p,cls:'bad',ic:'❌',t:miss+'× unentschuldigt gefehlt'});
+    const unans=own.filter(x=>!x.held&&stat(p,x.si)===3).length;
+    if(unans)flags.push({pi,p,cls:'warn',ic:'❔',t:unans+' Termin'+(unans>1?'e':'')+' nicht beantwortet'});
+    const lNow=loadOf(p,held),lPrev=loadOf(p,prevHeld);
+    if(lPrev>0&&lNow>lPrev*(1+LOAD_SPIKE_PCT/100))
+      flags.push({pi,p,cls:'warn',ic:'📈',t:'Belastung +'+Math.round((lNow/lPrev-1)*100)+'% zur Vorwoche'});
+    const phy=own.filter(x=>Array.isArray(p.physio)&&p.physio[x.si]===true);
+    if(phy.length)flags.push({pi,p,cls:'info',ic:'🧑‍⚕️',t:'Physio: '+phy.map(x=>x.s.date).join(', ')});
+  });
+  html+='<div class="wr2-sec"><div class="db-h">⚠ Im Blick behalten</div>';
+  if(!flags.length)html+='<div class="wr2-ok">✓ Nichts Auffälliges in dieser Woche.</div>';
+  else{
+    const order={bad:0,warn:1,info:2};
+    flags.sort((a,b)=>order[a.cls]-order[b.cls]||nm(a.p).localeCompare(nm(b.p)));
+    html+='<div class="wr2-flags">'+flags.map(f=>
+      `<div class="wr2-flag ${f.cls}" ${open(f.pi)}><span class="wr2-flag-ic">${f.ic}</span><b>${esc(nm(f.p))}</b><span>${esc(f.t)}</span></div>`).join('')+'</div>';
+  }
+  html+='</div>';
+  // ── 1. Week grid ──
+  const sym={1:['A','csa'],0:['F','csf'],2:['E','cse'],4:['M','csm'],3:['?','csq']};
+  const rows=players.map((p,pi)=>({p,pi})).filter(x=>x.p).map(x=>{
+    const now=pctOf(x.p,held),pr=pctOf(x.p,prevHeld);
+    return Object.assign(x,{now,pr});
+  }).sort((a,b)=>((b.now==null?-1:b.now)-(a.now==null?-1:a.now))||nm(a.p).localeCompare(nm(b.p)));
+  html+='<div class="wr2-sec"><div class="db-h">📅 Anwesenheit der Woche</div><div class="wr2-grid-wrap"><table class="wr2-grid"><thead><tr><th class="wr2-nm">Spieler</th>';
+  wk.forEach(({s,held:h})=>{
+    html+=`<th class="${h?'':'wr2-fut'}" title="${h?'':'noch nicht stattgefunden'}">${s.type==='match'?'⚽':''}${esc(String(s.date).replace(/\.\d{4}$/,''))}</th>`;
+  });
+  html+='<th>Woche</th><th>Trend</th></tr></thead><tbody>';
+  rows.forEach(({p,pi,now,pr})=>{
+    html+=`<tr><td class="wr2-nm" ${open(pi)}><span class="wr2-nr">${esc(String(p.nr||''))}</span>${esc(nm(p))}</td>`;
+    wk.forEach(({s,si,held:h})=>{
+      if(!_sessAfterJoin(p,s,season)){html+='<td><span class="wr2-st wr2-pre">–</span></td>';return;}
+      const m=sym[stat(p,si)]||sym[3];
+      html+=`<td class="${h?'':'wr2-fut'}"><span class="ssa-st wr2-st ${m[1]}">${m[0]}</span></td>`;
+    });
+    const col=now==null?'':now>=80?'good':now>=50?'mid':'bad';
+    html+=`<td class="wr2-pct ${col}">${now==null?'–':now+'%'}</td><td>${delta(now,pr)}</td></tr>`;
+  });
+  html+='</tbody></table></div></div>';
+  // ── 4. Match of the week ──
+  held.filter(x=>x.s.type==='match').forEach(({s,si})=>{
+    const sc=[],perf={1:0,2:0,3:0};
+    players.forEach((p,pi)=>{
+      if(!p)return;
+      const g=(Array.isArray(p.goals)?p.goals[si]:0)||0,a=(Array.isArray(p.assists)?p.assists[si]:0)||0;
+      if(g||a)sc.push({p,pi,g,a});
+      const v=Array.isArray(p.perf)?p.perf[si]:null;
+      if(v===1||v===2||v===3)perf[v]++;
+    });
+    sc.sort((x,y)=>(y.g-x.g)||(y.a-x.a));
+    const graded=perf[1]+perf[2]+perf[3];
+    html+=`<div class="wr2-sec"><div class="db-h">⚽ Spiel ${s.label?'gegen '+esc(s.label):''} <span class="db-h-sub">${esc(s.date)}</span></div>`;
+    if(s.evalTopic)html+=`<div class="wr2-muted" style="margin-bottom:6px;">Thema: <b>${esc(s.evalTopic)}</b></div>`;
+    html+='<div class="wr2-match">';
+    html+='<div class="wr2-scorers">'+(sc.length?sc.map(x=>
+      `<span class="wr2-sc" ${open(x.pi)}>${esc(nm(x.p))}${x.g?' ⚽'+(x.g>1?'×'+x.g:''):''}${x.a?' 🎯'+(x.a>1?'×'+x.a:''):''}</span>`).join('')
+      :'<span class="wr2-muted">Keine Tore/Vorlagen eingetragen</span>')+'</div>';
+    if(graded)html+=`<div class="wr2-perf"><span>🟢 ${perf[1]}</span><span>🔵 ${perf[2]}</span><span>🟠 ${perf[3]}</span><span class="wr2-muted">${graded} bewertet</span></div>`;
+    html+='</div></div>';
+  });
+  // ── 5. Load ──
+  const loads=players.map((p,pi)=>({p,pi})).filter(x=>x.p).map(x=>{
+    const present=held.filter(h=>_sessAfterJoin(x.p,h.s,season)&&stat(x.p,h.si)===1);
+    const rated=present.filter(h=>Array.isArray(x.p.rpe)&&typeof x.p.rpe[h.si]==='number').length;
+    return Object.assign(x,{now:loadOf(x.p,held),pr:loadOf(x.p,prevHeld),present:present.length,rated});
+  }).filter(x=>x.present);
+  if(loads.length){
+    const missing=loads.filter(x=>x.rated<x.present);
+    const max=Math.max(1,...loads.map(x=>x.now));
+    html+='<div class="wr2-sec"><div class="db-h">💪 Belastung <span class="db-h-sub">(sRPE · Minuten × Anstrengung)</span></div>';
+    html+='<div class="wr2-load">'+loads.filter(x=>x.now>0).sort((a,b)=>b.now-a.now).map(x=>{
+      const ch=x.pr>0?Math.round((x.now/x.pr-1)*100):null;
+      const hot=ch!=null&&ch>LOAD_SPIKE_PCT;
+      return `<div class="wr2-lrow" ${open(x.pi)}><span class="wr2-lnm">${esc(nm(x.p))}</span>
+        <span class="wr2-lbar"><span style="width:${Math.round(x.now/max*100)}%" class="${hot?'hot':''}"></span></span>
+        <span class="wr2-lv">${x.now}</span><span class="wr2-lch ${hot?'hot':''}">${ch==null?'':(ch>0?'+':'')+ch+'%'}</span></div>`;
+    }).join('')+'</div>';
+    if(missing.length)html+=`<div class="wr2-muted" style="margin-top:6px;">Nicht bewertet: ${missing.map(x=>`<a class="wr2-lnk" ${open(x.pi)}>${esc(nm(x.p))}</a>`).join(', ')}</div>`;
     html+='</div>';
   }
-  // Nothing to publish: players see this report live in their hub.
-  html+='<div class="db-wr-live">\ud83d\udc65 Die Spieler sehen diesen Bericht <b>live</b> in ihrem Spieler-Men\u00fc \u2014 nichts zu ver\u00f6ffentlichen oder zu versenden.</div>';
   html+='</div>';
   return html;
+}
+// Exactly what the players see in their hub, for the week shown here.
+function dbOpenPlayerReport(){
+  const team=UI.currentTeam,season=UI.currentSeason;
+  const block=G.db&&G.db[team+'__'+season];
+  if(!block)return;
+  const data={team,season,block,sessions:block.sessions,players:block.players};
+  const snap=dbBuildReportSnapshot(data,_dbState.weekReportOffset||0,false);
+  try{sessionStorage.setItem('fcf_live_report',JSON.stringify(snap));}catch(e){alert('Vorschau nicht möglich.');return;}
+  const url=location.origin+location.pathname.replace(/\/[^\/]*$/,'/')+'report.html?local=report';
+  const standalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
+  if(standalone){allowLeaveOnce&&allowLeaveOnce();location.href=url;}
+  else window.open(url,'_blank'); // no noopener: the new tab must inherit sessionStorage
 }
 function _dbEscapeHtml(s){
   return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');

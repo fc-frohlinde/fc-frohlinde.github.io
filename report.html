@@ -616,7 +616,7 @@ function renderReport(r){
     const b=document.createElement('button');
     document.body.classList.add('live');
     b.className='live-back';b.type='button';b.textContent='\u2039 Zur\u00fcck';
-    b.onclick=()=>{if(history.length>1)history.back();else location.href='./';};
+    b.onclick=()=>{if(window.opener){window.close();return;}if(history.length>1)history.back();else location.href='./';};
     document.body.appendChild(b);
     return;
   }
