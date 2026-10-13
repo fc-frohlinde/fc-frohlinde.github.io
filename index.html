@@ -4344,6 +4344,7 @@ if(window._fbBlocked){
   <div id="ps-note-card"></div>
   <div id="ps-ext-btn-wrap" style="margin:2px 0 12px;">
     <button class="btn bp" id="ps-ext-btn" onclick="openPlayerStatsExt()" style="width:100%;justify-content:center;font-size:.8rem;padding:9px 14px;">📊 Alle Statistiken</button>
+    <button class="btn" id="ps-preview-btn" onclick="psPreviewPlayer()" style="display:none;width:100%;justify-content:center;font-size:.8rem;padding:9px 14px;margin-top:6px;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" title="Das Spieler-Menü so sehen, wie dieser Spieler es sieht — ohne zu speichern">👁 Spieleransicht</button>
   </div>
   <!-- Everything below is the former front page: still here, still updated by
        the same code, but folded away. The card should answer "who is this and
@@ -4473,8 +4474,6 @@ if(window._fbBlocked){
       <div id="ss-rpe-wrap" style="display:none;"></div>
       <div id="ss-physio-wrap" style="display:none;"></div>
       <div style="margin-top:8px;">
-        <!-- ss-anmeld-btn removed: redundant with Erinnern button in Anmeldungen-bar. Kept ID for any legacy refs. -->
-        <button class="btn" id="ss-anmeld-btn" style="display:none;" onclick="openAnmeldungen(_currentSessIdx)"></button>
       </div>
   </div><!-- /ss-card-view -->
   <div id="ss-edit-wrap" style="margin-bottom:12px;">
@@ -4864,7 +4863,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791933232652; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791934322659; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -5033,32 +5032,9 @@ function initUI(){
 let tableSort={col:'nr',asc:true}; // nr, name, pos
 let mgrSort={col:'nr',asc:true};
 let attSort={col:'nr',asc:true};
-let _amSort={col:'nr',asc:true};
-function setAmSort(col){
-  if(_amSort.col===col)_amSort.asc=!_amSort.asc;
-  else{_amSort.col=col;_amSort.asc=true;}
-  if(typeof renderAnmeldungenModal==='function')renderAnmeldungenModal();
-}
 // Render a pill-style sort bar — used at top of Anmeldungen player lists in
 // both Overview and Session views. Always shows all four options so users
 // have a consistent control across views.
-function _amRenderSortBar(){
-  const cols=[
-    {id:'nr',lbl:'Nr'},
-    {id:'name',lbl:'Name'},
-    {id:'pos',lbl:'Position'},
-    {id:'link',lbl:'Link-Status'},
-  ];
-  let h='<div class="am-sortbar">';
-  h+='<span class="am-sortbar-lbl">Sortieren:</span>';
-  cols.forEach(c=>{
-    const active=_amSort.col===c.id;
-    const arrow=active?(_amSort.asc?'\u25b2':'\u25bc'):'';
-    h+=`<button class="am-sortpill${active?' active':''}" onclick="setAmSort('${c.id}')">${c.lbl}${arrow?' '+arrow:''}</button>`;
-  });
-  h+='</div>';
-  return h;
-}
 let zoomLvl=100, nextIdx=-1, newMatchHA='home';
 let selP1='8er', selP2='', editP1='', editP2='';
 let currentPI=-1, currentSI=-1;
@@ -10648,7 +10624,7 @@ function renderPlayerContact(p){
     if(rowsEl0){
       rowsEl0.innerHTML=((p&&p.email)?`<div class="tp-row"><span class="tp-l">E-Mail</span><span class="tp-v">${escapeHtml(p.email)}</span></div>`:'')
         +`<div class="ps-nophone">
-            <div class="ps-nophone-txt">\u26a0\ufe0f Keine Telefonnummer \u2014 dieser Spieler erh\u00e4lt keine Einladungen.</div>`
+            <div class="ps-nophone-txt" style="background:none;border:none;color:var(--gm);padding:0 0 4px;">Telefon</div>`
         +(canEdit()?`<div class="ps-nophone-add inline-field">
               <input type="tel" id="ps-quick-phone" placeholder="z.B. +49 170 1234567">
               <button class="btn bp" onclick="psQuickSavePhone()">Speichern</button>
@@ -12112,18 +12088,6 @@ function buildPlayerLink(token,sessIdx){
   return url;
 }
 // ── Bulk player-link management & WhatsApp distribution ──
-function _amBulkEnsureTokens(){
-  // Generate missing tokens for ALL players in current team/season. Returns {created, total}.
-  const D=cd();if(!D||!Array.isArray(D.players))return{created:0,total:0};
-  snap();
-  let created=0;
-  D.players.forEach(p=>{
-    if(!p)return;
-    if(!p.confirmToken){p.confirmToken=generatePlayerToken();created++;}
-  });
-  if(created>0)saveG();
-  return{created,total:D.players.length};
-}
 function _amCleanPhone(phone){
   // Convert "+49 176 12345678" / "0176/12345678" → "4917612345678" for wa.me
   if(!phone)return null;
@@ -12143,39 +12107,6 @@ function _amSessResponse(p,si){
   // Returns the player's status for a session — single source of truth: p.s[si].
   if(!p)return 3;
   return (p.s&&si<p.s.length)?p.s[si]:3;
-}
-function _amGetPlayerSessionHistory(playerName,sessLabel){
-  // Returns chronologically-sorted history entries for this player+session combo.
-  // Includes 'Anmeldung (Spieler-App)' and 'Grund (Spieler-App)' entries.
-  if(!playerName||!sessLabel)return[];
-  if(!G||!Array.isArray(G.auditLog))return[];
-  const targetLow=playerName.toLowerCase();
-  const sessLow=sessLabel.toLowerCase();
-  const out=[];
-  G.auditLog.forEach(e=>{
-    if(!e||e.role!=='player')return;
-    if(!e.action)return;
-    if(!e.action.includes('Anmeldung')&&!e.action.includes('Grund'))return;
-    if((e.target||'').toLowerCase()!==targetLow)return;
-    if(!(e.details||'').toLowerCase().includes(sessLow))return;
-    out.push(e);
-  });
-  out.sort((a,b)=>(a.ts||0)-(b.ts||0));
-  return out;
-}
-function _amFmtHistoryEntry(e){
-  if(!e)return '';
-  const d=new Date(e.ts||0);
-  const when=d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
-  let icon='\ud83d\udd04';
-  const det=e.details||'';
-  if(e.action.includes('Grund')){
-    if(det.includes('(entfernt)'))icon='\u270f\ufe0f';
-    else icon='\ud83d\udcac';
-  } else if(det.includes('Anwesend'))icon='\u2705';
-  else if(det.includes('Fehlend'))icon='\u274c';
-  else if(det.includes('Entschuldigt'))icon='\ud83d\udccb';
-  return {when,icon,details:det,action:e.action};
 }
 function _amSessionDeadline(si){
   const D=cd();
@@ -12222,55 +12153,6 @@ function _amCountSessionResponses(si){
 // instead of a single session. Five variants: the same request lands
 // differently depending on the week, and a message that never changes stops
 // being read after a month.
-function _amWeekCtx(p){
-  const D=cd();
-  const nm=(getDisplayName?getDisplayName(p):p.name)||'Spieler';
-  const url=buildHubLink(p.confirmToken||'','week');
-  const statsUrl=''; // the statistics live in the player menu now (url above)
-  const today=todaySK();
-  const horizon=(typeof _pmWeekHorizon==='function')?_pmWeekHorizon():today;
-  const weekStart=(typeof _pmWeekStart==='function')?_pmWeekStart():today;
-  const list=[];
-  (D&&Array.isArray(D.sessions)?D.sessions:[]).forEach(s=>{
-    if(!s||!s.date)return;
-    const sk=dispToSortKey(s.date);
-    if(sk<weekStart||sk>horizon)return;
-    const isMatch=s.type==='match';
-    list.push({
-      sk,date:s.date,time:s.time||(isMatch?'15:00':'18:30'),isMatch,
-      what:isMatch?(s.label||'Spiel'):'Training',
-      place:s.location||'',
-      map:(s.location&&typeof locRouteNeeded==='function'&&locRouteNeeded(s))?locMapsUrl(s.location):''
-    });
-  });
-  list.sort((a,b)=>a.sk-b.sk);
-  const dows=['So','Mo','Di','Mi','Do','Fr','Sa'];
-  list.forEach(e=>{
-    // Stored dates already carry the weekday ("Mi 05.08."). Split it off so
-    // templates compose the parts themselves — prepending a computed weekday
-    // produced "Mi Mi 05.08.".
-    const parts=String(e.date).trim().split(/\s+/);
-    if(parts.length>1&&/^[A-Za-zÄÖÜäöü]{2,3}$/.test(parts[0])){
-      e.dow=parts[0];
-      e.dnum=parts.slice(1).join(' ');
-    }else{
-      e.dnum=String(e.date).trim();
-      const m=e.dnum.match(/(\d+)\.(\d+)/);
-      e.dow=m?dows[new Date(Math.floor(e.sk/10000),+m[2]-1,+m[1]).getDay()]:'';
-    }
-  });
-  const trainCount=list.filter(e=>!e.isMatch).length;
-  const matchCount=list.filter(e=>e.isMatch).length;
-  // "2 Trainings und 1 Spiel" — what the message needs instead of the dates,
-  // which the link shows anyway.
-  const _p=(n,one,many)=>n+' '+(n===1?one:many);
-  const parts=[];
-  if(trainCount)parts.push(_p(trainCount,'Training','Trainings'));
-  if(matchCount)parts.push(_p(matchCount,'Spiel','Spiele'));
-  const summary=parts.length===2?parts.join(' und '):(parts[0]||'keine Termine');
-  return {nm,url,statsUrl,list,trainCount,matchCount,summary,
-    kw:(typeof isoWeekKey==='function')?parseInt(isoWeekKey(new Date()).split('-W')[1],10):null};
-}
 const AM_WEEK_TEMPLATES={
   // The link already shows every date of the week with its buttons, so listing
   // them here says the same thing twice — and a long message is scrolled past.
@@ -12374,177 +12256,17 @@ const AM_WEEK_TEMPLATES={
     }
   }
 };
-function amWeekTemplateKey(){
-  return (typeof getUserPref==='function')?getUserPref('amWeekTemplate','kompakt'):'kompakt';
-}
-function amSetWeekTemplate(v){
-  const box=document.getElementById('am-week-preview');
-  const wasOpen=!!(box&&box.style.display!=='none');
-  if(typeof setUserPref==='function')setUserPref('amWeekTemplate',v||'kompakt');
-  if(typeof renderAnmeldungenModal==='function'){try{renderAnmeldungenModal();}catch(e){}}
-  // Comparing two wordings is the reason to switch template at all — the
-  // preview should follow rather than close.
-  if(wasOpen)setTimeout(()=>{try{amShowWeekPreview();}catch(e){}},0);
-}
 // The text is built per player (name, own links), so an edited version cannot
 // simply be sent as-is to everyone. What CAN be personalised is the wording
 // around the placeholders: the edit is stored as an override with {name},
 // {link} and {stats} standing in for the per-player parts.
-let _amWeekOverride=null;
 // Read-only look at the text as one player would receive it, including the
 // greeting rule — the point is to judge the wording before sending.
-function amShowWeekPreview(){
-  const box=document.getElementById('am-week-preview');
-  if(!box)return;
-  if(box.style.display!=='none'){box.style.display='none';return;}
-  const D=cd();
-  const p=(D&&D.players||[]).find(x=>x&&x.confirmToken)||{name:'Max Mustermann'};
-  const nm=(getDisplayName?getDisplayName(p):p.name)||'Spieler';
-  const txt=_amWeekOverride
-    ? _amApplyWeekOverride(_amWeekOverride,p)
-    : _amBuildInviteText(p,null,'week');
-  const edited=!!_amWeekOverride;
-  const greetDropped=(typeof _amPlayedRecently==='function')&&_amPlayedRecently(p);
-  box.innerHTML='<div class="am-week-prev-h">So sieht es bei '+_dbEscapeHtml(nm)+' aus'
-    +(edited?' \u00b7 <b>angepasster Text</b>':'')
-    +(greetDropped?' \u00b7 ohne Begr\u00fc\u00dfung (war beim Spiel)':'')
-    +'</div><div class="am-week-prev-body">'+_dbEscapeHtml(txt)+'</div>';
-  box.style.display='block';
-  const ed=document.getElementById('am-week-edit');
-  if(ed)ed.style.display='none';
-}
-function amPreviewWeekText(){
-  const D=cd();const p=(D&&D.players||[]).find(x=>x&&x.confirmToken);
-  const sample=p||{name:'Max Mustermann'};
-  const box=document.getElementById('am-week-edit');
-  const ta=document.getElementById('am-week-text');
-  if(!box||!ta)return;
-  ta.value=_amWeekOverride||_amWeekTemplateWithPlaceholders(sample);
-  box.style.display='block';
-  ta.focus();
-}
-function _amWeekTemplateWithPlaceholders(sample){
-  const tpl=AM_WEEK_TEMPLATES[amWeekTemplateKey()]||AM_WEEK_TEMPLATES.kompakt;
-  const c=_amWeekCtx(sample);
-  let t=tpl.build(c);
-  // Replace this player's specifics with markers so the same text serves all
-  if(c.url)t=t.split(c.url).join('{link}');
-  if(c.statsUrl)t=t.split(c.statsUrl).join('{stats}');
-  if(c.nm)t=t.split(c.nm).join('{name}');
-  return t;
-}
-function amWeekEditReset(){
-  _amWeekOverride=null;
-  const ta=document.getElementById('am-week-text');
-  const D=cd();const p=(D&&D.players||[]).find(x=>x&&x.confirmToken);
-  if(ta)ta.value=_amWeekTemplateWithPlaceholders(p||{name:'Max Mustermann'});
-}
-function amWeekEditClose(){
-  const box=document.getElementById('am-week-edit');
-  if(box)box.style.display='none';
-}
 // Store the edited wording without sending: the trainer then uses the per-player
 // buttons in the list below, and those messages carry the same text.
-function amWeekEditKeep(){
-  const ta=document.getElementById('am-week-text');
-  if(!ta)return;
-  const v=String(ta.value||'').trim();
-  if(v&&v.indexOf('{link}')<0){
-    alert('Der Text enth\u00e4lt kein {link} \u2014 ohne den Platzhalter bekommen die Spieler keinen Anmeldelink.');
-    return;
-  }
-  _amWeekOverride=v||null;
-  amWeekEditClose();
-  if(typeof renderAnmeldungenModal==='function')renderAnmeldungenModal();
-  if(typeof showSaveFlash==='function'){
-    showSaveFlash(v?'\u2713 Text \u00fcbernommen \u2014 gilt auch f\u00fcr einzelne Spieler':'\u21ba Vorlage wiederhergestellt');
-  }
-}
-function amWeekEditApply(){
-  const ta=document.getElementById('am-week-text');
-  if(!ta)return;
-  const v=String(ta.value||'').trim();
-  _amWeekOverride=v||null;
-  if(v&&v.indexOf('{link}')<0){
-    alert('Der Text enth\u00e4lt kein {link} \u2014 ohne den Platzhalter bekommen die Spieler keinen Anmeldelink.');
-    return;
-  }
-  amWeekEditClose();
-  amSendWeekAll();
-}
 // Was this player at a match in the last two days?
-function _amPlayedRecently(p){
-  const D=cd();
-  if(!p||!Array.isArray(D.sessions))return false;
-  const today=todaySK();
-  const y=Math.floor(today/10000),m=Math.floor(today/100)%100,d=today%100;
-  const cutoff=new Date(y,m-1,d);
-  cutoff.setDate(cutoff.getDate()-2);
-  const cutSk=cutoff.getFullYear()*10000+(cutoff.getMonth()+1)*100+cutoff.getDate();
-  return (D.sessions||[]).some((s,si)=>{
-    if(!s||s.type!=='match'||!s.date)return false;
-    const sk=dispToSortKey(s.date);
-    if(sk<cutSk||sk>today)return false;
-    return ((p.s&&si<p.s.length)?p.s[si]:3)===1;
-  });
-}
 // Turns "Hi Fynn! 👋" into "Fynn," and leaves everything else alone. Applied
 // only to players who were at a match in the last two days.
-function _amDropGreeting(text,nm){
-  if(!text||!nm)return text;
-  const lines=String(text).split('\n');
-  if(!lines.length)return text;
-  const esc=String(nm).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-  // First line only, and only when it is a greeting naming this player
-  const re=new RegExp('^\\s*(Hi|Hallo|Hey|Moin|Servus|Guten Tag)\\s+'+esc+'\\s*[!,.:]*\\s*\\S{0,4}\\s*$','i');
-  if(re.test(lines[0])){
-    lines[0]=nm+',';
-    // The blank line after a greeting was separating it from the body; with a
-    // short opener the text reads better closed up.
-    if(lines[1]==='')lines.splice(1,1);
-    return lines.join('\n');
-  }
-  // Some templates open with just the name and an emoji — "Fynn! 🔥"
-  const re2=new RegExp('^\\s*'+esc+'\\s*[!]\\s*\\S{0,4}\\s*$');
-  if(re2.test(lines[0])){
-    lines[0]=nm+',';
-    if(lines[1]==='')lines.splice(1,1);
-    return lines.join('\n');
-  }
-  return text;
-}
-function _amBuildInviteText(p,sessIdx,kind){
-  // kind: 'general' | 'session' | 'reminder'
-  const D=cd();
-  const url=(kind==='session'||kind==='reminder')&&sessIdx!=null
-    ?buildPlayerLink(p.confirmToken||'',sessIdx)
-    :buildPlayerLink(p.confirmToken||'');
-  const nm=(getDisplayName?getDisplayName(p):p.name)||'Spieler';
-  if(kind==='general'||kind==='week'){
-    // The link covers the whole week — the message does too.
-    const tpl=AM_WEEK_TEMPLATES[amWeekTemplateKey()]||AM_WEEK_TEMPLATES.kompakt;
-    const ctx=_amWeekCtx(p);
-    const txt=tpl.build(ctx);
-    // Seen at the weekend match — no second greeting the same day.
-    return _amPlayedRecently(p)?_amDropGreeting(txt,ctx.nm):txt;
-  }
-  if(D&&Array.isArray(D.sessions)&&sessIdx!=null){
-    const s=D.sessions[sessIdx];
-    if(s){
-      const isMatch=s.type==='match';
-      const what=isMatch?(s.label||'Spiel'):'Training'+(s.focus?' \u00b7 '+s.focus:'');
-      const time=s.time||(isMatch?'15:00':'18:30');
-      const date=s.date||'';
-      if(kind==='reminder'){
-        return `Hi ${nm}!\n\nKurze Erinnerung: ${date} ${time} Uhr \u2014 ${what}.\n\nBitte best\u00e4tige kurz, ob du kommst:\n${url}\n\nDanke! \uD83D\uDE4F`;
-      }
-      // 'session'
-      return `Hi ${nm}!\n\n${date} \u00b7 ${time} Uhr \u2014 ${what}\n\nBitte best\u00e4tige kurz deine Anwesenheit:\n${url}\n\n\u2705 Komme  /  \u274c Komme nicht  /  \uD83D\uDCCB Entschuldigt`;
-    }
-  }
-  return _amBuildInviteText(p,null,'general');
-}
-
 function findPlayerByToken(token){
   if(!token||!G||!G.db)return null;
   const teams=Array.isArray(G.teamList)?G.teamList:[];
@@ -15920,433 +15642,16 @@ function pmSetStatus(si,val){
   try{_hubCheckDone();}catch(e){}
 }
 // ── Anmeldungen Modal — state and render ──
-let _amState={mode:'overview',sessIdx:null,hideOut:false};
-function openAnmeldungen(sessIdx){
-  // sessIdx: optional. If provided, opens in 'session' mode for that session.
-  if(!UI.currentTeam||!UI.currentSeason){alert('Bitte zuerst Mannschaft und Saison ausw\u00e4hlen.');return;}
-  _amState.mode=(sessIdx!=null)?'session':'overview';
-  _amState.sessIdx=(sessIdx!=null)?sessIdx:null;
-  renderAnmeldungenModal();
-  if(typeof openM==='function')openM('moAnmeldungen');
-}
-function setAmMode(mode){
-  if(mode==='session'&&_amState.sessIdx==null){
-    // Need a session — bail back to overview
-    mode='overview';
-  }
-  _amState.mode=mode;
-  renderAnmeldungenModal();
-}
-function renderAnmeldungenModal(){
-  const content=document.getElementById('am-content');
-  const tabsEl=document.getElementById('am-mode-tabs');
-  const metaEl=document.getElementById('am-head-meta');
-  if(!content)return;
-  const team=UI.currentTeam,season=UI.currentSeason;
-  if(metaEl)metaEl.textContent=team+' \u00b7 '+season;
-  const D=cd();
-  if(!D||!Array.isArray(D.players)){
-    if(tabsEl)tabsEl.innerHTML='';
-    content.innerHTML='<div class="am-empty">Keine Daten f\u00fcr '+_dbEscapeHtml(team)+' \u00b7 '+_dbEscapeHtml(season)+'.</div>';
-    return;
-  }
-  // Tabs (Session tab only shown if we have a session)
-  if(tabsEl){
-    let tabsHtml=`<button class="am-tab ${_amState.mode==='overview'?'active':''}" onclick="setAmMode('overview')">\u00dcbersicht</button>`;
-    if(_amState.sessIdx!=null){
-      tabsHtml+=`<button class="am-tab ${_amState.mode==='session'?'active':''}" onclick="setAmMode('session')">F\u00fcr diese Sitzung</button>`;
-    }
-    tabsEl.innerHTML=tabsHtml;
-  }
-  if(_amState.mode==='session'&&_amState.sessIdx!=null)content.innerHTML=_amRenderSessionView(_amState.sessIdx);
-  else content.innerHTML=_amRenderOverview();
-}
 // A player who is Entschuldigt for EVERY session of the week is on holiday or
 // injured — sending them the weekly link asks a question they have already
 // answered. Requires at least one session, and every one of them excused:
 // a single unanswered date means they are still expected to reply.
-function _amOutForWeek(p){
-  const D=cd();
-  if(!p||!Array.isArray(D.sessions))return false;
-  const today=todaySK();
-  const horizon=(typeof _pmWeekHorizon==='function')?_pmWeekHorizon():today;
-  const weekStart=(typeof _pmWeekStart==='function')?_pmWeekStart():today;
-  let n=0,exc=0;
-  D.sessions.forEach((s,si)=>{
-    if(!s||!s.date)return;
-    const sk=dispToSortKey(s.date);
-    if(sk<weekStart||sk>horizon)return;
-    n++;
-    const v=(p.s&&si<p.s.length)?p.s[si]:3;
-    if(v===2)exc++;
-  });
-  return n>0&&exc===n;
-}
-function amToggleHideOut(cb){
-  _amState.hideOut=!!(cb&&cb.checked);
-  renderAnmeldungenModal();
-}
-function _amRenderOverview(){
-  const D=cd();
-  const players=D.players;
-  const withLink=players.filter(p=>p&&p.confirmToken).length;
-  const withPhone=players.filter(p=>p&&p.phone&&p.phone.trim()).length;
-  const missing=players.length-withLink;
-  let html='';
-  // ── Mannschafts-Versand: broadcast tools (apply to whole team, not per-player) ──
-  // Two groups: (1) team-link copy, (2) Wochenbericht with inline mini-preview
-  // showing this week's headline stats so trainer can see at a glance whether
-  // there's anything to share.
-  // One link for the whole squad, given once. Everything else — registration,
-  // load, physio, report, statistics — players do in the hub themselves.
-  html+='<div class="am-broadcast-section">';
-  html+='<div class="am-bc-head">';
-  html+='<span class="am-broadcast-title">\ud83d\udd17 Spieler-Men\u00fc</span>';
-  html+='<button class="am-bc-btn" onclick="copyTeamLink()" title="Ein Link f\u00fcr alle Spieler">\ud83d\udd17 Link kopieren</button>';
-  html+='</div>';
-  html+='<div class="am-week-hint">Einmal an die Mannschaft geben. Jeder w\u00e4hlt sich beim ersten \u00d6ffnen selbst aus und erledigt danach alles dort: Anmeldung, Belastung, Physio, Wochenbericht, Statistik.</div>';
-  html+='</div>';
-  // Stat bar
-  html+='<div class="am-stat-row">';
-  html+=`<div class="am-stat"><div class="am-stat-label">Mit Link</div><div class="am-stat-value">${withLink}/${players.length}</div></div>`;
-  html+=`<div class="am-stat"><div class="am-stat-label">Mit Telefon</div><div class="am-stat-value">${withPhone}/${players.length}</div></div>`;
-  html+='</div>';
-  // Bulk actions
-  html+='<div class="am-bulk-actions">';
-  if(missing>0)html+=`<button class="am-bulk-btn primary" onclick="amBulkGenerate()">\u2795 Alle fehlenden Links erzeugen (${missing})</button>`;
-  else html+=`<button class="am-bulk-btn" disabled>\u2705 Alle Spieler haben einen Link</button>`;
-  html+=`<button class="am-bulk-btn" onclick="amCopyAllLinks()">\ud83d\udccb Alle Links als Liste kopieren</button>`;
-  html+='</div>';
-  // Player list — reference, not the point of this screen
-  html+='<details class="am-players"><summary class="ps-more-sum">'
-    +'<span>Einzelne Spieler</span><span class="ps-more-chev">\u203a</span></summary>'
-    +'<div class="ps-more-body">';
-  html+=_amRenderSortBar();
-  html+='<div class="am-list">';
-  if(players.length===0){
-    html+='<div class="am-empty">Noch keine Spieler in dieser Mannschaft.</div>';
-  } else {
-    // Build index list, sort by _amSort, then iterate
-    const sortedIdx=players
-      .map((p,pi)=>({p,pi}))
-      .filter(x=>x.p)
-      .filter(x=>!(_amState.hideOut&&_amOutForWeek(x.p)))
-      .sort((x,y)=>compareBySort(x.p,y.p,_amSort.col,_amSort.asc))
-      .map(x=>x.pi);
-    sortedIdx.forEach(pi=>{
-      const p=players[pi];
-      if(!p)return;
-      const hasTok=!!p.confirmToken;
-      const phone=p.phone&&p.phone.trim();
-      const nm=(getDisplayName?getDisplayName(p):p.name)||'(ohne Name)';
-      const nr=p.nr?`<span class="am-row-nr">#${_dbEscapeHtml(p.nr)}</span>`:'';
-      // Position pills in main-page style (colored badges) instead of plain "LF · ST"
-      const posHtml=(typeof pbHtml==='function')?pbHtml(p):'';
-      // Compact 32px avatar with photo or initials — clickable to jump to player profile
-      const ini=getPlayerInitials(p);
-      const avatar=p.photo
-        ? `<img src="${p.photo}" alt="" class="am-row-avatar-img"/>`
-        : `<div class="am-row-avatar-ini">${_dbEscapeHtml(ini)}</div>`;
-      html+=`<div class="am-row${hasTok?'':' no-link'}${phone?'':' no-phone'}" id="am-ov-row-${pi}">`;
-      html+=`<div class="am-row-avatar" onclick="closeM('moAnmeldungen');jumpToPlayer(${pi},{id:'moAnmeldungen'});" title="Profil \u00f6ffnen">${avatar}</div>`;
-      // Clickable name+meta block — opens player profile on click
-      html+=`<div class="am-row-info" onclick="closeM('moAnmeldungen');jumpToPlayer(${pi},{id:'moAnmeldungen'});" title="Profil \u00f6ffnen">`;
-      html+=`<div class="am-row-name-line">${nr}<span class="am-row-name-clickable">${_dbEscapeHtml(nm)}</span></div>`;
-      if(posHtml)html+=`<div class="am-row-meta">${posHtml}</div>`;
-      html+=`</div>`;
-      // Inline phone input — save on blur or Enter, no need to open player modal
-      const phoneVal=_dbEscapeHtml(p.phone||'');
-      html+=`<input type="tel" inputmode="tel" autocomplete="off" value="${phoneVal}" placeholder="+49 17612345678" onblur="amSavePhone(${pi},this.value)" onkeydown="if(event.key==='Enter'){this.blur();event.preventDefault();}" style="width:140px;font-size:.72rem;padding:4px 8px;border:1px solid var(--gl);border-radius:5px;background:var(--ow);color:var(--bd);font-family:'Barlow',sans-serif;flex-shrink:0;" title="Telefon (WhatsApp)"/>`;
-      html+=`<div class="am-row-status">`;
-      html+=`<span class="am-status-dot ${hasTok?'am-status-link-yes':'am-status-link-no'}" title="Link"></span>`;
-      html+=`<span class="am-status-dot ${phone?'am-status-phone-yes':'am-status-phone-no'}" title="Telefon"></span>`;
-      html+=`</div>`;
-      html+=`<div class="am-row-actions">`;
-      if(hasTok){
-        html+=`<button class="btn-mini" onclick="copyPlayerLink('${_dbEscapeHtml(p.confirmToken)}')" title="Link kopieren">\ud83d\udd17</button>`;
-        html+=`<button class="btn-mini" onclick="previewPlayer('${_dbEscapeHtml(p.confirmToken)}')" title="Spieleransicht \u00f6ffnen (Vorschau)">\ud83d\udc41</button>`;
-      } else {
-        html+=`<button class="btn-mini" onclick="amCreateOne(${pi})">\u2795 Link</button>`;
-      }
-      html+=`</div></div>`;
-    });
-  }
-  html+='</div>';
-  html+='</div></details>';
-  return html;
-}
-function _amRenderSessionView(sessIdx){
-  const D=cd();
-  if(!D||!Array.isArray(D.sessions)||!D.sessions[sessIdx])return '<div class="am-empty">Sitzung nicht gefunden.</div>';
-  const s=D.sessions[sessIdx];
-  const players=D.players;
-  const stats=_amCountSessionResponses(sessIdx);
-  const isMatch=s.type==='match';
-  const what=isMatch?(s.label||'Spiel'):'Training'+(s.focus?' \u00b7 '+s.focus:'');
-  const time=s.time||(isMatch?'15:00':'18:30');
-  let html='';
-  // Session info card
-  html+='<div class="am-sess-info">';
-  html+=`<div class="am-sess-when">${_dbEscapeHtml(s.date||'')} \u00b7 ${_dbEscapeHtml(time)} Uhr</div>`;
-  html+=`<div class="am-sess-what">${isMatch?'\u26bd':'\ud83c\udfc3'} ${_dbEscapeHtml(what)}</div>`;
-  html+='</div>';
-  // Response summary chips — consistent with session-modal bar.
-  // Use status names (Angemeldet/Entschuldigt/Ausstehend) not button labels (Komme/Kann nicht).
-  // Skip Kann nicht chip — "Kann nicht" maps to Entschuldigt anyway, would be duplicate.
-  html+='<div class="am-resp-summary">';
-  html+=`<span class="am-resp-chip komme" style="background:rgba(59,130,196,.12);color:#1e5a8a;">\ud83d\udcdd ${stats.komme} Angemeldet</span>`;
-  if(stats.entsch>0)html+=`<span class="am-resp-chip entsch">\ud83d\udccb ${stats.entsch} Entschuldigt</span>`;
-  html+=`<span class="am-resp-chip offen">\u2754 ${stats.offen} Ausstehend</span>`;
-  html+='</div>';
-  // Bulk actions for this session
-  html+='<div class="am-bulk-actions">';
-  // Players who have token + phone + are open (not yet answered)
-  const openPi=[];
-  const allPi=[];
-  players.forEach((p,pi)=>{
-    if(!p||!p.confirmToken||!p.phone||!p.phone.trim())return;
-    allPi.push(pi);
-    const v=_amSessResponse(p,sessIdx);
-    if(v===3||v==null)openPi.push(pi);
-  });
-
-  // (Adopt button removed in v1.0.4-beta+: Angemeldet is now a real status, no separate "adopt" step)
-  html+='</div>';
-  // Unified sort bar — same control as Overview, scoped to per-group ordering below
-  html+=_amRenderSortBar();
-  // Group by response status. Same phase-aware ordering as the session modal.
-  // Planning: Angemeldet (4 or 1) \u2192 Entschuldigt (2) \u2192 Ausstehend (3) \u2192 Fehlend (0)
-  // Past/roll-call: Anwesend (1) \u2192 Fehlend (0) \u2192 Entschuldigt (2) \u2192 Angemeldet (4 stragglers) \u2192 Ausstehend (3)
-  const _rollCallAm=(typeof _isSessRollCallTime==='function')?_isSessRollCallTime(sessIdx):false;
-  // Bucket players by their response status
-  const buckets={1:[],4:[],2:[],3:[],0:[]};
-  players.forEach((p,pi)=>{
-    if(!p)return;
-    const v=_amSessResponse(p,sessIdx);
-    const key=(v===1||v===4||v===2||v===3||v===0)?v:3;
-    buckets[key].push(pi);
-  });
-  // Sort each bucket using _amSort
-  Object.keys(buckets).forEach(k=>{
-    buckets[k].sort((a,b)=>compareBySort(players[a],players[b],_amSort.col,_amSort.asc));
-  });
-  // Group order
-  const groupOrder=_rollCallAm
-    ?[[1,'\u2705 Anwesend','agt-a'],[0,'\u274c Fehlend','agt-f'],[2,'\ud83d\udccb Entschuldigt','agt-e'],[4,'\ud83d\udcdd Angemeldet','agt-m'],[3,'\u2754 Ausstehend','agt-q']]
-    :[[4,'\ud83d\udcdd Angemeldet','agt-m'],[1,'\u2705 Anwesend','agt-a'],[2,'\ud83d\udccb Entschuldigt','agt-e'],[3,'\u2754 Ausstehend','agt-q'],[0,'\u274c Fehlend','agt-f']];
-  // List with groups
-  html+='<div class="am-list" style="border-top:none;">';
-  groupOrder.forEach(([key,title,cls])=>{
-    const pis=buckets[key];if(!pis.length)return;
-    html+=`<div class="att-grp-hdr ${cls}" style="margin-top:8px;">${title} <span style="font-size:.7rem;font-weight:500;">(${pis.length})</span></div>`;
-    pis.forEach(pi=>{
-      const p=players[pi];if(!p)return;
-      const hasTok=!!p.confirmToken;
-      const phone=p.phone&&p.phone.trim();
-      const v=_amSessResponse(p,sessIdx);
-      const respIcon=v===1?'\u2705':v===4?'\ud83d\udcdd':v===0?'\u274c':v===2?'\ud83d\udccb':'\u2754';
-      const nm=(getDisplayName?getDisplayName(p):p.name)||'(ohne Name)';
-      const nr=p.nr?`<span class="am-row-nr">#${_dbEscapeHtml(p.nr)}</span>`:'';
-      const posHtml=(typeof pbHtml==='function')?pbHtml(p):'';
-      const reason=(Array.isArray(p.preconfReason)&&sessIdx<p.preconfReason.length)?(p.preconfReason[sessIdx]||''):'';
-      const sessLabel=s.date+(s.type==='match'?' (Spiel)':' (Training)');
-      const histCount=_amGetPlayerSessionHistory(p.name||'',sessLabel).length;
-      const ini=getPlayerInitials(p);
-      const avatar=p.photo
-        ? `<img src="${p.photo}" alt="" class="am-row-avatar-img"/>`
-        : `<div class="am-row-avatar-ini">${_dbEscapeHtml(ini)}</div>`;
-      html+=`<div class="am-row${hasTok?'':' no-link'}${phone?'':' no-phone'}" id="am-row-${pi}">`;
-      html+=`<div class="am-row-resp" title="Antwortstatus">${respIcon}</div>`;
-      html+=`<div class="am-row-avatar" onclick="closeM('moAnmeldungen');jumpToPlayer(${pi},{id:'moAnmeldungen',sessIdx:${sessIdx}});" title="Profil \u00f6ffnen">${avatar}</div>`;
-      html+=`<div class="am-row-name-wrap" style="cursor:pointer;" onclick="closeM('moAnmeldungen');jumpToPlayer(${pi},{id:'moAnmeldungen',sessIdx:${sessIdx}});" title="Profil \u00f6ffnen">
-        <div class="am-row-name-line">${nr}<span class="am-row-name-clickable">${_dbEscapeHtml(nm)}</span>${histCount>1?`<button class="am-hist-toggle" onclick="event.stopPropagation();amToggleHistory(${pi},${sessIdx})" title="Verlauf der Antworten">\ud83d\udcdc ${histCount}</button>`:''}</div>
-        ${posHtml?`<div class="am-row-meta">${posHtml}</div>`:''}
-        ${reason?`<div class="am-row-reason">\u201c${_amEscapeText(reason)}\u201d</div>`:''}
-        <div class="am-row-history" id="am-hist-${pi}" style="display:none;" onclick="event.stopPropagation();"></div>
-      </div>`;
-      html+=`<div class="am-row-actions">`;
-      if(!hasTok){
-        html+=`<button class="btn-mini" onclick="amCreateOne(${pi})">\u2795 Link</button>`;
-      } else {
-        html+=`<button class="btn-mini" onclick="copyPlayerLink('${_dbEscapeHtml(p.confirmToken)}')" title="Link kopieren">\ud83d\udd17</button>`;
-        html+=`<button class="btn-mini" onclick="previewPlayer('${_dbEscapeHtml(p.confirmToken)}')" title="Spieleransicht öffnen (Vorschau)">\ud83d\udc41</button>`;
-      }
-      html+=`</div></div>`;
-    });
-  });
-  html+='</div>';
-  return html;
-}
 // ── Action handlers ──
 // Save phone number for player from inline input in Anmeldungen modal.
 // Updates UI in-place without full re-render to preserve input focus during typing.
-function amSavePhone(pi,raw){
-  if(!canEdit())return;
-  const D=cd();const p=D&&D.players&&D.players[pi];
-  if(!p)return;
-  const newPhone=String(raw||'').trim();
-  if((p.phone||'')===newPhone)return;
-  snap();
-  p.phone=newPhone;
-  saveG();
-  const row=document.getElementById('am-ov-row-'+pi);
-  if(row){
-    const dot=row.querySelector('.am-status-phone-yes,.am-status-phone-no');
-    if(dot){
-      dot.classList.toggle('am-status-phone-yes',!!newPhone);
-      dot.classList.toggle('am-status-phone-no',!newPhone);
-    }
-    row.classList.toggle('no-phone',!newPhone);
-    const wa=row.querySelector('.btn-wa');
-    if(wa){
-      if(newPhone&&p.confirmToken){
-        wa.classList.remove('disabled');
-        wa.removeAttribute('disabled');
-        wa.setAttribute('onclick',"amSendOne("+pi+",'general')");
-        wa.title='Über WhatsApp senden';
-        wa.innerHTML='💬 WA';
-      } else if(p.confirmToken){
-        wa.classList.add('disabled');
-        wa.setAttribute('disabled','disabled');
-        wa.removeAttribute('onclick');
-        wa.title='Kein Telefon';
-        wa.innerHTML='💬';
-      }
-    }
-  }
-  // Refresh "Mit Telefon" stat in header
-  const statEls=document.querySelectorAll('.am-stat-value');
-  if(statEls.length>=3){
-    const withPhone=D.players.filter(pp=>pp&&pp.phone&&pp.phone.trim()).length;
-    statEls[2].textContent=withPhone+'/'+D.players.length;
-  }
-}
-function amBulkGenerate(){
-  const r=_amBulkEnsureTokens();
-  if(r.created>0&&typeof showSaveFlash==='function')showSaveFlash('\u2705 '+r.created+' neue Links erzeugt');
-  renderAnmeldungenModal();
-}
-function amCreateOne(pi){
-  const tok=ensurePlayerToken(pi);
-  if(tok&&typeof showSaveFlash==='function')showSaveFlash('\u2705 Link erstellt');
-  renderAnmeldungenModal();
-}
-function amSendOne(pi,kind,sessIdx){
-  const D=cd();const p=D&&D.players&&D.players[pi];
-  if(!p)return;
-  if(!p.confirmToken){ensurePlayerToken(pi);}
-  if(!p.phone||!p.phone.trim()){alert('Kein Telefon hinterlegt.');return;}
-  // A weekly message uses the edited wording when there is one — the same text
-  // the trainer sees in the preview, with this player's own name and links.
-  const _isWeekly=(kind==='week'||kind==='general')&&sessIdx==null;
-  const text=(_isWeekly&&_amWeekOverride)
-    ? _amApplyWeekOverride(_amWeekOverride,p)
-    : _amBuildInviteText(p,sessIdx,kind);
-  const link=_amWhatsAppLink(p.phone,text);
-  if(!link){alert('Telefonnummer ung\u00fcltig.');return;}
-  window.open(link,'_blank','noopener');
-}
 // Weekly invite to every player with a phone number. No session index: the
 // message is about the whole week.
-function _amApplyWeekOverride(tpl,p){
-  const c=_amWeekCtx(p);
-  let t=String(tpl);
-  // Order matters: drop the whole line first when there is no stats link,
-  // otherwise the marker is already gone and an empty line stays behind.
-  if(c.statsUrl)t=t.split('{stats}').join(c.statsUrl);
-  else t=t.replace(/^.*\{stats\}.*$/gm,'');
-  t=t.split('{name}').join(c.nm||'')
-    .split('{link}').join(c.url||'')
-    .replace(/\n{3,}/g,'\n\n')
-    .trim();
-  return _amPlayedRecently(p)?_amDropGreeting(t,c.nm):t;
-}
-function amSendWeekAll(){
-  const D=cd();
-  const targets=[];
-  let skipped=0;
-  (D.players||[]).forEach((p,pi)=>{
-    if(!p||!p.phone||!p.phone.trim())return;
-    // Excused for the whole week → nothing to ask
-    if(_amOutForWeek(p)){skipped++;return;}
-    if(!p.confirmToken)ensurePlayerToken(pi);
-    targets.push({p,pi});
-  });
-  if(!targets.length){alert('Niemand zu kontaktieren'+(skipped?' \u2014 alle '+skipped+' sind f\u00fcr die ganze Woche entschuldigt.':'.'));return;}
-  if(!confirm('WhatsApp \u00f6ffnet '+targets.length+' Fenster nacheinander \u2014 in jedem nur auf "Senden" klicken.'
-    +(skipped?'\n\n'+skipped+' Spieler werden \u00fcbersprungen (ganze Woche entschuldigt).':'')
-    +'\n\nFortfahren?'))return;
-  targets.forEach(({p},i)=>{
-    setTimeout(()=>{
-      const text=_amWeekOverride
-        ? _amApplyWeekOverride(_amWeekOverride,p)
-        : _amBuildInviteText(p,null,'week');
-      const link=_amWhatsAppLink(p.phone,text);
-      if(link)window.open(link,'_blank','noopener');
-    },i*350);
-  });
-}
-function amSendBulk(sessIdx,scope,kind){
-  // Open WhatsApp for each player matching scope. scope: 'open' (no response) or 'all'.
-  const D=cd();const players=D.players;
-  const targets=[];
-  players.forEach((p,pi)=>{
-    if(!p||!p.confirmToken||!p.phone||!p.phone.trim())return;
-    if(scope==='open'){
-      const v=_amSessResponse(p,sessIdx);
-      if(v!==3&&v!=null)return; // already answered
-    }
-    targets.push({p,pi});
-  });
-  if(!targets.length){alert('Niemand zu kontaktieren.');return;}
-  if(!confirm('WhatsApp \u00f6ffnet jetzt '+targets.length+' Tabs/Fenster nacheinander \u2014 in jedem nur auf "Senden" klicken. Fortfahren?'))return;
-  // Open windows with a small delay to avoid popup-blocker chaos
-  targets.forEach(({p,pi},i)=>{
-    setTimeout(()=>{
-      const text=_amBuildInviteText(p,sessIdx,kind);
-      const link=_amWhatsAppLink(p.phone,text);
-      if(link)window.open(link,'_blank','noopener');
-    },i*350);
-  });
-}
 // amApplyResponsesToAttendance removed in 5-state refactor: Angemeldet is a real p.s status now, no adopt step needed.
-function amToggleHistory(pi,sessIdx){
-  const el=document.getElementById('am-hist-'+pi);
-  if(!el)return;
-  if(el.style.display!=='none'){el.style.display='none';el.innerHTML='';return;}
-  const D=cd();const p=D&&D.players&&D.players[pi];const s=D&&D.sessions&&D.sessions[sessIdx];
-  if(!p||!s)return;
-  const sessLabel=s.date+(s.type==='match'?' (Spiel)':' (Training)');
-  const entries=_amGetPlayerSessionHistory(p.name||'',sessLabel);
-  if(!entries.length){el.innerHTML='<div class="am-hist-empty">Keine Eintr\u00e4ge</div>';el.style.display='block';return;}
-  let html='<ul class="am-hist-list">';
-  entries.forEach(e=>{
-    const f=_amFmtHistoryEntry(e);
-    if(!f)return;
-    html+=`<li class="am-hist-item"><span class="am-hist-icon">${f.icon}</span><span class="am-hist-when">${_dbEscapeHtml(f.when)}</span><span class="am-hist-det">${_dbEscapeHtml(f.details)}</span></li>`;
-  });
-  html+='</ul>';
-  el.innerHTML=html;
-  el.style.display='block';
-}
-function amCopyAllLinks(){
-  const D=cd();const players=D.players;
-  const lines=[];
-  players.forEach(p=>{
-    if(!p||!p.confirmToken)return;
-    const nm=(getDisplayName?getDisplayName(p):p.name)||'?';
-    lines.push(nm+': '+buildHubLink(p.confirmToken));
-  });
-  if(!lines.length){alert('Noch keine Links vorhanden.');return;}
-  const txt=lines.join('\n');
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(txt).then(()=>{
-      if(typeof showSaveFlash==='function')showSaveFlash('\u2705 '+lines.length+' Links kopiert');
-    });
-  } else {
-    prompt('Kopieren:',txt);
-  }
-}
 // ── TRAINER DASHBOARD ────────────────────────────────────────
 let _dbState={team:null,season:null,weekdayTime:'past',weekdayType:'all',weekReportOffset:0};
 function setDbWeekdayTime(t){_dbState.weekdayTime=t;renderDashboard();}
@@ -18907,6 +18212,10 @@ function applyClubLogo(){
 
 // opts.edit: open straight in the form — used by the pencil in the team
 // manager, where the icon already states the intent.
+function psPreviewPlayer(){
+  const pi=window._psCurrentPi;if(pi==null||!canEdit())return;
+  previewPlayer(ensurePlayerToken(pi));
+}
 function openPlayerStats(pi,opts){
   // Track identity for drift-safe action resolution (see _resolveCurrentPI)
   if(typeof _trackPlayerModal==='function')_trackPlayerModal(pi);
@@ -18914,6 +18223,7 @@ function openPlayerStats(pi,opts){
   window._psCurrentPi=pi;
   const D=cd(),p=D.players[pi],ss=D.sessions,foc=teamFoc();
   if(!p)return;
+  {const pb=document.getElementById('ps-preview-btn');if(pb)pb.style.display=(canEdit()&&!(typeof isPlayerMode==='function'&&isPlayerMode()))?'':'none';}
   // Presence: notify others we're viewing this player
   if(typeof setPresenceContext==='function')setPresenceContext('👤 '+(p.name||'Spieler'));
   if(typeof updateInlinePresence==='function')setTimeout(()=>updateInlinePresence(),50);
@@ -21557,7 +20867,6 @@ function jumpToSession(sessIdx,from){
 function jumpToPlayer(pi,from){
   // `from` is optional context for the back button:
   //   - 'main' / undefined → back closes profile, returns to main table
-  //   - {id:'moAnmeldungen', sessIdx, mode} → back reopens Anmeldungen in same state
   //   - {id:'moDashboard'} → back reopens Dashboard
   //   - {id:'moCalendar'} → back reopens Calendar
   //   - {id:'moSession2', si} → back reopens session modal
@@ -21719,7 +21028,7 @@ function hxGo(k){
     case 'lineup':openNextMatchLineup();break;
     case 'stats':openDashboard();break;
     case 'week':openWeekReport();break;
-    case 'players':openAnmeldungen();break;
+    case 'players':copyTeamLink();break;
     case 'settings':openAppearanceSettings();break;
   }
   hxSyncNav();
@@ -22006,7 +21315,7 @@ function mobSheetOpen(){
   // Area rows — visibility follows the same permissions as the toolbar
   const ed=(typeof canEdit==='function')&&canEdit();
   const rows=[
-    ['\ud83d\udce9','Anmeldungen & Versand','openAnmeldungen()',ed],
+    ['\ud83d\udd17','Spieler-Men\u00fc: Link kopieren','copyTeamLink()',ed],
     ['\ud83d\udcc4','Wochenbericht','openWeekReport()',ed],
     ['\u26bd','Aufstellung','openNextMatchLineup()',ed],
     ['\ud83d\udccb','Saisonkader','openSeasonLineup()',ed],
@@ -25323,9 +24632,6 @@ function navBack(currentId){
     if(prev.id==='moSession2')openSessStats(prev.si);
     else if(prev.id==='moPlayer')openPlayerStats(prev.pi);
     else if(prev.id==='moTeamMgr')openTeamMgr(prev.tab||'spieler');
-    else if(prev.id==='moAnmeldungen'){
-      if(typeof openAnmeldungen==='function')openAnmeldungen(prev.sessIdx!=null?prev.sessIdx:undefined);
-    }
     else if(prev.id==='moDashboard'){
       if(typeof openDashboard==='function')openDashboard();
       else openM('moDashboard');
@@ -31679,7 +30985,7 @@ _pubCleanupSchedule();
   <!-- ── ARBEIT (canEdit) ── -->
   <div class="ud-sep" id="ud-work-sep" style="display:none;"></div>
   <div class="ud-group" id="ud-work-group" style="display:none;">Arbeit</div>
-  <div class="ud-item" id="ud-anmeld" onclick="closeUserMenu();openAnmeldungen()" style="display:none;">📋 Anmeldungen &amp; Spieler-Menü</div>
+  <div class="ud-item" id="ud-anmeld" onclick="closeUserMenu();copyTeamLink()" style="display:none;">🔗 Spieler-Menü: Link kopieren</div>
   <div class="ud-item" id="ud-dashboard" onclick="closeUserMenu();openDashboard();" style="display:none;">📊 Dashboard</div>
   <div class="ud-item" id="ud-audit" onclick="closeUserMenu();openAuditLog();" style="display:none;">📜 Verlauf</div>
 
@@ -32038,17 +31344,6 @@ _pubCleanupSchedule();
     <div id="wr-team-meta" class="wr-head-meta"></div>
   </div>
   <div id="wr-content" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 2px 6px;min-height:0;"></div>
-</div></div>
-
-<!-- Anmeldungen / Player-Confirmation links -->
-<div class="mo" id="moAnmeldungen" style="z-index:545;"><div class="mob" style="width:820px;max-width:96vw;height:84vh;max-height:780px;min-height:560px;display:flex;flex-direction:column;position:relative;">
-  <button class="mob-close-x" onclick="closeM('moAnmeldungen')" aria-label="Schließen">✕</button>
-  <div class="am-head">
-    <h3 class="am-head-title">📋 Anmeldungen</h3>
-    <div id="am-mode-tabs" class="am-tabs"></div>
-    <div id="am-head-meta" class="am-head-meta"></div>
-  </div>
-  <div id="am-content" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 2px 6px;min-height:0;"></div>
 </div></div>
 
 <!-- Detailstatistik (Player) -->
