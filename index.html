@@ -4100,7 +4100,6 @@ if(window._fbBlocked){
   <button type="button" class="hx-item" data-hx="stats" onclick="hxGo('stats')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Statistik</span></button>
   <button type="button" class="hx-item" data-hx="week" onclick="hxGo('week')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/></svg><span>Wochenbericht</span></button>
   <div class="hx-fill"></div>
-  <button type="button" class="hx-item sub" data-hx="players" onclick="hxGo('players')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg><span>Spieler-Menü</span></button>
   <button type="button" class="hx-item sub" data-hx="settings" onclick="hxGo('settings')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg><span>Einstellungen</span></button>
   <div class="hx-user"><button type="button" class="hx-user-btn" onclick="hxUserMenu(this,event)"><span class="hx-av" id="hxUserAv">?</span><span style="display:flex;flex-direction:column;min-width:0;"><span class="hx-user-nm" id="hxUserNm">–</span><span class="hx-user-role" id="hxUserRole"></span></span></button><button type="button" class="hx-bell" aria-label="Benachrichtigungen" onclick="hxNotif(this,event)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span class="hx-bell-dot" id="hxBellDot"></span></button></div>
 </nav>
@@ -4863,7 +4862,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791934322659; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791934948891; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -8657,7 +8656,7 @@ function updateUserMenuState(){
   const canEditNow=(typeof canEdit==='function')&&canEdit();
   // ARBEIT group: header+sep+anmeldungen (canEdit) and dashboard (canEdit).
   // The whole "Arbeit" group is hidden if neither item is visible.
-  ['ud-work-sep','ud-work-group','ud-anmeld'].forEach(id=>{
+  ['ud-work-sep','ud-work-group'].forEach(id=>{
     const el=document.getElementById(id);
     if(el)el.style.display=canEditNow?'':'none';
   });
@@ -12563,111 +12562,12 @@ function _automationMigrate(){
 }
 // ISO week number — week starts Monday per German convention. Used both for
 // "lastSentKw" tracking and matching the Wochenbericht KW shown elsewhere.
-function _automationIsoWeek(d){
-  const dt=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
-  const dayNum=dt.getUTCDay()||7;
-  dt.setUTCDate(dt.getUTCDate()+4-dayNum);
-  const yearStart=new Date(Date.UTC(dt.getUTCFullYear(),0,1));
-  return{
-    kw:Math.ceil((((dt-yearStart)/86400000)+1)/7),
-    year:dt.getUTCFullYear()
-  };
-}
 // Compute the most-recent trigger time for the week-report based on settings.
 // Returns Date (or null if not enabled). Trigger time is the LAST occurrence
 // of (weekday, hour:minute) that is <= now — i.e., we only fire after the
 // scheduled moment has passed in the current week.
-function _automationNextWeekTrigger(s,now){
-  if(!s||!s.enabled)return null;
-  const wd=s.weekday|0;
-  const hr=s.hour|0;
-  const mi=s.minute|0;
-  const candidate=new Date(now);
-  candidate.setHours(hr,mi,0,0);
-  // Move backwards from `now` to the most recent matching weekday
-  let daysBack=(now.getDay()-wd+7)%7;
-  if(daysBack===0&&candidate>now){
-    // Today is the trigger day but the time hasn't arrived yet — use last week
-    daysBack=7;
-  }
-  candidate.setDate(candidate.getDate()-daysBack);
-  return candidate;
-}
 // Should we show the week-report card right now?
-function _automationShouldShowWeekReport(){
-  const s=_automationGetPrefs().weekReport;
-  const st=_automationGetStatus().weekReport;
-  if(!s.enabled)return false;
-  if(!canEdit())return false;
-  const now=new Date();
-  const trigger=_automationNextWeekTrigger(s,now);
-  if(!trigger||trigger>now)return false;
-  // Trigger fired. Has anyone (this trainer or a teammate) already dismissed
-  // for this trigger week? We track by ISO week of trigger date in shared status.
-  const w=_automationIsoWeek(trigger);
-  if(st.lastSentKw===w.kw&&st.lastSentYear===w.year)return false;
-  // Need to verify there's actually data worth reporting (no sessions = no card)
-  try{
-    const team=UI.currentTeam,season=UI.currentSeason;
-    if(!team||!season)return false;
-    const block=G.db&&G.db[team+'__'+season];
-    if(!block||!Array.isArray(block.sessions))return false;
-    const data={team,season,block,sessions:block.sessions,players:block.players};
-    if(typeof dbComputeWeekReport!=='function')return false;
-    const r=dbComputeWeekReport(data,_dbCompletedWeekOffset(now));
-    if(!r||(!r.trainCount&&!r.matchCount))return false;
-    return{trigger,week:w,report:r};
-  }catch(e){return false;}
-}
 // For each upcoming session, decide whether the RSVP reminder card applies.
-function _automationListRsvpCards(){
-  const s=_automationGetPrefs().rsvpReminder;
-  const st=_automationGetStatus().rsvpReminder;
-  if(!s.enabled)return [];
-  if(!canEdit())return [];
-  const D=cd();
-  if(!D||!Array.isArray(D.sessions))return [];
-  const now=Date.now();
-  const hoursAhead=14*24; // look at sessions in next 14 days only
-  const daysBefore=Math.max(0,s.daysBefore|0);
-  const atH=(s.atHour!=null?s.atHour:20)|0;
-  const atM=(s.atMinute!=null?s.atMinute:0)|0;
-  const result=[];
-  D.sessions.forEach((sess,si)=>{
-    if(!sess||!sess.date)return;
-    const sk=dispToSortKey(sess.date);
-    if(!sk||sk===99999999)return;
-    // Build session datetime
-    const y=Math.floor(sk/10000),mo=Math.floor(sk/100)%100,day=sk%100;
-    const time=sess.time||(sess.type==='match'?'15:00':'18:30');
-    const [h,m]=time.split(':').map(x=>parseInt(x,10)||0);
-    const sessTs=new Date(y,mo-1,day,h||0,m||0).getTime();
-    if(sessTs<now)return; // already past
-    if(sessTs>now+hoursAhead*3600000)return; // too far in future
-    // Compute trigger: N days BEFORE session date, at the chosen HH:MM
-    const trigDt=new Date(y,mo-1,day,atH,atM,0,0);
-    trigDt.setDate(trigDt.getDate()-daysBefore);
-    const triggerTs=trigDt.getTime();
-    if(triggerTs>now)return; // trigger time not reached yet
-    if(triggerTs>=sessTs)return; // invalid config (reminder after event) — skip
-    // Already dismissed (by any trainer) for this session?
-    const key=String(si)+':'+sess.date;
-    if(st.lastSentSi&&st.lastSentSi[key])return;
-    // Count pending RSVPs — if everyone has answered, no need for a reminder
-    const players=D.players||[];
-    let pending=0;
-    players.forEach(p=>{
-      if(!p)return;
-      const v=(p.s&&si<p.s.length)?p.s[si]:3;
-      if(v===3||v==null)pending++;
-    });
-    if(pending===0)return; // everyone responded
-    result.push({si,sess,key,pending,sessTs});
-  });
-  // Show only the most-imminent session — surface one decision at a time.
-  // When trainer dismisses or the session passes, the next-closest takes its place.
-  return result.sort((a,b)=>a.sessTs-b.sessTs).slice(0,1);
-}
 // Sessions that ended at least (duration + 60min buffer) ago and still have
 // players with status=3 (Ausstehend). Returns the most recent only — we don't
 // want to spam the trainer with 5 cards if they were on holiday.
@@ -12743,42 +12643,6 @@ function _automationRenderCards(){
   wrap.style.display=html?'block':'none';
 }
 // Action handlers
-function _automationDismissWeekReport(){
-  if(!canEdit())return;
-  // Dismissal is team-shared so a teammate doesn't also send. We compute the
-  // trigger week from THIS trainer's own schedule (their day/time), which is
-  // a reasonable approximation — once any trainer dismisses, the card hides
-  // for everyone for that week.
-  const s=_automationGetPrefs().weekReport;
-  const st=_automationGetStatus().weekReport;
-  const trigger=_automationNextWeekTrigger(s,new Date());
-  if(trigger){
-    const w=_automationIsoWeek(trigger);
-    st.lastSentKw=w.kw;
-    st.lastSentYear=w.year;
-    snap();saveG();
-  }
-  _automationRenderCards();
-}
-function _automationSendRsvp(si,key){
-  if(!canEdit())return;
-  const D=cd();
-  const sess=D&&D.sessions&&D.sessions[si];
-  if(!sess)return;
-  const sk=dispToSortKey(sess.date);
-  if(sk&&sk!==99999999){
-    _openWhatsAppGroupCompose(_buildSessionBroadcastText(sess,sk));
-  }
-  _automationDismissRsvp(key);
-}
-function _automationDismissRsvp(key){
-  if(!canEdit())return;
-  const st=_automationGetStatus().rsvpReminder;
-  if(!st.lastSentSi)st.lastSentSi={};
-  st.lastSentSi[key]=Date.now();
-  snap();saveG();
-  _automationRenderCards();
-}
 function _automationOpenRollCall(si,key){
   if(!canEdit())return;
   _automationDismissRollCall(key,/*silent*/true);
@@ -12793,60 +12657,6 @@ function _automationDismissRollCall(key,silent){
   if(!silent)_automationRenderCards();
 }
 // Settings UI handlers
-function onAutoWeekReportToggle(el){
-  if(!canEdit())return;
-  const p=_automationGetPrefs();
-  p.weekReport.enabled=!!el.checked;
-  _automationSavePrefs(p);
-  // When trainer enables/changes their own schedule, reset the SHARED status
-  // so the card actually has a chance to appear. Mild side-effect: if a
-  // teammate had dismissed for this week, that dismissal is wiped.
-  if(p.weekReport.enabled){
-    const st=_automationGetStatus().weekReport;
-    st.lastSentKw=null;st.lastSentYear=null;
-    snap();saveG();
-  }
-  _automationSyncSettingsUI();
-  _automationRenderCards();
-}
-function onAutoWeekReportChange(){
-  if(!canEdit())return;
-  const p=_automationGetPrefs();
-  const dayEl=document.getElementById('autoWeekReportDay');
-  const timeEl=document.getElementById('autoWeekReportTime');
-  if(dayEl)p.weekReport.weekday=parseInt(dayEl.value,10)||0;
-  if(timeEl&&timeEl.value){
-    const [h,m]=timeEl.value.split(':').map(x=>parseInt(x,10)||0);
-    p.weekReport.hour=h;p.weekReport.minute=m;
-  }
-  _automationSavePrefs(p);
-  // Reset shared status — schedule changed, give it a fresh shot
-  const st=_automationGetStatus().weekReport;
-  st.lastSentKw=null;st.lastSentYear=null;
-  snap();saveG();
-  _automationRenderCards();
-}
-function onAutoRsvpToggle(el){
-  if(!canEdit())return;
-  const p=_automationGetPrefs();
-  p.rsvpReminder.enabled=!!el.checked;
-  _automationSavePrefs(p);
-  _automationSyncSettingsUI();
-  _automationRenderCards();
-}
-function onAutoRsvpChange(){
-  if(!canEdit())return;
-  const p=_automationGetPrefs();
-  const daysEl=document.getElementById('autoRsvpDays');
-  const timeEl=document.getElementById('autoRsvpTime');
-  if(daysEl)p.rsvpReminder.daysBefore=Math.max(0,parseInt(daysEl.value,10)||0);
-  if(timeEl&&timeEl.value){
-    const [h,m]=timeEl.value.split(':').map(x=>parseInt(x,10)||0);
-    p.rsvpReminder.atHour=h;p.rsvpReminder.atMinute=m;
-  }
-  _automationSavePrefs(p);
-  _automationRenderCards();
-}
 function onAutoRollCallToggle(el){
   if(!canEdit())return;
   const p=_automationGetPrefs();
@@ -12867,28 +12677,10 @@ function _automationSyncSettingsUI(){
   const editable=canEdit&&canEdit();
   const section=document.getElementById('setAutomationSection');
   if(section)section.style.display=editable?'block':'none';
+  const tl=document.getElementById('setTeamLinkRow');
+  if(tl)tl.style.display=editable?'':'none';
   if(!editable)return;
   const s=_automationGetPrefs();
-  const wrEnabled=document.getElementById('autoWeekReportEnabled');
-  if(wrEnabled)wrEnabled.checked=!!s.weekReport.enabled;
-  const wrCfg=document.getElementById('autoWeekReportConfig');
-  if(wrCfg)wrCfg.style.display=s.weekReport.enabled?'block':'none';
-  const wrDay=document.getElementById('autoWeekReportDay');
-  if(wrDay)wrDay.value=String(s.weekReport.weekday||0);
-  const wrTime=document.getElementById('autoWeekReportTime');
-  if(wrTime)wrTime.value=String(s.weekReport.hour||0).padStart(2,'0')+':'+String(s.weekReport.minute||0).padStart(2,'0');
-  const rsEnabled=document.getElementById('autoRsvpEnabled');
-  if(rsEnabled)rsEnabled.checked=!!s.rsvpReminder.enabled;
-  const rsCfg=document.getElementById('autoRsvpConfig');
-  if(rsCfg)rsCfg.style.display=s.rsvpReminder.enabled?'block':'none';
-  const rsDays=document.getElementById('autoRsvpDays');
-  if(rsDays)rsDays.value=String(s.rsvpReminder.daysBefore!=null?s.rsvpReminder.daysBefore:1);
-  const rsTime=document.getElementById('autoRsvpTime');
-  if(rsTime){
-    const h=s.rsvpReminder.atHour!=null?s.rsvpReminder.atHour:20;
-    const m=s.rsvpReminder.atMinute!=null?s.rsvpReminder.atMinute:0;
-    rsTime.value=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');
-  }
   const rcEnabled=document.getElementById('autoRollCallEnabled');
   if(rcEnabled)rcEnabled.checked=!!s.rollCall.enabled;
   const rcCfg=document.getElementById('autoRollCallConfig');
@@ -21028,7 +20820,6 @@ function hxGo(k){
     case 'lineup':openNextMatchLineup();break;
     case 'stats':openDashboard();break;
     case 'week':openWeekReport();break;
-    case 'players':copyTeamLink();break;
     case 'settings':openAppearanceSettings();break;
   }
   hxSyncNav();
@@ -21315,7 +21106,6 @@ function mobSheetOpen(){
   // Area rows — visibility follows the same permissions as the toolbar
   const ed=(typeof canEdit==='function')&&canEdit();
   const rows=[
-    ['\ud83d\udd17','Spieler-Men\u00fc: Link kopieren','copyTeamLink()',ed],
     ['\ud83d\udcc4','Wochenbericht','openWeekReport()',ed],
     ['\u26bd','Aufstellung','openNextMatchLineup()',ed],
     ['\ud83d\udccb','Saisonkader','openSeasonLineup()',ed],
@@ -30684,60 +30474,21 @@ _pubCleanupSchedule();
     </div>
   </div>
 
+  <div class="setting-row" id="setTeamLinkRow" style="display:none;">
+    <div>
+      <div class="setting-label">🔗 Spieler-Menü</div>
+      <div class="setting-sub">Ein Link für die ganze Mannschaft — einmal in die Gruppe geben, jeder wählt sich selbst aus.</div>
+    </div>
+    <div class="setting-control">
+      <button class="btn bs" onclick="copyTeamLink()">Link kopieren</button>
+    </div>
+  </div>
+
   <!-- AUTOMATION (canEdit only) -->
   <div id="setAutomationSection" style="display:none;border-top:1px solid var(--gl);padding-top:14px;margin-top:14px;">
     <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1.5px;color:var(--bd);margin-bottom:4px;">🤖 Automatisierung</div>
-    <div style="font-size:.7rem;color:var(--gm);margin-bottom:10px;line-height:1.4;">ℹ Zeitpläne sind persönlich (pro Trainer). Versand-Status wird im Team geteilt — wer als Erster „Schon erledigt" klickt, blendet die Karte für alle aus.</div>
+    <div style="font-size:.7rem;color:var(--gm);margin-bottom:10px;line-height:1.4;">ℹ Persönlich (pro Trainer): wann dich die App daran erinnert, die Anwesenheit einzutragen. Wer „Schon erledigt“ klickt, blendet die Karte für alle aus.</div>
     <div class="setting-row">
-      <div class="setting-label-wrap">
-        <div class="setting-label">Wochenbericht-Erinnerung</div>
-        <div class="setting-sub">Karte erscheint auf der Startseite zur gewählten Zeit, wenn die Woche Sitzungen hatte</div>
-      </div>
-      <div class="setting-control">
-        <label class="setting-switch"><input type="checkbox" id="autoWeekReportEnabled" onchange="onAutoWeekReportToggle(this)"/><span class="setting-slider"></span></label>
-      </div>
-    </div>
-    <div id="autoWeekReportConfig" style="display:none;padding:10px 12px;background:rgba(0,0,0,.025);border-radius:8px;margin-top:-4px;margin-bottom:12px;">
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-        <label style="font-size:.78rem;color:var(--gd);font-weight:600;">Wochentag:</label>
-        <select id="autoWeekReportDay" onchange="onAutoWeekReportChange()" style="padding:5px 8px;border:1.5px solid var(--gl);border-radius:6px;font-size:.82rem;font-family:'Barlow',sans-serif;background:#fff;color:var(--bd);">
-          <option value="1">Montag</option>
-          <option value="2">Dienstag</option>
-          <option value="3">Mittwoch</option>
-          <option value="4">Donnerstag</option>
-          <option value="5">Freitag</option>
-          <option value="6">Samstag</option>
-          <option value="0" selected>Sonntag</option>
-        </select>
-        <label style="font-size:.78rem;color:var(--gd);font-weight:600;">Uhrzeit:</label>
-        <input type="time" id="autoWeekReportTime" value="18:00" onchange="onAutoWeekReportChange()" style="padding:5px 8px;border:1.5px solid var(--gl);border-radius:6px;font-size:.82rem;font-family:'Barlow',sans-serif;background:#fff;color:var(--bd);"/>
-      </div>
-    </div>
-    <div class="setting-row">
-      <div class="setting-label-wrap">
-        <div class="setting-label">Anmeldungs-Erinnerung</div>
-        <div class="setting-sub">Karte erscheint vor Trainings/Spielen mit ausstehenden Antworten</div>
-      </div>
-      <div class="setting-control">
-        <label class="setting-switch"><input type="checkbox" id="autoRsvpEnabled" onchange="onAutoRsvpToggle(this)"/><span class="setting-slider"></span></label>
-      </div>
-    </div>
-    <div id="autoRsvpConfig" style="display:none;padding:10px 12px;background:rgba(0,0,0,.025);border-radius:8px;margin-top:-4px;">
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-        <label style="font-size:.78rem;color:var(--gd);font-weight:600;">Vorlauf:</label>
-        <select id="autoRsvpDays" onchange="onAutoRsvpChange()" style="padding:5px 8px;border:1.5px solid var(--gl);border-radius:6px;font-size:.82rem;font-family:'Barlow',sans-serif;background:#fff;color:var(--bd);">
-          <option value="0">Am gleichen Tag</option>
-          <option value="1" selected>1 Tag vorher</option>
-          <option value="2">2 Tage vorher</option>
-          <option value="3">3 Tage vorher</option>
-          <option value="7">1 Woche vorher</option>
-        </select>
-        <label style="font-size:.78rem;color:var(--gd);font-weight:600;">um</label>
-        <input type="time" id="autoRsvpTime" value="10:00" onchange="onAutoRsvpChange()" style="padding:5px 8px;border:1.5px solid var(--gl);border-radius:6px;font-size:.82rem;font-family:'Barlow',sans-serif;background:#fff;color:var(--bd);"/>
-      </div>
-      <div style="font-size:.68rem;color:var(--gm);margin-top:6px;line-height:1.4;">Wird zur gewählten Uhrzeit gezeigt, N Tage vor dem Termin. Beispiel: 1 Tag vorher um 10:00 → für Training Di erscheint die Karte Mo vormittags.</div>
-    </div>
-    <div class="setting-row" style="margin-top:8px;">
       <div class="setting-label-wrap">
         <div class="setting-label">Roll-Call-Erinnerung</div>
         <div class="setting-sub">Karte erscheint nach Trainings/Spielen, wenn die Anwesenheit noch nicht eingetragen ist</div>
@@ -30985,7 +30736,6 @@ _pubCleanupSchedule();
   <!-- ── ARBEIT (canEdit) ── -->
   <div class="ud-sep" id="ud-work-sep" style="display:none;"></div>
   <div class="ud-group" id="ud-work-group" style="display:none;">Arbeit</div>
-  <div class="ud-item" id="ud-anmeld" onclick="closeUserMenu();copyTeamLink()" style="display:none;">🔗 Spieler-Menü: Link kopieren</div>
   <div class="ud-item" id="ud-dashboard" onclick="closeUserMenu();openDashboard();" style="display:none;">📊 Dashboard</div>
   <div class="ud-item" id="ud-audit" onclick="closeUserMenu();openAuditLog();" style="display:none;">📜 Verlauf</div>
 
