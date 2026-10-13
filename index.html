@@ -3560,6 +3560,49 @@ body.design-heute #mobNav .mn-ic{display:flex;padding:4px 14px;line-height:0;}
 body.design-heute #mobNav .mn-item.on::before{display:none;}
 body.design-heute #mobNav .mn-lb{font-size:.68rem;}
 @media(max-width:767px){body.design-heute #mobNav{display:flex;}}
+/* "Heute" in the club's night blue — the same palette as the player hub and
+   the weekly report, instead of white surfaces. */
+body.design-heute{
+  --hx-ink:#EEF2FB;--hx-ink2:#C9D3E6;--hx-muted:#93A3C4;--hx-ground:#0A1430;--hx-line:rgba(150,175,230,.14);
+  --hx-card:#131F3D;--hx-card2:#1A2850;
+  --hx-ok:#6DD6A2;--hx-ok-bg:rgba(63,191,127,.15);--hx-warn:#F3B867;--hx-warn-bg:rgba(240,164,58,.16);
+  --hx-bad:#FF8F93;--hx-bad-bg:rgba(229,72,77,.16);
+}
+#hxNav{background:#060D20;border-right:1px solid rgba(150,175,230,.10);}
+body.design-heute .home-overlay{background:var(--hx-ground);}
+body.design-heute .hx-card{background:var(--hx-card);box-shadow:none;border:1px solid var(--hx-line);}
+body.design-heute .hx-dark{background:#1659B8;border-color:#1659B8;}
+body.design-heute .hx-dark .hx-meta,body.design-heute .hx-num span{color:#D3E2FB;}
+body.design-heute .hx-search{background:var(--hx-card);border-color:var(--hx-line);color:var(--hx-muted);}
+body.design-heute .hx-search:hover{border-color:rgba(150,175,230,.3);}
+body.design-heute .hx-tag{background:rgba(76,142,240,.18);color:#A9C8FF;}
+body.design-heute .hx-tag.match{background:var(--hx-yellow);color:#0E2350;}
+body.design-heute .hx-btn{background:transparent;border-color:rgba(150,175,230,.28);color:var(--hx-ink);}
+body.design-heute .hx-btn:hover{background:rgba(255,255,255,.06);}
+body.design-heute .hx-btn.primary{background:var(--hx-yellow);border-color:var(--hx-yellow);color:#0E2350;}
+body.design-heute .hx-btn.dark{background:#fff;border-color:#fff;color:#0E2350;}
+body.design-heute .hx-tile.open{background:rgba(255,255,255,.06);color:var(--hx-ink2);}
+body.design-heute .hx-chip{background:rgba(255,255,255,.06);color:var(--hx-ink);}
+body.design-heute .hx-chip:hover{background:rgba(255,255,255,.11);}
+body.design-heute .hx-chip i{background:transparent;box-shadow:inset 0 0 0 1px var(--hx-line);color:var(--hx-muted);}
+body.design-heute .hx-divider{border-top-color:var(--hx-line);}
+body.design-heute .hx-bar i{background:rgba(255,255,255,.14);}
+body.design-heute .hx-bar.cur i{background:var(--hx-yellow);}
+body.design-heute .hx-link{color:#8FB8FF;}
+body.design-heute .hx-day:hover{background:rgba(255,255,255,.04);}
+body.design-heute .hx-day.today{background:rgba(242,194,48,.12);}
+body.design-heute .hx-day.empty{color:#5D6C8C;}
+body.design-heute .hx-day.empty:hover{background:none;}
+body.design-heute .hx-day.empty.today{background:rgba(242,194,48,.12);}
+body.design-heute .hx-flag{border-bottom-color:var(--hx-line);color:var(--hx-ink);}
+body.design-heute .hx-flag:hover{background:rgba(255,255,255,.04);}
+body.design-heute .hx-mbell{background:var(--hx-card);border-color:var(--hx-line);color:var(--hx-ink);}
+body.design-heute #mobNav{background:#0E1B3B;border-top:1px solid var(--hx-line);}
+body.design-heute #mobNav .mn-item{color:var(--hx-muted);}
+body.design-heute #mobNav .mn-item.on{color:#fff;}
+body.design-heute #mobNav .mn-item.on .mn-ic{color:#0E2350;}
+@media(min-width:768px){body.design-heute .toolbar-l::before{color:var(--hx-ink);}}
+
 @media(min-width:768px){body.design-heute .toolbar-l::before{content:'Anwesenheit';font-family:var(--hx-num);font-weight:800;font-size:1.55rem;color:var(--hx-ink);padding:2px 6px 0;line-height:1;}}
 /* The side navigation already holds these — the toolbar keeps only the table's own tools */
 @media(min-width:768px){
@@ -4364,7 +4407,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791848793491; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791849993964; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -10717,7 +10760,7 @@ function saveAppearance(s){
 }
 // Design layers are opt-in per device. ?design=flutlicht|kabine|klassisch
 // in the address switches and remembers, so a look can be tried from a link.
-const DESIGN_LIST=['flutlicht','kabine','heute'];
+const DESIGN_LIST=['heute'];
 function applyAppearance(){
   try{
     const q=new URLSearchParams(location.search).get('design');
@@ -10733,7 +10776,12 @@ function applyAppearance(){
   const s=getAppearance();
   // Player screens have their own look — the design layers are for the trainer app.
   const _pl=/[?&](p|player|rpe|rpeteam|team)=/.test(location.search);
-  DESIGN_LIST.forEach(d=>document.body.classList.toggle('design-'+d,!_pl&&(s.design===d||(d==='kabine'&&s.design==='heute'))));
+  // Earlier colour-only tests (flutlicht/kabine) are gone; a device that had
+  // one picked falls back to Klassisch.
+  const _d=DESIGN_LIST.includes(s.design)?s.design:'';
+  document.body.classList.toggle('design-heute',!_pl&&_d==='heute');
+  document.body.classList.toggle('design-flutlicht',!_pl&&_d==='heute'); // dark table + header layer
+  document.body.classList.remove('design-kabine');
   if(typeof hxApplyDesign==='function')try{hxApplyDesign();}catch(e){}
   document.body.classList.toggle('theme-dark',s.theme==='dark');
   document.body.classList.toggle('no-anim',!s.animations);
@@ -10789,7 +10837,7 @@ function resetAppearance(){
 }
 function updateAppearanceUI(){
   const s=getAppearance();
-  ['','flutlicht','kabine','heute'].forEach(d=>document.getElementById('design-'+(d||'klassisch'))?.classList.toggle('active',(s.design||'')===d));
+  ['','heute'].forEach(d=>document.getElementById('design-'+(d||'klassisch'))?.classList.toggle('active',(DESIGN_LIST.includes(s.design)?s.design:'')===d));
   document.getElementById('theme-light')?.classList.toggle('active',s.theme==='light');
   document.getElementById('theme-dark')?.classList.toggle('active',s.theme==='dark');
   document.getElementById('fs-s')?.classList.toggle('active',s.fontScale<0.95);
@@ -21637,12 +21685,12 @@ function hxRender(){
     const segA=roll?c.present:c.yes,segB=c.exc,segC=roll?c.no:0;
     const a1=C*segA/tot,a2=C*segB/tot,a3=C*segC/tot;
     const ring=`<svg class="hx-ring" width="124" height="124" viewBox="0 0 132 132" role="img" aria-label="${segA} von ${c.total} ${roll?'anwesend':'zugesagt'}">
-      <circle cx="66" cy="66" r="52" fill="none" stroke="#E7EBF2" stroke-width="14"/>
-      <circle cx="66" cy="66" r="52" fill="none" stroke="#2E8B5E" stroke-width="14" stroke-dasharray="${a1} ${C}" transform="rotate(-90 66 66)"/>
-      <circle cx="66" cy="66" r="52" fill="none" stroke="#E0912F" stroke-width="14" stroke-dasharray="${a2} ${C}" stroke-dashoffset="${-a1}" transform="rotate(-90 66 66)"/>
-      ${segC?`<circle cx="66" cy="66" r="52" fill="none" stroke="#C9373E" stroke-width="14" stroke-dasharray="${a3} ${C}" stroke-dashoffset="${-(a1+a2)}" transform="rotate(-90 66 66)"/>`:''}
-      <text x="66" y="68" text-anchor="middle" font-family="Big Shoulders Display, Bebas Neue, sans-serif" font-weight="800" font-size="40" fill="#0E2350">${segA}</text>
-      <text x="66" y="90" text-anchor="middle" font-family="Barlow, sans-serif" font-weight="600" font-size="13" fill="#4E5D7C">von ${c.total}</text></svg>`;
+      <circle cx="66" cy="66" r="52" fill="none" stroke="rgba(255,255,255,.09)" stroke-width="14"/>
+      <circle cx="66" cy="66" r="52" fill="none" stroke="#3FBF7F" stroke-width="14" stroke-dasharray="${a1} ${C}" transform="rotate(-90 66 66)"/>
+      <circle cx="66" cy="66" r="52" fill="none" stroke="#F0A43A" stroke-width="14" stroke-dasharray="${a2} ${C}" stroke-dashoffset="${-a1}" transform="rotate(-90 66 66)"/>
+      ${segC?`<circle cx="66" cy="66" r="52" fill="none" stroke="#E5484D" stroke-width="14" stroke-dasharray="${a3} ${C}" stroke-dashoffset="${-(a1+a2)}" transform="rotate(-90 66 66)"/>`:''}
+      <text x="66" y="68" text-anchor="middle" font-family="Big Shoulders Display, Bebas Neue, sans-serif" font-weight="800" font-size="40" fill="#EEF2FB">${segA}</text>
+      <text x="66" y="90" text-anchor="middle" font-family="Barlow, sans-serif" font-weight="600" font-size="13" fill="#93A3C4">von ${c.total}</text></svg>`;
     const tiles=roll
       ?`<div class="hx-tile ok"><b>${c.present}</b><span>anwesend</span></div><div class="hx-tile bad"><b>${c.no}</b><span>fehlend</span></div><div class="hx-tile warn"><b>${c.exc}</b><span>entschuldigt</span></div>`
       :`<div class="hx-tile ok"><b>${c.yes}</b><span>zugesagt</span></div><div class="hx-tile warn"><b>${c.exc}</b><span>entschuldigt</span></div><div class="hx-tile open"><b>${c.open}</b><span>noch offen</span></div>`;
@@ -29135,12 +29183,10 @@ checkAutoBackup();
   <div class="setting-row">
     <div>
       <div class="setting-label">🎨 Design <span style="font-size:.62rem;font-weight:700;padding:1px 6px;border-radius:999px;background:var(--ac);color:var(--bd);vertical-align:middle;">Test</span></div>
-      <div class="setting-sub">Neues Aussehen ausprobieren — „Klassisch“ ist das bisherige. Gilt nur für dieses Gerät.</div>
+      <div class="setting-sub">„Heute“: Startseite mit dem nächsten Termin und Menü an der Seite. „Klassisch“ ist das bisherige. Gilt nur für dieses Gerät.</div>
     </div>
     <div class="setting-control">
       <button class="seg-btn" id="design-klassisch" onclick="setAppDesign('')">Klassisch</button>
-      <button class="seg-btn" id="design-flutlicht" onclick="setAppDesign('flutlicht')">Flutlicht</button>
-      <button class="seg-btn" id="design-kabine" onclick="setAppDesign('kabine')">Kabine</button>
       <button class="seg-btn" id="design-heute" onclick="setAppDesign('heute')">Heute</button>
     </div>
   </div>
@@ -29507,6 +29553,7 @@ checkAutoBackup();
   <!-- A heading over a single entry is noise; the item sits directly under the
        user name at the top of the menu, where it explains itself. -->
   <div class="ud-item" id="ud-password" onclick="closeUserMenu();openPasswordModal();">👤 Mein Konto</div>
+  <div class="ud-item" id="ud-appearance" onclick="closeUserMenu();openAppearanceSettings();">🎨 Erscheinungsbild &amp; Design</div>
 
   <!-- ── ARBEIT (canEdit) ── -->
   <div class="ud-sep" id="ud-work-sep" style="display:none;"></div>
@@ -29570,6 +29617,8 @@ checkAutoBackup();
       <button class="ms-row" onclick="undo();mobSheetClose();"><span class="ms-row-ic">↩</span> Rückgängig</button>
       <button class="ms-row" onclick="redo();mobSheetClose();"><span class="ms-row-ic">↪</span> Wiederholen</button>
     </div>
+    <div class="ms-sec">Darstellung</div>
+    <button class="ms-row" onclick="mobSheetClose();openAppearanceSettings();"><span class="ms-row-ic">🎨</span> Erscheinungsbild &amp; Design</button>
   </div>
 </div>
 
