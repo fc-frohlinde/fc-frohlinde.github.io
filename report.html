@@ -9,8 +9,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <style>
   :root{
     --bg0:#080f22; --bg1:#0c1733; --bg2:#102047;
@@ -349,13 +347,6 @@
 </div>
 
 <script>
-const FB_CONFIG={
-  apiKey:'AIzaSyANvxDo9idsZSq7syZwmCHDvbVguIjKtsY',
-  databaseURL:'https://fc-frohlinde-ea23f-default-rtdb.europe-west1.firebasedatabase.app',
-  projectId:'fc-frohlinde-ea23f',
-  appId:'1:765150260941:web:42da53f86f8bbcbed8c384',
-  authDomain:'fc-frohlinde-ea23f.firebaseapp.com'
-};
 
 // ── Utilities ──
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
@@ -623,114 +614,10 @@ function renderReport(r){
     // No own back button: the phone's back gesture returns to the hub.
     return;
   }
-  const id=getParam('id');
-  if(!id){
-    showError('\ud83d\udd17','Kein Bericht angegeben',
-      'Dieser Link ist unvollst\u00e4ndig. Bitte verwende den vollst\u00e4ndigen Link aus der Team-Gruppe.');
-    return;
-  }
-  if(!/^[A-Za-z0-9_-]{4,64}$/.test(id)){
-    showError('\u26a0\ufe0f','Ung\u00fcltiger Link',
-      'Der Bericht-Code in diesem Link ist ung\u00fcltig.');
-    return;
-  }
-  let app;
-  try{
-    app=firebase.initializeApp(FB_CONFIG,'report');
-  }catch(e){
-    showError('\u26a0\ufe0f','Fehler','Die Verbindung konnte nicht hergestellt werden.');
-    return;
-  }
-  const db=firebase.database(app);
-  // safety timeout
-  let settled=false;
-  const to=setTimeout(()=>{
-    if(settled)return;settled=true;
-    showError('\ud83d\udd04','Zeit\u00fcberschreitung',
-      'Der Bericht konnte nicht geladen werden. Pr\u00fcfe deine Internetverbindung und lade die Seite neu.');
-  },12000);
-  // ── PERSONAL STATISTICS PAGE ──────────────────────────────
-  // Contains one player only. Deliberately no trainer grades and no team
-  // ranking: this page belongs to the player, not to a comparison.
-  function renderPlayerStats(d){
-    const p=(d.players&&d.players[0])||{};
-    const det=d.detail||{};
-    const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-    const pctCls=v=>v==null?'':(v>=80?'good':v>=50?'mid':'bad');
-    const av=p.photo?`<img class="ps-av" src="${p.photo}" alt="">`
-      :`<div class="ps-av ps-av-ph">${esc((p.name||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase())}</div>`;
-    const wdMax=Math.max(1,...(det.weekday||[]).map(w=>w.pct||0));
-    const trMax=Math.max(1,...(det.trend||[]).map(t=>t.pct||0));
-    let html=`<div class="ps-hero">
-      ${av}
-      <div class="ps-hero-txt">
-        <div class="ps-name">${esc(p.name)}</div>
-        <div class="ps-meta">${p.nr?'#'+esc(p.nr)+' \u00b7 ':''}${esc(p.pos||'')}${p.pos?' \u00b7 ':''}${esc(d.team||'')} \u00b7 ${esc(d.season||'')}</div>
-      </div>
-    </div>
-    <div class="ps-kw">KW ${esc(d.week&&d.week.kw)} \u00b7 ${esc(d.week&&d.week.from)}\u2013${esc(d.week&&d.week.to)}</div>
-    <div class="ps-kpis">
-      <div class="ps-kpi"><div class="ps-kpi-v ${pctCls(p.sPct)}">${p.sPct==null?'\u2013':p.sPct+'%'}</div><div class="ps-kpi-l">Saison</div><div class="ps-kpi-s">${p.sPresent}/${p.sTotal}</div></div>
-      <div class="ps-kpi"><div class="ps-kpi-v ${pctCls(p.wPct)}">${p.wPct==null?'\u2013':p.wPct+'%'}</div><div class="ps-kpi-l">Diese Woche</div><div class="ps-kpi-s">${p.wPresent}/${p.wTotal}</div></div>
-      <div class="ps-kpi"><div class="ps-kpi-v">${det.streak||0}</div><div class="ps-kpi-l">Serie</div><div class="ps-kpi-s">in Folge</div></div>
-      ${det.rank?`<div class="ps-kpi"><div class="ps-kpi-v">#${det.rank}</div><div class="ps-kpi-l">Platz</div><div class="ps-kpi-s">von ${det.ranked}</div></div>`:''}
-    </div>
-    ${(d.scorer&&(d.scorer.apps||d.scorer.goals||d.scorer.assists))?`
-    <div class="ps-sec">
-      <div class="ps-h">Deine Scorer-Bilanz</div>
-      <div class="ps-split">
-        <div class="ps-split-item"><span class="ps-split-ic">\ud83d\udc5f</span><span class="ps-split-v">${d.scorer.apps||0}</span><span class="ps-split-l">${d.scorer.apps===1?'Spiel':'Spiele'}</span></div>
-        ${d.scorer.goals?`<div class="ps-split-item"><span class="ps-split-ic">\u26bd</span><span class="ps-split-v">${d.scorer.goals}</span><span class="ps-split-l">${d.scorer.goals===1?'Tor':'Tore'}</span></div>`:''}
-        ${d.scorer.assists?`<div class="ps-split-item"><span class="ps-split-ic">\ud83c\udfaf</span><span class="ps-split-v">${d.scorer.assists}</span><span class="ps-split-l">${d.scorer.assists===1?'Vorlage':'Vorlagen'}</span></div>`:''}
-      </div>
-    </div>`:''}
-    <div class="ps-sec">
-      <div class="ps-h">Training &amp; Spiele</div>
-      <div class="ps-split">
-        <div class="ps-split-item"><span class="ps-split-ic">\ud83c\udfc3</span><span class="ps-split-v ${pctCls(det.tPct)}">${det.tPct==null?'\u2013':det.tPct+'%'}</span><span class="ps-split-l">Training</span></div>
-        <div class="ps-split-item"><span class="ps-split-ic">\u26bd</span><span class="ps-split-v ${pctCls(det.mPct)}">${det.mPct==null?'\u2013':det.mPct+'%'}</span><span class="ps-split-l">Spiele</span></div>
-      </div>
-      <div class="ps-counts">\u2705 ${det.cA||0} anwesend \u00b7 \u274c ${det.cF||0} gefehlt \u00b7 \ud83d\udccb ${det.cE||0} entschuldigt</div>
-    </div>`;
-    if(det.trend&&det.trend.length>1){
-      html+=`<div class="ps-sec"><div class="ps-h">Verlauf der letzten Wochen</div>
-        <div class="ps-chart">${det.trend.map(t=>
-          `<div class="ps-col"><div class="ps-bar-wrap"><div class="ps-bar" style="height:${Math.round((t.pct/trMax)*100)}%"></div></div>
-           <div class="ps-col-l">KW${t.kw}</div><div class="ps-col-v">${t.pct}%</div></div>`).join('')}</div></div>`;
-    }
-    if(det.weekday&&det.weekday.length){
-      html+=`<div class="ps-sec"><div class="ps-h">Nach Wochentag</div>
-        <div class="ps-chart">${det.weekday.map(w=>
-          `<div class="ps-col"><div class="ps-bar-wrap"><div class="ps-bar ps-bar-alt" style="height:${Math.round(((w.pct||0)/wdMax)*100)}%"></div></div>
-           <div class="ps-col-l">${esc(w.day)}</div><div class="ps-col-v">${w.pct==null?'\u2013':w.pct+'%'}</div></div>`).join('')}</div></div>`;
-    }
-    html+=`<div class="ps-foot">Stand: ${new Date(d.publishedAt).toLocaleDateString('de-DE')} \u00b7 ${esc(d.club||'')}</div>`;
-    const root=document.getElementById('app')||document.body;
-    root.innerHTML='<div class="ps-wrap">'+html+'</div>';
-    document.body.classList.add('ps-mode');
-  }
-  db.ref('publishedReports/'+id).get().then(snap=>{
-    if(settled)return;settled=true;clearTimeout(to);
-    if(!snap.exists()){
-      showError('\ud83d\udd0d','Bericht nicht gefunden',
-        'Dieser Bericht existiert nicht (mehr). M\u00f6glicherweise wurde er entfernt oder der Link ist veraltet.');
-      return;
-    }
-    const data=snap.val();
-    if(!data||!data.players||!Array.isArray(data.players)){
-      showError('\u26a0\ufe0f','Bericht besch\u00e4digt',
-        'Die Bericht-Daten konnten nicht gelesen werden.');
-      return;
-    }
-    try{ (data.kind==='player') ? renderPlayerStats(data) : renderReport(data); }
-    catch(e){
-      showError('\u26a0\ufe0f','Anzeigefehler','Der Bericht konnte nicht dargestellt werden.');
-    }
-  }).catch(err=>{
-    if(settled)return;settled=true;clearTimeout(to);
-    showError('\ud83d\udce1','Verbindungsfehler',
-      'Der Bericht konnte nicht geladen werden. Bitte sp\u00e4ter erneut versuchen.');
-  });
+  // Old links (?id=…) pointed at published snapshots. Those are gone: the
+  // player menu builds the weekly report and the statistics live.
+  showError('\ud83d\udd17','Dieser Link ist veraltet',
+    'Wochenbericht und deine Statistik findest du jetzt im Spieler-Men\u00fc \u2014 \u00fcber den Link aus der Team-Gruppe.');
 })();
 </script>
 </body>

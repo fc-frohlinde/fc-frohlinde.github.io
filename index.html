@@ -4864,7 +4864,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791929736217; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791933232652; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -6701,8 +6701,6 @@ function sanitizeG(data){
   if(!Array.isArray(data.auditLog))data.auditLog=data.auditLog?Object.values(data.auditLog).filter(Boolean):[];
   // Session templates
   if(!Array.isArray(data.sessionTemplates))data.sessionTemplates=data.sessionTemplates?Object.values(data.sessionTemplates).filter(Boolean):[];
-  // Published weekly reports log (metadata only; snapshots live in top-level publishedReports node)
-  if(!Array.isArray(data.reportLog))data.reportLog=data.reportLog?Object.values(data.reportLog).filter(Boolean):[];
   // One-time migration: legacy "team__idx" matchLineup keys → "team__season__idx"
   _migrateMatchLineupsIn(data);
   // One-time migration: invert registration model (V2)
@@ -12228,9 +12226,7 @@ function _amWeekCtx(p){
   const D=cd();
   const nm=(getDisplayName?getDisplayName(p):p.name)||'Spieler';
   const url=buildHubLink(p.confirmToken||'','week');
-  // Personal statistics page — only included once it has been published,
-  // so the message never carries a dead link.
-  const statsUrl=(p.statsToken&&G.statsPublishedAt)?buildStatsLink(p.statsToken):'';
+  const statsUrl=''; // the statistics live in the player menu now (url above)
   const today=todaySK();
   const horizon=(typeof _pmWeekHorizon==='function')?_pmWeekHorizon():today;
   const weekStart=(typeof _pmWeekStart==='function')?_pmWeekStart():today;
@@ -12687,65 +12683,6 @@ function sendRsvpWhatsApp(){
   }
   _openWhatsAppGroupCompose(_buildSessionBroadcastText(target.s,target.sk));
 }
-function sendWeekReportWhatsApp(){
-  if(!canEdit())return;
-  // Use the published report if available, else compute current-week stats.
-  // Read team/season directly from UI state instead of via dbGetData() — the
-  // latter reads from Dashboard <select> elements that may not exist yet if
-  // the trainer never opened the Wochenbericht modal.
-  if(typeof dbComputeWeekReport!=='function'){
-    alert('Wochenbericht-Funktion nicht verfügbar.');return;
-  }
-  const team=UI.currentTeam||'';
-  const season=UI.currentSeason||'';
-  const block=team&&season&&G.db&&G.db[team+'__'+season];
-  if(!block||!Array.isArray(block.sessions)||!Array.isArray(block.players)){
-    alert('Keine Daten für aktuelle Mannschaft.');return;
-  }
-  const data={team,season,block,sessions:block.sessions,players:block.players};
-  const r=dbComputeWeekReport(data,_dbCompletedWeekOffset());
-  if(!r){alert('Wochenbericht konnte nicht berechnet werden.');return;}
-  // No sessions this week → no meaningful report to broadcast. Bail with a
-  // friendly message rather than send an empty/useless WhatsApp.
-  if(!r.trainCount&&!r.matchCount){
-    alert('Diese Woche gab es keine Sitzungen \u2014 es gibt nichts zu berichten.');
-    return;
-  }
-  // Try to find a recently-published report for this week → include link
-  let reportUrl='';
-  try{
-    if(Array.isArray(G.reportLog)){
-      const entry=G.reportLog.find(e=>e&&e.team===team&&e.season===season&&e.kw===r.kw);
-      if(entry&&entry.token&&typeof _dbReportUrl==='function'){
-        reportUrl=_dbReportUrl(entry.token);
-        // Fallback for local file:// previews: substitute production GitHub Pages URL
-        // so the trainer's WhatsApp share isn't useless for players. If you ever
-        // change the hosting domain, update this constant.
-        if(reportUrl.startsWith('file://')||location.protocol==='file:'){
-          reportUrl=_SHARE_FALLBACK_HOST+'/report.html?id='+encodeURIComponent(entry.token);
-        }
-      }
-    }
-  }catch(e){}
-  const lines=[];
-  lines.push('Wochenbericht KW '+(r.kw||'?')+' \u00b7 '+team);
-  lines.push('');
-  if(r.trainCount){
-    lines.push(r.trainCount+' Training'+(r.trainCount>1?'s':'')+' \u00b7 \u00d8 '+(r.teamAgg?r.teamAgg.overallPct:0)+'% Anwesenheit');
-  }
-  if(r.matchCount){
-    lines.push(r.matchCount+' Spiel'+(r.matchCount>1?'e':''));
-  }
-  if(reportUrl){
-    lines.push('');
-    lines.push('Vollst\u00e4ndiger Bericht:');
-    lines.push(reportUrl);
-  } else {
-    lines.push('');
-    lines.push('Tipp: Ver\u00f6ffentliche zun\u00e4chst den Bericht \u00fcber das Dashboard, damit der Link geteilt werden kann.');
-  }
-  _openWhatsAppGroupCompose(lines.join('\n'));
-}
 // Open WhatsApp with pre-filled text — no specific recipient, trainer picks
 // the group after the share sheet opens. This is the only WhatsApp pattern that
 // supports group-broadcast from a web link.
@@ -13084,10 +13021,6 @@ function _automationRenderCards(){
   wrap.style.display=html?'block':'none';
 }
 // Action handlers
-function _automationSendWeekReport(){
-  if(typeof sendWeekReportWhatsApp==='function')sendWeekReportWhatsApp();
-  _automationDismissWeekReport();
-}
 function _automationDismissWeekReport(){
   if(!canEdit())return;
   // Dismissal is team-shared so a teammate doesn't also send. We compute the
@@ -16415,7 +16348,7 @@ function amCopyAllLinks(){
   }
 }
 // ── TRAINER DASHBOARD ────────────────────────────────────────
-let _dbState={team:null,season:null,weekdayTime:'past',weekdayType:'all',weekReportOffset:0,reportIncludePhotos:true};
+let _dbState={team:null,season:null,weekdayTime:'past',weekdayType:'all',weekReportOffset:0};
 function setDbWeekdayTime(t){_dbState.weekdayTime=t;renderDashboard();}
 function setDbWeekdayType(t){_dbState.weekdayType=t;renderDashboard();}
 function openDashboard(){
@@ -16901,8 +16834,6 @@ function dbComputeWeekReport(data,offsetWeeks){
     rosterSize:players.filter(p=>p).length
   };
 }
-// ── Weekly Report: publish flow ──────────────────────────────
-let _dbPublishing=false;
 function _dbComputeSeasonStats(data){
   // Per-player cumulative season attendance + overall team season %
   const {sessions,players,season}=data;
@@ -16924,35 +16855,12 @@ function _dbComputeSeasonStats(data){
   });
   return {perPlayer,teamPct:teamT?Math.round(teamA/teamT*100):null};
 }
-function _dbGenReportToken(){
-  const chars='abcdefghijkmnpqrstuvwxyz23456789'; // no ambiguous chars
-  let t='wr_';
-  for(let i=0;i<10;i++)t+=chars[Math.floor(Math.random()*chars.length)];
-  return t;
-}
-function _dbReportUrl(token){
-  const base=location.origin+location.pathname.replace(/\/[^\/]*$/,'/');
-  return base+'report.html?id='+encodeURIComponent(token);
-}
-// ══ PER-PLAYER STATS DOCUMENTS ═══════════════════════════════
-// One published document per player, each under its own token, so a player
-// can only ever open their own figures. Deliberately excluded: Leistungsnoten
+// ══ PER-PLAYER STATISTICS (player menu, built live) ═══════════
+// Each player only ever gets his own figures. Deliberately excluded: Leistungsnoten
 // and Bewertungsthemen. Those are the trainers' working notes about a player,
 // not feedback the player is meant to read off a web page — publishing them
 // would change how they get written. Attendance, the player's own sRPE input
 // and their trend are all fair game.
-function ensureStatsToken(pi){
-  const D=cd();const p=D&&D.players&&D.players[pi];
-  if(!p)return null;
-  // Separate from confirmToken on purpose: a leaked stats link must not also
-  // hand over the ability to answer for that player.
-  if(!p.statsToken){
-    const arr=new Uint8Array(9);
-    (crypto&&crypto.getRandomValues)?crypto.getRandomValues(arr):arr.forEach((_,i)=>arr[i]=Math.floor(Math.random()*256));
-    p.statsToken='s_'+Array.from(arr).map(b=>b.toString(16).padStart(2,'0')).join('');
-  }
-  return p.statsToken;
-}
 function buildHubLink(token,action,sessIdx){
   const base=location.origin+location.pathname;
   return base+'?p='+encodeURIComponent(token||'')
@@ -16970,10 +16878,6 @@ function buildRpeTeamLink(sessIdx,preview){
     +'&season='+encodeURIComponent(UI.currentSeason||'')
     +(sessIdx!=null?('&s='+sessIdx):'')
     +(preview?'&preview=1':'');
-}
-function buildStatsLink(token){
-  const base=location.origin+location.pathname.replace(/\/[^\/]*$/,'/');
-  return base+'report.html?id='+encodeURIComponent(token||'');
 }
 // Weekly attendance series for the trend chart (last N weeks, held sessions)
 function _psWeekSeries(p,block,season,weeks){
@@ -17147,257 +17051,12 @@ function dbBuildReportSnapshot(data,offset,includePhotos){
     }
   };
 }
-function dbPublishPlayerStats(opts){
-  const silent=!!(opts&&opts.silent);   // called as part of publishing the report
-  if(!canEdit())return;
-  if(!fbDb){if(!silent)alert('Keine Verbindung zur Datenbank.');return;}
-  const data=dbGetData();
-  if(!data.block)return;
-  const offset=_dbState.weekReportOffset||0;
-  const includePhoto=!!_dbState.reportIncludePhotos;
-  const targets=[];
-  data.players.forEach((p,pi)=>{if(p)targets.push(pi);});
-  if(!targets.length){if(!silent)alert('Keine Spieler.');return;}
-  if(!silent&&!confirm(targets.length+' pers\u00f6nliche Statistik-Seiten ver\u00f6ffentlichen bzw. aktualisieren?'))return;
-  snap();
-  const updates={};
-  let built=0;
-  targets.forEach(pi=>{
-    const tok=ensureStatsToken(pi);
-    const snapshot=dbBuildPlayerStatsSnapshot(data,pi,offset,includePhoto);
-    if(!tok||!snapshot)return;
-    updates['publishedReports/'+tok]=snapshot;
-    built++;
-  });
-  if(!built){if(!silent)alert('Nichts zu ver\u00f6ffentlichen.');return;}
-  saveG(); // persist the freshly created statsTokens
-  fbDb.ref().update(updates).then(()=>{
-    G.statsPublishedAt=Date.now();
-    saveG();
-    if(!silent&&typeof showSaveFlash==='function')showSaveFlash('\u2705 '+built+' Statistik-Seiten aktualisiert');
-    if(typeof renderDashboard==='function')renderDashboard();
-  }).catch(err=>{
-    _fbWarn('playerStats',err,'\u26a0\ufe0f Statistik-Seiten nicht ver\u00f6ffentlicht');
-    if(!silent)alert('Ver\u00f6ffentlichung fehlgeschlagen. Bitte Verbindung pr\u00fcfen.');
-  });
-}
-function dbPublishWeekReport(){
-  if(!canEdit())return;
-  if(_dbPublishing)return;
-  if(!fbDb){alert('Keine Verbindung zur Datenbank \u2014 Bericht kann nicht ver\u00f6ffentlicht werden. Bitte Internetverbindung pr\u00fcfen.');return;}
-  const data=dbGetData();
-  if(!data.block)return;
-  const offset=_dbState.weekReportOffset||0;
-  const r=dbComputeWeekReport(data,offset);
-  // Empty weeks are allowed — the report then shows only the season standings.
-  const includePhotos=!!_dbState.reportIncludePhotos;
-  const snapshot=dbBuildReportSnapshot(data,offset,includePhotos);
-  if(!Array.isArray(G.reportLog))G.reportLog=[];
-  // Reuse token if a report for this team+season+KW already exists (so the shared link stays valid)
-  const existing=G.reportLog.find(e=>e&&e.team===snapshot.team&&e.season===snapshot.season&&e.kw===snapshot.week.kw);
-  const token=existing?existing.token:_dbGenReportToken();
-  _dbPublishing=true;
-  const btn=document.querySelector('.db-wr-publish');
-  if(btn){btn.disabled=true;btn.innerHTML='\u23f3 Wird ver\u00f6ffentlicht\u2026';}
-  fbDb.ref('publishedReports/'+token).set(snapshot).then(()=>{
-    const logEntry={
-      token:token,team:snapshot.team,season:snapshot.season,
-      kw:snapshot.week.kw,from:snapshot.week.from,to:snapshot.week.to,
-      publishedAt:snapshot.publishedAt,hasPhotos:includePhotos,
-      sessionCount:r.weekSess.length,
-      // Fields used by WhatsApp templates
-      weekTrainCount:r.trainCount,
-      weekMatchCount:r.matchCount,
-      weekPct:r.teamAgg.overallPct
-    };
-    if(existing)Object.assign(existing,logEntry);
-    else G.reportLog.unshift(logEntry);
-    if(G.reportLog.length>30)G.reportLog=G.reportLog.slice(0,30);
-    saveG();
-    _dbPublishing=false;
-    _dbCopyText(_dbReportUrl(token));
-    if(typeof showSaveFlash==='function')showSaveFlash('\u2705 Ver\u00f6ffentlicht & Link kopiert');
-    // The per-player pages belong to the same weekly act — as a separate
-    // button they could be forgotten, and the invitations would then carry a
-    // stale statistics link or none at all.
-    try{dbPublishPlayerStats({silent:true});}catch(e){console.error('playerStats:',e);}
-    if(document.getElementById('wr-content'))renderWeekReportModal();
-    else if(typeof renderDashboard==='function')renderDashboard();
-  }).catch(err=>{
-    _dbPublishing=false;
-    if(btn){btn.disabled=false;btn.innerHTML='\ud83d\udce4 Bericht ver\u00f6ffentlichen';}
-    console.error('[Firebase:publish] Bericht konnte nicht ver\u00f6ffentlicht werden:',err&&err.message?err.message:err);
-    alert('Ver\u00f6ffentlichung fehlgeschlagen. Bitte Internetverbindung pr\u00fcfen und erneut versuchen.');
-  });
-}
-function dbToggleReportPhotos(cb){
-  _dbState.reportIncludePhotos=!!cb.checked;
-}
-// ── WhatsApp announcement templates ──
-function _dbFmtSessCount(tc,mc){
-  const parts=[];
-  if(tc>0)parts.push(tc===1?'1 Training':tc+' Trainings');
-  if(mc>0)parts.push(mc===1?'1 Spiel':mc+' Spiele');
-  return parts.length?parts.join(', '):'keine Termine';
-}
-const _waTemplates={
-  // Ten variants for the group message that carries the weekly report link.
-  // Same rotation logic as the personal invites: a message that always reads
-  // the same gets scrolled past.
-  hype:{
-    label:'Mit Hype',
-    build:c=>c.hasSessions
-      ?'\ud83c\udfc6 *Wochenbericht KW '+c.kw+' ist da!*\n\nHier seht ihr eure Anwesenheit der Woche und den aktuellen Stand der Saison-Wertung \ud83d\udcca\n\n\ud83d\udc49 '+c.url+'\n\nWer schafft es auf Platz 1? \ud83e\udd47'
-      :'\ud83c\udfc6 *Wochenbericht KW '+c.kw+'*\n\nDiese Woche war Pause \u2014 aber die Saison-Wertung l\u00e4uft weiter! \ud83d\udcca\n\n\ud83d\udc49 '+c.url+'\n\nWer steht ganz oben? \ud83e\udd47'
-  },
-  neutral:{
-    label:'Neutral',
-    build:c=>c.hasSessions
-      ?'\ud83d\udccb Wochenbericht KW '+c.kw+'\n\nTeilnahme der Woche + Saison-Wertung:\n\ud83d\udc49 '+c.url
-      :'\ud83d\udccb Wochenbericht KW '+c.kw+' (Pause)\n\nAktueller Saison-Stand:\n\ud83d\udc49 '+c.url
-  },
-  metrics:{
-    label:'Mit Metriken',
-    build:c=>{
-      if(!c.hasSessions)return '\ud83d\udcca *Wochenbericht KW '+c.kw+'*\n\nDiese Woche keine Termine.\nAber die Saison-Wertung l\u00e4uft weiter:\n\ud83d\udc49 '+c.url;
-      const l=['\ud83d\udcca *Wochenbericht KW '+c.kw+'*',''];
-      if(c.sessCountStr)l.push('Diese Woche: '+c.sessCountStr);
-      if(c.teamPct!=null)l.push('Mannschaft: '+c.teamPct+'% Teilnahme');
-      l.push('','\ud83d\udc49 Wer steht ganz oben?',c.url);
-      return l.join('\n');
-    }
-  },
-  danke:{
-    label:'Dankend',
-    build:c=>{
-      if(!c.hasSessions)return '\ud83d\ude4f Diese Woche war Pause \u2014 n\u00e4chste Woche geht es weiter!\n\nSaison-Stand: '+c.url;
-      const pct=c.teamPct!=null?' Bei '+c.teamPct+'% Beteiligung.':'';
-      return '\ud83d\ude4f *Danke f\u00fcr diese Woche, Jungs!*'+pct+'\n\nDer Wochenbericht ist online:\n\ud83d\udc49 '+c.url;
-    }
-  },
-  kurz:{
-    label:'Sehr kurz',
-    build:c=>'\ud83d\udcca Wochenbericht KW '+c.kw+':\n'+c.url
-  },
-  frage:{
-    label:'Als Frage',
-    build:c=>{
-      if(!c.hasSessions)return 'Wer f\u00fchrt die Saison-Wertung an? \ud83d\udc40\n'+c.url;
-      return 'Wer war diese Woche am fleissigsten? \ud83d\udc40\n\nWochenbericht KW '+c.kw+':\n'+c.url;
-    }
-  },
-  ziel:{
-    label:'Mit Zielsetzung',
-    build:c=>{
-      if(!c.hasSessions)return '\ud83c\udfaf Pause-Woche. Der Saison-Stand bleibt einsehbar:\n'+c.url;
-      const l=['\ud83c\udfaf *Wochenbericht KW '+c.kw+'*',''];
-      if(c.teamPct!=null){
-        l.push(c.teamPct>=85?'Starke '+c.teamPct+'% Beteiligung \u2014 genau so weiter!'
-          :c.teamPct>=70?c.teamPct+'% Beteiligung \u2014 da geht noch was.'
-          :c.teamPct+'% Beteiligung \u2014 lasst uns das gemeinsam hochschrauben.');
-        l.push('');
-      }
-      l.push('\ud83d\udc49 '+c.url);
-      return l.join('\n');
-    }
-  },
-  saison:{
-    label:'Saison-Fokus',
-    build:c=>'\ud83d\udcc8 Der Saison-\u00dcberblick ist aktualisiert'+(c.hasSessions?' (inkl. KW '+c.kw+')':'')+':\n\n'+c.url+'\n\nSchaut mal rein, wo ihr steht.'
-  },
-  formell:{
-    label:'Formell',
-    build:c=>{
-      const l=['Wochenbericht KW '+c.kw,''];
-      if(c.hasSessions&&c.sessCountStr)l.push('Termine: '+c.sessCountStr);
-      if(c.hasSessions&&c.teamPct!=null)l.push('Teilnahmequote: '+c.teamPct+'%');
-      if(!c.hasSessions)l.push('In dieser Woche fanden keine Termine statt.');
-      l.push('','Zum Bericht: '+c.url);
-      return l.join('\n');
-    }
-  },
-  emoji:{
-    label:'Bildhaft',
-    build:c=>{
-      if(!c.hasSessions)return '\u26bd \ud83d\udcca \ud83d\udc47\n\nSaison-Wertung:\n'+c.url;
-      return '\u26bd\ud83d\udd25 KW '+c.kw+' ist ausgewertet!\n\n\ud83d\udcca Anwesenheit\n\ud83c\udfc6 Saison-Wertung\n\ud83d\udcc8 Verlauf\n\n\ud83d\udc47\n'+c.url;
-    }
-  }
-};
-function _dbBuildWhatsAppText(token,templateKey){
-  if(!Array.isArray(G.reportLog))return null;
-  const entry=G.reportLog.find(e=>e&&e.token===token);
-  if(!entry)return null;
-  const tmpl=_waTemplates[templateKey]||_waTemplates.hype;
-  const tc=entry.weekTrainCount,mc=entry.weekMatchCount;
-  const hasBreakdown=typeof tc==='number'||typeof mc==='number';
-  return tmpl.build({
-    kw:entry.kw,
-    url:_dbReportUrl(token),
-    hasSessions:(entry.sessionCount||0)>0,
-    teamPct:typeof entry.weekPct==='number'?entry.weekPct:null,
-    sessCountStr:hasBreakdown?_dbFmtSessCount(tc||0,mc||0):null
-  });
-}
-function dbCopyWhatsAppText(token,btnEl){
-  const tplKey=(typeof getUserPref==='function')?getUserPref('waTemplate','hype'):'hype';
-  const txt=_dbBuildWhatsAppText(token,tplKey);
-  if(!txt){alert('Text konnte nicht erstellt werden.');return;}
-  _dbCopyText(txt,()=>{
-    if(btnEl){
-      const orig=btnEl.innerHTML;
-      btnEl.innerHTML='\u2705 Kopiert!';
-      btnEl.classList.add('db-wr-copied');
-      setTimeout(()=>{btnEl.innerHTML=orig;btnEl.classList.remove('db-wr-copied');},2000);
-    }
-  });
-}
-function dbSetWaTemplate(sel){
-  if(typeof setUserPref==='function')setUserPref('waTemplate',sel.value||'hype');
-  // Live-update the preview if present
-  const preview=document.getElementById('db-wr-wa-preview');
-  if(preview&&preview.dataset.token)_dbUpdateWaPreview(preview.dataset.token);
-}
-function _dbUpdateWaPreview(token){
-  const preview=document.getElementById('db-wr-wa-preview');
-  if(!preview)return;
-  const tplKey=(typeof getUserPref==='function')?getUserPref('waTemplate','hype'):'hype';
-  const txt=_dbBuildWhatsAppText(token,tplKey);
-  if(txt)preview.textContent=txt; // textContent: pre-wrap CSS preserves \n
-}
 function _dbCopyText(txt,onDone){
   if(navigator.clipboard&&navigator.clipboard.writeText){
     navigator.clipboard.writeText(txt).then(()=>onDone&&onDone()).catch(()=>_dbCopyFallback(txt,onDone));
   } else {
     _dbCopyFallback(txt,onDone);
   }
-}
-function dbCopyReportLink(token,btnEl){
-  _dbCopyText(_dbReportUrl(token),()=>{
-    if(btnEl){
-      const orig=btnEl.innerHTML;
-      btnEl.innerHTML='\u2705 Kopiert!';
-      btnEl.classList.add('db-wr-copied');
-      setTimeout(()=>{btnEl.innerHTML=orig;btnEl.classList.remove('db-wr-copied');},2000);
-    }
-  });
-}
-function dbRenderPublishedList(){
-  if(!Array.isArray(G.reportLog)||G.reportLog.length===0)return '';
-  const sorted=[...G.reportLog].sort((a,b)=>(b.publishedAt||0)-(a.publishedAt||0)).slice(0,8);
-  let html='<div class="db-wr-loglist"><div class="db-wr-log-h">Zuletzt ver\u00f6ffentlicht</div>';
-  sorted.forEach(e=>{
-    const d=new Date(e.publishedAt);
-    const ds=d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'});
-    html+=`<div class="db-wr-logrow">
-      <span class="db-wr-log-kw">KW ${e.kw}</span>
-      <span class="db-wr-log-meta">${_dbEscapeHtml(e.team)} \u00b7 ${_dbEscapeHtml(e.from)}\u2013${_dbEscapeHtml(e.to)}${e.hasPhotos?' \u00b7 \ud83d\udcf7':''}</span>
-      <span class="db-wr-log-date">${ds}</span>
-      <button class="db-wr-log-copy" onclick="dbCopyReportLink('${_dbEscapeHtml(e.token)}',this)" title="Link kopieren">\ud83d\udd17</button>
-    </div>`;
-  });
-  html+='</div>';
-  return html;
 }
 // ── Wochenbericht modal (standalone — uses UI.currentTeam/currentSeason) ──
 function openWeekReport(){
@@ -26243,7 +25902,7 @@ window.checkLoss=async function(key){
   const rows=[];
   // Everything _pmSanitizeG clears, plus the squads themselves
   ['seasonLineups','matchLineups','lineupSaves','sessionTemplates','exerciseLibrary',
-   'trash','locationList','trainers','teamList','seasonList','reportLog'].forEach(k=>{
+   'trash','locationList','trainers','teamList','seasonList'].forEach(k=>{
     rows.push({bereich:k,jetzt:n(G[k]),imBackup:n(src[k]),
       fehlt:Math.max(0,n(src[k])-n(G[k]))});
   });
@@ -27114,6 +26773,42 @@ document.addEventListener('click',e=>{
 // Auto-backup once per day. Uses Firebase as source of truth so that opening
 // the app on a 2nd device (or after localStorage was cleared) doesn't create
 // a duplicate auto-backup for the same day.
+// ══ AUFRÄUMEN: alte veröffentlichte Berichte ══════════════════
+// Weekly reports and player statistics used to be published as snapshots
+// under publishedReports — readable by anyone with the database address, with
+// names and figures. The player menu builds both live now, so the snapshots
+// only leak. The first admin session after this release removes them, once,
+// together with the tokens and the log that pointed at them.
+async function _pubCleanup(){
+  if(!CU||CU.role!=='admin'||!fbDb||!G||G.__sanitized||G.pubCleanedAt)return true;
+  let keys=[];
+  try{
+    // shallow: only the keys — the snapshots themselves can be megabytes of photos
+    const res=await fetch(DEFAULT_FB_CONFIG.databaseURL+'/publishedReports.json?shallow=true',{cache:'no-store'});
+    if(res.ok){const j=await res.json();keys=j?Object.keys(j):[];}
+    else if(res.status!==401&&res.status!==403)return false; // try again later
+  }catch(e){return false;}
+  let failed=0;
+  await Promise.all(keys.map(k=>fbDb.ref('publishedReports/'+k).remove().catch(()=>{failed++;})));
+  if(failed)console.warn('[Aufräumen] '+failed+' Berichte konnten nicht entfernt werden (Regeln?)');
+  delete G.reportLog;delete G.statsPublishedAt;
+  Object.values(G.db||{}).forEach(D=>((D&&Array.isArray(D.players))?D.players:[]).forEach(p=>{if(p&&p.statsToken)delete p.statsToken;}));
+  G.pubCleanedAt=Date.now();
+  try{saveG(false);}catch(e){}
+  console.log('[Aufräumen] '+(keys.length-failed)+' alte veröffentlichte Berichte entfernt');
+  return true;
+}
+function _pubCleanupSchedule(){
+  let n=0;
+  const t=setInterval(async()=>{
+    n++;
+    if(n>60||(CU&&CU.role==='player')){clearInterval(t);return;}
+    if(!CU||CU.role!=='admin'||!_fbInitialLoaded||!fbDb)return;
+    clearInterval(t);
+    const done=await _pubCleanup();
+    if(!done)setTimeout(_pubCleanupSchedule,10*60*1000);
+  },5000);
+}
 function checkAutoBackup(){
   // Traffic anatomy of the old version: it ran for EVERY visitor — including
   // all player links — and downloaded the entire __backups node (15 full
@@ -31435,6 +31130,7 @@ document.addEventListener('click',(e)=>{
 // ══════════════════════════════
 initAuth();
 checkAutoBackup();
+_pubCleanupSchedule();
 </script>
 
 <!-- Backup Modal (Admin only) -->
