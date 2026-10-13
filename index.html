@@ -3118,7 +3118,7 @@ body.guest-mode .notif-compose{display:none !important;}
 /* Hide trainer chips */
 body.guest-mode #hTrainersWrap{display:none !important;}
 /* Manager modal buttons */
-body.guest-mode #btn-mgr-addpl,
+body.guest-mode #btn-mgr-addpl,body.guest-mode #btn-mgr-teamlink,
 body.guest-mode .pl-edit-btn,
 body.guest-mode .lp-fab,
 body.guest-mode .slp-fab,
@@ -4694,6 +4694,7 @@ if(window._fbBlocked){
     <div class="tmgr-scroll" style="border:1px solid var(--gl);border-radius:8px;margin-bottom:10px;" id="tmgr-pl-list"></div>
     <div class="mob-btns">
       <button class="btn bp" id="btn-mgr-addpl" onclick="closeM('moTeamMgr');openM('moAddPlayer');" style="display:none;">＋ Spieler</button>
+      <button class="btn" id="btn-mgr-teamlink" onclick="copyTeamLink()" style="display:none;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" title="Ein Link für die ganze Mannschaft — einmal in die Gruppe geben, jeder wählt sich selbst aus">🔗 Spieler-Menü-Link</button>
       <button class="btn" onclick="exportPlayersCSV()" style="background:var(--gd);color:#fff;" title="Spielerdaten als CSV exportieren (Trikotverwaltung-Format)">⬇ CSV-Export</button>
       
     </div>
@@ -4862,7 +4863,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791934948891; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791935137840; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -8878,7 +8879,7 @@ function renderUserPill(){
 
 function applyRoleUI(){
   const edit=canEdit(),admin=isAdmin(),guest=isGuest();
-  ['btn-addSess','btn-addMatch','btn-mgr-addpl','vd-multisel'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=edit?'':'none';});
+  ['btn-addSess','btn-addMatch','btn-mgr-addpl','btn-mgr-teamlink','vd-multisel'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=edit?'':'none';});
   ['btn-plan'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=admin?'':'none';});
   // User-menu role-specific items
   const ba=document.getElementById('ud-admin');if(ba)ba.style.display=admin?'':'none';
@@ -12677,8 +12678,6 @@ function _automationSyncSettingsUI(){
   const editable=canEdit&&canEdit();
   const section=document.getElementById('setAutomationSection');
   if(section)section.style.display=editable?'block':'none';
-  const tl=document.getElementById('setTeamLinkRow');
-  if(tl)tl.style.display=editable?'':'none';
   if(!editable)return;
   const s=_automationGetPrefs();
   const rcEnabled=document.getElementById('autoRollCallEnabled');
@@ -21747,6 +21746,7 @@ function renderMgrPlayers(){
     </div>`;}).join('')
     :'<p style="padding:14px;font-size:.76rem;color:var(--gm);">Keine Spieler.</p>';
   document.getElementById('btn-mgr-addpl').style.display=canEdit()?'':'none';
+  {const tl=document.getElementById('btn-mgr-teamlink');if(tl)tl.style.display=canEdit()?'':'none';}
 }
 async function mgrDelPl(pi){
   // Delegate to canonical delPlayer flow:
@@ -30471,16 +30471,6 @@ _pubCleanupSchedule();
     </div>
     <div class="setting-control">
       <label class="setting-switch"><input type="checkbox" id="setPushEnabled" onchange="onPushToggle(this)"/><span class="setting-slider"></span></label>
-    </div>
-  </div>
-
-  <div class="setting-row" id="setTeamLinkRow" style="display:none;">
-    <div>
-      <div class="setting-label">🔗 Spieler-Menü</div>
-      <div class="setting-sub">Ein Link für die ganze Mannschaft — einmal in die Gruppe geben, jeder wählt sich selbst aus.</div>
-    </div>
-    <div class="setting-control">
-      <button class="btn bs" onclick="copyTeamLink()">Link kopieren</button>
     </div>
   </div>
 
