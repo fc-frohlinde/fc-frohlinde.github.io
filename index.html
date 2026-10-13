@@ -3560,48 +3560,40 @@ body.design-heute #mobNav .mn-ic{display:flex;padding:4px 14px;line-height:0;}
 body.design-heute #mobNav .mn-item.on::before{display:none;}
 body.design-heute #mobNav .mn-lb{font-size:.68rem;}
 @media(max-width:767px){body.design-heute #mobNav{display:flex;}}
-/* "Heute" in the club's night blue — the same palette as the player hub and
-   the weekly report, instead of white surfaces. */
-body.design-heute{
-  --hx-ink:#EEF2FB;--hx-ink2:#C9D3E6;--hx-muted:#93A3C4;--hx-ground:#0A1430;--hx-line:rgba(150,175,230,.14);
-  --hx-card:#131F3D;--hx-card2:#1A2850;
-  --hx-ok:#6DD6A2;--hx-ok-bg:rgba(63,191,127,.15);--hx-warn:#F3B867;--hx-warn-bg:rgba(240,164,58,.16);
-  --hx-bad:#FF8F93;--hx-bad-bg:rgba(229,72,77,.16);
-}
-#hxNav{background:#060D20;border-right:1px solid rgba(150,175,230,.10);}
+/* "Heute": light content framed in the club's navy — the side navigation and a
+   navy band across the top of the start screen form one L-shaped frame; cards
+   sit on a cool blue-grey ground instead of plain white, and overlap the band. */
+body.design-heute{--hx-ground:#E8EDF5;--hx-shadow:0 1px 2px rgba(14,35,80,.06),0 12px 32px -14px rgba(14,35,80,.22);}
 body.design-heute .home-overlay{background:var(--hx-ground);}
-body.design-heute .hx-card{background:var(--hx-card);box-shadow:none;border:1px solid var(--hx-line);}
-body.design-heute .hx-dark{background:#1659B8;border-color:#1659B8;}
-body.design-heute .hx-dark .hx-meta,body.design-heute .hx-num span{color:#D3E2FB;}
-body.design-heute .hx-search{background:var(--hx-card);border-color:var(--hx-line);color:var(--hx-muted);}
-body.design-heute .hx-search:hover{border-color:rgba(150,175,230,.3);}
-body.design-heute .hx-tag{background:rgba(76,142,240,.18);color:#A9C8FF;}
-body.design-heute .hx-tag.match{background:var(--hx-yellow);color:#0E2350;}
-body.design-heute .hx-btn{background:transparent;border-color:rgba(150,175,230,.28);color:var(--hx-ink);}
-body.design-heute .hx-btn:hover{background:rgba(255,255,255,.06);}
-body.design-heute .hx-btn.primary{background:var(--hx-yellow);border-color:var(--hx-yellow);color:#0E2350;}
-body.design-heute .hx-btn.dark{background:#fff;border-color:#fff;color:#0E2350;}
-body.design-heute .hx-tile.open{background:rgba(255,255,255,.06);color:var(--hx-ink2);}
-body.design-heute .hx-chip{background:rgba(255,255,255,.06);color:var(--hx-ink);}
-body.design-heute .hx-chip:hover{background:rgba(255,255,255,.11);}
-body.design-heute .hx-chip i{background:transparent;box-shadow:inset 0 0 0 1px var(--hx-line);color:var(--hx-muted);}
-body.design-heute .hx-divider{border-top-color:var(--hx-line);}
-body.design-heute .hx-bar i{background:rgba(255,255,255,.14);}
-body.design-heute .hx-bar.cur i{background:var(--hx-yellow);}
-body.design-heute .hx-link{color:#8FB8FF;}
-body.design-heute .hx-day:hover{background:rgba(255,255,255,.04);}
-body.design-heute .hx-day.today{background:rgba(242,194,48,.12);}
-body.design-heute .hx-day.empty{color:#5D6C8C;}
-body.design-heute .hx-day.empty:hover{background:none;}
-body.design-heute .hx-day.empty.today{background:rgba(242,194,48,.12);}
-body.design-heute .hx-flag{border-bottom-color:var(--hx-line);color:var(--hx-ink);}
-body.design-heute .hx-flag:hover{background:rgba(255,255,255,.04);}
-body.design-heute .hx-mbell{background:var(--hx-card);border-color:var(--hx-line);color:var(--hx-ink);}
-body.design-heute #mobNav{background:#0E1B3B;border-top:1px solid var(--hx-line);}
-body.design-heute #mobNav .mn-item{color:var(--hx-muted);}
-body.design-heute #mobNav .mn-item.on{color:#fff;}
-body.design-heute #mobNav .mn-item.on .mn-ic{color:#0E2350;}
-@media(min-width:768px){body.design-heute .toolbar-l::before{color:var(--hx-ink);}}
+body.design-heute #hxHome{background:linear-gradient(#0E2350,#0E2350) 0 0/100% 280px no-repeat,var(--hx-ground);background-attachment:local;}
+body.design-heute .hx-h1{color:#fff;}
+body.design-heute .hx-lead{color:#C9D6EC;}
+body.design-heute .hx-search{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18);color:#DCE5F5;}
+body.design-heute .hx-search:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.3);}
+body.design-heute .hx-top{padding-bottom:6px;}
+body.design-heute .hx-card{box-shadow:var(--hx-shadow);border:none;}
+body.design-heute .hx-dark{background:#1659B8;}
+body.design-heute .hx-dark .hx-meta,body.design-heute .hx-num span{color:#D6E4FB;}
+body.design-heute .hx-bar i{background:#D5DEEC;}
+body.design-heute .hx-bar.cur i{background:#1659B8;}
+body.design-heute .hx-day.today{background:#FFF3CC;}
+body.design-heute .hx-tile.ok{background:#DDF1E5;}
+body.design-heute .hx-tile.warn{background:#FBE7CC;}
+body.design-heute .hx-tile.open{background:#EDF1F7;}
+@media(max-width:767px){
+  body.design-heute #hxHome{background:linear-gradient(#0E2350,#0E2350) 0 0/100% 230px no-repeat,var(--hx-ground);background-attachment:local;}
+  body.design-heute .hx-mctx{color:#fff;}
+  body.design-heute .hx-mbell{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff;}
+}
+/* The table as one card on the same ground */
+@media(min-width:768px){
+  body.design-heute .page{background:transparent;box-shadow:none;}
+  body.design-heute .toolbar{background:transparent!important;border-bottom:none!important;padding:12px 16px 10px;}
+  body.design-heute .table-wrap{margin:0 10px;border-radius:18px;box-shadow:var(--hx-shadow);background:#fff;}
+  body.design-heute .footer{background:transparent!important;border-top:none!important;}
+}
+/* The "Mehr" sheet and its pickers must open above the start screen */
+body.design-heute #mobSheet{z-index:458;}
 
 @media(min-width:768px){body.design-heute .toolbar-l::before{content:'Anwesenheit';font-family:var(--hx-num);font-weight:800;font-size:1.55rem;color:var(--hx-ink);padding:2px 6px 0;line-height:1;}}
 /* The side navigation already holds these — the toolbar keeps only the table's own tools */
@@ -4407,7 +4399,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791849993964; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791850695597; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -10780,8 +10772,8 @@ function applyAppearance(){
   // one picked falls back to Klassisch.
   const _d=DESIGN_LIST.includes(s.design)?s.design:'';
   document.body.classList.toggle('design-heute',!_pl&&_d==='heute');
-  document.body.classList.toggle('design-flutlicht',!_pl&&_d==='heute'); // dark table + header layer
-  document.body.classList.remove('design-kabine');
+  document.body.classList.toggle('design-kabine',!_pl&&_d==='heute'); // light table layer
+  document.body.classList.remove('design-flutlicht');
   if(typeof hxApplyDesign==='function')try{hxApplyDesign();}catch(e){}
   document.body.classList.toggle('theme-dark',s.theme==='dark');
   document.body.classList.toggle('no-anim',!s.animations);
@@ -21512,9 +21504,12 @@ function hxIcon(k,size){
   return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${HX_IC[k]||''}</svg>`;
 }
 function hxOn(){return document.body.classList.contains('design-heute');}
+document.addEventListener('DOMContentLoaded',()=>{try{hxApplyDesign();}catch(e){}});
 // Phone tab bar: same five buttons, the design's icons and names
 const HX_TABS={home:['home','Heute'],list:['table','Liste'],cal:['cal','Kalender'],team:['team','Kader'],more:['more','Mehr']};
 function hxApplyDesign(){
+  // The tab bar is further down the document than this script: wait for it
+  if(!document.getElementById('mn-home')){document.addEventListener('DOMContentLoaded',hxApplyDesign,{once:true});return;}
   const on=hxOn();
   Object.keys(HX_TABS).forEach(k=>{
     const b=document.getElementById('mn-'+k);if(!b)return;
@@ -21685,12 +21680,12 @@ function hxRender(){
     const segA=roll?c.present:c.yes,segB=c.exc,segC=roll?c.no:0;
     const a1=C*segA/tot,a2=C*segB/tot,a3=C*segC/tot;
     const ring=`<svg class="hx-ring" width="124" height="124" viewBox="0 0 132 132" role="img" aria-label="${segA} von ${c.total} ${roll?'anwesend':'zugesagt'}">
-      <circle cx="66" cy="66" r="52" fill="none" stroke="rgba(255,255,255,.09)" stroke-width="14"/>
-      <circle cx="66" cy="66" r="52" fill="none" stroke="#3FBF7F" stroke-width="14" stroke-dasharray="${a1} ${C}" transform="rotate(-90 66 66)"/>
-      <circle cx="66" cy="66" r="52" fill="none" stroke="#F0A43A" stroke-width="14" stroke-dasharray="${a2} ${C}" stroke-dashoffset="${-a1}" transform="rotate(-90 66 66)"/>
-      ${segC?`<circle cx="66" cy="66" r="52" fill="none" stroke="#E5484D" stroke-width="14" stroke-dasharray="${a3} ${C}" stroke-dashoffset="${-(a1+a2)}" transform="rotate(-90 66 66)"/>`:''}
-      <text x="66" y="68" text-anchor="middle" font-family="Big Shoulders Display, Bebas Neue, sans-serif" font-weight="800" font-size="40" fill="#EEF2FB">${segA}</text>
-      <text x="66" y="90" text-anchor="middle" font-family="Barlow, sans-serif" font-weight="600" font-size="13" fill="#93A3C4">von ${c.total}</text></svg>`;
+      <circle cx="66" cy="66" r="52" fill="none" stroke="#E7EBF2" stroke-width="14"/>
+      <circle cx="66" cy="66" r="52" fill="none" stroke="#2E8B5E" stroke-width="14" stroke-dasharray="${a1} ${C}" transform="rotate(-90 66 66)"/>
+      <circle cx="66" cy="66" r="52" fill="none" stroke="#E0912F" stroke-width="14" stroke-dasharray="${a2} ${C}" stroke-dashoffset="${-a1}" transform="rotate(-90 66 66)"/>
+      ${segC?`<circle cx="66" cy="66" r="52" fill="none" stroke="#C9373E" stroke-width="14" stroke-dasharray="${a3} ${C}" stroke-dashoffset="${-(a1+a2)}" transform="rotate(-90 66 66)"/>`:''}
+      <text x="66" y="68" text-anchor="middle" font-family="Big Shoulders Display, Bebas Neue, sans-serif" font-weight="800" font-size="40" fill="#0E2350">${segA}</text>
+      <text x="66" y="90" text-anchor="middle" font-family="Barlow, sans-serif" font-weight="600" font-size="13" fill="#4E5D7C">von ${c.total}</text></svg>`;
     const tiles=roll
       ?`<div class="hx-tile ok"><b>${c.present}</b><span>anwesend</span></div><div class="hx-tile bad"><b>${c.no}</b><span>fehlend</span></div><div class="hx-tile warn"><b>${c.exc}</b><span>entschuldigt</span></div>`
       :`<div class="hx-tile ok"><b>${c.yes}</b><span>zugesagt</span></div><div class="hx-tile warn"><b>${c.exc}</b><span>entschuldigt</span></div><div class="hx-tile open"><b>${c.open}</b><span>noch offen</span></div>`;
