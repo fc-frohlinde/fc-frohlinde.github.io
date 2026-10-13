@@ -3784,6 +3784,80 @@ body.theme-dark .tpl-warnbar{background:#3A3010;color:#FFE7A3;border-color:#6B5A
 }
 @media print{.tpl-ov{display:none !important;}}
 .tpl-ov:focus{outline:none;}
+/* Tabs + Trainingsgruppen */
+.tpl-ov [hidden]{display:none !important;}
+.tpl-tabs{display:flex;gap:4px;padding:4px;border-radius:12px;background:rgba(255,255,255,.08);flex:0 0 auto;}
+.tpl-tabs button{padding:8px 16px;border-radius:9px;border:none;background:transparent;color:#DCE5F5;font:600 14px 'Barlow',sans-serif;cursor:pointer;display:flex;align-items:center;gap:6px;}
+.tpl-tabs button:hover{background:rgba(255,255,255,.1);}
+.tpl-tabs button.on{background:var(--tp-yel);color:#0B2550;font-weight:700;}
+.tpl-tabs .cnt:not(:empty){font-size:11px;font-weight:700;min-width:18px;height:18px;border-radius:9px;background:rgba(255,255,255,.18);display:inline-flex;align-items:center;justify-content:center;padding:0 5px;}
+.tpl-tabs button.on .cnt:not(:empty){background:rgba(11,37,80,.15);}
+.tpl-gmain{grid-template-columns:minmax(250px,290px) minmax(0,1fr) minmax(240px,290px);}
+.tpl-gset{gap:16px;}
+.tpl-gyes{display:flex;flex-direction:column;gap:2px;}
+.tpl-gyes .big{font-family:'Bebas Neue',sans-serif;font-size:48px;line-height:.9;color:#1E8A55;}
+.tpl-gyes b{font-size:15px;}
+.tpl-gstep{display:flex;align-items:center;gap:6px;}
+.tpl-gstep button{width:40px;height:40px;border-radius:10px;border:1px solid var(--tp-line2);background:var(--tp-card);font:700 18px 'Barlow',sans-serif;color:var(--tp-ink);cursor:pointer;}
+.tpl-gstep button:disabled{opacity:.35;cursor:default;}
+.tpl-gstep span{font-family:'Bebas Neue',sans-serif;font-size:30px;min-width:28px;text-align:center;}
+.tpl-chk{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600;cursor:pointer;color:var(--tp-ink);}
+.tpl-chk input{width:20px;height:20px;accent-color:#1659B8;flex:0 0 auto;margin:0;}
+.tpl-chk.sm{font-size:14px;font-weight:500;gap:8px;}
+.tpl-chk.sm input{width:18px;height:18px;}
+.tpl-gbtn{height:46px;border-radius:12px;border:none;background:var(--tp-navy);color:#FFFFFF;font:700 15px 'Barlow',sans-serif;cursor:pointer;flex:0 0 auto;}
+body.theme-dark .tpl-gbtn{background:var(--tp-yel);color:#0B2550;}
+.tpl-gbtn:hover{filter:brightness(1.15);}
+.tpl-gfor{display:flex;flex-direction:column;gap:8px;padding-top:14px;border-top:1px solid var(--tp-line);}
+.tpl-gfor > b{font-size:15px;}
+.tpl-ggrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;align-content:start;min-height:0;overflow:auto;padding:2px;}
+.tpl-gcard{background:var(--tp-card);border-radius:18px;overflow:hidden;box-shadow:0 1px 2px rgba(14,35,80,.06);display:flex;flex-direction:column;border:2px solid transparent;}
+.tpl-gcard.dropa{border-color:var(--tp-link);}
+.tpl-gcard.gk{padding:16px;gap:6px;}
+.tpl-gcard.gk .tpl-gl{padding:0;}
+.tpl-gh{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;}
+.tpl-gh b{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1px;font-weight:400;line-height:1;}
+.tpl-gh span{font-weight:700;font-size:14px;}
+.tpl-gl{display:flex;flex-direction:column;padding:4px 8px;min-height:48px;}
+.tpl-gp{display:flex;align-items:center;gap:10px;padding:9px 8px;border-bottom:1px solid var(--tp-line);cursor:pointer;border-radius:8px;}
+.tpl-gp[draggable=true]{cursor:grab;}
+.tpl-gp:hover,.tpl-gp.open{background:var(--tp-soft);}
+.tpl-gp:focus-visible{outline:2px solid var(--tp-link);outline-offset:-2px;}
+.tpl-gp .nr{font-family:'Bebas Neue',sans-serif;font-size:22px;min-width:26px;color:var(--tp-link);line-height:1;}
+.tpl-gp .nm{flex:1 1 auto;font-weight:600;font-size:15px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.tpl-pos{padding:2px 8px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;}
+.tpl-gmove{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:6px 8px 10px 44px;font-size:13px;color:var(--tp-mut);}
+.tpl-gmove button{height:30px;padding:0 12px;border-radius:999px;border:1px solid;font:700 12px 'Barlow',sans-serif;cursor:pointer;}
+.tpl-gmove button.gk{background:#14181F;color:#FFFFFF;border-color:#14181F;}
+.tpl-gf{margin-top:auto;padding:9px 16px;font-size:13px;color:var(--tp-mut);background:var(--tp-soft);}
+.tpl-gside{display:flex;flex-direction:column;gap:14px;min-height:0;overflow:auto;}
+.tpl-gside .tpl-col{overflow:visible;flex:0 0 auto;}
+.tpl-gout{gap:6px;font-size:15px;color:var(--tp-mut);}
+.tpl-gout b{font-size:14px;color:var(--tp-ink);margin-top:6px;}
+.tpl-gout b.exc{color:#8A5212;}
+body.theme-dark .tpl-gout b.exc{color:#F2B766;}
+.tpl-gchip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:var(--tp-chip);font-size:13px;font-weight:700;}
+.tpl-gchip i{width:10px;height:10px;border-radius:50%;display:inline-block;}
+.tpl-grow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:4px;}
+.tpl-grow .tpl-lnk{padding:4px;}
+.tpl-bgd{display:inline-flex;gap:3px;margin-right:6px;vertical-align:middle;}
+.tpl-bgd i{width:8px;height:8px;border-radius:50%;display:inline-block;}
+@media (max-width:1180px){
+  .tpl-gmain{grid-template-columns:minmax(240px,280px) minmax(0,1fr);}
+  .tpl-ggrid{overflow:visible;}
+  .tpl-gside{grid-column:1/-1;overflow:visible;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));align-items:start;}
+}
+@media (max-width:760px){
+  .tpl-ttl{flex:1 1 calc(100% - 60px);}
+  .tpl-hd-r{width:auto;flex:0 1 auto;margin-left:auto;}
+  .tpl-st{display:none;}
+  .tpl-st.warn{display:flex;}
+  .tpl-hb .lbl-m{display:none;}
+  .tpl-hb{width:38px;padding:0;justify-content:center;}
+  .tpl-tabs button{padding:7px 12px;}
+  .tpl-ggrid{grid-template-columns:1fr;flex:0 0 auto;min-height:auto;}
+  .tpl-gside{display:flex;flex:0 0 auto;min-height:auto;align-items:stretch;}
+}
 /* Zeichenbrett */
 .dg-wrap{display:flex;flex-direction:column;gap:8px;}
 .dg-tools{display:flex;flex-wrap:wrap;align-items:center;gap:3px;padding:6px;border-radius:12px;background:var(--tp-navy);}
@@ -4186,11 +4260,12 @@ if(window._fbBlocked){
   <header class="tpl-hd">
     <button class="tpl-x" type="button" onclick="tplClose()" aria-label="Schließen" title="Schließen"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     <div class="tpl-ttl"><h2>Trainingsplan</h2><span class="tpl-sub" id="tplSub"></span></div>
+    <div class="tpl-tabs" role="tablist" aria-label="Ansicht"><button type="button" role="tab" data-tab="a" class="on" aria-selected="true" onclick="tplTab('a')">Ablauf</button><button type="button" role="tab" data-tab="g" aria-selected="false" onclick="tplTab('g')">Gruppen<span class="cnt" id="tplTabGCnt"></span></button></div>
     <div class="tpl-hd-r">
       <span class="tpl-st" id="tplSt" role="status" aria-live="polite"></span>
-      <button class="tpl-hb" id="tplUndoBtn" type="button" onclick="tplUndo()" title="Rückgängig (Strg+Z)" disabled><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 7L4 12l5 5"/><path d="M4 12h11a5 5 0 0 1 0 10h-2"/></svg><span class="lbl-l">Rückgängig</span></button>
-      <button class="tpl-hb" type="button" style="gap:4px" onclick="tplSaveTplDlg()">Als Vorlage<span class="lbl-l">speichern</span></button>
-      <button class="tpl-hb pri" type="button" onclick="tplPrint()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/></svg>Drucken</button>
+      <button class="tpl-hb" id="tplUndoBtn" type="button" onclick="tplUndo()" title="Rückgängig (Strg+Z)" disabled><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 7L4 12l5 5"/><path d="M4 12h11a5 5 0 0 1 0 10h-2"/></svg><span class="lbl-l lbl-m">Rückgängig</span></button>
+      <button class="tpl-hb" type="button" onclick="tplSaveTplDlg()" title="Als Vorlage speichern"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/><path d="M12 7v6M9 10h6"/></svg><span class="lbl-m">Als Vorlage<span class="lbl-l"> speichern</span></span></button>
+      <button class="tpl-hb pri" type="button" onclick="tplPrint()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/></svg><span class="lbl-m">Drucken</span></button>
     </div>
   </header>
   <div class="tpl-main" id="tplMain">
@@ -4198,6 +4273,7 @@ if(window._fbBlocked){
     <section class="tpl-col" id="tplEd" aria-label="Ausgewählter Block"></section>
     <aside class="tpl-col lib" id="tplLib" aria-label="Übungsbibliothek"></aside>
   </div>
+  <div class="tpl-main tpl-gmain" id="tplGrp" hidden></div>
   <div class="tpl-dlg-bg" id="tplDlg" onclick="if(event.target===this)tplDlgClose()"><div class="tpl-dlg" id="tplDlgBox" role="dialog" aria-modal="true"></div></div>
   <div class="tpl-toast" id="tplToast" role="status" aria-live="polite"><span></span><button type="button"></button></div>
 </div>
@@ -4632,7 +4708,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791922107118; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791924150822; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -27203,41 +27279,6 @@ const TPL_CATS=[
   {k:'Spielform',c:'#E8A928'},{k:'Umschalten',c:'#8B5CC7'},{k:'Torschuss',c:'#D9443F'},{k:'Athletik',c:'#E07A3A'},
   {k:'Torwart',c:'#2E7D46'},{k:'Auslaufen',c:'#7A8BA6'},{k:'Sonstiges',c:'#9AA5B8'}
 ];
-// Standard drills every team library starts with: [Titel, Kategorie, Min., Spieler, Feld, Ablauf, Coaching-Punkte]
-const TPL_SEED=[
-  ['Passdreieck mit Positionswechsel','Aufwärmen',15,'6–12','Dreieck, 12 m','Drei Hütchen im Dreieck, Abstand 12 m, an jedem Hütchen 2–4 Spieler. Pass zum nächsten Hütchen und dem Ball hinterherlaufen.\nNach 5 Min. Richtungswechsel, danach nur mit dem schwachen Fuß oder direkt.','Pass auf den richtigen Fuß des Mitspielers\nOffene Annahme, Ball mit dem ersten Kontakt mitnehmen\nVor dem Pass Blickkontakt und Name rufen'],
-  ['Lauf-ABC mit Mobilisation','Aufwärmen',10,'alle','20 m Strecke','Lauf-ABC auf 20 m: Fußgelenksarbeit, Skippings, Anfersen, Seitgalopp, Überkreuzlauf, Kniehebelauf. Zurück jeweils locker traben.\nZum Abschluss Hüfte und Sprunggelenk mobilisieren, dann 2–3 Steigerungsläufe.','Aufrechter Oberkörper, aktive Armarbeit\nKurzer Bodenkontakt\nSteigerungen bis etwa 90 %, nicht maximal'],
-  ['Ballgewöhnung im Quadrat','Aufwärmen',10,'alle','20 × 20 m','Jeder Spieler mit Ball im Quadrat: Dribbling mit Richtungs- und Tempowechseln, Sohle, Innen- und Außenseite, Finten.\nAuf Zuruf wechselt die Aufgabe (Ball stoppen, Drehung, Sprint aus dem Feld und zurück).','Kopf hoch, Blick vom Ball lösen\nViele Ballkontakte mit beiden Füßen\nTempowechsel deutlich machen'],
-  ['Koordinationsleiter mit Passabschluss','Aufwärmen',12,'6–12','Leiter + 10 m','Lauf durch die Koordinationsleiter (Ein-Aus, seitwärts, Skippings), danach Pass vom Anspieler direkt zurückspielen und hinten anstellen.\nDer Anspieler wechselt jede Minute.','Schnelle, kleine Schritte\nNach der Leiter kurz abbremsen, dann sauber passen\nKörper zum Ball öffnen'],
-  ['Rondo 4 gegen 1','Rondo',10,'5','8 × 8 m','Vier Spieler am Rand halten den Ball gegen einen Verteidiger in der Mitte, maximal 2 Kontakte.\nWer den Ballverlust verursacht, geht in die Mitte. 3 × 3 Min., 1 Min. Pause.','Immer zwei Anspielstationen anbieten, links und rechts\nOffene Körperstellung, Ball weg vom Verteidiger mitnehmen\nVerteidiger: einen Passweg zustellen und den Ball lenken'],
-  ['Rondo 5 gegen 2','Rondo',15,'7','15 × 15 m','Fünf Spieler am Rand halten den Ball gegen zwei im Feld, maximal 2 Kontakte.\nWer den Ballverlust verursacht, geht mit dem Spieler, der am längsten drin ist, in die Mitte. 3 × 4 Min., 1 Min. Pause.','Offene Körperstellung vor der Ballannahme\nPass in den Fuß, weg vom Verteidiger\nVerteidiger: Passweg zustellen, zu zweit anlaufen'],
-  ['Rondo 4 + 2 gegen 2 mit Seitenwechsel','Rondo',15,'8','2 Felder à 10 × 10 m','Zwei Felder nebeneinander: im ersten 4 gegen 2, im zweiten warten zwei Spieler des Ballbesitzteams. Nach 6 Pässen geht der Ball ins zweite Feld, zwei Spieler laufen mit, zwei Verteidiger rücken nach.\nBei Ballverlust tauschen die Verteidiger mit den Spielern, die den Fehler gemacht haben.','Erst sichern, dann verlagern\nTimingläufe ins zweite Feld\nVerteidiger: sofort nachrücken, Ball isolieren'],
-  ['Positionsrondo 4 gegen 4 + 3','Rondo',15,'11','25 × 20 m','4 gegen 4 in Ballbesitz mit drei Neutralen: je einer an den Stirnseiten, einer zentral. Die Neutralen spielen immer mit dem Team in Ballbesitz.\nPunkt nach 8 Pässen oder nach einem Pass von Stirnseite zu Stirnseite. 4 × 3 Min.','Spielfeld breit und tief machen\nZentralen Spieler suchen, in den Rücken des Gegners drehen\nNach Ballverlust sofort Gegenpressing'],
-  ['Y-Passform mit Hinterlaufen','Passspiel',15,'8–12','Y-Form, ca. 30 m','Startposition A, zentraler Spieler B nach 15 m, zwei äußere Positionen C und D je 10 m schräg dahinter.\nA passt auf B, B lässt prallen, A spielt steil auf C, B hinterläuft und bekommt den Ball von C in den Lauf. Jeder rückt eine Position weiter, im Wechsel über links und rechts.','Präzise Pässe mit passender Schärfe\nAblagen auf den starken Fuß des Mitspielers\nHinterlaufen mit Tempo, Pass in den Lauf'],
-  ['Passraute mit drittem Mann','Passspiel',15,'8–12','Raute, 15 m','Vier Positionen in einer Raute. A spielt auf B, B lässt auf C prallen, C spielt den freigelaufenen A in die Tiefe (Dritter-Mann-Lauf). Danach rücken alle eine Position weiter.\nVariation: nur Direktspiel oder Spielrichtung wechseln.','Lauf des dritten Mannes erst nach dem ersten Pass starten\nAblage flach und in den Lauf\nKommunikation und Blick über die Schulter'],
-  ['Passviereck mit Doppelpass','Passspiel',12,'8–12','15 × 15 m','Vier Hütchen im Quadrat, an jedem 2–3 Spieler. Pass zum nächsten Hütchen, dort Doppelpass, dann Pass zum übernächsten Hütchen und hinterherlaufen.\nAlle 3 Min. Richtungswechsel.','Doppelpass direkt, flach und scharf\nZum Ball entgegenkommen, nicht warten\nBei der Annahme den Körper in Spielrichtung öffnen'],
-  ['Spielverlagerung über drei Zonen','Passspiel',20,'12–16','45 × 30 m, 3 Zonen','Feld in drei Zonen: in den Außenzonen je 4 gegen 2, die Mittelzone ist neutral.\nNach 5 Pässen darf der Ball in die andere Außenzone verlagert werden, zwei Verteidiger wechseln hinüber. Punkt für jede gelungene Verlagerung.','Erst die Überzahl nutzen, dann den Seitenwechsel suchen\nVerlagerung flach oder halbhoch, nicht hoch und lang\nVerteidiger: den Ball auf einer Seite halten'],
-  ['Ballan- und -mitnahme im Quadrat','Technik',12,'8–12','20 × 20 m','Paare spielen sich im Quadrat zu. Die Annahme geht mit dem ersten Kontakt in die freie Richtung, dann Pass zum nächsten freien Spieler.\nSteigerung: Annahme nur mit dem schwachen Fuß oder erst nach einem Schulterblick.','Vor der Annahme Schulterblick\nErster Kontakt weg vom Druck\nOffene Hüfte, Ball nicht stoppen, sondern mitnehmen'],
-  ['Dribbling-Parcours mit Finten','Technik',12,'6–12','Hütchenparcours, 25 m','Slalom durch Hütchen, danach 1 gegen 1 gegen einen passiven Verteidiger mit Finte (Übersteiger, Schere, Körpertäuschung) und Abschluss auf ein Minitor.\nZwei Parcours nebeneinander als Wettkampf.','Enge Ballführung im Slalom\nNach der Finte Tempo aufnehmen\nBall mit dem Fuß mitnehmen, der von der Finte wegführt'],
-  ['Kopfballspiel zu dritt','Technik',10,'3er-Gruppen','10 m','Ein Spieler wirft zu, einer köpft zurück, der dritte steht als Gegenspieler im Rücken. Erst aus dem Stand, dann aus dem Sprung, dann mit Richtungswechsel.\nNach 10 Kopfbällen wird gewechselt.','Augen offen, mit der Stirn treffen\nSpannung aus dem Oberkörper\nEinbeinig abspringen, Arme für Schwung und Schutz'],
-  ['1 gegen 1 auf Minitore','Spielform',15,'ab 6 Spieler','15 × 10 m','Zwei Minitore an den Stirnseiten. Der Trainer spielt den Ball ein, 1 gegen 1 bis zum Tor oder höchstens 20 Sekunden.\nDer Sieger bleibt, der Verlierer stellt sich hinten an. Kurz und intensiv.','Mit Tempo auf den Gegner zudribbeln\nVerteidiger: seitlich stellen, auf eine Seite lenken\nNach Ballgewinn sofort umschalten'],
-  ['2 gegen 2 auf Linie','Spielform',15,'ab 8 Spieler','20 × 15 m','Punkt durch kontrolliertes Dribbling über die gegnerische Grundlinie.\n4 Durchgänge à 90 Sek., dazwischen aktive Pause. Wartende Teams sind Anspieler am Rand.','Breite herstellen, 2-gegen-1-Situationen suchen\nDoppelpass oder Hinterlaufen nutzen\nVerteidiger: sichern und absprechen'],
-  ['4 gegen 4 + 2 Neutrale auf Minitore','Spielform',25,'10','30 × 25 m','Zwei Teams à 4 Spieler, zwei Neutrale spielen immer mit dem Team in Ballbesitz. Je zwei Minitore pro Seite.\n4 × 5 Min. Ein Tor zählt nur nach mindestens 4 Pässen.','Spiel auf das freie Minitor verlagern\nNeutrale als Anspieler nutzen\nNach Ballverlust sofort Gegenpressing'],
-  ['5 gegen 5 mit Torhütern','Spielform',20,'12','40 × 30 m','Zwei Teams à 5 Spieler mit Torhütern auf zwei große Tore.\n3 × 6 Min. Ein Tor nach Flanke oder direktem Abschluss zählt doppelt.','Wenn möglich schnell in die Tiefe spielen\nAbschluss suchen\nKompakt verteidigen, ballnah verschieben'],
-  ['Abschlussspiel 8 gegen 8','Spielform',20,'16 + 2 TW','Halbes Feld','Spiel auf zwei große Tore mit Torhütern nach Wettkampfregeln.\nDen Schwerpunkt der Einheit als Zusatzregel einbauen, z. B. ein Tor nach Ballgewinn im Angriffsdrittel zählt doppelt.','Schwerpunkt der Einheit im Spiel sichtbar machen\nCoaching nur in Unterbrechungen\nSpannung und Wettkampf hochhalten'],
-  ['6 gegen 4 mit Konter auf 2 Tore','Umschalten',20,'10–12 + TW','40 × 35 m','Sechs Spieler greifen auf ein großes Tor an, vier verteidigen. Nach Ballgewinn kontern die vier innerhalb von 8 Sekunden auf zwei Minitore an der Mittellinie.\nNach Ballverlust sofort Gegenpressing der sechs.','Nach Ballgewinn erster Pass in die Tiefe\nKonter mit höchstens 3 Kontakten pro Spieler\nWer den Ball verliert: sofort nachsetzen, Konter verzögern'],
-  ['3 gegen 2, danach Konter 2 gegen 1','Umschalten',15,'ab 10 + TW','35 × 25 m','Drei Angreifer spielen gegen zwei Verteidiger auf das große Tor. Nach Abschluss oder Ballgewinn kontern die zwei Verteidiger gegen einen zurücklaufenden Angreifer auf zwei Minitore.\nDann kommt die nächste Gruppe.','Überzahl schnell und konsequent ausspielen\nOhne Pause umschalten, erster Kontakt nach vorne\nZurücklaufender Spieler: Zeit gewinnen, nicht ins Dribbling locken lassen'],
-  ['Gegenpressing 5 gegen 5 mit 5-Sekunden-Regel','Umschalten',15,'10–12','35 × 30 m','5 gegen 5 in Ballbesitz. Holt das Team, das den Ball verloren hat, ihn innerhalb von 5 Sekunden zurück, gibt es einen Punkt. Einen Punkt gibt es auch für 10 Pässe in Folge.\n4 × 3 Min.','Sofort Druck auf den Ballführenden\nPasswege im Nahbereich schließen\nIn Ballbesitz: erster Pass aus dem Druck heraus'],
-  ['Torschuss nach Doppelpass','Torschuss',15,'8–16 + TW','Strafraum + 20 m','Doppelpass mit dem Anspieler an der Strafraumgrenze, Abschluss mit höchstens 2 Kontakten.\nZwei Stationen parallel (links und rechts), die Torhüter wechseln nach jeder Serie.','Pass in den Lauf fordern\nAbschluss flach ins lange Eck\nNach jedem Schuss nachsetzen'],
-  ['Flanken und Abschluss','Torschuss',20,'10–16 + TW','Halbes Feld','Pass aus dem Zentrum auf den Flügel, der Außenspieler dribbelt an und flankt. Zwei Stürmer kreuzen (erster und zweiter Pfosten), ein dritter Spieler besetzt den Rückraum.\nIm Wechsel über links und rechts.','Flanke früh und scharf vor das Tor\nLaufwege zum ersten und zweiten Pfosten absprechen\nRückraum für Abpraller besetzen'],
-  ['Abschluss nach 1 gegen 1','Torschuss',15,'8–12 + TW','25 × 20 m vor dem Tor','Der Angreifer startet mit Ball, der Verteidiger seitlich versetzt. 1 gegen 1 mit Abschluss auf das große Tor.\nErobert der Verteidiger den Ball, kontert er auf ein Minitor.','Mit Tempo in den Strafraum ziehen\nFrüh abschließen, wenn der Verteidiger zögert\nVerteidiger: Schussbahn zustellen'],
-  ['Torschuss aus der Drehung','Torschuss',15,'6–12 + TW','20 m vor dem Tor','Ein Spieler mit dem Rücken zum Tor bekommt einen Pass, dreht mit dem ersten Kontakt auf und schließt ab. Erst ein passiver, später ein halbaktiver Gegenspieler im Rücken.\nIm Wechsel über links und rechts.','Schulterblick vor der Annahme\nMit dem ersten Kontakt aufdrehen, Ball vom Körper weg\nSchuss mit Spannung, Blick zum Tor'],
-  ['Reaktionssprints auf Farbsignal','Athletik',10,'alle','4 Farbhütchen, 10 m','Die Spieler stehen in der Mitte, vier farbige Hütchen im Abstand von 10 m. Der Trainer ruft eine Farbe: Sprint zum Hütchen und zurück.\n2 × 6 Sprints, 20 Sek. Pause zwischen den Sprints, 2 Min. zwischen den Serien.','Explosiver Antritt, erste Schritte kurz\nKontrolliert abbremsen und die Richtung wechseln\nPausen voll einhalten: Qualität vor Menge'],
-  ['Intervallläufe 15/15','Athletik',12,'alle','Bahnen à ca. 60 m','15 Sekunden laufen (etwa 85–90 % der maximalen Herzfrequenz), 15 Sekunden gehen.\n2 Serien à 6 Min., 3 Min. Pause dazwischen. Die Laufstrecke an das Niveau der Gruppe anpassen.','Gleichmäßiges Tempo halten\nLaufstrecken nach Gruppen staffeln\nNicht direkt nach einer sehr intensiven Spielform einplanen'],
-  ['Stabilisationszirkel','Athletik',15,'alle','Matten oder Rasen','6 Stationen à 40 Sek. Belastung, 20 Sek. Wechsel: Unterarmstütz, Seitstütz links und rechts, Kniebeugen, Ausfallschritte, Copenhagen-Plank.\n2 Durchgänge.','Saubere Ausführung vor Tempo\nRumpf durchgehend angespannt\nAtmung nicht anhalten'],
-  ['Torwart: Fangen und Fallen','Torwart',20,'2–3 TW','Strafraum','Grundtechnik: Bälle aus dem Stand fangen (hoch, halbhoch, flach), dann Fallen nach links und rechts aus dem Kniestand, später aus dem Stand.\nZum Abschluss Schüsse aus 11–16 m.','Hände hinter den Ball, Daumen zueinander\nÜber die Seite fallen, nicht auf den Ellenbogen\nNach dem Fangen schnell zurück in die Grundstellung'],
-  ['Auslaufen und Dehnen','Auslaufen',10,'alle','Rund um das Feld','5 Min. lockeres Auslaufen, danach die großen Muskelgruppen dehnen (Oberschenkel vorne und hinten, Wade, Hüftbeuger, Adduktoren), je 20–30 Sek.','Locker bleiben, den Puls herunterfahren\nKurz besprechen, was gut lief']
-];
 const TPL={team:null,season:null,si:null,pid:null,sessDate:null,sessTime:'',plan:null,sel:0,
   lib:{},tpls:{},idx:{},undo:[],saveT:null,inflight:0,err:null,libCat:'Alle',libQ:'',libOpen:null,
   mode:'replace',drag:null,dropAt:null,openSeq:0,idxCache:{},readFail:false};
@@ -27408,7 +27449,7 @@ function _tplNewBlock(src,keepId){
   return {id:(keepId&&src.id)||_tplId('b'),cat:src.cat||'Sonstiges',title:src.title||'',
     min:(src.min===0||src.min)?(+src.min||0):15,players:src.players||'',area:src.area||'',
     desc:src.desc||'',coach:src.coach||'',org:src.org||'',libId:src.libId||'',
-    dia:(src.dia&&typeof src.dia==='object')?_tplClean(src.dia):null};
+    dia:(src.dia&&typeof src.dia==='object')?_tplClean(src.dia):null,grp:src.grp?1:0};
 }
 
 // ── Open / close
@@ -27427,7 +27468,8 @@ async function tplOpen(si){
     ov._dgFocusHook=true;
     ov.addEventListener('pointerdown',e=>{DG.focus=!!(e.target.closest&&e.target.closest('#dgWrap'));},true);
   }
-  DG.focus=false;DG.tool='sel';DG.bid=null;
+  DG.focus=false;DG.tool='sel';DG.bid=null;TPL.tab='a';TPL.gOpen=null;tplTab('a');
+  {const c=document.getElementById('tplTabGCnt');if(c)c.textContent='';}
   ov.classList.add('open');
   try{ov.focus({preventScroll:true});}catch(e){}
   _tplHead();
@@ -27444,42 +27486,23 @@ async function tplOpen(si){
   TPL.idx=(idx&&typeof idx==='object')?idx:{};TPL.idxCache[TPL.team]=TPL.idx;
   TPL.lib=(lib&&typeof lib==='object')?lib:{};
   TPL.tpls=(tpls&&typeof tpls==='object')?tpls:{};
-  if(!meta||!meta.seeded){
-    // Seed only on a definite answer: after a failed read, writing the
-    // standard set would overwrite edits and bring back deleted drills.
-    if(!TPL.readFail)_tplSeed();
-    else if(!Object.keys(TPL.lib).length)_tplSeedView();
-  }else if(!TPL.readFail&&(meta.seedV||1)<2)_tplSeedUpgrade(meta);
+  // Libraries start empty: each team builds its own. The standard drills that
+  // were seeded for a while are removed again, unless a trainer changed one.
+  if(meta&&meta.seeded&&(meta.seedV||1)<3&&!TPL.readFail)_tplDropStd(meta);
   TPL.plan=_tplNorm(plan)||{v:1,blocks:[]};
   _tplRenderAll();
 }
-function _tplSeed(){
-  const b=_tplBase();const now=Date.now();
-  TPL_SEED.forEach((x,i)=>{
-    const id='std'+String(i+1).padStart(2,'0');
-    if(TPL.lib[id])return;
-    const it={title:x[0],cat:x[1],min:x[2],players:x[3],area:x[4],desc:x[5],coach:x[6],std:1,upd:now};
-    const dia=_tplSeedDia(i+1);if(dia)it.dia=dia;
-    TPL.lib[id]=it;_tplWrite(b+'/lib/'+id,it);
+function _tplDropStd(meta){
+  const b=_tplBase();
+  // seeding and the sketch upgrade stamped drill and meta in the same tick;
+  // anything newer was saved by a trainer and is his now
+  const lim=Math.max(meta.upd||0,meta.seeded||0)+2000;
+  Object.keys(TPL.lib).forEach(id=>{
+    const it=TPL.lib[id];
+    if(!/^std\d\d$/.test(id)||!it||!it.std||(it.upd||0)>lim)return;
+    delete TPL.lib[id];_tplWrite(b+'/lib/'+id,null);
   });
-  _tplWrite(b+'/meta',{seeded:now,seedV:2,upd:now});
-}
-// Libraries seeded before sketches existed: give the standard drills theirs,
-// unless the trainer has drawn one himself or deleted the drill.
-function _tplSeedUpgrade(meta){
-  const b=_tplBase();const now=Date.now();
-  TPL_SEED.forEach((x,i)=>{
-    const id='std'+String(i+1).padStart(2,'0');const it=TPL.lib[id];
-    if(!it||_dgHas(it.dia))return;
-    const dia=_tplSeedDia(i+1);if(!dia)return;
-    const nu=Object.assign({},it,{dia:dia,upd:now});TPL.lib[id]=nu;_tplWrite(b+'/lib/'+id,nu);
-  });
-  _tplWrite(b+'/meta',{seeded:meta.seeded||now,seedV:2,upd:now});
-}
-function _tplSeedView(){ // shown, not stored — the real seeding happens once the database answers
-  const now=0;
-  TPL_SEED.forEach((x,i)=>{const it={title:x[0],cat:x[1],min:x[2],players:x[3],area:x[4],desc:x[5],coach:x[6],std:1,upd:now};
-    const dia=_tplSeedDia(i+1);if(dia)it.dia=dia;TPL.lib['std'+String(i+1).padStart(2,'0')]=it;});
+  _tplWrite(b+'/meta',{seeded:meta.seeded,seedV:3,upd:Date.now()});
 }
 function tplClose(){
   if(TPL.saveT)_tplSaveNow();
@@ -27579,20 +27602,23 @@ function _tplSaveNow(){
 
 // ── Undo (structure only — text fields keep their own undo)
 function _tplPushUndo(){
-  TPL.undo.push(JSON.stringify({b:TPL.plan.blocks,s:TPL.sel}));
+  TPL.undo.push(JSON.stringify({b:TPL.plan.blocks,s:TPL.sel,g:TPL.plan.grp||null}));
   if(TPL.undo.length>40)TPL.undo.shift();
   _tplUndoBtn();
 }
 function tplUndo(){
   const x=TPL.undo.pop();if(!x||!TPL.plan)return;
   const o=JSON.parse(x);TPL.plan.blocks=o.b;TPL.sel=o.s;
+  if('g' in o){if(o.g)TPL.plan.grp=o.g;else delete TPL.plan.grp;}
   _tplRenderList();_tplRenderEd();_tplUndoBtn();_tplTouch();
+  if(TPL.tab==='g')_tplRenderGrp();
   _tplToast('Rückgängig gemacht');
 }
 function _tplUndoBtn(){const b=document.getElementById('tplUndoBtn');if(b)b.disabled=!TPL.undo.length;}
 
 // ── Rendering
-function _tplRenderAll(){_tplHead();_tplRenderList();_tplRenderEd();_tplRenderLib();_tplUndoBtn();_tplStatus();}
+function _tplRenderAll(){_tplHead();_tplRenderList();_tplRenderEd();_tplRenderLib();_tplUndoBtn();_tplStatus();tplTab(TPL.tab);
+  const c=document.getElementById('tplTabGCnt');if(c)c.textContent=(TPL.plan&&TPL.plan.grp)?String(TPL.plan.grp.n):'';}
 function _tplHead(){
   const el=document.getElementById('tplSub');if(!el)return;
   const s=_tplSess();if(!s){el.textContent='';return;}
@@ -27616,7 +27642,7 @@ function _tplRenderList(){
       <span class="tpl-stripe" style="background:${_tplCatColor(b.cat)}"></span>${_dgThumb(b.dia)}
       <span class="tpl-bt"><span class="tpl-bk">${st[i].clock?st[i].clock+' · ':''}${_tplE(b.cat)}</span>
         <span class="tpl-bn${b.title?'':' empty'}">${b.title?_tplE(b.title):'Ohne Titel'}</span>
-        ${b.org?`<span class="tpl-bo">${_tplE(b.org)}</span>`:''}</span>
+        ${(b.org||(b.grp&&TPL.plan.grp))?`<span class="tpl-bo">${(b.grp&&TPL.plan.grp)?`<span class="tpl-bgd" title="In Gruppen">${_tplGrpDots()}</span>`:''}${_tplE(b.org||'In Gruppen')}</span>`:''}</span>
       <span class="tpl-bm">${+b.min||0}′</span></div>`).join('');
   let msg='';
   if(!bl.length)msg='<div class="tpl-hint">Noch nichts geplant. Übungen aus der Bibliothek mit + übernehmen<span class="tpl-dsk"> oder hierher ziehen</span>.</div>';
@@ -27679,7 +27705,9 @@ function _tplRenderEd(){
     <div class="tpl-fld"><label for="tplDesc">Ablauf</label><textarea id="tplDesc" placeholder="Aufbau, Regeln, Durchgänge und Pausen …" oninput="tplSetF('desc',this.value)">${_tplE(b.desc)}</textarea></div>
     <div class="tpl-fld"><label for="tplCoach">Coaching-Punkte</label><textarea id="tplCoach" placeholder="Ein Punkt pro Zeile" oninput="tplSetF('coach',this.value)">${_tplE(b.coach)}</textarea></div>
   </div>
-  <div class="tpl-fld tpl-org"><label for="tplOrg">Gruppen / Organisation</label><input id="tplOrg" value="${_tplE(b.org)}" placeholder="z. B. Gelb + Blau → Feld 1 · Torhüter separat" oninput="tplSetF('org',this.value)"></div>`;
+  <div class="tpl-fld tpl-org"><label for="tplOrg">Gruppen / Organisation</label><input id="tplOrg" value="${_tplE(b.org)}" placeholder="z. B. Gelb + Blau → Feld 1 · Torhüter separat" oninput="tplSetF('org',this.value)">
+    <div class="tpl-grow"><label class="tpl-chk sm"><input type="checkbox"${b.grp?' checked':''} onchange="tplBlockGrp(this.checked)">In Trainingsgruppen</label>
+      ${b.grp?_tplGrpChips(false)+`<button type="button" class="tpl-lnk" onclick="tplTab('g')">Gruppen bearbeiten</button>`:''}</div></div>`;
   _tplGrow(document.getElementById('tplTitle'));
   _dgMount();
 }
@@ -27713,7 +27741,9 @@ function _tplRenderLibList(){
   const items=_tplLibItems().filter(x=>(TPL.libCat==='Alle'||x.cat===TPL.libCat)
     &&(!q||(x.title+' '+x.cat+' '+(x.desc||'')+' '+(x.coach||'')).toLowerCase().indexOf(q)>=0))
     .sort((a,b)=>_tplCatIdx(a.cat)-_tplCatIdx(b.cat)||String(a.title).localeCompare(String(b.title),'de'));
-  if(!items.length){el.innerHTML=`<div class="tpl-none">${q?'Keine Übung gefunden.':'Noch keine Übungen in dieser Kategorie.'}</div>`;return;}
+  if(!items.length){el.innerHTML=`<div class="tpl-none">${q?'Keine Übung gefunden.'
+    :(_tplLibItems().length?'Noch keine Übungen in dieser Kategorie.'
+    :'Die Bibliothek ist noch leer. Lege mit „+ Neue Übung“ eine an oder speichere einen fertigen Block über „In Bibliothek speichern“.')}</div>`;return;}
   el.innerHTML=items.map(x=>{
     const open=TPL.libOpen===x.id;
     const meta=[x.cat,x.min?x.min+' Min.':'',x.players?_tplPlayersTxt(x.players):''].filter(Boolean).join(' · ');
@@ -27809,7 +27839,7 @@ function tplDragEnd(){
   document.querySelectorAll('#tplOverlay .drag,#tplOverlay .dropb,#tplOverlay .dropa').forEach(x=>x.classList.remove('drag','dropb','dropa'));
 }
 function tplDragOver(e,i){
-  if(!TPL.drag||!TPL.plan)return;
+  if(!TPL.drag||!TPL.plan||TPL.drag.k==='gp')return;
   e.preventDefault();
   const t=e.currentTarget;let after=false;
   if(i>=0){const r=t.getBoundingClientRect();after=e.clientY>r.top+r.height/2;}
@@ -28001,7 +28031,7 @@ function _tplPrintHtml(s){
     const coach=String(b.coach||'').split(/\n+/).map(x=>x.replace(/^[-•*]\s*/,'').trim()).filter(Boolean);
     const meta=[b.players?_tplPlayersTxt(b.players):'',b.area||''].filter(Boolean).map(E).join(' · ');
     return `<section class="b"><div class="tm"><b>${starts[i].clock||('+'+starts[i].from+'′')}</b><span>${+b.min||0} Min.</span></div>
-      ${_dgHas(b.dia)?`<div class="dg">${_dgSvg(b.dia,'Skizze: '+(b.title||''))}</div>`:''}<div class="bd"><div class="k"><i style="background:${_tplCatColor(b.cat)}"></i>${E(b.cat)}${b.org?' · '+E(b.org):''}</div>
+      ${_dgHas(b.dia)?`<div class="dg">${_dgSvg(b.dia,'Skizze: '+(b.title||''))}</div>`:''}<div class="bd"><div class="k"><i style="background:${_tplCatColor(b.cat)}"></i>${E(b.cat)}${(b.grp&&TPL.plan.grp)?' · in Gruppen':''}${b.org?' · '+E(b.org):''}</div>
       <h2>${E(b.title||'Ohne Titel')}</h2>${meta?`<div class="m">${meta}</div>`:''}${b.desc?`<p>${E(b.desc)}</p>`:''}
       ${coach.length?`<ul>${coach.map(c=>'<li>'+E(c)+'</li>').join('')}</ul>`:''}</div></section>`;
   }).join('');
@@ -28035,6 +28065,12 @@ h2{margin:2px 0 0;font-size:15px;font-weight:700}
 p{margin:4px 0 0;font-size:12.5px;line-height:1.45;white-space:pre-line;color:#2C3B5A}
 ul{margin:4px 0 0;padding-left:18px;font-size:12.5px;line-height:1.45;color:#2C3B5A}
 .notes{margin-top:12px;break-inside:avoid}
+.grp{margin-top:12px;break-inside:avoid}
+.grp .gt{font-size:12px;color:#3A4A6B;display:block;margin-bottom:6px}
+.gbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(36mm,1fr));gap:8px}
+.gb{border:1px solid #DCE3EE;border-radius:6px;overflow:hidden;break-inside:avoid}
+.gbh{padding:4px 8px;font-weight:700;font-size:12px}
+.gbl{padding:5px 8px;font-size:11px;line-height:1.5}
 .notes b{font-size:12px;color:#3A4A6B}
 .notes div{height:22px;border-bottom:1px solid #D5DCE7}
 footer{margin-top:10px;font-size:10px;color:#8A97AE;display:flex;justify-content:space-between}
@@ -28047,6 +28083,7 @@ footer{margin-top:10px;font-size:10px;color:#8A97AE;display:flex;justify-content
 <div class="r">${r1?`<span>${r1}</span>`:''}${r2?`<span>${r2}</span>`:''}</div></header>
 <div class="tot">${tot} von ${dur} Min. verplant<span class="seg">${TPL.plan.blocks.map(b=>`<i style="flex:${Math.max(+b.min||0,1)} 1 0;background:${_tplCatColor(b.cat)}"></i>`).join('')}</span></div>
 ${rows}
+${_tplGrpPrint()}
 <div class="notes"><b>Notizen</b><div></div><div></div><div></div></div>
 <footer><span>${E(club)} · ${E(TPL.team)}</span><span>Erstellt mit footy.ai</span></footer>
 </main>
@@ -28421,65 +28458,226 @@ function dgRedo(){
   _dgRestore(DG.redo.pop());
 }
 
-// ── Sketches for the standard drills (std01…)
-function _tplSeedDia(n){
-  const P=(k,x,y,l)=>({t:'p',k:k,x:x,y:y,n:l==null?'':String(l)}),C=(x,y,c)=>c?{t:'c',x:x,y:y,c:c}:{t:'c',x:x,y:y},
-    Bl=(x,y)=>({t:'b',x:x,y:y}),Lp=(k,x1,y1,x2,y2,cx,cy)=>cx==null?{t:'l',k:k,x1:x1,y1:y1,x2:x2,y2:y2}:{t:'l',k:k,x1:x1,y1:y1,x2:x2,y2:y2,cx:cx,cy:cy},
-    Z=(x,y,w,h)=>({t:'z',x:x,y:y,w:w,h:h}),Gm=(x,y,r)=>({t:'g',x:x,y:y,r:r||0}),Gb=(x,y,r)=>({t:'G',x:x,y:y,r:r||0}),
-    T=(x,y,s)=>({t:'tx',x:x,y:y,s:s}),Ld=(x,y,r)=>({t:'ld',x:x,y:y,r:r||0});
-  const D={
-    1:['grass',[C(220,300),C(420,300),C(320,120),P('a',196,318,1),P('a',444,318,2),P('a',320,96,3),Bl(214,296),
-       Lp('pass',232,290,308,140),Lp('pass',334,140,410,288),Lp('run',200,296,300,128,226,190),T(320,370,'12 m')]],
-    2:['grass',[C(140,110),C(500,110),C(140,170),C(500,170),C(140,230),C(500,230),C(140,290),C(500,290),
-       P('a',108,110),P('a',108,170),P('a',108,230),P('a',108,290),Lp('run',152,110,488,110),Lp('run',152,170,488,170),Lp('run',152,230,488,230),Lp('run',152,290,488,290),T(320,80,'20 m')]],
-    3:['grass',[Z(170,60,300,280),P('a',230,120),Bl(246,132),P('a',390,110),Bl(374,124),P('a',420,240),Bl(406,252),P('a',290,215),Bl(306,224),P('a',220,290),Bl(236,300),
-       Lp('drib',236,138,300,180),Lp('drib',372,128,330,190),Lp('drib',404,256,350,300),Lp('drib',240,302,300,320,280,290),T(320,370,'20 × 20 m')]],
-    4:['grass',[C(90,200),P('a',110,200),Ld(210,200),Lp('run',122,200,288,200),P('n',470,200,'A'),Bl(456,214),Lp('pass',454,214,312,214),Lp('pass',312,186,454,186),T(210,170,'Leiter')]],
-    5:['grass',[Z(220,100,200,200),P('a',320,100,1),P('a',420,200,2),P('a',320,300,3),P('a',220,200,4),P('b',320,200),Bl(334,112),Lp('pass',336,110,410,186),T(320,340,'8 × 8 m')]],
-    6:['grass',[Z(170,50,300,300),P('a',170,140,2),P('a',170,270,6),P('a',320,50,8),P('a',470,200,10),P('a',320,350,4),P('b',300,190,9),P('b',350,228,7),Bl(190,150),
-       Lp('pass',184,140,306,64),Lp('pass',336,64,456,186),Lp('run',296,182,238,112,262,140),Lp('run',352,222,418,196,386,206),T(540,60,'15 m')]],
-    7:['grass',[Z(80,110,200,180),Z(360,110,200,180),P('a',80,200),P('a',180,110),P('a',280,200),P('a',180,290),P('b',160,180),P('b',205,225),P('a',440,170),P('a',470,240),Bl(266,206),
-       Lp('pass',268,212,426,176,350,230),Lp('run',184,124,420,150,300,90),Lp('run',290,214,450,250,370,270),T(180,330,'Feld 1'),T(460,330,'Feld 2')]],
-    8:['grass',[Z(120,70,400,260),P('a',220,130),P('a',420,130),P('a',220,270),P('a',420,270),P('b',300,120),P('b',340,280),P('b',250,200),P('b',390,200),P('n',120,200,'N'),P('n',520,200,'N'),P('n',320,200,'N'),Bl(138,210),
-       Lp('pass',136,192,206,138),Lp('pass',232,138,308,192,280,150),Lp('pass',334,208,504,200,420,250)]],
-    9:['grass',[C(100,220),C(300,220),C(450,130),C(450,310),P('a',100,200,'A'),P('a',300,200,'B'),P('a',470,120,'C'),P('a',470,300,'D'),Bl(116,206),
-       Lp('pass',116,200,284,200),Lp('pass',286,212,128,214,210,240),Lp('pass',124,190,452,126,280,120),Lp('run',312,186,510,150,420,80)]],
-    10:['grass',[C(180,220),C(320,120),C(460,220),C(320,320),P('a',180,200,'A'),P('a',320,100,'B'),P('a',460,200,'C'),P('a',320,300,'D'),Bl(196,196),
-       Lp('pass',194,190,306,112),Lp('pass',334,112,446,190),Lp('run',186,216,300,292,220,290),Lp('pass',446,212,338,294)]],
-    11:['grass',[C(200,118),C(440,118),C(440,318),C(200,318),P('a',200,100,1),P('a',440,100,2),P('a',440,300,3),P('a',200,300,4),Bl(214,108),
-       Lp('pass',216,100,424,100),Lp('run',210,116,310,146),Lp('pass',428,112,326,148),Lp('pass',332,158,428,288)]],
-    12:['grass',[Z(50,90,170,220),Z(235,90,170,220),Z(420,90,170,220),P('a',70,150),P('a',140,95),P('a',210,200),P('a',130,300),P('b',120,180),P('b',165,240),
-       P('a',440,150),P('a',510,95),P('a',580,200),P('a',500,300),P('b',490,190),P('b',530,250),Bl(198,206),Lp('pass',200,198,426,156,320,110),T(320,200,'neutral'),T(320,350,'45 × 30 m')]],
-    13:['grass',[Z(170,60,300,280),Z(270,150,100,100),P('a',170,110),P('a',170,290),P('a',470,110),P('a',470,290),P('a',320,60),P('a',320,340),Bl(184,118),
-       Lp('pass',186,116,300,180),Lp('drib',304,186,350,226),Lp('pass',358,232,456,284),T(320,205,'frei')]],
-    14:['grass',[P('a',80,200),Bl(96,208),C(140,200),C(185,200),C(230,200),C(275,200),Lp('drib',100,212,318,206,210,240),P('b',380,200),Lp('drib',322,212,486,206,400,270),Gm(560,200,90),Lp('pass',492,204,546,202)]],
-    15:['grass',[P('n',170,200,'W'),P('a',390,200,'K'),P('b',426,206),Bl(186,190),Lp('pass',184,188,376,186,280,110),Lp('pass',376,214,186,214),T(280,250,'10 m')]],
-    16:['grass',[Z(170,100,300,200),Gm(170,200,270),Gm(470,200,90),P('a',270,200),P('b',370,200),P('n',320,340,'T'),Bl(320,322),Lp('pass',320,318,322,218),Lp('drib',280,214,430,250,350,270),T(320,85,'15 × 10 m')]],
-    17:['grass',[Z(170,90,300,220),P('a',250,160),P('a',250,250),P('b',390,160),P('b',390,250),Bl(262,170),Lp('pass',256,174,256,234),Lp('drib',266,256,460,282,360,300),T(470,80,'Linie'),T(170,80,'Linie')]],
-    18:['grass',[Z(110,70,420,260),Gm(110,140,270),Gm(110,260,270),Gm(530,140,90),Gm(530,260,90),P('a',200,130),P('a',260,220),P('a',330,160),P('a',220,290),
-       P('b',420,140),P('b',380,240),P('b',450,280),P('b',300,280),P('n',320,100,'N'),P('n',320,320,'N'),Bl(214,138),
-       Lp('pass',214,128,306,104),Lp('pass',328,112,336,146),Lp('drib',344,166,470,150,420,190),Lp('pass',476,148,516,142)]],
-    19:['grass',[Z(60,40,520,320),Gb(60,200,270),Gb(580,200,90),P('k',82,200),P('k',558,200),P('a',170,120),P('a',170,280),P('a',250,200),P('a',330,110),P('a',330,290),
-       P('b',420,120),P('b',420,280),P('b',380,200),P('b',480,160),P('b',480,240),Bl(184,128),Lp('pass',184,120,316,112),Lp('pass',342,118,450,196,420,130)]],
-    20:['full',[P('k',58,200),P('a',130,110),P('a',125,200),P('a',130,290),P('a',210,90),P('a',215,170),P('a',215,240),P('a',210,320),P('a',290,200),
-       P('k',582,200),P('b',510,110),P('b',515,200),P('b',510,290),P('b',430,90),P('b',425,170),P('b',425,240),P('b',430,320),P('b',350,200)]],
-    21:['grass',[Gb(600,200,90),P('k',578,200),Gm(40,130,270),Gm(40,270,270),P('a',300,90),P('a',360,170),P('a',300,310),P('a',400,240),P('a',450,110),P('a',460,300),
-       P('b',500,150),P('b',510,250),P('b',450,200),P('b',420,140),Bl(436,192),Lp('pass',438,206,60,134,240,160),Lp('run',412,148,90,250,260,240),T(200,360,'Konter in 8 Sekunden')]],
-    22:['grass',[Z(100,60,440,280),Gb(540,200,90),P('k',520,200),Gm(100,140,270),Gm(100,260,270),P('a',250,130),P('a',230,200),P('a',250,270),P('b',400,160),P('b',400,240),Bl(244,208),
-       Lp('run',262,124,430,110,350,90),Lp('pass',246,194,420,116,330,140),Lp('drib',390,248,126,262,260,300),Lp('run',440,130,220,220,360,200)]],
-    23:['grass',[Z(140,70,360,260),P('a',220,120),P('a',300,190),P('a',220,280),P('a',380,110),P('a',390,280),P('b',260,160),P('b',345,145),P('b',330,250),P('b',450,200),P('b',250,230),Bl(352,158),
-       Lp('run',300,174,334,152),Lp('run',372,120,350,138),Lp('run',236,128,252,148),T(320,55,'5 Sekunden')]],
-    24:['half',[P('k',320,24),P('n',320,165,'A'),P('a',250,300),P('a',390,300),Bl(262,300),Lp('pass',262,288,310,178),Lp('run',244,286,282,170,236,220),Lp('pass',306,166,290,146),Lp('pass',284,136,306,22,280,70)]],
-    25:['half',[P('k',320,24),P('a',320,320),P('a',520,230),P('a',360,220),P('a',280,230),P('a',320,180),Bl(332,316),
-       Lp('pass',334,312,506,236),Lp('drib',522,214,540,112),Lp('pass',536,100,320,60,450,40),Lp('run',364,206,350,60),Lp('run',280,214,292,74,270,140),Lp('run',320,166,320,140)]],
-    26:['half',[P('k',320,24),Gm(520,384,180),P('a',300,330),P('b',380,330),Bl(312,320),Lp('drib',304,316,300,150,280,240),Lp('run',372,316,322,170),Lp('pass',300,140,330,22)]],
-    27:['half',[P('k',320,24),P('n',320,330,'A'),P('a',320,200),P('b',320,165),Bl(320,314),Lp('pass',320,314,320,218),Lp('drib',332,198,392,170),Lp('pass',398,160,340,22,380,80)]],
-    28:['grass',[C(320,80,DG_CONES[1]),C(320,320,DG_CONES[2]),C(180,200,DG_CONES[3]),C(460,200,DG_CONES[4]),P('a',320,200),P('a',296,222),P('a',344,222),
-       Lp('run',320,184,320,94),Lp('run',336,200,446,200),T(390,270,'10 m')]],
-    29:['full',[C(100,120),C(540,120),C(100,280),C(540,280),Lp('run',112,120,528,120),Lp('pass',528,140,112,140),Lp('run',112,280,528,280),T(320,104,'15 s laufen'),T(320,170,'15 s gehen')]],
-    31:['half',[P('k',320,30),P('n',300,150,'T'),Bl(310,140),Lp('pass',304,136,280,30),Lp('pass',318,138,352,32),Lp('pass',294,138,300,58)]]
-  };
-  const v=D[n];return v?{bg:v[0],it:v[1]}:null;
+
+// ── Trainingsgruppen (Stufe 3) ───────────────────────────────
+// One split per training: plan.grp = {n, bal, gk, perf, a:[[Name, Gruppe]]}
+// (Gruppe −1 = Torhüter). Players are kept by name — indices shift when the
+// squad changes. Who is in is read live from the session's answers: new
+// Zusagen land in the smallest group, withdrawals drop out of the cards.
+const TPL_GRP=[{n:'Gelb',bg:'#E8C840',fg:'#0B2550'},{n:'Blau',bg:'#1E5BC6',fg:'#FFFFFF'},{n:'Orange',bg:'#EE7A2E',fg:'#2B1400'},
+  {n:'Weiß',bg:'#F4F7FB',fg:'#0B2550',bd:'#C9D3E3'},{n:'Rot',bg:'#D9443F',fg:'#FFFFFF'},{n:'Grün',bg:'#2E9D5B',fg:'#FFFFFF'}];
+const TPL_LINES=[{n:'Tor',s:'TW',bg:'#EEE6FA',fg:'#5B3A9C'},{n:'Abwehr',s:'AW',bg:'#DCE8FB',fg:'#1A4E9E'},
+  {n:'Mittelfeld',s:'MF',bg:'#DDF1E5',fg:'#1E6B46'},{n:'Angriff',s:'ST',bg:'#FBE3DF',fg:'#A52F35'},{n:'ohne Position',s:'–',bg:'#EEF2F8',fg:'#4E5D7C'}];
+function _tplLine(p){return (typeof _ssaLineOf==='function')?_ssaLineOf(p):4;}
+function _tplPerfAvg(p){
+  const a=(Array.isArray(p.perf)?p.perf:[]).filter(v=>v===1||v===2||v===3);
+  return a.length?a.reduce((x,y)=>x+y,0)/a.length:2; // 1 sehr gut … 3 nicht gut
+}
+function _tplRoster(){
+  const D=_tplD();const s=_tplSess();const si=TPL.si;
+  const R={yes:[],exc:[],abs:[],open:[]};
+  if(!D||!s)return R;
+  (D.players||[]).forEach((p,pi)=>{
+    if(!p||!p.name)return;
+    if(typeof _sessAfterJoin==='function'&&!_sessAfterJoin(p,s,TPL.season))return;
+    const v=(p.s&&si<p.s.length)?p.s[si]:3;
+    const x={p:p,pi:pi,line:_tplLine(p),perf:_tplPerfAvg(p)};
+    if(v===1||v===4)R.yes.push(x);else if(v===2)R.exc.push(x);else if(v===0)R.abs.push(x);else R.open.push(x);
+  });
+  return R;
+}
+function _tplGrpDefault(cnt){return {n:cnt>=16?4:cnt>=9?3:2,bal:1,gk:1,perf:0,a:[]};}
+function _tplCmp(a,b){for(let i=0;i<a.length;i++){if(a[i]!==b[i])return a[i]-b[i];}return 0;}
+// Greedy split: each player goes to the group that has the fewest players;
+// ties go to fewest of his line, then to the weaker group, then by chance.
+function _tplPlace(groups,x,g){
+  let best=0,bk=null;
+  groups.forEach((gr,i)=>{
+    const k=[gr.length,g.bal?gr.filter(y=>y.line===x.line).length:0,g.perf?gr.reduce((s,y)=>s+(4-y.perf),0):0,Math.random()];
+    if(!bk||_tplCmp(k,bk)<0){bk=k;best=i;}
+  });
+  groups[best].push(x);
+}
+function _tplDistribute(){
+  const g=TPL.plan.grp;const R=_tplRoster();
+  let field=R.yes.slice();const gk=[];
+  if(g.gk)field=field.filter(x=>{if(x.line===0){gk.push(x);return false;}return true;});
+  for(let i=field.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[field[i],field[j]]=[field[j],field[i]];}
+  if(g.perf)field.sort((a,b)=>a.perf-b.perf);     // strongest first, so they spread out
+  if(g.bal)field.sort((a,b)=>a.line-b.line);      // line by line (stable: keeps the order above)
+  const groups=Array.from({length:g.n},()=>[]);
+  field.forEach(x=>_tplPlace(groups,x,g));
+  g.a=[];groups.forEach((gr,i)=>gr.forEach(x=>g.a.push([x.p.name,i])));gk.forEach(x=>g.a.push([x.p.name,-1]));
+}
+// Current picture: stored assignment + whoever answered since.
+function _tplGrpView(){
+  const g=TPL.plan&&TPL.plan.grp;const R=_tplRoster();
+  const V={R:R,groups:[],gk:[],changed:false};
+  if(!g)return V;
+  const map={};_tplArr(g.a).forEach(e=>{if(Array.isArray(e)&&e.length===2)map[e[0]]=e[1];});
+  V.groups=Array.from({length:g.n},()=>[]);
+  const late=[];
+  R.yes.forEach(x=>{
+    const a=map[x.p.name];
+    if(a===-1)V.gk.push(x);
+    else if(typeof a==='number'&&a>=0&&a<g.n)V.groups[a].push(x);
+    else late.push(x);
+  });
+  late.forEach(x=>{
+    if(g.gk&&x.line===0)V.gk.push(x);else _tplPlace(V.groups,x,g);
+    V.changed=true;
+  });
+  const sortP=(a,b)=>a.line-b.line||(+a.p.nr||99)-(+b.p.nr||99)||String(a.p.name).localeCompare(String(b.p.name),'de');
+  V.groups.forEach(gr=>gr.sort(sortP));V.gk.sort(sortP);
+  if(V.changed){ // keep late answers where they landed
+    const keep=_tplArr(g.a).filter(e=>Array.isArray(e)&&!R.yes.some(x=>x.p.name===e[0]));
+    g.a=keep;V.groups.forEach((gr,i)=>gr.forEach(x=>g.a.push([x.p.name,i])));V.gk.forEach(x=>g.a.push([x.p.name,-1]));
+  }
+  return V;
+}
+function _tplGrpEnsure(){
+  if(!TPL.plan)return null;
+  if(!TPL.plan.grp||typeof TPL.plan.grp!=='object'){
+    TPL.plan.grp=_tplGrpDefault(_tplRoster().yes.length);_tplDistribute();_tplTouch();
+  }
+  const g=TPL.plan.grp;g.n=Math.max(2,Math.min(TPL_GRP.length,+g.n||4));
+  return g;
+}
+
+// ── Tabs
+function tplTab(t){
+  TPL.tab=(t==='g')?'g':'a';
+  const m=document.getElementById('tplMain'),gm=document.getElementById('tplGrp');
+  if(m)m.hidden=TPL.tab!=='a';
+  if(gm)gm.hidden=TPL.tab!=='g';
+  document.querySelectorAll('#tplOverlay .tpl-tabs button').forEach(b=>{const on=b.dataset.tab===TPL.tab;b.classList.toggle('on',on);b.setAttribute('aria-selected',on);});
+  if(TPL.tab==='g'&&TPL.plan)_tplRenderGrp();
+}
+
+// ── Gruppen view
+function _tplPosBadge(x){const L=TPL_LINES[x.line]||TPL_LINES[4];return `<span class="tpl-pos" style="background:${L.bg};color:${L.fg}">${_tplE(x.p.pos||L.s)}</span>`;}
+function _tplMix(gr){
+  const c=[0,0,0,0,0];gr.forEach(x=>c[Math.min(x.line,4)]++);
+  return TPL_LINES.map((L,i)=>c[i]?L.n+' '+c[i]:'').filter(Boolean).join(' · ')||'leer';
+}
+function _tplGpRow(x,cur){
+  const g=TPL.plan.grp;const open=TPL.gOpen===x.p.name;
+  const targets=TPL_GRP.slice(0,g.n).map((G,i)=>i===cur?'':`<button type="button" style="background:${G.bg};color:${G.fg};border-color:${G.bd||G.bg}" onclick="event.stopPropagation();tplGrpMove(${x.pi},${i})">${G.n}</button>`).join('')
+    +(cur!==-1?`<button type="button" class="gk" onclick="event.stopPropagation();tplGrpMove(${x.pi},-1)">Torhüter</button>`:'');
+  return `<div class="tpl-gp${open?' open':''}" role="button" tabindex="0" draggable="true" data-pi="${x.pi}"
+      ondragstart="tplGrpDrag(event,${x.pi})" ondragend="tplDragEnd()" onclick="tplGrpToggle(${x.pi})"
+      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();tplGrpToggle(${x.pi});}" title="Klicken zum Verschieben${window.innerWidth>760?' oder in eine andere Gruppe ziehen':''}">
+      <span class="nr">${_tplE(x.p.nr!=null?x.p.nr:'')}</span><span class="nm">${_tplE(x.p.name)}</span>${_tplPosBadge(x)}</div>
+    ${open?`<div class="tpl-gmove"><span>Nach:</span>${targets}</div>`:''}`;
+}
+function _tplRenderGrp(){
+  const el=document.getElementById('tplGrp');if(!el||!TPL.plan)return;
+  const g=_tplGrpEnsure();const V=_tplGrpView();
+  if(V.changed)_tplTouch();
+  const R=V.R;const yes=R.yes.length;const gkN=R.yes.filter(x=>x.line===0).length;
+  const blocks=TPL.plan.blocks;
+  const set=`<section class="tpl-col tpl-gset" aria-label="Einteilung">
+    <div class="tpl-gyes"><span class="big">${yes}</span><b>${yes===1?'Spieler zugesagt':'Spieler zugesagt'}</b>
+      <span class="tpl-hint">${gkN?`davon ${gkN} ${gkN===1?'Torhüter':'Torhüter'} · `:''}aktualisiert sich bei neuen Antworten</span></div>
+    <div class="tpl-row" style="align-items:center"><b style="font-size:15px">Gruppen</b>
+      <div class="tpl-gstep"><button type="button" aria-label="Eine Gruppe weniger" onclick="tplGrpN(-1)"${g.n<=2?' disabled':''}>−</button><span aria-live="polite">${g.n}</span><button type="button" aria-label="Eine Gruppe mehr" onclick="tplGrpN(1)"${g.n>=TPL_GRP.length?' disabled':''}>+</button></div></div>
+    <label class="tpl-chk"><input type="checkbox"${g.bal?' checked':''} onchange="tplGrpOpt('bal',this.checked)">Positionen ausgleichen</label>
+    <label class="tpl-chk"><input type="checkbox"${g.gk?' checked':''} onchange="tplGrpOpt('gk',this.checked)">Torhüter separat</label>
+    <label class="tpl-chk"><input type="checkbox"${g.perf?' checked':''} onchange="tplGrpOpt('perf',this.checked)">Nach Leistungsnote mischen</label>
+    <button type="button" class="tpl-gbtn" onclick="tplGrpShuffle()">Neu verteilen</button>
+    <div class="tpl-gfor"><b>Gilt für</b>
+      ${blocks.length?blocks.map((b,i)=>`<label class="tpl-chk sm"><input type="checkbox"${b.grp?' checked':''} onchange="tplGrpFor(${i},this.checked)"><span class="tpl-catdot" style="background:${_tplCatColor(b.cat)}"></span>${_tplE(b.title||'Ohne Titel')}</label>`).join('')
+        :'<span class="tpl-hint">Noch keine Blöcke im Ablauf.</span>'}
+    </div>
+  </section>`;
+  const cards=V.groups.map((gr,i)=>{const G=TPL_GRP[i];
+    return `<div class="tpl-gcard" ondragover="tplGrpOver(event)" ondragleave="tplDragLeave(event)" ondrop="tplGrpDrop(event,${i})">
+      <div class="tpl-gh" style="background:${G.bg};color:${G.fg};${G.bd?'border-bottom:1px solid '+G.bd:''}"><b>${G.n}</b><span>${gr.length} Spieler</span></div>
+      <div class="tpl-gl">${gr.map(x=>_tplGpRow(x,i)).join('')||'<span class="tpl-none">Hierher ziehen oder Spieler antippen.</span>'}</div>
+      <div class="tpl-gf">${_tplMix(gr)}</div></div>`;}).join('');
+  const names=a=>a.map(x=>_tplE(x.p.name)).join(', ');
+  const gkCard=(g.gk||V.gk.length)?`<section class="tpl-col tpl-gcard gk" ondragover="tplGrpOver(event)" ondragleave="tplDragLeave(event)" ondrop="tplGrpDrop(event,-1)" aria-label="Torhüter">
+      <h3 class="tpl-h3">Torhüter</h3><div class="tpl-gl">${V.gk.map(x=>_tplGpRow(x,-1)).join('')||'<span class="tpl-none">Kein Torhüter zugesagt.</span>'}</div></section>`:'';
+  const out=`<section class="tpl-col tpl-gout" aria-label="Nicht dabei"><h3 class="tpl-h3">Nicht dabei</h3>
+      ${R.exc.length?`<b class="exc">Entschuldigt</b><span>${names(R.exc)}</span>`:''}
+      ${R.abs.length?`<b>Fehlt</b><span>${names(R.abs)}</span>`:''}
+      ${R.open.length?`<b>Noch keine Antwort</b><span>${names(R.open)}</span>`:''}
+      ${(R.exc.length||R.abs.length||R.open.length)?'':'<span class="tpl-hint">Alle haben zugesagt.</span>'}
+      <span class="tpl-hint">Sagt jemand nachträglich zu, landet er in der kleinsten Gruppe.</span></section>`;
+  el.innerHTML=set+`<section class="tpl-ggrid" aria-label="Gruppen">${yes?cards:'<div class="tpl-col"><div class="tpl-empty"><h4>Noch keine Zusagen</h4><p>Sobald Spieler zusagen, werden sie hier auf die Gruppen verteilt.</p></div></div>'}</section>`
+    +`<div class="tpl-gside">${gkCard}${out}</div>`;
+  const cnt=document.getElementById('tplTabGCnt');if(cnt)cnt.textContent=yes?String(g.n):'';
+}
+function _tplGrpChanged(msg,undo){
+  _tplRenderGrp();_tplRenderList();_tplTouch();
+  if(msg)_tplToast(msg,undo?'Rückgängig':'',undo?tplUndo:null);
+}
+function tplGrpToggle(pi){
+  const p=(_tplD()||{}).players[pi];if(!p)return;
+  TPL.gOpen=(TPL.gOpen===p.name)?null:p.name;_tplRenderGrp();
+}
+function tplGrpMove(pi,to){
+  const g=TPL.plan&&TPL.plan.grp;const p=(_tplD()||{}).players[pi];if(!g||!p)return;
+  _tplPushUndo();
+  g.a=_tplArr(g.a).filter(e=>!(Array.isArray(e)&&e[0]===p.name));g.a.push([p.name,to]);
+  TPL.gOpen=null;
+  _tplGrpChanged();
+}
+function tplGrpN(d){
+  const g=_tplGrpEnsure();if(!g)return;
+  const n=Math.max(2,Math.min(TPL_GRP.length,g.n+d));if(n===g.n)return;
+  _tplPushUndo();g.n=n;_tplDistribute();
+  _tplGrpChanged(n+' Gruppen, neu verteilt',true);
+}
+function tplGrpOpt(k,v){
+  const g=_tplGrpEnsure();if(!g)return;
+  _tplPushUndo();g[k]=v?1:0;_tplDistribute();
+  _tplGrpChanged('Neu verteilt',true);
+}
+function tplGrpShuffle(){
+  const g=_tplGrpEnsure();if(!g)return;
+  _tplPushUndo();_tplDistribute();
+  _tplGrpChanged('Neu verteilt',true);
+}
+function tplGrpFor(i,v){
+  const b=TPL.plan&&TPL.plan.blocks[i];if(!b)return;
+  b.grp=v?1:0;_tplRenderList();if(i===TPL.sel)_tplRenderEd();_tplTouch();
+}
+function tplBlockGrp(v){
+  const b=_tplCur();if(!b)return;
+  b.grp=v?1:0;if(v)_tplGrpEnsure();
+  _tplRenderList();_tplRenderEd();_tplTouch();
+}
+function tplGrpDrag(e,pi){
+  TPL.drag={k:'gp',pi:pi};
+  try{e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain','gp:'+pi);}catch(x){}
+}
+function tplGrpOver(e){
+  if(!TPL.drag||TPL.drag.k!=='gp')return;
+  e.preventDefault();e.currentTarget.classList.add('dropa');
+  try{e.dataTransfer.dropEffect='move';}catch(x){}
+}
+function tplGrpDrop(e,to){
+  e.preventDefault();const d=TPL.drag;tplDragEnd();
+  if(d&&d.k==='gp')tplGrpMove(d.pi,to);
+}
+// Chips for the block editor, the Ablauf list and print
+function _tplGrpChips(small){
+  const g=TPL.plan&&TPL.plan.grp;if(!g)return '';
+  const V=_tplGrpView();
+  return V.groups.map((gr,i)=>{const G=TPL_GRP[i];
+    return `<span class="tpl-gchip${small?' sm':''}"><i style="background:${G.bg};${G.bd?'box-shadow:inset 0 0 0 1px '+G.bd:''}"></i>${G.n}${small?'':' · '+gr.length}</span>`;}).join('')
+    +((V.gk.length&&!small)?`<span class="tpl-gchip"><i style="background:#14181F"></i>Torhüter · ${V.gk.length}</span>`:'');
+}
+function _tplGrpDots(){
+  const g=TPL.plan&&TPL.plan.grp;if(!g)return '';
+  return TPL_GRP.slice(0,g.n).map(G=>`<i style="background:${G.bg};${G.bd?'box-shadow:inset 0 0 0 1px '+G.bd:''}"></i>`).join('');
+}
+function _tplGrpPrint(){
+  const g=TPL.plan&&TPL.plan.grp;if(!g)return '';
+  const V=_tplGrpView();if(!V.R.yes.length)return '';
+  const box=(name,bg,fg,bd,list)=>`<div class="gb"><div class="gbh" style="background:${bg};color:${fg};${bd?'border-bottom:1px solid '+bd:''}">${name} · ${list.length}</div><div class="gbl">${list.map(x=>_tplE((x.p.nr!=null&&x.p.nr!==''?x.p.nr+' ':'')+x.p.name)).join('<br>')||'–'}</div></div>`;
+  return `<div class="grp"><b class="gt">Gruppen</b><div class="gbs">${V.groups.map((gr,i)=>box(TPL_GRP[i].n,TPL_GRP[i].bg,TPL_GRP[i].fg,TPL_GRP[i].bd,gr)).join('')}${V.gk.length?box('Torhüter','#14181F','#FFFFFF','',V.gk):''}</div></div>`;
 }
 
 function openLineupPlanner(sessIdx){
