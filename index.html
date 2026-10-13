@@ -3921,6 +3921,87 @@ body.theme-dark .tpl-gout b.exc{color:#F2B766;}
 .tpp-end .tpp-timer{color:#FFFFFF;}
 @media (max-height:700px){.tpp-timer{font-size:76px;}.tpp-title{font-size:28px;}}
 @media (min-width:900px){.tpp-in{padding-top:24px;}}
+/* Statistik */
+.tpl-ov{--viz1:#2a78d6;--viz2:#eb6834;}
+body.theme-dark .tpl-ov{--viz1:#3987e5;--viz2:#d95926;}
+.tpl-smain{display:block;overflow:auto;}
+.tst{display:flex;flex-direction:column;gap:16px;position:relative;max-width:1240px;margin:0 auto;}
+.tst-filter{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;}
+.tst-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;}
+.tst-kpi{background:var(--tp-card);border-radius:18px;padding:16px 18px;box-shadow:0 1px 2px rgba(14,35,80,.06);display:flex;flex-direction:column;gap:4px;min-width:0;}
+.tst-kpi .lab{font-size:13px;font-weight:700;color:var(--tp-mut);}
+.tst-kpi b{font-size:34px;font-weight:700;line-height:1.05;color:var(--tp-ink);}
+.tst-kpi b small{font-size:15px;font-weight:600;color:var(--tp-mut);}
+.tst-kpi .sub{font-size:13px;color:var(--tp-mut);line-height:1.35;}
+.tst-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
+.tst-card{overflow:visible;gap:8px;}
+.tst-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 16px;align-items:flex-start;}
+.tst-head > div:first-child{display:flex;flex-direction:column;gap:4px;}
+.tst-legend{display:flex;gap:14px;font-size:13px;font-weight:600;color:var(--tp-ink);}
+.tst-legend span{display:inline-flex;align-items:center;gap:6px;}
+.tst-legend i,.tst-tip i{display:inline-block;width:16px;height:2px;border-radius:1px;}
+.k1{background:var(--viz1);}.k2{background:var(--viz2);}
+.tst-bars{display:flex;flex-direction:column;gap:6px;margin-top:6px;}
+.tst-bar{display:grid;grid-template-columns:minmax(90px,130px) minmax(0,1fr) auto;align-items:center;gap:10px;padding:3px 4px;border-radius:8px;outline:none;}
+.tst-bar:hover,.tst-bar:focus-visible{background:var(--tp-soft);}
+.tst-bar .l{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:600;color:var(--tp-ink);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tst-bar .l i{width:9px;height:9px;border-radius:50%;flex:0 0 auto;}
+.tst-bar .t{height:14px;display:block;}
+.tst-bar .f{display:block;height:14px;background:var(--viz1);border-radius:0 4px 4px 0;}
+.tst-bar .v{font-size:13px;font-weight:700;color:var(--tp-ink);white-space:nowrap;font-variant-numeric:tabular-nums;}
+.tst-bar .v em{font-style:normal;font-weight:500;color:var(--tp-mut);margin-left:4px;}
+.tst-svg{margin-top:6px;}
+.tst-svg svg{display:block;max-width:100%;height:auto;overflow:visible;}
+.tst-grid{stroke:var(--tp-line);stroke-width:1;}
+.tst-base{stroke:var(--tp-line2);stroke-width:1;}
+.tst-ax{font:500 11px 'Barlow',sans-serif;fill:var(--tp-mut);font-variant-numeric:tabular-nums;}
+.tst-lbl{font:700 12px 'Barlow',sans-serif;fill:var(--tp-ink);}
+.tst-col{fill:var(--viz1);}
+.tst-hit{cursor:default;outline:none;}
+.tst-hit:hover .tst-col,.tst-hit:focus .tst-col{filter:brightness(1.15);}
+.tst-l1{stroke:var(--viz1);stroke-width:2;stroke-linejoin:round;stroke-linecap:round;}
+.tst-l2{stroke:var(--viz2);stroke-width:2;stroke-linejoin:round;stroke-linecap:round;}
+.tst-d1{fill:var(--viz1);stroke:var(--tp-card);stroke-width:2;}
+.tst-d2{fill:var(--viz2);stroke:var(--tp-card);stroke-width:2;}
+.tst-cross{stroke:var(--tp-mut);stroke-width:1;}
+.tst-det summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--tp-link);margin-top:4px;}
+.tst-tab{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px;font-variant-numeric:tabular-nums;}
+.tst-tab th{text-align:left;font-size:12px;color:var(--tp-mut);font-weight:700;padding:6px 8px;border-bottom:1px solid var(--tp-line2);}
+.tst-tab td{padding:8px;border-bottom:1px solid var(--tp-line);color:var(--tp-ink);}
+.tst-tab th:not(:first-child),.tst-tab td:not(:first-child){text-align:right;}
+/* the attendance table's global styles must not reach these */
+.tpl-ov .tst-tab{border-collapse:collapse;font-size:14px;}
+.tpl-ov .tst-tab thead th{background:transparent;color:var(--tp-mut);position:static;z-index:auto;border-bottom:1px solid var(--tp-line2);padding:6px 8px;white-space:nowrap;font-size:12px;text-align:right;}
+.tpl-ov .tst-tab thead th:first-child,.tpl-ov .tst-tab tbody td:first-child{text-align:left;}
+.tpl-ov .tst-tab tbody tr,.tpl-ov .tst-tab tbody tr:nth-child(odd),.tpl-ov .tst-tab tbody tr:nth-child(even){background:transparent;}
+.tpl-ov .tst-tab tbody tr:hover{background:var(--tp-soft);}
+.tpl-ov .tst-tab tbody td{text-align:right;}
+.tst-tab td.over{color:#C2410C;font-weight:700;}
+.tst-tab td.under{color:#1E7F4E;font-weight:700;}
+body.theme-dark .tst-tab td.over{color:#FF9F6E;}
+body.theme-dark .tst-tab td.under{color:#7BD3A0;}
+.tst-tip{position:absolute;z-index:5;pointer-events:none;background:var(--tp-card);color:var(--tp-ink);border:1px solid var(--tp-line2);border-radius:10px;padding:8px 10px;box-shadow:0 8px 24px rgba(14,35,80,.18);font-size:13px;display:flex;flex-direction:column;gap:3px;max-width:240px;}
+.tst-tip[hidden]{display:none;}
+.tst-tip b{font-size:15px;}
+.tst-tip span{color:var(--tp-mut);}
+.tst-tip .h{color:var(--tp-ink);font-weight:700;}
+.tst-tip .row{display:flex;align-items:center;gap:6px;color:var(--tp-mut);}
+.tst-tip .row b{color:var(--tp-ink);}
+@media (max-width:1000px){.tst-kpis{grid-template-columns:repeat(2,minmax(0,1fr));}.tst-two{grid-template-columns:1fr;}}
+@media (max-width:760px){.tpl-smain{padding:10px;}.tst-kpi b{font-size:28px;}.tst-kpis{gap:10px;}.tst-kpi{padding:12px 14px;}}
+/* header overflow menu (phones) */
+.tpl-morebtn{display:none;}
+.tpl-moremenu{position:absolute;right:12px;top:calc(100% - 4px);z-index:20;background:var(--tp-card);color:var(--tp-ink);border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.28);padding:6px;display:flex;flex-direction:column;min-width:220px;}
+.tpl-moremenu[hidden]{display:none;}
+.tpl-moremenu button{display:flex;align-items:center;gap:10px;height:44px;padding:0 12px;border:none;background:none;border-radius:10px;font:600 15px 'Barlow',sans-serif;color:var(--tp-ink);cursor:pointer;text-align:left;}
+.tpl-moremenu button:hover{background:var(--tp-soft);}
+.tpl-moremenu button:disabled{opacity:.4;}
+@media (max-width:760px){
+  .tpl-hd{position:relative;}
+  .tpl-hb.mob-x{display:none;}
+  .tpl-morebtn{display:flex;}
+  .tpl-tabs button{padding:7px 10px;}
+}
 /* Zeichenbrett */
 .dg-wrap{display:flex;flex-direction:column;gap:8px;}
 .dg-tools{display:flex;flex-wrap:wrap;align-items:center;gap:3px;padding:6px;border-radius:12px;background:var(--tp-navy);}
@@ -4323,13 +4404,19 @@ if(window._fbBlocked){
   <header class="tpl-hd">
     <button class="tpl-x" type="button" onclick="tplClose()" aria-label="Schließen" title="Schließen"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
     <div class="tpl-ttl"><h2>Trainingsplan</h2><span class="tpl-sub" id="tplSub"></span></div>
-    <div class="tpl-tabs" role="tablist" aria-label="Ansicht"><button type="button" role="tab" data-tab="a" class="on" aria-selected="true" onclick="tplTab('a')">Ablauf</button><button type="button" role="tab" data-tab="g" aria-selected="false" onclick="tplTab('g')">Gruppen<span class="cnt" id="tplTabGCnt"></span></button></div>
+    <div class="tpl-tabs" role="tablist" aria-label="Ansicht"><button type="button" role="tab" data-tab="a" class="on" aria-selected="true" onclick="tplTab('a')">Ablauf</button><button type="button" role="tab" data-tab="g" aria-selected="false" onclick="tplTab('g')">Gruppen<span class="cnt" id="tplTabGCnt"></span></button><button type="button" role="tab" data-tab="s" aria-selected="false" onclick="tplTab('s')">Statistik</button></div>
     <div class="tpl-hd-r">
       <span class="tpl-st" id="tplSt" role="status" aria-live="polite"></span>
-      <button class="tpl-hb" id="tplUndoBtn" type="button" onclick="tplUndo()" title="Rückgängig (Strg+Z)" disabled><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 7L4 12l5 5"/><path d="M4 12h11a5 5 0 0 1 0 10h-2"/></svg><span class="lbl-l lbl-m">Rückgängig</span></button>
-      <button class="tpl-hb" type="button" onclick="tplSaveTplDlg()" title="Als Vorlage speichern"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/><path d="M12 7v6M9 10h6"/></svg><span class="lbl-m">Als Vorlage<span class="lbl-l"> speichern</span></span></button>
-      <button class="tpl-hb" type="button" onclick="tplPrint()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/></svg><span class="lbl-m">Drucken</span></button>
+      <button class="tpl-hb mob-x" id="tplUndoBtn" type="button" onclick="tplUndo()" title="Rückgängig (Strg+Z)" disabled><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 7L4 12l5 5"/><path d="M4 12h11a5 5 0 0 1 0 10h-2"/></svg><span class="lbl-l lbl-m">Rückgängig</span></button>
+      <button class="tpl-hb mob-x" type="button" onclick="tplSaveTplDlg()" title="Als Vorlage speichern"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/><path d="M12 7v6M9 10h6"/></svg><span class="lbl-m">Als Vorlage<span class="lbl-l"> speichern</span></span></button>
+      <button class="tpl-hb mob-x" type="button" onclick="tplPrint()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/></svg><span class="lbl-m">Drucken</span></button>
+      <button class="tpl-hb tpl-morebtn" type="button" onclick="tplMore(event)" aria-label="Weitere Aktionen" aria-haspopup="menu"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
       <button class="tpl-hb pri" type="button" onclick="tplPitchOpen()" title="Auf dem Platz: Block für Block mit Timer"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg><span class="lbl-m">Auf dem Platz</span></button>
+    </div>
+    <div class="tpl-moremenu" id="tplMoreMenu" role="menu" hidden>
+      <button type="button" role="menuitem" id="tplMoreUndo" onclick="tplMoreDo(tplUndo)">↶ Rückgängig</button>
+      <button type="button" role="menuitem" onclick="tplMoreDo(tplSaveTplDlg)">Als Vorlage speichern</button>
+      <button type="button" role="menuitem" onclick="tplMoreDo(tplPrint)">Drucken</button>
     </div>
   </header>
   <div class="tpl-main" id="tplMain">
@@ -4338,6 +4425,7 @@ if(window._fbBlocked){
     <aside class="tpl-col lib" id="tplLib" aria-label="Übungsbibliothek"></aside>
   </div>
   <div class="tpl-main tpl-gmain" id="tplGrp" hidden></div>
+  <div class="tpl-main tpl-smain" id="tplStat" hidden></div>
   <div class="tpl-dlg-bg" id="tplDlg" onclick="if(event.target===this)tplDlgClose()"><div class="tpl-dlg" id="tplDlgBox" role="dialog" aria-modal="true"></div></div>
   <div class="tpl-pitch" id="tplPitch" role="dialog" aria-modal="true" aria-label="Auf dem Platz"></div>
   <div class="tpl-toast" id="tplToast" role="status" aria-live="polite"><span></span><button type="button"></button></div>
@@ -4776,7 +4864,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791926583428; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791929736217; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -27517,7 +27605,7 @@ function _tplNewBlock(src,keepId){
   src=src||{};
   return {id:(keepId&&src.id)||_tplId('b'),cat:src.cat||'Sonstiges',title:src.title||'',
     min:(src.min===0||src.min)?(+src.min||0):15,players:src.players||'',area:src.area||'',
-    desc:src.desc||'',coach:src.coach||'',org:src.org||'',libId:src.libId||'',
+    desc:src.desc||'',coach:src.coach||'',org:src.org||'',libId:src.libId||'',int:(+src.int>=1&&+src.int<=10)?+src.int:'',
     dia:(src.dia&&typeof src.dia==='object')?_tplClean(src.dia):null,grp:src.grp?1:0};
 }
 
@@ -27673,9 +27761,7 @@ function _tplSaveNow(){
   p.upd=p.upd||Date.now();
   const b=_tplBase();
   _tplWrite(b+'/plans/'+TPL.pid,p);
-  const sum={d:p.date,t:p.time,s:p.season,n:p.blocks.length,m:_tplTotal(p.blocks),
-    f:p.blocks.map(x=>x.title).filter(Boolean).slice(0,4).join(' · ').slice(0,160),
-    c:p.blocks.map(x=>x.cat).join('|').slice(0,200),upd:p.upd};
+  const sum=_tplIdxSum(p);
   TPL.idx[TPL.pid]=sum;
   _tplWrite(b+'/idx/'+TPL.pid,sum);
   _tplStatus();
@@ -27773,6 +27859,7 @@ function _tplRenderEd(){
         <span class="tpl-chip"><span>Dauer</span><button type="button" class="tpl-step" onclick="tplStepMin(-5)" aria-label="5 Minuten weniger">–</button><input class="w-min" id="tplMinIn" type="number" inputmode="numeric" min="1" max="240" value="${+b.min||0}" aria-label="Dauer in Minuten" oninput="tplSetMin(this.value)"><span>Min.</span><button type="button" class="tpl-step" onclick="tplStepMin(5)" aria-label="5 Minuten mehr">+</button></span>
         <label class="tpl-chip"><span>Spieler</span><input class="w-txt" value="${_tplE(b.players)}" placeholder="z. B. 7 pro Feld" oninput="tplSetF('players',this.value)"></label>
         <label class="tpl-chip"><span>Feld</span><input class="w-txt" value="${_tplE(b.area)}" placeholder="z. B. 15 × 15 m" oninput="tplSetF('area',this.value)"></label>
+        <label class="tpl-chip" title="Geplante Intensität auf der Skala der Spieler (0–10). Ohne Angabe gilt der Wert der Kategorie."><span>Intensität</span><select aria-label="Geplante Intensität" onchange="tplSetF('int',this.value?+this.value:'')"><option value=""${(+b.int>=1)?'':' selected'}>auto · ${TPL_CAT_INT[b.cat]||5}</option>${[1,2,3,4,5,6,7,8,9,10].map(v=>`<option value="${v}"${+b.int===v?' selected':''}>${v} · ${RPE_SCALE[v][1]}</option>`).join('')}</select></label>
       </div>
     </div>
     <div class="tpl-acts">
@@ -27992,7 +28079,7 @@ function tplToLib(){
   if(!String(b.title||'').trim()){_tplToast('Bitte zuerst einen Namen eingeben');const t=document.getElementById('tplTitle');if(t)t.focus();return;}
   const ex=!!(b.libId&&TPL.lib[b.libId]);const id=ex?b.libId:_tplId('l');
   const it=Object.assign({},ex?TPL.lib[id]:{},{title:String(b.title).trim(),cat:b.cat,min:+b.min||0,players:b.players||'',
-    area:b.area||'',desc:b.desc||'',coach:b.coach||'',dia:_dgHas(b.dia)?_tplClean(b.dia):null,upd:Date.now()});
+    area:b.area||'',desc:b.desc||'',coach:b.coach||'',dia:_dgHas(b.dia)?_tplClean(b.dia):null,int:b.int||'',upd:Date.now()});
   TPL.lib[id]=it;b.libId=id;
   _tplWrite(_tplBase()+'/lib/'+id,_tplClean(it));
   _tplRenderLib();_tplTouch();
@@ -28629,12 +28716,14 @@ function _tplGrpEnsure(){
 
 // ── Tabs
 function tplTab(t){
-  TPL.tab=(t==='g')?'g':'a';
-  const m=document.getElementById('tplMain'),gm=document.getElementById('tplGrp');
+  TPL.tab=(t==='g'||t==='s')?t:'a';
+  const m=document.getElementById('tplMain'),gm=document.getElementById('tplGrp'),sm=document.getElementById('tplStat');
   if(m)m.hidden=TPL.tab!=='a';
   if(gm)gm.hidden=TPL.tab!=='g';
+  if(sm)sm.hidden=TPL.tab!=='s';
   document.querySelectorAll('#tplOverlay .tpl-tabs button').forEach(b=>{const on=b.dataset.tab===TPL.tab;b.classList.toggle('on',on);b.setAttribute('aria-selected',on);});
   if(TPL.tab==='g'&&TPL.plan)_tplRenderGrp();
+  if(TPL.tab==='s'&&TPL.plan)_tplRenderStat();
 }
 
 // ── Gruppen view
@@ -29008,6 +29097,253 @@ function _tplPitchEndHtml(r){
     <div class="tpp-foot"><div class="tpp-btns"><button type="button" class="tpp-b tpp-b2" onclick="tplPitchView('blk')">Weiter trainieren</button><button type="button" class="tpp-b tpp-b1" onclick="tplPitchSave()">Speichern &amp; beenden</button></div></div>
   </div>`;
 }
+
+// ── Statistik (Stufe 5) ──────────────────────────────────────
+// Read from the plan summaries (idx), never from the full plans: a season of
+// plans with sketches would be megabytes, the summaries are a few hundred
+// bytes each. Summaries from before v2 are upgraded once, on first view.
+// Intensity uses the players' own scale (sRPE 0–10): a block's planned
+// intensity is set in the editor or falls back to its category's default.
+const TPL_CAT_INT={'Aufwärmen':3,'Rondo':5,'Passspiel':4,'Technik':4,'Spielform':7,'Umschalten':8,'Torschuss':6,'Athletik':8,'Torwart':5,'Auslaufen':2,'Sonstiges':5};
+function _tplBlockInt(b){const v=+b.int;return (v>=1&&v<=10)?v:(TPL_CAT_INT[b.cat]||5);}
+function _tplIdxSum(p){
+  const bl=_tplArr(p.blocks);const tot=_tplTotal(bl);
+  const cm={};bl.forEach(b=>{const m=+b.min||0;const k=String(b.cat||'Sonstiges').replace(/[|:]/g,' ');if(m)cm[k]=(cm[k]||0)+m;});
+  const sum={v:2,d:p.date,t:p.time,s:p.season,n:bl.length,m:tot,
+    f:bl.map(x=>x.title).filter(Boolean).slice(0,4).join(' · ').slice(0,160),
+    c:bl.map(x=>x.cat).join('|').slice(0,200),
+    cm:Object.keys(cm).map(k=>k+':'+cm[k]).join('|'),
+    tt:bl.map(b=>String(b.title||'').replace(/\|/g,'/').trim().slice(0,40)+':'+(+b.min||0)).filter(x=>!/^:/.test(x)).join('|').slice(0,700),
+    upd:p.upd||Date.now()};
+  if(tot)sum.pi=Math.round(bl.reduce((a,b)=>a+(+b.min||0)*_tplBlockInt(b),0)/tot*10)/10;
+  if(p.done&&p.done.tot)sum.dn=Math.round(p.done.tot/60);
+  return sum;
+}
+function _tplNum(v,d){return (Math.round(v*Math.pow(10,d||0))/Math.pow(10,d||0)).toLocaleString('de-DE');}
+TPL.st={range:'season',upgrading:false,rows:[],ix:[]};
+
+async function _tplStatUpgrade(){
+  // summaries written before v2 lack categories, intensity and titles
+  if(TPL.st.upgrading)return;
+  const old=Object.keys(TPL.idx||{}).filter(k=>{const e=TPL.idx[k];return e&&e.n>0&&e.s===TPL.season&&!(e.v>=2);});
+  if(!old.length)return;
+  TPL.st.upgrading=true;
+  const b=_tplBase();
+  for(const pid of old){
+    const p=_tplNorm(await _tplRead(b+'/plans/'+pid));
+    if(!p)continue;
+    p.season=p.season||TPL.season;
+    const sum=_tplIdxSum(p);TPL.idx[pid]=sum;
+    if(_tplAllowed())_tplWrite(b+'/idx/'+pid,sum);
+  }
+  TPL.st.upgrading=false;
+  if(TPL.tab==='s')_tplRenderStat();
+}
+function _tplStatRange(){
+  const t=todaySK();const td=new Date(Math.floor(t/10000),Math.floor(t/100)%100-1,t%100);
+  const sk=d=>d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
+  const shift=n=>{const x=new Date(td);x.setDate(x.getDate()+n);return sk(x);};
+  if(TPL.st.range==='w4')return [shift(-28),shift(7)];
+  if(TPL.st.range==='w8')return [shift(-56),shift(7)];
+  return [0,99999999];
+}
+function _tplStatRows(){
+  const D=_tplD();const [a,z]=_tplStatRange();const today=todaySK();
+  const sess=(D&&D.sessions)||[];
+  const rows=[];
+  Object.keys(TPL.idx||{}).forEach(pid=>{
+    const e=TPL.idx[pid];if(!e||!(e.n>0)||e.s!==TPL.season)return;
+    const sk=_dbSortKey(e.d,e.s);if(sk<a||sk>z)return;
+    let si=sess.findIndex(s=>s&&s.pid===pid);
+    if(si<0)si=sess.findIndex(s=>s&&s.type!=='match'&&s.date===e.d&&(s.time||'')===(e.t||''));
+    const s=si>=0?sess[si]:null;
+    const cm={};String(e.cm||'').split('|').forEach(x=>{const i=x.lastIndexOf(':');if(i>0)cm[x.slice(0,i)]=+x.slice(i+1)||0;});
+    const tt=String(e.tt||'').split('|').map(x=>{const i=x.lastIndexOf(':');return i>0?{t:x.slice(0,i),m:+x.slice(i+1)||0}:null;}).filter(x=>x&&x.t);
+    let rpe=null;
+    if(s&&D.players){
+      const v=[];D.players.forEach(p=>{if(!p||!Array.isArray(p.rpe))return;const r=p.rpe[si];const st=p.s&&p.s[si];
+        if(typeof r==='number'&&st!==0&&st!==2)v.push(r);});
+      if(v.length)rpe={avg:v.reduce((x,y)=>x+y,0)/v.length,n:v.length};
+    }
+    rows.push({pid:pid,e:e,sk:sk,past:sk<=today,si:si,s:s,min:+e.m||0,cm:cm,pi:(typeof e.pi==='number')?e.pi:null,dn:e.dn||null,tt:tt,rpe:rpe});
+  });
+  rows.sort((x,y)=>x.sk-y.sk||String(x.e.t||'').localeCompare(String(y.e.t||'')));
+  return rows;
+}
+function _tplHeldTrainings(){
+  const D=_tplD();const [a,z]=_tplStatRange();const today=todaySK();
+  return ((D&&D.sessions)||[]).filter(s=>s&&s.type!=='match'&&(()=>{const k=_dbSortKey(s.date,TPL.season);return k>=a&&k<=z&&k<=today;})()).length;
+}
+function _tplShortDate(e){return _tplDateLong(e.d,e.s,'short').replace(/\.\d\d$/,'.');}
+
+// ── Charts (one hue per series; text in text colours; values reachable as a table)
+function _tplTipShow(ev,html){
+  const tip=document.getElementById('tplTip');const host=document.getElementById('tplStat');if(!tip||!host)return;
+  tip.innerHTML=html;tip.hidden=false;
+  const hr=host.getBoundingClientRect();const r=tip.getBoundingClientRect();
+  let x=ev.clientX-hr.left+14,y=ev.clientY-hr.top+host.scrollTop+14;
+  if(x+r.width>hr.width-8)x=ev.clientX-hr.left-r.width-14;
+  tip.style.left=Math.max(8,x)+'px';tip.style.top=y+'px';
+}
+function _tplTipHide(){const tip=document.getElementById('tplTip');if(tip)tip.hidden=true;}
+function _tplTipFocus(el,html){
+  const host=document.getElementById('tplStat');const r=el.getBoundingClientRect();
+  _tplTipShow({clientX:r.left+r.width/2,clientY:r.top},html);
+}
+function _tplCatBars(rows){
+  const tot={},cnt={};rows.forEach(r=>Object.keys(r.cm).forEach(k=>{tot[k]=(tot[k]||0)+r.cm[k];cnt[k]=(cnt[k]||0)+1;}));
+  const all=Object.values(tot).reduce((a,b)=>a+b,0);
+  const ks=Object.keys(tot).sort((a,b)=>tot[b]-tot[a]);
+  if(!ks.length)return {html:'<div class="tpl-none">Noch keine Minuten verplant.</div>',tips:[],table:''};
+  const max=tot[ks[0]];
+  const tips=[];
+  const html=ks.map(k=>{const pct=Math.round(tot[k]/all*100);
+    tips.push(`<b>${_tplNum(tot[k])} Min.</b> · ${pct} %<br><span>${_tplE(k)} · in ${cnt[k]} ${cnt[k]===1?'Training':'Trainings'}</span>`);
+    return `<div class="tst-bar" tabindex="0" data-tip="${tips.length-1}"><span class="l"><i style="background:${_tplCatColor(k)}"></i>${_tplE(k)}</span>
+      <span class="t"><span class="f" style="width:${Math.max(2,tot[k]/max*100).toFixed(1)}%"></span></span><span class="v">${_tplNum(tot[k])} Min. <em>${pct} %</em></span></div>`;}).join('');
+  return {html:html,tips:tips,table:`<table class="tst-tab"><thead><tr><th>Kategorie</th><th>Minuten</th><th>Anteil</th><th>Trainings</th></tr></thead><tbody>${ks.map(k=>`<tr><td>${_tplE(k)}</td><td>${tot[k]}</td><td>${Math.round(tot[k]/all*100)} %</td><td>${cnt[k]}</td></tr>`).join('')}</tbody></table>`};
+}
+function _tplWeekCols(rows,W){
+  const wk={};rows.forEach(r=>{const y=Math.floor(r.sk/10000),m=Math.floor(r.sk/100)%100,d=r.sk%100;const k=isoWeekKey(new Date(y,m-1,d));
+    if(!wk[k])wk[k]={m:0,n:0,k:k};wk[k].m+=r.min;wk[k].n++;});
+  let ks=Object.keys(wk).sort();
+  if(!ks.length)return null;
+  // fill the gaps between the first and the last week, so empty weeks show as empty
+  const all=[];const parse=k=>{const [y,w]=k.split('-W').map(Number);return {y,w};};
+  {let {y,w}=parse(ks[0]);const last=ks[ks.length-1];let guard=0;
+    while(guard++<80){const k=y+'-W'+String(w).padStart(2,'0');all.push(k);if(k===last)break;w++;const dec28=new Date(y,11,28);const maxW=+isoWeekKey(dec28).split('-W')[1];if(w>maxW){w=1;y++;}}}
+  ks=all.slice(-16);
+  const H=170,padL=34,padB=24,padT=10,iw=W-padL-6,ih=H-padB-padT;
+  const max=Math.max(...ks.map(k=>wk[k]?wk[k].m:0),60);
+  const step=max<=120?30:max<=300?60:max<=600?120:240;const top=Math.ceil(max/step)*step;
+  const bw=Math.min(24,iw/ks.length*0.6);const gap=iw/ks.length;
+  let g='';
+  for(let v=0;v<=top;v+=step){const y=padT+ih-(v/top)*ih;g+=`<line x1="${padL}" x2="${W-6}" y1="${y}" y2="${y}" class="tst-grid"/><text x="${padL-6}" y="${y+4}" text-anchor="end" class="tst-ax">${v}</text>`;}
+  const tips=[];
+  const bars=ks.map((k,i)=>{const v=wk[k]?wk[k].m:0;const x=padL+gap*i+gap/2-bw/2;const h=v/top*ih;const y=padT+ih-h;
+    tips.push(`<b>${_tplNum(v)} Min.</b><br><span>KW ${+k.split('-W')[1]} · ${wk[k]?wk[k].n:0} ${wk[k]&&wk[k].n===1?'Training':'Trainings'}</span>`);
+    const r=Math.min(4,h/2,bw/2);
+    const path=h>0?`M${x},${padT+ih} V${y+r} Q${x},${y} ${x+r},${y} H${x+bw-r} Q${x+bw},${y} ${x+bw},${y+r} V${padT+ih} Z`:'';
+    const lbl=(ks.length<=10||i%2===(ks.length-1)%2)?`<text x="${x+bw/2}" y="${H-6}" text-anchor="middle" class="tst-ax">${+k.split('-W')[1]}</text>`:'';
+    return `<g class="tst-hit" tabindex="0" data-tip="${i}"><rect x="${padL+gap*i}" y="${padT}" width="${gap}" height="${ih}" fill="transparent"/>${path?`<path d="${path}" class="tst-col"/>`:''}${lbl}</g>`;}).join('');
+  return {svg:`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Geplante Minuten pro Kalenderwoche">${g}<line x1="${padL}" x2="${W-6}" y1="${padT+ih}" y2="${padT+ih}" class="tst-base"/>${bars}</svg>`,
+    tips:tips,table:`<table class="tst-tab"><thead><tr><th>KW</th><th>Minuten</th><th>Trainings</th></tr></thead><tbody>${ks.map(k=>`<tr><td>${+k.split('-W')[1]}</td><td>${wk[k]?wk[k].m:0}</td><td>${wk[k]?wk[k].n:0}</td></tr>`).join('')}</tbody></table>`};
+}
+function _tplIntChart(rows,W){
+  const pts=rows.filter(r=>r.pi!=null&&r.rpe);
+  if(pts.length<2)return null;
+  const wide=W>=520;
+  const H=220,padL=30,padR=wide?92:12,padT=14,padB=26,iw=W-padL-padR,ih=H-padT-padB;
+  const X=i=>padL+(pts.length===1?iw/2:iw*i/(pts.length-1));const Y=v=>padT+ih-(v/10)*ih;
+  let g='';for(let v=0;v<=10;v+=2){g+=`<line x1="${padL}" x2="${padL+iw}" y1="${Y(v)}" y2="${Y(v)}" class="tst-grid"/><text x="${padL-6}" y="${Y(v)+4}" text-anchor="end" class="tst-ax">${v}</text>`;}
+  const line=(f,cls)=>`<path d="${pts.map((r,i)=>(i?'L':'M')+X(i).toFixed(1)+','+Y(f(r)).toFixed(1)).join(' ')}" class="${cls}" fill="none"/>`;
+  const dots=(f,cls)=>pts.map((r,i)=>`<circle cx="${X(i).toFixed(1)}" cy="${Y(f(r)).toFixed(1)}" r="4" class="${cls}"/>`).join('');
+  const every=Math.ceil(pts.length/Math.max(2,Math.floor(iw/58)));
+  const xl=pts.map((r,i)=>(i%every===0||i===pts.length-1)?`<text x="${X(i).toFixed(1)}" y="${H-7}" text-anchor="middle" class="tst-ax">${_tplE(_tplShortDate(r.e).replace(/^\S+ /,''))}</text>`:'').join('');
+  const L=pts[pts.length-1];const yP=Y(L.pi),yR=Y(L.rpe.avg);
+  // end labels: only when the two ends are apart, otherwise legend + tooltip carry them
+  const apart=wide&&Math.abs(yP-yR)>=16;
+  const ends=apart?`<text x="${padL+iw+10}" y="${yP+4}" class="tst-lbl">Geplant ${_tplNum(L.pi,1)}</text><text x="${padL+iw+10}" y="${yR+4}" class="tst-lbl">Gefühlt ${_tplNum(L.rpe.avg,1)}</text>`:'';
+  TPL.st.int=pts;TPL.st.intGeo={padL:padL,iw:iw,n:pts.length,W:W,H:H,padT:padT,ih:ih};
+  return {svg:`<svg id="tstInt" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Intensität geplant und von den Spielern gefühlt, je Training">${g}
+    <line x1="${padL}" x2="${padL+iw}" y1="${Y(0)}" y2="${Y(0)}" class="tst-base"/>
+    <line id="tstCross" x1="0" x2="0" y1="${padT}" y2="${padT+ih}" class="tst-cross" visibility="hidden"/>
+    ${line(r=>r.pi,'tst-l1')}${line(r=>r.rpe.avg,'tst-l2')}${dots(r=>r.pi,'tst-d1')}${dots(r=>r.rpe.avg,'tst-d2')}${xl}${ends}
+    <rect x="${padL-10}" y="${padT}" width="${iw+20}" height="${ih}" fill="transparent" class="tst-int-hit"/></svg>`,
+    table:`<table class="tst-tab"><thead><tr><th>Training</th><th>Geplant</th><th>Gefühlt (Ø RPE)</th><th>Antworten</th></tr></thead><tbody>${pts.map(r=>`<tr><td>${_tplE(_tplShortDate(r.e))}</td><td>${_tplNum(r.pi,1)}</td><td>${_tplNum(r.rpe.avg,1)}</td><td>${r.rpe.n}</td></tr>`).join('')}</tbody></table>`};
+}
+function _tplIntMove(ev){
+  const svg=document.getElementById('tstInt');const G=TPL.st.intGeo;if(!svg||!G)return;
+  const r=svg.getBoundingClientRect();const x=(ev.clientX-r.left)/r.width*G.W;
+  const i=Math.max(0,Math.min(G.n-1,Math.round((x-G.padL)/(G.n>1?G.iw/(G.n-1):1))));
+  const p=TPL.st.int[i];if(!p)return;
+  const cx=G.padL+(G.n>1?G.iw*i/(G.n-1):G.iw/2);
+  const c=document.getElementById('tstCross');if(c){c.setAttribute('x1',cx);c.setAttribute('x2',cx);c.setAttribute('visibility','visible');}
+  const d=p.pi-p.rpe.avg;
+  _tplTipShow(ev,`<span class="h">${_tplE(_tplShortDate(p.e))}${p.s&&p.s.focus?' · '+_tplE(p.s.focus):''}</span>
+    <span class="row"><i class="k1"></i><b>${_tplNum(p.pi,1)}</b> geplant</span>
+    <span class="row"><i class="k2"></i><b>${_tplNum(p.rpe.avg,1)}</b> gefühlt · ${p.rpe.n} ${p.rpe.n===1?'Antwort':'Antworten'}</span>
+    <span>${Math.abs(d)<0.5?'passt zum Plan':d>0?'leichter als geplant':'härter als geplant'}</span>`);
+}
+function _tplIntLeave(){const c=document.getElementById('tstCross');if(c)c.setAttribute('visibility','hidden');_tplTipHide();}
+
+function tplStatRange(v){TPL.st.range=v;_tplRenderStat();}
+function _tplRenderStat(){
+  const el=document.getElementById('tplStat');if(!el||!TPL.plan)return;
+  _tplStatUpgrade();
+  const rows=_tplStatRows();
+  const W=Math.max(260,Math.min(1200,(el.clientWidth||900)-40));
+  const half=window.innerWidth>1000?Math.floor((W-16)/2)-36:W-36;
+  const held=_tplHeldTrainings();const heldPlanned=rows.filter(r=>r.past).length;
+  const avgPlan=rows.length?rows.reduce((a,r)=>a+r.min,0)/rows.length:0;
+  const dn=rows.filter(r=>r.dn);const avgDone=dn.length?dn.reduce((a,r)=>a+r.dn,0)/dn.length:0;
+  const dnDiff=dn.length?dn.reduce((a,r)=>a+(r.dn-r.min),0)/dn.length:0;
+  const withI=rows.filter(r=>r.pi!=null);const withR=rows.filter(r=>r.pi!=null&&r.rpe);
+  const avgPI=withI.length?withI.reduce((a,r)=>a+r.pi,0)/withI.length:0;
+  const avgR=withR.length?withR.reduce((a,r)=>a+r.rpe.avg,0)/withR.length:0;
+  const dur=_tplDur(_tplSess());
+  const seg=[['season','Saison'],['w8','8 Wochen'],['w4','4 Wochen']].map(([k,l])=>`<button type="button" class="${TPL.st.range===k?'on':''}" onclick="tplStatRange('${k}')">${l}</button>`).join('');
+  const cat=_tplCatBars(rows);const wk=_tplWeekCols(rows,half);const it=_tplIntChart(rows,W-36);
+  // most used drills
+  const use={};rows.forEach(r=>r.tt.forEach(x=>{const k=x.t;if(!use[k])use[k]={n:0,m:0,last:0};use[k].n++;use[k].m+=x.m;use[k].last=Math.max(use[k].last,r.sk);}));
+  const top=Object.keys(use).sort((a,b)=>use[b].n-use[a].n||use[b].m-use[a].m).slice(0,8);
+  const done=rows.filter(r=>r.dn).slice(-10).reverse();
+  el.innerHTML=`<div class="tst">
+    <div class="tst-filter"><span class="tpl-seg" role="group" aria-label="Zeitraum">${seg}</span><span class="tpl-hint">${_tplE(TPL.team)} · Saison ${_tplE(TPL.season)} · nur Trainings mit Plan</span></div>
+    ${rows.length?`
+    <div class="tst-kpis">
+      <div class="tst-kpi"><span class="lab">Trainings mit Plan</span><b>${heldPlanned}<small> / ${held}</small></b><span class="sub">bisher im Zeitraum${rows.length>heldPlanned?` · ${rows.length-heldPlanned} weitere geplant`:''}</span></div>
+      <div class="tst-kpi"><span class="lab">Geplant pro Training</span><b>${_tplNum(avgPlan)}<small> Min.</small></b><span class="sub">Ø · Einheit ${dur} Min.</span></div>
+      <div class="tst-kpi"><span class="lab">Auf dem Platz</span><b>${dn.length?_tplNum(avgDone)+'<small> Min.</small>':'–'}</b><span class="sub">${dn.length?`Ø aus ${dn.length} ${dn.length===1?'Training':'Trainings'} · ${dnDiff>=0?'+':'−'}${_tplNum(Math.abs(dnDiff))} Min. zum Plan`:'noch nicht gemessen'}</span></div>
+      <div class="tst-kpi"><span class="lab">Intensität</span><b>${withI.length?_tplNum(avgPI,1):'–'}<small> geplant</small></b><span class="sub">${withR.length?`gefühlt ${_tplNum(avgR,1)} (Ø RPE der Spieler)`:'noch keine Rückmeldungen der Spieler'}</span></div>
+    </div>
+    <div class="tst-two">
+      <section class="tpl-col tst-card"><h3 class="tpl-h3">Inhalte nach Kategorie</h3><span class="tpl-hint">Verplante Minuten im Zeitraum</span>
+        <div class="tst-bars" data-tipset="cat">${cat.html}</div>
+        ${cat.table?`<details class="tst-det"><summary>Werte als Tabelle</summary>${cat.table}</details>`:''}</section>
+      <section class="tpl-col tst-card"><h3 class="tpl-h3">Minuten pro Woche</h3><span class="tpl-hint">Geplante Trainingszeit je Kalenderwoche</span>
+        ${wk?`<div class="tst-svg" data-tipset="wk">${wk.svg}</div><details class="tst-det"><summary>Werte als Tabelle</summary>${wk.table}</details>`:'<div class="tpl-none">Keine Daten.</div>'}</section>
+    </div>
+    <section class="tpl-col tst-card"><div class="tst-head"><div><h3 class="tpl-h3">Intensität: geplant und gefühlt</h3><span class="tpl-hint">Geplant aus den Blöcken (Dauer × Intensität), gefühlt = Ø Belastungs-Rückmeldung der Spieler (0–10)</span></div>
+      <div class="tst-legend"><span><i class="k1"></i>Geplant</span><span><i class="k2"></i>Gefühlt</span></div></div>
+      ${it?`<div class="tst-svg" id="tstIntWrap">${it.svg}</div><details class="tst-det"><summary>Werte als Tabelle</summary>${it.table}</details>`
+        :'<div class="tpl-none">Sobald Spieler nach mindestens zwei geplanten Trainings ihre Belastung melden, erscheint hier der Vergleich.</div>'}</section>
+    <div class="tst-two">
+      <section class="tpl-col tst-card"><h3 class="tpl-h3">Plan und Platz</h3><span class="tpl-hint">Trainings, die mit „Auf dem Platz“ gelaufen sind</span>
+        ${done.length?`<table class="tst-tab show"><thead><tr><th>Training</th><th>Plan</th><th>Platz</th><th>Differenz</th></tr></thead><tbody>${done.map(r=>{const d=r.dn-r.min;return `<tr><td>${_tplE(_tplShortDate(r.e))}</td><td>${r.min} Min.</td><td>${r.dn} Min.</td><td class="${d>5?'over':d<-5?'under':''}">${d>0?'+':d<0?'−':'±'}${Math.abs(d)} Min.</td></tr>`;}).join('')}</tbody></table>`
+          :'<div class="tpl-none">Noch kein Training mit „Auf dem Platz“ beendet.</div>'}</section>
+      <section class="tpl-col tst-card"><h3 class="tpl-h3">Häufigste Übungen</h3><span class="tpl-hint">Nach Anzahl der Trainings im Zeitraum</span>
+        ${top.length?`<table class="tst-tab show"><thead><tr><th>Übung</th><th>Trainings</th><th>Minuten</th></tr></thead><tbody>${top.map(k=>`<tr><td>${_tplE(k)}</td><td>${use[k].n}</td><td>${use[k].m}</td></tr>`).join('')}</tbody></table>`:'<div class="tpl-none">Keine Daten.</div>'}</section>
+    </div>`
+    :`<div class="tpl-col"><div class="tpl-empty"><h4>Noch keine Pläne</h4><p>${TPL.st.range==='season'?'In dieser Saison':'In diesem Zeitraum'} gibt es noch keine Trainings mit Plan. Die Auswertung füllt sich mit jedem geplanten Training.</p></div></div>`}
+    <div class="tst-tip" id="tplTip" role="tooltip" hidden></div>
+  </div>`;
+  TPL.st.catTips=cat.tips;TPL.st.wkTips=wk?wk.tips:[];
+  const tipOf=t=>{const set=t.closest('[data-tipset]');if(!set)return null;const list=set.dataset.tipset==='cat'?TPL.st.catTips:TPL.st.wkTips;return list[+t.dataset.tip];};
+  el.querySelectorAll('[data-tipset] [data-tip]').forEach(t=>{
+    t.addEventListener('pointermove',ev=>{const h=tipOf(t);if(h)_tplTipShow(ev,h);});
+    t.addEventListener('pointerleave',_tplTipHide);
+    t.addEventListener('focus',()=>{const h=tipOf(t);if(h)_tplTipFocus(t,h);});
+    t.addEventListener('blur',_tplTipHide);
+  });
+  const ih=el.querySelector('.tst-int-hit');
+  if(ih){ih.addEventListener('pointermove',_tplIntMove);ih.addEventListener('pointerleave',_tplIntLeave);ih.addEventListener('pointerdown',_tplIntMove);}
+}
+let _tplStatRz=null;
+window.addEventListener('resize',()=>{if(TPL.tab!=='s'||!_tplIsOpen())return;clearTimeout(_tplStatRz);_tplStatRz=setTimeout(_tplRenderStat,200);});
+
+// ── Header overflow menu (phones)
+function tplMore(ev){
+  ev.stopPropagation();
+  const m=document.getElementById('tplMoreMenu');if(!m)return;
+  const open=m.hidden;m.hidden=!open;
+  if(open){
+    const ub=document.getElementById('tplMoreUndo');if(ub)ub.disabled=!TPL.undo.length;
+    setTimeout(()=>document.addEventListener('pointerdown',_tplMoreAway,{once:true,capture:true}),0);
+  }
+}
+function _tplMoreAway(e){const m=document.getElementById('tplMoreMenu');if(m&&!m.contains(e.target))m.hidden=true;else if(m&&!m.hidden)document.addEventListener('pointerdown',_tplMoreAway,{once:true,capture:true});}
+function tplMoreDo(fn){const m=document.getElementById('tplMoreMenu');if(m)m.hidden=true;fn();}
 
 function openLineupPlanner(sessIdx){
   const el=document.getElementById('moLineup');
