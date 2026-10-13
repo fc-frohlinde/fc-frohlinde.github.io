@@ -4401,7 +4401,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791851329179; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791851963147; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -13957,12 +13957,45 @@ function _hubBuildLive(found){
   let report=null,stats=null;
   try{report=dbBuildReportSnapshot(data,off,false);}catch(e){console.error('[HubLive report]',e);}
   try{stats=dbBuildPlayerStatsSnapshot(data,found.pi,off,true);}catch(e){console.error('[HubLive stats]',e);}
-  _hubLive={report,stats};
+  _hubLive={report,stats,data,off,pi:found.pi};
 }
 // Hands a live snapshot to report.html in the same tab (sessionStorage is
 // per tab and origin, so it never leaves this device).
-function hubOpenLive(kind){
-  const d=_hubLive&&_hubLive[kind];
+// Photos: players keep only a media id; the bytes live in MEDIA. Resolve them
+// when the report is opened (they may have arrived after the hub was built)
+// and shrink each to a thumbnail so 20+ portraits fit into sessionStorage.
+function _hubThumb(src,size){
+  return new Promise(res=>{
+    if(!src||typeof src!=='string'||src.indexOf('data:image')!==0){res(null);return;}
+    const im=new Image();
+    im.onload=()=>{try{
+      const c=document.createElement('canvas');c.width=c.height=size;
+      const x=c.getContext('2d');const m=Math.min(im.width,im.height);
+      x.drawImage(im,(im.width-m)/2,(im.height-m)/2,m,m,0,0,size,size);
+      res(c.toDataURL('image/jpeg',0.82));
+    }catch(e){res(null);}};
+    im.onerror=()=>res(null);
+    im.src=src;
+  });
+}
+async function _hubLivePhotos(kind){
+  const L=_hubLive;if(!L||!L.data)return L&&L[kind];
+  try{if(typeof _mediaReinject==='function')_mediaReinject(L.data.block.players);}catch(e){}
+  let d;
+  try{d=(kind==='report')?dbBuildReportSnapshot(L.data,L.off,true):dbBuildPlayerStatsSnapshot(L.data,L.pi,L.off,true);}
+  catch(e){return L[kind];}
+  if(d&&Array.isArray(d.players)){
+    await Promise.all(d.players.map(async p=>{if(p&&p.photo)p.photo=await _hubThumb(p.photo,kind==='report'?96:160);}));
+  }
+  return d;
+}
+let _hubOpening=false;
+async function hubOpenLive(kind){
+  if(_hubOpening)return;_hubOpening=true;
+  let d=null;
+  try{d=await _hubLivePhotos(kind);}catch(e){}
+  _hubOpening=false;
+  if(!d)d=_hubLive&&_hubLive[kind];
   if(!d)return;
   let ok=false;
   try{sessionStorage.setItem('fcf_live_'+kind,JSON.stringify(d));ok=true;}
@@ -17133,17 +17166,22 @@ function dbRenderWeekReportSection(data){
   return html;
 }
 // Exactly what the players see in their hub, for the week shown here.
-function dbOpenPlayerReport(){
+async function dbOpenPlayerReport(){
   const team=UI.currentTeam,season=UI.currentSeason;
   const block=G.db&&G.db[team+'__'+season];
   if(!block)return;
-  const data={team,season,block,sessions:block.sessions,players:block.players};
-  const snap=dbBuildReportSnapshot(data,_dbState.weekReportOffset||0,false);
-  try{sessionStorage.setItem('fcf_live_report',JSON.stringify(snap));}catch(e){alert('Vorschau nicht möglich.');return;}
   const url=location.origin+location.pathname.replace(/\/[^\/]*$/,'/')+'report.html?local=report';
   const standalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
+  // Open the tab inside the click (popup blockers), fill it once the photos are ready
+  const w=standalone?null:window.open('about:blank','_blank');
+  const data={team,season,block,sessions:block.sessions,players:block.players};
+  const snap=dbBuildReportSnapshot(data,_dbState.weekReportOffset||0,true);
+  if(Array.isArray(snap.players))await Promise.all(snap.players.map(async p=>{if(p&&p.photo)p.photo=await _hubThumb(p.photo,96);}));
+  // localStorage, not sessionStorage: the tab is already open and would not see later writes
+  try{localStorage.setItem('fcf_live_report',JSON.stringify(snap));}catch(e){if(w)w.close();alert('Vorschau nicht möglich.');return;}
   if(standalone){allowLeaveOnce&&allowLeaveOnce();location.href=url;}
-  else window.open(url,'_blank'); // no noopener: the new tab must inherit sessionStorage
+  else if(w)w.location.href=url;
+  else window.open(url,'_blank');
 }
 function _dbEscapeHtml(s){
   return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');

@@ -607,6 +607,7 @@ function renderReport(r){
   if(local){
     let d=null;
     try{d=JSON.parse(sessionStorage.getItem('fcf_live_'+local)||'null');}catch(e){}
+    if(!d)try{d=JSON.parse(localStorage.getItem('fcf_live_'+local)||'null');}catch(e){} // trainer preview
     if(!d){
       showError('\u26a0\ufe0f','Nicht verf\u00fcgbar','Bitte \u00fcber dein Spieler-Men\u00fc erneut \u00f6ffnen.');
     }else{
@@ -614,10 +615,7 @@ function renderReport(r){
       catch(e){showError('\u26a0\ufe0f','Anzeigefehler','Der Bericht konnte nicht dargestellt werden.');}
     }
     const b=document.createElement('button');
-    document.body.classList.add('live');
-    b.className='live-back';b.type='button';b.textContent='\u2039 Zur\u00fcck';
-    b.onclick=()=>{if(window.opener){window.close();return;}if(history.length>1)history.back();else location.href='./';};
-    document.body.appendChild(b);
+    // No own back button: the phone's back gesture returns to the hub.
     return;
   }
   const id=getParam('id');
