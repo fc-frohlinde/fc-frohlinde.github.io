@@ -3612,6 +3612,179 @@ body.design-heute .home-overlay::before,body.design-heute .home-overlay::after{d
   .hx-tiles{flex-basis:100%;}
 }
 
+
+/* ══════ TRAININGSPLANER (trainer only) ══════ */
+.tpl-ov{--tp-bg:#E9EEF5;--tp-card:#FFFFFF;--tp-ink:#0E2350;--tp-mut:#4E5D7C;--tp-line:#E7EBF2;--tp-line2:#DCE3EE;--tp-soft:#F4F7FB;--tp-chip:#EEF2F8;--tp-sel:#EEF4FF;--tp-link:#1659B8;--tp-navy:#0B2550;--tp-yel:#E8C840;
+  position:fixed;inset:0;z-index:805;display:none;flex-direction:column;background:var(--tp-bg);color:var(--tp-ink);font-family:'Barlow',sans-serif;}
+.tpl-ov.open{display:flex;}
+body.theme-dark .tpl-ov{--tp-bg:#0D1830;--tp-card:#15264A;--tp-ink:#E3EAF6;--tp-mut:#A3B3CF;--tp-line:#22365F;--tp-line2:#2A3E6E;--tp-soft:#102043;--tp-chip:#1D3260;--tp-sel:#1C3768;--tp-link:#8DB8F2;}
+.tpl-ov *{box-sizing:border-box;}
+.tpl-ov button{font-family:'Barlow',sans-serif;}
+.tpl-hd{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:10px 18px;background:var(--tp-navy);color:#fff;flex:0 0 auto;padding-top:calc(10px + env(safe-area-inset-top,0px));}
+.tpl-x{width:40px;height:40px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto;}
+.tpl-x:hover{background:rgba(255,255,255,.16);}
+.tpl-ttl{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 0;}
+.tpl-ttl h2{margin:0;font-family:'Bebas Neue',sans-serif;font-weight:400;font-size:28px;letter-spacing:1.5px;line-height:1;color:#fff;}
+.tpl-sub{font-size:14px;color:#C3D2EC;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tpl-hd-r{display:flex;align-items:center;gap:8px;margin-left:auto;flex-wrap:wrap;justify-content:flex-end;}
+.tpl-st .st-s,.tpl-sm{display:none;}
+.tpl-st{display:flex;align-items:center;gap:6px;font-size:13px;color:#A8C9F0;white-space:nowrap;}
+.tpl-st.warn{color:#FFD27A;}
+.tpl-st.warn button{background:none;border:none;color:#FFD27A;text-decoration:underline;cursor:pointer;font-size:13px;padding:0;}
+.tpl-hb{height:40px;padding:0 14px;border-radius:10px;border:1px solid rgba(255,255,255,.22);background:transparent;color:#fff;font-weight:600;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:7px;white-space:nowrap;}
+.tpl-hb:hover:not(:disabled){background:rgba(255,255,255,.1);}
+.tpl-hb:disabled{opacity:.4;cursor:default;}
+.tpl-hb.pri{background:var(--tp-yel);border-color:var(--tp-yel);color:#0B2550;font-weight:700;}
+.tpl-hb.pri:hover{background:#F2D65A;}
+.tpl-main{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:minmax(280px,340px) minmax(0,1fr) minmax(280px,330px);gap:16px;padding:16px;overflow:hidden;}
+.tpl-col{background:var(--tp-card);border-radius:18px;padding:18px;box-shadow:0 1px 2px rgba(14,35,80,.06);min-height:0;overflow:auto;display:flex;flex-direction:column;gap:14px;}
+.tpl-h3{margin:0;font-family:'Bebas Neue',sans-serif;font-weight:400;font-size:24px;letter-spacing:1px;line-height:1;color:var(--tp-ink);}
+.tpl-row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+.tpl-tot{font-weight:700;font-size:15px;white-space:nowrap;}
+.tpl-tot .ok{color:#1E8A55;}.tpl-tot .under{color:#B7791F;}.tpl-tot .over{color:#D9443F;}
+.tpl-bar{display:flex;height:10px;border-radius:5px;overflow:hidden;gap:2px;background:transparent;}
+.tpl-bar span{min-width:3px;}
+.tpl-bar .rest{background:var(--tp-line2);}
+.tpl-hint{font-size:13px;color:var(--tp-mut);line-height:1.45;}
+.tpl-blocks{display:flex;flex-direction:column;gap:8px;}
+.tpl-blk{display:flex;gap:12px;align-items:stretch;text-align:left;padding:10px 12px;border-radius:14px;border:1px solid var(--tp-line);background:var(--tp-card);cursor:pointer;color:var(--tp-ink);width:100%;position:relative;}
+.tpl-blk:hover{border-color:#B9C6DB;}
+.tpl-blk.sel{border:2px solid var(--tp-link);background:var(--tp-sel);padding:9px 11px;}
+.tpl-blk.drag{opacity:.45;}
+.tpl-blk.dropb::before,.tpl-blk.dropa::after{content:'';position:absolute;left:8px;right:8px;height:3px;border-radius:2px;background:var(--tp-link);}
+.tpl-blk.dropb::before{top:-6px;}.tpl-blk.dropa::after{bottom:-6px;}
+.tpl-stripe{width:6px;border-radius:3px;flex:0 0 auto;}
+.tpl-bt{display:flex;flex-direction:column;gap:2px;flex:1 1 auto;min-width:0;}
+.tpl-bk{font-size:12px;font-weight:700;color:var(--tp-mut);}
+.tpl-bn{font-weight:700;font-size:15px;line-height:1.25;overflow-wrap:anywhere;}
+.tpl-bn.empty{color:var(--tp-mut);font-style:italic;font-weight:600;}
+.tpl-bo{font-size:13px;color:var(--tp-mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tpl-bm{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.5px;align-self:center;white-space:nowrap;}
+.tpl-add{height:44px;border-radius:12px;border:1.5px dashed #AEBBD1;background:var(--tp-soft);color:var(--tp-mut);font-weight:600;font-size:14px;cursor:pointer;flex:0 0 auto;}
+.tpl-add:hover,.tpl-add.dropa{border-color:var(--tp-link);color:var(--tp-link);}
+.tpl-links{display:flex;flex-direction:column;gap:2px;padding-top:6px;border-top:1px solid var(--tp-line);}
+.tpl-lnk{text-align:left;padding:8px 4px;border:none;background:none;color:var(--tp-link);font-weight:700;font-size:14px;cursor:pointer;}
+.tpl-lnk:hover{text-decoration:underline;}
+/* editor */
+.tpl-ed-top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;align-items:flex-start;}
+.tpl-ed-l{display:flex;flex-direction:column;gap:8px;flex:1 1 320px;min-width:0;}
+.tpl-kick{font-size:13px;font-weight:700;color:var(--tp-link);}
+.tpl-in-title{font-family:'Bebas Neue',sans-serif;font-weight:400;font-size:34px;letter-spacing:1px;line-height:1.1;border:none;border-bottom:2px solid transparent;background:transparent;color:var(--tp-ink);padding:0 0 2px;width:100%;outline:none;resize:none;overflow:hidden;display:block;}
+.tpl-in-title:hover{border-bottom-color:var(--tp-line2);}
+.tpl-in-title:focus{border-bottom-color:var(--tp-link);}
+.tpl-in-title::placeholder{color:#AEBBD1;}
+.tpl-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.tpl-chip{display:inline-flex;align-items:center;gap:6px;padding:3px 4px 3px 10px;border-radius:999px;background:var(--tp-chip);font-size:13px;font-weight:600;color:var(--tp-ink);height:34px;}
+.tpl-chip > span:first-child{color:var(--tp-mut);font-weight:600;}
+.tpl-chip input,.tpl-chip select{border:1px solid transparent;background:var(--tp-card);border-radius:999px;height:26px;padding:0 10px;font:600 13px 'Barlow',sans-serif;color:var(--tp-ink);outline:none;}
+.tpl-chip input:focus,.tpl-chip select:focus{border-color:var(--tp-link);}
+.tpl-chip input.w-txt{width:118px;}
+.tpl-chip input.w-min{width:48px;text-align:center;padding:0 4px;-moz-appearance:textfield;}
+.tpl-chip input.w-min::-webkit-inner-spin-button,.tpl-chip input.w-min::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
+.tpl-step{width:26px;height:26px;border-radius:50%;border:none;background:var(--tp-card);color:var(--tp-ink);font-weight:700;font-size:15px;cursor:pointer;line-height:1;padding:0;}
+.tpl-step:hover{background:var(--tp-line2);}
+.tpl-catdot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:0 0 auto;}
+.tpl-acts{display:flex;gap:6px;flex-wrap:wrap;}
+.tpl-ab{height:38px;padding:0 12px;border-radius:10px;border:1px solid var(--tp-line2);background:var(--tp-card);color:var(--tp-ink);font-weight:600;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;}
+.tpl-ab.ico{width:38px;padding:0;justify-content:center;}
+.tpl-ab:hover:not(:disabled){background:var(--tp-soft);border-color:#B9C6DB;}
+.tpl-ab:disabled{opacity:.35;cursor:default;}
+.tpl-ab.danger:hover{color:#D9443F;border-color:#E9A3A1;}
+.tpl-grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;}
+.tpl-fld{display:flex;flex-direction:column;gap:6px;min-width:0;}
+.tpl-fld > label{font-size:15px;font-weight:700;}
+.tpl-fld textarea,.tpl-fld input,.tpl-dlg textarea,.tpl-dlg input,.tpl-dlg select{width:100%;border:1px solid var(--tp-line2);border-radius:12px;background:var(--tp-soft);color:var(--tp-ink);font:500 15px/1.55 'Barlow',sans-serif;padding:10px 12px;outline:none;resize:vertical;}
+.tpl-fld textarea{min-height:150px;}
+.tpl-fld textarea:focus,.tpl-fld input:focus,.tpl-dlg textarea:focus,.tpl-dlg input:focus,.tpl-dlg select:focus{border-color:var(--tp-link);background:var(--tp-card);}
+.tpl-fld ::placeholder,.tpl-dlg ::placeholder{color:#97A5BE;}
+.tpl-org{padding-top:12px;border-top:1px solid var(--tp-line);}
+.tpl-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px;padding:40px 20px;color:var(--tp-mut);flex:1 1 auto;}
+.tpl-empty h4{margin:0;font-family:'Bebas Neue',sans-serif;font-weight:400;font-size:28px;letter-spacing:1px;color:var(--tp-ink);}
+.tpl-empty p{margin:0;max-width:430px;line-height:1.5;font-size:15px;}
+.tpl-empty .tpl-acts{justify-content:center;}
+.tpl-load{display:flex;align-items:center;justify-content:center;flex:1 1 auto;color:var(--tp-mut);font-weight:600;}
+/* library */
+.tpl-srch{display:flex;align-items:center;gap:8px;height:40px;padding:0 12px;border-radius:10px;border:1px solid var(--tp-line2);background:var(--tp-soft);color:var(--tp-mut);flex:0 0 auto;}
+.tpl-srch input{border:none;background:transparent;outline:none;font:500 14px 'Barlow',sans-serif;color:var(--tp-ink);width:100%;}
+.tpl-cats{display:flex;flex-wrap:wrap;gap:6px;}
+.tpl-cat{padding:5px 10px;border-radius:999px;border:1px solid var(--tp-line2);background:var(--tp-card);color:var(--tp-mut);font-weight:600;font-size:13px;cursor:pointer;}
+.tpl-cat.on{background:var(--tp-navy);border-color:var(--tp-navy);color:#fff;}
+body.theme-dark .tpl-cat.on{background:var(--tp-yel);border-color:var(--tp-yel);color:#0B2550;}
+.tpl-lib{display:flex;flex-direction:column;gap:8px;}
+.tpl-li{border:1px solid var(--tp-line);border-radius:12px;background:var(--tp-card);}
+.tpl-li.open{border-color:#B9C6DB;box-shadow:0 2px 8px rgba(14,35,80,.07);}
+.tpl-li-h{display:flex;gap:10px;align-items:center;padding:8px 8px 8px 10px;cursor:pointer;}
+.tpl-li-h[draggable=true]{cursor:grab;}
+.tpl-li-t{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1 1 auto;}
+.tpl-li-t b{font-size:14px;line-height:1.25;}
+.tpl-li-t span{font-size:12px;color:var(--tp-mut);}
+.tpl-li-plus{width:32px;height:32px;border-radius:9px;border:1px solid var(--tp-line2);background:var(--tp-soft);color:var(--tp-ink);font-size:18px;font-weight:700;cursor:pointer;flex:0 0 auto;line-height:1;}
+.tpl-li-plus:hover{background:var(--tp-yel);border-color:var(--tp-yel);color:#0B2550;}
+.tpl-li-b{padding:0 12px 12px;display:flex;flex-direction:column;gap:8px;font-size:13px;line-height:1.5;color:var(--tp-mut);}
+.tpl-li-b p{margin:0;white-space:pre-line;}
+.tpl-li-b ul{margin:0;padding-left:18px;}
+.tpl-li-b .tpl-acts .tpl-ab{height:32px;font-size:13px;padding:0 10px;}
+.tpl-new{height:42px;border-radius:12px;border:none;background:var(--tp-navy);color:#fff;font-weight:700;font-size:14px;cursor:pointer;flex:0 0 auto;}
+body.theme-dark .tpl-new{background:#2A4A86;}
+.tpl-new:hover{filter:brightness(1.15);}
+.tpl-none{font-size:13px;color:var(--tp-mut);padding:6px 2px;}
+/* dialog + toast */
+.tpl-dlg-bg{position:fixed;inset:0;z-index:810;background:rgba(5,14,32,.5);display:none;align-items:center;justify-content:center;padding:16px;}
+.tpl-dlg-bg.open{display:flex;}
+.tpl-dlg{background:var(--tp-card);color:var(--tp-ink);border-radius:18px;padding:20px;width:520px;max-width:100%;max-height:calc(100% - 20px);overflow:auto;display:flex;flex-direction:column;gap:12px;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.tpl-dlg h4{margin:0;font-family:'Bebas Neue',sans-serif;font-weight:400;font-size:26px;letter-spacing:1px;}
+.tpl-dlg label{font-size:13px;font-weight:700;color:var(--tp-mut);display:flex;flex-direction:column;gap:4px;}
+.tpl-dlg .two{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+.tpl-dlg-f{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:4px;}
+.tpl-dlg-f .sp{margin-right:auto;}
+.tpl-btn{height:40px;padding:0 16px;border-radius:10px;border:1px solid var(--tp-line2);background:var(--tp-card);color:var(--tp-ink);font-weight:700;font-size:14px;cursor:pointer;}
+.tpl-btn.pri{background:var(--tp-navy);border-color:var(--tp-navy);color:#fff;}
+body.theme-dark .tpl-btn.pri{background:var(--tp-yel);border-color:var(--tp-yel);color:#0B2550;}
+.tpl-btn.danger{color:#C0392B;}
+.tpl-btn:hover{filter:brightness(.97);}
+.tpl-seg{display:inline-flex;gap:4px;padding:4px;border-radius:12px;background:var(--tp-chip);align-self:flex-start;}
+.tpl-seg button{padding:6px 14px;border-radius:9px;border:none;background:transparent;color:var(--tp-mut);font-weight:700;font-size:13px;cursor:pointer;}
+.tpl-seg button.on{background:var(--tp-card);color:var(--tp-ink);box-shadow:0 1px 2px rgba(14,35,80,.12);}
+.tpl-pick{display:flex;flex-direction:column;gap:8px;}
+.tpl-pk{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;border:1px solid var(--tp-line);background:var(--tp-card);cursor:pointer;text-align:left;color:var(--tp-ink);width:100%;}
+.tpl-pk:hover{border-color:var(--tp-link);background:var(--tp-sel);}
+.tpl-pk .tpl-bt b{font-size:15px;}
+.tpl-pk .tpl-bt span{font-size:13px;color:var(--tp-mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.tpl-pk-del{width:32px;height:32px;border-radius:9px;border:1px solid var(--tp-line2);background:var(--tp-card);color:var(--tp-mut);cursor:pointer;flex:0 0 auto;}
+.tpl-pk-del.arm{background:#D9443F;border-color:#D9443F;color:#fff;width:auto;padding:0 10px;font-weight:700;font-size:12px;}
+.tpl-toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);z-index:812;background:rgba(10,20,40,.95);color:#fff;padding:10px 12px 10px 18px;border-radius:999px;font-weight:600;font-size:14px;display:flex;align-items:center;gap:12px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;box-shadow:0 6px 22px rgba(0,0,0,.35);max-width:92vw;}
+.tpl-toast.show{opacity:1;transform:translateX(-50%);pointer-events:auto;}
+.tpl-toast button{background:var(--tp-yel);color:#0B2550;border:none;border-radius:999px;padding:6px 12px;font-weight:700;font-size:13px;cursor:pointer;}
+.tpl-toast button:empty{display:none;}
+.tpl-warnbar{background:#FFF4D6;color:#6B4E00;border:1px solid #F0D58A;border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.45;}
+body.theme-dark .tpl-warnbar{background:#3A3010;color:#FFE7A3;border-color:#6B5A1E;}
+@media (max-width:1180px){
+  .tpl-main{grid-template-columns:minmax(260px,320px) minmax(0,1fr);overflow:auto;grid-auto-rows:max-content;}
+  .tpl-col{overflow:visible;}
+  .tpl-col.lib{grid-column:1/-1;}
+}
+@media (max-width:760px){
+  .tpl-hd{padding:8px 12px;gap:8px 10px;padding-top:calc(8px + env(safe-area-inset-top,0px));}
+  .tpl-ttl h2{font-size:24px;}
+  .tpl-sub{font-size:13px;white-space:normal;}
+  .tpl-hd-r{width:100%;margin-left:0;flex-wrap:nowrap;}
+  .tpl-hb{height:36px;padding:0 10px;font-size:13px;gap:6px;}
+  .tpl-hb .lbl-l{display:none;}
+  .tpl-st{flex:1 1 auto;min-width:0;font-size:12px;overflow:hidden;}
+  .tpl-st .st-l,.tpl-dsk{display:none;}
+  .tpl-st .st-s,.tpl-sm{display:inline;}
+  .tpl-col.ed-empty{display:none;}
+  .tpl-main{display:flex;flex-direction:column;padding:10px;gap:10px;overflow:auto;}
+  .tpl-col{padding:14px;border-radius:16px;flex:0 0 auto;}
+  .tpl-grid2{grid-template-columns:1fr;gap:12px;}
+  .tpl-fld textarea{min-height:110px;}
+  .tpl-in-title{font-size:28px;}
+  .tpl-chip input.w-txt{width:92px;}
+  .tpl-dlg .two{grid-template-columns:1fr 1fr;}
+}
+@media print{.tpl-ov{display:none !important;}}
+.tpl-ov:focus{outline:none;}
+.tpl-blk:focus-visible,.tpl-li-h:focus-visible{outline:2px solid var(--tp-link);outline-offset:2px;}
 </style>
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -3971,6 +4144,27 @@ if(window._fbBlocked){
   </div>
 </div></div>
 
+<!-- Trainingsplaner — trainer only; the code that fills it refuses to run in player mode -->
+<div class="tpl-ov" id="tplOverlay" role="dialog" aria-modal="true" aria-label="Trainingsplan" tabindex="-1">
+  <header class="tpl-hd">
+    <button class="tpl-x" type="button" onclick="tplClose()" aria-label="Schließen" title="Schließen"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+    <div class="tpl-ttl"><h2>Trainingsplan</h2><span class="tpl-sub" id="tplSub"></span></div>
+    <div class="tpl-hd-r">
+      <span class="tpl-st" id="tplSt" role="status" aria-live="polite"></span>
+      <button class="tpl-hb" id="tplUndoBtn" type="button" onclick="tplUndo()" title="Rückgängig (Strg+Z)" disabled><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 7L4 12l5 5"/><path d="M4 12h11a5 5 0 0 1 0 10h-2"/></svg><span class="lbl-l">Rückgängig</span></button>
+      <button class="tpl-hb" type="button" style="gap:4px" onclick="tplSaveTplDlg()">Als Vorlage<span class="lbl-l">speichern</span></button>
+      <button class="tpl-hb pri" type="button" onclick="tplPrint()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9V3h10v6"/><rect x="3" y="9" width="18" height="8" rx="2"/><path d="M7 14h10v7H7z"/></svg>Drucken</button>
+    </div>
+  </header>
+  <div class="tpl-main" id="tplMain">
+    <section class="tpl-col" id="tplList" aria-label="Ablauf"></section>
+    <section class="tpl-col" id="tplEd" aria-label="Ausgewählter Block"></section>
+    <aside class="tpl-col lib" id="tplLib" aria-label="Übungsbibliothek"></aside>
+  </div>
+  <div class="tpl-dlg-bg" id="tplDlg" onclick="if(event.target===this)tplDlgClose()"><div class="tpl-dlg" id="tplDlgBox" role="dialog" aria-modal="true"></div></div>
+  <div class="tpl-toast" id="tplToast" role="status" aria-live="polite"><span></span><button type="button"></button></div>
+</div>
+
 <!-- Session Stats -->
 <div class="mo" id="moSession2"><div class="mob" style="width:440px;max-width:96vw;">
   <div class="ss-sticky">
@@ -3996,6 +4190,9 @@ if(window._fbBlocked){
       <div class="ss-actions">
       <div id="ss-rollcall-wrap" style="display:none;">
         <button class="btn" style="background:var(--ok-bg);color:var(--ok-fg);border:1.5px solid rgba(39,174,96,.4);font-size:.78rem;font-weight:700;" onclick="rcOpen(_currentSessIdx)">✓ Anwesenheit erfassen</button>
+      </div>
+      <div id="ss-plan-btn-wrap" style="display:none;">
+        <button class="btn" style="background:rgba(232,200,64,.2);color:#6b5200;border:1.5px solid rgba(214,180,40,.65);font-size:.78rem;font-weight:700;" onclick="tplOpen(_currentSessIdx)">📝 Trainingsplan</button>
       </div>
       <div id="ss-lineup-btn-wrap" style="display:none;">
         <button class="btn" style="background:rgba(39,174,96,.15);color:#1a7a40;border:1.5px solid rgba(39,174,96,.4);font-size:.78rem;" onclick="openLineupForSess()">⚽ Aufstellung planen</button>
@@ -4401,7 +4598,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791852218942; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791856354667; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -7990,7 +8187,7 @@ function _navArm(){
 function _navLayers(){
   // Home is not a layer — it is a view (see _navViewLevel).
   const l=Array.from(document.querySelectorAll(
-    '.mo.open, .lp-overlay.open, .slp-overlay.open, .rc-overlay.open, #mobSheet.open'
+    '.mo.open, .lp-overlay.open, .slp-overlay.open, .rc-overlay.open, #mobSheet.open, .tpl-ov.open, .tpl-dlg-bg.open'
   ));
   // Planner sub-menus are toggled through inline display, not a class, so they
   // need their own check — without it "back" inside an open player picker
@@ -8017,6 +8214,8 @@ function _navCloseLayer(el){
     if(el.id==='lp-popup'&&typeof lpClosePopup==='function')return lpClosePopup();
     if(el.id==='slp-popup'&&typeof slpClosePopup==='function')return slpClosePopup();
     if(el.id==='mobSheet'&&typeof mobSheetClose==='function')return mobSheetClose();
+    if(el.id==='tplDlg'&&typeof tplDlgClose==='function')return tplDlgClose();
+    if(el.id==='tplOverlay'&&typeof tplClose==='function')return tplClose();
     if(el.classList.contains('rc-overlay')&&typeof rcClose==='function')return rcClose();
     // Planners are lp-overlay / slp-overlay, not .mo — without these they fell
     // through to the class strip below and lost unsaved work in silence.
@@ -8766,7 +8965,7 @@ function _isTextInputFocused(){
   if(ae.isContentEditable)return true;
   return false;
 }
-function _isModalOpen(){return !!document.querySelector('.mo.open, .lp-overlay.open');}
+function _isModalOpen(){return !!document.querySelector('.mo.open, .lp-overlay.open, .tpl-ov.open');}
 document.addEventListener('keydown',ev=>{
   // Cmd+K / Ctrl+K → Search (works globally, even with modal open if not typing)
   if((ev.metaKey||ev.ctrlKey)&&(ev.key==='k'||ev.key==='K')){
@@ -8777,6 +8976,7 @@ document.addEventListener('keydown',ev=>{
   }
   // Esc → Close topmost open modal (overlay or .mo). Works even when typing inside.
   if(ev.key==='Escape'){
+    if(typeof tplHandleEsc==='function'&&tplHandleEsc(ev))return; // saves before closing
     const openModals=Array.from(document.querySelectorAll('.mo.open, .lp-overlay.open, .slp-overlay.open, .home-overlay.open'));
     if(openModals.length){
       // Find the one with highest z-index (visually on top)
@@ -9098,6 +9298,8 @@ function updateUndoBtns(){
   if(u)u.disabled=!undoStack.length;if(r)r.disabled=!redoStack.length;
 }
 document.addEventListener('keydown',e=>{
+  // The training planner has its own undo; the table's must never fire under it.
+  if(typeof _tplIsOpen==='function'&&_tplIsOpen()){tplKey(e);return;}
   if((e.ctrlKey||e.metaKey)&&e.key==='z'&&!e.shiftKey){e.preventDefault();undo();}
   if((e.ctrlKey||e.metaKey)&&(e.key==='y'||(e.key==='z'&&e.shiftKey))){e.preventDefault();redo();}
 });
@@ -19812,6 +20014,7 @@ function openSessStats(si){
   }catch(e){}
   if(lbw)lbw.style.display=(isMatchSess&&isUpcoming)?'block':'none';
   if(lvw)lvw.style.display=(isMatchSess&&!isUpcoming&&hasSavedLineup)?'block':'none';
+  try{_tplSyncSessBtn(si);}catch(e){console.error('tplBtn:',e);}
   if(noteEl){const sn=s.note;if(sn){noteEl.textContent='📝 '+sn;noteEl.style.display='block';}else{noteEl.style.display='none';}}
   // Reset edit section
   const ssEditBox=document.getElementById('ss-edit');
@@ -26961,6 +27164,833 @@ function showSaveFlash(text){
   el.classList.add('show');
   clearTimeout(el._t);
   el._t=setTimeout(()=>el.classList.remove('show'),1500);
+}
+
+// ══════════════════════════════
+//  TRAININGSPLANER — trainer only
+// ══════════════════════════════
+// Plans live in their own node, fcf_plans, and NOT in fcf_data: every client,
+// players included, downloads fcf_data in full, while fcf_plans is only ever
+// read by the functions below, and every entry point refuses to run in player
+// mode or without edit rights for the team.
+// A training gets a stable id (s.pid) the first time a plan is saved for it:
+// session indices shift whenever a session is added or moved, ids do not.
+// Layout per team:  plans/<pid>  idx/<pid> (summary)  lib/<id>  tpl/<id>  meta
+const TPL_ROOT='fcf_plans';
+const TPL_LS='fcf_plans_local';   // writes not yet confirmed by Firebase
+const TPL_CATS=[
+  {k:'Aufwärmen',c:'#2BA39A'},{k:'Rondo',c:'#1E5BC6'},{k:'Passspiel',c:'#3D8FD6'},{k:'Technik',c:'#5468D4'},
+  {k:'Spielform',c:'#E8A928'},{k:'Umschalten',c:'#8B5CC7'},{k:'Torschuss',c:'#D9443F'},{k:'Athletik',c:'#E07A3A'},
+  {k:'Torwart',c:'#2E7D46'},{k:'Auslaufen',c:'#7A8BA6'},{k:'Sonstiges',c:'#9AA5B8'}
+];
+// Standard drills every team library starts with: [Titel, Kategorie, Min., Spieler, Feld, Ablauf, Coaching-Punkte]
+const TPL_SEED=[
+  ['Passdreieck mit Positionswechsel','Aufwärmen',15,'6–12','Dreieck, 12 m','Drei Hütchen im Dreieck, Abstand 12 m, an jedem Hütchen 2–4 Spieler. Pass zum nächsten Hütchen und dem Ball hinterherlaufen.\nNach 5 Min. Richtungswechsel, danach nur mit dem schwachen Fuß oder direkt.','Pass auf den richtigen Fuß des Mitspielers\nOffene Annahme, Ball mit dem ersten Kontakt mitnehmen\nVor dem Pass Blickkontakt und Name rufen'],
+  ['Lauf-ABC mit Mobilisation','Aufwärmen',10,'alle','20 m Strecke','Lauf-ABC auf 20 m: Fußgelenksarbeit, Skippings, Anfersen, Seitgalopp, Überkreuzlauf, Kniehebelauf. Zurück jeweils locker traben.\nZum Abschluss Hüfte und Sprunggelenk mobilisieren, dann 2–3 Steigerungsläufe.','Aufrechter Oberkörper, aktive Armarbeit\nKurzer Bodenkontakt\nSteigerungen bis etwa 90 %, nicht maximal'],
+  ['Ballgewöhnung im Quadrat','Aufwärmen',10,'alle','20 × 20 m','Jeder Spieler mit Ball im Quadrat: Dribbling mit Richtungs- und Tempowechseln, Sohle, Innen- und Außenseite, Finten.\nAuf Zuruf wechselt die Aufgabe (Ball stoppen, Drehung, Sprint aus dem Feld und zurück).','Kopf hoch, Blick vom Ball lösen\nViele Ballkontakte mit beiden Füßen\nTempowechsel deutlich machen'],
+  ['Koordinationsleiter mit Passabschluss','Aufwärmen',12,'6–12','Leiter + 10 m','Lauf durch die Koordinationsleiter (Ein-Aus, seitwärts, Skippings), danach Pass vom Anspieler direkt zurückspielen und hinten anstellen.\nDer Anspieler wechselt jede Minute.','Schnelle, kleine Schritte\nNach der Leiter kurz abbremsen, dann sauber passen\nKörper zum Ball öffnen'],
+  ['Rondo 4 gegen 1','Rondo',10,'5','8 × 8 m','Vier Spieler am Rand halten den Ball gegen einen Verteidiger in der Mitte, maximal 2 Kontakte.\nWer den Ballverlust verursacht, geht in die Mitte. 3 × 3 Min., 1 Min. Pause.','Immer zwei Anspielstationen anbieten, links und rechts\nOffene Körperstellung, Ball weg vom Verteidiger mitnehmen\nVerteidiger: einen Passweg zustellen und den Ball lenken'],
+  ['Rondo 5 gegen 2','Rondo',15,'7','15 × 15 m','Fünf Spieler am Rand halten den Ball gegen zwei im Feld, maximal 2 Kontakte.\nWer den Ballverlust verursacht, geht mit dem Spieler, der am längsten drin ist, in die Mitte. 3 × 4 Min., 1 Min. Pause.','Offene Körperstellung vor der Ballannahme\nPass in den Fuß, weg vom Verteidiger\nVerteidiger: Passweg zustellen, zu zweit anlaufen'],
+  ['Rondo 4 + 2 gegen 2 mit Seitenwechsel','Rondo',15,'8','2 Felder à 10 × 10 m','Zwei Felder nebeneinander: im ersten 4 gegen 2, im zweiten warten zwei Spieler des Ballbesitzteams. Nach 6 Pässen geht der Ball ins zweite Feld, zwei Spieler laufen mit, zwei Verteidiger rücken nach.\nBei Ballverlust tauschen die Verteidiger mit den Spielern, die den Fehler gemacht haben.','Erst sichern, dann verlagern\nTimingläufe ins zweite Feld\nVerteidiger: sofort nachrücken, Ball isolieren'],
+  ['Positionsrondo 4 gegen 4 + 3','Rondo',15,'11','25 × 20 m','4 gegen 4 in Ballbesitz mit drei Neutralen: je einer an den Stirnseiten, einer zentral. Die Neutralen spielen immer mit dem Team in Ballbesitz.\nPunkt nach 8 Pässen oder nach einem Pass von Stirnseite zu Stirnseite. 4 × 3 Min.','Spielfeld breit und tief machen\nZentralen Spieler suchen, in den Rücken des Gegners drehen\nNach Ballverlust sofort Gegenpressing'],
+  ['Y-Passform mit Hinterlaufen','Passspiel',15,'8–12','Y-Form, ca. 30 m','Startposition A, zentraler Spieler B nach 15 m, zwei äußere Positionen C und D je 10 m schräg dahinter.\nA passt auf B, B lässt prallen, A spielt steil auf C, B hinterläuft und bekommt den Ball von C in den Lauf. Jeder rückt eine Position weiter, im Wechsel über links und rechts.','Präzise Pässe mit passender Schärfe\nAblagen auf den starken Fuß des Mitspielers\nHinterlaufen mit Tempo, Pass in den Lauf'],
+  ['Passraute mit drittem Mann','Passspiel',15,'8–12','Raute, 15 m','Vier Positionen in einer Raute. A spielt auf B, B lässt auf C prallen, C spielt den freigelaufenen A in die Tiefe (Dritter-Mann-Lauf). Danach rücken alle eine Position weiter.\nVariation: nur Direktspiel oder Spielrichtung wechseln.','Lauf des dritten Mannes erst nach dem ersten Pass starten\nAblage flach und in den Lauf\nKommunikation und Blick über die Schulter'],
+  ['Passviereck mit Doppelpass','Passspiel',12,'8–12','15 × 15 m','Vier Hütchen im Quadrat, an jedem 2–3 Spieler. Pass zum nächsten Hütchen, dort Doppelpass, dann Pass zum übernächsten Hütchen und hinterherlaufen.\nAlle 3 Min. Richtungswechsel.','Doppelpass direkt, flach und scharf\nZum Ball entgegenkommen, nicht warten\nBei der Annahme den Körper in Spielrichtung öffnen'],
+  ['Spielverlagerung über drei Zonen','Passspiel',20,'12–16','45 × 30 m, 3 Zonen','Feld in drei Zonen: in den Außenzonen je 4 gegen 2, die Mittelzone ist neutral.\nNach 5 Pässen darf der Ball in die andere Außenzone verlagert werden, zwei Verteidiger wechseln hinüber. Punkt für jede gelungene Verlagerung.','Erst die Überzahl nutzen, dann den Seitenwechsel suchen\nVerlagerung flach oder halbhoch, nicht hoch und lang\nVerteidiger: den Ball auf einer Seite halten'],
+  ['Ballan- und -mitnahme im Quadrat','Technik',12,'8–12','20 × 20 m','Paare spielen sich im Quadrat zu. Die Annahme geht mit dem ersten Kontakt in die freie Richtung, dann Pass zum nächsten freien Spieler.\nSteigerung: Annahme nur mit dem schwachen Fuß oder erst nach einem Schulterblick.','Vor der Annahme Schulterblick\nErster Kontakt weg vom Druck\nOffene Hüfte, Ball nicht stoppen, sondern mitnehmen'],
+  ['Dribbling-Parcours mit Finten','Technik',12,'6–12','Hütchenparcours, 25 m','Slalom durch Hütchen, danach 1 gegen 1 gegen einen passiven Verteidiger mit Finte (Übersteiger, Schere, Körpertäuschung) und Abschluss auf ein Minitor.\nZwei Parcours nebeneinander als Wettkampf.','Enge Ballführung im Slalom\nNach der Finte Tempo aufnehmen\nBall mit dem Fuß mitnehmen, der von der Finte wegführt'],
+  ['Kopfballspiel zu dritt','Technik',10,'3er-Gruppen','10 m','Ein Spieler wirft zu, einer köpft zurück, der dritte steht als Gegenspieler im Rücken. Erst aus dem Stand, dann aus dem Sprung, dann mit Richtungswechsel.\nNach 10 Kopfbällen wird gewechselt.','Augen offen, mit der Stirn treffen\nSpannung aus dem Oberkörper\nEinbeinig abspringen, Arme für Schwung und Schutz'],
+  ['1 gegen 1 auf Minitore','Spielform',15,'ab 6 Spieler','15 × 10 m','Zwei Minitore an den Stirnseiten. Der Trainer spielt den Ball ein, 1 gegen 1 bis zum Tor oder höchstens 20 Sekunden.\nDer Sieger bleibt, der Verlierer stellt sich hinten an. Kurz und intensiv.','Mit Tempo auf den Gegner zudribbeln\nVerteidiger: seitlich stellen, auf eine Seite lenken\nNach Ballgewinn sofort umschalten'],
+  ['2 gegen 2 auf Linie','Spielform',15,'ab 8 Spieler','20 × 15 m','Punkt durch kontrolliertes Dribbling über die gegnerische Grundlinie.\n4 Durchgänge à 90 Sek., dazwischen aktive Pause. Wartende Teams sind Anspieler am Rand.','Breite herstellen, 2-gegen-1-Situationen suchen\nDoppelpass oder Hinterlaufen nutzen\nVerteidiger: sichern und absprechen'],
+  ['4 gegen 4 + 2 Neutrale auf Minitore','Spielform',25,'10','30 × 25 m','Zwei Teams à 4 Spieler, zwei Neutrale spielen immer mit dem Team in Ballbesitz. Je zwei Minitore pro Seite.\n4 × 5 Min. Ein Tor zählt nur nach mindestens 4 Pässen.','Spiel auf das freie Minitor verlagern\nNeutrale als Anspieler nutzen\nNach Ballverlust sofort Gegenpressing'],
+  ['5 gegen 5 mit Torhütern','Spielform',20,'12','40 × 30 m','Zwei Teams à 5 Spieler mit Torhütern auf zwei große Tore.\n3 × 6 Min. Ein Tor nach Flanke oder direktem Abschluss zählt doppelt.','Wenn möglich schnell in die Tiefe spielen\nAbschluss suchen\nKompakt verteidigen, ballnah verschieben'],
+  ['Abschlussspiel 8 gegen 8','Spielform',20,'16 + 2 TW','Halbes Feld','Spiel auf zwei große Tore mit Torhütern nach Wettkampfregeln.\nDen Schwerpunkt der Einheit als Zusatzregel einbauen, z. B. ein Tor nach Ballgewinn im Angriffsdrittel zählt doppelt.','Schwerpunkt der Einheit im Spiel sichtbar machen\nCoaching nur in Unterbrechungen\nSpannung und Wettkampf hochhalten'],
+  ['6 gegen 4 mit Konter auf 2 Tore','Umschalten',20,'10–12 + TW','40 × 35 m','Sechs Spieler greifen auf ein großes Tor an, vier verteidigen. Nach Ballgewinn kontern die vier innerhalb von 8 Sekunden auf zwei Minitore an der Mittellinie.\nNach Ballverlust sofort Gegenpressing der sechs.','Nach Ballgewinn erster Pass in die Tiefe\nKonter mit höchstens 3 Kontakten pro Spieler\nWer den Ball verliert: sofort nachsetzen, Konter verzögern'],
+  ['3 gegen 2, danach Konter 2 gegen 1','Umschalten',15,'ab 10 + TW','35 × 25 m','Drei Angreifer spielen gegen zwei Verteidiger auf das große Tor. Nach Abschluss oder Ballgewinn kontern die zwei Verteidiger gegen einen zurücklaufenden Angreifer auf zwei Minitore.\nDann kommt die nächste Gruppe.','Überzahl schnell und konsequent ausspielen\nOhne Pause umschalten, erster Kontakt nach vorne\nZurücklaufender Spieler: Zeit gewinnen, nicht ins Dribbling locken lassen'],
+  ['Gegenpressing 5 gegen 5 mit 5-Sekunden-Regel','Umschalten',15,'10–12','35 × 30 m','5 gegen 5 in Ballbesitz. Holt das Team, das den Ball verloren hat, ihn innerhalb von 5 Sekunden zurück, gibt es einen Punkt. Einen Punkt gibt es auch für 10 Pässe in Folge.\n4 × 3 Min.','Sofort Druck auf den Ballführenden\nPasswege im Nahbereich schließen\nIn Ballbesitz: erster Pass aus dem Druck heraus'],
+  ['Torschuss nach Doppelpass','Torschuss',15,'8–16 + TW','Strafraum + 20 m','Doppelpass mit dem Anspieler an der Strafraumgrenze, Abschluss mit höchstens 2 Kontakten.\nZwei Stationen parallel (links und rechts), die Torhüter wechseln nach jeder Serie.','Pass in den Lauf fordern\nAbschluss flach ins lange Eck\nNach jedem Schuss nachsetzen'],
+  ['Flanken und Abschluss','Torschuss',20,'10–16 + TW','Halbes Feld','Pass aus dem Zentrum auf den Flügel, der Außenspieler dribbelt an und flankt. Zwei Stürmer kreuzen (erster und zweiter Pfosten), ein dritter Spieler besetzt den Rückraum.\nIm Wechsel über links und rechts.','Flanke früh und scharf vor das Tor\nLaufwege zum ersten und zweiten Pfosten absprechen\nRückraum für Abpraller besetzen'],
+  ['Abschluss nach 1 gegen 1','Torschuss',15,'8–12 + TW','25 × 20 m vor dem Tor','Der Angreifer startet mit Ball, der Verteidiger seitlich versetzt. 1 gegen 1 mit Abschluss auf das große Tor.\nErobert der Verteidiger den Ball, kontert er auf ein Minitor.','Mit Tempo in den Strafraum ziehen\nFrüh abschließen, wenn der Verteidiger zögert\nVerteidiger: Schussbahn zustellen'],
+  ['Torschuss aus der Drehung','Torschuss',15,'6–12 + TW','20 m vor dem Tor','Ein Spieler mit dem Rücken zum Tor bekommt einen Pass, dreht mit dem ersten Kontakt auf und schließt ab. Erst ein passiver, später ein halbaktiver Gegenspieler im Rücken.\nIm Wechsel über links und rechts.','Schulterblick vor der Annahme\nMit dem ersten Kontakt aufdrehen, Ball vom Körper weg\nSchuss mit Spannung, Blick zum Tor'],
+  ['Reaktionssprints auf Farbsignal','Athletik',10,'alle','4 Farbhütchen, 10 m','Die Spieler stehen in der Mitte, vier farbige Hütchen im Abstand von 10 m. Der Trainer ruft eine Farbe: Sprint zum Hütchen und zurück.\n2 × 6 Sprints, 20 Sek. Pause zwischen den Sprints, 2 Min. zwischen den Serien.','Explosiver Antritt, erste Schritte kurz\nKontrolliert abbremsen und die Richtung wechseln\nPausen voll einhalten: Qualität vor Menge'],
+  ['Intervallläufe 15/15','Athletik',12,'alle','Bahnen à ca. 60 m','15 Sekunden laufen (etwa 85–90 % der maximalen Herzfrequenz), 15 Sekunden gehen.\n2 Serien à 6 Min., 3 Min. Pause dazwischen. Die Laufstrecke an das Niveau der Gruppe anpassen.','Gleichmäßiges Tempo halten\nLaufstrecken nach Gruppen staffeln\nNicht direkt nach einer sehr intensiven Spielform einplanen'],
+  ['Stabilisationszirkel','Athletik',15,'alle','Matten oder Rasen','6 Stationen à 40 Sek. Belastung, 20 Sek. Wechsel: Unterarmstütz, Seitstütz links und rechts, Kniebeugen, Ausfallschritte, Copenhagen-Plank.\n2 Durchgänge.','Saubere Ausführung vor Tempo\nRumpf durchgehend angespannt\nAtmung nicht anhalten'],
+  ['Torwart: Fangen und Fallen','Torwart',20,'2–3 TW','Strafraum','Grundtechnik: Bälle aus dem Stand fangen (hoch, halbhoch, flach), dann Fallen nach links und rechts aus dem Kniestand, später aus dem Stand.\nZum Abschluss Schüsse aus 11–16 m.','Hände hinter den Ball, Daumen zueinander\nÜber die Seite fallen, nicht auf den Ellenbogen\nNach dem Fangen schnell zurück in die Grundstellung'],
+  ['Auslaufen und Dehnen','Auslaufen',10,'alle','Rund um das Feld','5 Min. lockeres Auslaufen, danach die großen Muskelgruppen dehnen (Oberschenkel vorne und hinten, Wade, Hüftbeuger, Adduktoren), je 20–30 Sek.','Locker bleiben, den Puls herunterfahren\nKurz besprechen, was gut lief']
+];
+const TPL={team:null,season:null,si:null,pid:null,sessDate:null,sessTime:'',plan:null,sel:0,
+  lib:{},tpls:{},idx:{},undo:[],saveT:null,inflight:0,err:null,libCat:'Alle',libQ:'',libOpen:null,
+  mode:'replace',drag:null,dropAt:null,openSeq:0,idxCache:{},readFail:false};
+const TPL_IC={
+  up:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>',
+  down:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>',
+  dup:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>',
+  del:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>',
+  ok:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>',
+  find:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>'
+};
+function _tplEnc(k){return String(k).replace(/\//g,'__SL__').replace(/\./g,'__DOT__').replace(/[#$\[\]]/g,'_');}
+function _tplBase(team){return TPL_ROOT+'/'+_tplEnc(team||TPL.team);}
+function _tplId(pfx){return (pfx||'x')+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function _tplArr(x){
+  if(Array.isArray(x))return x.filter(Boolean);
+  if(x&&typeof x==='object')return Object.keys(x).sort((a,b)=>(+a)-(+b)).map(k=>x[k]).filter(Boolean);
+  return [];
+}
+function _tplClean(v){return JSON.parse(JSON.stringify(v));}
+function _tplCatColor(k){const c=TPL_CATS.find(x=>x.k===k);return c?c.c:'#9AA5B8';}
+function _tplE(s){return escapeHtml(s==null?'':String(s));}
+function _tplAllowed(){
+  if(typeof isPlayerMode==='function'&&isPlayerMode())return false;
+  if(typeof RPE_IS_PREVIEW!=='undefined'&&RPE_IS_PREVIEW)return false;
+  return typeof canEdit==='function'&&canEdit();
+}
+function _tplIsOpen(){const o=document.getElementById('tplOverlay');return !!(o&&o.classList.contains('open'));}
+function _tplPlayersTxt(p){p=String(p||'').trim();return /^[\d–\-\s]+$/.test(p)?p+' Spieler':p;}
+
+// ── Storage: Firebase, with a local copy of every write until it is confirmed.
+// If the database refuses (rules not yet updated) or the device is offline,
+// nothing is lost: the copy stays here and is uploaded on the next opening.
+function _tplLocal(){try{const v=JSON.parse(localStorage.getItem(TPL_LS)||'{}');return (v&&typeof v==='object')?v:{};}catch(e){return {};}}
+function _tplLocalSave(a){try{localStorage.setItem(TPL_LS,JSON.stringify(a));}catch(e){console.error('[Trainingsplan] lokal:',e&&e.message);}}
+function _tplLocalPut(path,v,ts){const a=_tplLocal();a[path]={v:(v===undefined?null:v),ts:ts};_tplLocalSave(a);}
+function _tplLocalDone(path,ts){const a=_tplLocal();if(a[path]&&a[path].ts===ts){delete a[path];_tplLocalSave(a);}}
+function _tplPending(){const p=TPL_ROOT+'/';return Object.keys(_tplLocal()).filter(k=>k.startsWith(p)).length;}
+function _tplDenied(e){return /permission/i.test(String(e&&(e.code||e.message)||''));}
+function _tplMerge(path,remote){
+  const loc=_tplLocal();
+  let out=remote,copied=false;
+  Object.keys(loc).forEach(q=>{
+    const e=loc[q];if(!e)return;
+    if(q===path){
+      if(!(remote&&typeof remote==='object'&&(remote.upd||0)>e.ts))out=e.v;
+      return;
+    }
+    if(!q.startsWith(path+'/'))return;
+    const key=q.slice(path.length+1);
+    if(key.indexOf('/')>=0)return; // writes are only ever one level below a read
+    if(!copied){out=(out&&typeof out==='object')?Object.assign({},out):{};copied=true;}
+    const r=out[key];
+    if(r&&typeof r==='object'&&(r.upd||0)>e.ts)return; // newer online
+    if(e.v===null||e.v===undefined)delete out[key];else out[key]=e.v;
+  });
+  return out;
+}
+async function _tplRead(path){
+  let remote=null;
+  if(typeof fbDb!=='undefined'&&fbDb){
+    // once() waits for a connection that may never come on a dead network.
+    try{
+      const sn=await Promise.race([fbDb.ref(path).once('value'),
+        new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),8000))]);
+      remote=sn.val();
+    }catch(e){TPL.err=e;TPL.readFail=true;}
+  }
+  return _tplMerge(path,remote);
+}
+function _tplWrite(path,v){
+  if(!_tplAllowed())return;
+  if(typeof _writeBlocked==='function'&&_writeBlocked('Trainingsplan'))return;
+  const ts=Date.now();
+  _tplLocalPut(path,v,ts);
+  if(typeof fbDb==='undefined'||!fbDb){_tplStatus();return;}
+  TPL.inflight++;_tplStatus();
+  fbDb.ref(path).set(v===undefined?null:v)
+    .then(()=>{_tplLocalDone(path,ts);TPL.err=null;})
+    .catch(e=>{TPL.err=e;console.error('[Trainingsplan] Speichern:',e&&e.message);})
+    .finally(()=>{TPL.inflight=Math.max(0,TPL.inflight-1);_tplStatus();});
+}
+function _tplFlush(){
+  if(typeof fbDb==='undefined'||!fbDb)return;
+  const loc=_tplLocal();
+  Object.keys(loc).forEach(p=>{
+    if(!p.startsWith(TPL_ROOT+'/'))return;
+    const e=loc[p];
+    fbDb.ref(p).transaction(cur=>{
+      if(cur&&typeof cur==='object'&&(cur.upd||0)>e.ts)return; // someone saved a newer version meanwhile
+      return e.v;
+    }).then(()=>{_tplLocalDone(p,e.ts);_tplStatus();}).catch(err=>{TPL.err=err;_tplStatus();});
+  });
+}
+function _tplStatus(){
+  const el=document.getElementById('tplSt');if(!el)return;
+  const pend=_tplPending();
+  let html,warn=false;
+  if(TPL.saveT||TPL.inflight>0)html='Speichert …';
+  else if(typeof fbDb==='undefined'||!fbDb)html=TPL_IC.ok+'<span class="st-l">Auf diesem Gerät gespeichert</span><span class="st-s">Auf dem Gerät</span>';
+  else if(pend&&TPL.err&&_tplDenied(TPL.err)){warn=true;html='<span class="st-l">⚠ Nur auf diesem Gerät gespeichert</span><span class="st-s">⚠ Nur lokal</span> <button type="button" onclick="tplWhyLocal()">Warum?</button>';}
+  else if(pend){warn=true;html='<span class="st-l">⚠ Offline gespeichert, wird hochgeladen</span><span class="st-s">⚠ Offline gespeichert</span>';}
+  else html=TPL_IC.ok+'Gespeichert';
+  el.className='tpl-st'+(warn?' warn':'');
+  el.innerHTML=html;
+}
+function tplWhyLocal(){
+  _tplDlg(`<h4>Noch nicht online</h4>
+    <p class="tpl-hint" style="font-size:15px">Die Datenbank hat noch keinen Bereich für Trainingspläne freigegeben. Deine Pläne sind sicher auf diesem Gerät gespeichert.</p>
+    <p class="tpl-hint" style="font-size:15px">Sobald die neuen Firebase-Regeln eingetragen sind, werden sie beim nächsten Öffnen automatisch hochgeladen und sind dann auf allen Geräten der Trainer da.</p>
+    <div class="tpl-dlg-f"><button class="tpl-btn pri" type="button" onclick="tplDlgClose()">Verstanden</button></div>`);
+}
+
+// ── Session helpers
+function _tplD(){return (G&&G.db&&TPL.team)?G.db[TPL.team+'__'+TPL.season]:null;}
+function _tplPidFor(D,s,season){
+  if(s.pid)return s.pid;
+  // Derived from date and time, so two trainers starting a plan for the same
+  // training at the same moment end up on the same record.
+  const base='p'+_dbSortKey(s.date,season)+'_'+String(s.time||'').replace(/\D/g,'');
+  const used=new Set((D&&D.sessions||[]).filter(x=>x&&x!==s&&x.pid).map(x=>x.pid));
+  let id=base,n=2;while(used.has(id))id=base+'_'+(n++);
+  return id;
+}
+function _tplSess(){
+  const D=_tplD();if(!D||!D.sessions)return null;
+  const s=D.sessions[TPL.si];
+  if(s&&(s.pid===TPL.pid||(!s.pid&&s.date===TPL.sessDate)))return s;
+  let i=D.sessions.findIndex(x=>x&&x.pid===TPL.pid);
+  if(i<0)i=D.sessions.findIndex(x=>x&&!x.pid&&x.date===TPL.sessDate&&(x.time||'')===TPL.sessTime);
+  if(i>=0){TPL.si=i;return D.sessions[i];}
+  return null;
+}
+function _tplMin(t){const m=String(t||'').match(/(\d{1,2})[:.](\d{2})/);return m?(+m[1])*60+(+m[2]):null;}
+function _tplHM(x){x=((x%1440)+1440)%1440;return String(Math.floor(x/60)).padStart(2,'0')+':'+String(x%60).padStart(2,'0');}
+function _tplDur(s){try{return (s&&rpeSessionMinutes(s,null,TPL.si))||90;}catch(e){return 90;}}
+function _tplTotal(bl){return _tplArr(bl||(TPL.plan&&TPL.plan.blocks)).reduce((a,b)=>a+(+b.min||0),0);}
+function _tplStarts(){
+  const s=_tplSess();const st=_tplMin(s&&s.time);let acc=0;
+  return TPL.plan.blocks.map(b=>{const a=acc;acc+=(+b.min||0);
+    return {from:a,to:acc,clock:st!=null?_tplHM(st+a):null,clockEnd:st!=null?_tplHM(st+acc):null};});
+}
+const TPL_WD=['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+function _tplDateLong(date,season,mode){
+  const k=_dbSortKey(date,season);
+  if(!k||k===99999999)return date||'';
+  const d=new Date(Math.floor(k/10000),Math.floor(k/100)%100-1,k%100);
+  const dm=String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.';
+  if(mode==='short')return TPL_WD[d.getDay()].slice(0,2)+' '+dm+String(d.getFullYear()).slice(2);
+  return TPL_WD[d.getDay()]+' '+dm+(mode==='year'?d.getFullYear():'');
+}
+function _tplYes(){
+  const D=_tplD();const s=_tplSess();if(!D||!s)return 0;const si=TPL.si;
+  return (D.players||[]).filter(p=>p&&p.s&&(p.s[si]===4||p.s[si]===1)
+    &&(typeof _sessAfterJoin!=='function'||_sessAfterJoin(p,s,TPL.season))).length;
+}
+function _tplNorm(p){
+  if(!p||typeof p!=='object')return null;
+  p=Object.assign({},p);
+  p.blocks=_tplArr(p.blocks).map(b=>_tplNewBlock(b,true));
+  return p;
+}
+function _tplNewBlock(src,keepId){
+  src=src||{};
+  return {id:(keepId&&src.id)||_tplId('b'),cat:src.cat||'Sonstiges',title:src.title||'',
+    min:(src.min===0||src.min)?(+src.min||0):15,players:src.players||'',area:src.area||'',
+    desc:src.desc||'',coach:src.coach||'',org:src.org||'',libId:src.libId||''};
+}
+
+// ── Open / close
+async function tplOpen(si){
+  if(!_tplAllowed())return;
+  const D=cd();const s=D&&D.sessions&&D.sessions[si];
+  if(!s||s.type==='match')return;
+  const seq=++TPL.openSeq;
+  Object.assign(TPL,{team:UI.currentTeam,season:UI.currentSeason,si:si,sessDate:s.date,sessTime:s.time||'',
+    plan:null,sel:0,undo:[],libOpen:null,libQ:'',libCat:'Alle',err:null,drag:null,readFail:false});
+  TPL.pid=_tplPidFor(D,s,TPL.season);
+  const ov=document.getElementById('tplOverlay');
+  if(!ov)return;
+  if(typeof _navArm==='function')_navArm();
+  ov.classList.add('open');
+  try{ov.focus({preventScroll:true});}catch(e){}
+  _tplHead();
+  document.getElementById('tplList').innerHTML='<div class="tpl-load">Plan wird geladen …</div>';
+  document.getElementById('tplEd').innerHTML='';
+  document.getElementById('tplLib').innerHTML='';
+  _tplUndoBtn();_tplStatus();
+  if(typeof setPresenceContext==='function')setPresenceContext('📝 Trainingsplan '+s.date);
+  _tplFlush();
+  const b=_tplBase();
+  const [plan,idx,lib,tpls,meta]=await Promise.all([
+    _tplRead(b+'/plans/'+TPL.pid),_tplRead(b+'/idx'),_tplRead(b+'/lib'),_tplRead(b+'/tpl'),_tplRead(b+'/meta')]);
+  if(seq!==TPL.openSeq||!ov.classList.contains('open'))return;
+  TPL.idx=(idx&&typeof idx==='object')?idx:{};TPL.idxCache[TPL.team]=TPL.idx;
+  TPL.lib=(lib&&typeof lib==='object')?lib:{};
+  TPL.tpls=(tpls&&typeof tpls==='object')?tpls:{};
+  if(!meta||!meta.seeded){
+    // Seed only on a definite answer: after a failed read, writing the
+    // standard set would overwrite edits and bring back deleted drills.
+    if(!TPL.readFail)_tplSeed();
+    else if(!Object.keys(TPL.lib).length)_tplSeedView();
+  }
+  TPL.plan=_tplNorm(plan)||{v:1,blocks:[]};
+  _tplRenderAll();
+}
+function _tplSeed(){
+  const b=_tplBase();const now=Date.now();
+  TPL_SEED.forEach((x,i)=>{
+    const id='std'+String(i+1).padStart(2,'0');
+    if(TPL.lib[id])return;
+    const it={title:x[0],cat:x[1],min:x[2],players:x[3],area:x[4],desc:x[5],coach:x[6],std:1,upd:now};
+    TPL.lib[id]=it;_tplWrite(b+'/lib/'+id,it);
+  });
+  _tplWrite(b+'/meta',{seeded:now,upd:now});
+}
+function _tplSeedView(){ // shown, not stored — the real seeding happens once the database answers
+  const now=0;
+  TPL_SEED.forEach((x,i)=>{TPL.lib['std'+String(i+1).padStart(2,'0')]={title:x[0],cat:x[1],min:x[2],players:x[3],area:x[4],desc:x[5],coach:x[6],std:1,upd:now};});
+}
+function tplClose(){
+  if(TPL.saveT)_tplSaveNow();
+  tplDlgClose();
+  const ov=document.getElementById('tplOverlay');
+  if(ov)ov.classList.remove('open');
+  const t=document.getElementById('tplToast');if(t)t.classList.remove('show');
+  TPL.openSeq++;
+  const s=_tplSess();
+  if(s&&typeof setPresenceContext==='function')setPresenceContext('🏃 '+s.date);
+  try{
+    const m=document.getElementById('moSession2');
+    if(m&&m.classList.contains('open')&&typeof _currentSessIdx!=='undefined')_tplSyncSessBtn(_currentSessIdx);
+  }catch(e){}
+}
+function tplHandleEsc(ev){
+  if(!_tplIsOpen())return false;
+  ev.preventDefault();
+  const d=document.getElementById('tplDlg');
+  if(d&&d.classList.contains('open'))tplDlgClose();else tplClose();
+  return true;
+}
+function tplKey(e){
+  const k=(e.key||'').toLowerCase();
+  if(!(e.ctrlKey||e.metaKey)||(k!=='z'&&k!=='y'))return;
+  const t=e.target;
+  if(t&&(/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)||t.isContentEditable))return; // the field's own undo
+  e.preventDefault();
+  if(k==='z'&&!e.shiftKey)tplUndo();
+}
+
+// ── Session window entry point
+function _tplSyncSessBtn(si){
+  const w=document.getElementById('ss-plan-btn-wrap');if(!w)return;
+  const D=cd();const s=D&&D.sessions&&D.sessions[si];
+  const show=!!(s&&s.type!=='match'&&_tplAllowed());
+  w.style.display=show?'block':'none';
+  if(!show)return;
+  const team=UI.currentTeam;
+  const idx=TPL.idxCache[team];
+  const e=(s.pid&&idx)?idx[s.pid]:null;
+  const btn=w.querySelector('button');
+  if(btn)btn.innerHTML=(s.pid&&(!e||e.n>0))
+    ?'📝 Trainingsplan öffnen'+(e&&e.n?` <span style="font-weight:500;opacity:.75">· ${e.n} ${e.n===1?'Block':'Blöcke'} · ${e.m}′</span>`:'')
+    :'📝 Trainingsplan erstellen';
+  // The summaries are tiny; load them once so the button can say what is planned.
+  if(s.pid&&!idx&&typeof fbDb!=='undefined'&&fbDb&&!TPL.idxCache['__'+team]){
+    TPL.idxCache['__'+team]=1; // one request per team and page load
+    _tplRead(_tplBase(team)+'/idx').then(v=>{
+      if(TPL.idxCache[team])return; // the planner loaded it meanwhile
+      TPL.idxCache[team]=(v&&typeof v==='object')?v:{};
+      if(UI.currentTeam===team&&typeof _currentSessIdx!=='undefined'&&_currentSessIdx===si)_tplSyncSessBtn(si);
+    }).catch(()=>{});
+  }
+}
+
+// ── Saving
+function _tplTouch(){
+  if(!TPL.plan)return;
+  TPL.plan.upd=Date.now();TPL.plan.by=(CU&&CU.name)||'';
+  clearTimeout(TPL.saveT);
+  TPL.saveT=setTimeout(_tplSaveNow,700);
+  _tplStatus();
+}
+function _tplSaveNow(){
+  clearTimeout(TPL.saveT);TPL.saveT=null;
+  if(!TPL.plan||!TPL.team||!_tplAllowed())return;
+  const s=_tplSess();
+  if(s&&!s.pid){s.pid=TPL.pid;try{saveG(false);}catch(e){console.error('[Trainingsplan] pid:',e);}}
+  const p=_tplClean(TPL.plan);
+  p.v=1;p.season=TPL.season;
+  p.date=s?s.date:(p.date||TPL.sessDate);p.time=s?(s.time||''):(p.time||TPL.sessTime);
+  p.upd=p.upd||Date.now();
+  const b=_tplBase();
+  _tplWrite(b+'/plans/'+TPL.pid,p);
+  const sum={d:p.date,t:p.time,s:p.season,n:p.blocks.length,m:_tplTotal(p.blocks),
+    f:p.blocks.map(x=>x.title).filter(Boolean).slice(0,4).join(' · ').slice(0,160),
+    c:p.blocks.map(x=>x.cat).join('|').slice(0,200),upd:p.upd};
+  TPL.idx[TPL.pid]=sum;
+  _tplWrite(b+'/idx/'+TPL.pid,sum);
+  _tplStatus();
+}
+
+// ── Undo (structure only — text fields keep their own undo)
+function _tplPushUndo(){
+  TPL.undo.push(JSON.stringify({b:TPL.plan.blocks,s:TPL.sel}));
+  if(TPL.undo.length>40)TPL.undo.shift();
+  _tplUndoBtn();
+}
+function tplUndo(){
+  const x=TPL.undo.pop();if(!x||!TPL.plan)return;
+  const o=JSON.parse(x);TPL.plan.blocks=o.b;TPL.sel=o.s;
+  _tplRenderList();_tplRenderEd();_tplUndoBtn();_tplTouch();
+  _tplToast('Rückgängig gemacht');
+}
+function _tplUndoBtn(){const b=document.getElementById('tplUndoBtn');if(b)b.disabled=!TPL.undo.length;}
+
+// ── Rendering
+function _tplRenderAll(){_tplHead();_tplRenderList();_tplRenderEd();_tplRenderLib();_tplUndoBtn();_tplStatus();}
+function _tplHead(){
+  const el=document.getElementById('tplSub');if(!el)return;
+  const s=_tplSess();if(!s){el.textContent='';return;}
+  const st=_tplMin(s.time);const bits=[_tplDateLong(s.date,TPL.season)];
+  if(st!=null)bits.push(_tplHM(st)+'–'+_tplHM(st+_tplDur(s)));
+  bits.push(TPL.team);
+  if(s.location&&String(s.location).trim())bits.push(String(s.location).trim());
+  if(s.focus)bits.push('Schwerpunkt: '+s.focus+(s.focus2?' + '+s.focus2:''));
+  const y=_tplYes();if(y)bits.push(y+' Zusagen');
+  el.textContent=bits.join(' · ');
+}
+function _tplRenderList(){
+  const el=document.getElementById('tplList');if(!el||!TPL.plan)return;
+  const s=_tplSess();const dur=_tplDur(s);const tot=_tplTotal();const bl=TPL.plan.blocks;const st=_tplStarts();
+  const cls=tot===dur?'ok':tot<dur?'under':'over';
+  const bar=bl.map(b=>`<span style="flex:${Math.max(+b.min||0,1)} 1 0;background:${_tplCatColor(b.cat)}"></span>`).join('')
+    +(tot<dur?`<span class="rest" style="flex:${dur-tot} 1 0"></span>`:'');
+  const rows=bl.map((b,i)=>`<div role="button" tabindex="0" class="tpl-blk${i===TPL.sel?' sel':''}" draggable="true" data-i="${i}"
+      aria-pressed="${i===TPL.sel}" onclick="tplSelect(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();tplSelect(${i});}" ondragstart="tplDragStart(event,${i})" ondragend="tplDragEnd()"
+      ondragover="tplDragOver(event,${i})" ondragleave="tplDragLeave(event)" ondrop="tplDrop(event)">
+      <span class="tpl-stripe" style="background:${_tplCatColor(b.cat)}"></span>
+      <span class="tpl-bt"><span class="tpl-bk">${st[i].clock?st[i].clock+' · ':''}${_tplE(b.cat)}</span>
+        <span class="tpl-bn${b.title?'':' empty'}">${b.title?_tplE(b.title):'Ohne Titel'}</span>
+        ${b.org?`<span class="tpl-bo">${_tplE(b.org)}</span>`:''}</span>
+      <span class="tpl-bm">${+b.min||0}′</span></div>`).join('');
+  let msg='';
+  if(!bl.length)msg='<div class="tpl-hint">Noch nichts geplant. Übungen aus der Bibliothek mit + übernehmen<span class="tpl-dsk"> oder hierher ziehen</span>.</div>';
+  else if(tot>dur)msg=`<div class="tpl-hint" style="color:#D9443F">${tot-dur} Min. mehr, als die Einheit dauert.</div>`;
+  else if(tot<dur)msg=`<div class="tpl-hint">Noch ${dur-tot} Min. frei.</div>`;
+  el.innerHTML=`<div class="tpl-row"><h3 class="tpl-h3">Ablauf</h3><span class="tpl-tot"><span class="${cls}">${tot}</span> / ${dur} Min.</span></div>
+    <div class="tpl-bar" role="img" aria-label="Zeitaufteilung: ${tot} von ${dur} Minuten verplant">${bar}</div>${msg}
+    ${bl.length?`<div class="tpl-blocks">${rows}</div>`:''}
+    <button type="button" class="tpl-add" ondragover="tplDragOver(event,-1)" ondragleave="tplDragLeave(event)" ondrop="tplDrop(event)" onclick="tplAddBlock()">+ Block hinzufügen</button>
+    <div class="tpl-links">
+      <button type="button" class="tpl-lnk" onclick="tplCopyDlg()">Aus früherem Training übernehmen</button>
+      <button type="button" class="tpl-lnk" onclick="tplLoadTplDlg()">Vorlage laden</button>
+    </div>`;
+}
+function _tplKick(i){
+  const st=_tplStarts()[i];const b=TPL.plan.blocks[i];
+  return `Block ${i+1}`+(st&&st.clock?` · ${st.clock}–${st.clockEnd}`:'')+` · ${_tplE(b.cat)}`;
+}
+function _tplRenderEd(){
+  const el=document.getElementById('tplEd');if(!el||!TPL.plan)return;
+  const bl=TPL.plan.blocks;
+  el.classList.toggle('ed-empty',!bl.length); // phones: the Ablauf card already offers the same three ways in
+  if(!bl.length){
+    el.innerHTML=`<div class="tpl-empty"><h4>Noch kein Ablauf</h4>
+      <p>Wähle rechts Übungen aus der Bibliothek, lege einen leeren Block an oder übernimm einen früheren Plan.</p>
+      <div class="tpl-acts"><button type="button" class="tpl-ab" onclick="tplAddBlock()">+ Leerer Block</button>
+      <button type="button" class="tpl-ab" onclick="tplCopyDlg()">Früheren Plan übernehmen</button>
+      <button type="button" class="tpl-ab" onclick="tplLoadTplDlg()">Vorlage laden</button></div></div>`;
+    return;
+  }
+  if(TPL.sel>=bl.length)TPL.sel=bl.length-1;if(TPL.sel<0)TPL.sel=0;
+  const i=TPL.sel,b=bl[i];
+  const known=TPL_CATS.some(c=>c.k===b.cat);
+  const catOpts=TPL_CATS.map(c=>`<option value="${c.k}"${c.k===b.cat?' selected':''}>${c.k}</option>`).join('')
+    +(known?'':`<option value="${_tplE(b.cat)}" selected>${_tplE(b.cat)}</option>`);
+  const inLib=!!(b.libId&&TPL.lib[b.libId]);
+  el.innerHTML=`
+  <div class="tpl-ed-top">
+    <div class="tpl-ed-l">
+      <span class="tpl-kick" id="tplKick">${_tplKick(i)}</span>
+      <textarea class="tpl-in-title" id="tplTitle" rows="1" placeholder="Name der Übung" aria-label="Name der Übung" oninput="_tplGrow(this);tplSetF('title',this.value.replace(/[\\r\\n]+/g,' '))" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${_tplE(b.title)}</textarea>
+      <div class="tpl-chips">
+        <label class="tpl-chip"><span class="tpl-catdot" id="tplCatDot" style="background:${_tplCatColor(b.cat)}"></span><select aria-label="Kategorie" onchange="tplSetF('cat',this.value)">${catOpts}</select></label>
+        <span class="tpl-chip"><span>Dauer</span><button type="button" class="tpl-step" onclick="tplStepMin(-5)" aria-label="5 Minuten weniger">–</button><input class="w-min" id="tplMinIn" type="number" inputmode="numeric" min="1" max="240" value="${+b.min||0}" aria-label="Dauer in Minuten" oninput="tplSetMin(this.value)"><span>Min.</span><button type="button" class="tpl-step" onclick="tplStepMin(5)" aria-label="5 Minuten mehr">+</button></span>
+        <label class="tpl-chip"><span>Spieler</span><input class="w-txt" value="${_tplE(b.players)}" placeholder="z. B. 7 pro Feld" oninput="tplSetF('players',this.value)"></label>
+        <label class="tpl-chip"><span>Feld</span><input class="w-txt" value="${_tplE(b.area)}" placeholder="z. B. 15 × 15 m" oninput="tplSetF('area',this.value)"></label>
+      </div>
+    </div>
+    <div class="tpl-acts">
+      <button type="button" class="tpl-ab" id="tplLibBtn" onclick="tplToLib()" title="${inLib?'Übung in der Bibliothek aktualisieren':'Als Übung in der Bibliothek speichern'}">${_tplLibLbl(inLib)}</button>
+      <button type="button" class="tpl-ab ico" title="Nach oben" aria-label="Nach oben" onclick="tplMove(-1)"${i===0?' disabled':''}>${TPL_IC.up}</button>
+      <button type="button" class="tpl-ab ico" title="Nach unten" aria-label="Nach unten" onclick="tplMove(1)"${i===bl.length-1?' disabled':''}>${TPL_IC.down}</button>
+      <button type="button" class="tpl-ab ico" title="Duplizieren" aria-label="Duplizieren" onclick="tplDup()">${TPL_IC.dup}</button>
+      <button type="button" class="tpl-ab ico danger" title="Block entfernen" aria-label="Block entfernen" onclick="tplDel()">${TPL_IC.del}</button>
+    </div>
+  </div>
+  <div class="tpl-grid2">
+    <div class="tpl-fld"><label for="tplDesc">Ablauf</label><textarea id="tplDesc" placeholder="Aufbau, Regeln, Durchgänge und Pausen …" oninput="tplSetF('desc',this.value)">${_tplE(b.desc)}</textarea></div>
+    <div class="tpl-fld"><label for="tplCoach">Coaching-Punkte</label><textarea id="tplCoach" placeholder="Ein Punkt pro Zeile" oninput="tplSetF('coach',this.value)">${_tplE(b.coach)}</textarea></div>
+  </div>
+  <div class="tpl-fld tpl-org"><label for="tplOrg">Gruppen / Organisation</label><input id="tplOrg" value="${_tplE(b.org)}" placeholder="z. B. Gelb + Blau → Feld 1 · Torhüter separat" oninput="tplSetF('org',this.value)"></div>`;
+  _tplGrow(document.getElementById('tplTitle'));
+}
+// Long drill names wrap instead of disappearing behind the edge of the field.
+function _tplGrow(el){if(!el)return;el.style.height='auto';el.style.height=el.scrollHeight+'px';}
+function _tplLibLbl(inLib){
+  return '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg>'
+    +'<span><span class="tpl-dsk">In </span>Bibliothek<span class="tpl-dsk"> '+(inLib?'aktualisieren':'speichern')+'</span></span>';
+}
+function _tplLibItems(){
+  return Object.keys(TPL.lib||{}).map(id=>{const x=TPL.lib[id];return (x&&typeof x==='object'&&x.title)?Object.assign({id:id},x):null;}).filter(Boolean);
+}
+function _tplRenderLib(){
+  const el=document.getElementById('tplLib');if(!el)return;
+  const all=_tplLibItems();
+  const cats=['Alle'].concat(TPL_CATS.map(c=>c.k).filter(k=>all.some(x=>x.cat===k)))
+    .concat([...new Set(all.map(x=>x.cat).filter(c=>c&&!TPL_CATS.some(t=>t.k===c)))]);
+  if(cats.indexOf(TPL.libCat)<0)TPL.libCat='Alle';
+  el.innerHTML=`<div class="tpl-row"><h3 class="tpl-h3">Übungen ${_tplE(TPL.team)}</h3><span class="tpl-hint">${all.length} ${all.length===1?'Übung':'Übungen'}</span></div>
+    <label class="tpl-srch">${TPL_IC.find}<input type="search" placeholder="Übung suchen" aria-label="Übung suchen" value="${_tplE(TPL.libQ)}" oninput="TPL.libQ=this.value;_tplRenderLibList()"></label>
+    <div class="tpl-cats">${cats.map(c=>`<button type="button" class="tpl-cat${c===TPL.libCat?' on':''}" data-c="${_tplE(c)}" onclick="tplLibCat(this.dataset.c)">${_tplE(c)}</button>`).join('')}</div>
+    <div class="tpl-lib" id="tplLibList"></div>
+    <button type="button" class="tpl-new" onclick="tplLibEdit()">+ Neue Übung</button>`;
+  _tplRenderLibList();
+}
+function tplLibCat(c){TPL.libCat=c;document.querySelectorAll('#tplLib .tpl-cat').forEach(b=>b.classList.toggle('on',b.dataset.c===c));_tplRenderLibList();}
+function _tplCatIdx(c){const i=TPL_CATS.findIndex(x=>x.k===c);return i<0?99:i;}
+function _tplRenderLibList(){
+  const el=document.getElementById('tplLibList');if(!el)return;
+  const q=String(TPL.libQ||'').trim().toLowerCase();
+  const items=_tplLibItems().filter(x=>(TPL.libCat==='Alle'||x.cat===TPL.libCat)
+    &&(!q||(x.title+' '+x.cat+' '+(x.desc||'')+' '+(x.coach||'')).toLowerCase().indexOf(q)>=0))
+    .sort((a,b)=>_tplCatIdx(a.cat)-_tplCatIdx(b.cat)||String(a.title).localeCompare(String(b.title),'de'));
+  if(!items.length){el.innerHTML=`<div class="tpl-none">${q?'Keine Übung gefunden.':'Noch keine Übungen in dieser Kategorie.'}</div>`;return;}
+  el.innerHTML=items.map(x=>{
+    const open=TPL.libOpen===x.id;
+    const meta=[x.cat,x.min?x.min+' Min.':'',x.players?_tplPlayersTxt(x.players):''].filter(Boolean).join(' · ');
+    const coach=String(x.coach||'').split(/\n+/).map(c=>c.trim()).filter(Boolean);
+    return `<div class="tpl-li${open?' open':''}">
+      <div class="tpl-li-h" draggable="true" ondragstart="tplLibDragStart(event,'${x.id}')" ondragend="tplDragEnd()" onclick="tplLibToggle('${x.id}')" title="Klicken für Details, ziehen in den Ablauf">
+        <span class="tpl-stripe" style="background:${_tplCatColor(x.cat)};align-self:stretch"></span>
+        <span class="tpl-li-t"><b>${_tplE(x.title)}</b><span>${_tplE(meta)}</span></span>
+        <button type="button" class="tpl-li-plus" title="In den Ablauf übernehmen" aria-label="${_tplE(x.title)} in den Ablauf übernehmen" onclick="event.stopPropagation();tplAddLib('${x.id}')">+</button>
+      </div>
+      ${open?`<div class="tpl-li-b">${x.area?`<span><b>Feld:</b> ${_tplE(x.area)}</span>`:''}${x.desc?`<p>${_tplE(x.desc)}</p>`:''}
+        ${coach.length?`<ul>${coach.map(c=>'<li>'+_tplE(c)+'</li>').join('')}</ul>`:''}
+        <div class="tpl-acts"><button type="button" class="tpl-ab" onclick="tplAddLib('${x.id}')">+ In den Ablauf</button><button type="button" class="tpl-ab" onclick="tplLibEdit('${x.id}')">Bearbeiten</button></div></div>`:''}
+    </div>`;
+  }).join('');
+}
+function tplLibToggle(id){TPL.libOpen=(TPL.libOpen===id)?null:id;_tplRenderLibList();}
+
+// ── Editing blocks
+function _tplCur(){return TPL.plan&&TPL.plan.blocks[TPL.sel];}
+function _tplAfterEdit(){
+  _tplRenderList();
+  const k=document.getElementById('tplKick');if(k&&_tplCur())k.innerHTML=_tplKick(TPL.sel);
+  _tplTouch();
+}
+function tplSetF(f,v){
+  const b=_tplCur();if(!b)return;
+  b[f]=v;
+  if(f==='cat'){const d=document.getElementById('tplCatDot');if(d)d.style.background=_tplCatColor(v);}
+  _tplAfterEdit();
+}
+function tplSetMin(v){const b=_tplCur();if(!b)return;b.min=Math.max(0,Math.min(240,parseInt(v,10)||0));_tplAfterEdit();}
+function tplStepMin(d){
+  const b=_tplCur();if(!b)return;
+  b.min=Math.max(1,Math.min(240,(+b.min||0)+d));
+  const inp=document.getElementById('tplMinIn');if(inp)inp.value=b.min;
+  _tplAfterEdit();
+}
+function _tplRedraw(){_tplRenderList();_tplRenderEd();_tplTouch();}
+function _tplFocusEd(focusTitle){
+  if(window.innerWidth<=760){const e=document.getElementById('tplEd');if(e)e.scrollIntoView({behavior:'smooth',block:'start'});}
+  if(focusTitle)setTimeout(()=>{const t=document.getElementById('tplTitle');if(t)try{t.focus({preventScroll:window.innerWidth<=760});}catch(e){t.focus();}},60);
+}
+function tplSelect(i){TPL.sel=i;_tplRenderList();_tplRenderEd();_tplFocusEd(false);}
+function tplAddBlock(at){
+  if(!TPL.plan)return;
+  _tplPushUndo();
+  const bl=TPL.plan.blocks;const pos=(at==null||at<0)?bl.length:at;
+  bl.splice(pos,0,_tplNewBlock({cat:bl.length?'Sonstiges':'Aufwärmen'}));
+  TPL.sel=pos;_tplRedraw();_tplFocusEd(true);
+}
+function tplAddLib(id,at){
+  const it=TPL.lib[id];if(!it||!TPL.plan)return;
+  _tplPushUndo();
+  const bl=TPL.plan.blocks;
+  const pos=(at==null||at<0)?(bl.length?Math.min(TPL.sel+1,bl.length):0):at;
+  bl.splice(pos,0,_tplNewBlock(Object.assign({},it,{libId:id,org:''})));
+  TPL.sel=pos;_tplRedraw();
+  _tplToast(`„${it.title}“ eingefügt`);
+}
+function tplDel(){
+  const bl=TPL.plan&&TPL.plan.blocks;if(!bl||!bl.length)return;
+  _tplPushUndo();
+  const b=bl.splice(TPL.sel,1)[0];
+  if(TPL.sel>=bl.length)TPL.sel=bl.length-1;if(TPL.sel<0)TPL.sel=0;
+  _tplRedraw();
+  _tplToast(`„${b.title||'Block'}“ entfernt`,'Rückgängig',tplUndo);
+}
+function tplDup(){
+  const b=_tplCur();if(!b)return;
+  _tplPushUndo();
+  const c=_tplNewBlock(_tplClean(b));
+  TPL.plan.blocks.splice(TPL.sel+1,0,c);TPL.sel++;_tplRedraw();
+}
+function tplMove(d){
+  const bl=TPL.plan&&TPL.plan.blocks;if(!bl)return;
+  const j=TPL.sel+d;if(j<0||j>=bl.length)return;
+  _tplPushUndo();
+  const [b]=bl.splice(TPL.sel,1);bl.splice(j,0,b);TPL.sel=j;_tplRedraw();
+}
+// Drag & drop: blocks within the list, library entries into the list
+function tplDragStart(e,i){
+  TPL.drag={k:'blk',i:i};
+  try{e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain','blk:'+i);}catch(x){}
+  e.currentTarget.classList.add('drag');
+}
+function tplLibDragStart(e,id){
+  TPL.drag={k:'lib',id:id};
+  try{e.dataTransfer.effectAllowed='copy';e.dataTransfer.setData('text/plain','lib:'+id);}catch(x){}
+}
+function tplDragEnd(){
+  TPL.drag=null;
+  document.querySelectorAll('#tplOverlay .drag,#tplOverlay .dropb,#tplOverlay .dropa').forEach(x=>x.classList.remove('drag','dropb','dropa'));
+}
+function tplDragOver(e,i){
+  if(!TPL.drag||!TPL.plan)return;
+  e.preventDefault();
+  const t=e.currentTarget;let after=false;
+  if(i>=0){const r=t.getBoundingClientRect();after=e.clientY>r.top+r.height/2;}
+  document.querySelectorAll('#tplOverlay .dropb,#tplOverlay .dropa').forEach(x=>{if(x!==t)x.classList.remove('dropb','dropa');});
+  if(i<0)t.classList.add('dropa');else{t.classList.toggle('dropa',after);t.classList.toggle('dropb',!after);}
+  TPL.dropAt=i<0?TPL.plan.blocks.length:(after?i+1:i);
+  try{e.dataTransfer.dropEffect=TPL.drag.k==='lib'?'copy':'move';}catch(x){}
+}
+function tplDragLeave(e){const t=e.currentTarget;if(!t.contains(e.relatedTarget))t.classList.remove('dropb','dropa');}
+function tplDrop(e){
+  e.preventDefault();
+  const d=TPL.drag,at=TPL.dropAt;tplDragEnd();TPL.dropAt=null;
+  if(!d||at==null||!TPL.plan)return;
+  if(d.k==='lib'){tplAddLib(d.id,at);return;}
+  let to=at;if(to>d.i)to--;
+  if(to===d.i)return;
+  _tplPushUndo();
+  const bl=TPL.plan.blocks;const [b]=bl.splice(d.i,1);bl.splice(to,0,b);TPL.sel=to;_tplRedraw();
+}
+
+// ── Library
+function _tplCatSelect(id,cur){
+  const known=TPL_CATS.some(c=>c.k===cur);
+  return `<select id="${id}">${TPL_CATS.map(c=>`<option${c.k===cur?' selected':''}>${c.k}</option>`).join('')}${(!known&&cur)?`<option selected>${_tplE(cur)}</option>`:''}</select>`;
+}
+function tplLibEdit(id){
+  const it=id?TPL.lib[id]:null;
+  const x=it||{title:'',cat:(TPL.libCat&&TPL.libCat!=='Alle')?TPL.libCat:'Spielform',min:15,players:'',area:'',desc:'',coach:''};
+  _tplDlg(`<h4>${it?'Übung bearbeiten':'Neue Übung'}</h4>
+    <label>Name<input id="tlTitle" value="${_tplE(x.title)}" placeholder="z. B. Rondo 4 gegen 2" maxlength="120"></label>
+    <div class="two"><label>Kategorie${_tplCatSelect('tlCat',x.cat)}</label>
+      <label>Dauer (Min.)<input id="tlMin" type="number" inputmode="numeric" min="1" max="240" value="${+x.min||''}"></label>
+      <label>Spieler<input id="tlPl" value="${_tplE(x.players)}" placeholder="z. B. 8–12"></label></div>
+    <label>Feld<input id="tlArea" value="${_tplE(x.area)}" placeholder="z. B. 30 × 25 m"></label>
+    <label>Ablauf<textarea id="tlDesc" rows="5" placeholder="Aufbau, Regeln, Durchgänge und Pausen …">${_tplE(x.desc)}</textarea></label>
+    <label>Coaching-Punkte<textarea id="tlCoach" rows="4" placeholder="Ein Punkt pro Zeile">${_tplE(x.coach)}</textarea></label>
+    <div class="tpl-dlg-f">${it?`<button type="button" class="tpl-btn danger sp" onclick="tplLibDel(this,'${id}')">Löschen</button>`:''}
+      <button type="button" class="tpl-btn" onclick="tplDlgClose()">Abbrechen</button>
+      <button type="button" class="tpl-btn pri" onclick="tplLibSave('${id||''}')">Speichern</button></div>`);
+  setTimeout(()=>{const t=document.getElementById('tlTitle');if(t)t.focus();},40);
+}
+function tplLibSave(id){
+  const v=k=>{const e=document.getElementById(k);return e?String(e.value||'').trim():'';};
+  const title=v('tlTitle');
+  if(!title){const t=document.getElementById('tlTitle');if(t){t.focus();t.style.borderColor='#D9443F';}return;}
+  const nid=id||_tplId('l');
+  const it=Object.assign({},TPL.lib[nid]||{},{title:title,cat:v('tlCat')||'Sonstiges',min:Math.max(0,Math.min(240,parseInt(v('tlMin'),10)||0)),
+    players:v('tlPl'),area:v('tlArea'),desc:v('tlDesc'),coach:v('tlCoach'),upd:Date.now()});
+  TPL.lib[nid]=it;_tplWrite(_tplBase()+'/lib/'+nid,_tplClean(it));
+  tplDlgClose();TPL.libOpen=nid;
+  if(TPL.libCat!=='Alle'&&TPL.libCat!==it.cat)TPL.libCat='Alle';
+  _tplRenderLib();_tplRenderEd();
+  _tplToast(id?'Übung gespeichert':'Neue Übung in der Bibliothek');
+}
+function tplLibDel(btn,id){
+  if(!btn.dataset.arm){btn.dataset.arm='1';btn.textContent='Wirklich löschen?';return;}
+  const old=TPL.lib[id];if(!old)return;
+  delete TPL.lib[id];_tplWrite(_tplBase()+'/lib/'+id,null);
+  tplDlgClose();if(TPL.libOpen===id)TPL.libOpen=null;
+  _tplRenderLib();_tplRenderEd();
+  _tplToast(`„${old.title}“ gelöscht`,'Rückgängig',()=>{
+    const it=Object.assign({},old,{upd:Date.now()});TPL.lib[id]=it;_tplWrite(_tplBase()+'/lib/'+id,it);_tplRenderLib();_tplRenderEd();
+  });
+}
+function tplToLib(){
+  const b=_tplCur();if(!b)return;
+  if(!String(b.title||'').trim()){_tplToast('Bitte zuerst einen Namen eingeben');const t=document.getElementById('tplTitle');if(t)t.focus();return;}
+  const ex=!!(b.libId&&TPL.lib[b.libId]);const id=ex?b.libId:_tplId('l');
+  const it=Object.assign({},ex?TPL.lib[id]:{},{title:String(b.title).trim(),cat:b.cat,min:+b.min||0,players:b.players||'',
+    area:b.area||'',desc:b.desc||'',coach:b.coach||'',upd:Date.now()});
+  TPL.lib[id]=it;b.libId=id;
+  _tplWrite(_tplBase()+'/lib/'+id,_tplClean(it));
+  _tplRenderLib();_tplTouch();
+  const lb=document.getElementById('tplLibBtn');if(lb)lb.innerHTML=_tplLibLbl(true);
+  _tplToast(ex?'Übung in der Bibliothek aktualisiert':'Übung in der Bibliothek gespeichert');
+}
+
+// ── Templates and earlier plans
+function _tplModeSeg(){
+  if(!TPL.plan||!TPL.plan.blocks.length)return '';
+  return `<div class="tpl-seg" role="group" aria-label="Übernehmen">
+    <button type="button" class="${TPL.mode==='replace'?'on':''}" onclick="tplSetMode('replace',this)">Ablauf ersetzen</button>
+    <button type="button" class="${TPL.mode==='append'?'on':''}" onclick="tplSetMode('append',this)">Hinten anhängen</button></div>`;
+}
+function tplSetMode(m,btn){TPL.mode=m;btn.parentNode.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===btn));}
+function _tplMiniBar(bl){
+  const tot=_tplTotal(bl)||1;
+  return `<span style="display:flex;flex-direction:column;width:6px;align-self:stretch;border-radius:3px;overflow:hidden;gap:1px;flex:0 0 auto">${_tplArr(bl).map(b=>`<span style="flex:${Math.max(+b.min||0,1)} 1 0;background:${_tplCatColor(b.cat)}"></span>`).join('')||'<span style="flex:1;background:#DCE3EE"></span>'}</span>`;
+}
+function _tplApplyBlocks(src,label){
+  const bl=_tplArr(src).map(b=>_tplNewBlock(b));
+  if(!bl.length){_tplToast('Dieser Plan ist leer');return;}
+  _tplPushUndo();
+  if(TPL.mode==='append'&&TPL.plan.blocks.length){TPL.sel=TPL.plan.blocks.length;TPL.plan.blocks=TPL.plan.blocks.concat(bl);}
+  else{TPL.plan.blocks=bl;TPL.sel=0;}
+  tplDlgClose();_tplRedraw();
+  _tplToast(label+' übernommen','Rückgängig',tplUndo);
+}
+function tplSaveTplDlg(){
+  if(!TPL.plan)return;
+  if(!TPL.plan.blocks.length){_tplToast('Der Ablauf ist noch leer');return;}
+  const s=_tplSess();const n=TPL.plan.blocks.length;
+  const def=((s&&s.focus)?s.focus:'Training')+' · '+_tplTotal()+' Min.';
+  _tplDlg(`<h4>Als Vorlage speichern</h4>
+    <p class="tpl-hint">Der ganze Ablauf (${n} ${n===1?'Block':'Blöcke'}, ${_tplTotal()} Min.) wird als Vorlage für ${_tplE(TPL.team)} gespeichert.</p>
+    <label>Name der Vorlage<input id="ttName" value="${_tplE(def)}" maxlength="80" onkeydown="if(event.key==='Enter'){event.preventDefault();tplSaveTpl();}"></label>
+    <div class="tpl-dlg-f"><button type="button" class="tpl-btn" onclick="tplDlgClose()">Abbrechen</button><button type="button" class="tpl-btn pri" onclick="tplSaveTpl()">Speichern</button></div>`);
+  setTimeout(()=>{const t=document.getElementById('ttName');if(t){t.focus();t.select();}},40);
+}
+function tplSaveTpl(){
+  const inp=document.getElementById('ttName');const name=(inp&&inp.value.trim())||'Vorlage';
+  const blocks=_tplClean(TPL.plan.blocks).map(b=>{delete b.id;return b;});
+  const id=_tplId('t');const t={name:name,blocks:blocks,n:blocks.length,m:_tplTotal(blocks),upd:Date.now()};
+  TPL.tpls[id]=t;_tplWrite(_tplBase()+'/tpl/'+id,t);
+  tplDlgClose();_tplToast(`Vorlage „${name}“ gespeichert`);
+}
+function tplLoadTplDlg(){
+  const ids=Object.keys(TPL.tpls||{}).filter(k=>TPL.tpls[k]&&TPL.tpls[k].name)
+    .sort((a,b)=>(TPL.tpls[b].upd||0)-(TPL.tpls[a].upd||0));
+  const rows=ids.length?ids.map(id=>{const t=TPL.tpls[id];const bl=_tplArr(t.blocks);
+    return `<div style="display:flex;gap:8px;align-items:center"><button type="button" class="tpl-pk" onclick="tplApplyTpl('${id}')">${_tplMiniBar(bl)}
+      <span class="tpl-bt"><b>${_tplE(t.name)}</b><span>${bl.length} ${bl.length===1?'Block':'Blöcke'} · ${_tplTotal(bl)} Min. · ${_tplE(bl.map(b=>b.title).filter(Boolean).slice(0,3).join(', '))}</span></span></button>
+      <button type="button" class="tpl-pk-del" title="Vorlage löschen" aria-label="Vorlage löschen" onclick="tplTplDel(this,'${id}')">${TPL_IC.del}</button></div>`;}).join('')
+    :'<div class="tpl-none">Noch keine Vorlagen. Einen fertigen Ablauf oben mit „Als Vorlage speichern“ ablegen.</div>';
+  _tplDlg(`<h4>Vorlage laden</h4>${_tplModeSeg()}<div class="tpl-pick">${rows}</div>
+    <div class="tpl-dlg-f"><button type="button" class="tpl-btn" onclick="tplDlgClose()">Schließen</button></div>`);
+}
+function tplApplyTpl(id){const t=TPL.tpls[id];if(!t)return;_tplApplyBlocks(t.blocks,`Vorlage „${t.name}“`);}
+function tplTplDel(btn,id){
+  if(!btn.dataset.arm){btn.dataset.arm='1';btn.classList.add('arm');btn.textContent='Löschen?';return;}
+  delete TPL.tpls[id];_tplWrite(_tplBase()+'/tpl/'+id,null);
+  const row=btn.parentNode;if(row)row.remove();
+  _tplToast('Vorlage gelöscht');
+}
+function tplCopyDlg(){
+  const ids=Object.keys(TPL.idx||{}).filter(k=>k!==TPL.pid&&TPL.idx[k]&&TPL.idx[k].n>0)
+    .sort((a,b)=>{const x=TPL.idx[a],y=TPL.idx[b];
+      return (_dbSortKey(y.d,y.s)-_dbSortKey(x.d,x.s))||String(y.t||'').localeCompare(String(x.t||''));}).slice(0,40);
+  const rows=ids.length?ids.map(id=>{const e=TPL.idx[id];
+    const cats=String(e.c||'').split('|').filter(Boolean).map(c=>({cat:c,min:1}));
+    return `<button type="button" class="tpl-pk" onclick="tplApplyCopy(this,'${id}')">${_tplMiniBar(cats)}
+      <span class="tpl-bt"><b>${_tplE(_tplDateLong(e.d,e.s,'short'))}${e.t?' · '+_tplE(e.t):''}</b><span>${e.n} ${e.n===1?'Block':'Blöcke'} · ${e.m} Min.${e.f?' · '+_tplE(e.f):''}</span></span></button>`;}).join('')
+    :'<div class="tpl-none">Für dieses Team gibt es noch keine anderen Pläne.</div>';
+  _tplDlg(`<h4>Früheren Plan übernehmen</h4>${_tplModeSeg()}<div class="tpl-pick">${rows}</div>
+    <div class="tpl-dlg-f"><button type="button" class="tpl-btn" onclick="tplDlgClose()">Schließen</button></div>`);
+}
+async function tplApplyCopy(btn,pid){
+  const e=TPL.idx[pid];
+  if(btn){btn.disabled=true;btn.style.opacity='.6';}
+  const p=_tplNorm(await _tplRead(_tplBase()+'/plans/'+pid));
+  if(btn){btn.disabled=false;btn.style.opacity='';}
+  if(!p||!p.blocks.length){_tplToast('Dieser Plan konnte nicht geladen werden');return;}
+  _tplApplyBlocks(p.blocks,'Plan vom '+(e?_tplDateLong(e.d,e.s,'short'):''));
+}
+
+// ── Dialog and toast
+function _tplDlg(html){
+  const bg=document.getElementById('tplDlg');const box=document.getElementById('tplDlgBox');
+  if(!bg||!box)return;
+  box.innerHTML=html;bg.classList.add('open');
+  if(typeof _navArm==='function')_navArm();
+}
+function tplDlgClose(){const bg=document.getElementById('tplDlg');if(bg)bg.classList.remove('open');}
+function _tplToast(msg,btnLabel,fn){
+  const t=document.getElementById('tplToast');if(!t)return;
+  t.querySelector('span').textContent=msg;
+  const b=t.querySelector('button');b.textContent=btnLabel||'';
+  b.onclick=fn?()=>{t.classList.remove('show');fn();}:null;
+  t.classList.add('show');clearTimeout(t._h);
+  t._h=setTimeout(()=>t.classList.remove('show'),btnLabel?6000:2600);
+}
+
+// ── Print (A4)
+function tplPrint(){
+  if(!TPL.plan)return;
+  if(!TPL.plan.blocks.length){_tplToast('Der Ablauf ist noch leer');return;}
+  if(TPL.saveT)_tplSaveNow();
+  const s=_tplSess()||{date:TPL.sessDate,time:TPL.sessTime};
+  const w=window.open('','_blank');
+  if(!w){_tplToast('Bitte Pop-ups für diese Seite erlauben');return;}
+  w.document.open();w.document.write(_tplPrintHtml(s));w.document.close();
+}
+function _tplPrintHtml(s){
+  const E=_tplE;const st=_tplMin(s.time);const dur=_tplDur(s);const starts=_tplStarts();const tot=_tplTotal();
+  const club=(G&&G.clubName)||'';const yes=_tplYes();
+  const r1=[st!=null?_tplHM(st)+'–'+_tplHM(st+dur):'',String(s.location||'').trim()].filter(Boolean).map(E).join(' · ');
+  const r2=[s.focus?'Schwerpunkt: '+s.focus+(s.focus2?' + '+s.focus2:''):'',yes?yes+' Zusagen':''].filter(Boolean).map(E).join(' · ');
+  const rows=TPL.plan.blocks.map((b,i)=>{
+    const coach=String(b.coach||'').split(/\n+/).map(x=>x.replace(/^[-•*]\s*/,'').trim()).filter(Boolean);
+    const meta=[b.players?_tplPlayersTxt(b.players):'',b.area||''].filter(Boolean).map(E).join(' · ');
+    return `<section class="b"><div class="tm"><b>${starts[i].clock||('+'+starts[i].from+'′')}</b><span>${+b.min||0} Min.</span></div>
+      <div class="bd"><div class="k"><i style="background:${_tplCatColor(b.cat)}"></i>${E(b.cat)}${b.org?' · '+E(b.org):''}</div>
+      <h2>${E(b.title||'Ohne Titel')}</h2>${meta?`<div class="m">${meta}</div>`:''}${b.desc?`<p>${E(b.desc)}</p>`:''}
+      ${coach.length?`<ul>${coach.map(c=>'<li>'+E(c)+'</li>').join('')}</ul>`:''}</div></section>`;
+  }).join('');
+  const date=_tplDateLong(s.date,TPL.season,'year');
+  return `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Trainingsplan ${E(date)}</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+@page{size:A4;margin:14mm 14mm 16mm}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Barlow',Arial,sans-serif;color:#0E2350;background:#E9EEF5;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.bar{position:sticky;top:0;display:flex;gap:12px;align-items:center;justify-content:center;padding:10px;background:#0B2550;color:#C3D2EC;font-size:14px;z-index:2}
+.bar button{height:38px;padding:0 18px;border:none;border-radius:10px;background:#E8C840;color:#0B2550;font:700 15px 'Barlow',sans-serif;cursor:pointer}
+main{background:#fff;max-width:210mm;margin:16px auto;padding:14mm;box-shadow:0 2px 12px rgba(0,0,0,.12)}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;border-bottom:2px solid #0B2550;padding-bottom:8px}
+.club{font-size:12px;font-weight:600;color:#3A4A6B}
+h1{margin:0;font-family:'Bebas Neue',sans-serif;font-weight:400;font-size:28px;letter-spacing:1px;line-height:1.05}
+.r{display:flex;flex-direction:column;align-items:flex-end;font-size:12px;color:#3A4A6B;text-align:right;gap:1px}
+.tot{font-size:12px;color:#3A4A6B;padding:6px 0 2px;display:flex;gap:2px;align-items:center}
+.tot .seg{display:flex;flex:1;height:6px;border-radius:3px;overflow:hidden;gap:1px;margin-left:10px}
+.b{display:flex;gap:14px;padding:10px 0;border-bottom:1px solid #E1E6EF;break-inside:avoid;page-break-inside:avoid}
+.tm{width:54px;flex:0 0 auto;display:flex;flex-direction:column}
+.tm b{font-family:'Bebas Neue',sans-serif;font-weight:400;font-size:21px;line-height:1}
+.tm span{font-size:12px;color:#3A4A6B}
+.bd{min-width:0;flex:1}
+.k{font-size:11px;font-weight:700;color:#3A4A6B;display:flex;align-items:center;gap:6px}
+.k i{width:9px;height:9px;border-radius:50%;display:inline-block;flex:0 0 auto}
+h2{margin:2px 0 0;font-size:15px;font-weight:700}
+.m{font-size:12px;color:#3A4A6B;margin-top:1px}
+p{margin:4px 0 0;font-size:12.5px;line-height:1.45;white-space:pre-line;color:#2C3B5A}
+ul{margin:4px 0 0;padding-left:18px;font-size:12.5px;line-height:1.45;color:#2C3B5A}
+.notes{margin-top:12px;break-inside:avoid}
+.notes b{font-size:12px;color:#3A4A6B}
+.notes div{height:22px;border-bottom:1px solid #D5DCE7}
+footer{margin-top:10px;font-size:10px;color:#8A97AE;display:flex;justify-content:space-between}
+@media print{body{background:#fff}.bar{display:none}main{margin:0;padding:0;box-shadow:none;max-width:none}}
+@media (max-width:600px){main{padding:16px;margin:0}header{flex-direction:column;align-items:flex-start}.r{align-items:flex-start;text-align:left}}
+</style></head><body>
+<div class="bar"><button type="button" onclick="window.print()">Drucken</button><span>oder im Druckdialog „Als PDF speichern“</span></div>
+<main>
+<header><div><div class="club">${E(club)}${club?' · ':''}${E(TPL.team)}</div><h1>Trainingsplan ${E(date)}</h1></div>
+<div class="r">${r1?`<span>${r1}</span>`:''}${r2?`<span>${r2}</span>`:''}</div></header>
+<div class="tot">${tot} von ${dur} Min. verplant<span class="seg">${TPL.plan.blocks.map(b=>`<i style="flex:${Math.max(+b.min||0,1)} 1 0;background:${_tplCatColor(b.cat)}"></i>`).join('')}</span></div>
+${rows}
+<div class="notes"><b>Notizen</b><div></div><div></div><div></div></div>
+<footer><span>${E(club)} · ${E(TPL.team)}</span><span>Erstellt mit footy.ai</span></footer>
+</main>
+<script>(document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(function(){setTimeout(function(){window.print();},300);});<\/script>
+</body></html>`;
 }
 
 function openLineupPlanner(sessIdx){
