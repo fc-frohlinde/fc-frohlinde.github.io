@@ -4230,6 +4230,115 @@ body.design-heute .home-overlay::before,body.design-heute .home-overlay::after{d
   .hx-tiles{flex-basis:100%;}
 }
 
+/* ══ Anwesenheit als Matrix (Konzept C) ══
+   Filter bar over the table, week groups with this week marked, older weeks
+   folded into one column each, the season rate next to the names; on the
+   phone a players' view with the last ten sessions. */
+#mxBar,#mxPlayers{display:none;}
+@media(min-width:768px){
+  body.design-heute #mxBar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;margin:0 10px 12px;}
+}
+.mx-q{display:flex;align-items:center;gap:8px;height:40px;padding:0 12px;border-radius:10px;border:1px solid var(--hx-line);background:var(--hx-field);color:var(--hx-muted);flex:0 1 280px;min-width:180px;box-sizing:border-box;cursor:text;}
+.mx-q:focus-within{border-color:var(--hx-blue);box-shadow:0 0 0 3px color-mix(in srgb,var(--hx-blue) 16%,transparent);}
+.mx-q input{border:none;background:transparent;outline:none;font:500 15px 'Barlow',sans-serif;color:var(--hx-ink);width:100%;min-width:0;padding:0;}
+.mx-q input::placeholder{color:var(--hx-muted);}
+.mx-seg{display:flex;gap:3px;padding:3px;border-radius:11px;background:color-mix(in srgb,var(--hx-ink) 8%,transparent);}
+.mx-seg button{height:34px;padding:0 13px;border-radius:8px;border:none;background:transparent;color:var(--hx-ink2);font:600 14px 'Barlow',sans-serif;cursor:pointer;}
+.mx-seg button:hover:not(.on){color:var(--hx-ink);background:color-mix(in srgb,var(--hx-card) 50%,transparent);}
+.mx-seg button.on{background:var(--hx-card);color:var(--hx-ink);font-weight:700;box-shadow:0 1px 2px rgba(14,35,80,.16);}
+.mx-range{display:flex;align-items:center;gap:8px;font:600 14px 'Barlow',sans-serif;color:var(--hx-muted);}
+.mx-range select{height:40px;border-radius:10px;border:1px solid var(--hx-line);background:var(--hx-field);padding:0 10px;font:600 14px 'Barlow',sans-serif;color:var(--hx-ink);cursor:pointer;}
+.mx-fold{margin-left:auto;display:inline-flex;align-items:center;gap:9px;height:40px;padding:0 13px 0 11px;border-radius:10px;border:1px solid var(--hx-line);background:var(--hx-field);color:var(--hx-ink);font:600 14px 'Barlow',sans-serif;cursor:pointer;}
+.mx-fold:hover{border-color:var(--hx-ink2);}
+.mx-fold i{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--hx-muted);display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;color:transparent;}
+.mx-fold.on i{background:var(--hx-nav);border-color:var(--hx-nav);color:#fff;}
+:is(.mx-seg button,.mx-fold,.mx-range select):focus-visible{outline:2px solid var(--hx-blue);outline-offset:2px;}
+@media(max-width:1199px){body.design-heute #mxFold{display:none;}}
+@media(min-width:1200px){#vd-mxfold{display:none !important;}}
+/* few columns: the table keeps its natural width instead of stretching the chips */
+#mainTable.mx{width:auto;}
+
+/* Table: the season column and the week rows */
+#mainTable.mx{--c3:60px;--mxg-h:24px;}
+#mainTable.mx .c3{position:sticky;left:calc(var(--c0) + var(--c1) + var(--c2));width:var(--c3);min-width:var(--c3);max-width:var(--c3);z-index:4;text-align:center;}
+#mainTable.mx .c2{box-shadow:none;}
+#mainTable.mx .c3{box-shadow:1px 0 0 var(--d-line);}
+#mainTable.mx thead .c3{z-index:12 !important;padding:8px 4px;}
+#mainTable.mx tfoot .c3{z-index:12 !important;}
+body.design-kabine #mainTable.mx thead .c3{font-family:'Barlow',sans-serif !important;font-weight:700;font-size:.72rem !important;letter-spacing:.3px !important;color:var(--d-muted) !important;}
+body.design-kabine #mainTable.mx tbody tr .c3{background:var(--rowbg) !important;}
+#mainTable.mx .mx-pct{font-family:var(--hx-num);font-weight:700;font-size:1.02rem;}
+#mainTable.mx .mx-avg{font:600 .72rem 'Barlow',sans-serif;margin-right:3px;}
+body.design-kabine #mainTable.mx tfoot td.mx-pct{font-size:.95rem;}
+#mainTable.mx thead tr.mx-r1 th.mxg{height:var(--mxg-h);box-sizing:border-box;padding:0 8px;text-align:left;font:700 .7rem 'Barlow',sans-serif;letter-spacing:.2px;color:var(--d-muted);border-bottom:1px solid var(--d-line) !important;white-space:nowrap;}
+#mainTable.mx thead tr.mx-r2 th{top:var(--mxg-h);}
+#mainTable.mx thead th.mxg-old,#mainTable.mx thead th.mx-wk{background:var(--d-panel2) !important;}
+#mainTable.mx thead th.mxg-cur{background:#FFEFC2 !important;color:#6B4E00 !important;}
+#mainTable.mx thead tr.mx-r2 th[data-mx~="cur"]{background:#FFF8E1 !important;}
+.mxg-b{border:none;background:none;padding:0 4px;margin:0 -4px;height:20px;border-radius:5px;font:inherit;color:var(--hx-blue);cursor:pointer;}
+.mxg-b:hover{background:color-mix(in srgb,var(--hx-blue) 10%,transparent);}
+#mainTable.mx [data-mx~="wb"]{border-left:1px solid var(--d-line);}
+#mainTable.mx thead th.mx-wk{cursor:pointer;}
+#mainTable.mx thead th.mx-wk .dnum{color:var(--d-ink);}
+#mainTable.mx thead th.mx-wk:hover{background:var(--d-line) !important;}
+/* this week: a warm wash down the column */
+#mainTable.mx tbody td[data-mx~="cur"]{--rowbg:#FFFBEE;}
+#mainTable.mx tbody td[data-mx~="cur"]:is(.csq,.cs-prejoin){background:#FFFBEE !important;}
+#mainTable.mx tbody td[data-mx~="old"]{--rowbg:var(--d-panel2);background:var(--d-panel2);}
+/* folded week: anwesend von erfasst */
+#mainTable.mx td.mx-wc{border-radius:7px;box-shadow:inset 0 0 0 2.5px var(--rowbg);font:700 .74rem 'Barlow',sans-serif;cursor:pointer;min-width:46px;color:var(--d-ink);font-variant-numeric:tabular-nums;}
+#mainTable.mx td.mx-wc.h3{background:#CDEBD9;color:#1E6B46;}
+#mainTable.mx td.mx-wc.h2{background:#E6F3EB;color:#1E6B46;}
+#mainTable.mx td.mx-wc.h1{background:#FBE3C7;color:#8A5212;}
+#mainTable.mx td.mx-wc.h0{background:#F6D3D5;color:#A52F35;}
+#mainTable.mx td.mx-wc:is(.mx-wc-q,.mx-wc-pre){color:var(--d-q-fg);}
+#mainTable.mx td.mx-wc.mx-wc-pre{cursor:default;}
+#mainTable.mx td.mx-wc:not(.mx-wc-pre):hover{filter:brightness(.95);}
+#mainTable.mx tfoot td[data-mx~="old"]{background:var(--d-panel2) !important;}
+#mainTable.mx td.mx-none{padding:26px 0 !important;text-align:left !important;}
+#mainTable.mx td.mx-none span{position:sticky;left:16px;display:inline-block;color:var(--hx-muted);font-weight:600;font-size:.95rem;}
+
+/* Phone: Termine | Spieler */
+@media(max-width:767px){
+  body.design-heute #hxListTop{flex-wrap:wrap;flex-shrink:0;}
+  body.design-heute .mxp-sw{flex:1 0 100%;display:flex;gap:3px;padding:3px;margin-top:10px;border-radius:12px;background:rgba(255,255,255,.1);}
+  body.design-heute .mxp-sw button{flex:1 1 0;height:34px;border:none;border-radius:9px;background:transparent;color:#C9D6EC;font:700 .9rem 'Barlow',sans-serif;cursor:pointer;}
+  body.design-heute .mxp-sw button.on{background:#fff;color:var(--hx-nav);}
+  body.design-heute #mxPlayers{display:flex;flex-direction:column;flex:1 1 0;min-height:0;background:var(--hx-ground);}
+}
+.mxp-tools{padding:12px 12px 4px;display:flex;flex-direction:column;gap:10px;}
+.mxp-row1{display:flex;gap:8px;}
+.mxp-q{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:8px;height:44px;padding:0 12px;border-radius:12px;background:var(--hx-card);border:1px solid var(--hx-line);color:var(--hx-muted);box-sizing:border-box;}
+.mxp-q:focus-within{border-color:var(--hx-blue);}
+.mxp-q input{border:none;background:transparent;outline:none;font:500 16px 'Barlow',sans-serif;color:var(--hx-ink);width:100%;min-width:0;padding:0;}
+.mxp-chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;}
+.mxp-chips::-webkit-scrollbar{display:none;}
+.mxp-chips button{flex:0 0 auto;height:36px;padding:0 13px;border-radius:999px;border:1px solid var(--hx-line);background:var(--hx-card);color:var(--hx-ink2);font:600 .84rem 'Barlow',sans-serif;cursor:pointer;}
+.mxp-chips button.on{background:var(--hx-nav);border-color:var(--hx-nav);color:#fff;}
+.mxp-type{flex:0 0 auto;height:44px;border-radius:12px;border:1px solid var(--hx-line);background-color:var(--hx-card);color:var(--hx-ink);font:600 1rem 'Barlow',sans-serif;padding:0 32px 0 12px;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234E5D7C' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;}
+.mxp-cap{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 16px 6px;font:600 .8rem 'Barlow',sans-serif;color:var(--hx-muted);}
+.mxp-lg{display:flex;gap:10px;}
+.mxp-lg span{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;}
+.mxp-lg i,.mxp-bars i{border-radius:3px;background:#DCE3EE;}
+.mxp-lg i{width:8px;height:8px;border-radius:2px;}
+.mxp-list{flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:2px 12px 16px;display:flex;flex-direction:column;gap:6px;}
+.mxp-row{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border:none;border-radius:14px;background:var(--hx-card);box-shadow:var(--hx-shadow);color:var(--hx-ink);text-align:left;cursor:pointer;font-family:'Barlow',sans-serif;flex:0 0 auto;}
+.mxp-nr{font-family:var(--hx-num);font-weight:800;font-size:1.35rem;min-width:28px;text-align:center;color:var(--hx-blue);}
+.mxp-mid{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:7px;}
+.mxp-nm{font-weight:700;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mxp-bars{display:flex;gap:3px;}
+.mxp-bars i{flex:1 1 0;height:10px;max-width:22px;}
+:is(.mxp-bars,.mxp-lg) i.a{background:#2E8B5E;}
+:is(.mxp-bars,.mxp-lg) i.f{background:#C9373E;}
+:is(.mxp-bars,.mxp-lg) i.e{background:#E0912F;}
+.mxp-bars i.x{background:transparent;box-shadow:inset 0 0 0 1px #DCE3EE;}
+.mxp-r{display:flex;flex-direction:column;align-items:flex-end;gap:2px;min-width:64px;}
+.mxp-r b{font-family:var(--hx-num);font-weight:800;font-size:1.4rem;line-height:1;}
+.mxp-r small{font-size:.72rem;font-weight:600;color:var(--hx-muted);white-space:nowrap;}
+.mxp-sec{display:flex;align-items:baseline;gap:6px;padding:10px 4px 2px;font-family:var(--hx-num);font-weight:800;font-size:1.1rem;color:var(--hx-ink);}
+.mxp-sec span{font:600 .78rem 'Barlow',sans-serif;color:var(--hx-muted);}
+.mxp-empty{padding:32px 8px;text-align:center;color:var(--hx-muted);font-weight:600;}
+
 /* ══════ TRAININGSPLANER (trainer only) ══════ */
 .tpl-ov{--tp-bg:#E9EEF5;--tp-card:#FFFFFF;--tp-ink:#0E2350;--tp-mut:#4E5D7C;--tp-line:#E7EBF2;--tp-line2:#DCE3EE;--tp-soft:#F4F7FB;--tp-chip:#EEF2F8;--tp-sel:#EEF4FF;--tp-link:#1659B8;--tp-navy:#0B2550;--tp-yel:#E8C840;
   position:fixed;inset:0;z-index:805;display:none;flex-direction:column;background:var(--tp-bg);color:var(--tp-ink);font-family:'Barlow',sans-serif;}
@@ -4913,6 +5022,7 @@ if(window._fbBlocked){
         <div class="vd-item" onclick="event.stopPropagation();toggleHidePast()">Vergangene ausblenden<div class="vd-check" id="vd2-hidepast">–</div></div>
         <div class="vd-item" onclick="event.stopPropagation();toggleHideFuture()">Zukünftige ausblenden<div class="vd-check" id="vd2-hidefuture">–</div></div>
         <div class="vd-sep"></div>
+        <div class="vd-item" id="vd-mxfold" onclick="event.stopPropagation();mxFold()" style="display:none;"><span>Ältere Wochen zusammenfassen</span><div class="vd-check" id="vd2-mxfold">–</div></div>
         <div class="vd-item" id="vd-multisel" onclick="event.stopPropagation();document.getElementById('viewDropdown2').classList.remove('open');toggleMultiSelectMode();"><span style="display:flex;align-items:center;gap:6px;">Mehrfach-Auswahl</span><div class="vd-check" id="vd2-multisel"></div></div>
       </div>
     </div>
@@ -4948,6 +5058,13 @@ if(window._fbBlocked){
   <button class="btn bs" style="font-size:.7rem;padding:4px 10px;" onclick="toggleMultiSelectMode()">✕ Schließen</button>
 </div>
 
+<div class="mx-bar" id="mxBar" role="search" aria-label="Anwesenheit filtern" style="display:none;">
+  <label class="mx-q"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input type="search" id="mxQ" placeholder="Spieler suchen" aria-label="Spieler suchen" autocomplete="off" oninput="mxSearch(this.value)" onkeydown="if(event.key==='Escape'){this.value='';mxSearch('');}"></label>
+  <div class="mx-seg" role="group" aria-label="Termine zeigen"><button type="button" data-t="all" onclick="mxType('all')">Alle</button><button type="button" data-t="training" onclick="mxType('training')">Training</button><button type="button" data-t="match" onclick="mxType('match')">Spiele</button></div>
+  <label class="mx-range">Zeitraum<select id="mxRange" onchange="mxRange(this.value)"><option value="all">Ganze Saison</option><option value="4w">Letzte 4 Wochen</option><option value="past">Nur vergangene</option><option value="future">Nur kommende</option></select></label>
+  <button type="button" class="mx-fold" id="mxFold" onclick="mxFold()" aria-pressed="true"><i aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></i>Ältere Wochen zusammenfassen</button>
+</div>
+
 <div class="table-wrap" id="tableWrap">
   <table id="mainTable">
     <thead id="tHead"></thead>
@@ -4964,6 +5081,14 @@ if(window._fbBlocked){
   <div class="ma-list-wrap" id="maListWrap">
     <div class="ma-ptr" id="maPtr"><span id="maPtrIcon">↓</span> <span id="maPtrText">Zum Aktualisieren ziehen</span></div>
     <div class="ma-list" id="maList"></div>
+  </div>
+  <div class="mxp" id="mxPlayers" style="display:none;">
+    <div class="mxp-tools">
+      <div class="mxp-row1"><label class="mxp-q"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input type="search" id="mxpQ" placeholder="Spieler suchen" aria-label="Spieler suchen" autocomplete="off" oninput="mxSearch(this.value)"></label><select class="mxp-type" id="mxpType" aria-label="Termine zeigen" onchange="mxType(this.value)"><option value="all">Alle Termine</option><option value="training">Training</option><option value="match">Spiele</option></select></div>
+      <div class="mxp-chips" role="group" aria-label="Sortierung"><button type="button" data-s="weak" onclick="mxpSort('weak')">Schwächste zuerst</button><button type="button" data-s="pos" onclick="mxpSort('pos')">Position</button><button type="button" data-s="nr" onclick="mxpSort('nr')">Nummer</button></div>
+    </div>
+    <div class="mxp-cap"><span id="mxpCap"></span><span class="mxp-lg" aria-hidden="true"><span><i class="a"></i>da</span><span><i class="e"></i>entschuldigt</span><span><i class="f"></i>fehlt</span></span></div>
+    <div class="mxp-list" id="mxpList"></div>
   </div>
 </div>
 
@@ -5504,7 +5629,7 @@ const APP_VERSION_LABEL='1.1.1';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792013641683; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792015501863; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.1.1',date:'14.10.2026',title:'Kader-Tafel',items:[
     {icon:'📋',title:'Kader als Tafel',desc:'Im Kader gibt es den neuen Reiter „Tafel“: die Mannschaft nach Linien (Tor, Abwehr, Mittelfeld, Angriff) für einen Termin. Pro Linie siehst du, wie viele zugesagt haben, pro Spieler den Status und die letzten fünf Termine als Punkte. Oben wählst du den Termin.'},
@@ -10320,6 +10445,8 @@ function _seasonMenuDocClose(){closeSeasonMenu();}
 
 // ══ TABLE HEAD ══
 function renderHead(){
+  if(typeof mxSyncBar==='function')mxSyncBar();
+  if(_mxOn())return mxHead();
   const D=cd();
   if(!D||!Array.isArray(D.sessions)){document.getElementById('tHead').innerHTML='';return;}
   const today=todaySK();
@@ -10379,6 +10506,7 @@ function updateC1Width(){
   document.documentElement.style.setProperty('--c1',final+'px');
 }
 function renderBody(){
+  if(_mxOn())return mxBody();
   updateC1Width();
   const D=cd();const tbody=document.getElementById('tBody');
   if(!D||!Array.isArray(D.sessions)||!Array.isArray(D.players)){if(tbody)tbody.innerHTML='<tr><td colspan="10" style="padding:30px;text-align:center;color:var(--gm);">Keine Daten</td></tr>';return;}
@@ -10437,6 +10565,7 @@ function renderBody(){
 
 // ══ TABLE FOOT ══
 function renderTfoot(){
+  if(_mxOn())return mxFoot();
   const D=cd();if(!D){document.getElementById('tFoot').innerHTML='';return;}
   const today3=todaySK();
   const ss=(D.sessions||[]).filter((s,i)=>_sessVisible(s,today3,nextIdx,i));
@@ -10482,6 +10611,397 @@ function renderTfoot(){
     ${cells}
     <td></td>
   </tr>`;
+}
+
+// ══ Anwesenheit als Matrix (Konzept C) ══════════════════════════════════
+// The table as a working tool: find a player, show trainings or matches only,
+// pick a time span. Columns are grouped by calendar week with this week
+// marked; weeks before last week fold into one column each (anwesend von
+// erfasst), a click opens them again; the season rate stands next to every
+// name. On the phone a second view lists the players with their last ten
+// sessions. Admin only while it is a preview — MX_PREVIEW_ADMIN_ONLY=false
+// opens it for every trainer.
+const MX_PREVIEW_ADMIN_ONLY=true;
+const MX_LS='fcf_mx';
+const MX={q:'',type:'all',range:'all',fold:true,open:new Set(),pview:'sess',psort:'weak',team:null,season:null,_m:null};
+(function(){try{
+  const o=JSON.parse(localStorage.getItem(MX_LS)||'{}')||{};
+  if(['all','training','match'].includes(o.type))MX.type=o.type;
+  if(['all','4w','past','future'].includes(o.range))MX.range=o.range;
+  if(typeof o.fold==='boolean')MX.fold=o.fold;
+  if(['sess','players'].includes(o.pview))MX.pview=o.pview;
+  if(['weak','pos','nr'].includes(o.psort))MX.psort=o.psort;
+}catch(e){}})();
+function _mxSave(){try{localStorage.setItem(MX_LS,JSON.stringify({type:MX.type,range:MX.range,fold:MX.fold,pview:MX.pview,psort:MX.psort}));}catch(e){}}
+function _mxOn(){
+  if(typeof isPlayerMode==='function'&&isPlayerMode())return false;
+  if(!document.body.classList.contains('design-heute'))return false;
+  return !MX_PREVIEW_ADMIN_ONLY||(typeof isAdmin==='function'&&isAdmin());
+}
+function _mxPhone(){return window.matchMedia('(max-width:767px)').matches;}
+// Dates as sort keys (yyyymmdd), weeks by their Monday
+function _mxDate(k){return new Date(Math.floor(k/10000),Math.floor(k/100)%100-1,k%100);}
+function _mxKey(d){return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();}
+function _mxMon(k){const d=_mxDate(k);d.setDate(d.getDate()-((d.getDay()+6)%7));return _mxKey(d);}
+function _mxAdd(k,n){const d=_mxDate(k);d.setDate(d.getDate()+n);return _mxKey(d);}
+function _mxKw(k){return +String(isoWeekKey(_mxDate(k))).split('-W')[1]||0;}
+function _mxSpan(wk){
+  const a=_mxDate(wk),b=_mxDate(_mxAdd(wk,6)),f=d=>String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.';
+  return f(a)+'–'+f(b);
+}
+function _mxTypeOk(s){return MX.type==='all'||(MX.type==='match')===(s&&s.type==='match');}
+// Held sessions of the chosen kind — the base of every rate here
+function _mxHeld(D){
+  return (D.sessions||[]).map((s,si)=>({s,si})).filter(x=>x.s&&x.s.date&&_mxTypeOk(x.s)&&sessTookPlace(x.s));
+}
+// Anwesend ÷ erfasst (A+F+E), like the Statistik; null when nothing counts yet
+function _mxRate(p,held){
+  let a=0,n=0;
+  held.forEach(x=>{
+    if(!_sessAfterJoin(p,x.s))return;
+    const v=p.s&&p.s[x.si];
+    if(v===1){a++;n++;}else if(v===0||v===2)n++;
+  });
+  return n?Math.round(a/n*100):null;
+}
+function _mxPctCol(r){return r==null?'var(--hx-muted)':r>=80?'var(--hx-ok)':r>=60?'var(--hx-warn)':'var(--hx-bad)';}
+function _mxNorm(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').trim();}
+function _mxMatch(p,q){
+  if(!q)return true;
+  const dn=typeof getDisplayName==='function'?getDisplayName(p):'';
+  return _mxNorm([dn,p.name||'',p.nr!=null?String(p.nr):''].join(' ')).includes(q);
+}
+// Columns: one per session, or one per folded week
+function _mxModel(D){
+  if(MX.team!==UI.currentTeam||MX.season!==UI.currentSeason){MX.open.clear();MX.team=UI.currentTeam;MX.season=UI.currentSeason;}
+  const today=todaySK(),tm=_mxMon(today),lm=_mxAdd(tm,-7),r4=_mxAdd(tm,-21);
+  const weeks=[];let cur=null;
+  (D.sessions||[]).forEach((s,si)=>{
+    if(!s||!s.date||!_mxTypeOk(s))return;
+    const k=dispToSortKey(s.date);if(k>=99999999)return;
+    const wk=_mxMon(k);
+    // the next session always stays in view
+    if(si!==nextIdx){
+      if(MX.range==='4w'&&(wk<r4||wk>tm))return;
+      if(MX.range==='past'&&k>today)return;
+      if(MX.range==='future'&&k<today)return;
+    }
+    if(!cur||cur.wk!==wk){cur={wk,kw:_mxKw(wk),items:[]};weeks.push(cur);}
+    cur.items.push({s,si,k});
+  });
+  weeks.forEach(w=>{
+    w.cur=w.wk===tm;
+    const old=MX.fold&&w.wk<lm;
+    w.fold=old&&!MX.open.has(w.wk);
+    w.reopened=old&&MX.open.has(w.wk);
+  });
+  const cols=[],groups=[];
+  weeks.forEach(w=>{
+    const last=groups[groups.length-1];
+    if(w.fold){
+      if(last&&last.fold)last.n++;else groups.push({fold:true,n:1,wb:cols.length>0});
+      cols.push({kind:'week',w,wb:!(last&&last.fold)&&cols.length>0});
+    }else{
+      groups.push({w,n:w.items.length,wb:cols.length>0});
+      w.items.forEach((it,j)=>cols.push({kind:'sess',it,w,wb:j===0&&cols.length>0}));
+    }
+  });
+  return {weeks,cols,groups,tm,today};
+}
+function _mxDm(c){return [c.wb?'wb':'',c.w.cur?'cur':'',c.kind==='week'?'old':''].filter(Boolean).join(' ');}
+
+// ── Head: week row over the date row ──
+function mxHead(){
+  const tbl=document.getElementById('mainTable');if(tbl)tbl.classList.add('mx');
+  const D=cd(),th=document.getElementById('tHead');
+  if(!D||!Array.isArray(D.sessions)){th.innerHTML='';MX._m=null;return;}
+  const M=_mxModel(D);MX._m=M;
+  const ro=!canEdit(),e=escapeHtml;
+  const mark=c=>tableSort.col===c?(tableSort.asc?'▲':'▼'):'';
+  const hs="font-family:'Bebas Neue',sans-serif;font-size:.82rem;letter-spacing:1.2px;cursor:pointer;user-select:none;";
+  let r1='<tr class="mx-r1">';
+  r1+=`<th class="c0" rowspan="2" style="width:var(--c0);padding:8px 6px;text-align:left;${hs}" onclick="sortTable('nr')">№${mark('nr')}</th>`;
+  r1+=`<th class="c1" rowspan="2" style="width:var(--c1);padding:8px 6px;text-align:left;${hs}" onclick="sortTable('name')">Spieler${mark('name')}</th>`;
+  r1+=`<th class="c2" rowspan="2" style="width:var(--c2);padding:8px 4px;text-align:left;${hs}" onclick="sortTable('pos')">Pos.${mark('pos')}</th>`;
+  const kind=MX.type==='match'?'Spiele':MX.type==='training'?'Trainings':'Termine';
+  r1+=`<th class="c3" rowspan="2" style="${hs}" onclick="sortTable('pct')" title="Anwesenheit in der Saison: anwesend von erfasst, gelaufene ${kind}. Klicken sortiert.">Saison${mark('pct')}</th>`;
+  M.groups.forEach(g=>{
+    if(g.fold){
+      r1+=`<th class="mxg mxg-old" colspan="${g.n}"${g.wb?' data-mx="wb"':''} title="Je Woche eine Spalte: anwesend von erfasst. Woche anklicken öffnet sie.">${g.n>1?'Ältere Wochen':'Älter'}</th>`;
+      return;
+    }
+    const w=g.w;
+    const lbl=w.cur?(g.n>=3?`KW ${w.kw} · diese Woche`:g.n===2?'Diese Woche':`KW ${w.kw}`):`KW ${w.kw}`;
+    const dm=[g.wb?'wb':'',w.cur?'cur':''].filter(Boolean).join(' ');
+    r1+=`<th class="mxg${w.cur?' mxg-cur':''}" colspan="${g.n}"${dm?` data-mx="${dm}"`:''} title="${_mxSpan(w.wk)}${w.cur?' · diese Woche':''}">`
+      +(w.reopened?`<button type="button" class="mxg-b" onclick="mxWeek(${w.wk})" title="Woche wieder zusammenfassen">${e(lbl)} <span aria-hidden="true">▴</span></button>`:e(lbl))+`</th>`;
+  });
+  if(!M.cols.length)r1+='<th class="mxg"></th>';
+  r1+=`<th rowspan="2" style="width:24px;background:var(--bd);"></th></tr>`;
+  let r2='<tr class="mx-r2">';
+  M.cols.forEach(c=>{
+    const dm=_mxDm(c);
+    if(c.kind==='week'){
+      const w=c.w,n=w.items.length;
+      r2+=`<th class="dth mx-wk" data-mx="${dm}" data-wk="${w.wk}" onclick="mxWeek(${w.wk})" title="KW ${w.kw} (${_mxSpan(w.wk)}): ${n} ${n===1?'Termin':'Termine'} · anklicken öffnet die Woche"><span class="ddow">KW</span><span class="dnum">${w.kw}</span></th>`;
+      return;
+    }
+    const s=c.it.s,si=c.it.si,isMat=s.type==='match',isNext=si===nextIdx;
+    const parts=s.date.split(' ');const dow=parts[0]||'';const dmy=parts[1]||s.date;
+    r2+=`<th class="dth${isMat?' match-col':''}${isNext?' next-col':''}"${dm?` data-mx="${dm}"`:''} data-wk="${c.w.wk}" onclick="openSessFromMain(${si})">`;
+    r2+=`<span class="ddow">${isMat?'⚽':''} ${dow}</span>`;
+    r2+=`<span class="dnum">${dmy}</span>`;
+    if(!ro)r2+=`<button class="dcb" onclick="event.stopPropagation();delSess(${si})">✕</button>`;
+    r2+=`</th>`;
+  });
+  if(!M.cols.length)r2+='<th style="background:var(--bm);min-width:40px;"></th>';
+  r2+='</tr>';
+  th.innerHTML=r1+r2;
+  // After opening or closing a week that week stays in view; otherwise the
+  // next session, as in the plain table
+  const fw=MX._focus;MX._focus=null;
+  if(fw!=null||nextIdx>=0){
+    setTimeout(()=>{
+      const t=fw!=null?document.querySelector(`#tHead tr.mx-r2 th[data-wk="${fw}"]`):document.querySelector('#tHead th.next-col');
+      if(t)t.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
+    },100);
+  }
+}
+function _mxCell(p,pi,c,ro){
+  const si=c.it.si,s=c.it.s,dm=_mxDm(c),dma=dm?` data-mx="${dm}"`:'';
+  const sVal=(p.s&&si<p.s.length)?p.s[si]:3;
+  const isNext=si===nextIdx,isPast=isSessPast(si);
+  if(!_sessAfterJoin(p,s)){
+    const jd=String(p.joinDate).split('-').reverse().join('.');
+    return `<td class="cs cs-prejoin${isNext?' next-col':''}" data-pi="${pi}" data-si="${si}"${dma} title="Noch nicht im Team (dabei seit ${jd})">–</td>`;
+  }
+  const cls=`cs ${CLS[sVal]}${isNext?' next-col':''}${ro?' ro':''}${isPast?' past-locked':''}`;
+  let title='';
+  if(sVal===4)title=' title="Vom Spieler angemeldet — noch nicht überprüft"';
+  else if(sVal===2&&Array.isArray(p.preconfReason)&&p.preconfReason[si])title=` title="Abgemeldet: ${(p.preconfReason[si]||'').replace(/"/g,'&quot;')}"`;
+  return `<td class="${cls}" data-pi="${pi}" data-si="${si}"${dma}${title} ${!ro?(isPast?`onclick="event.stopPropagation();cellOpenMenu(${pi},${si},this)"`:`onclick="cycSt(${pi},${si})"`):''}>${SYM[sVal]}</td>`;
+}
+// A folded week: anwesend von erfasst, coloured by the share
+function _mxWeekCell(p,c){
+  const w=c.w,dm=_mxDm(c);
+  let n=0,a=0,f=0,x=0;
+  w.items.forEach(it=>{
+    if(!_sessAfterJoin(p,it.s))return;n++;
+    const v=p.s&&p.s[it.si];
+    if(v===1)a++;else if(v===0)f++;else if(v===2)x++;
+  });
+  const k=a+f+x,head=`KW ${w.kw} (${_mxSpan(w.wk)})`;
+  if(!n)return `<td class="mx-wc mx-wc-pre" data-mx="${dm}" title="${head}: noch nicht im Team">–</td>`;
+  if(!k)return `<td class="mx-wc mx-wc-q" data-mx="${dm}" onclick="mxWeek(${w.wk})" title="${head}: nichts erfasst">?</td>`;
+  const r=a/k,h=r>=.999?3:r>=.6?2:r>=.34?1:0;
+  const tip=[`${a} anwesend`,x?`${x} entschuldigt`:'',f?`${f} fehlend`:'',n>k?`${n-k} nicht erfasst`:''].filter(Boolean).join(' · ');
+  return `<td class="mx-wc h${h}" data-mx="${dm}" onclick="mxWeek(${w.wk})" title="${head}: ${tip}">${a}/${k}</td>`;
+}
+function mxBody(){
+  updateC1Width();
+  const D=cd();const tbody=document.getElementById('tBody');
+  const M=MX._m||(D&&Array.isArray(D.sessions)?_mxModel(D):null);
+  if(!D||!M||!Array.isArray(D.players)){if(tbody)tbody.innerHTML='<tr><td colspan="10" style="padding:30px;text-align:center;color:var(--gm);">Keine Daten</td></tr>';return;}
+  const ro=!canEdit();
+  const span=M.cols.length+5;
+  if(!D.players.length){
+    tbody.innerHTML=`<tr><td colspan="${Math.max(span,5)}" style="padding:30px;text-align:center;color:var(--gm);">
+      <div style="font-size:1.8rem;margin-bottom:7px;">👥</div>
+      <p>Keine Spieler vorhanden.</p>
+    </td></tr>`;
+    return;
+  }
+  const held=_mxHeld(D);
+  const rate=new Map();D.players.forEach(p=>{if(p)rate.set(p,_mxRate(p,held));});
+  let list;
+  if(tableSort.col==='pct'){
+    list=D.players.filter(Boolean).sort((a,b)=>{
+      const ra=rate.get(a),rb=rate.get(b);
+      if(ra==null||rb==null)return (ra==null)-(rb==null)||compareBySort(a,b,'nr',true);
+      return (tableSort.asc?ra-rb:rb-ra)||compareBySort(a,b,'nr',true);
+    });
+  }else list=sortPlayers(D.players);
+  const q=_mxNorm(MX.q);
+  if(q)list=list.filter(p=>p&&_mxMatch(p,q));
+  if(!list.length){
+    tbody.innerHTML=`<tr><td colspan="${span}" class="mx-none"><span>Kein Spieler gefunden für „${escapeHtml(MX.q.trim())}“.</span></td></tr>`;
+    return;
+  }
+  const rows=[];
+  list.forEach(p=>{
+    if(!p)return;
+    const origPi=D.players.indexOf(p);
+    const r=rate.get(p);
+    const cells=M.cols.map(c=>c.kind==='week'?_mxWeekCell(p,c):_mxCell(p,origPi,c,ro)).join('');
+    rows.push(`<tr class="${_multiSelMode&&_multiSelIds.has(origPi)?'msel-row':''}">
+      <td class="tdl c0">${!ro?`<input class="nri" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="${p.nr||''}" onclick="event.stopPropagation();this.select();" onchange="updNr(${origPi},this.value)" onblur="updNr(${origPi},this.value)" onkeydown="if(event.key==='Enter'){this.blur();event.preventDefault();}" title="Trikotnummer bearbeiten"/>`:`<span style="font-weight:700;color:var(--bm);">${p.nr||''}</span>`}</td>
+      <td class="tdl c1" onclick="${_multiSelMode?`multiSelectToggle(${origPi})`:`openPlayerFromMain(${origPi})`}" style="cursor:pointer;">
+        <div class="ncell">${_multiSelMode?`<input type="checkbox" class="msel-cb" data-pi="${origPi}" ${_multiSelIds.has(origPi)?'checked':''} onclick="event.stopPropagation();multiSelectToggle(${origPi})" style="margin-right:6px;width:16px;height:16px;cursor:pointer;"/>`:''}${p.photo?`<img class="nm-av" src="${p.photo}" alt="" loading="lazy">`:'<span class="nm-av nm-av-ph"></span>'}<span class="nm ${plNameClass(p)}">${getDisplayName(p)||''}</span>${!_multiSelMode?'<span class="ni">›</span>':''}</div>
+      </td>
+      <td class="c2" style="padding:4px;cursor:pointer;" onclick="openPlayerFromMain(${origPi})" title="Profil öffnen">${pcHtml(p)}</td>
+      <td class="c3 mx-pct" data-mxp="${origPi}" style="color:${_mxPctCol(r)};">${r==null?'–':r+'%'}</td>
+      ${cells}
+      <td>${!ro&&!_multiSelMode?`<button class="drb" onclick="delPlayer(${origPi})">✕</button>`:''}</td>
+    </tr>`);
+  });
+  tbody.innerHTML=rows.join('');
+}
+function mxFoot(){
+  const D=cd();const tf=document.getElementById('tFoot');
+  const M=MX._m;
+  if(!D||!M||!M.cols.length||!D.players||!D.players.length){tf.innerHTML='';return;}
+  const held=_mxHeld(D);
+  let A=0,N=0;
+  D.players.forEach(p=>{
+    if(!p)return;
+    held.forEach(x=>{
+      if(!_sessAfterJoin(p,x.s))return;
+      const v=p.s&&p.s[x.si];
+      if(v===1){A++;N++;}else if(v===0||v===2)N++;
+    });
+  });
+  const avg=N?Math.round(A/N*100):null;
+  const present=it=>{
+    const on=D.players.filter(p=>p&&_sessAfterJoin(p,it.s));
+    return {c:on.filter(p=>p.s&&it.si<p.s.length&&p.s[it.si]===1).length,n:on.length};
+  };
+  const cells=M.cols.map(c=>{
+    const dm=_mxDm(c),dma=dm?` data-mx="${dm}"`:'';
+    if(c.kind==='week'){
+      let c2=0,n2=0;c.w.items.forEach(it=>{const x=present(it);c2+=x.c;n2+=x.n;});
+      const k=c.w.items.length,avgC=k?Math.round(c2/k):0,pct=n2?Math.round(c2/n2*100):0;
+      return `<td${dma} title="Ø ${avgC} anwesend pro Termin">
+      <span style="font-weight:700;color:var(--ac);">${avgC}</span>
+      <span style="display:block;font-size:.62rem;opacity:.82;">${pct}%</span>
+    </td>`;
+    }
+    const x=present(c.it),pct=x.n?Math.round((x.c/x.n)*100):0;
+    const isMat=c.it.s.type==='match',isNext=c.it.si===nextIdx;
+    return `<td class="${isMat?'match-col':''}${isNext?' next-col':''}"${dma}>
+      <span style="font-weight:700;color:${isMat?'#ffb38a':'var(--ac)'};">${x.c}</span>
+      <span style="display:block;font-size:.62rem;opacity:.82;">${pct}%</span>
+    </td>`;
+  }).join('');
+  tf.innerHTML=`<tr>
+    <td class="tdl c0" style="font-family:'Bebas Neue';letter-spacing:1px;font-size:.9rem;">∑</td>
+    <td class="tdl c1" style="font-size:.8rem;font-weight:500;">${D.players.length} Spieler</td>
+    <td class="c2"></td>
+    <td class="c3 mx-pct" style="color:${_mxPctCol(avg)};" title="Ø der Mannschaft in der Saison">${avg==null?'–':'<small class="mx-avg">Ø</small>'+avg+'%'}</td>
+    ${cells}
+    <td></td>
+  </tr>`;
+  // A status change repaints only its cell and this row: keep the rates current
+  document.querySelectorAll('#tBody td[data-mxp]').forEach(td=>{
+    const p=D.players[+td.dataset.mxp];if(!p)return;
+    const r=_mxRate(p,held);
+    td.textContent=r==null?'–':r+'%';td.style.color=_mxPctCol(r);
+  });
+}
+// ── Controls ──
+function mxSyncBar(){
+  const on=_mxOn();
+  const bar=document.getElementById('mxBar');if(bar)bar.style.display=on?'':'none';
+  // The Zeitraum picker replaces the two hide switches of the Ansicht menu
+  ['vd2-hidepast','vd2-hidefuture'].forEach((id,i)=>{
+    const it=document.getElementById(id)?.closest('.vd-item');if(!it)return;
+    it.style.display=on?'none':'';
+    if(i===0&&it.previousElementSibling&&it.previousElementSibling.classList.contains('vd-sep'))it.previousElementSibling.style.display=on?'none':'';
+  });
+  const fi=document.getElementById('vd-mxfold');if(fi)fi.style.display=on?'':'none';
+  if(!on){document.getElementById('mainTable')?.classList.remove('mx');return;}
+  document.querySelectorAll('#mxBar .mx-seg button').forEach(b=>{const p=b.dataset.t===MX.type;b.classList.toggle('on',p);b.setAttribute('aria-pressed',p);});
+  const r=document.getElementById('mxRange');if(r&&r.value!==MX.range)r.value=MX.range;
+  const f=document.getElementById('mxFold');if(f){f.classList.toggle('on',MX.fold);f.setAttribute('aria-pressed',MX.fold);}
+  const fc=document.getElementById('vd2-mxfold');if(fc){fc.classList.toggle('on',MX.fold);fc.textContent=MX.fold?'✓':'–';fc.closest('.vd-item').classList.toggle('vd-active',MX.fold);}
+  const q=document.getElementById('mxQ');if(q&&q.value!==MX.q&&document.activeElement!==q)q.value=MX.q;
+}
+function _mxRedraw(){
+  renderHead();renderBody();renderTfoot();
+  if(_mxPhone()&&typeof renderMobileAtt==='function')renderMobileAtt();
+}
+function mxSearch(v){
+  MX.q=String(v||'');
+  ['mxQ','mxpQ'].forEach(id=>{const x=document.getElementById(id);if(x&&x.value!==MX.q)x.value=MX.q;});
+  if(_mxPhone())mxpRender();else renderBody();
+}
+function mxType(t){if(!['all','training','match'].includes(t))return;MX.type=t;_mxSave();mxSyncBar();_mxRedraw();}
+function mxRange(r){if(!['all','4w','past','future'].includes(r))return;MX.range=r;_mxSave();mxSyncBar();_mxRedraw();}
+function mxFold(){MX.fold=!MX.fold;MX.open.clear();_mxSave();mxSyncBar();_mxRedraw();}
+function mxWeek(wk){if(MX.open.has(wk))MX.open.delete(wk);else MX.open.add(wk);MX._focus=wk;_mxRedraw();}
+
+// ── Phone: the players with their last ten sessions ──
+function _mxpSwitch(){
+  if(!_mxOn())return '';
+  const b=(v,l)=>`<button type="button" class="${MX.pview===v?'on':''}" aria-pressed="${MX.pview===v}" onclick="mxpView('${v}')">${l}</button>`;
+  return `<div class="mxp-sw" role="group" aria-label="Ansicht">${b('sess','Termine')}${b('players','Spieler')}</div>`;
+}
+function mxpView(v){if(!['sess','players'].includes(v))return;MX.pview=v;_mxSave();renderMobileAtt();}
+function mxpSort(s){if(!['weak','pos','nr'].includes(s))return;MX.psort=s;_mxSave();mxpRender();}
+// Shows one of the two phone views; true when the players' view is on
+function _mxpShow(){
+  const pl=_mxOn()&&MX.pview==='players';
+  ['maSessBar','maListWrap'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display=pl?'none':'';});
+  if(pl){const h=document.getElementById('maSessHead');if(h)h.style.display='none';}
+  const mp=document.getElementById('mxPlayers');if(mp)mp.style.display=pl?'':'none';
+  return pl;
+}
+function mxpRender(){
+  const host=document.getElementById('mxpList');if(!host)return;
+  document.querySelectorAll('#mxPlayers .mxp-chips button').forEach(b=>{const on=b.dataset.s===MX.psort;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on);});
+  const ts=document.getElementById('mxpType');if(ts&&ts.value!==MX.type)ts.value=MX.type;
+  const qi=document.getElementById('mxpQ');if(qi&&qi.value!==MX.q&&document.activeElement!==qi)qi.value=MX.q;
+  const cap=document.getElementById('mxpCap');
+  const D=cd(),e=escapeHtml;
+  if(!D||!Array.isArray(D.players)||!D.players.filter(Boolean).length){host.innerHTML='<div class="mxp-empty">Noch keine Spieler im Kader.</div>';if(cap)cap.textContent='';return;}
+  const held=_mxHeld(D),last=held.slice(-10);
+  const kind=MX.type==='match'?'Spiele':MX.type==='training'?'Trainings':'Termine';
+  const one=MX.type==='match'?'Letztes Spiel':MX.type==='training'?'Letztes Training':'Letzter Termin';
+  if(cap)cap.textContent=!last.length?'':last.length===1?one:`Letzte ${last.length} ${kind}`;
+  if(!last.length){host.innerHTML=`<div class="mxp-empty">Noch keine ${kind} gelaufen.</div>`;return;}
+  const q=_mxNorm(MX.q);
+  let rows=D.players.map((p,pi)=>{
+    if(!p||!_mxMatch(p,q))return null;
+    let a=0,k=0;
+    const bars=last.map(x=>{
+      if(!_sessAfterJoin(p,x.s))return 'x';
+      const v=p.s&&p.s[x.si];
+      if(v===1){a++;k++;return 'a';}
+      if(v===0){k++;return 'f';}
+      if(v===2){k++;return 'e';}
+      return 'q';
+    });
+    return {p,pi,bars,a,k,r:k?Math.round(a/k*100):null,rs:_mxRate(p,held)};
+  }).filter(Boolean);
+  if(!rows.length){host.innerHTML=`<div class="mxp-empty">Kein Spieler gefunden für „${e(MX.q.trim())}“.</div>`;return;}
+  const nr=x=>(+x.p.nr||999);
+  const byNr=(x,y)=>nr(x)-nr(y)||String(x.p.name||'').localeCompare(String(y.p.name||''));
+  const LB={a:'anwesend',f:'fehlend',e:'entschuldigt',q:'nicht erfasst',x:'noch nicht im Team'};
+  const row=x=>{
+    const nm=(typeof getDisplayName==='function'?getDisplayName(x.p):'')||x.p.name||'';
+    const lbl=`${e(nm)}: ${x.k?`${x.a} von ${x.k} erfasst anwesend`:'nichts erfasst'}`;
+    return `<button type="button" class="mxp-row" onclick="openPlayerFromMain(${x.pi})">
+      <span class="mxp-nr">${e(String(x.p.nr!=null&&x.p.nr!==''?x.p.nr:'–'))}</span>
+      <span class="mxp-mid"><b class="mxp-nm">${e(nm)}</b><span class="mxp-bars" role="img" aria-label="${lbl}">${x.bars.map((b,i)=>`<i class="${b}" title="${e(last[i].s.date)}: ${LB[b]}"></i>`).join('')}</span></span>
+      <span class="mxp-r"><b style="color:${_mxPctCol(x.r)};">${x.r==null?'–':x.r+'%'}</b><small>Saison ${x.rs==null?'–':x.rs+'%'}</small></span>
+    </button>`;
+  };
+  let html='';
+  if(MX.psort==='pos'){
+    const groups=SSA_LINES.map(l=>({name:l[0],list:[]}));const none=[];
+    rows.forEach(x=>{const li=_ssaLineOf(x.p);(li<groups.length?groups[li].list:none).push(x);});
+    const pr=x=>{const i=POS.indexOf(x.p.pos);return i<0?99:i;};
+    groups.push({name:'Ohne Position',list:none});
+    groups.forEach(g=>{
+      if(!g.list.length)return;
+      g.list.sort((x,y)=>pr(x)-pr(y)||byNr(x,y));
+      html+=`<div class="mxp-sec">${e(g.name)}<span>${g.list.length}</span></div>`+g.list.map(row).join('');
+    });
+  }else{
+    if(MX.psort==='weak')rows.sort((x,y)=>((x.r==null)-(y.r==null))||((x.r??0)-(y.r??0))||byNr(x,y));
+    else rows.sort(byNr);
+    html=rows.map(row).join('');
+  }
+  host.innerHTML=html;
 }
 
 function openNextSess(){if(nextIdx>=0)openSessStats(nextIdx);}
@@ -11813,8 +12333,10 @@ function renderMobileAtt(){
   const lt=document.getElementById('hxListTop');
   if(lt&&typeof hxOn==='function'&&hxOn()){
     const e=escapeHtml;
-    lt.innerHTML=`<h2 class="hx-ltop-t">Anwesenheit</h2><button type="button" class="hx-ltop-ctx" onclick="mobSheetOpen()" aria-label="Mannschaft und Saison wechseln">${e(UI.currentTeam||'')} · ${e(UI.currentSeason||'')}${hxIcon('down',16)}</button><button type="button" class="hx-ltop-bell" aria-label="Benachrichtigungen" onclick="hxNotif(this,event)">${hxIcon('bell')}</button>`;
+    lt.innerHTML=`<h2 class="hx-ltop-t">Anwesenheit</h2><button type="button" class="hx-ltop-ctx" onclick="mobSheetOpen()" aria-label="Mannschaft und Saison wechseln">${e(UI.currentTeam||'')} · ${e(UI.currentSeason||'')}${hxIcon('down',16)}</button><button type="button" class="hx-ltop-bell" aria-label="Benachrichtigungen" onclick="hxNotif(this,event)">${hxIcon('bell')}</button>${_mxpSwitch()}`;
   }
+  // Matrix: the players' view instead of the session list
+  if(_mxpShow()){mxpRender();return;}
   // Determine session list & default selection (next upcoming)
   const sessions=D.sessions;
   if(_maSelectedSi===null||_maSelectedSi<0||_maSelectedSi>=sessions.length){
