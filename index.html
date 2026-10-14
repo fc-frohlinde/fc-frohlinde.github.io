@@ -3389,6 +3389,7 @@ body.design-flutlicht:not(.theme-dark) .mob .db-h,body.design-kabine:not(.theme-
 .set-link:hover{border-color:var(--bm);}
 .set-link-go{margin-left:auto;font-size:1.4rem;opacity:.45;line-height:1;}
 .set-logo-prev{width:46px;height:46px;border-radius:50%;object-fit:cover;background:#fff;box-shadow:0 0 0 1px var(--gl);flex-shrink:0;}
+.set-hero-prev{width:74px;height:46px;border-radius:10px;background:var(--hx-nav,#0E2350) center/cover no-repeat;box-shadow:0 0 0 1px var(--gl);flex-shrink:0;}
 body.theme-dark .set-nav-it,body.theme-dark .set-link,body.theme-dark .set-back,body.theme-dark .set-sec-h{color:#dde5f0;}
 body.theme-dark .set-link{background:transparent;border-color:#2a3e6e;}
 body.theme-dark #moSettings .set-hd,body.theme-dark .set-nav{border-color:#2a3e6e;}
@@ -4280,14 +4281,8 @@ body.design-heute #hxHome.hx-has-hero .hx-heroimg::after{content:'';position:abs
 body.design-heute #hxHome.hx-has-hero .hx-h1{text-shadow:0 1px 12px rgba(0,0,0,.35);}
 body.design-heute #hxHome .hx-wrap{position:relative;z-index:1;}
 body.design-heute .hx-top-r,body.design-heute .hx-mtop-r{display:flex;align-items:center;gap:8px;}
-body.design-heute .hx-photo{width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.1);color:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto;}
-body.design-heute .hx-photo:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.35);}
-body.design-heute .hx-photo:focus-visible{outline:2px solid var(--hx-yellow);outline-offset:2px;}
-@media(min-width:768px){body.design-heute .hx-mtop-r .hx-photo{display:none;}}
 @media(max-width:767px){
   body.design-heute #hxHome.hx-has-hero .hx-heroimg{height:230px;}
-  body.design-heute .hx-top-r .hx-photo{display:none;}
-  body.design-heute .hx-photo{width:44px;height:44px;border-radius:12px;}
 }
 body.design-heute .ssx-sort{display:flex;align-items:center;gap:4px;margin:2px 0 4px;font-size:.78rem;color:var(--hx-muted);}
 body.design-heute .ssx-sort span{margin-right:4px;}
@@ -4364,7 +4359,6 @@ body.design-heute{
   flex-direction:column;gap:4px;padding:20px 14px 16px;box-sizing:border-box;font-family:'Barlow',sans-serif;overflow-y:auto;}
 .hx-club{display:flex;align-items:center;gap:12px;padding:0 6px 16px;}
 .hx-crest{width:46px;height:46px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px var(--hx-yellow);object-fit:cover;flex-shrink:0;}
-.hx-crest.editable{cursor:pointer;}
 .hx-club-nm{font-family:var(--hx-num);font-weight:800;font-size:1.3rem;line-height:1.05;letter-spacing:.2px;}
 .hx-ctx{display:flex;gap:6px;margin:0 2px 14px;}
 .hx-ctx button{flex:1;display:flex;align-items:center;justify-content:space-between;gap:6px;padding:9px 11px;border-radius:10px;
@@ -5036,7 +5030,7 @@ if(window._fbBlocked){
 
 <!-- Design "Heute": side navigation (hidden unless body.design-heute) -->
 <nav id="hxNav" aria-label="Hauptnavigation">
-  <div class="hx-club"><img class="hx-crest" id="hxCrest" alt="" onclick="clubLogoMenu(this,event)" title="Vereinslogo"><span class="hx-club-nm" id="hxClub">FC Frohlinde</span></div>
+  <div class="hx-club"><img class="hx-crest" id="hxCrest" alt=""><span class="hx-club-nm" id="hxClub">FC Frohlinde</span></div>
   <div class="hx-ctx"><button type="button" onclick="hxTeamMenu(this,event)" title="Mannschaft wechseln"><span id="hxTeamLbl">–</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><button type="button" onclick="hxSeasonMenu(this,event)" title="Saison wechseln"><span id="hxSeasonLbl">–</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></div>
   <button type="button" class="hx-item" data-hx="home" onclick="hxGo('home')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"/></svg><span>Heute</span></button>
   <button type="button" class="hx-item" data-hx="table" onclick="hxGo('table')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg><span>Anwesenheit</span></button>
@@ -5056,7 +5050,7 @@ if(window._fbBlocked){
 
 <div class="header" id="hdrEl">
   
-  <div class="logo-ring" id="logoRingWrap" onclick="if(!window.matchMedia('(hover:none)').matches)clubLogoMenu(this,event)" style="cursor:pointer;" title="Logo"><img id="clogo" alt="FC Frohlinde"/></div>
+  <div class="logo-ring" id="logoRingWrap"><img id="clogo" alt="FC Frohlinde"/></div>
   <div class="htext" id="hTextHome" onclick="headerHome()" title="Zur Startseite" style="cursor:pointer;">
     <div class="hclub">FC Frohlinde<span class="hclub-suffix"> 1949 e.V.</span></div>
     <div class="hsub" id="hSub">U19 · Junioren</div>
@@ -5807,7 +5801,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791956729980; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791958135393; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -10031,7 +10025,7 @@ function buildSearchCorpus(){
   }
   cmds.push({label:'⌨️ Tastatur-Kürzel',meta:'Hotkeys-Übersicht',fn:()=>typeof openShortcutsHelp==='function'&&openShortcutsHelp()});
   cmds.push({label:'⚙️ Einstellungen',meta:'Konto, Darstellung, Benachrichtigungen',fn:()=>typeof openSettings==='function'&&openSettings()});
-  cmds.push({label:'🎨 Darstellung',meta:'Farben, Design, Schrift',fn:()=>typeof openSettings==='function'&&openSettings('darstellung')});
+  cmds.push({label:'🎨 Darstellung',meta:'Farbschema, Schrift',fn:()=>typeof openSettings==='function'&&openSettings('darstellung')});
   cmds.push({label:'👤 Konto',meta:'Passwort, PIN, Passkey',fn:()=>typeof openSettings==='function'&&openSettings('konto')});
   cmds.push({label:'🚪 Abmelden',meta:'Logout',fn:()=>typeof confirmLogout==='function'&&confirmLogout()});
   cmds.forEach(c=>{
@@ -12139,60 +12133,53 @@ function getAppearance(){
 function saveAppearance(s){
   try{localStorage.setItem('appearance',JSON.stringify(s));}catch(e){}
 }
-// Design layers are opt-in per device. ?design=flutlicht|kabine|klassisch
-// in the address switches and remembers, so a look can be tried from a link.
-const DESIGN_LIST=['heute'];
+// The trainer app has one design ("Heute"). Old links with ?design=… still
+// arrive; the parameter is dropped and changes nothing.
 function applyAppearance(){
   try{
-    const q=new URLSearchParams(location.search).get('design');
-    if(q!=null){
-      const v=DESIGN_LIST.includes(q)?q:'';
-      const s0=getAppearance();
-      if(s0.design!==v){s0.design=v;saveAppearance(s0);}
-      // Consumed once: a later tap in the settings must win over the link.
+    if(new URLSearchParams(location.search).has('design')){
       const u=new URL(location.href);u.searchParams.delete('design');
       history.replaceState(history.state,'',u.pathname+u.search+u.hash);
     }
   }catch(e){}
   const s=getAppearance();
-  // Player screens have their own look — the design layers are for the trainer app.
-  const _pl=/[?&](p|player|rpe|rpeteam|team)=/.test(location.search);
-  // Earlier colour-only tests (flutlicht/kabine) are gone; a device that had
-  // one picked falls back to Klassisch.
-  const _d=DESIGN_LIST.includes(s.design)?s.design:'';
-  document.body.classList.toggle('design-heute',!_pl&&_d==='heute');
-  document.body.classList.toggle('design-kabine',!_pl&&_d==='heute'); // light table layer
+  // Player screens have their own look — the design layer is for the trainer app.
+  const _pl=/[?&](p|player|rpe|rpeteam|team)=/.test(location.search)||document.body.classList.contains('player-mode');
+  const hx=!_pl;
+  document.body.classList.toggle('design-heute',hx);
+  document.body.classList.toggle('design-kabine',hx); // light table layer
   document.body.classList.remove('design-flutlicht');
-  HX_SCHEMES.forEach(x=>{if(x[0]&&x[0]!=='dunkel')document.body.classList.remove('hxs-'+x[0]);});
-  if(!_pl&&_d==='heute'&&s.hxScheme&&s.hxScheme!=='dunkel'&&HX_SCHEMES.some(x=>x[0]===s.hxScheme))document.body.classList.add('hxs-'+s.hxScheme);
+  HX_SCHEMES.forEach(x=>{if(x[0])document.body.classList.remove('hxs-'+x[0]);});
+  if(hx&&s.hxScheme&&HX_SCHEMES.some(x=>x[0]===s.hxScheme))document.body.classList.add('hxs-'+s.hxScheme);
   if(typeof hxApplyDesign==='function')try{hxApplyDesign();}catch(e){}
-  document.body.classList.toggle('theme-dark',s.theme==='dark');
+  // The old dark layer, colour palettes and custom colour belonged to the old
+  // design. The trainer app uses the colour schemes instead; a device that
+  // still has one of them stored simply ignores it.
+  document.body.classList.toggle('theme-dark',!hx&&s.theme==='dark');
   document.body.classList.toggle('no-anim',!s.animations);
   document.body.classList.toggle('compact',s.compact);
   // Remove all palette classes
   PALETTE_LIST.forEach(p=>{if(p)document.body.classList.remove('palette-'+p);});
   // Custom color overrides palette presets
-  if(s.customColor){
+  if(!hx&&s.customColor){
     applyCustomColor(s.customColor);
   } else {
     clearCustomColor();
-    if(s.palette)document.body.classList.add('palette-'+s.palette);
+    if(!hx&&s.palette)document.body.classList.add('palette-'+s.palette);
   }
   document.documentElement.style.fontSize=(s.fontScale*16)+'px';
   const notifWrap=document.getElementById('notifWrap');
   if(notifWrap)notifWrap.style.display=s.notifVisible?'':'none';
 }
-function setAppDesign(v){const s=getAppearance();s.design=DESIGN_LIST.includes(v)?v:'';saveAppearance(s);applyAppearance();updateAppearanceUI();if(typeof render==='function')render();}
 function setHxScheme(v){
   const s=getAppearance();
   s.hxScheme=HX_SCHEMES.some(x=>x[0]===v)?v:'';
-  // "Dunkel" is the dark layer; every other scheme is light
-  s.theme=s.hxScheme==='dunkel'?'dark':'light';
+  s.theme='light';
   saveAppearance(s);applyAppearance();updateAppearanceUI();
 }
 function _hxSchemeCur(s){
   s=s||getAppearance();
-  return s.theme==='dark'?'dunkel':(HX_SCHEMES.some(x=>x[0]===s.hxScheme)?s.hxScheme:'');
+  return HX_SCHEMES.some(x=>x[0]===s.hxScheme)?s.hxScheme:'';
 }
 function setAppTheme(v){const s=getAppearance();s.theme=v;saveAppearance(s);applyAppearance();updateAppearanceUI();}
 function setAppFontScale(v){const s=getAppearance();s.fontScale=v;saveAppearance(s);applyAppearance();updateAppearanceUI();}
@@ -12237,7 +12224,6 @@ function updateAppearanceUI(){
     const cur=_hxSchemeCur(s);
     hg.innerHTML=HX_SCHEMES.map(x=>`<button type="button" class="hxs-sw${x[0]===cur?' on':''}" aria-pressed="${x[0]===cur}" onclick="setHxScheme('${x[0]}')"><span class="hxs-pv" style="--n:${x[2]};--g:${x[3]};--c:${x[4]}" aria-hidden="true"><i></i><b></b><b></b><b></b></span><span class="hxs-nm">${x[1]}</span></button>`).join('');
   }
-  ['','heute'].forEach(d=>document.getElementById('design-'+(d||'klassisch'))?.classList.toggle('active',(DESIGN_LIST.includes(s.design)?s.design:'')===d));
   document.getElementById('theme-light')?.classList.toggle('active',s.theme==='light');
   document.getElementById('theme-dark')?.classList.toggle('active',s.theme==='dark');
   document.getElementById('fs-s')?.classList.toggle('active',s.fontScale<0.95);
@@ -12337,6 +12323,14 @@ function _setLogoSync(){
   if(pv&&cl&&cl.src&&pv.src!==cl.src)pv.src=cl.src;
   const del=document.getElementById('setLogoDel');
   if(del)del.style.display=(G&&G.clubLogo)?'':'none';
+  // Titelbild: preview, "Hinzufügen" when there is none yet
+  const hero=(G&&typeof G.heroPhoto==='string'&&G.heroPhoto)||'';
+  const hp=document.getElementById('setHeroPrev');
+  if(hp){const v=hero?'url("'+hero+'")':'';if(hp._v!==v){hp.style.backgroundImage=v;hp._v=v;}}
+  const hk=document.getElementById('setHeroPick');
+  if(hk)hk.textContent=hero?'Ändern':'Hinzufügen';
+  const hd=document.getElementById('setHeroDel');
+  if(hd)hd.style.display=hero?'':'none';
 }
 const HX_SUB={backup:'moBackup',trash:'moTrash',audit:'moAuditLog'};
 function _hxSubKids(mo){
@@ -18919,8 +18913,6 @@ function applyClubLogo(){
   if(ring){
     ring.classList.toggle('editable', !!(canEdit&&canEdit()));
   }
-  const crest=document.getElementById('hxCrest');
-  if(crest)crest.classList.toggle('editable', !!(canEdit&&canEdit()));
   // Keep the Startseite hero logo in sync — same G.clubLogo, both places
   const homeLogo=document.getElementById('home-hero-logo');
   if(homeLogo){
@@ -22198,16 +22190,14 @@ function hxRender(){
   const crestSrc=(document.getElementById('clogo')||{}).src||'';
   const today=todaySK();
   const dateTxt=new Date().toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long'});
-  // The team photo (the same G.heroPhoto as the Klassisch start screen) sits
-  // behind the band, tinted in the scheme colour; editors change it here.
+  // The team photo (G.heroPhoto) sits behind the band, tinted in the scheme
+  // colour. It is changed in Einstellungen → Mannschaft only.
   const _hero=(G&&typeof G.heroPhoto==='string'&&G.heroPhoto)||'';
   if(el._hxHero!==_hero){el.style.setProperty('--hx-hero',_hero?'url("'+_hero+'")':'none');el._hxHero=_hero;}
   el.classList.toggle('hx-has-hero',!!_hero);
-  const _ed=typeof canEdit==='function'&&canEdit();
-  const photoBtn=_ed?`<button type="button" class="hx-photo" onclick="heroPhotoMenu(this,event)" aria-label="${_hero?'Titelbild ändern':'Titelbild hinzufügen'}" title="${_hero?'Titelbild ändern':'Titelbild hinzufügen'}">${hxIcon('camera',18)}</button>`:'';
   const mtop=`<div class="hx-mtop">
       <button type="button" class="hx-mctx" onclick="mobSheetOpen()"><img src="${esc(crestSrc)}" alt="">${esc(UI.currentTeam||'')} · ${esc(season||'')}${hxIcon('down',16)}</button>
-      <span class="hx-mtop-r">${photoBtn}<button type="button" class="hx-mbell" aria-label="Benachrichtigungen" onclick="hxNotif(this,event)">${hxIcon('bell')}</button></span>
+      <span class="hx-mtop-r"><button type="button" class="hx-mbell" aria-label="Benachrichtigungen" onclick="hxNotif(this,event)">${hxIcon('bell')}</button></span>
     </div>`;
   if(!D||!Array.isArray(D.sessions)||!Array.isArray(D.players)){
     el.innerHTML=`<div class="hx-wrap">${mtop}<h1 class="hx-h1">${esc(dateTxt)}</h1><div class="hx-card hx-empty">Für ${esc(UI.currentTeam||'')} · ${esc(season||'')} gibt es noch keine Daten.</div></div>`;
@@ -22220,7 +22210,7 @@ function hxRender(){
   const mi=findNextMatchIdx();
   let html=`<div class="hx-heroimg" aria-hidden="true"></div><div class="hx-wrap">${mtop}
     <div class="hx-top"><div><h1 class="hx-h1">${esc(dateTxt)}</h1></div>
-    <span class="hx-top-r">${photoBtn}<button type="button" class="hx-search" onclick="openSearch()">${hxIcon('search',18)}Spieler oder Termin suchen</button></span></div>
+    <span class="hx-top-r"><button type="button" class="hx-search" onclick="openSearch()">${hxIcon('search',18)}Spieler oder Termin suchen</button></span></div>
     <div class="hx-grid">`;
   // ── Focus: the next session ──
   if(fi<0){
@@ -22560,9 +22550,6 @@ function homeData(){
 function homeRender(){
   if(typeof hxOn==='function'&&hxOn()){try{hxRender();}catch(e){console.error('hxRender',e);}return;}
   if(!homeEligible())return;
-  // Idempotent: bindLongPress marks the element, so repeated renders do not
-  // stack listeners.
-  try{_bindPhotoLongPress();}catch(e){}
   const D=homeData()||{players:[],sessions:[]};
   // ── Hero ──
   const heroTitle=document.getElementById('home-hero-title');
@@ -22579,7 +22566,6 @@ function homeRender(){
   }
   // Hero photo
   const photoEl=document.getElementById('home-hero-photo');
-  const photoBtn=document.getElementById('home-hero-photobtn');
   if(photoEl){
     if(G&&G.heroPhoto){
       photoEl.style.backgroundImage='url('+G.heroPhoto+')';
@@ -22588,7 +22574,6 @@ function homeRender(){
       photoEl.style.display='none';
     }
   }
-  if(photoBtn)photoBtn.style.display=canEdit()?'':'none';
   const unEl=document.getElementById('home-user-name');
   if(unEl)unEl.textContent=(CU&&CU.name)||'\u2013';
   // ── Sections isolated: one broken block must not kill the whole screen ──
@@ -22815,9 +22800,9 @@ function homeUploadHeroPhoto(ev){
         snap();
         G.heroPhoto=result;
         saveG();
-        logAudit('Startseiten-Foto ge\u00e4ndert','','');
+        logAudit('Titelbild ge\u00e4ndert','','');
         homeRender();
-        if(typeof hxRender==='function'&&_hxOn())hxRender();
+        if(typeof _setLogoSync==='function')_setLogoSync();
       };
       img.onerror=()=>alert('Ung\u00fcltiges Bildformat');
       img.src=rv.target.result;
@@ -22828,39 +22813,6 @@ function homeUploadHeroPhoto(ev){
   document.body.appendChild(inp);
   inp.click();
   setTimeout(()=>inp.remove(),0);
-}
-// Photo targets on the Startseite behave like the player and trainer photos:
-// a tap offers upload or removal instead of opening the file dialog at once.
-function heroPhotoMenu(el,ev){
-  if(ev)ev.stopPropagation();
-  if(!canEdit())return;
-  photoMenu(el,!!(G&&G.heroPhoto),()=>homeUploadHeroPhoto(),()=>homeRemoveHeroPhoto());
-}
-// Long press on touch devices. Bound per element, cancelled by movement so a
-// scroll that starts on the photo never opens the menu.
-function bindLongPress(el,fn){
-  if(!el||el._lpBound)return;
-  el._lpBound=true;
-  let t=null,sx=0,sy=0,fired=false;
-  const clear=()=>{if(t){clearTimeout(t);t=null;}};
-  el.addEventListener('touchstart',e=>{
-    if(!canEdit())return;
-    const p=e.touches&&e.touches[0];
-    sx=p?p.clientX:0;sy=p?p.clientY:0;fired=false;
-    clear();
-    t=setTimeout(()=>{fired=true;fn(el);},550);
-  },{passive:true});
-  el.addEventListener('touchmove',e=>{
-    const p=e.touches&&e.touches[0];
-    if(!p)return;
-    if(Math.abs(p.clientX-sx)>10||Math.abs(p.clientY-sy)>10)clear();
-  },{passive:true});
-  el.addEventListener('touchend',e=>{
-    clear();
-    // Swallow the click the browser sends after a long press
-    if(fired){e.preventDefault();fired=false;}
-  });
-  el.addEventListener('touchcancel',clear);
 }
 // The manifest pins the installed app to portrait, but a browser tab ignores
 // that. The Screen Orientation API covers the tab case where it exists; where
@@ -22875,17 +22827,6 @@ function _lockPortrait(){
 }
 document.addEventListener('DOMContentLoaded',_lockPortrait);
 window.addEventListener('orientationchange',()=>setTimeout(_lockPortrait,120));
-function _bindPhotoLongPress(){
-  const hero=document.getElementById('home-hero');
-  if(hero)bindLongPress(hero,el=>heroPhotoMenu(el));
-  [document.getElementById('home-hero-logo'),document.getElementById('logoRingWrap'),document.getElementById('hxCrest')]
-    .forEach(el=>{if(el)bindLongPress(el,x=>clubLogoMenu(x));});
-}
-function clubLogoMenu(el,ev){
-  if(ev)ev.stopPropagation();
-  if(!canEdit())return;
-  photoMenu(el,!!(G&&G.clubLogo),()=>pickClubLogo(),()=>removeClubLogo());
-}
 function removeClubLogo(){
   if(!canEdit())return;
   if(!G||!G.clubLogo)return;
@@ -22901,24 +22842,21 @@ function removeClubLogo(){
 function homeRemoveHeroPhoto(){
   if(!canEdit())return;
   if(!G||!G.heroPhoto)return;
-  if(!confirm('Startseiten-Foto entfernen?'))return;
+  if(!confirm('Titelbild entfernen?'))return;
   snap();
   delete G.heroPhoto;
   saveG();
+  logAudit('Titelbild entfernt','','');
   homeRender();
-  if(typeof hxRender==='function'&&_hxOn())hxRender();
+  if(typeof _setLogoSync==='function')_setLogoSync();
 }
 // ── Start view preference (per user, cloud-synced) ──
 // 'home' (default): Startseite opens after login. 'table': straight to table.
 // Stored in G.userSettings[name] so it follows the trainer across devices,
 // same pattern as G.userAutomation. Read-only users always get 'home' (no writes).
 function _homeStartViewPref(){
-  // Design "Heute" always starts on the start screen — no choice any more
-  if((typeof hxOn==='function'&&hxOn())||(typeof getAppearance==='function'&&getAppearance().design==='heute'))return 'home';
-  const uname=CU&&CU.name;
-  if(!G||!uname)return 'home';
-  const s=G.userSettings&&G.userSettings[uname];
-  return (s&&s.startView==='table')?'table':'home';
+  // One design, one start: the app always opens on the start screen
+  return 'home';
 }
 function homeSetStartView(v){
   if(!CU||!canEdit())return;
@@ -27638,8 +27576,9 @@ function _tplArr(x){
 function _tplClean(v){return JSON.parse(JSON.stringify(v));}
 function _tplCatColor(k){const c=TPL_CATS.find(x=>x.k===k);return c?c.c:'#9AA5B8';}
 function _tplE(s){return escapeHtml(s==null?'':String(s));}
-// Test phase: admins only. Set to false to open the planner for the team's trainers.
-const TPL_ADMIN_ONLY=true;
+// Open for the team's trainers (canEdit). Set to true to limit it to admins again.
+// Players and "Nur ansehen" never get it.
+const TPL_ADMIN_ONLY=false;
 function _tplAllowed(){
   if(typeof isPlayerMode==='function'&&isPlayerMode())return false;
   if(typeof RPE_IS_PREVIEW!=='undefined'&&RPE_IS_PREVIEW)return false;
@@ -31798,9 +31737,9 @@ _pubCleanupSchedule();
   <div class="set-body">
     <nav class="set-nav" id="set-nav">
       <button type="button" class="set-nav-it" data-sec="konto" onclick="settingsShow('konto')"><span class="set-nav-ic">👤</span><span class="set-nav-tx"><b>Konto</b><small>Passwort, PIN, Passkey, Sitzung</small></span></button>
-      <button type="button" class="set-nav-it" data-sec="darstellung" onclick="settingsShow('darstellung')"><span class="set-nav-ic">🎨</span><span class="set-nav-tx"><b>Darstellung</b><small>Farben, Design, Schrift</small></span></button>
+      <button type="button" class="set-nav-it" data-sec="darstellung" onclick="settingsShow('darstellung')"><span class="set-nav-ic">🎨</span><span class="set-nav-tx"><b>Darstellung</b><small>Farbschema, Schrift</small></span></button>
       <button type="button" class="set-nav-it" data-sec="benach" onclick="settingsShow('benach')"><span class="set-nav-ic">🔔</span><span class="set-nav-tx"><b>Benachrichtigungen</b><small>Push, Erinnerungen</small></span></button>
-      <button type="button" class="set-nav-it" data-sec="team" onclick="settingsShow('team')"><span class="set-nav-ic">👥</span><span class="set-nav-tx"><b>Mannschaft</b><small>Vereinslogo, Anzeige der Spieler</small></span></button>
+      <button type="button" class="set-nav-it" data-sec="team" onclick="settingsShow('team')"><span class="set-nav-ic">👥</span><span class="set-nav-tx"><b>Mannschaft</b><small>Vereinslogo, Titelbild, Anzeige der Spieler</small></span></button>
       <button type="button" class="set-nav-it" data-sec="daten" onclick="settingsShow('daten')"><span class="set-nav-ic">💾</span><span class="set-nav-tx"><b>Daten</b><small>Backups, Papierkorb, Verlauf</small></span></button>
     </nav>
     <div class="set-pane" id="set-pane">
@@ -31930,17 +31869,6 @@ _pubCleanupSchedule();
 
   <div class="setting-row">
     <div>
-      <div class="setting-label">🎨 Design <span style="font-size:.62rem;font-weight:700;padding:1px 6px;border-radius:999px;background:var(--ac);color:var(--bd);vertical-align:middle;">Test</span></div>
-      <div class="setting-sub">„Heute“: Startseite mit dem nächsten Termin und Menü an der Seite. „Klassisch“ ist das bisherige. Gilt nur für dieses Gerät.</div>
-    </div>
-    <div class="setting-control">
-      <button class="seg-btn" id="design-klassisch" onclick="setAppDesign('')">Klassisch</button>
-      <button class="seg-btn" id="design-heute" onclick="setAppDesign('heute')">Heute</button>
-    </div>
-  </div>
-
-  <div class="setting-row">
-    <div>
       <div class="setting-label">🔠 Schriftgröße</div>
       <div class="setting-sub">Allgemein für die Oberfläche</div>
     </div>
@@ -32028,11 +31956,22 @@ _pubCleanupSchedule();
         <img id="setLogoPrev" class="set-logo-prev" alt=""/>
         <div style="flex:1;min-width:0;">
           <div class="setting-label">🛡 Vereinslogo</div>
-          <div class="setting-sub">In der Kopfleiste, auf der Startseite und im Menü</div>
+          <div class="setting-sub">In der Navigation, auf dem Handy oben auf der Startseite</div>
         </div>
         <div class="setting-control" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;">
           <button type="button" class="btn bp" onclick="pickClubLogo()">Ändern</button>
           <button type="button" class="btn" id="setLogoDel" onclick="removeClubLogo()" style="background:rgba(231,76,60,.1);color:#c0392b;border:1px solid rgba(231,76,60,.3);">Entfernen</button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <span id="setHeroPrev" class="set-hero-prev" aria-hidden="true"></span>
+        <div style="flex:1;min-width:0;">
+          <div class="setting-label">🖼 Titelbild</div>
+          <div class="setting-sub">Mannschaftsfoto oben auf der Startseite</div>
+        </div>
+        <div class="setting-control" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;">
+          <button type="button" class="btn bp" id="setHeroPick" onclick="homeUploadHeroPhoto()">Ändern</button>
+          <button type="button" class="btn" id="setHeroDel" onclick="homeRemoveHeroPhoto()" style="background:rgba(231,76,60,.1);color:#c0392b;border:1px solid rgba(231,76,60,.3);">Entfernen</button>
         </div>
       </div>
   <div class="setting-row">
@@ -32362,10 +32301,9 @@ _pubCleanupSchedule();
       <div class="home-hero" id="home-hero">
         <div class="home-hero-photo" id="home-hero-photo" style="display:none;"></div>
         <div class="home-hero-shade"></div>
-        <button class="home-hero-photobtn" id="home-hero-photobtn" style="display:none;left:12px;right:auto;" onclick="heroPhotoMenu(this,event)">📷 Foto</button>
         <button class="home-user-pill" id="home-user-pill" onclick="homeToggleUserMenu(event)">👤 <span id="home-user-name">–</span> <span style="opacity:.6;">▾</span></button>
         <div class="home-hero-content">
-          <div class="home-hero-logo" id="home-hero-logo" onclick="if(!window.matchMedia('(hover:none)').matches)clubLogoMenu(this,event)" title="Logo"></div>
+          <div class="home-hero-logo" id="home-hero-logo"></div>
           <div>
             <div class="home-hero-title" id="home-hero-title">FC FROHLINDE</div>
             <div class="home-hero-sub" id="home-hero-sub">U19 · Saison 2025/26</div>
