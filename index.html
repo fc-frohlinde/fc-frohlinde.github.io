@@ -3877,7 +3877,6 @@ body.design-heute .hx-a-flags .hx-flag:last-of-type{border-bottom:none;}
 body.design-heute .hx-wrap{container:hxw / inline-size;}
 @media(min-width:768px) and (max-width:1180px){
   body.design-heute .hx-wrap{padding-bottom:12px;}
-  body.design-heute .hx-wrap > .hx-top{margin-bottom:6px;}
 }
 @container hxw (max-width:884px){
   body.design-heute .hx-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(230px,.95fr);gap:14px;}
@@ -4017,8 +4016,6 @@ body.design-heute .hxv-block{border-bottom:none !important;padding-bottom:4px !i
    every page and on the start screen (the phone already had it). The band
    ends above the cards; nothing runs underneath them. */
 @media(min-width:768px){
-  body.design-heute .hx-top{position:relative;z-index:0;padding-bottom:0;margin-bottom:10px;}
-  body.design-heute .hx-top::before{content:'';position:absolute;z-index:-1;left:-100vw;right:-100vw;top:-500px;bottom:-14px;background:var(--hx-nav);}
   /* Kalender, Statistik, Wochenbericht */
   body.design-heute :is(#moCalendar,#moDashboard,#moWeekReport) > .mob > .has-inrow-close{background:var(--hx-nav);margin:-30px -40px 18px !important;padding:22px max(40px,calc(100% - 1080px)) 18px 40px !important;max-width:none !important;width:auto !important;min-height:76px;box-sizing:border-box;}
   body.design-heute :is(#moCalendar,#moDashboard,#moWeekReport) > .mob > .has-inrow-close h3{color:#fff !important;}
@@ -4118,6 +4115,43 @@ body.design-heute :is(#lp-pitch,#slp-pitch) > circle:not([stroke]){fill:rgba(255
   body.design-heute .ma-btn.ma-4:not(.dim){background:#E0912F;color:#fff;}
   body.design-heute .ma-btn.ma-5:not(.dim){background:var(--hx-blue);}
   body.design-heute .ma-btn.ma-3:not(.dim){background:var(--hx-ink);color:#fff;}
+}
+/* ── One header standard ──
+   Every page bar has the same height and the title the same size and place:
+   desktop 76px / 2rem, phone 62px (+ safe area) / 1.6rem, centred. Controls
+   that do not fit one row (Statistik selects, Wochenbericht week switcher)
+   sit just below the bar on the page ground. The start screen keeps its
+   band running under the cards; its title row lines up with the bars. */
+@media(min-width:768px){
+  body.design-heute .hx-wrap{padding-top:16px !important;}
+  body.design-heute .hx-wrap > .hx-top{min-height:44px;padding-bottom:0;margin-bottom:0;align-items:center;}
+  body.design-heute .hx-h1{font-size:2rem !important;line-height:1.1;}
+  body.design-heute :is(#moCalendar,#moDashboard,#moWeekReport) > .mob > .has-inrow-close,
+  body.design-heute #moTeamMgr.hx-page > .mob > div:first-child,
+  body.design-heute #moSettings .set-hd,
+  body.design-heute #toolbarEl.toolbar{min-height:76px !important;padding-top:0 !important;padding-bottom:0 !important;align-items:center !important;box-sizing:border-box;}
+  body.design-heute :is(#moCalendar,#moDashboard,#moWeekReport) > .mob > .has-inrow-close h3,
+  body.design-heute #moTeamMgr #tmgr-h,body.design-heute #moSettings .set-title{font-size:2rem !important;line-height:1.1 !important;}
+  body.design-heute #toolbarEl.toolbar .toolbar-l::before{font-size:2rem !important;line-height:1.1;padding-top:0 !important;}
+  body.design-heute #moDashboard .has-inrow-close .db-sel{min-height:36px;height:36px;}
+}
+@media(max-width:767px){
+  body.design-heute :is(#moCalendar,#moDashboard,#moWeekReport) > .mob > .has-inrow-close,
+  body.design-heute #moTeamMgr.hx-page > .mob > div:first-child,
+  body.design-heute #moSettings .set-hd,
+  body.design-heute #hxListTop{min-height:calc(62px + env(safe-area-inset-top,0px)) !important;padding-top:calc(12px + env(safe-area-inset-top,0px)) !important;padding-bottom:12px !important;align-items:center !important;box-sizing:border-box;}
+  body.design-heute :is(#moCalendar,#moDashboard,#moWeekReport) .has-inrow-close h3,
+  body.design-heute #moTeamMgr #tmgr-h,body.design-heute #moSettings .set-title,body.design-heute .hx-ltop-t{font-size:1.6rem !important;line-height:38px !important;min-height:38px;margin:0 !important;}
+  body.design-heute #moCalendar .has-inrow-close .cal-btn{flex:0 0 38px !important;width:38px !important;height:38px !important;min-height:38px !important;}
+  /* Second row (Statistik, Wochenbericht) on the ground below a 62px bar */
+  body.design-heute :is(#moDashboard,#moWeekReport) > .mob > .has-inrow-close{background:linear-gradient(var(--hx-nav),var(--hx-nav)) 0 0/100% calc(62px + env(safe-area-inset-top,0px)) no-repeat,var(--hx-ground) !important;row-gap:12px !important;padding-bottom:4px !important;align-content:flex-start;}
+  body.design-heute #moDashboard .has-inrow-close .db-header-actions{flex:1 1 100%;order:9;}
+  body.design-heute #moDashboard .has-inrow-close .db-sel{background:var(--hx-field) !important;border:1px solid var(--hx-line) !important;color:var(--hx-ink) !important;}
+  body.design-heute #moWeekReport .has-inrow-close .wr-head-nav{order:9;flex:1 1 auto;}
+  body.design-heute #moWeekReport .has-inrow-close .wr-head-meta{order:10;color:var(--hx-muted) !important;align-self:center;}
+  body.design-heute #moWeekReport .has-inrow-close .db-wr-nav button{background:var(--hx-field) !important;border:1px solid var(--hx-line) !important;color:var(--hx-ink) !important;}
+  body.design-heute #moWeekReport .has-inrow-close .db-wr-wk{color:var(--hx-ink) !important;}
+  body.design-heute .hx-wrap{padding-top:calc(9px + env(safe-area-inset-top,0px)) !important;}
 }
 /* ── Kader page (#moTeamMgr) ── */
 body.design-heute #moTeamMgr > .mob{padding:30px 40px 28px !important;}
@@ -4332,7 +4366,7 @@ body.design-heute #mobNav .mn-lb{font-size:.68rem;}
    sit on a cool blue-grey ground instead of plain white, and overlap the band. */
 body.design-heute{--hx-ground:#E8EDF5;--hx-shadow:0 1px 2px rgba(14,35,80,.06),0 12px 32px -14px rgba(14,35,80,.22);}
 body.design-heute .home-overlay{background:var(--hx-ground);}
-body.design-heute #hxHome{background:var(--hx-ground);overflow-x:hidden;}
+body.design-heute #hxHome{background:linear-gradient(var(--hx-nav),var(--hx-nav)) 0 0/100% 280px no-repeat,var(--hx-ground);background-attachment:local;}
 body.design-heute .hx-h1{color:#fff;}
 body.design-heute .hx-lead{color:#C9D6EC;}
 body.design-heute .hx-search{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18);color:#DCE5F5;}
@@ -4348,11 +4382,7 @@ body.design-heute .hx-tile.ok{background:#DDF1E5;}
 body.design-heute .hx-tile.warn{background:#FBE7CC;}
 body.design-heute .hx-tile.open{background:#EDF1F7;}
 @media(max-width:767px){
-  body.design-heute #hxHome{background:var(--hx-ground);overflow-x:hidden;}
-  body.design-heute .hx-mtop{position:relative;z-index:1;}
-  body.design-heute .hx-top{position:relative;z-index:0;padding-bottom:4px;}
-  body.design-heute .hx-top::before{content:'';position:absolute;z-index:-1;left:-100vw;right:-100vw;top:-500px;bottom:-14px;background:var(--hx-nav);}
-  body.design-heute .hx-a-hero{margin-top:12px;}
+  body.design-heute #hxHome{background:linear-gradient(var(--hx-nav),var(--hx-nav)) 0 0/100% 230px no-repeat,var(--hx-ground);background-attachment:local;}
   body.design-heute .hx-mctx{color:#fff;}
   body.design-heute .hx-mbell{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff;}
 }
@@ -5629,7 +5659,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791950092208; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791951025169; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -12205,7 +12235,7 @@ function settingsShow(sec){
   const nav=sec&&document.querySelector('#moSettings .set-nav-it[data-sec="'+sec+'"] b');
   const subH=secEl&&secEl.dataset.parent&&secEl.querySelector('.set-sec-h');
   const t=document.getElementById('set-title');
-  if(t)t.textContent=_setPhone()&&(nav||subH)?(nav||subH).textContent.replace(/^\S+\s/,''):'⚙️ Einstellungen';
+  if(t)t.textContent=_setPhone()&&(nav||subH)?(nav||subH).textContent.replace(/^\S+\s/,''):((typeof hxOn==='function'&&hxOn())?'Einstellungen':'⚙️ Einstellungen');
   if(sec)_setLast=parent;
   const pane=document.getElementById('set-pane');if(pane)pane.scrollTop=0;
 }
