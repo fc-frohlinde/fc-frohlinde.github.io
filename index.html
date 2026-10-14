@@ -3550,7 +3550,7 @@ body.design-heute.theme-dark :is(:is(#moCalendar,#moDashboard,#moWeekReport)) .h
   body.design-heute :is(#moCalendar,#moDashboard,#moWeekReport){bottom:var(--mob-nav-h,62px);}
   body.design-heute :is(#moCalendar,#moDashboard,#moWeekReport) > .mob{padding:0 !important;}
   body.design-heute :is(#moCalendar,#moDashboard,#moWeekReport) > .mob > *:not(.mob-close-x){max-width:none !important;}
-  body.design-heute :is(#moCalendar,#moDashboard,#moWeekReport) .has-inrow-close{background:#0E2350;margin:0 !important;padding:calc(12px + env(safe-area-inset-top,0px)) 62px 12px 16px !important;row-gap:8px;}
+  body.design-heute :is(#moCalendar,#moDashboard,#moWeekReport) .has-inrow-close{background:#0E2350;margin:0 !important;padding:calc(12px + env(safe-area-inset-top,0px)) 16px 12px 16px !important;row-gap:8px;}
   body.design-heute :is(#moCalendar,#moDashboard,#moWeekReport) .has-inrow-close h3{color:#fff !important;font-size:1.6rem !important;flex:1 1 auto !important;}
   body.design-heute .hx-page .mob-close-x{position:absolute !important;top:calc(10px + env(safe-area-inset-top,0px)) !important;right:12px !important;width:38px !important;height:38px !important;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff;z-index:3;margin:0 !important;}
   body.design-heute #moSettings .mob-close-x,body.design-heute #moTeamMgr .mob-close-x{position:static !important;}
@@ -3622,13 +3622,22 @@ body.design-heute{--hx-pw:460px;}
   body.design-heute .mo.hx-panel > .mob{width:100% !important;height:100% !important;max-height:none !important;border-radius:0;box-shadow:none;animation:hxPanelUp .2s cubic-bezier(.22,1,.36,1);padding-top:calc(12px + env(safe-area-inset-top,0px)) !important;}
   body.design-heute .mo.hx-panel > .mob::before{display:none;}
 }
+/* Pages are left through the navigation, not closed — no ✕ on pages.
+   Phone: Statistik, Wochenbericht and Einstellungen are not in the bottom
+   bar (they come from "Mehr" / the user menu), so they get ‹ on the left. */
+.hx-back{display:none;}
+body.design-heute :is(#moCalendar,#moDashboard,#moWeekReport) .mob-close-x,body.design-heute #moSettings .set-x{display:none !important;}
+@media(max-width:767px){
+  body.design-heute :is(#moDashboard,#moWeekReport) .hx-back{display:flex;align-items:center;justify-content:center;width:38px;height:38px;margin:0 2px 0 -6px;padding:0 0 3px;border:none;border-radius:999px;background:rgba(255,255,255,.1);color:#fff;font-size:1.7rem;line-height:1;cursor:pointer;flex-shrink:0;}
+  body.design-heute #moSettings .set-back{display:flex;color:#fff;}
+}
 /* ── Kader page (#moTeamMgr) ── */
 body.design-heute #moTeamMgr > .mob{padding:30px 40px 28px !important;}
 body.design-heute #moTeamMgr > .mob > *{width:100%;max-width:1040px;box-sizing:border-box;}
 body.design-heute #moTeamMgr > .mob > div:first-child{position:static;margin:0 0 16px;padding:0;background:none;border:none;z-index:auto;}
 body.design-heute #moTeamMgr #tmgr-h{font-family:var(--hx-num);font-weight:800;font-size:2rem;letter-spacing:.2px;color:var(--hx-ink);line-height:1.1;}
 body.design-heute #moTeamMgr #tmgr-back{display:none !important;}
-body.design-heute #moTeamMgr #tmgr-close-top{display:flex !important;border-radius:999px;width:40px;height:40px;padding:0;align-items:center;justify-content:center;background:#fff;border:1px solid var(--hx-line);color:var(--hx-ink);}
+body.design-heute #moTeamMgr #tmgr-close-top{display:none !important;border-radius:999px;width:40px;height:40px;padding:0;align-items:center;justify-content:center;background:#fff;border:1px solid var(--hx-line);color:var(--hx-ink);}
 body.design-heute #moTeamMgr .tbar{border-bottom:none;gap:6px;margin:0 0 14px;padding:2px 0;}
 body.design-heute #moTeamMgr .tbtn{padding:8px 15px;border-radius:999px;background:#fff;border:1px solid var(--hx-line);margin:0;color:var(--hx-ink2);text-transform:none;font-size:.86rem;font-weight:600;letter-spacing:0;}
 body.design-heute #moTeamMgr .tbtn:hover{border-color:var(--hx-ink2);color:var(--hx-ink);}
@@ -5126,7 +5135,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791939725457; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791940203491; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -11640,7 +11649,11 @@ function settingsShow(sec){
   if(sec)_setLast=sec;
   const pane=document.getElementById('set-pane');if(pane)pane.scrollTop=0;
 }
-function settingsBack(){settingsShow('');}
+function settingsBack(){
+  const mob=document.querySelector('#moSettings .set-mob');
+  if(mob&&mob.classList.contains('sec-open'))settingsShow('');
+  else closeM('moSettings');   // Heute phone: ‹ on the category list leaves the page
+}
 // Kept for old callers (search, shortcuts)
 function openPreferences(){openSettings();}
 function setUserSessionExpiry(val){
@@ -31460,6 +31473,7 @@ _pubCleanupSchedule();
 <div class="mo hx-page" id="moDashboard" style="z-index:540;"><div class="mob" style="width:920px;max-width:96vw;max-height:94vh;display:flex;flex-direction:column;position:relative;">
   <button class="mob-close-x" onclick="closeM('moDashboard')" aria-label="Schließen">✕</button>
   <div class="db-header">
+    <button type="button" class="hx-back" onclick="closeM('moDashboard')" aria-label="Zurück">‹</button>
     <h3 style="flex:1 1 200px;margin:0;color:var(--bd);"><span class="kl-only">📊 Trainer-Dashboard</span><span class="hx-only">Statistik</span></h3>
     <div class="db-header-actions">
       <select id="db-team-sel" onchange="renderDashboard()" class="db-sel"></select>
@@ -31473,6 +31487,7 @@ _pubCleanupSchedule();
 <div class="mo hx-page" id="moWeekReport" style="z-index:540;"><div class="mob" style="width:760px;max-width:96vw;height:82vh;max-height:740px;min-height:540px;display:flex;flex-direction:column;position:relative;">
   <button class="mob-close-x" onclick="closeM('moWeekReport')" aria-label="Schließen">✕</button>
   <div class="wr-head">
+    <button type="button" class="hx-back" onclick="closeM('moWeekReport')" aria-label="Zurück">‹</button>
     <h3 class="wr-head-title"><span class="kl-only">📄 Wochenbericht</span><span class="hx-only">Wochenbericht</span></h3>
     <div id="wr-nav-slot" class="wr-head-nav"></div>
     <div id="wr-team-meta" class="wr-head-meta"></div>
