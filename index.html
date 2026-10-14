@@ -3644,6 +3644,28 @@ body.design-heute :is(.lp-close-btn,.slp-close-btn){border-radius:999px;backgrou
 body.design-heute :is(.lp-close-btn,.slp-close-btn):hover{background:rgba(255,255,255,.16);color:#fff;border-color:rgba(255,255,255,.3);}
 body.design-heute #slp-status-btn{background:var(--hx-yellow) !important;border-color:var(--hx-yellow) !important;color:var(--hx-ink) !important;}
 body.design-heute .lp-hint{color:#AFC0E0;}
+/* Beside the side navigation (from 1000px; narrower tablets keep the
+   full width, the pitch would get too small): the navigation stays usable,
+   so Aufstellung behaves like the other entries; close is a round ✕ as in
+   the Trainingsplaner. */
+@media(min-width:1000px){
+  body.design-heute :is(.lp-overlay,.slp-overlay){left:232px;}
+  body.design-heute :is(.lp-close-btn,#slp-close-btn){width:38px;height:38px;padding:0;flex:0 0 38px;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;}
+  body.design-heute :is(.lp-close-btn,#slp-close-btn) .fb-long{display:none;}
+  body.design-heute :is(.lp-close-btn,#slp-close-btn) .fb-short{display:inline;}
+  body.design-heute :is(.lp-topbar,.slp-topbar){flex-wrap:nowrap;}
+  body.design-heute :is(.lp-topbar,.slp-topbar) .lp-title{min-width:0;flex:0 1 auto;}
+  body.design-heute :is(.lp-sub,.slp-sub){white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  body.design-heute :is(.lp-logo,.slp-logo,.slp-close-btn,.lp-fmt-btn,.slp-fmt-btn){white-space:nowrap;}
+  body.design-heute :is(#lp-fmt-btns,#slp-fmt-btns,.lp-kind-wrap){flex-wrap:nowrap !important;flex-shrink:0;}
+}
+@media(min-width:1000px) and (max-width:1180px){
+  body.design-heute :is(.lp-logo,.slp-logo){font-size:1.3rem;}
+  body.design-heute :is(.lp-topbar,.slp-topbar){gap:8px;padding-left:16px;padding-right:16px;}
+}
+@media(min-width:1000px) and (max-width:1180px){
+  body.design-heute .lp-hint{display:none;}
+}
 /* side panels → white cards */
 body.design-heute :is(.lp-sidebar,.slp-sidebar,.slp-roster-col){background:#fff;border-color:var(--hx-line);color:var(--hx-ink);}
 body.design-heute :is(.lp-sb-top,.slp-sb-top,.slp-roster-col-head){border-color:var(--hx-line);}
@@ -5375,7 +5397,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791946758371; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791947180697; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -21151,6 +21173,7 @@ setTimeout(_bootVeilHide,5000);
 // visibility settings are. No-op for players, who have no home screen.
 function headerHome(){
   if(typeof homeEligible==='function'&&!homeEligible())return;
+  if(document.body.classList.contains('design-heute')&&_hxToolOpen()){hxGo('home');return;}
   const ov=document.getElementById('homeOverlay');
   if(ov&&ov.classList.contains('open'))return; // already there
   homeOpen();
@@ -21295,10 +21318,34 @@ function _hxPageSync(){
   if(typeof _mobNavSync==='function'&&typeof _mobCurrentView==='function')_mobNavSync(_mobCurrentView());
   else if(typeof hxSyncNav==='function')hxSyncNav();
 }
+// Tools that sit beside the navigation in "Heute" (Aufstellung, Saisonkader).
+// They cover pages and panels, so the navigation shows them as current.
+function _hxToolOpen(){
+  for(const id of ['moSeasonLineup','moLineup']){const el=document.getElementById(id);if(el&&el.classList.contains('open'))return id;}
+  return '';
+}
+// Leaves the open tools through their own save checks. Resolves false when
+// the trainer chose to stay (Saisonkader offers "Abbrechen").
+async function _hxCloseTools(){
+  const slp=document.getElementById('moSeasonLineup');
+  if(slp&&slp.classList.contains('open')){
+    try{await closeSeasonLineup();}catch(e){console.error(e);}
+    if(slp.classList.contains('open'))return false;
+  }
+  const lp=document.getElementById('moLineup');
+  if(lp&&lp.classList.contains('open'))closeLineupPlanner();
+  return !_hxToolOpen();
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  ['moLineup','moSeasonLineup'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)new MutationObserver(()=>{if(typeof hxSyncNav==='function')hxSyncNav();}).observe(el,{attributes:true,attributeFilter:['class']});
+  });
+});
 function hxSyncNav(){
   const ov=document.getElementById('homeOverlay');
   const pg=_hxOpenPage();
-  const cur=pg?pg.k:(ov&&ov.classList.contains('open'))?'home':'table';
+  const cur=_hxToolOpen()?'lineup':pg?pg.k:(ov&&ov.classList.contains('open'))?'home':'table';
   document.querySelectorAll('#hxNav .hx-item[data-hx]').forEach(b=>{
     const on=b.dataset.hx===cur;
     b.classList.toggle('on',on);
@@ -21306,6 +21353,13 @@ function hxSyncNav(){
   });
 }
 function hxGo(k){
+  const tool=_hxToolOpen();
+  if(tool){
+    closeUserMenuIfOpen&&closeUserMenuIfOpen();
+    if(k==='lineup'&&tool==='moLineup'){hxSyncNav();return;}
+    _hxCloseTools().then(ok=>{if(ok)hxGo(k);else hxSyncNav();});
+    return;
+  }
   closeUserMenuIfOpen&&closeUserMenuIfOpen();
   _hxClosePanels('');
   _hxClosePages(HX_PAGE[k]);
@@ -21327,6 +21381,8 @@ function closeUserMenuIfOpen(){
 }
 function hxTeamMenu(btn,e){
   if(e)e.stopPropagation();
+  // Switching the team under an open lineup would mix two teams' data
+  if(_hxToolOpen()){_hxCloseTools().then(ok=>{if(ok)hxTeamMenu(btn);});return;}
   const m=document.getElementById('teamTabs');if(!m)return;
   if(typeof closeSeasonMenu==='function')closeSeasonMenu();
   const open=m.classList.toggle('open');
@@ -21337,6 +21393,7 @@ function hxTeamMenu(btn,e){
 }
 function hxSeasonMenu(btn,e){
   if(e)e.stopPropagation();
+  if(_hxToolOpen()){_hxCloseTools().then(ok=>{if(ok)hxSeasonMenu(btn);});return;}
   const m=document.getElementById('seasonTabs');if(!m)return;
   closeTeamMenu();
   const open=m.classList.toggle('open');
@@ -30848,7 +30905,7 @@ _pubCleanupSchedule();
     </div>
     <div class="lp-spacer"></div>
     <div class="lp-hint" id="lp-hint">Slot wählen → Spieler klicken</div>
-    <button class="lp-close-btn" onclick="closeLineupPlanner()"><span class="fb-long">✕ Schließen</span><span class="fb-short">✕</span></button>
+    <button class="lp-close-btn" onclick="closeLineupPlanner()" aria-label="Schließen"><span class="fb-long">✕ Schließen</span><span class="fb-short">✕</span></button>
   </div>
   <div id="lp-unavail-bar" class="lp-unavail-bar" style="display:none;"></div>
   <!-- Separate strip: "cannot play today" and "not eligible this week" are
@@ -31552,7 +31609,7 @@ _pubCleanupSchedule();
     <input type="checkbox" id="slp-conf-toggle" onchange="slpToggleConfirmations(this.checked)" style="cursor:pointer;margin:0 4px 0 0;width:14px;height:14px;vertical-align:middle;"/>
     <span id="slp-conf-toggle-lbl" style="font-size:.75rem;color:rgba(255,255,255,.95);font-weight:600;margin-right:6px;user-select:none;cursor:pointer;" onclick="const _t=document.getElementById('slp-conf-toggle');_t.checked=!_t.checked;slpToggleConfirmations(_t.checked);">Bestätigungen</span>
     <button class="slp-close-btn" id="slp-status-btn" onclick="slpOpenStatusList()" style="display:none;background:rgba(232,200,64,0.15);border-color:rgba(232,200,64,0.4);color:#e8c840;"><span class="fb-long">📋 Status verwalten</span><span class="fb-short">📋</span></button>
-    <button class="slp-close-btn" onclick="closeSeasonLineup()"><span class="fb-long">✕ Schließen</span><span class="fb-short">✕</span></button>
+    <button class="slp-close-btn" id="slp-close-btn" onclick="closeSeasonLineup()" aria-label="Schließen"><span class="fb-long">✕ Schließen</span><span class="fb-short">✕</span></button>
   </div>
   <div class="slp-body">
     <div class="slp-roster-col" id="slp-roster-col">
