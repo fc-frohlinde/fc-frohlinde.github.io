@@ -1269,144 +1269,14 @@ select.lp-fmt-btn option:checked{background:var(--bm);color:#fff;}
 .lp-slot-g.drop-target circle{stroke:#27ae60;stroke-width:3;filter:drop-shadow(0 0 8px rgba(39,174,96,.7));}
 
 /* ══ STARTSEITE (home screen) ═══════════════════════════════ */
-/* Fullscreen overlay. z-index 450: ABOVE table UI (<=300), BELOW modals
-   (500+) and planners (801) — sections open on top, closing lands on home.
-   Composition fills the FULL viewport height: hero and tiles scale up with
-   vh, the tile zone absorbs leftover space and vertically centers its grid,
-   so the page always looks intentionally full — no dead space, no scroll. */
+/* Fullscreen overlay that hosts #hxHome. z-index 450: ABOVE the table UI
+   (<=300), BELOW modals (500+) and planners (801). */
 .home-overlay{position:fixed;inset:0;z-index:450;background:linear-gradient(165deg,var(--planner-dark) 0%,var(--planner-mid) 55%,var(--planner-dark) 100%);display:none;flex-direction:column;overflow:hidden;}
 .home-overlay.open{display:flex;}
 .home-overlay::before{content:'';position:absolute;top:-20%;left:50%;transform:translateX(-50%);width:120vw;height:60vh;background:radial-gradient(ellipse at center,rgba(232,200,64,.08),transparent 65%);pointer-events:none;}
 .home-overlay::after{content:'';position:absolute;bottom:-30%;left:-10%;width:70vw;height:60vh;background:radial-gradient(ellipse at center,rgba(29,112,216,.10),transparent 65%);pointer-events:none;}
-.home-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 22px 18px;display:flex;flex-direction:column;position:relative;z-index:1;}
-.home-inner{max-width:900px;margin:0 auto;width:100%;display:flex;flex-direction:column;flex:1;min-height:0;}
-/* Hero — big, cinematic */
-.home-hero{position:relative;border-radius:0 0 26px 26px;overflow:hidden;margin:0 -22px clamp(16px,2.4vh,24px);min-height:clamp(150px,26vh,270px);flex-shrink:0;display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(135deg,rgba(0,0,0,.25),rgba(0,0,0,.05));}
-.home-hero-photo{position:absolute;inset:0;background-size:cover;background-position:center;}
-.home-hero-shade{position:absolute;inset:0;background:linear-gradient(to top,rgba(4,10,30,.9) 0%,rgba(4,10,30,.4) 50%,rgba(4,10,30,.12) 100%);}
-.home-hero-content{position:relative;padding:26px 30px 22px;display:flex;align-items:flex-end;gap:20px;}
-/* Club logo — same white ring as the table header */
-.home-hero-logo{flex-shrink:0;width:clamp(64px,10vh,84px);height:clamp(64px,10vh,84px);border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 0 0 2px var(--ac),0 0 0 3.5px rgba(255,255,255,.12),0 6px 20px rgba(0,0,0,.45);}
-.home-hero-logo img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
-.home-hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.9rem,4.4vh,2.6rem);letter-spacing:2.5px;color:#fff;line-height:1;text-shadow:0 2px 12px rgba(0,0,0,.55);}
-.home-hero-sub{font-size:clamp(.72rem,1.5vh,.84rem);font-weight:600;letter-spacing:3px;color:#e8c840;text-transform:uppercase;margin-top:6px;}
-.home-hero-photobtn{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.85);border-radius:8px;padding:5px 11px;font-size:.72rem;font-weight:600;cursor:pointer;backdrop-filter:blur(4px);transition:background .18s,color .18s,opacity .22s;opacity:0;pointer-events:none;}
-.home-hero:hover .home-hero-photobtn{opacity:1;pointer-events:auto;}
-.home-hero-photobtn:hover{background:rgba(0,0,0,.65);color:#fff;}
-/* User pill on home — opens the SAME #userDropdown as the table header.
-   Items that exist as tiles (Dashboard, Administration) are hidden via the
-   from-home class to avoid duplicates. */
-.home-user-pill{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.9);border-radius:20px;padding:6px 14px;font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;backdrop-filter:blur(4px);transition:background .18s;display:flex;align-items:center;gap:6px;z-index:3;}
-.home-user-pill:hover{background:rgba(0,0,0,.65);}
-.user-dropdown.from-home #ud-dashboard{display:none !important;}
-/* Editable club logo — same 📷 hover affordance as the table's logo ring */
-.home-hero-logo.editable{cursor:pointer;overflow:visible;position:relative;transition:transform .2s,box-shadow .2s;}
-.home-hero-logo.editable:hover{transform:scale(1.06);box-shadow:0 0 0 2px var(--ac),0 0 0 3.5px rgba(255,255,255,.18),0 8px 24px rgba(0,0,0,.5);}
-.home-hero-logo.editable::after{content:'\1F4F7';position:absolute;bottom:-2px;right:-2px;width:24px;height:24px;background:var(--ac);color:#0a1430;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;border:2px solid #07132e;box-shadow:0 1px 3px rgba(0,0,0,.4);pointer-events:none;opacity:0;transition:opacity .15s;z-index:2;}
-.home-hero-logo.editable:hover::after{opacity:1;}
-/* Next training + next match — two cards side by side */
-.home-next-row{display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,1.8vh,16px);margin-bottom:clamp(16px,2.4vh,24px);flex-shrink:0;}
-.home-next{position:relative;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:clamp(14px,2.2vh,20px) 22px clamp(14px,2.2vh,20px) 26px;cursor:pointer;transition:background .2s,transform .18s,box-shadow .2s;backdrop-filter:blur(6px);overflow:hidden;}
-.home-next::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(to bottom,#e8c840,rgba(232,200,64,.25));}
-.home-next-match::before{background:linear-gradient(to bottom,#e74c3c,rgba(231,76,60,.25));}
-.home-next-opp{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.35rem,3vh,1.75rem);letter-spacing:1.5px;color:#fff;line-height:1.05;margin-bottom:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.home-next:hover{background:rgba(255,255,255,.11);transform:translateY(-2px);box-shadow:0 10px 32px rgba(0,0,0,.35);}
-.home-next-label{font-size:.66rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#e8c840;margin-bottom:7px;display:flex;align-items:center;gap:6px;}
-.home-next-main{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;}
-.home-next-date{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.5rem,3.2vh,1.9rem);letter-spacing:1.5px;color:#fff;line-height:1;}
-.home-next-count{font-size:.84rem;font-weight:600;color:rgba(255,255,255,.65);}
-.home-next-rsvp{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;}
-.home-next-pill{font-size:.76rem;font-weight:700;padding:4px 12px;border-radius:20px;}
-/* Tile grid — absorbs leftover height, grid vertically centered */
-/* Flex instead of grid: column count comes from JS (ceil(n/2)) so the tiles
-   always form exactly two balanced rows — 4+4 for trainers (8), 5+4 for
-   admin (9) — and an incomplete last row auto-centers, never leaving holes. */
-.home-tiles{--tcols:4;--tgap:clamp(12px,1.8vh,16px);display:flex;flex-wrap:wrap;justify-content:center;align-content:center;gap:var(--tgap);margin-bottom:clamp(14px,2.2vh,22px);flex:1;min-height:0;}
-.home-tile{flex:0 0 calc((100% - (var(--tcols) - 1)*var(--tgap))/var(--tcols));}
-.home-tile{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.11);border-radius:16px;padding:clamp(16px,2.6vh,24px) 16px clamp(14px,2.2vh,20px);cursor:pointer;transition:background .2s,transform .18s,border-color .2s,box-shadow .2s;display:flex;flex-direction:column;gap:clamp(8px,1.4vh,12px);min-height:clamp(90px,13vh,124px);justify-content:center;}
-.home-tile:hover{background:rgba(255,255,255,.11);border-color:rgba(232,200,64,.45);transform:translateY(-3px) scale(1.015);box-shadow:0 12px 34px rgba(0,0,0,.35),0 0 0 1px rgba(232,200,64,.12);}
-.home-tile:active{transform:translateY(-1px) scale(.99);}
-.home-tile-icon{font-size:clamp(1.5rem,2.8vh,1.85rem);line-height:1;transition:transform .25s cubic-bezier(.34,1.56,.64,1);}
-.home-tile:hover .home-tile-icon{transform:scale(1.18) rotate(-4deg);}
-.home-tile-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.02rem,2vh,1.2rem);letter-spacing:1.8px;color:#fff;}
-.home-tile-desc{font-size:.7rem;color:rgba(255,255,255,.5);line-height:1.35;}
-/* Bottom zone */
-.home-bottom{display:grid;grid-template-columns:1fr 1fr;gap:clamp(12px,1.8vh,16px);flex-shrink:0;}
-.home-panel{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:clamp(10px,1.6vh,14px) 18px;transition:background .2s,border-color .2s;}
-.home-panel:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.16);}
-.home-panel-title{font-size:.64rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#e8c840;margin-bottom:7px;}
-.home-panel-row{display:flex;align-items:center;gap:8px;font-size:.78rem;color:rgba(255,255,255,.8);padding:2px 0;}
-.home-panel-empty{font-size:.74rem;color:rgba(255,255,255,.35);}
-/* ── Entrance choreography (only under .home-animate — see homeOpen) ──
-   One continuous wave, ~0.95s total: overlay fades in, hero settles with a
-   gentle scale, then card → tiles cascade → panels, all on transform/opacity
-   (compositor-only, no layout thrash). Background re-renders are deferred
-   while this plays, so nothing ever pops twice. */
-@keyframes homeFadeUp{from{opacity:0;transform:translateY(26px);}to{opacity:1;transform:translateY(0);}}
-@keyframes homeHeroIn{from{opacity:0;transform:scale(1.045);}to{opacity:1;transform:scale(1);}}
-/* During the entrance wave, translated-down elements momentarily overflow
-   the scroll container — suppress the transient scrollbar for that window. */
-.home-overlay.home-animate .home-scroll{overflow-y:hidden;}
-.home-overlay.home-animate .home-hero{animation:homeHeroIn .7s cubic-bezier(.22,1,.36,1) both;}
-.home-overlay.home-animate .home-next-row{animation:homeFadeUp .55s cubic-bezier(.22,1,.36,1) .12s both;}
-.home-overlay.home-animate .home-tile{animation:homeFadeUp .5s cubic-bezier(.22,1,.36,1) both;}
-.home-overlay.home-animate .home-tile:nth-child(1){animation-delay:.2s;}
-.home-overlay.home-animate .home-tile:nth-child(2){animation-delay:.24s;}
-.home-overlay.home-animate .home-tile:nth-child(3){animation-delay:.28s;}
-.home-overlay.home-animate .home-tile:nth-child(4){animation-delay:.32s;}
-.home-overlay.home-animate .home-tile:nth-child(5){animation-delay:.36s;}
-.home-overlay.home-animate .home-tile:nth-child(6){animation-delay:.4s;}
-.home-overlay.home-animate .home-tile:nth-child(7){animation-delay:.44s;}
-.home-overlay.home-animate .home-tile:nth-child(8){animation-delay:.48s;}
-.home-overlay.home-animate .home-tile:nth-child(9){animation-delay:.52s;}
-.home-overlay.home-animate .home-bottom{animation:homeFadeUp .5s cubic-bezier(.22,1,.36,1) .5s both;}
 @media (prefers-reduced-motion: reduce){
   .home-overlay *{animation:none !important;transition:none !important;}
-}
-@media(max-width:600px){
-  .home-bottom{grid-template-columns:1fr;}
-  .home-next-row{grid-template-columns:1fr !important;}
-  .home-hero-title{font-size:1.55rem;}
-  .home-tiles{--tcols:2 !important;}
-}
-/* ── STARTSEITE ON PHONES ────────────────────────────────────────
-   The desktop layout is built for ONE fixed viewport: the tile grid takes
-   the leftover height (flex:1) and centres itself. On a phone everything
-   stacks past the fold and that same rule squashed the tiles into slivers
-   while the screen scrolled. Mobile therefore lets every block keep its
-   natural height and simply scrolls. */
-@media (max-width:767px){
-  .home-scroll{padding:0 14px calc(70px + env(safe-area-inset-bottom,0px));}
-  /* Hero bleeds edge-to-edge — margin must mirror the scroll padding */
-  .home-hero{margin:0 -14px 16px;min-height:auto;border-radius:0 0 20px 20px;}
-  .home-hero-content{padding:18px 16px 16px;gap:14px;align-items:center;}
-  .home-hero-logo{width:56px;height:56px;}
-  .home-hero-title{font-size:1.5rem;letter-spacing:1.5px;}
-  .home-hero-sub{font-size:.66rem;letter-spacing:2px;margin-top:3px;}
-  /* No hover on touch, so the desktop reveal-on-hover button would sit
-     permanently on the photo. Hidden again — on a phone the photo area itself
-     opens the menu, so no button is needed. */
-  .home-hero-photobtn{display:none !important;}
-  /* Long press opens the photo menu — stop the OS text/image selection popup
-     from appearing on top of it. */
-  .home-hero,#home-hero-logo,#logoRingWrap{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
-  .home-user-pill{top:8px;right:8px;padding:4px 9px;font-size:.7rem;}
-  /* Tiles: natural height, two columns, real tap targets */
-  .home-tiles{flex:0 0 auto;min-height:0;align-content:flex-start;gap:10px;margin-bottom:16px;}
-  .home-tile{min-height:82px;padding:14px 12px;border-radius:14px;gap:6px;}
-  .home-tile-icon{font-size:1.45rem;}
-  .home-tile-name{font-size:.86rem;}
-  .home-tile-desc{font-size:.64rem;line-height:1.25;}
-  /* Hover transforms are meaningless on touch and cause sticky states */
-  .home-tile:hover{transform:none;box-shadow:none;}
-  .home-tile:hover .home-tile-icon{transform:none;}
-  .home-tile:active{background:rgba(255,255,255,.14);transform:scale(.98);}
-  /* Next training / match cards */
-  .home-next{padding:14px 16px;}
-  .home-next-row{gap:10px;margin-bottom:16px;}
-  /* Bottom panels */
-  .home-bottom{gap:10px;}
-  .home-panel{padding:14px;}
 }
 /* ══ SEASON LINEUP PLANNER ══════════════════════════════════ */
 .slp-overlay{position:fixed;inset:0;z-index:801;background:linear-gradient(160deg,var(--planner-dark) 0%,var(--planner-mid) 50%,var(--planner-dark) 100%);display:none;flex-direction:column;overflow:hidden;}
@@ -2678,7 +2548,7 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
   text-underline-offset:3px;cursor:pointer;}
 .loc-link:hover{text-decoration-style:solid;}
 .loc-name{flex:1;min-width:0;font-size:.8rem;color:var(--gd);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.home-next-loc{font-size:.72rem;color:rgba(255,255,255,.6);margin-top:4px;display:flex;align-items:center;gap:5px;}
+
 .rpe-ov-sum{font-size:.74rem;color:var(--gm);margin-bottom:10px;}
 .rpe-ov-sess{border:1px solid var(--gl);border-radius:10px;padding:9px 11px;margin-bottom:8px;}
 .rpe-ov-h{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
@@ -4312,7 +4182,7 @@ body.design-heute{
 
 /* ── Start screen ── */
 body.design-heute .home-overlay{background:var(--hx-ground);}
-body.design-heute .home-overlay > .home-scroll{display:none!important;}
+
 body.design-heute #hxHome{display:block;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
   font-family:'Barlow',sans-serif;color:var(--hx-ink);}
 .hx-wrap{max-width:1240px;margin:0 auto;padding:28px 36px 48px;display:flex;flex-direction:column;gap:22px;box-sizing:border-box;}
@@ -5726,7 +5596,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791958615100; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791958953472; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -9468,25 +9338,10 @@ function toggleUserMenu(e){
   e.stopPropagation();
   const dd=document.getElementById('userDropdown');
   if(!dd)return;
-  dd.classList.remove('from-home');
   const btn=document.getElementById('userPill');
   const willOpen=!dd.classList.contains('open');
   dd.classList.toggle('open',willOpen);
   if(willOpen)_placePopup(dd,btn.getBoundingClientRect(),{align:'right'});
-  updateUserMenuState();
-}
-// Same dropdown, opened from the Startseite pill. from-home hides items
-// that already exist as tiles right below (Dashboard, Administration).
-function homeToggleUserMenu(e){
-  e.stopPropagation();
-  const dd=document.getElementById('userDropdown');
-  if(!dd)return;
-  dd.classList.add('from-home');
-  const btn=document.getElementById('home-user-pill');
-  if(!btn)return;
-  const willOpen=!dd.classList.contains('open');
-  dd.classList.toggle('open',willOpen);
-  if(willOpen)_placePopup(dd,btn.getBoundingClientRect(),{align:'right',gap:6});
   updateUserMenuState();
 }
 function closeUserMenu(){
@@ -10560,13 +10415,8 @@ function render(){
     if(typeof hxRenderNav==='function')hxRenderNav();
     // Keep Startseite in sync: Firebase sync, undo/redo, team/season switch
     // all funnel through render() — refresh home if it's currently visible.
-    // While the entrance choreography is playing (.home-animate), postpone —
-    // homeOpen's timer flushes one deferred render right after it finishes.
     const _homeOv=document.getElementById('homeOverlay');
-    if(_homeOv&&_homeOv.classList.contains('open')&&typeof homeRender==='function'){
-      if(_homeOv.classList.contains('home-animate'))_homeOv._pendingRender=true;
-      else homeRender();
-    }
+    if(_homeOv&&_homeOv.classList.contains('open')&&typeof homeRender==='function')homeRender();
   }catch(err){
     console.error('render error:',err);
   }
@@ -18713,13 +18563,7 @@ function applyClubLogo(){
   if(ring){
     ring.classList.toggle('editable', !!(canEdit&&canEdit()));
   }
-  // Keep the Startseite hero logo in sync — same G.clubLogo, both places
-  const homeLogo=document.getElementById('home-hero-logo');
-  if(homeLogo){
-    const img=homeLogo.querySelector('img');
-    if(img)img.src=src;
-  }
-  // Design "Heute": crest in the side navigation and on the start screen;
+  // Crest in the side navigation and on the start screen;
   // Einstellungen → Mannschaft shows a preview.
   if(typeof _setLogoSync==='function')try{_setLogoSync();}catch(e){}
   if(typeof hxOn==='function'&&hxOn()){
@@ -21606,16 +21450,7 @@ function homeOpen(){
   // button apparently doing nothing.
   ov.classList.add('open');
   try{homeRender();}catch(e){console.error('homeRender:',e);}
-  // Entrance animations replay on every open, but NOT on background
-  // re-renders (Firebase sync etc.) — class is dropped after the sequence,
-  // then one deferred render (if any arrived meanwhile) is flushed.
-  ov.classList.add('home-animate');
   if(typeof _mobNavSync==='function')_mobNavSync('home');
-  clearTimeout(ov._animT);
-  ov._animT=setTimeout(()=>{
-    ov.classList.remove('home-animate');
-    if(ov._pendingRender){ov._pendingRender=false;homeRender();}
-  },1150);
 }
 function homeClose(){
   if(typeof _navArm==='function')_navArm(); // so "back" returns to the Startseite
@@ -21672,8 +21507,6 @@ function hxIcon(k,size){
   return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${HX_IC[k]||''}</svg>`;
 }
 function hxOn(){return document.body.classList.contains('design-heute');}
-// Some call sites use the underscored name — keep both pointing at the same check
-function _hxOn(){return hxOn();}
 document.addEventListener('DOMContentLoaded',()=>{try{hxApplyDesign();}catch(e){}});
 // Phone tab bar: same five buttons, the design's icons and names
 const HX_TABS={home:['home','Heute'],list:['table','Anwesenheit'],cal:['cal','Kalender'],team:['team','Kader'],more:['more','Mehr']};
@@ -21903,7 +21736,6 @@ function hxSeasonMenu(btn,e){
 function hxUserMenu(btn,e){
   if(e)e.stopPropagation();
   const dd=document.getElementById('userDropdown');if(!dd)return;
-  dd.classList.remove('from-home');
   const willOpen=!dd.classList.contains('open');
   dd.classList.toggle('open',willOpen);
   if(typeof updateUserMenuState==='function')updateUserMenuState();
@@ -22342,230 +22174,15 @@ function homeSeason(){
   list.sort((a,b)=>String(a).localeCompare(String(b)));
   return list[list.length-1]||UI.currentSeason||null;
 }
-function homeData(){
-  const seas=homeSeason();
-  if(!seas||!UI.currentTeam||!G.db)return cd();
-  return G.db[UI.currentTeam+'__'+seas]||cd();
-}
 function homeRender(){
-  if(typeof hxOn==='function'&&hxOn()){try{hxRender();}catch(e){console.error('hxRender',e);}return;}
-  if(!homeEligible())return;
-  const D=homeData()||{players:[],sessions:[]};
-  // ── Hero ──
-  const heroTitle=document.getElementById('home-hero-title');
-  const heroSub=document.getElementById('home-hero-sub');
-  if(heroTitle)heroTitle.textContent='FC FROHLINDE';
-  if(heroSub)heroSub.textContent=(UI.currentTeam||'U19')+' \u00b7 Saison '+(homeSeason()||'');
-  const logoEl=document.getElementById('home-hero-logo');
-  if(logoEl){
-    const src=(G&&G.clubLogo)||('data:image/jpeg;base64,'+LB64);
-    logoEl.innerHTML='<img src="'+src+'" alt=""/>';
-    // Same edit affordance as the table's logo ring — hover shows 📷 badge,
-    // click opens the same pickClubLogo cropper. One logo, two places.
-    logoEl.classList.toggle('editable',!!(typeof canEdit==='function'&&canEdit()));
-  }
-  // Hero photo
-  const photoEl=document.getElementById('home-hero-photo');
-  if(photoEl){
-    if(G&&G.heroPhoto){
-      photoEl.style.backgroundImage='url('+G.heroPhoto+')';
-      photoEl.style.display='';
-    } else {
-      photoEl.style.display='none';
-    }
-  }
-  const unEl=document.getElementById('home-user-name');
-  if(unEl)unEl.textContent=(CU&&CU.name)||'\u2013';
-  // ── Sections isolated: one broken block must not kill the whole screen ──
-  try{homeRenderNext();}catch(e){console.error('homeRenderNext:',e);}
-
-  try{homeRenderTiles();}catch(e){console.error('homeRenderTiles:',e);}
-  try{homeRenderBottom();}catch(e){console.error('homeRenderBottom:',e);}
+  // Player screens never show the start screen
+  if(!hxOn())return;
+  try{hxRender();}catch(e){console.error('hxRender',e);}
 }
-// Assign innerHTML only when the generated markup actually changed —
-// otherwise a background render() (Firebase sync ping, presence update…)
-// rebuilds identical DOM and RESTARTS any running CSS entrance animation,
-// which reads as elements popping in twice.
-function _homeSetHtml(el,html){
-  if(el._homeHtml===html)return;
-  el._homeHtml=html;
-  el.innerHTML=html;
-}
-function homeRenderNext(){
-  const row=document.getElementById('home-next-row');
-  if(!row)return;
-  const D=homeData()||{players:[],sessions:[]};
-  const seas=homeSeason();
-  const _sk=d=>_dbSortKey(d,seas); // season-aware: home may show another season than the table
-  const t=todaySK();
-  // Next training (first future training) and next match — shown as two
-  // cards side by side. If the very next session IS the match, the match
-  // card still renders (dedicated), and the training card shows the next
-  // training after it. Either card alone → full-width single card.
-  let tIdx=-1,mIdx=-1;
-  for(let i=0;i<(D.sessions||[]).length;i++){
-    const s=D.sessions[i];
-    if(!s||!s.date)continue;
-    if(_sk(s.date)<t)continue;
-    if(s.type==='training'&&tIdx<0)tIdx=i;
-    if(s.type==='match'&&mIdx<0)mIdx=i;
-    if(tIdx>=0&&mIdx>=0)break;
-  }
-  if(tIdx<0&&mIdx<0){row.style.display='none';return;}
-  const daysUntil=si=>{
-    const sk=_sk(D.sessions[si].date);
-    const y1=Math.floor(sk/10000),m1=Math.floor((sk%10000)/100),d1=sk%100;
-    const y0=Math.floor(t/10000),m0=Math.floor((t%10000)/100),d0=t%100;
-    return Math.round((new Date(y1,m1-1,d1)-new Date(y0,m0-1,d0))/864e5);
-  };
-  const rsvp=si=>{
-    let yes=0,no=0,open=0;
-    (D.players||[]).forEach(p=>{
-      if(!p||!p.s)return;
-      const v=p.s[si];
-      if(v===4||v===1)yes++;
-      else if(v===2||v===0)no++;
-      else open++;
-    });
-    return '<div class="home-next-rsvp">'+
-      '<span class="home-next-pill" style="background:rgba(39,174,96,.25);color:#7be0a8;">\u2713 '+yes+'</span>'+
-      '<span class="home-next-pill" style="background:rgba(231,76,60,.22);color:#f5a094;">\u2715 '+no+'</span>'+
-      '<span class="home-next-pill" style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);">? '+open+'</span>'+
-    '</div>';
-  };
-  const whenTxt=d=>d===0?'Heute':d===1?'Morgen':'in '+d+' Tagen';
-  let html='';
-  if(tIdx>=0){
-    const s=D.sessions[tIdx];
-    const d=daysUntil(tIdx);
-    html+='<div class="home-next" onclick="homeOpenSess('+tIdx+')">'+
-      '<div class="home-next-label">\u23f1 N\u00e4chstes Training</div>'+
-      '<div class="home-next-main">'+
-        '<div class="home-next-date">'+escapeHtml(s.date||'')+(s.time?(' \u00b7 '+s.time):'')+'</div>'+
-        '<div class="home-next-count">'+whenTxt(d)+'</div>'+
-      '</div>'+
-      ((s.location&&s.location.trim())?'<div class="home-next-loc">'+locNameHtml(s)+'</div>':'')+
-      rsvp(tIdx)+'</div>';
-  }
-  if(mIdx>=0){
-    const s=D.sessions[mIdx];
-    const d=daysUntil(mIdx);
-    const opp=(s.label||'').trim();
-    const ha=s.homeAway==='away'?'Ausw\u00e4rts':'Heim';
-    const haColor=s.homeAway==='away'?'background:rgba(231,76,60,.22);color:#f5a094;':'background:rgba(39,174,96,.25);color:#7be0a8;';
-    html+='<div class="home-next home-next-match" onclick="homeOpenSess('+mIdx+')">'+
-      '<div class="home-next-label" style="color:#ff9d8a;">\u26bd N\u00e4chstes Spiel</div>'+
-      '<div class="home-next-opp">'+(opp?('vs. '+escapeHtml(opp)):'Spiel')+'</div>'+
-      '<div class="home-next-main">'+
-        '<div class="home-next-date" style="font-size:1.1rem;">'+escapeHtml(s.date||'')+(s.time?(' \u00b7 '+s.time):'')+'</div>'+
-        '<span class="home-next-pill" style="'+haColor+'">'+ha+'</span>'+
-        '<div class="home-next-count">'+whenTxt(d)+'</div>'+
-      '</div>'+
-      ((s.location&&s.location.trim())?'<div class="home-next-loc">'+locNameHtml(s)+'</div>':'')+
-      rsvp(mIdx)+'</div>';
-  }
-  _homeSetHtml(row,html);
-  row.style.gridTemplateColumns=(tIdx>=0&&mIdx>=0)?'1fr 1fr':'1fr';
-  row.style.display='';
-}
-// Everything launched FROM the Startseite must operate on the season the
-// Startseite shows (the running one) — not on whatever season the table was
-// last parked in. Called by every tile action and by the next-session cards.
-function homeEnsureSeason(){
-  const seas=homeSeason();
-  if(seas&&UI.currentSeason!==seas){
-    UI.currentSeason=seas;
-    try{localStorage.setItem('currentSeason',seas);}catch(e){}
-    if(typeof render==='function')render();
-  }
-}
-function homeOpenSess(si){
-  // The card belongs to the HOME season — switch first, otherwise the index
-  // would point into a different block's session list.
-  homeEnsureSeason();
-  if(typeof openSessStats==='function')openSessStats(si);
-}
-function homeRenderTiles(){
-  const el=document.getElementById('home-tiles');
-  if(!el)return;
-  const ed=canEdit();
-  // Each tile: [icon, name, desc, onclick-js, visible]
-  // Sections open ON TOP of home (z 500+ vs home 450) — closing them lands
-  // back on home. Only the Tabelle tile actually leaves home.
-  const tiles=[
-    ['\ud83d\udccb','Tabelle','Anwesenheit & Status',"homeClose();",true],
-    ['\ud83d\udcc5','Kalender','Termine & Events',"openCalendar();",true],
-    ['\u26bd','Aufstellung','N\u00e4chstes Spiel planen',"openNextMatchLineup();",ed],
-    ['\ud83d\udccb','Saisonkader','Kader-Planung',"openSeasonLineup();",ed],
-    ['\ud83c\udfc6','Mannschaft','Spieler & Trainer',"openTeamMgr('spieler');",true],
-    ['\ud83d\udcca','Statistik','Team-\u00dcbersicht',"openTeamMgr('statistik');",true],
-    ['\ud83d\udcc4','Wochenbericht','KW-Zusammenfassung',"openWeekReport();",ed],
-    ['\ud83d\udcc8','Dashboard','Trainer-Analysen',"openDashboard();",ed],
-  ];
-  const shown=tiles.filter(t=>t[4]);
-  _homeSetHtml(el,shown.map(t=>
-    '<div class="home-tile" onclick="homeEnsureSeason();'+t[3]+'">'+
-      '<div class="home-tile-icon">'+t[0]+'</div>'+
-      '<div><div class="home-tile-name">'+t[1]+'</div>'+
-      '<div class="home-tile-desc">'+t[2]+'</div></div>'+
-    '</div>'
-  ).join(''));
-  // Two balanced rows: 8 tiles → 4 cols (4+4), 9 → 5 cols (5+4 centered)
-  el.style.setProperty('--tcols',String(Math.max(2,Math.ceil(shown.length/2))));
-}
-function homeRenderBottom(){
-  const el=document.getElementById('home-bottom');
-  if(!el)return;
-  const D=homeData()||{players:[],sessions:[]};
-  const seas=homeSeason();
-  // Birthdays in next 30 days (reuse parseBirthdate logic pattern)
-  const today=new Date();today.setHours(0,0,0,0);
-  // 30-day window — the panel title says so explicitly, and each row shows
-  // date + countdown so the timeframe reads at a glance.
-  const bdays=[];
-  (D.players||[]).forEach(p=>{
-    if(!p||!p.birthdate)return;
-    const bd=(typeof parseBirthdate==='function')?parseBirthdate(p.birthdate):null;
-    if(!bd)return;
-    // parseBirthdate returns {y,m,d} (plain object), m is 1-based
-    const next=new Date(today.getFullYear(),bd.m-1,bd.d);
-    if(next<today)next.setFullYear(next.getFullYear()+1);
-    const diff=Math.round((next-today)/864e5);
-    if(diff<=30)bdays.push({name:getDisplayName(p),diff,date:next});
-  });
-  bdays.sort((a,b)=>a.diff-b.diff);
-  const bdHtml=bdays.length
-    ?bdays.slice(0,5).map(b=>{
-      const dstr=String(b.date.getDate()).padStart(2,'0')+'.'+String(b.date.getMonth()+1).padStart(2,'0');
-      const when=b.diff===0?'<span style="color:#e8c840;font-weight:700;">\ud83c\udf89 Heute!</span>'
-        :b.diff===1?'<span style="color:#e8c840;">Morgen</span>'
-        :'<span style="color:rgba(255,255,255,.5);">'+dstr+' \u00b7 in '+b.diff+' Tagen</span>';
-      return '<div class="home-panel-row"><span>\ud83c\udf82</span><span style="flex:1;">'+escapeHtml(b.name)+'</span>'+when+'</div>';
-    }).join('')
-    :'<div class="home-panel-empty">Keine Geburtstage in den n\u00e4chsten 30 Tagen</div>';
-  // Mini stats — fact-based attendance overall
-  let a=0,f=0,e=0;
-  (D.sessions||[]).forEach((s,si)=>{
-    if(!s||!sessTookPlace(s,seas))return;
-    (D.players||[]).forEach(p=>{
-      if(!_sessAfterJoin(p,s))return; // before he was on the team
-      const v=p&&p.s?p.s[si]:3;
-      if(v===1)a++;else if(v===0)f++;else if(v===2)e++;
-    });
-  });
-  const total=a+f+e;
-  const pct=total?Math.round(a/total*100):0;
-  const statsHtml=total
-    ?'<div class="home-panel-row"><span style="font-family:\'Bebas Neue\',sans-serif;font-size:1.6rem;color:#e8c840;">'+pct+'%</span><span style="color:rgba(255,255,255,.55);">\u00d8 Anwesenheit (Saison)</span></div>'+
-     '<div class="home-panel-row" style="font-size:.72rem;color:rgba(255,255,255,.45);">'+a+' anwesend \u00b7 '+f+' fehlend \u00b7 '+e+' entschuldigt</div>'
-    :'<div class="home-panel-empty">Noch keine Daten</div>';
-  _homeSetHtml(el,
-    '<div class="home-panel"><div class="home-panel-title">\ud83c\udf82 Geburtstage \u00b7 n\u00e4chste 30 Tage</div>'+bdHtml+'</div>'+
-    '<div class="home-panel"><div class="home-panel-title">\ud83d\udcc8 Saison-Statistik</div>'+statsHtml+'</div>');
-}
-// ── Hero photo upload ──
+// ── Titelbild (team photo behind the start screen band) ──
 // Stored globally (not per team) as G.heroPhoto. Resized to max 1400px wide,
 // JPEG quality stepped down until under ~300KB — Firebase-friendly.
+// Changed in Einstellungen → Mannschaft only.
 function homeUploadHeroPhoto(ev){
   if(ev)ev.stopPropagation();
   if(!canEdit())return;
@@ -32048,25 +31665,6 @@ _pubCleanupSchedule();
 <!-- ══ STARTSEITE ══════════════════════════════════════════ -->
 <div class="home-overlay" id="homeOverlay">
   <div id="hxHome"></div>
-  <div class="home-scroll">
-    <div class="home-inner">
-      <div class="home-hero" id="home-hero">
-        <div class="home-hero-photo" id="home-hero-photo" style="display:none;"></div>
-        <div class="home-hero-shade"></div>
-        <button class="home-user-pill" id="home-user-pill" onclick="homeToggleUserMenu(event)">👤 <span id="home-user-name">–</span> <span style="opacity:.6;">▾</span></button>
-        <div class="home-hero-content">
-          <div class="home-hero-logo" id="home-hero-logo"></div>
-          <div>
-            <div class="home-hero-title" id="home-hero-title">FC FROHLINDE</div>
-            <div class="home-hero-sub" id="home-hero-sub">U19 · Saison 2025/26</div>
-          </div>
-        </div>
-      </div>
-      <div class="home-next-row" id="home-next-row" style="display:none;"></div>
-      <div class="home-tiles" id="home-tiles"></div>
-      <div class="home-bottom" id="home-bottom"></div>
-    </div>
-  </div>
 </div>
 <div class="slp-overlay" id="moSeasonLineup">
   <div class="slp-topbar">
