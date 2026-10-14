@@ -3894,6 +3894,72 @@ body.design-heute .hx-a-flags .hx-flag:last-of-type{border-bottom:none;}
   body.design-heute .hx-grid .hx-btn,body.design-heute .hx-grid .hx-btn.primary{height:48px;font-size:.98rem;}
   body.design-heute .hx-a-last .hx-bars{min-height:100px;margin-bottom:4px;}
 }
+/* ── Anwesenheit (table page) in "Heute" ──
+   The footer repeated what other places already show (counts → Statistik,
+   next training → Heute, team and date → navigation), so it goes. Ansicht
+   moves up into the toolbar, Saisonkader into Aufstellung (tabs), Links into
+   the side navigation. Klassisch keeps all of it. */
+.hxv-hx{display:none;}
+body.design-heute .hxv-kl{display:none;}
+body.design-heute .hxv-hx{display:inline;}
+.hxv-row{display:none !important;}
+body.design-heute .hxv-row:not(.off){display:flex !important;}
+@media(min-width:768px){
+  body.design-heute .footer{display:none !important;}
+  body.design-heute #toolbarEl.hidden{display:flex !important;}
+  body.design-heute #btn-slp,body.design-heute #linksMenuWrap,body.design-heute .toolbar-r .tsep{display:none !important;}
+  body.design-heute .toolbar-r{gap:6px;align-items:center;}
+  body.design-heute .toolbar-r :is(#undoBtn,#redoBtn,#btn-legend){width:36px;height:36px;padding:0;border-radius:999px;background:#fff !important;border:1px solid var(--hx-line) !important;color:var(--hx-ink) !important;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;box-shadow:none;}
+  body.design-heute .toolbar-r :is(#undoBtn,#redoBtn):disabled{opacity:.4;}
+  body.design-heute .toolbar-r :is(#undoBtn,#redoBtn,#btn-legend):hover:not(:disabled){border-color:var(--hx-ink2) !important;}
+  body.design-heute #viewMenuWrap2{margin-left:4px;}
+  body.design-heute #viewMenuWrap2 .view-menu-btn{background:#fff !important;color:var(--hx-ink) !important;border:1px solid var(--hx-line) !important;border-radius:999px;height:36px;padding:0 12px 0 15px !important;font-size:.88rem !important;font-weight:600;gap:6px;}
+  body.design-heute #viewMenuWrap2 .view-menu-btn::after{content:'';width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateY(-2px) rotate(45deg);margin-left:2px;}
+  body.design-heute #viewMenuWrap2 .view-menu-btn:hover{border-color:var(--hx-ink2) !important;}
+}
+body.design-heute :is(#viewDropdown2,#linksDropdown){background:#fff;border:1px solid var(--hx-line);border-radius:14px;box-shadow:0 18px 40px -16px rgba(14,35,80,.4),0 2px 6px rgba(14,35,80,.08);padding:6px;min-width:260px;color:var(--hx-ink);}
+body.design-heute #viewDropdown2{top:calc(100% + 8px) !important;bottom:auto !important;right:0 !important;left:auto !important;z-index:600;}
+body.design-heute #viewDropdown2 .vd-item{color:var(--hx-ink);border-left:none;border-radius:10px;padding:9px 10px;font-size:.9rem;min-height:40px;box-sizing:border-box;}
+body.design-heute #viewDropdown2 .vd-item:hover,body.design-heute #viewDropdown2 .vd-item.vd-active:hover{background:var(--hx-ground);color:var(--hx-ink);}
+body.design-heute #viewDropdown2 .vd-item.vd-active{background:none;color:var(--hx-ink);}
+body.design-heute :is(#viewDropdown2,#linksDropdown) .vd-sep{background:var(--hx-line);margin:4px 8px;}
+body.design-heute #viewDropdown2 .vd-check{display:inline-block;flex:0 0 auto;width:34px;height:20px;border-radius:999px;background:#D5DEEC;position:relative;font-size:0;transition:background .15s;}
+body.design-heute #viewDropdown2 .vd-check::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(14,35,80,.25);transition:left .15s;}
+body.design-heute #viewDropdown2 .vd-check.on{background:var(--hx-blue);}
+body.design-heute #viewDropdown2 .vd-check.on::after{left:16px;}
+body.design-heute #viewDropdown2 .vd-item[onclick*="toggleSec('hdr')"],
+body.design-heute #viewDropdown2 .vd-item[onclick*="toggleSec('tools')"],
+body.design-heute #viewDropdown2 .vd-item[onclick*="openAppearanceSettings"],
+body.design-heute #vd-startview-sec,
+body.design-heute #vd-multisel + .vd-sep{display:none !important;}
+body.design-heute #viewDropdown2 .vd-item span[style*=".76rem"]{font-size:.9rem !important;}
+body.design-heute #viewDropdown2 button[onclick*="zoom("]{width:30px;height:30px;padding:0 !important;border-radius:999px !important;border:1px solid var(--hx-line) !important;background:#fff !important;color:var(--hx-ink) !important;font-size:.9rem !important;}
+body.design-heute #viewDropdown2 button[onclick*="zoom("]:hover{background:var(--hx-ground) !important;}
+body.design-heute #zoomLbl2{color:var(--hx-ink) !important;font-weight:700;font-size:.82rem !important;}
+/* Links (opens from the side navigation) */
+body.design-heute #linksDropdown::before{content:'Links';display:block;font-family:var(--hx-num);font-weight:800;font-size:1.15rem;padding:6px 10px 4px;color:var(--hx-ink);}
+body.design-heute #linksDropdown .links-item{padding:9px 10px;border-radius:10px;font-size:.92rem;}
+body.design-heute #linksDropdown .links-item:hover{background:var(--hx-ground);}
+body.design-heute #linksDropdown .links-item a{color:var(--hx-blue);}
+body.design-heute #linksDropdown .links-item a:hover{color:var(--hx-ink);text-decoration:none;}
+body.design-heute #linksDropdown .links-del{color:var(--hx-muted);border-radius:999px;width:26px;height:26px;}
+body.design-heute #links-empty{color:var(--hx-muted) !important;font-size:.88rem !important;padding:6px 10px 10px !important;}
+body.design-heute #links-admin-area > div[style]{padding:8px 4px 4px !important;}
+body.design-heute #links-admin-area input{background:#fff !important;border:1px solid var(--hx-line) !important;color:var(--hx-ink) !important;border-radius:10px !important;padding:8px 10px !important;font-size:.88rem !important;box-sizing:border-box;}
+body.design-heute #links-admin-area input::placeholder{color:#9AA7BF;}
+body.design-heute #links-admin-area .btn.bp{background:var(--hx-yellow) !important;color:var(--hx-ink) !important;border:none !important;border-radius:999px !important;height:36px;font-weight:700;font-size:.86rem !important;}
+/* Aufstellung: "Spiel | Saisonkader" as the heading of both tools */
+.hx-lptabs{display:none;}
+body.design-heute .hx-lptabs{display:flex;gap:18px;align-items:flex-end;}
+body.design-heute .hx-lptabs button{background:none;border:none;padding:0 0 3px;margin:0;cursor:pointer;font-family:var(--hx-num);font-weight:800;font-size:1.5rem;line-height:1.05;letter-spacing:.2px;color:#8FA3C8;border-bottom:3px solid transparent;white-space:nowrap;}
+body.design-heute .hx-lptabs button:hover{color:#fff;}
+body.design-heute .hx-lptabs button.on{color:#fff;border-bottom-color:var(--hx-yellow);cursor:default;}
+body.design-heute .hx-lptabs button:focus-visible{outline:2px solid var(--hx-yellow);outline-offset:3px;border-radius:4px;}
+body.design-heute :is(.lp-logo,.slp-logo){font-size:0 !important;line-height:0 !important;}
+body.design-heute :is(.lp-logo,.slp-logo) .inline-presence{font-size:.75rem;line-height:normal;margin:4px 0 0;}
+body.design-heute :is(.lp-sub,.slp-sub){margin-top:3px;}
+@media(min-width:1000px) and (max-width:1180px){body.design-heute .hx-lptabs button{font-size:1.3rem;}body.design-heute .hx-lptabs{gap:14px;}}
+@media(max-width:767px){body.design-heute .hx-lptabs button{font-size:1.15rem;}body.design-heute .hx-lptabs{gap:14px;}}
 /* ── Kader page (#moTeamMgr) ── */
 body.design-heute #moTeamMgr > .mob{padding:30px 40px 28px !important;}
 body.design-heute #moTeamMgr > .mob > *{width:100%;max-width:1040px;box-sizing:border-box;}
@@ -4640,6 +4706,7 @@ if(window._fbBlocked){
   <button type="button" class="hx-item" data-hx="stats" onclick="hxGo('stats')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Statistik</span></button>
   <button type="button" class="hx-item" data-hx="week" onclick="hxGo('week')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/></svg><span>Wochenbericht</span></button>
   <div class="hx-fill"></div>
+  <button type="button" class="hx-item sub" id="hxLinksItem" onclick="hxLinks(this,event)" aria-haspopup="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.5-1.5"/></svg><span>Links</span></button>
   <button type="button" class="hx-item sub" data-hx="settings" onclick="hxGo('settings')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg><span>Einstellungen</span></button>
   <div class="hx-user"><button type="button" class="hx-user-btn" onclick="hxUserMenu(this,event)"><span class="hx-av" id="hxUserAv">?</span><span style="display:flex;flex-direction:column;min-width:0;"><span class="hx-user-nm" id="hxUserNm">–</span><span class="hx-user-role" id="hxUserRole"></span></span></button><button type="button" class="hx-bell" aria-label="Benachrichtigungen" onclick="hxNotif(this,event)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span class="hx-bell-dot" id="hxBellDot"></span></button></div>
 </nav>
@@ -4803,7 +4870,7 @@ if(window._fbBlocked){
   <div class="footer-r">
       <div class="fsign"><span id="fTeam">–</span> &nbsp;|&nbsp; <span id="fDate"></span></div>
       <div class="view-menu-wrap" id="viewMenuWrap2">
-        <button class="view-menu-btn" onclick="toggleViewMenu2(event)" style="background:var(--bd);color:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.22);font-size:.78rem;padding:5px 12px;">⊞ Ansicht ▾</button>
+        <button class="view-menu-btn" onclick="toggleViewMenu2(event)" style="background:var(--bd);color:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.22);font-size:.78rem;padding:5px 12px;"><span class="hxv-kl">⊞ Ansicht ▾</span><span class="hxv-hx">Ansicht</span></button>
         <div class="view-dropdown" id="viewDropdown2" style="bottom:calc(100% + 5px);top:auto;left:auto;right:0;">
           <div class="vd-item" onclick="event.stopPropagation();toggleSec('hdr')"><span>Header</span><div class="vd-check on" id="vd2-hdr">✓</div></div>
           <div class="vd-item" onclick="event.stopPropagation();toggleSec('tools')"><span>Werkzeuge</span><div class="vd-check on" id="vd2-tools">✓</div></div>
@@ -4819,10 +4886,10 @@ if(window._fbBlocked){
             </div>
           </div>
           <div class="vd-sep"></div>
-          <div class="vd-item" onclick="event.stopPropagation();toggleHidePast()"><span>🕒 Vergangene ausblenden</span><div class="vd-check" id="vd2-hidepast">–</div></div>
-          <div class="vd-item" onclick="event.stopPropagation();toggleHideFuture()"><span>📆 Zukünftige ausblenden</span><div class="vd-check" id="vd2-hidefuture">–</div></div>
+          <div class="vd-item" onclick="event.stopPropagation();toggleHidePast()"><span class="hxv-kl">🕒 Vergangene ausblenden</span><span class="hxv-hx">Vergangene ausblenden</span><div class="vd-check" id="vd2-hidepast">–</div></div>
+          <div class="vd-item" onclick="event.stopPropagation();toggleHideFuture()"><span class="hxv-kl">📆 Zukünftige ausblenden</span><span class="hxv-hx">Zukünftige ausblenden</span><div class="vd-check" id="vd2-hidefuture">–</div></div>
           <div class="vd-sep"></div>
-          <div class="vd-item" id="vd-multisel" onclick="event.stopPropagation();document.getElementById('viewDropdown2').classList.remove('open');toggleMultiSelectMode();"><span style="display:flex;align-items:center;gap:6px;">☑ Mehrfach-Auswahl</span><div class="vd-check" id="vd2-multisel"></div></div>
+          <div class="vd-item" id="vd-multisel" onclick="event.stopPropagation();document.getElementById('viewDropdown2').classList.remove('open');toggleMultiSelectMode();"><span style="display:flex;align-items:center;gap:6px;"><span class="hxv-kl">☑ Mehrfach-Auswahl</span><span class="hxv-hx">Mehrfach-Auswahl</span></span><div class="vd-check" id="vd2-multisel"></div></div>
           <div class="vd-sep"></div>
           <div id="vd-startview-sec">
           <div class="vd-sep"></div>
@@ -5397,7 +5464,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791947180697; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791947957928; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -11793,6 +11860,7 @@ function resetAppearance(){
   updateAppearanceUI();
 }
 function updateAppearanceUI(){
+  try{_syncStartViewCheck();}catch(e){}
   const s=getAppearance();
   ['','heute'].forEach(d=>document.getElementById('design-'+(d||'klassisch'))?.classList.toggle('active',(DESIGN_LIST.includes(s.design)?s.design:'')===d));
   document.getElementById('theme-light')?.classList.toggle('active',s.theme==='light');
@@ -21258,6 +21326,7 @@ function hxApplyDesign(){
   // The tab bar is further down the document than this script: wait for it
   if(!document.getElementById('mn-home')){document.addEventListener('DOMContentLoaded',hxApplyDesign,{once:true});return;}
   const on=hxOn();
+  _hxPlaceTableMenus(on);
   Object.keys(HX_TABS).forEach(k=>{
     const b=document.getElementById('mn-'+k);if(!b)return;
     const ic=b.querySelector('.mn-ic'),lb=b.querySelector('.mn-lb');
@@ -21270,8 +21339,67 @@ function hxApplyDesign(){
   if(typeof _hxSyncBack==='function')_hxSyncBack();
   if(typeof _mobNavMeasure==='function')setTimeout(_mobNavMeasure,30);
 }
+// "Heute" moves two menus out of the old chrome: Ansicht from the footer into
+// the Anwesenheit toolbar, the Links list out of the toolbar (it opens from
+// the side navigation). Klassisch gets both back where they were.
+function _hxPlaceTableMenus(on){
+  const vw=document.getElementById('viewMenuWrap2');
+  const tr=document.querySelector('#toolbarEl .toolbar-r'),fr=document.querySelector('.footer .footer-r');
+  if(vw&&tr&&fr){const host=on?tr:fr;if(vw.parentNode!==host){document.getElementById('viewDropdown2')?.classList.remove('open');host.appendChild(vw);}}
+  const ld=document.getElementById('linksDropdown'),lw=document.getElementById('linksMenuWrap');
+  if(ld&&lw){const host=on?document.body:lw;if(ld.parentNode!==host){ld.classList.remove('open');host.appendChild(ld);}}
+}
+function hxLinks(btn,e){
+  if(e)e.stopPropagation();
+  const dd=document.getElementById('linksDropdown');if(!dd)return;
+  if(dd.classList.contains('open')){dd.classList.remove('open');return;}
+  closeUserMenuIfOpen&&closeUserMenuIfOpen();
+  renderLinksMenu();
+  Object.assign(dd.style,{position:'fixed',zIndex:'99999',right:'auto',bottom:'auto',minWidth:'260px',maxWidth:'320px'});
+  dd.classList.add('open');
+  const r=btn.getBoundingClientRect(),ph=dd.offsetHeight;
+  dd.style.left=(r.right+10)+'px';
+  dd.style.top=Math.max(8,Math.min(r.top,innerHeight-ph-8))+'px';
+}
+// Table cells stop their clicks from bubbling, so in "Heute" the two menus
+// close on any press outside them (capture phase, before a cell sees it).
+document.addEventListener('pointerdown',e=>{
+  if(!hxOn())return;
+  [['viewDropdown2','viewMenuWrap2'],['linksDropdown','hxLinksItem']].forEach(([dd,keep])=>{
+    const m=document.getElementById(dd);if(!m||!m.classList.contains('open'))return;
+    const k=document.getElementById(keep);
+    if(m.contains(e.target)||(k&&k.contains(e.target)))return;
+    m.classList.remove('open');
+  });
+},true);
+// Aufstellung has two modes in "Heute": the lineup of one match and the
+// season squad plan. Each side keeps its own save check when leaving.
+let _hxLpBack=null;
+async function hxLineupSwitch(to){
+  const lp=document.getElementById('moLineup'),slp=document.getElementById('moSeasonLineup');
+  if(to==='season'){
+    if(slp&&slp.classList.contains('open'))return;
+    if(lp&&lp.classList.contains('open')){
+      _hxLpBack={t:UI.currentTeam,s:UI.currentSeason,si:lpState.sessIdx};
+      closeLineupPlanner();
+    }
+    openSeasonLineup();
+    return;
+  }
+  const b=_hxLpBack;
+  const si=(b&&b.t===UI.currentTeam&&b.s===UI.currentSeason&&b.si!=null)?b.si:findNextMatchIdx();
+  if(si==null||si<0){alert('Kein kommendes Spiel gefunden.');return;}
+  if(slp&&slp.classList.contains('open')){
+    try{await closeSeasonLineup();}catch(e){console.error(e);}
+    if(slp.classList.contains('open'))return;
+  }
+  _hxLpBack=null;
+  openLineupPlanner(si);
+}
 function hxRenderNav(){
   if(!hxOn())return;
+  const li=document.getElementById('hxLinksItem');
+  if(li)li.style.display=((G&&G.quickLinks&&G.quickLinks.length)||(typeof isAdmin==='function'&&isAdmin()))?'':'none';
   const crest=document.getElementById('hxCrest'),src=document.getElementById('clogo');
   if(crest&&src&&src.src&&crest.src!==src.src)crest.src=src.src;
   const set=(id,v)=>{const e=document.getElementById(id);if(e&&e.textContent!==v)e.textContent=v;};
@@ -22211,6 +22339,11 @@ function _syncStartViewCheck(){
   const b=document.getElementById('vd-start-table');
   if(a)a.classList.toggle('vd-active',cur==='home');
   if(b)b.classList.toggle('vd-active',cur==='table');
+  // Same choice in Einstellungen › Darstellung (design "Heute")
+  const row=document.getElementById('set-startview-row');
+  if(row)row.classList.toggle('off',!(typeof canEdit==='function'&&canEdit()));
+  document.getElementById('sv-home')?.classList.toggle('active',cur==='home');
+  document.getElementById('sv-table')?.classList.toggle('active',cur==='table');
 }
 function openTeamMgr(tab,fromId){
   if(tab==='trainers')tab='trainer';
@@ -30897,7 +31030,7 @@ _pubCleanupSchedule();
 <div class="lp-overlay" id="moLineup">
   <!-- Topbar -->
   <div class="lp-topbar">
-    <div class="lp-title"><div class="lp-logo">⚽ Aufstellungsplaner <span id="lp-presence-inline" class="inline-presence"></span></div><div class="lp-sub" id="lp-context-info">FC Frohlinde 1949</div></div>
+    <div class="lp-title"><div class="hx-lptabs" role="tablist" aria-label="Aufstellung"><button type="button" role="tab" class="on" aria-selected="true">Spiel</button><button type="button" role="tab" aria-selected="false" onclick="hxLineupSwitch('season')">Saisonkader</button></div><div class="lp-logo">⚽ Aufstellungsplaner <span id="lp-presence-inline" class="inline-presence"></span></div><div class="lp-sub" id="lp-context-info">FC Frohlinde 1949</div></div>
     <div id="lp-fmt-btns" style="display:flex;gap:5px;flex-wrap:wrap;margin-left:8px;"></div>
     <div class="lp-kind-wrap" style="display:flex;gap:4px;margin-left:10px;align-items:center;" title="Spieltyp bestimmt die Bankgröße">
       <button class="lp-fmt-btn active" id="lp-kind-ms" onclick="lpSetMatchKind('meisterschaft')" title="Meisterschaftsspiel: 7 Bankplätze"><span class="lk-long">Meisterschaft</span><span class="lk-short">M</span> · 7</button>
@@ -31158,6 +31291,17 @@ _pubCleanupSchedule();
     <div class="setting-control">
       <button class="seg-btn" id="design-klassisch" onclick="setAppDesign('')">Klassisch</button>
       <button class="seg-btn" id="design-heute" onclick="setAppDesign('heute')">Heute</button>
+    </div>
+  </div>
+
+  <div class="setting-row hxv-row" id="set-startview-row">
+    <div>
+      <div class="setting-label">🏠 Startansicht</div>
+      <div class="setting-sub">Womit die App beim Öffnen startet. Gilt für dein Konto auf allen Geräten.</div>
+    </div>
+    <div class="setting-control">
+      <button class="seg-btn" id="sv-home" onclick="homeSetStartView('home')">Heute</button>
+      <button class="seg-btn" id="sv-table" onclick="homeSetStartView('table')">Anwesenheit</button>
     </div>
   </div>
 
@@ -31602,7 +31746,7 @@ _pubCleanupSchedule();
 </div>
 <div class="slp-overlay" id="moSeasonLineup">
   <div class="slp-topbar">
-    <div class="lp-title"><div class="slp-logo">📋 Saisonkader-Planer <span id="slp-presence-inline" class="inline-presence"></span></div><div class="slp-sub" id="slp-context-info">Mehrere Spieler pro Position</div></div>
+    <div class="lp-title"><div class="hx-lptabs" role="tablist" aria-label="Aufstellung"><button type="button" role="tab" aria-selected="false" onclick="hxLineupSwitch('match')">Spiel</button><button type="button" role="tab" class="on" aria-selected="true">Saisonkader</button></div><div class="slp-logo">📋 Saisonkader-Planer <span id="slp-presence-inline" class="inline-presence"></span></div><div class="slp-sub" id="slp-context-info">Mehrere Spieler pro Position</div></div>
     <div id="slp-fmt-btns" style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-left:8px;"></div>
     <div style="flex:1;"></div>
     <div id="slp-hint" style="display:none;"></div>
