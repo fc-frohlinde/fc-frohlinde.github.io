@@ -3567,6 +3567,34 @@ body.design-heute.theme-dark :is(:is(#moCalendar,#moDashboard,#moWeekReport)) .h
   body.design-heute #moWeekReport .db-wr-nav button{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff;}
   body.design-heute #moWeekReport .db-wr-wk{color:#fff;}
 }
+/* ════════════════════════════════════════════════════════════════
+   DESIGN "HEUTE" — DIALOGS: every .mo that is not a page. Softer
+   backdrop, larger radius, Heute type for titles and numbers, pill
+   buttons, round ✕, calmer inputs. Phone keeps the bottom sheet.
+   ════════════════════════════════════════════════════════════════ */
+body.design-heute .mo:not(.hx-page){background:rgba(14,35,80,.42);backdrop-filter:blur(3px);}
+body.design-heute .mo:not(.hx-page) > .mob{border-radius:22px;box-shadow:0 30px 70px -20px rgba(14,35,80,.55),0 2px 8px rgba(14,35,80,.08);}
+body.design-heute .mo .mob h3{font-family:var(--hx-num);font-weight:800;font-size:1.5rem;letter-spacing:.2px;line-height:1.15;color:var(--hx-ink);}
+body.design-heute .mo .mob :is(#ps-name,#ss-title,.ps-tile-v,.ps-card .cv,#ps-nr){font-family:var(--hx-num) !important;font-weight:800;letter-spacing:.2px !important;}
+body.design-heute .mo .mob #ps-name,body.design-heute .mo .mob #ss-title{font-size:1.6rem !important;color:var(--hx-ink) !important;}
+body.design-heute .mo .mob :is(.ps-tile,.ps-card){background:var(--hx-ground);border:none;border-radius:14px;}
+body.design-heute .mo .mob .btn{border-radius:999px;}
+body.design-heute .mo .mob .btn.bs{background:#fff;border:1px solid var(--hx-line);color:var(--hx-ink);}
+body.design-heute .mo .mob .mob-btns .btn{min-height:40px;padding:0 18px;justify-content:center;}
+body.design-heute .mo .mob .hx-x,body.design-heute .mo:not(.hx-page) .mob-close-x{width:36px;height:36px !important;min-width:36px;padding:0 !important;border-radius:999px !important;justify-content:center;align-items:center;background:#fff;border:1px solid var(--hx-line);color:var(--hx-ink);font-size:.85rem;}
+body.design-heute .mo .mob .hx-x:hover,body.design-heute .mo:not(.hx-page) .mob-close-x:hover{border-color:var(--hx-ink2);}
+body.design-heute .mob :is(input:not([type=range]):not([type=checkbox]):not([type=radio]):not([type=color]),select,textarea){border-radius:12px !important;border:1px solid var(--hx-line) !important;}
+body.design-heute .mob :is(input:not([type=range]):not([type=checkbox]):not([type=radio]):not([type=color]),select,textarea):focus{border-color:var(--hx-blue) !important;box-shadow:0 0 0 3px rgba(22,89,184,.14);}
+body.design-heute .mob label{color:var(--hx-muted);}
+body.design-heute.theme-dark .mob :is(input:not([type=range]):not([type=checkbox]):not([type=radio]):not([type=color]),select,textarea){border-color:#2a3e6e !important;}
+body.design-heute.theme-dark .mo .mob :is(.ps-tile,.ps-card){background:#1a2f5a;}
+body.design-heute.theme-dark .mo .mob .btn.bs,body.design-heute.theme-dark .mo .mob .hx-x,body.design-heute.theme-dark .mo:not(.hx-page) .mob-close-x{background:rgba(255,255,255,.06);border-color:#2a3e6e;color:#dde5f0;}
+body.design-heute.theme-dark .mo .mob :is(h3,#ps-name,#ss-title){color:#fff !important;}
+@media(max-width:767px){
+  body.design-heute .mo:not(.hx-page) > .mob{border-radius:24px 24px 0 0;box-shadow:0 -12px 40px rgba(14,35,80,.28);}
+  body.design-heute .mo:not(.hx-page) > .mob::before{background:var(--hx-line);width:44px;}
+  body.design-heute .mo .mob .mob-btns .btn{min-height:46px;}
+}
 /* ── Kader page (#moTeamMgr) ── */
 body.design-heute #moTeamMgr > .mob{padding:30px 40px 28px !important;}
 body.design-heute #moTeamMgr > .mob > *{width:100%;max-width:1040px;box-sizing:border-box;}
@@ -5071,7 +5099,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791937985072; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791938722804; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -24553,6 +24581,9 @@ function openM(id){
   const _moEl=document.getElementById(id);
   _moEl.classList.add('open');
   requestAnimationFrame(()=>{try{_syncCloseHeight(_moEl);}catch(e){}});
+  // Mark plain ✕ close buttons so design "Heute" can draw them round
+  // (no effect in Klassisch — only Heute rules use the class).
+  requestAnimationFrame(()=>{try{_moEl.querySelectorAll('button').forEach(b=>{if(!b.classList.contains('hx-x')&&b.textContent.trim()==='\u2715')b.classList.add('hx-x');});}catch(e){}});
   if(id==='moAddPlayer')initAddPos();
   if(id==='moMatch'){
     const mw=document.getElementById('newMatchLocWrap');
