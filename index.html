@@ -4398,7 +4398,8 @@ body.design-heute .home-overlay::before,body.design-heute .home-overlay::after{d
   .kb-col header > span{color:var(--hx-muted);}
   .kb-col header b{color:var(--hx-ink);}
   .kb-bar i.open{background:#D5DEEC;}
-  .kb-card{box-shadow:none;border:1px solid var(--hx-line);}
+  .kb-card{box-shadow:none;border:1px solid var(--hx-line);grid-template-columns:24px minmax(0,1fr) auto;grid-template-areas:"nr nm row";padding:9px 10px;gap:8px;}
+  .kb-card .kb-st{margin-left:0;}
   .kb-card.st-warn,.kb-card.st-bad{background:var(--hx-card2);border-color:var(--hx-card2);}
   .kb-empty{color:var(--hx-muted);}
   .kb-none .kb-cards{grid-template-columns:1fr;}
@@ -5498,7 +5499,7 @@ const APP_VERSION_LABEL='1.1.0';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791989974595; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791990025642; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.1.0',date:'14.10.2026',title:'Neues Design',items:[
     {icon:'🧭',title:'Neues Design für alle',desc:'Die Übersicht zeigt den nächsten Termin, das nächste Spiel, diese und letzte Woche. Die Navigation sitzt an der Seite (auf dem Handy unten), Bereiche öffnen als Seiten statt als Fenster. Das alte Design gibt es nicht mehr.'},
