@@ -4293,11 +4293,12 @@ body.design-heute .ssx-sort{display:flex;align-items:center;gap:4px;margin:2px 0
 body.design-heute .ssx-sort span{margin-right:4px;}
 body.design-heute .ssx-sort button{height:28px;padding:0 11px;border-radius:999px;border:1px solid var(--hx-line);background:var(--hx-field);color:var(--hx-ink2);font:600 .78rem 'Barlow',sans-serif;cursor:pointer;}
 body.design-heute .ssx-sort button.on{background:var(--hx-nav);border-color:var(--hx-nav);color:#fff;}
-body.design-heute .ssx-line{display:grid;grid-template-columns:92px minmax(0,1fr);gap:8px;align-items:start;padding:5px 0;border-top:1px solid var(--hx-line);}
-body.design-heute .ssx-line:first-of-type{border-top:none;}
-body.design-heute .ssx-ll{font-size:.76rem;font-weight:600;color:var(--hx-muted);padding-top:7px;white-space:nowrap;}
-body.design-heute .ssx-ll b{color:var(--hx-ink);font-family:var(--hx-num);font-weight:800;font-size:.9rem;margin-left:2px;}
-@media(max-width:420px){body.design-heute .ssx-line{grid-template-columns:78px minmax(0,1fr);}}
+body.design-heute .ssx-line{display:grid;grid-template-columns:70px minmax(0,1fr);gap:8px;align-items:start;padding:4px 0;}
+body.design-heute .ssx-line.ssx-nl{margin-top:4px;padding-top:8px;border-top:1px solid var(--hx-line);}
+body.design-heute .ssx-ll{display:flex;align-items:center;gap:6px;height:32px;white-space:nowrap;}
+body.design-heute .ssx-pb{display:inline-flex;align-items:center;justify-content:center;min-width:38px;height:22px;padding:0 6px;border-radius:6px;font:800 .72rem 'Barlow',sans-serif;box-sizing:border-box;}
+body.design-heute .ssx-pb-none{background:var(--hx-card2);color:var(--hx-muted);}
+body.design-heute .ssx-ll b{color:var(--hx-ink);font-family:var(--hx-num);font-weight:800;font-size:1rem;}
 /* ── Kader page (#moTeamMgr) ── */
 body.design-heute #moTeamMgr > .mob{padding:30px 40px 28px !important;}
 body.design-heute #moTeamMgr > .mob > *{width:100%;max-width:1040px;box-sizing:border-box;}
@@ -5806,7 +5807,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791956261633; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791956729980; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -20264,19 +20265,28 @@ function _ssHxAttRender(si){
   let h=`<div class="ssx-head"><h4>${roll?'Wer war da?':'Wer kommt?'}</h4>${frist?`<span class="ssx-frist">${e(frist)}</span>`:''}</div>
     <div class="ssx-sum"><b>${roll?c.present:c.yes}</b><span>von ${c.total} ${roll?'anwesend':'zugesagt'}</span></div>${_hxSeg(parts,c.total)}
     <div class="ssx-sort" role="group" aria-label="Sortieren"><span>Sortieren</span>${sb('pos','Position')}${sb('name','Name')}${sb('nr','Nr.')}</div>`;
-  const chip=({p,pi})=>{
+  const chip=({p,pi},noPos)=>{
     const nm=e((getDisplayName?getDisplayName(p):p.name)||'');
-    return `<button type="button" class="ssx-chip"${ed?` onclick="_ssxMenu(event,${si},${pi})"`:' disabled'} title="${ed?'Antippen zum Ändern':''}"><b>${e(String(p.nr||'–'))}</b>${nm}${p.pos?`<i>${e(p.pos)}</i>`:''}</button>`;
+    return `<button type="button" class="ssx-chip"${ed?` onclick="_ssxMenu(event,${si},${pi})"`:' disabled'} title="${ed?'Antippen zum Ändern':''}"><b>${e(String(p.nr||'–'))}</b>${nm}${p.pos&&!noPos?`<i>${e(p.pos)}</i>`:''}</button>`;
   };
   groups.forEach(([v,label,cls])=>{
     const list=by[v];if(!list||!list.length)return;
     const remind=(!roll&&v===3&&ed)?`<button type="button" class="ssx-remind" onclick="ssRemindOpen(${si})">Erinnern</button>`:'';
     let body='';
     if(sortBy==='pos'){
-      // one row per line of the team — "do we have enough defenders?"
-      const rows={};list.forEach(x=>{const l=line(x.p);(rows[l]=rows[l]||[]).push(x);});
-      body=Object.keys(rows).map(Number).sort((a,b)=>a-b).map(l=>`<div class="ssx-line"><span class="ssx-ll">${l<SSA_LINES.length?SSA_LINES[l][0]:'Ohne Position'} <b>${rows[l].length}</b></span><div class="ssx-chips">${rows[l].map(chip).join('')}</div></div>`).join('');
-    }else body=`<div class="ssx-chips">${list.map(chip).join('')}</div>`;
+      // One row per position (TW, RV, IV …) with its coloured badge, so how
+      // many of each are coming shows at a glance; a little more space where
+      // the team line changes (Tor → Abwehr → Mittelfeld → Angriff)
+      const rows={};list.forEach(x=>{const k=x.p.pos&&POS.includes(x.p.pos)?x.p.pos:'';(rows[k]=rows[k]||[]).push(x);});
+      const keys=POS.filter(k=>rows[k]).concat(rows['']?['']:[]);
+      let lastLine=-1;
+      body=keys.map(k=>{
+        const l=k?line({pos:k}):99;const nl=lastLine!==-1&&l!==lastLine;lastLine=l;
+        const bc=(k&&typeof PB_COLORS!=='undefined'&&PB_COLORS[k])||'#e6ecf5;color:#4a5b75';
+        const badge=k?`<span class="ssx-pb" style="background:${bc.split(';')[0]};${bc.split(';')[1]||''}">${e(k)}</span>`:'<span class="ssx-pb ssx-pb-none">–</span>';
+        return `<div class="ssx-line${nl?' ssx-nl':''}"><span class="ssx-ll">${badge}<b>${rows[k].length}</b></span><div class="ssx-chips">${rows[k].map(x=>chip(x,true)).join('')}</div></div>`;
+      }).join('');
+    }else body=`<div class="ssx-chips">${list.map(x=>chip(x)).join('')}</div>`;
     h+=`<div class="ssx-grp" data-st="${v}"><div class="ssx-gh"><i class="s-${cls}"></i>${label} <b>${list.length}</b>${remind}</div>${body}</div>`;
   });
   if(roll&&s.type==='match'&&ed&&(typeof sessTookPlace!=='function'||sessTookPlace(s,season)))
@@ -21870,6 +21880,8 @@ function hxIcon(k,size){
   return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${HX_IC[k]||''}</svg>`;
 }
 function hxOn(){return document.body.classList.contains('design-heute');}
+// Some call sites use the underscored name — keep both pointing at the same check
+function _hxOn(){return hxOn();}
 document.addEventListener('DOMContentLoaded',()=>{try{hxApplyDesign();}catch(e){}});
 // Phone tab bar: same five buttons, the design's icons and names
 const HX_TABS={home:['home','Heute'],list:['table','Anwesenheit'],cal:['cal','Kalender'],team:['team','Kader'],more:['more','Mehr']};
@@ -22418,7 +22430,7 @@ function mobSheetOpen(){
   // Start-view preference (lives in the desktop Ansicht menu, which is hidden here)
   const sv=document.getElementById('ms-startview');
   if(sv){
-    if(ed&&typeof _homeStartViewPref==='function'){
+    if(ed&&typeof _homeStartViewPref==='function'&&!(typeof _hxOn==='function'&&_hxOn())){
       const cur=_homeStartViewPref();
       sv.innerHTML=
         `<button class="ms-row" onclick="homeSetStartView('home');mobSheetClose();"><span class="ms-row-ic">\u2302</span>Startseite${cur!=='table'?' \u2713':''}</button>`+
@@ -22901,6 +22913,8 @@ function homeRemoveHeroPhoto(){
 // Stored in G.userSettings[name] so it follows the trainer across devices,
 // same pattern as G.userAutomation. Read-only users always get 'home' (no writes).
 function _homeStartViewPref(){
+  // Design "Heute" always starts on the start screen — no choice any more
+  if((typeof hxOn==='function'&&hxOn())||(typeof getAppearance==='function'&&getAppearance().design==='heute'))return 'home';
   const uname=CU&&CU.name;
   if(!G||!uname)return 'home';
   const s=G.userSettings&&G.userSettings[uname];
@@ -31922,17 +31936,6 @@ _pubCleanupSchedule();
     <div class="setting-control">
       <button class="seg-btn" id="design-klassisch" onclick="setAppDesign('')">Klassisch</button>
       <button class="seg-btn" id="design-heute" onclick="setAppDesign('heute')">Heute</button>
-    </div>
-  </div>
-
-  <div class="setting-row hxv-row" id="set-startview-row">
-    <div>
-      <div class="setting-label">🏠 Startansicht</div>
-      <div class="setting-sub">Womit die App beim Öffnen startet. Gilt für dein Konto auf allen Geräten.</div>
-    </div>
-    <div class="setting-control">
-      <button class="seg-btn" id="sv-home" onclick="homeSetStartView('home')">Heute</button>
-      <button class="seg-btn" id="sv-table" onclick="homeSetStartView('table')">Anwesenheit</button>
     </div>
   </div>
 
