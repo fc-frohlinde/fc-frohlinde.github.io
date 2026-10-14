@@ -3568,7 +3568,7 @@ body.design-heute{--hx-pw:460px;}
   body.design-heute .mo.hx-panel{left:auto;right:0;width:min(var(--hx-pw),calc(100vw - 232px));background:none;backdrop-filter:none;align-items:stretch;justify-content:stretch;padding:0 !important;}
   body.design-heute .mo.hx-panel > .mob{width:100% !important;max-width:none !important;height:100% !important;max-height:none !important;border-radius:22px 0 0 22px;box-shadow:-30px 0 60px -24px rgba(14,35,80,.4),-1px 0 0 var(--hx-line);animation:hxPanelIn .22s cubic-bezier(.22,1,.36,1);box-sizing:border-box;padding:22px 24px 28px !important;}
   /* Detail statistics on top of the profile: give it a backdrop over the rest */
-  body.design-heute #moPlayerStatsExt.hx-panel > .mob{box-shadow:-40px 0 80px -20px rgba(14,35,80,.5),-1px 0 0 var(--hx-line);}
+  body.design-heute :is(#moPlayerStatsExt,#moSessAtt,#moRpeAll).hx-panel > .mob{box-shadow:-40px 0 80px -20px rgba(14,35,80,.5),-1px 0 0 var(--hx-line);}
 }
 @media(min-width:1100px){
   /* Room for the panel: pages and the start screen end where it begins (the
@@ -3844,7 +3844,10 @@ body.design-heute #hxHome{display:block;height:100%;overflow-y:auto;-webkit-over
 .hx-btn.primary:hover{filter:brightness(.97);}
 .hx-btn.dark{background:#fff;color:var(--hx-ink);border-color:#fff;font-weight:700;}
 .hx-counts{display:flex;flex-wrap:wrap;gap:24px;align-items:center;}
-.hx-tiles{flex:1 1 300px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+.hx-tiles{flex:1 1 300px;display:grid;grid-template-columns:repeat(var(--hxn,3),minmax(0,1fr));gap:10px;}
+button.hx-tile{cursor:pointer;transition:transform .12s,box-shadow .12s;}
+button.hx-tile:hover{box-shadow:0 0 0 2px rgba(14,35,80,.12) inset;}
+button.hx-tile:active{transform:scale(.98);}
 .hx-tile{padding:12px 14px;border-radius:14px;display:flex;flex-direction:column;gap:2px;border:none;text-align:left;font-family:'Barlow',sans-serif;}
 .hx-tile b{font-family:var(--hx-num);font-weight:800;font-size:2rem;line-height:1;}
 .hx-tile span{font-weight:600;font-size:.86rem;}
@@ -5224,7 +5227,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791944214712; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791944805363; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -18876,7 +18879,11 @@ function ssAttRender(){
   if(body==null||si==null)return;
   const D=cd();
   const meta=SS_ATT_META[_ssAttFilter];
-  if(ttl)ttl.textContent=meta?meta.n:'Anwesenheit';
+  // Same words as the tile that opened the list (before the session players
+  // answer: Zugesagt/Abgesagt/Offen; afterwards: Anwesend/Fehlend/Offen)
+  {const _rsvp=typeof _isSessRollCallTime==='function'&&!_isSessRollCallTime(si);
+   const _T=_rsvp?{4:'Zugesagt',0:'Abgesagt',2:'Entschuldigt',3:'Offen'}:{1:'Anwesend',0:'Fehlend',2:'Entschuldigt',4:'Offen'};
+   if(ttl)ttl.textContent=meta?(_T[_ssAttFilter]||meta.n):'Anwesenheit';}
   const pis=[];
   (D.players||[]).forEach((p,pi)=>{
     if(!p)return;
@@ -21219,6 +21226,10 @@ function _hxTag(isM,title,skv){
   const kind=isM?'Spiel':'Training',when=_hxWhen(skv);
   return title===kind?when.charAt(0).toUpperCase()+when.slice(1):kind+' · '+when;
 }
+// A count tile on the start card: opens the session with that group's list
+function _hxTile(cls,n,label,si,st){
+  return `<button type="button" class="hx-tile ${cls}" onclick="openSessFromMain(${si});ssAttOpen(${si},${st})"><b>${n}</b><span>${label}</span></button>`;
+}
 function _hxEnd(time,dur){
   const m=String(time||'').match(/(\d+):(\d+)/);if(!m)return '';
   const t=(+m[1])*60+(+m[2])+(+dur||90);
@@ -21285,7 +21296,7 @@ function hxRender(){
     // The time range already says how long it is
     if(s.duration&&!s.time)meta.push(s.duration+' Minuten');
     const tot=Math.max(1,c.total),C=2*Math.PI*52;
-    const segA=roll?c.present:c.yes,segB=c.exc,segC=roll?c.no:0;
+    const segA=roll?c.present:c.yes,segB=c.exc,segC=c.no;
     const a1=C*segA/tot,a2=C*segB/tot,a3=C*segC/tot;
     const ring=`<svg class="hx-ring" width="124" height="124" viewBox="0 0 132 132" role="img" aria-label="${segA} von ${c.total} ${roll?'anwesend':'zugesagt'}">
       <circle cx="66" cy="66" r="52" fill="none" stroke="#E7EBF2" stroke-width="14"/>
@@ -21295,8 +21306,9 @@ function hxRender(){
       <text x="66" y="68" text-anchor="middle" font-family="Big Shoulders Display, Bebas Neue, sans-serif" font-weight="800" font-size="40" fill="#0E2350">${segA}</text>
       <text x="66" y="90" text-anchor="middle" font-family="Barlow, sans-serif" font-weight="600" font-size="13" fill="#4E5D7C">von ${c.total}</text></svg>`;
     const tiles=roll
-      ?`<div class="hx-tile ok"><b>${c.present}</b><span>anwesend</span></div><div class="hx-tile bad"><b>${c.no}</b><span>fehlend</span></div><div class="hx-tile warn"><b>${c.exc}</b><span>entschuldigt</span></div>`
-      :`<div class="hx-tile ok"><b>${c.yes}</b><span>zugesagt</span></div><div class="hx-tile warn"><b>${c.exc}</b><span>entschuldigt</span></div><div class="hx-tile open"><b>${c.open}</b><span>noch offen</span></div>`;
+      ?`${_hxTile('ok',c.present,'anwesend',fi,1)}${_hxTile('bad',c.no,'fehlend',fi,0)}${_hxTile('warn',c.exc,'entschuldigt',fi,2)}`
+      :`${_hxTile('ok',c.yes,'zugesagt',fi,4)}${c.no?_hxTile('bad',c.no,'abgesagt',fi,0):''}${_hxTile('warn',c.exc,'entschuldigt',fi,2)}${_hxTile('open',c.open,'noch offen',fi,3)}`;
+    const nTiles=roll?3:(c.no?4:3);
     let btns='';
     if(roll)btns+=`<button type="button" class="hx-btn primary" onclick="rcOpen(${fi})">${hxIcon('check')}Anwesenheit erfassen</button>`;
     else btns+=`<button type="button" class="hx-btn primary" onclick="openSessFromMain(${fi})">Termin öffnen</button>`;
@@ -21310,7 +21322,7 @@ function hxRender(){
         <h2 class="hx-focus-title">${esc(title)}</h2>
         <div class="hx-meta">${esc(meta.join(' · '))}</div>
       </div><div class="hx-btns">${btns}</div></div>
-      <div class="hx-counts">${ring}<div class="hx-tiles">${tiles}</div></div>`;
+      <div class="hx-counts">${ring}<div class="hx-tiles" style="--hxn:${nTiles}">${tiles}</div></div>`;
     if(c.openList.length){
       html+=`<div class="hx-divider"><span class="hx-sub-h">${roll?'Noch nicht erfasst':'Noch keine Antwort'} (${c.openList.length})</span><div class="hx-chips">`
         +c.openList.map(({p,pi})=>`<button type="button" class="hx-chip" onclick="openPlayerFromMain(${pi})"><i>${esc(String(p.nr||'·'))}</i>${esc(nm(p))}</button>`).join('')
@@ -21364,7 +21376,8 @@ function hxRender(){
     list.forEach(si=>{
       const s=S[si],c=_hxCounts(D,si,season),held=sessTookPlace(s,season);
       const t=(s.type==='match'?'Spiel'+(s.label?' · '+s.label:''):'Training'+(s.focus?' · '+s.focus:''));
-      const n=held?(c.present+' da'):(c.yes+'/'+c.total);
+      // One format: present (held) or confirmed (upcoming) of all
+      const n=(held?c.present:c.yes)+'/'+c.total;
       html+=`<button type="button" class="hx-day${isT?' today':''}${held&&!isT?' past':''}" onclick="openSessFromMain(${si})"><span class="hx-day-d"><small>${esc(dow)}</small><b>${d.getDate()}</b></span><span class="hx-day-x"><span class="hx-day-t">${esc(t)}</span><span class="hx-day-s">${esc(s.time||'')}${isT?' · heute':''}</span></span><span class="hx-day-n">${esc(n)}</span></button>`;
     });
   });
@@ -24680,7 +24693,8 @@ function openM(id){
   if(id==='moAdmin'){switchAdminTab('trainers');}
   if(id==='moTeamMgr')switchTab('spieler');
   if(_moEl.classList.contains('hx-panel')&&typeof _hxOn==='function'&&_hxOn()){
-    if(id!=='moPlayerStatsExt'&&typeof _hxClosePanels==='function')_hxClosePanels(id);
+    // Detail lists stack on top of their panel; profile and session replace each other
+    if(!['moPlayerStatsExt','moSessAtt','moRpeAll'].includes(id)&&typeof _hxClosePanels==='function')_hxClosePanels(id);
     if(typeof _hxPanelSync==='function')_hxPanelSync();
     if(typeof _hxSyncBack==='function')_hxSyncBack();
   }
@@ -31253,7 +31267,7 @@ _pubCleanupSchedule();
   <div id="tp-content" style="max-height:64vh;overflow-y:auto;"></div>
 </div></div>
 
-<div class="mo" id="moSessAtt" style="z-index:875;"><div class="mob" style="width:440px;max-width:94vw;">
+<div class="mo hx-panel" id="moSessAtt" style="z-index:875;"><div class="mob" style="width:440px;max-width:94vw;">
   <div class="ps-title-row">
     <h3 class="ps-title" id="ss-att-title">Anwesenheit</h3>
     <button class="btn bs" onclick="closeM('moSessAtt')" aria-label="Schließen">✕</button>
@@ -31261,7 +31275,7 @@ _pubCleanupSchedule();
   <div id="ss-att-body"></div>
 </div></div>
 
-<div class="mo" id="moRpeAll" style="z-index:875;"><div class="mob" style="width:420px;max-width:94vw;">
+<div class="mo hx-panel" id="moRpeAll" style="z-index:875;"><div class="mob" style="width:420px;max-width:94vw;">
   <div class="ps-title-row">
     <h3 class="ps-title">💪 Belastung</h3>
     <button class="btn bs" onclick="closeM('moRpeAll')" aria-label="Schließen">✕</button>
