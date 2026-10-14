@@ -3600,6 +3600,18 @@ body.design-heute .cal-evt .cal-att{font-weight:800;color:inherit;opacity:.75;}
 body.design-heute #moDashboard .db-alltab .full-table{width:100%;}
 body.design-heute #moDashboard .db-alltab .full-table thead th{background:var(--hx-ground);color:var(--hx-muted);cursor:pointer;white-space:nowrap;}
 body.design-heute #moDashboard .db-alltab .full-table tbody tr:hover{background:var(--hx-ground);}
+/* ── Einstellungen → Daten: Backups / Papierkorb / Verlauf as sub-pages (Heute) ── */
+.set-sub-back{display:inline-flex;align-items:center;gap:4px;margin:0 0 10px -4px;padding:4px 10px;border:none;border-radius:999px;background:none;color:var(--bm);font:600 .82rem 'Barlow',sans-serif;cursor:pointer;}
+.set-sub-back:hover{background:rgba(22,89,184,.08);}
+body.design-heute .set-sub-back{color:var(--hx-blue);}
+#moSettings .set-sub-host .mob-close-x,#moSettings #set-host-audit h3{display:none !important;}
+#moSettings #set-host-audit > div:first-child{margin-bottom:12px !important;padding-right:0 !important;}
+#moSettings #set-host-audit .db-sel{width:auto !important;margin:0 !important;min-height:36px;}
+body.design-heute #moSettings #set-host-audit .db-sel{border-radius:999px !important;}
+#moSettings .set-sub-host #backup-list,#moSettings .set-sub-host #trash-list,#moSettings .set-sub-host #au-content{max-height:none;overflow:visible !important;}
+@media(max-width:767px){
+  #moSettings .set-sub .set-sub-back,#moSettings .set-sub .set-sec-h{display:none;}
+}
 /* ── Kader page (#moTeamMgr) ── */
 body.design-heute #moTeamMgr > .mob{padding:30px 40px 28px !important;}
 body.design-heute #moTeamMgr > .mob > *{width:100%;max-width:1040px;box-sizing:border-box;}
@@ -5099,7 +5111,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791940929868; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791941575938; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -9629,7 +9641,7 @@ function _mergePlayerAudit(cb){
 }
 function openAuditLog(){
   if(!isAdmin())return;
-  openM('moAuditLog');
+  if(!_hxSettingsSub('audit'))openM('moAuditLog');
   _mergePlayerAudit(()=>{try{renderAuditLog();}catch(e){}});
   // Reset filters
   const ts=document.getElementById('au-type-sel');if(ts)ts.value='';
@@ -11565,7 +11577,7 @@ function _setPhone(){return window.matchMedia('(max-width:767px)').matches;}
 function _setVisible(sec){
   const role=CU&&CU.role;
   if(sec==='konto')return !!CU&&role!=='player';
-  if(sec==='daten')return typeof isAdmin==='function'&&isAdmin();
+  if(sec==='daten'||sec==='backup'||sec==='trash'||sec==='audit')return typeof isAdmin==='function'&&isAdmin();
   if(sec==='team')return typeof canEdit==='function'&&canEdit();
   return true;
 }
@@ -11597,6 +11609,35 @@ function _setLogoSync(){
   const del=document.getElementById('setLogoDel');
   if(del)del.style.display=(G&&G.clubLogo)?'':'none';
 }
+const HX_SUB={backup:'moBackup',trash:'moTrash',audit:'moAuditLog'};
+function _hxSubKids(mo){
+  // Everything in the window except its own title / close: Backups has a
+  // bare h3, Papierkorb a header row with h3 + ✕; Verlauf keeps its header
+  // row (filters live there — its h3 and ✕ are hidden on the sub-page).
+  const mob=mo.querySelector('.mob');
+  if(!mo._hxKids)mo._hxKids=Array.from(mob.children).filter(el=>{
+    if(el.classList.contains('mob-close-x'))return false;
+    if(el.tagName==='H3')return false;
+    if(mo.id==='moTrash'&&el.querySelector('h3'))return false;
+    return true;
+  });
+  return mo._hxKids;
+}
+// Returns true when the sub-page took over (Heute), false for the old window.
+function _hxSettingsSub(key){
+  const mo=document.getElementById(HX_SUB[key]);if(!mo)return false;
+  const kids=_hxSubKids(mo);
+  if(_hxOn()&&isAdmin()){
+    const host=document.getElementById('set-host-'+key);
+    kids.forEach(el=>{if(el.parentNode!==host)host.appendChild(el);});
+    if(mo.classList.contains('open'))closeM(mo.id);
+    openSettings(key);
+    return true;
+  }
+  const mob=mo.querySelector('.mob');
+  kids.forEach(el=>{if(el.parentNode!==mob)mob.appendChild(el);});
+  return false;
+}
 function openSettings(sec){
   _setFill();
   if(_hxOn()&&_setVisible('team')){_focMoveTo(document.getElementById('set-foc-host'));try{renderFocList();}catch(e){}}
@@ -11610,16 +11651,22 @@ function settingsShow(sec){
   const mob=document.querySelector('#moSettings .set-mob');if(!mob)return;
   mob.classList.toggle('sec-open',!!sec);
   document.querySelectorAll('#moSettings .set-sec').forEach(el=>el.classList.toggle('on',el.dataset.sec===sec));
-  document.querySelectorAll('#moSettings .set-nav-it').forEach(el=>el.classList.toggle('on',el.dataset.sec===sec));
+  // A sub-page (Backups, Papierkorb, Verlauf) keeps its parent highlighted
+  const secEl=sec&&document.querySelector('#moSettings .set-sec[data-sec="'+sec+'"]');
+  const parent=(secEl&&secEl.dataset.parent)||sec;
+  document.querySelectorAll('#moSettings .set-nav-it').forEach(el=>el.classList.toggle('on',el.dataset.sec===parent));
   const nav=sec&&document.querySelector('#moSettings .set-nav-it[data-sec="'+sec+'"] b');
+  const subH=secEl&&secEl.dataset.parent&&secEl.querySelector('.set-sec-h');
   const t=document.getElementById('set-title');
-  if(t)t.textContent=(_setPhone()&&nav)?nav.textContent:'⚙️ Einstellungen';
-  if(sec)_setLast=sec;
+  if(t)t.textContent=_setPhone()&&(nav||subH)?(nav||subH).textContent.replace(/^\S+\s/,''):'⚙️ Einstellungen';
+  if(sec)_setLast=parent;
   const pane=document.getElementById('set-pane');if(pane)pane.scrollTop=0;
 }
 function settingsBack(){
   const mob=document.querySelector('#moSettings .set-mob');
-  if(mob&&mob.classList.contains('sec-open'))settingsShow('');
+  const on=document.querySelector('#moSettings .set-sec.on');
+  if(on&&on.dataset.parent)settingsShow(on.dataset.parent);
+  else if(mob&&mob.classList.contains('sec-open'))settingsShow('');
   else closeM('moSettings');   // Heute phone: ‹ on the category list leaves the page
 }
 // Kept for old callers (search, shortcuts)
@@ -22763,7 +22810,7 @@ function openTrash(){
   if(!isAdmin())return;
   _trashCleanup();
   renderTrash();
-  openM('moTrash');
+  if(!_hxSettingsSub('trash'))openM('moTrash');
 }
 function renderTrash(){
   const list=document.getElementById('trash-list');
@@ -25469,7 +25516,7 @@ function deleteBackup(i){
   modifyBackups(currentBks=>currentBks.filter(b=>b&&b.ts!==targetTs));
 }
 function openBackupModal(){
-  openM('moBackup');
+  if(!_hxSettingsSub('backup'))openM('moBackup');
   // Show local data immediately (no flicker)
   renderBackupList();
   // Then fetch fresh from Firebase and re-render with the full list
@@ -30822,6 +30869,25 @@ _pubCleanupSchedule();
       <button type="button" class="set-link" onclick="openBackupModal()"><span class="set-nav-ic">💾</span><span class="set-nav-tx"><b>Backups</b><small>Sicherung erstellen, laden oder wiederherstellen</small></span><span class="set-link-go">›</span></button>
       <button type="button" class="set-link" onclick="openTrash()"><span class="set-nav-ic">🗑</span><span class="set-nav-tx"><b>Papierkorb <span id="set-trash-count"></span></b><small>Gelöschte Spieler und Termine zurückholen</small></span><span class="set-link-go">›</span></button>
       <button type="button" class="set-link" onclick="openAuditLog()"><span class="set-nav-ic">📜</span><span class="set-nav-tx"><b>Verlauf</b><small>Wer hat wann was geändert</small></span><span class="set-link-go">›</span></button>
+    </section>
+
+    <!-- Heute: Backups / Papierkorb / Verlauf open here as sub-pages of Daten.
+         Their content is moved in from the old windows (same ids), so the
+         functions behind them are unchanged; Klassisch keeps the windows. -->
+    <section class="set-sec set-sub" data-sec="backup" data-parent="daten">
+      <button type="button" class="set-sub-back" onclick="settingsShow('daten')">‹ Daten</button>
+      <h4 class="set-sec-h">💾 Backups</h4>
+      <div class="set-sub-host" id="set-host-backup"></div>
+    </section>
+    <section class="set-sec set-sub" data-sec="trash" data-parent="daten">
+      <button type="button" class="set-sub-back" onclick="settingsShow('daten')">‹ Daten</button>
+      <h4 class="set-sec-h">🗑 Papierkorb</h4>
+      <div class="set-sub-host" id="set-host-trash"></div>
+    </section>
+    <section class="set-sec set-sub" data-sec="audit" data-parent="daten">
+      <button type="button" class="set-sub-back" onclick="settingsShow('daten')">‹ Daten</button>
+      <h4 class="set-sec-h">📜 Verlauf</h4>
+      <div class="set-sub-host" id="set-host-audit"></div>
     </section>
 
     </div>
