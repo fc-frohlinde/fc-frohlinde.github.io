@@ -3429,6 +3429,7 @@ body.design-flutlicht:not(.theme-dark) .mob .db-h,body.design-kabine:not(.theme-
 .set-link{padding:12px;border:1px solid var(--gl);background:#fff;margin-bottom:8px;gap:12px;}
 .set-link:hover{border-color:var(--bm);}
 .set-link-go{margin-left:auto;font-size:1.4rem;opacity:.45;line-height:1;}
+.set-logo-prev{width:46px;height:46px;border-radius:50%;object-fit:cover;background:#fff;box-shadow:0 0 0 1px var(--gl);flex-shrink:0;}
 body.theme-dark .set-nav-it,body.theme-dark .set-link,body.theme-dark .set-back,body.theme-dark .set-sec-h{color:#dde5f0;}
 body.theme-dark .set-link{background:transparent;border-color:#2a3e6e;}
 body.theme-dark #moSettings .set-hd,body.theme-dark .set-nav{border-color:#2a3e6e;}
@@ -3498,6 +3499,14 @@ body.design-heute .mo.hx-page > .mob{width:100% !important;max-width:none !impor
 body.design-heute .mo.hx-page > .mob::before{display:none;}
 body.design-heute.theme-dark .mo.hx-page{background:#0b1730;}
 body.design-heute #mobSheet{z-index:490;}
+/* The side navigation has its own "Einstellungen" — not again in the user menu */
+/* The side navigation already has "Einstellungen" and "Statistik" (= Dashboard),
+   so the user menu does not repeat them. The first separator left at the top
+   of the menu is hidden too. */
+@media(min-width:768px){
+  body.design-heute :is(#ud-settings,#ud-dashboard,#ud-work-sep,#ud-work-group){display:none !important;}
+  body.design-heute #userDropdown .ud-lead{display:none !important;}
+}
 @media(min-width:768px){body.design-heute .mo.hx-page{left:232px;}}
 
 /* ── Kalender, Statistik, Wochenbericht as pages ── */
@@ -3582,7 +3591,7 @@ body.design-heute #moTeamMgr .pl-name{color:var(--hx-ink);}
 body.design-heute #moTeamMgr .pl-btn{padding:5px 9px;border-radius:8px;font-size:.72rem;}
 body.design-heute #moTeamMgr .tpanel .mob-btns{border-top:1px solid var(--hx-line);padding:12px 0 0;margin:12px 0 0;gap:8px;justify-content:flex-end;background:none;position:static;}
 body.design-heute #moTeamMgr .tpanel .mob-btns .btn{border-radius:999px;min-height:40px;padding:0 16px;font-size:.84rem;font-weight:600;flex:0 0 auto;}
-body.design-heute #moTeamMgr #btn-mgr-teamlink,body.design-heute #moTeamMgr .tpanel .mob-btns .btn[onclick^="exportPlayersCSV"]{background:#fff !important;color:var(--hx-ink) !important;border:1px solid var(--hx-line) !important;}
+body.design-heute #moTeamMgr #btn-mgr-teamlink{background:#fff !important;color:var(--hx-ink) !important;border:1px solid var(--hx-line) !important;}
 body.design-heute #moTeamMgr #btn-mgr-addpl{order:9;}
 body.design-heute #moTeamMgr .tpanel .note{color:var(--hx-muted);}
 body.design-heute.theme-dark #moTeamMgr .tpanel.active{background:#15264a;}
@@ -3621,6 +3630,7 @@ body.design-heute{
   flex-direction:column;gap:4px;padding:20px 14px 16px;box-sizing:border-box;font-family:'Barlow',sans-serif;overflow-y:auto;}
 .hx-club{display:flex;align-items:center;gap:12px;padding:0 6px 16px;}
 .hx-crest{width:46px;height:46px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px var(--hx-yellow);object-fit:cover;flex-shrink:0;}
+.hx-crest.editable{cursor:pointer;}
 .hx-club-nm{font-family:var(--hx-num);font-weight:800;font-size:1.3rem;line-height:1.05;letter-spacing:.2px;}
 .hx-ctx{display:flex;gap:6px;margin:0 2px 14px;}
 .hx-ctx button{flex:1;display:flex;align-items:center;justify-content:space-between;gap:6px;padding:9px 11px;border-radius:10px;
@@ -4289,7 +4299,7 @@ if(window._fbBlocked){
 
 <!-- Design "Heute": side navigation (hidden unless body.design-heute) -->
 <nav id="hxNav" aria-label="Hauptnavigation">
-  <div class="hx-club"><img class="hx-crest" id="hxCrest" alt=""><span class="hx-club-nm" id="hxClub">FC Frohlinde</span></div>
+  <div class="hx-club"><img class="hx-crest" id="hxCrest" alt="" onclick="clubLogoMenu(this,event)" title="Vereinslogo"><span class="hx-club-nm" id="hxClub">FC Frohlinde</span></div>
   <div class="hx-ctx"><button type="button" onclick="hxTeamMenu(this,event)" title="Mannschaft wechseln"><span id="hxTeamLbl">–</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><button type="button" onclick="hxSeasonMenu(this,event)" title="Saison wechseln"><span id="hxSeasonLbl">–</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></div>
   <button type="button" class="hx-item" data-hx="home" onclick="hxGo('home')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"/></svg><span>Heute</span></button>
   <button type="button" class="hx-item" data-hx="table" onclick="hxGo('table')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg><span>Anwesenheit</span></button>
@@ -4894,7 +4904,6 @@ if(window._fbBlocked){
     <div class="mob-btns">
       <button class="btn bp" id="btn-mgr-addpl" onclick="_tmLeave();openM('moAddPlayer');" style="display:none;">＋ Spieler</button>
       <button class="btn" id="btn-mgr-teamlink" onclick="copyTeamLink()" style="display:none;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" title="Ein Link für die ganze Mannschaft — einmal in die Gruppe geben, jeder wählt sich selbst aus">🔗 Spieler-Menü-Link</button>
-      <button class="btn" onclick="exportPlayersCSV()" style="background:var(--gd);color:#fff;" title="Spielerdaten als CSV exportieren (Trikotverwaltung-Format)">⬇ CSV-Export</button>
       
     </div>
   </div>
@@ -5062,7 +5071,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791937695326; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791937985072; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -11544,11 +11553,18 @@ function _setFill(){
   const regSwitch=document.getElementById('setRegStatus');
   if(regSwitch)regSwitch.checked=isRegStatusShown();
   if(typeof _automationSyncSettingsUI==='function')_automationSyncSettingsUI();
+  _setLogoSync();
   const tc=document.getElementById('set-trash-count');
   if(tc)tc.textContent=Array.isArray(G.trash)&&G.trash.length?`(${G.trash.length})`:'';
   document.querySelectorAll('#moSettings [data-sec]').forEach(el=>{
     el.classList.toggle('set-hide',!_setVisible(el.dataset.sec));
   });
+}
+function _setLogoSync(){
+  const pv=document.getElementById('setLogoPrev'),cl=document.getElementById('clogo');
+  if(pv&&cl&&cl.src&&pv.src!==cl.src)pv.src=cl.src;
+  const del=document.getElementById('setLogoDel');
+  if(del)del.style.display=(G&&G.clubLogo)?'':'none';
 }
 function openSettings(sec){
   _setFill();
@@ -18216,11 +18232,20 @@ function applyClubLogo(){
   if(ring){
     ring.classList.toggle('editable', !!(canEdit&&canEdit()));
   }
+  const crest=document.getElementById('hxCrest');
+  if(crest)crest.classList.toggle('editable', !!(canEdit&&canEdit()));
   // Keep the Startseite hero logo in sync — same G.clubLogo, both places
   const homeLogo=document.getElementById('home-hero-logo');
   if(homeLogo){
     const img=homeLogo.querySelector('img');
     if(img)img.src=src;
+  }
+  // Design "Heute": crest in the side navigation and on the start screen;
+  // Einstellungen → Mannschaft shows a preview.
+  if(typeof _setLogoSync==='function')try{_setLogoSync();}catch(e){}
+  if(typeof hxOn==='function'&&hxOn()){
+    try{hxRenderNav();}catch(e){}
+    try{if(typeof hxRender==='function')hxRender();}catch(e){}
   }
 }
 
@@ -21094,8 +21119,13 @@ function hxUserMenu(btn,e){
   dd.classList.remove('from-home');
   const willOpen=!dd.classList.contains('open');
   dd.classList.toggle('open',willOpen);
-  if(willOpen)_placePopup(dd,btn.getBoundingClientRect(),{align:'left',gap:6});
   if(typeof updateUserMenuState==='function')updateUserMenuState();
+  // Items the side navigation already offers are hidden here, which can leave
+  // a separator at the very top — hide that one.
+  dd.querySelectorAll('.ud-lead').forEach(el=>el.classList.remove('ud-lead'));
+  const first=Array.from(dd.children).find(el=>getComputedStyle(el).display!=='none');
+  if(first&&first.classList.contains('ud-sep'))first.classList.add('ud-lead');
+  if(willOpen)_placePopup(dd,btn.getBoundingClientRect(),{align:'left',gap:6});
 }
 function hxNotif(btn,e){
   if(e)e.stopPropagation();
@@ -21810,7 +21840,7 @@ window.addEventListener('orientationchange',()=>setTimeout(_lockPortrait,120));
 function _bindPhotoLongPress(){
   const hero=document.getElementById('home-hero');
   if(hero)bindLongPress(hero,el=>heroPhotoMenu(el));
-  [document.getElementById('home-hero-logo'),document.getElementById('logoRingWrap')]
+  [document.getElementById('home-hero-logo'),document.getElementById('logoRingWrap'),document.getElementById('hxCrest')]
     .forEach(el=>{if(el)bindLongPress(el,x=>clubLogoMenu(x));});
 }
 function clubLogoMenu(el,ev){
@@ -21954,49 +21984,6 @@ function switchTab(t){
   if(t==='spiele')renderMgrSessions('match');
 }
 
-// CSV-Export für Trikotverwaltung (trikotverwaltung.de / ähnliche Dienste)
-// Spalten: Vorname;Nachname;Mannschaft;Rückennummer;Größe;Notizen
-// Trennzeichen: Semikolon. Encoding: UTF-8 mit BOM (Excel-kompatibel).
-function exportPlayersCSV(){
-  const D=cd();
-  if(!D||!D.players||!D.players.length){
-    alert('Keine Spielerdaten vorhanden.');return;
-  }
-  const team=UI.currentTeam||'U19';
-  const SEP=';';
-
-  // Helper: escape a CSV cell — wrap in quotes if it contains SEP, quote or newline
-  const esc=v=>{
-    const s=String(v??'');
-    return(s.includes(SEP)||s.includes('"')||s.includes('\n'))?'"'+s.replace(/"/g,'""')+'"':s;
-  };
-
-  const header=['Vorname','Nachname','Mannschaft','Rückennummer','Größe','Notizen'];
-  const rows=D.players
-    .filter(p=>p&&p.name)
-    .map(p=>{
-      // Split "Vorname Nachname" — first word = Vorname, remainder = Nachname
-      const parts=(p.name||'').trim().split(/\s+/);
-      const vorname=parts[0]||'';
-      const nachname=parts.slice(1).join(' ')||'';
-      return [vorname,nachname,team,p.nr||'','',p.note||''].map(esc).join(SEP);
-    });
-
-  // UTF-8 BOM so Excel opens correctly without encoding dialog
-  const bom='\uFEFF';
-  const csv=bom+header.map(esc).join(SEP)+'\n'+rows.join('\n');
-
-  // Trigger download
-  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;
-  const date=new Date().toISOString().slice(0,10).replace(/-/g,'');
-  a.download=`spieler_${team.toLowerCase()}_${date}.csv`;
-  document.body.appendChild(a);a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
 
 function renderMgrPlayers(){
   const D=cd();
@@ -30656,7 +30643,7 @@ _pubCleanupSchedule();
       <button type="button" class="set-nav-it" data-sec="konto" onclick="settingsShow('konto')"><span class="set-nav-ic">👤</span><span class="set-nav-tx"><b>Konto</b><small>Passwort, PIN, Passkey, Sitzung</small></span></button>
       <button type="button" class="set-nav-it" data-sec="darstellung" onclick="settingsShow('darstellung')"><span class="set-nav-ic">🎨</span><span class="set-nav-tx"><b>Darstellung</b><small>Farben, Design, Schrift</small></span></button>
       <button type="button" class="set-nav-it" data-sec="benach" onclick="settingsShow('benach')"><span class="set-nav-ic">🔔</span><span class="set-nav-tx"><b>Benachrichtigungen</b><small>Push, Erinnerungen</small></span></button>
-      <button type="button" class="set-nav-it" data-sec="team" onclick="settingsShow('team')"><span class="set-nav-ic">👥</span><span class="set-nav-tx"><b>Mannschaft</b><small>Anzeige der Spieler</small></span></button>
+      <button type="button" class="set-nav-it" data-sec="team" onclick="settingsShow('team')"><span class="set-nav-ic">👥</span><span class="set-nav-tx"><b>Mannschaft</b><small>Vereinslogo, Anzeige der Spieler</small></span></button>
       <button type="button" class="set-nav-it" data-sec="daten" onclick="settingsShow('daten')"><span class="set-nav-ic">💾</span><span class="set-nav-tx"><b>Daten</b><small>Backups, Papierkorb, Verlauf</small></span></button>
     </nav>
     <div class="set-pane" id="set-pane">
@@ -30872,7 +30859,18 @@ _pubCleanupSchedule();
 
     <section class="set-sec" data-sec="team">
       <h4 class="set-sec-h">👥 Mannschaft</h4>
-      <p class="set-sec-sub">Wie Spieler in Tabelle und Listen angezeigt werden.</p>
+      <p class="set-sec-sub">Gilt für die ganze Mannschaft.</p>
+      <div class="setting-row">
+        <img id="setLogoPrev" class="set-logo-prev" alt=""/>
+        <div style="flex:1;min-width:0;">
+          <div class="setting-label">🛡 Vereinslogo</div>
+          <div class="setting-sub">In der Kopfleiste, auf der Startseite und im Menü</div>
+        </div>
+        <div class="setting-control" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;">
+          <button type="button" class="btn bp" onclick="pickClubLogo()">Ändern</button>
+          <button type="button" class="btn" id="setLogoDel" onclick="removeClubLogo()" style="background:rgba(231,76,60,.1);color:#c0392b;border:1px solid rgba(231,76,60,.3);">Entfernen</button>
+        </div>
+      </div>
   <div class="setting-row">
     <div>
       <div class="setting-label">🟡 Anmeldungs-Status anzeigen</div>
