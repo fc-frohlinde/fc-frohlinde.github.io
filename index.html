@@ -5348,9 +5348,9 @@ if(window._fbBlocked){
     <h3 id="tmgr-h" style="margin:0;flex:1;">Mannschaft</h3>
   </div>
   <div class="tbar">
-    <button class="tbtn" data-tab="tafel" id="tbtn-tafel" onclick="switchTab('tafel')" style="display:none;">Tafel</button>
-    <button class="tbtn active" data-tab="spieler" onclick="switchTab('spieler')">Spieler</button>
-    <button class="tbtn" data-tab="trainer" onclick="switchTab('trainer')">Trainer</button>
+    <button class="tbtn" data-tab="tafel" id="tbtn-tafel" onclick="switchTab('tafel',1)" style="display:none;">Tafel</button>
+    <button class="tbtn active" data-tab="spieler" onclick="switchTab('spieler',1)">Spieler</button>
+    <button class="tbtn" data-tab="trainer" onclick="switchTab('trainer',1)">Trainer</button>
   </div>
   <div class="tpanel" id="tab-tafel"><div id="kbBoard"></div></div>
   <div class="tpanel active" id="tab-spieler">
@@ -5499,7 +5499,7 @@ const APP_VERSION_LABEL='1.1.1';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791990575102; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792012900485; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.1.1',date:'14.10.2026',title:'Kader-Tafel',items:[
     {icon:'📋',title:'Kader als Tafel',desc:'Im Kader gibt es den neuen Reiter „Tafel“: die Mannschaft nach Linien (Tor, Abwehr, Mittelfeld, Angriff) für einen Termin. Pro Linie siehst du, wie viele zugesagt haben, pro Spieler den Status und die letzten fünf Termine als Punkte. Oben wählst du den Termin.'},
@@ -21200,7 +21200,7 @@ function mobNav(what){
     case 'home': mobSheetClose(); if(typeof homeOpen==='function')homeOpen(); break;
     case 'list': mobSheetClose(); if(typeof homeClose==='function')homeClose(); break;
     case 'cal':  mobSheetClose(); if(typeof openCalendar==='function')openCalendar(); break;
-    case 'team': mobSheetClose(); if(typeof openTeamMgr==='function')openTeamMgr('spieler'); break;
+    case 'team': mobSheetClose(); if(typeof openTeamMgr==='function')openTeamMgr(_kbDefaultTab()); break;
     case 'more': mobSheetOpen(); break;
   }
   _mobNavSync(what);
@@ -22173,12 +22173,14 @@ document.addEventListener('wheel',e=>{
   bar.scrollLeft+=e.deltaY;
   e.preventDefault();
 },{passive:false});
-function switchTab(t){
+// user=1 only for a tap on the tab strip: that choice is remembered for the
+// next "Kader". Programmatic switches (opening, refresh, back) never overwrite it.
+function switchTab(t,user){
   if(t==='tafel'&&!_kbOn())t='spieler';
   const tb=document.getElementById('tbtn-tafel');if(tb)tb.style.display=_kbOn()?'':'none';
   document.querySelectorAll('#moTeamMgr .tbtn').forEach(b=>{const on=b.dataset.tab===t;b.classList.toggle('active',on);b.setAttribute('aria-pressed',on);});
   ['tafel','spieler','trainer'].forEach(n=>document.getElementById('tab-'+n)?.classList.toggle('active',n===t));
-  if(_kbOn())try{localStorage.setItem('fcf_kader_tab',t);}catch(e){}
+  if(user&&_kbOn())try{localStorage.setItem('fcf_kb_tab',t);}catch(e){}
   if(t==='tafel')kbRender();
   document.getElementById('tmgr-h').textContent='Kader';
   if(t==='spieler')renderMgrPlayers();
@@ -22203,7 +22205,7 @@ function _kbVisible(){
 }
 function _kbDefaultTab(){
   if(!_kbOn())return 'spieler';
-  let t='';try{t=localStorage.getItem('fcf_kader_tab')||'';}catch(e){}
+  let t='';try{t=localStorage.getItem('fcf_kb_tab')||'';}catch(e){}
   return ['tafel','spieler','trainer'].includes(t)?t:'tafel';
 }
 // Before the session: the players' answers; from its start: attendance
