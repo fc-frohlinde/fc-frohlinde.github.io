@@ -3595,6 +3595,33 @@ body.design-heute.theme-dark .mo .mob :is(h3,#ps-name,#ss-title){color:#fff !imp
   body.design-heute .mo:not(.hx-page) > .mob::before{background:var(--hx-line);width:44px;}
   body.design-heute .mo .mob .mob-btns .btn{min-height:46px;}
 }
+/* ════════════════════════════════════════════════════════════════
+   DESIGN "HEUTE" — PANELS (.mo.hx-panel): player profile, session and
+   detail statistics. Desktop: a panel on the right, the table / page
+   next to it stays visible and usable (clicking another player switches
+   the panel). Phone: a full screen above the bottom bar.
+   ════════════════════════════════════════════════════════════════ */
+body.design-heute{--hx-pw:460px;}
+#moPlayerStatsExt{--hx-pw:680px;}
+@keyframes hxPanelIn{from{transform:translateX(36px);opacity:.3;}to{transform:none;opacity:1;}}
+@keyframes hxPanelUp{from{transform:translateY(24px);opacity:.3;}to{transform:none;opacity:1;}}
+@media(min-width:768px){
+  body.design-heute .mo.hx-panel{left:auto;right:0;width:min(var(--hx-pw),calc(100vw - 232px));background:none;backdrop-filter:none;align-items:stretch;justify-content:stretch;padding:0 !important;}
+  body.design-heute .mo.hx-panel > .mob{width:100% !important;max-width:none !important;height:100% !important;max-height:none !important;border-radius:22px 0 0 22px;box-shadow:-30px 0 60px -24px rgba(14,35,80,.4),-1px 0 0 var(--hx-line);animation:hxPanelIn .22s cubic-bezier(.22,1,.36,1);box-sizing:border-box;padding:22px 24px 28px !important;}
+  /* Detail statistics on top of the profile: give it a backdrop over the rest */
+  body.design-heute #moPlayerStatsExt.hx-panel > .mob{box-shadow:-40px 0 80px -20px rgba(14,35,80,.5),-1px 0 0 var(--hx-line);}
+}
+@media(min-width:1100px){
+  /* Room for the panel: pages and the start screen end where it begins (the
+     table scrolls sideways anyway and simply runs under it) */
+  body.design-heute.hx-panel-open :is(#moTeamMgr,#moCalendar,#moDashboard,#moWeekReport,#moSettings).hx-page > .mob{padding-right:calc(var(--hx-pw) + 28px) !important;}
+  body.design-heute.hx-panel-open .home-overlay{right:var(--hx-pw);}
+}
+@media(max-width:767px){
+  body.design-heute .mo.hx-panel{bottom:var(--mob-nav-h,62px);background:var(--hx-ground);backdrop-filter:none;align-items:stretch;padding:0 !important;}
+  body.design-heute .mo.hx-panel > .mob{width:100% !important;height:100% !important;max-height:none !important;border-radius:0;box-shadow:none;animation:hxPanelUp .2s cubic-bezier(.22,1,.36,1);padding-top:calc(12px + env(safe-area-inset-top,0px)) !important;}
+  body.design-heute .mo.hx-panel > .mob::before{display:none;}
+}
 /* ── Kader page (#moTeamMgr) ── */
 body.design-heute #moTeamMgr > .mob{padding:30px 40px 28px !important;}
 body.design-heute #moTeamMgr > .mob > *{width:100%;max-width:1040px;box-sizing:border-box;}
@@ -4538,7 +4565,7 @@ if(window._fbBlocked){
 <!-- ═══════════════ MODALS ═══════════════ -->
 
 <!-- Player Stats -->
-<div class="mo" id="moPlayer"><div class="mob" style="width:440px;max-width:96vw;">
+<div class="mo hx-panel" id="moPlayer"><div class="mob" style="width:440px;max-width:96vw;">
   <div class="ps-sticky">
   <div class="ps-title-row">
     <h3 class="ps-title">👤 Spielerprofil</h3>
@@ -4669,7 +4696,7 @@ if(window._fbBlocked){
 </div>
 
 <!-- Session Stats -->
-<div class="mo" id="moSession2"><div class="mob" style="width:440px;max-width:96vw;">
+<div class="mo hx-panel" id="moSession2"><div class="mob" style="width:440px;max-width:96vw;">
   <div class="ss-sticky">
     <div class="ps-title-row">
       <h3 class="ps-title" id="ss-kind">Termin</h3>
@@ -5099,7 +5126,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791938722804; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791939725457; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -18284,6 +18311,9 @@ function psPreviewPlayer(){
   previewPlayer(ensurePlayerToken(pi));
 }
 function openPlayerStats(pi,opts){
+  // Design "Heute": the profile is a side panel and the table/list next to it
+  // stays usable, so another player can be opened mid-edit — ask first.
+  if(typeof _hxOn==='function'&&_hxOn()){const mp=document.getElementById('moPlayer');if(mp&&mp.classList.contains('open'))_psSwitchGuard();}
   // Track identity for drift-safe action resolution (see _resolveCurrentPI)
   if(typeof _trackPlayerModal==='function')_trackPlayerModal(pi);
   else currentPI=pi;
@@ -18705,6 +18735,15 @@ function _psCommitEdit(){
   if(psNr)psNr.textContent='#'+(p.nr||'?');
   const psBadge=document.getElementById('ps-pos-badge');
   if(psBadge&&typeof pbHtml==='function')psBadge.innerHTML=pbHtml(p);
+}
+function _psSwitchGuard(){
+  const box=document.getElementById('ps-edit');
+  const editing=box&&box.style.display!=='none'&&box.style.display!=='';
+  if(editing&&_psIsDirty()){
+    const keep=confirm('\u00c4nderungen speichern?\n\nOK = speichern, Abbrechen = verwerfen.');
+    if(keep)_psCommitEdit();
+  }
+  _psSnapshot=null;
 }
 // Closing the window mid-edit must not silently drop or silently keep work
 function psCloseGuard(){
@@ -21008,7 +21047,7 @@ function homeEligible(){
 // Drives the fixed bottom bar. Every entry reuses the SAME functions the
 // desktop toolbar calls — this is a different surface, not a parallel app.
 function mobNav(what){
-  if(_hxOn()&&what!=='more')_hxClosePages(what==='team'?'moTeamMgr':what==='cal'?'moCalendar':'');
+  if(_hxOn()&&what!=='more'){_hxClosePanels('');_hxClosePages(what==='team'?'moTeamMgr':what==='cal'?'moCalendar':'');}
   switch(what){
     case 'home': mobSheetClose(); if(typeof homeOpen==='function')homeOpen(); break;
     case 'list': mobSheetClose(); if(typeof homeClose==='function')homeClose(); break;
@@ -21088,6 +21127,19 @@ function _hxOpenPage(){
 function _hxClosePages(keepId){
   document.querySelectorAll('.mo.hx-page.open').forEach(el=>{if(el.id!==keepId)closeM(el.id);});
 }
+// Panels: player profile and session open as a side panel on the right
+// (desktop) or a full screen above the bottom bar (phone). Player and session
+// share the spot — one replaces the other; the detail statistics stack on top.
+function _hxClosePanels(keepId){
+  document.querySelectorAll('.mo.hx-panel.open').forEach(el=>{
+    if(el.id===keepId)return;
+    if(el.id==='moPlayer'&&typeof psCloseGuard==='function')psCloseGuard();
+    else closeM(el.id);
+  });
+}
+function _hxPanelSync(){
+  document.body.classList.toggle('hx-panel-open',_hxOn()&&!!document.querySelector('.mo.hx-panel.open'));
+}
 function _hxPageSync(){
   if(typeof _mobNavSync==='function'&&typeof _mobCurrentView==='function')_mobNavSync(_mobCurrentView());
   else if(typeof hxSyncNav==='function')hxSyncNav();
@@ -21104,6 +21156,7 @@ function hxSyncNav(){
 }
 function hxGo(k){
   closeUserMenuIfOpen&&closeUserMenuIfOpen();
+  _hxClosePanels('');
   _hxClosePages(HX_PAGE[k]);
   switch(k){
     case 'home':homeOpen();break;
@@ -24583,7 +24636,8 @@ function openM(id){
   requestAnimationFrame(()=>{try{_syncCloseHeight(_moEl);}catch(e){}});
   // Mark plain ✕ close buttons so design "Heute" can draw them round
   // (no effect in Klassisch — only Heute rules use the class).
-  requestAnimationFrame(()=>{try{_moEl.querySelectorAll('button').forEach(b=>{if(!b.classList.contains('hx-x')&&b.textContent.trim()==='\u2715')b.classList.add('hx-x');});}catch(e){}});
+  // Only buttons that close something — a ✕ that deletes a row stays as it is.
+  requestAnimationFrame(()=>{try{_moEl.querySelectorAll('button').forEach(b=>{if(!b.classList.contains('hx-x')&&b.textContent.trim()==='\u2715'&&/closeM\(|[Cc]lose/.test(b.getAttribute('onclick')||''))b.classList.add('hx-x');});}catch(e){}});
   if(id==='moAddPlayer')initAddPos();
   if(id==='moMatch'){
     const mw=document.getElementById('newMatchLocWrap');
@@ -24612,6 +24666,10 @@ function openM(id){
   }
   if(id==='moAdmin'){switchAdminTab('trainers');}
   if(id==='moTeamMgr')switchTab('spieler');
+  if(_moEl.classList.contains('hx-panel')&&typeof _hxOn==='function'&&_hxOn()){
+    if(id!=='moPlayerStatsExt'&&typeof _hxClosePanels==='function')_hxClosePanels(id);
+    if(typeof _hxPanelSync==='function')_hxPanelSync();
+  }
   if(_moEl.classList.contains('hx-page')&&typeof _hxOn==='function'&&_hxOn()){
     if(typeof _hxClosePages==='function')_hxClosePages(id);   // one page at a time
     if(typeof _hxPageSync==='function')_hxPageSync();
@@ -24636,6 +24694,7 @@ function closeM(id){
   // Design "Heute": pages stay under dialogs — refresh the Kader page when a
   // dialog opened from it closes, and move the nav highlight when a page closes.
   if(typeof _hxOn==='function'&&_hxOn()){
+    if(document.getElementById(id).classList.contains('hx-panel')&&typeof _hxPanelSync==='function')_hxPanelSync();
     if(document.getElementById(id).classList.contains('hx-page')){if(typeof _hxPageSync==='function')_hxPageSync();}
     else if(typeof _hxRefreshPages==='function')setTimeout(_hxRefreshPages,0);
   }
@@ -31422,7 +31481,7 @@ _pubCleanupSchedule();
 </div></div>
 
 <!-- Detailstatistik (Player) -->
-<div class="mo" id="moPlayerStatsExt" style="z-index:540;"><div class="mob" style="width:680px;max-width:96vw;max-height:92vh;display:flex;flex-direction:column;position:relative;">
+<div class="mo hx-panel" id="moPlayerStatsExt" style="z-index:540;"><div class="mob" style="width:680px;max-width:96vw;max-height:92vh;display:flex;flex-direction:column;position:relative;">
   <button class="mob-close-x" onclick="closeM('moPlayerStatsExt')" aria-label="Schließen">✕</button>
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-shrink:0;padding-right:32px;">
     <h3 id="pse-title" style="flex:1;margin:0;color:var(--bd);">📊 Detailstatistik</h3>
