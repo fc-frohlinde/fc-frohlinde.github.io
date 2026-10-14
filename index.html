@@ -1026,7 +1026,7 @@ input[type="date"]{cursor:pointer;}
 /* Covers every portrait in the working views: table rows, the mobile list,
    the trainer strip on the Startseite and the trainer manager. */
 body.no-photos .nm-av,body.no-photos .ma-card-av,body.no-photos .tr-av{display:none;}
-.nm-av-ph{display:inline-block;background:rgba(0,0,0,.06);}
+.nm-av-ph{display:inline-flex;align-items:center;justify-content:center;background:rgba(0,0,0,.06);font:700 .6rem 'Barlow',sans-serif;letter-spacing:.2px;color:var(--gm);line-height:1;}
 
 .tp-av{width:72px;height:72px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid var(--gl);}
 .tp-av-ph{display:flex;align-items:center;justify-content:center;background:var(--bm);color:#fff;
@@ -2971,6 +2971,8 @@ body.design-kabine thead .match-col{background:var(--d-panel)!important;}
 /* Next session: a yellow cap on the column */
 body.design-kabine thead th.next-col{background:var(--d-panel)!important;box-shadow:inset 0 4px 0 var(--d-yellow);}
 body.design-kabine thead th.next-col .ddow{color:var(--d-ink);}
+.ddow .dtoday{font-weight:800;color:#fff;}
+body.design-kabine .ddow .dtoday{color:var(--d-ink);}
 
 /* Rows: no zebra; hairlines carry the rhythm */
 body.design-kabine tbody tr{background:var(--d-panel)!important;}
@@ -2989,6 +2991,9 @@ body.design-kabine .csf{background:var(--d-red)!important;color:#fff!important;}
 body.design-kabine .cse{background:var(--d-amber)!important;color:#2B1900!important;}
 body.design-kabine .csm{background:var(--d-m-bg)!important;color:var(--d-m-fg)!important;}
 body.design-kabine .csq{background:transparent!important;color:var(--d-q-fg)!important;}
+/* nothing entered yet: a dashed chip, so "no answer" reads differently from a blank */
+body.design-kabine td.cs.csq{position:relative;}
+body.design-kabine td.cs.csq::after{content:'';position:absolute;inset:3px;border:1.5px dashed #C3CDDD;border-radius:6px;pointer-events:none;}
 body.design-kabine tbody tr:hover td.csa.past-locked{background:var(--d-a-bg)!important;}
 body.design-kabine tbody tr:hover td.csf.past-locked{background:var(--d-red)!important;}
 body.design-kabine tbody tr:hover td.cse.past-locked{background:var(--d-amber)!important;}
@@ -3043,7 +3048,7 @@ body.design-kabine .ma-btn.ma-3{background:var(--d-ink);}
 /* names, avatars, pickers, footer mark */
 body.design-kabine .ncell .nm{color:var(--d-ink);font-weight:600;}
 
-body.design-kabine .nm-av-ph{background:var(--d-panel2);box-shadow:inset 0 0 0 1px var(--d-line);}
+body.design-kabine .nm-av-ph{background:var(--d-panel2);box-shadow:inset 0 0 0 1px var(--d-line);color:var(--d-muted);}
 
 body.design-kabine .ma-card-av-ph{background:var(--d-panel2);color:var(--d-muted);box-shadow:inset 0 0 0 1px var(--d-line);}
 
@@ -4212,7 +4217,9 @@ body.design-heute .hx-tile.open{background:#EDF1F7;}
 @media(min-width:768px){
   body.design-heute .page{background:transparent;box-shadow:none;}
   body.design-heute .toolbar{background:transparent!important;border-bottom:none!important;padding:12px 16px 10px;}
-  body.design-heute .table-wrap{margin:0 10px;border-radius:18px;box-shadow:var(--hx-shadow);background:var(--hx-card);}
+  body.design-heute .table-wrap{margin:0 10px;border-radius:18px;box-shadow:var(--hx-shadow);background:var(--hx-card);flex:0 1 auto;}
+  /* Matrix keeps its natural width: the card ends with the table */
+  body.design-heute .table-wrap:has(#mainTable.mx){align-self:flex-start;max-width:calc(100% - 20px);}
   body.design-heute .footer{background:transparent!important;border-top:none!important;}
 }
 /* The "Mehr" sheet and its pickers must open above the start screen */
@@ -4421,6 +4428,7 @@ body.design-kabine #mainTable.mx tfoot td.mx-pct{font-size:.95rem;}
 .tpl-fld > label{font-size:15px;font-weight:700;}
 /* ── Kader-Tafel (Konzept B) ── */
 #tab-tafel #kbBoard{display:flex;flex-direction:column;gap:14px;}
+@media(min-width:768px){body.design-heute #tab-tafel.tpanel.active{flex:0 1 auto;}}
 #tab-tafel #kbBoard > *{flex-shrink:0;}
 .kb-top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;}
 .kb-days{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;flex:0 1 auto;max-width:100%;}
@@ -4453,7 +4461,7 @@ body.design-kabine #mainTable.mx tfoot td.mx-pct{font-size:.95rem;}
 .kb-board{position:relative;border-radius:18px;overflow:hidden;background:#2E7D46;}
 .kb-pitch{position:absolute;inset:0;width:100%;height:100%;display:block;}
 .kb-cols{position:relative;display:grid;grid-template-columns:minmax(0,.82fr) repeat(3,minmax(0,1fr));gap:14px;padding:16px;min-height:420px;}
-.kb-col header{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;margin:0 0 10px;padding:9px 11px 10px;border-radius:12px;background:rgba(6,32,18,.42);color:#fff;}
+.kb-col header{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;margin:0 0 10px;padding:9px 11px 10px;border-radius:12px;background:#1D5630;color:#fff;}
 #tab-tafel .kb-col h3{margin:0;font-family:var(--hx-num);font-weight:800;font-size:1.2rem;line-height:1;color:#fff;}
 .kb-col header > span{font-size:.8rem;color:rgba(255,255,255,.82);}
 .kb-col header b{font-family:var(--hx-num);font-weight:800;font-size:1.05rem;color:#fff;}
@@ -4465,6 +4473,9 @@ body.design-kabine #mainTable.mx tfoot td.mx-pct{font-size:.95rem;}
 .kb-card:hover{box-shadow:0 0 0 2px var(--hx-yellow),0 4px 10px -4px rgba(0,0,0,.28);}
 .kb-card:focus-visible{outline:2px solid var(--hx-yellow);outline-offset:2px;}
 .kb-card.st-warn,.kb-card.st-bad{background:#E4EAE6;box-shadow:none;}
+/* no answer yet: dashed edge, as in the concept */
+.kb-card.st-open{box-shadow:none;outline:1.5px dashed #9FB0CB;outline-offset:-1.5px;}
+.kb-card.st-open:hover{box-shadow:0 0 0 2px var(--hx-yellow);}
 .kb-card.st-warn :is(.kb-nm,.kb-nr,.kb-pb),.kb-card.st-bad :is(.kb-nm,.kb-nr,.kb-pb){opacity:.5;}
 .kb-nr{grid-area:nr;font-family:var(--hx-num);font-weight:800;font-size:1.3rem;line-height:1;color:var(--hx-blue);text-align:center;}
 .kb-nm{grid-area:nm;min-width:0;font-size:.9rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -4515,6 +4526,7 @@ body.design-kabine #mainTable.mx tfoot td.mx-pct{font-size:.95rem;}
   .kb-card{box-shadow:none;border:1px solid var(--hx-line);grid-template-columns:24px minmax(0,1fr) auto;grid-template-areas:"nr nm row";padding:9px 10px;gap:8px;}
   .kb-card .kb-st{margin-left:0;}
   .kb-card.st-warn,.kb-card.st-bad{background:var(--hx-card2);border-color:var(--hx-card2);}
+  .kb-card.st-open{outline:none;border:1.5px dashed #AEBBD1;padding:8.5px 9.5px;}
   .kb-empty{color:var(--hx-muted);}
   .kb-none .kb-cards{grid-template-columns:1fr;}
 }
@@ -5629,7 +5641,7 @@ const APP_VERSION_LABEL='1.1.1';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792015501863; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792019882053; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.1.1',date:'14.10.2026',title:'Kader-Tafel',items:[
     {icon:'📋',title:'Kader als Tafel',desc:'Im Kader gibt es den neuen Reiter „Tafel“: die Mannschaft nach Linien (Tor, Abwehr, Mittelfeld, Angriff) für einen Termin. Pro Linie siehst du, wie viele zugesagt haben, pro Spieler den Status und die letzten fünf Termine als Punkte. Oben wählst du den Termin.'},
@@ -10341,6 +10353,9 @@ function pbHtml(p){
 function pcHtml(p){
   return`<div class="pos-wrap">${pbHtml(p)}</div>`;
 }
+// One letter for a player without a photo (as in the phone list) — an empty
+// circle next to the name read like a radio button
+function _avIni(p){const n=String((typeof getDisplayName==='function'&&getDisplayName(p))||(p&&p.name)||'').trim();return escapeHtml((n.split(/\s+/).map(x=>x[0]||'').join('').slice(0,2)||'?').toUpperCase());}
 function pctColor(pct){return pct>=80?'var(--cp)':pct>=60?'var(--ce)':'var(--ca)';}
 
 // ══════════════════════════════
@@ -10464,7 +10479,8 @@ function renderHead(){
     const parts=s.date.split(' ');
     const dow=parts[0]||'';const dm=parts[1]||s.date;
     r+=`<th class="dth${isMat?' match-col':''}${isNext?' next-col':''}" onclick="openSessFromMain(${D.sessions.indexOf(ss[i])})">`;
-    r+=`<span class="ddow">${isMat?'⚽':''} ${dow}</span>`;
+    const isToday=dispToSortKey(s.date)===todaySK();
+    r+=`<span class="ddow">${isMat?'⚽':''} ${isToday?'<b class="dtoday">heute</b>':dow}</span>`;
     r+=`<span class="dnum">${dm}</span>`;
     if(!ro)r+=`<button class="dcb" onclick="event.stopPropagation();delSess(${realIdx})">✕</button>`;
     r+=`</th>`;
@@ -10553,7 +10569,7 @@ function renderBody(){
     rows.push(`<tr class="${_multiSelMode&&_multiSelIds.has(origPi)?'msel-row':''}">
       <td class="tdl c0">${!ro?`<input class="nri" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="${p.nr||''}" onclick="event.stopPropagation();this.select();" onchange="updNr(${origPi},this.value)" onblur="updNr(${origPi},this.value)" onkeydown="if(event.key==='Enter'){this.blur();event.preventDefault();}" title="Trikotnummer bearbeiten"/>`:`<span style="font-weight:700;color:var(--bm);">${p.nr||''}</span>`}</td>
       <td class="tdl c1" onclick="${_multiSelMode?`multiSelectToggle(${origPi})`:`openPlayerFromMain(${origPi})`}" style="cursor:pointer;">
-        <div class="ncell">${_multiSelMode?`<input type="checkbox" class="msel-cb" data-pi="${origPi}" ${_multiSelIds.has(origPi)?'checked':''} onclick="event.stopPropagation();multiSelectToggle(${origPi})" style="margin-right:6px;width:16px;height:16px;cursor:pointer;"/>`:''}${p.photo?`<img class="nm-av" src="${p.photo}" alt="" loading="lazy">`:'<span class="nm-av nm-av-ph"></span>'}<span class="nm ${plNameClass(p)}">${getDisplayName(p)||''}</span>${!_multiSelMode?'<span class="ni">›</span>':''}</div>
+        <div class="ncell">${_multiSelMode?`<input type="checkbox" class="msel-cb" data-pi="${origPi}" ${_multiSelIds.has(origPi)?'checked':''} onclick="event.stopPropagation();multiSelectToggle(${origPi})" style="margin-right:6px;width:16px;height:16px;cursor:pointer;"/>`:''}${p.photo?`<img class="nm-av" src="${p.photo}" alt="" loading="lazy">`:`<span class="nm-av nm-av-ph" aria-hidden="true">${_avIni(p)}</span>`}<span class="nm ${plNameClass(p)}">${getDisplayName(p)||''}</span>${!_multiSelMode?'<span class="ni">›</span>':''}</div>
       </td>
       <td class="c2" style="padding:4px;cursor:pointer;" onclick="openPlayerFromMain(${origPi})" title="Profil öffnen">${pcHtml(p)}</td>
       ${cells}
@@ -10749,7 +10765,8 @@ function mxHead(){
     const s=c.it.s,si=c.it.si,isMat=s.type==='match',isNext=si===nextIdx;
     const parts=s.date.split(' ');const dow=parts[0]||'';const dmy=parts[1]||s.date;
     r2+=`<th class="dth${isMat?' match-col':''}${isNext?' next-col':''}"${dm?` data-mx="${dm}"`:''} data-wk="${c.w.wk}" onclick="openSessFromMain(${si})">`;
-    r2+=`<span class="ddow">${isMat?'⚽':''} ${dow}</span>`;
+    const isToday=c.it.k===todaySK();
+    r2+=`<span class="ddow">${isMat?'⚽':''} ${isToday?'<b class="dtoday">heute</b>':dow}</span>`;
     r2+=`<span class="dnum">${dmy}</span>`;
     if(!ro)r2+=`<button class="dcb" onclick="event.stopPropagation();delSess(${si})">✕</button>`;
     r2+=`</th>`;
@@ -10836,7 +10853,7 @@ function mxBody(){
     rows.push(`<tr class="${_multiSelMode&&_multiSelIds.has(origPi)?'msel-row':''}">
       <td class="tdl c0">${!ro?`<input class="nri" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="${p.nr||''}" onclick="event.stopPropagation();this.select();" onchange="updNr(${origPi},this.value)" onblur="updNr(${origPi},this.value)" onkeydown="if(event.key==='Enter'){this.blur();event.preventDefault();}" title="Trikotnummer bearbeiten"/>`:`<span style="font-weight:700;color:var(--bm);">${p.nr||''}</span>`}</td>
       <td class="tdl c1" onclick="${_multiSelMode?`multiSelectToggle(${origPi})`:`openPlayerFromMain(${origPi})`}" style="cursor:pointer;">
-        <div class="ncell">${_multiSelMode?`<input type="checkbox" class="msel-cb" data-pi="${origPi}" ${_multiSelIds.has(origPi)?'checked':''} onclick="event.stopPropagation();multiSelectToggle(${origPi})" style="margin-right:6px;width:16px;height:16px;cursor:pointer;"/>`:''}${p.photo?`<img class="nm-av" src="${p.photo}" alt="" loading="lazy">`:'<span class="nm-av nm-av-ph"></span>'}<span class="nm ${plNameClass(p)}">${getDisplayName(p)||''}</span>${!_multiSelMode?'<span class="ni">›</span>':''}</div>
+        <div class="ncell">${_multiSelMode?`<input type="checkbox" class="msel-cb" data-pi="${origPi}" ${_multiSelIds.has(origPi)?'checked':''} onclick="event.stopPropagation();multiSelectToggle(${origPi})" style="margin-right:6px;width:16px;height:16px;cursor:pointer;"/>`:''}${p.photo?`<img class="nm-av" src="${p.photo}" alt="" loading="lazy">`:`<span class="nm-av nm-av-ph" aria-hidden="true">${_avIni(p)}</span>`}<span class="nm ${plNameClass(p)}">${getDisplayName(p)||''}</span>${!_multiSelMode?'<span class="ni">›</span>':''}</div>
       </td>
       <td class="c2" style="padding:4px;cursor:pointer;" onclick="openPlayerFromMain(${origPi})" title="Profil öffnen">${pcHtml(p)}</td>
       <td class="c3 mx-pct" data-mxp="${origPi}" style="color:${_mxPctCol(r)};">${r==null?'–':r+'%'}</td>
