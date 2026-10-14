@@ -3486,6 +3486,65 @@ body.design-heute.theme-dark #moSettings{background:#0b1730;}
 body.design-heute.theme-dark .set-nav-it.on,body.design-heute.theme-dark .set-nav-it.on small{color:var(--hx-ink);}
 body.design-heute #hxNav .hx-item.sub.on{color:var(--hx-ink);}
 body.design-heute.theme-dark .set-nav-it,body.design-heute.theme-dark .set-sec-h,body.design-heute.theme-dark .set-link{color:#dde5f0;}
+/* ════════════════════════════════════════════════════════════════
+   DESIGN "HEUTE" — PAGES (.mo.hx-page): big windows open as a page next
+   to the side navigation (desktop) or full screen above the bottom bar
+   (phone) instead of a floating box. Dialogs opened from a page (player,
+   session, add form) sit above it: pages 480, dialogs 500.
+   Klassisch never sees these rules — the class alone changes nothing.
+   ════════════════════════════════════════════════════════════════ */
+body.design-heute .mo.hx-page{z-index:480;background:var(--hx-ground);backdrop-filter:none;align-items:stretch;justify-content:stretch;}
+body.design-heute .mo.hx-page > .mob{width:100% !important;max-width:none !important;height:100% !important;max-height:none !important;border-radius:0;box-shadow:none;background:transparent !important;animation:none;box-sizing:border-box;}
+body.design-heute .mo.hx-page > .mob::before{display:none;}
+body.design-heute.theme-dark .mo.hx-page{background:#0b1730;}
+body.design-heute #mobSheet{z-index:490;}
+@media(min-width:768px){body.design-heute .mo.hx-page{left:232px;}}
+
+/* ── Kader page (#moTeamMgr) ── */
+body.design-heute #moTeamMgr > .mob{padding:30px 40px 28px !important;}
+body.design-heute #moTeamMgr > .mob > *{width:100%;max-width:1040px;box-sizing:border-box;}
+body.design-heute #moTeamMgr > .mob > div:first-child{position:static;margin:0 0 16px;padding:0;background:none;border:none;z-index:auto;}
+body.design-heute #moTeamMgr #tmgr-h{font-family:var(--hx-num);font-weight:800;font-size:2rem;letter-spacing:.2px;color:var(--hx-ink);line-height:1.1;}
+body.design-heute #moTeamMgr #tmgr-back{display:none !important;}
+body.design-heute #moTeamMgr #tmgr-close-top{display:flex !important;border-radius:999px;width:40px;height:40px;padding:0;align-items:center;justify-content:center;background:#fff;border:1px solid var(--hx-line);color:var(--hx-ink);}
+body.design-heute #moTeamMgr .tbar{border-bottom:none;gap:6px;margin:0 0 14px;padding:2px 0;}
+body.design-heute #moTeamMgr .tbtn{padding:8px 15px;border-radius:999px;background:#fff;border:1px solid var(--hx-line);margin:0;color:var(--hx-ink2);text-transform:none;font-size:.86rem;font-weight:600;letter-spacing:0;}
+body.design-heute #moTeamMgr .tbtn:hover{border-color:var(--hx-ink2);color:var(--hx-ink);}
+body.design-heute #moTeamMgr .tbtn.active{background:var(--hx-ink);border-color:var(--hx-ink);color:#fff;}
+body.design-heute #moTeamMgr .tpanel.active{background:#fff;border-radius:18px;box-shadow:var(--hx-shadow);padding:14px 16px;overflow-y:auto;}
+body.design-heute #moTeamMgr .tmgr-foot{display:none !important;}
+body.design-heute #moTeamMgr #tmgr-pl-list,body.design-heute #moTeamMgr #tmgr-sess-list,body.design-heute #moTeamMgr #tmgr-match-list{border:none !important;border-radius:0 !important;margin-bottom:0 !important;}
+body.design-heute #tmgr-pl-list > div:first-child{background:var(--hx-ground) !important;border-radius:10px !important;padding:7px 10px !important;margin-bottom:4px;}
+body.design-heute #tmgr-pl-list > div:first-child > div{color:var(--hx-muted) !important;}
+body.design-heute #moTeamMgr .pl-row{padding:8px 10px;border-bottom-color:var(--hx-line);font-size:.84rem;}
+body.design-heute #moTeamMgr .pl-row:nth-child(even){background:none;}
+body.design-heute #moTeamMgr .pl-row:hover{background:var(--hx-ground);}
+body.design-heute #moTeamMgr .pl-nr{color:var(--hx-ink2);}
+body.design-heute #moTeamMgr .pl-name{color:var(--hx-ink);}
+body.design-heute #moTeamMgr .pl-btn{padding:5px 9px;border-radius:8px;font-size:.72rem;}
+body.design-heute #moTeamMgr .tpanel .mob-btns{border-top:1px solid var(--hx-line);padding:12px 0 0;margin:12px 0 0;gap:8px;justify-content:flex-end;background:none;position:static;}
+body.design-heute #moTeamMgr .tpanel .mob-btns .btn{border-radius:999px;min-height:40px;padding:0 16px;font-size:.84rem;font-weight:600;flex:0 0 auto;}
+body.design-heute #moTeamMgr #btn-mgr-teamlink,body.design-heute #moTeamMgr .tpanel .mob-btns .btn[onclick^="exportPlayersCSV"]{background:#fff !important;color:var(--hx-ink) !important;border:1px solid var(--hx-line) !important;}
+body.design-heute #moTeamMgr #btn-mgr-addpl{order:9;}
+body.design-heute #moTeamMgr .tpanel .note{color:var(--hx-muted);}
+body.design-heute.theme-dark #moTeamMgr .tpanel.active{background:#15264a;}
+body.design-heute.theme-dark #moTeamMgr #tmgr-h{color:#fff;}
+body.design-heute.theme-dark #moTeamMgr .pl-row:hover{background:#1a2f5a;}
+@media(max-width:767px){
+  body.design-heute #moTeamMgr{bottom:var(--mob-nav-h,62px);}
+  body.design-heute #moTeamMgr > .mob{padding:0 !important;}
+  body.design-heute #moTeamMgr > .mob > *{max-width:none;}
+  body.design-heute #moTeamMgr > .mob > div:first-child{margin:0;padding:calc(10px + env(safe-area-inset-top,0px)) 12px 10px 16px;background:#0E2350;}
+  body.design-heute #moTeamMgr #tmgr-h{color:#fff;font-size:1.6rem;}
+  body.design-heute #moTeamMgr #tmgr-close-top{width:38px;height:38px;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff;}
+  body.design-heute #moTeamMgr .tbar{margin:0;padding:10px 12px;}
+  body.design-heute #moTeamMgr .tbtn{padding:7px 13px;font-size:.82rem;}
+  body.design-heute #moTeamMgr .tpanel.active{margin:0 12px 12px;width:auto;border-radius:16px;padding:10px 12px;}
+  body.design-heute #moTeamMgr .pl-row{padding:8px 4px;}
+  body.design-heute #moTeamMgr .tpanel .mob-btns{flex-wrap:wrap;margin:10px 0 0;padding:10px 0 0;}
+  body.design-heute #moTeamMgr .tpanel .mob-btns .btn{flex:1 1 40%;min-height:44px;padding:0 10px;font-size:.82rem;}
+  body.design-heute #moTeamMgr #btn-mgr-addpl{order:-1;flex:1 1 100%;}
+}
 #hxNav,#hxHome{display:none;}
 body.design-heute{
   --hx-ink:#0E2350;--hx-ink2:#3A4A6B;--hx-muted:#4E5D7C;--hx-ground:#F2F4F8;--hx-line:#DCE3EE;
@@ -3676,7 +3735,6 @@ body.design-heute .hx-tile.open{background:#EDF1F7;}
   body.design-heute .footer{background:transparent!important;border-top:none!important;}
 }
 /* The "Mehr" sheet and its pickers must open above the start screen */
-body.design-heute #mobSheet{z-index:470;}
 /* Above the tab bar now, so its own bottom inset must clear nothing; keep it scrollable */
 body.design-heute #mobSheet .ms-panel{max-height:85vh;overflow-y:auto;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));}
 
@@ -4759,7 +4817,7 @@ if(window._fbBlocked){
 </div></div>
 
 <!-- Team Manager -->
-<div class="mo" id="moTeamMgr"><div class="mob" style="width:600px;height:min(78vh,620px);display:flex;flex-direction:column;">
+<div class="mo hx-page" id="moTeamMgr"><div class="mob" style="width:600px;height:min(78vh,620px);display:flex;flex-direction:column;">
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
     <h3 id="tmgr-h" style="margin:0;flex:1;">Mannschaft</h3>
     <button class="btn" id="tmgr-back" style="font-size:.76rem;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" onclick="teamMgrGoBack()">← Zurück</button>
@@ -4776,7 +4834,7 @@ if(window._fbBlocked){
   <div class="tpanel active" id="tab-spieler">
     <div class="tmgr-scroll" style="border:1px solid var(--gl);border-radius:8px;margin-bottom:10px;" id="tmgr-pl-list"></div>
     <div class="mob-btns">
-      <button class="btn bp" id="btn-mgr-addpl" onclick="closeM('moTeamMgr');openM('moAddPlayer');" style="display:none;">＋ Spieler</button>
+      <button class="btn bp" id="btn-mgr-addpl" onclick="_tmLeave();openM('moAddPlayer');" style="display:none;">＋ Spieler</button>
       <button class="btn" id="btn-mgr-teamlink" onclick="copyTeamLink()" style="display:none;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" title="Ein Link für die ganze Mannschaft — einmal in die Gruppe geben, jeder wählt sich selbst aus">🔗 Spieler-Menü-Link</button>
       <button class="btn" onclick="exportPlayersCSV()" style="background:var(--gd);color:#fff;" title="Spielerdaten als CSV exportieren (Trikotverwaltung-Format)">⬇ CSV-Export</button>
       
@@ -4946,7 +5004,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791935766224; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791936853354; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -20839,6 +20897,7 @@ function homeEligible(){
 // Drives the fixed bottom bar. Every entry reuses the SAME functions the
 // desktop toolbar calls — this is a different surface, not a parallel app.
 function mobNav(what){
+  if(_hxOn()&&what!=='more')_hxClosePages(what==='team'?'moTeamMgr':'');
   switch(what){
     case 'home': mobSheetClose(); if(typeof homeOpen==='function')homeOpen(); break;
     case 'list': mobSheetClose(); if(typeof homeClose==='function')homeClose(); break;
@@ -20907,10 +20966,25 @@ function hxRenderNav(){
   const badge=document.getElementById('notifBadge'),dot=document.getElementById('hxBellDot');
   if(dot)dot.classList.toggle('on',!!(badge&&badge.textContent&&badge.textContent.trim()&&badge.textContent.trim()!=='0'));
 }
+// Pages: big windows that open beside the side navigation (desktop) or above
+// the bottom bar (phone) instead of floating in the middle. One page at a
+// time; going somewhere else in the navigation closes it.
+const HX_PAGE={settings:'moSettings',team:'moTeamMgr'};
+function _hxOpenPage(){
+  for(const k in HX_PAGE){const el=document.getElementById(HX_PAGE[k]);if(el&&el.classList.contains('open'))return{k,el};}
+  return null;
+}
+function _hxClosePages(keepId){
+  document.querySelectorAll('.mo.hx-page.open').forEach(el=>{if(el.id!==keepId)closeM(el.id);});
+}
+function _hxPageSync(){
+  if(typeof _mobNavSync==='function'&&typeof _mobCurrentView==='function')_mobNavSync(_mobCurrentView());
+  else if(typeof hxSyncNav==='function')hxSyncNav();
+}
 function hxSyncNav(){
   const ov=document.getElementById('homeOverlay');
-  const so=document.getElementById('moSettings');
-  const cur=(so&&so.classList.contains('open'))?'settings':(ov&&ov.classList.contains('open'))?'home':'table';
+  const pg=_hxOpenPage();
+  const cur=pg?pg.k:(ov&&ov.classList.contains('open'))?'home':'table';
   document.querySelectorAll('#hxNav .hx-item[data-hx]').forEach(b=>{
     const on=b.dataset.hx===cur;
     b.classList.toggle('on',on);
@@ -20919,7 +20993,7 @@ function hxSyncNav(){
 }
 function hxGo(k){
   closeUserMenuIfOpen&&closeUserMenuIfOpen();
-  if(k!=='settings'){const so=document.getElementById('moSettings');if(so&&so.classList.contains('open'))closeM('moSettings');}
+  _hxClosePages(HX_PAGE[k]);
   switch(k){
     case 'home':homeOpen();break;
     case 'table':homeClose();break;
@@ -21252,6 +21326,7 @@ function mobSheetClose(){
 }
 function _mobCurrentView(){
   const home=document.getElementById('homeOverlay');
+  if(typeof _hxOn==='function'&&_hxOn()){const tm=document.getElementById('moTeamMgr');if(tm&&tm.classList.contains('open'))return 'team';}
   if(home&&home.classList.contains('open'))return 'home';
   return 'list';
 }
@@ -21736,6 +21811,21 @@ function openTeamMgr(tab,fromId){
   navPush({id:fromId||'main'});
   openM('moTeamMgr');switchTab(tab||'spieler');
 }
+// Leaving the team window for a player, a session or the add form.
+// Klassisch: the window closes and "Zurück" there returns to it (nav stack).
+// Design "Heute": the Kader is a page — the dialog opens on top of it and the
+// page simply stays underneath, so nothing is pushed and nothing closes.
+function _hxOn(){return document.body.classList.contains('design-heute');}
+function _tmLeave(tab){
+  if(_hxOn())return;
+  if(tab)navPush({id:'moTeamMgr',tab});
+  closeM('moTeamMgr');
+}
+// Heute: a dialog over the Kader page closed → the page shows current data.
+function _tmRefresh(){
+  const a=document.querySelector('#moTeamMgr .tpanel.active');
+  if(a&&a.id)switchTab(a.id.replace('tab-',''));
+}
 
 function renderMgrSessions(type){
   const D=cd(),ss=D.sessions.filter(s=>s.type===type);
@@ -21750,7 +21840,7 @@ function renderMgrSessions(type){
     const bc=pct>=80?'var(--cp)':pct>=60?'var(--ce)':'var(--ca)';
     const extra=type==='match'?(s.label?' – '+s.label:''):(s.focus?' · '+s.focus:'');
     const linkHtml=s.planLink?`<a href="${s.planLink}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="font-size:.68rem;color:var(--bm);flex-shrink:0;">🔗</a>`:'';
-    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--gl);font-size:.8rem;cursor:pointer;" onclick="navPush({id:'moTeamMgr',tab:'${type==='training'?'trainings':'spiele'}'}); closeM('moTeamMgr');openSessStats(${origIdx})">
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--gl);font-size:.8rem;cursor:pointer;" onclick="_tmLeave('${type==='training'?'trainings':'spiele'}');openSessStats(${origIdx})">
       <div style="font-weight:600;color:var(--bd);width:72px;">${s.date}</div>
       ${type==='match'?`<div style="font-size:.68rem;padding:1px 6px;border-radius:6px;background:rgba(176,48,0,.1);color:var(--mc1);">${s.homeAway==='home'?'🏠':'🚌'}</div>`:''}
       <div style="flex:1;color:var(--gd);">${extra}</div>
@@ -21774,7 +21864,7 @@ function switchTab(t){
     document.querySelectorAll('#moTeamMgr .tbtn')[i]?.classList.toggle('active',n===t);
     document.getElementById('tab-'+n)?.classList.toggle('active',n===t);
   });
-  document.getElementById('tmgr-h').textContent={spieler:'👥 Spieler',trainer:'🎽 Trainer',schwerpunkte:'🎯 Schwerpunkte',statistik:'📊 Statistik',trainings:'📅 Trainingseinheiten',spiele:'⚽ Spiele'}[t]||'Mannschaft';
+  document.getElementById('tmgr-h').textContent=_hxOn()?'Kader':{spieler:'👥 Spieler',trainer:'🎽 Trainer',schwerpunkte:'🎯 Schwerpunkte',statistik:'📊 Statistik',trainings:'📅 Trainingseinheiten',spiele:'⚽ Spiele'}[t]||'Mannschaft';
   if(t==='spieler')renderMgrPlayers();
   if(t==='trainer'){document.getElementById('mgr-team-lbl').textContent=UI.currentTeam;renderMgrTrainers();buildTeamChecks('tTeamChecks');}
   if(t==='schwerpunkte')renderFocList();
@@ -21842,14 +21932,14 @@ function renderMgrPlayers(){
     sortHdr+sortedP.map((p)=>{const i=D.players.indexOf(p);
       // All non-functional zones of the row (nr/avatar/name/pos) open the profile.
       // Functional buttons (✎ / ✕) keep their own onclick + stopPropagation.
-      const openHandler=`navPush({id:'moTeamMgr',tab:'spieler'});closeM('moTeamMgr');openPlayerStats(${i});`;
+      const openHandler=`_tmLeave('spieler');openPlayerStats(${i});`;
       return`<div class="pl-row">
       <div class="pl-nr" style="cursor:pointer;" onclick="${openHandler}">${p.nr||''}</div>
       <div style="flex-shrink:0;cursor:pointer;" onclick="${openHandler}" title="Profil \u00f6ffnen">${renderPlayerAvatar(p,32)}</div>
       <div class="pl-name" style="cursor:pointer;" onclick="${openHandler}">${p.name||''}</div>
       <div class="pl-pos" style="cursor:pointer;" onclick="${openHandler}" title="Profil \u00f6ffnen">${pbHtml(p)}</div>
       <div class="pl-btns">
-        <button class="pl-btn pl-btn-e" title="Bearbeiten" onclick="event.stopPropagation();navPush({id:'moTeamMgr',tab:'spieler'});closeM('moTeamMgr');openPlayerStats(${i},{edit:true});">✎</button>
+        <button class="pl-btn pl-btn-e" title="Bearbeiten" onclick="event.stopPropagation();_tmLeave('spieler');openPlayerStats(${i},{edit:true});">✎</button>
         ${canEdit()?`<button class="pl-btn pl-btn-d" onclick="event.stopPropagation();mgrDelPl(${i})">✕</button>`:''}
       </div>
     </div>`;}).join('')
@@ -22474,7 +22564,7 @@ function renderMgrStats(){
       ${mS?th('mPct','S%')+th('mA','S-A')+th('mPl','S-∑'):''}
     </tr></thead><tbody>
     ${rows.map(r=>{const bc=pctColor(r.tPct);
-      const openHandler=`navPush({id:'moTeamMgr',tab:'statistik'});closeM('moTeamMgr');openPlayerStats(${r.pi});`;
+      const openHandler=`_tmLeave('statistik');openPlayerStats(${r.pi});`;
       const perfColor=r.perfAvg==null?'var(--gm)':r.perfAvg<=1.5?'#1a7a40':r.perfAvg<=2.5?'#0d3d80':'#a56a0a';
       return`<tr style="cursor:pointer;" onclick="${openHandler}">
       <td>${r.nr}</td>
@@ -24423,6 +24513,7 @@ function openM(id){
   }
   if(id==='moAdmin'){switchAdminTab('trainers');}
   if(id==='moTeamMgr')switchTab('spieler');
+  if(_moEl.classList.contains('hx-page')&&typeof _hxOn==='function'&&_hxOn()&&typeof _hxPageSync==='function')_hxPageSync();
 }
 var _closingPlanner=false;   // var: closeM runs before the planners are defined
 function closeM(id){
@@ -24440,6 +24531,12 @@ function closeM(id){
     return;
   }
   document.getElementById(id).classList.remove('open');
+  // Design "Heute": pages stay under dialogs — refresh the Kader page when a
+  // dialog opened from it closes, and move the nav highlight when a page closes.
+  if(typeof _hxOn==='function'&&_hxOn()){
+    if(['moPlayer','moSession2','moAddPlayer'].includes(id)){const tm=document.getElementById('moTeamMgr');if(tm&&tm.classList.contains('open'))_tmRefresh();}
+    if(document.getElementById(id).classList.contains('hx-page')&&typeof _hxPageSync==='function')_hxPageSync();
+  }
   // Reset presence context when closing main editing modals
   if(['moSession2','moLineup','moSeasonLineup','moPlayer','moCalendar'].includes(id)){
     if(typeof setPresenceContext==='function')setPresenceContext('');
@@ -30464,7 +30561,7 @@ _pubCleanupSchedule();
      its old id, so the functions behind them did not change. Desktop: categories on the left. Phone: the
      category list first, a category opens as its own page with a back arrow. In design "Heute" the window is
      a page next to the side navigation instead of a floating box. -->
-<div class="mo set-mo" id="moSettings"><div class="mob set-mob">
+<div class="mo set-mo hx-page" id="moSettings"><div class="mob set-mob">
   <div class="set-hd">
     <button type="button" class="set-back" onclick="settingsBack()" aria-label="Zurück">‹</button>
     <h3 class="set-title" id="set-title">⚙️ Einstellungen</h3>
