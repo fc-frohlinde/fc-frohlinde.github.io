@@ -3621,6 +3621,11 @@ body.design-heute #moSettings #set-host-audit .db-sel{border-radius:999px !impor
   body.design-heute .mo.hx-full > .mob{display:flex !important;flex-direction:column;overflow-y:auto;}
   body.design-heute .mo.hx-full > .mob > :last-child{margin-top:auto !important;padding-top:10px;}
 }
+/* ── Heute: training planner in Heute type and colours (full screen as before) ── */
+body.design-heute:not(.theme-dark) .tpl-ov{--tp-navy:#0E2350;--tp-yel:#F2C230;--tp-bg:#E8EDF5;}
+body.design-heute :is(.tpl-ttl h2,.tpl-h3,.tpl-bm,.tpl-in-title,.tpl-empty h4,.tpl-dlg h4,.tpl-gyes .big,.tpl-gstep span,.tpl-gh b,.tpl-gp .nr,.tpp-timer,.tpp-title,.tpp-stats b,.tpp-cm){font-family:var(--hx-num);font-weight:800;letter-spacing:.2px;}
+body.design-heute .tpl-x{border-radius:999px;}
+body.design-heute .hx-btn.hx-plan-on{border-color:var(--hx-ok);color:var(--hx-ok);}
 /* ── Kader page (#moTeamMgr) ── */
 body.design-heute #moTeamMgr > .mob{padding:30px 40px 28px !important;}
 body.design-heute #moTeamMgr > .mob > *{width:100%;max-width:1040px;box-sizing:border-box;}
@@ -5120,7 +5125,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791941769876; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791942869899; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -21182,6 +21187,7 @@ function hxRender(){
     else btns+=`<button type="button" class="hx-btn primary" onclick="openSessFromMain(${fi})">Termin öffnen</button>`;
     if(isM)btns+=`<button type="button" class="hx-btn" onclick="openLineupPlanner(${fi})">Aufstellung planen</button>`;
     else if(s.planLink)btns+=`<a class="hx-btn" href="${esc(s.planLink)}" target="_blank" rel="noopener">Trainingsplan</a>`;
+    if(!isM&&typeof _tplHomeBtn==='function')btns+=_tplHomeBtn(fi);
     if(roll)btns+=`<button type="button" class="hx-btn" onclick="openSessFromMain(${fi})">Termin öffnen</button>`;
     html+=`<section class="hx-card" aria-label="Nächster Termin">
       <div class="hx-focus-head"><div>
@@ -26769,6 +26775,25 @@ function tplKey(e){
   if(k==='z'&&!e.shiftKey)tplUndo();
 }
 
+// ── Heute start screen: the next training card says whether a plan exists
+// and opens the planner directly. Same tiny index as the session window.
+function _tplHomeBtn(si){
+  if(!_tplAllowed())return '';
+  const D=cd();const s=D&&D.sessions&&D.sessions[si];
+  if(!s||s.type==='match')return '';
+  const team=UI.currentTeam,idx=TPL.idxCache[team];
+  const e=(s.pid&&idx)?idx[s.pid]:null;
+  if(s.pid&&!idx&&typeof fbDb!=='undefined'&&fbDb&&!TPL.idxCache['__'+team]){
+    TPL.idxCache['__'+team]=1; // one request per team and page load
+    _tplRead(_tplBase(team)+'/idx').then(v=>{
+      if(!TPL.idxCache[team])TPL.idxCache[team]=(v&&typeof v==='object')?v:{};
+      if(typeof hxOn==='function'&&hxOn()&&typeof hxRender==='function')hxRender();
+    }).catch(()=>{});
+  }
+  const has=!!(s.pid&&(!e||e.n>0));
+  const lbl=!has?'Plan erstellen':(e&&e.n?`Plan · ${e.n} ${e.n===1?'Block':'Blöcke'} · ${e.m}′`:'Plan öffnen');
+  return `<button type="button" class="hx-btn${has?' hx-plan-on':''}" onclick="tplOpen(${si})">${lbl}</button>`;
+}
 // ── Session window entry point
 function _tplSyncSessBtn(si){
   const w=document.getElementById('ss-plan-btn-wrap');if(!w)return;
