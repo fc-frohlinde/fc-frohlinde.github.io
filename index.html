@@ -5494,13 +5494,17 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.1.0'; // v1.1.0: new design only, planner for trainers (read-only), home-screen icon
-const APP_VERSION_LABEL='1.1.0';
+const APP_VERSION='1.1.1'; // v1.1.1: Kader-Tafel
+const APP_VERSION_LABEL='1.1.1';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791990025642; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791990575102; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.1.1',date:'14.10.2026',title:'Kader-Tafel',items:[
+    {icon:'📋',title:'Kader als Tafel',desc:'Im Kader gibt es den neuen Reiter „Tafel“: die Mannschaft nach Linien (Tor, Abwehr, Mittelfeld, Angriff) für einen Termin. Pro Linie siehst du, wie viele zugesagt haben, pro Spieler den Status und die letzten fünf Termine als Punkte. Oben wählst du den Termin.'},
+    {icon:'⚽',title:'Aufstellung aus Zusagen',desc:'Bei Spielen füllt der Knopf „Aufstellung aus Zusagen“ die Aufstellung mit den Spielern, die zugesagt haben, passend zu ihren Positionen; der Rest kommt auf die Bank. Bereits gesetzte Spieler bleiben. Gespeichert wird erst, wenn du speicherst.'},
+  ]},
   {version:'1.1.0',date:'14.10.2026',title:'Neues Design',items:[
     {icon:'🧭',title:'Neues Design für alle',desc:'Die Übersicht zeigt den nächsten Termin, das nächste Spiel, diese und letzte Woche. Die Navigation sitzt an der Seite (auf dem Handy unten), Bereiche öffnen als Seiten statt als Fenster. Das alte Design gibt es nicht mehr.'},
     {icon:'👋',title:'Begrüßung',desc:'Auf der Übersicht begrüßt dich die App mit deinem Vornamen, je nach Tageszeit.'},
@@ -22185,9 +22189,9 @@ function switchTab(t){
 // The squad by lines — Tor, Abwehr, Mittelfeld, Angriff — for one date: who
 // is available, who is not, and how reliably each one came lately. On a
 // match day "Aufstellung aus Zusagen" fills the lineup from the available
-// players by position. Preview for the admin first; set
-// KB_PREVIEW_ADMIN_ONLY=false to open it for every trainer.
-const KB_PREVIEW_ADMIN_ONLY=true;
+// players by position. Open for everyone in the trainer app; set
+// KB_PREVIEW_ADMIN_ONLY=true to limit it to the admin again.
+const KB_PREVIEW_ADMIN_ONLY=false;
 const KB={si:null,team:null,season:null};
 function _kbOn(){
   if(typeof isPlayerMode==='function'&&isPlayerMode())return false;
