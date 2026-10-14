@@ -342,13 +342,7 @@ body.compact .toolbar{padding:3px 14px !important;}
    the screen. Now the pill row gives way first and scrolls inside itself,
    while everything else keeps its place however many teams exist. */
 .team-bar-wrap{flex:0 0 auto;}
-.team-pick{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.08);
-  border:1px solid rgba(255,255,255,.16);color:#fff;border-radius:var(--r-pill);
-  padding:4px 11px;font-family:'Barlow',sans-serif;font-size:.72rem;font-weight:700;
-  letter-spacing:.6px;text-transform:uppercase;cursor:pointer;min-height:26px;
-  max-width:180px;white-space:nowrap;overflow:hidden;}
-.team-pick:hover{background:rgba(255,255,255,.16);}
-.team-pick-caret{opacity:.6;font-size:.6rem;}
+
 /* The list itself is a popup, so team count changes its height, never the
    width of the toolbar. */
 .team-tabs{display:none;position:fixed;z-index:600;flex-direction:column;gap:2px;
@@ -418,10 +412,9 @@ body.compact .toolbar{padding:3px 14px !important;}
 /* Labels at .72 measured 4.34:1 against the toolbar while everything around
    them is solid white — they read as dimmed until hovered. Full white for the
    text, and a slightly stronger surface so the buttons still sit as buttons. */
-.toolbar .btb,.toolbar .bteam,.toolbar .bundo,.toolbar .bs{
+.toolbar .bundo,.toolbar .bs{
   background:rgba(255,255,255,.08);color:#fff;
   border:1px solid rgba(255,255,255,.16);transition:background .12s,border-color .12s,color .12s;}
-.toolbar .btb:hover,.toolbar .bteam:hover,
 .toolbar .bs:hover{
   background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.3);color:#fff;}
 /* Disabled undo/redo must stay visibly inert */
@@ -440,10 +433,9 @@ body.compact .toolbar{padding:3px 14px !important;}
 .bs-dark:hover{background:rgba(255,255,255,.18);}.bs:hover{background:rgba(255,255,255,.2);}
 .bd{background:rgba(231,76,60,.13);color:#ff9080;border:1px solid rgba(231,76,60,.27);}.bd:hover{background:rgba(231,76,60,.27);}
 .bm{background:rgba(176,48,0,.15);color:#ffc0a0;border:1px solid rgba(176,48,0,.3);}.bm:hover{background:rgba(176,48,0,.3);}
-.bteam{background:rgba(255,255,255,.07);color:rgba(255,255,255,.68);border:1px solid rgba(255,255,255,.14);}.bteam:hover{background:color-mix(in srgb, var(--ac) 22%, transparent);}
 
 .bundo{background:rgba(255,255,255,.07);color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.13);}.bundo:hover{background:rgba(255,255,255,.15);}.bundo:disabled{opacity:.25;cursor:default;}
-.tsep{width:1px;height:18px;background:rgba(255,255,255,.15);margin:0 1px;}
+
 .saved{font-size:.68rem;color:#7ec8a0;opacity:0;transition:opacity .4s;}.saved.show{opacity:1;}
 
 /* LEGEND */
@@ -2942,13 +2934,12 @@ body.design-kabine .uname{color:var(--d-ink)!important;}
 
 /* ── Toolbar: one quiet row, no gradient ── */
 body.design-kabine .toolbar{background:var(--d-panel);border-bottom:1px solid var(--d-line);padding:6px 20px;}
-body.design-kabine .toolbar .bs,body.design-kabine .toolbar .btb,body.design-kabine .toolbar .bteam{
+body.design-kabine .toolbar .bs{
   background:transparent!important;border:1px solid transparent!important;color:var(--d-text)!important;font-weight:600;box-shadow:none!important;}
-body.design-kabine .toolbar .bs:hover,body.design-kabine .toolbar .btb:hover,body.design-kabine .toolbar .bteam:hover{
+body.design-kabine .toolbar .bs:hover{
   background:var(--d-panel2)!important;border-color:var(--d-line)!important;}
 body.design-kabine .toolbar .bundo{background:transparent!important;border-color:transparent!important;color:var(--d-muted)!important;}
 body.design-kabine .toolbar #btn-legend{color:var(--d-muted)!important;}
-body.design-kabine .tsep{background:var(--d-line)!important;}
 
 /* ── Table ── */
 body.design-kabine .table-wrap{background:var(--d-panel);}
@@ -3042,9 +3033,6 @@ body.design-kabine .ma-btn.ma-3{background:var(--d-ink);}
 body.design-kabine .ncell .nm{color:var(--d-ink);font-weight:600;}
 
 body.design-kabine .nm-av-ph{background:var(--d-panel2);box-shadow:inset 0 0 0 1px var(--d-line);}
-body.design-kabine .team-pick{background:transparent;border:1px solid var(--d-line);color:var(--d-ink);}
-body.design-kabine .team-pick:hover{background:var(--d-panel2);}
-body.design-kabine .toolbar #btn-home{color:var(--d-muted)!important;}
 
 body.design-kabine .ma-card-av-ph{background:var(--d-panel2);color:var(--d-muted);box-shadow:inset 0 0 0 1px var(--d-line);}
 
@@ -3611,7 +3599,7 @@ body.design-heute .hxv-row:not(.off){display:flex !important;}
 @media(min-width:768px){
   body.design-heute .footer{display:none !important;}
   body.design-heute #toolbarEl.hidden{display:flex !important;}
-  body.design-heute #btn-slp,body.design-heute .toolbar-r .tsep{display:none !important;}
+  
   body.design-heute .toolbar-r{gap:6px;align-items:center;}
   body.design-heute .toolbar-r :is(#undoBtn,#redoBtn,#btn-legend){width:36px;height:36px;padding:0;border-radius:999px;background:var(--hx-field) !important;border:1px solid var(--hx-line) !important;color:var(--hx-ink) !important;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;box-shadow:none;}
   body.design-heute .toolbar-r :is(#undoBtn,#redoBtn):disabled{opacity:.4;}
@@ -3631,11 +3619,7 @@ body.design-heute #viewDropdown2 .vd-check{display:inline-block;flex:0 0 auto;wi
 body.design-heute #viewDropdown2 .vd-check::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(14,35,80,.25);transition:left .15s;}
 body.design-heute #viewDropdown2 .vd-check.on{background:var(--hx-blue);}
 body.design-heute #viewDropdown2 .vd-check.on::after{left:16px;}
-body.design-heute #viewDropdown2 .vd-item[onclick*="toggleSec('hdr')"],
-body.design-heute #viewDropdown2 .vd-item[onclick*="toggleSec('tools')"],
-body.design-heute #viewDropdown2 .vd-item[onclick*="openAppearanceSettings"],
-body.design-heute #vd-startview-sec,
-body.design-heute #vd-multisel + .vd-sep{display:none !important;}
+
 body.design-heute #viewDropdown2 .vd-item span[style*=".76rem"]{font-size:.9rem !important;}
 body.design-heute #viewDropdown2 button[onclick*="zoom("]{width:30px;height:30px;padding:0 !important;border-radius:999px !important;border:1px solid var(--hx-line) !important;background:var(--hx-field) !important;color:var(--hx-ink) !important;font-size:.9rem !important;}
 body.design-heute #viewDropdown2 button[onclick*="zoom("]:hover{background:var(--hx-ground) !important;}
@@ -4228,11 +4212,7 @@ body.design-heute #mobSheet .ms-panel{max-height:85vh;overflow-y:auto;padding-bo
 
 @media(min-width:768px){body.design-heute .toolbar-l::before{content:'Anwesenheit';font-family:var(--hx-num);font-weight:800;font-size:1.55rem;color:var(--hx-ink);padding:2px 6px 0;line-height:1;}}
 /* The side navigation already holds these — the toolbar keeps only the table's own tools */
-@media(min-width:768px){
-  body.design-heute #btn-home,body.design-heute #teamPickBtn,body.design-heute #seasonPickBtn,
-  body.design-heute .toolbar-l .tsep,body.design-heute #btn-next-lineup,body.design-heute .toolbar .bteam,
-  body.design-heute .toolbar button[onclick="openCalendar()"],body.design-heute .toolbar button[onclick="openWeekReport()"]{display:none!important;}
-}
+
 body.design-heute .home-overlay::before,body.design-heute .home-overlay::after{display:none;}
 @media(max-width:767px){
   .hx-ring{display:none;}
@@ -4739,45 +4719,25 @@ if(window._fbBlocked){
 
 <div class="toolbar" id="toolbarEl">
   <div class="toolbar-l">
-    <button class="btn bs" id="btn-home" onclick="homeOpen()" title="Startseite" style="font-size:.95rem;padding:4px 10px;">⌂</button>
+    <!-- Team and season menus: opened from the side navigation (hxTeamMenu,
+         hxSeasonMenu). The drag-to-reorder handler binds to #teamTabs/.ttab;
+         #seasonSel is a hidden select that readers of the season still use. -->
     <div class="team-bar-wrap" id="teamBarWrap">
-      <button class="team-pick" id="teamPickBtn" onclick="event.stopPropagation();toggleTeamMenu()" title="Mannschaft wechseln">
-        <span id="teamPickLbl">–</span><span class="team-pick-caret">▾</span>
-      </button>
-      <!-- id kept: the render code and the drag-to-reorder handler both bind
-           to #teamTabs and .ttab, so the picker inherits both unchanged. -->
       <div class="team-tabs" id="teamTabs"></div>
     </div>
-    <div class="tsep"></div>
     <div class="team-bar-wrap" id="seasonPickWrap">
-      <button class="team-pick" id="seasonPickBtn" onclick="event.stopPropagation();toggleSeasonMenu()" title="Saison wechseln">
-        <span id="seasonPickLbl">–</span><span class="team-pick-caret">▾</span>
-      </button>
-      <!-- The old select plus a ＋ and a ✕ next to it: three controls where the
-           team picker needs one. Kept as a hidden select so switchSeason and
-           every reader of #seasonSel keep working unchanged. -->
       <select class="ssel" id="seasonSel" onchange="switchSeason(this.value)" style="display:none;"></select>
       <div class="team-tabs" id="seasonTabs"></div>
     </div>
-    <div class="tsep"></div>
-    <button class="btn bs" onclick="openCalendar()" title="Kalender">📅 Kalender</button>
-    <button class="btn bs" onclick="openWeekReport()" title="Wochenbericht">📄 Wochenbericht</button>
-    <button class="btn bs" id="btn-next-lineup" onclick="openNextMatchLineup()" style="display:none;" title="Aufstellung für nächstes Spiel planen"><span id="btn-next-lineup-label">⚽ Aufstellung</span></button>
-    <!-- Anmeldungen toolbar button removed: per-session access via session modal's Erinnern button is sufficient -->
   </div>
   <div class="toolbar-r">
     <button class="btn bundo" id="undoBtn" onclick="undo()" disabled title="Rückgängig Ctrl+Z">↩</button>
     <button class="btn bundo" id="redoBtn" onclick="redo()" disabled title="Wiederholen Ctrl+Y">↪</button>
     <span class="saved" id="savedBadge">✓</span>
     <button class="btn" id="btn-legend" onclick="event.stopPropagation();toggleLegendPop(this)" title="Legende" aria-label="Legende">ⓘ</button>
-    <div class="tsep"></div>
-    <button class="btn btb" id="btn-slp" onclick="openSeasonLineup()">📋 Saisonkader</button>
-    <button class="btn bteam" onclick="openTeamMgr('spieler')">🏆 Mannschaft</button>
     <div class="view-menu-wrap" id="viewMenuWrap2">
       <button class="view-menu-btn" onclick="toggleViewMenu2(event)" style="background:var(--bd);color:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.22);font-size:.78rem;padding:5px 12px;">Ansicht</button>
       <div class="view-dropdown" id="viewDropdown2" style="bottom:calc(100% + 5px);top:auto;left:auto;right:0;">
-        <div class="vd-item" onclick="event.stopPropagation();toggleSec('hdr')"><span>Header</span><div class="vd-check on" id="vd2-hdr">✓</div></div>
-        <div class="vd-item" onclick="event.stopPropagation();toggleSec('tools')"><span>Werkzeuge</span><div class="vd-check on" id="vd2-tools">✓</div></div>
         <div class="vd-item hxv-item" id="vd-compact" onclick="event.stopPropagation();setAppCompact(!getAppearance().compact);_syncCompactCheck();"><span>Kompakte Ansicht</span><div class="vd-check" id="vd2-compact"></div></div>
         <div class="vd-item" onclick="event.stopPropagation();toggleSec('photos')"><span>Fotos</span><div class="vd-check on" id="vd2-photos">✓</div></div>
         <div class="vd-sep"></div>
@@ -4795,15 +4755,6 @@ if(window._fbBlocked){
         <div class="vd-item" onclick="event.stopPropagation();toggleHideFuture()">Zukünftige ausblenden<div class="vd-check" id="vd2-hidefuture">–</div></div>
         <div class="vd-sep"></div>
         <div class="vd-item" id="vd-multisel" onclick="event.stopPropagation();document.getElementById('viewDropdown2').classList.remove('open');toggleMultiSelectMode();"><span style="display:flex;align-items:center;gap:6px;">Mehrfach-Auswahl</span><div class="vd-check" id="vd2-multisel"></div></div>
-        <div class="vd-sep"></div>
-        <div id="vd-startview-sec">
-        <div class="vd-sep"></div>
-        <div style="padding:5px 12px 3px;font-size:.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.4);">Start beim Laden</div>
-        <div class="vd-item" id="vd-start-home" onclick="event.stopPropagation();homeSetStartView('home');"><span style="display:flex;align-items:center;gap:6px;">⌂ Startseite</span></div>
-        <div class="vd-item" id="vd-start-table" onclick="event.stopPropagation();homeSetStartView('table');"><span style="display:flex;align-items:center;gap:6px;">📋 Tabelle</span></div>
-        <div class="vd-sep"></div>
-        </div>
-        <div class="vd-item" onclick="event.stopPropagation();document.getElementById('viewDropdown2').classList.remove('open');openAppearanceSettings();"><span style="display:flex;align-items:center;gap:6px;">🎨 Erscheinungsbild</span></div>
       </div>
     </div>
   </div>
@@ -5418,7 +5369,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791959705083; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791960012428; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -5826,26 +5777,6 @@ function openNextMatchLineup(){
   const mi=findNextMatchIdx();
   if(mi<0){alert('Kein kommendes Spiel gefunden.');return;}
   if(typeof openLineupPlanner==='function')openLineupPlanner(mi);
-}
-// Toolbar button visibility + label refresh. Hidden for non-editors or when
-// there's no upcoming match. Label is "⚽ Aufstellung · <Do dd.mm>" with the
-// next match date, so the trainer sees at a glance what's next.
-function _updateNextLineupBtn(){
-  const btn=document.getElementById('btn-next-lineup');
-  if(!btn)return;
-  if(typeof canEdit!=='function'||!canEdit()){btn.style.display='none';return;}
-  const mi=findNextMatchIdx();
-  if(mi<0){btn.style.display='none';return;}
-  const D=cd();
-  const s=D&&D.sessions&&D.sessions[mi];
-  if(!s){btn.style.display='none';return;}
-  // s.date is in format "Do dd.mm" or "Sa dd.mm." — use as-is, trim trailing dot
-  const lblEl=document.getElementById('btn-next-lineup-label');
-  if(lblEl){
-    const datePart=String(s.date||'').replace(/\.$/,'');
-    lblEl.textContent='⚽ Aufstellung \u00b7 '+datePart;
-  }
-  btn.style.display='';
 }
 
 // ══════════════════════════════
@@ -9027,11 +8958,10 @@ function _navCloseLayer(el){
 function _navStackLen(){
   return (typeof _navStack!=='undefined'&&Array.isArray(_navStack))?_navStack.length:0;
 }
-// The configured start view is the root of in-app history: standing on the
-// other one counts as a step back.
+// The start screen is the root of in-app history: standing on the table
+// counts as a step back.
 function _navHomeIsDefault(){
-  if(typeof homeEligible==='function'&&!homeEligible())return false;
-  return (typeof _homeStartViewPref!=='function')||_homeStartViewPref()!=='table';
+  return !(typeof homeEligible==='function'&&!homeEligible());
 }
 function _navHomeOpen(){
   const ov=document.getElementById('homeOverlay');
@@ -9352,8 +9282,7 @@ function showApp(){
   // usual flow. Data may still be syncing from Firebase at this point —
   // homeRender() runs again on open and is cheap, so a slightly stale first
   // paint self-corrects when the user navigates.
-  if(typeof homeEligible==='function'&&homeEligible()&&
-     (typeof _homeStartViewPref!=='function'||_homeStartViewPref()!=='table')){
+  if(typeof homeEligible==='function'&&homeEligible()){
     // On page RELOAD, auto-login runs during initial script evaluation —
     // at that moment the #homeOverlay markup further down the document is
     // not parsed yet, so homeOpen() would find nothing and silently bail
@@ -9366,7 +9295,7 @@ function showApp(){
       _bootVeilHide();
     } else {
       document.addEventListener('DOMContentLoaded',()=>{
-        if(!(typeof _homeStartViewPref==='function'&&_homeStartViewPref()==='table'))homeOpen();
+        homeOpen();
         _bootVeilHide();
       },{once:true});
     }
@@ -10047,10 +9976,6 @@ document.addEventListener('keydown',e=>{
 //  VIEW STATE
 // ══════════════════════════════
 function saveVS(){localStorage.setItem(VIEW_SK,JSON.stringify({colState,zl:zoomLvl}));}
-function toggleSlpBtn(){
-  colState.slpBtn=!colState.slpBtn;
-  saveVS();updateViewChecks();applyCollapse();
-}
 function toggleSec(k){colState[k]=!colState[k];applyCollapse();saveVS();updateViewChecks();}
 function toggleHidePast(){colState.hidePast=!colState.hidePast;saveVS();render();_syncSessVisToggles();}
 function toggleHideFuture(){colState.hideFuture=!colState.hideFuture;saveVS();render();_syncSessVisToggles();}
@@ -10111,7 +10036,7 @@ function updateRegStatusCheck(){
 function plNameClass(p){
   return (p&&p.registered!==true)?'player-unregistered':'';
 }
-function toggleViewMenu2(e){e.stopPropagation();document.getElementById('viewDropdown2').classList.toggle('open');if(typeof _syncStartViewCheck==='function')_syncStartViewCheck();_syncCompactCheck();}
+function toggleViewMenu2(e){e.stopPropagation();document.getElementById('viewDropdown2').classList.toggle('open');_syncCompactCheck();}
 function _syncCompactCheck(){
   const on=!!getAppearance().compact,c=document.getElementById('vd2-compact');
   if(c){c.classList.toggle('on',on);c.textContent=on?'✓':'–';}
@@ -10122,9 +10047,9 @@ document.addEventListener('click',e=>{
 });
 function updateViewChecks(){
   const lbl2=document.getElementById('zoomLbl2');if(lbl2)lbl2.textContent=zoomLvl+'%';
-  ['hdr','tools','photos','slpBtn'].forEach(k=>{
+  ['photos'].forEach(k=>{
     ['vd-','vd2-'].forEach(pfx=>{
-      const eid=pfx+(k==='slpBtn'?'slpbtn':k);
+      const eid=pfx+k;
       const el=document.getElementById(eid);
       if(el){el.classList.toggle('on',colState[k]);el.textContent=colState[k]?'✓':'–';const item=el.closest('.vd-item');if(item)item.classList.toggle('vd-active',colState[k]);}
     });
@@ -10143,8 +10068,6 @@ function applyCollapse(){
   if(colState.photos===undefined)colState.photos=true;
   document.body.classList.toggle('no-photos',!colState.photos);
   document.getElementById('legendEl').classList.toggle('hidden',!colState.legend);
-  const slpBtn=document.getElementById('btn-slp');
-  if(slpBtn)slpBtn.style.display=colState.slpBtn?'':'none';
 }
 // collapseAll/resetCollapse removed with their menu entries: after Tabs and
 // Legende became a picker and a popover, they toggled the same two switches
@@ -10206,7 +10129,6 @@ function render(){
     if(typeof renderMobileAtt==='function')renderMobileAtt();
     applyRoleUI();
     updateUndoBtns();
-    if(typeof _updateNextLineupBtn==='function')_updateNextLineupBtn();
     if(typeof _automationRenderCards==='function')_automationRenderCards();
     if(typeof hxRenderNav==='function')hxRenderNav();
     // Keep Startseite in sync: Firebase sync, undo/redo, team/season switch
@@ -10239,8 +10161,6 @@ function renderTeamBar(){
       ${t}${isAdmin()?`<span class="tdelt" onclick="event.stopPropagation();delTeam('${t}')">✕</span>`:''}
     </button>`).join('')+
     (isAdmin()?`<button class="ttab-add" onclick="closeTeamMenu();openM('moNewTeam')">＋ Neue Mannschaft</button>`:'');
-  const lbl=document.getElementById('teamPickLbl');
-  if(lbl)lbl.textContent=UI.currentTeam||'–';
   // With a single team there is nothing to pick — the button would only take
   // space and state the obvious. This replaces the old "Tabs" toggle, which
   // could hide the picker and leave no way back to another team.
@@ -10249,16 +10169,11 @@ function renderTeamBar(){
     const many=(G.teamList||[]).length>1||isAdmin();
     wrap.style.display=many?'':'none';
   }
-  // Trainer chips on right
-  const trainers=G.trainers.filter(t=>t&&Array.isArray(t.teams)&&t.teams.includes(UI.currentTeam));
-  // trainer strip removed
 }
 
 function renderSeasonSel(){
   const sorted=[...G.seasonList].sort((a,b)=>{const ya=+a.split('/')[0],yb=+b.split('/')[0];return yb-ya;});
   document.getElementById('seasonSel').innerHTML=sorted.map(s=>`<option value="${s}"${s===UI.currentSeason?' selected':''}>${s}</option>`).join('');
-  const lbl=document.getElementById('seasonPickLbl');
-  if(lbl)lbl.textContent=UI.currentSeason||'–';
   const menu=document.getElementById('seasonTabs');
   if(menu){
     menu.innerHTML=sorted.map(s=>`
@@ -10266,16 +10181,6 @@ function renderSeasonSel(){
         ${s}${isAdmin()?`<span class="tdelt" onclick="event.stopPropagation();deleteSeason('${s}')">✕</span>`:''}
       </button>`).join('')
       +(isAdmin()?`<button class="ttab-add" onclick="closeSeasonMenu();openM('moSeason')">＋ Neue Saison</button>`:'');
-  }
-}
-function toggleSeasonMenu(){
-  const m=document.getElementById('seasonTabs');
-  if(!m)return;
-  closeTeamMenu();
-  const open=m.classList.toggle('open');
-  if(open){
-    try{_placePopup(m,document.getElementById('seasonPickBtn').getBoundingClientRect(),{align:'left',gap:4});}catch(e){}
-    setTimeout(()=>document.addEventListener('click',_seasonMenuDocClose,{once:true}),0);
   }
 }
 function closeSeasonMenu(){
@@ -11584,9 +11489,8 @@ async function onPushToggle(el){
 function resetAppearance(){
   if(!confirm('Alle Anzeigeeinstellungen zurücksetzen?'))return;
   saveAppearance(Object.assign({},APPEARANCE_DEFAULTS));
-  // Also reset view-state items shown in this modal (Saisonkader-Button, Vergangene ausblenden)
+  // Also reset the table's "Vergangene ausblenden"
   if(typeof colState!=='undefined'){
-    colState.slpBtn=true;
     colState.hidePast=false;
     if(typeof saveVS==='function')saveVS();
     if(typeof updateViewChecks==='function')updateViewChecks();
@@ -11597,7 +11501,6 @@ function resetAppearance(){
   updateAppearanceUI();
 }
 function updateAppearanceUI(){
-  try{_syncStartViewCheck();}catch(e){}
   const s=getAppearance();
   const hg=document.getElementById('hxSchemeGrid');
   if(hg){
@@ -11609,8 +11512,6 @@ function updateAppearanceUI(){
   document.getElementById('fs-l')?.classList.toggle('active',s.fontScale>1.05);
   const a=document.getElementById('setAnim');if(a)a.checked=s.animations;
   // Saisonkader-Button & Vergangene ausblenden — mirror current colState
-  const sb=document.getElementById('setSlpBtn');if(sb)sb.checked=!!(typeof colState!=='undefined'&&colState.slpBtn!==false);
-  const hp=document.getElementById('setHidePast');if(hp)hp.checked=!!(typeof colState!=='undefined'&&colState.hidePast);
   // Push notifications: reflect both setting and OS-level permission
   const pe=document.getElementById('setPushEnabled');
   const psub=document.getElementById('pushSubLabel');
@@ -11641,8 +11542,6 @@ function updateAppearanceUI(){
   }
 
 }
-function toggleSlpBtnFromSettings(_){toggleSlpBtn();}
-function toggleHidePastFromSettings(_){toggleHidePast();}
 
 function openAppearanceSettings(){openSettings('darstellung');}
 // ── EINSTELLUNGEN — one window with categories ─────────────────
@@ -21922,39 +21821,6 @@ function homeRemoveHeroPhoto(){
   if(typeof _setLogoSync==='function')_setLogoSync();
 }
 // ── Start view preference (per user, cloud-synced) ──
-// 'home' (default): Startseite opens after login. 'table': straight to table.
-// Stored in G.userSettings[name] so it follows the trainer across devices,
-// same pattern as G.userAutomation. Read-only users always get 'home' (no writes).
-function _homeStartViewPref(){
-  // One design, one start: the app always opens on the start screen
-  return 'home';
-}
-function homeSetStartView(v){
-  if(!CU||!canEdit())return;
-  if(!G.userSettings||typeof G.userSettings!=='object')G.userSettings={};
-  const uname=CU.name;
-  if(!G.userSettings[uname]||typeof G.userSettings[uname]!=='object')G.userSettings[uname]={};
-  G.userSettings[uname].startView=(v==='table')?'table':'home';
-  saveG(false);
-  _syncStartViewCheck();
-}
-function _syncStartViewCheck(){
-  // Read-only users can't persist settings — hide the whole chooser for them
-  const sec=document.getElementById('vd-startview-sec');
-  if(sec)sec.style.display=(typeof canEdit==='function'&&canEdit())?'':'none';
-  // Explicit two-option chooser — the selected one carries vd-active
-  // (accent left border + tint), the other stays plain.
-  const cur=_homeStartViewPref();
-  const a=document.getElementById('vd-start-home');
-  const b=document.getElementById('vd-start-table');
-  if(a)a.classList.toggle('vd-active',cur==='home');
-  if(b)b.classList.toggle('vd-active',cur==='table');
-  // Same choice in Einstellungen › Darstellung (design "Heute")
-  const row=document.getElementById('set-startview-row');
-  if(row)row.classList.toggle('off',!(typeof canEdit==='function'&&canEdit()));
-  document.getElementById('sv-home')?.classList.toggle('active',cur==='home');
-  document.getElementById('sv-table')?.classList.toggle('active',cur==='table');
-}
 function openTeamMgr(tab,fromId){
   if(tab==='trainers')tab='trainer';
   // Design "Heute": Kader is people only — the other former tabs have one
@@ -24752,16 +24618,6 @@ function toggleLegendPop(btn){
 function _legendDocClose(){
   const pop=document.getElementById('legendPop');
   if(pop)pop.classList.remove('open');
-}
-function toggleTeamMenu(){
-  const m=document.getElementById('teamTabs');
-  if(!m)return;
-  if(typeof closeSeasonMenu==='function')closeSeasonMenu();
-  const open=m.classList.toggle('open');
-  if(open){
-    try{_placePopup(m,document.getElementById('teamPickBtn').getBoundingClientRect(),{align:'left',gap:4});}catch(e){}
-    setTimeout(()=>document.addEventListener('click',_teamMenuDocClose,{once:true}),0);
-  }
 }
 function closeTeamMenu(){
   const m=document.getElementById('teamTabs');
