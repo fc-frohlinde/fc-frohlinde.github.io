@@ -3738,7 +3738,7 @@ body.design-heute #moTeamMgr .tbtn.active{background:var(--hx-ink);border-color:
 body.design-heute #moTeamMgr .tpanel.active{background:#fff;border-radius:18px;box-shadow:var(--hx-shadow);padding:14px 16px;overflow-y:auto;}
 body.design-heute #moTeamMgr .tmgr-foot{display:none !important;}
 body.design-heute #moTeamMgr #tmgr-pl-list,body.design-heute #moTeamMgr #tmgr-sess-list,body.design-heute #moTeamMgr #tmgr-match-list{border:none !important;border-radius:0 !important;margin-bottom:0 !important;}
-body.design-heute #tmgr-pl-list > div:first-child{background:var(--hx-ground) !important;border-radius:10px !important;padding:7px 10px !important;margin-bottom:4px;}
+body.design-heute #tmgr-pl-list > div:first-child{background:var(--hx-ground) !important;border-radius:10px !important;padding:7px 10px !important;margin-bottom:4px;box-shadow:0 0 0 4px #fff;}
 body.design-heute #tmgr-pl-list > div:first-child > div{color:var(--hx-muted) !important;}
 body.design-heute #moTeamMgr .pl-row{padding:8px 10px;border-bottom-color:var(--hx-line);font-size:.84rem;}
 body.design-heute #moTeamMgr .pl-row:nth-child(even){background:none;}
@@ -3754,6 +3754,7 @@ body.design-heute #moTeamMgr .tpanel .note{color:var(--hx-muted);}
 body.design-heute.theme-dark #moTeamMgr .tpanel.active{background:#15264a;}
 body.design-heute.theme-dark #moTeamMgr #tmgr-h{color:#fff;}
 body.design-heute.theme-dark #moTeamMgr .pl-row:hover{background:#1a2f5a;}
+body.design-heute.theme-dark #tmgr-pl-list > div:first-child{box-shadow:0 0 0 4px #15264a;}
 @media(max-width:767px){
   body.design-heute #moTeamMgr{bottom:var(--mob-nav-h,62px);}
   body.design-heute #moTeamMgr > .mob{padding:0 !important;}
@@ -5223,7 +5224,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791943659366; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791943950708; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -22056,7 +22057,8 @@ function renderMgrPlayers(){
   const D=cd();
   const sortedP=sortMgrPlayers(D.players||[]);
   // Add sort buttons to header
-  const sortHdr=`<div style="display:flex;align-items:center;gap:7px;padding:4px 10px;background:var(--bd);border-radius:7px 7px 0 0;">
+  // Sticky: the sort header stays visible while the list scrolls
+  const sortHdr=`<div class="pl-sort-hdr" style="display:flex;align-items:center;gap:7px;padding:4px 10px;background:var(--bd);border-radius:7px 7px 0 0;position:sticky;top:0;z-index:2;">
     <div style="width:26px;font-size:.65rem;font-weight:700;color:rgba(255,255,255,.6);cursor:pointer;" onclick="sortMgr('nr')">№${mgrSort.col==='nr'?(mgrSort.asc?'▲':'▼'):''}</div>
     <div style="width:32px;flex-shrink:0;"></div>
     <div style="flex:1;font-size:.65rem;font-weight:700;color:rgba(255,255,255,.6);cursor:pointer;" onclick="sortMgr('name')">Spieler${mgrSort.col==='name'?(mgrSort.asc?'▲':'▼'):''}</div>
@@ -22068,11 +22070,13 @@ function renderMgrPlayers(){
       // All non-functional zones of the row (nr/avatar/name/pos) open the profile.
       // Functional buttons (✎ / ✕) keep their own onclick + stopPropagation.
       const openHandler=`_tmLeave('spieler');openPlayerStats(${i});`;
-      return`<div class="pl-row">
-      <div class="pl-nr" style="cursor:pointer;" onclick="${openHandler}">${p.nr||''}</div>
-      <div style="flex-shrink:0;cursor:pointer;" onclick="${openHandler}" title="Profil \u00f6ffnen">${renderPlayerAvatar(p,32)}</div>
-      <div class="pl-name" style="cursor:pointer;" onclick="${openHandler}">${p.name||''}</div>
-      <div class="pl-pos" style="cursor:pointer;" onclick="${openHandler}" title="Profil \u00f6ffnen">${pbHtml(p)}</div>
+      // The whole row opens the profile — gaps between the cells used to be
+      // dead spots although the row lit up on hover. ✎ / ✕ stop propagation.
+      return`<div class="pl-row" style="cursor:pointer;" onclick="${openHandler}" title="Profil \u00f6ffnen">
+      <div class="pl-nr">${p.nr||''}</div>
+      <div style="flex-shrink:0;">${renderPlayerAvatar(p,32)}</div>
+      <div class="pl-name">${p.name||''}</div>
+      <div class="pl-pos">${pbHtml(p)}</div>
       <div class="pl-btns">
         <button class="pl-btn pl-btn-e" title="Bearbeiten" onclick="event.stopPropagation();_tmLeave('spieler');openPlayerStats(${i},{edit:true});">✎</button>
         ${canEdit()?`<button class="pl-btn pl-btn-d" onclick="event.stopPropagation();mgrDelPl(${i})">✕</button>`:''}
