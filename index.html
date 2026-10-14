@@ -4055,11 +4055,11 @@ body.design-heute .hxv-block{border-bottom:none !important;padding-bottom:4px !i
 @media(min-width:1000px){
   body.design-heute :is(#moLineup,#moSeasonLineup).hx-vianav :is(.lp-close-btn,#slp-close-btn){display:none !important;}
 }
-/* Pitch as in the Trainingsplaner: mown grass, clear white lines */
+/* Pitch exactly as in the Trainingsplaner (_dgBg('full')), turned upright and
+   scaled into the lineup's 340×525 frame; the old markings are hidden */
 .hx-grass{display:none;}
 body.design-heute .hx-grass{display:inline;}
-body.design-heute :is(#lp-pitch,#slp-pitch) > :is(rect,line,circle,path)[stroke]{stroke:rgba(255,255,255,.78);stroke-width:2;}
-body.design-heute :is(#lp-pitch,#slp-pitch) > circle:not([stroke]){fill:rgba(255,255,255,.85);}
+body.design-heute :is(#lp-pitch,#slp-pitch) > :is(rect,line,circle,path){display:none;}
 /* ── Phone list (Anwesenheit) in "Heute" ──
    Date tiles instead of pills, one summary card for the chosen session (the
    season totals row is gone, Statistik has them), rows as cards with the
@@ -4152,6 +4152,60 @@ body.design-heute :is(#lp-pitch,#slp-pitch) > circle:not([stroke]){fill:rgba(255
   body.design-heute #moWeekReport .has-inrow-close .db-wr-nav button{background:var(--hx-field) !important;border:1px solid var(--hx-line) !important;color:var(--hx-ink) !important;}
   body.design-heute #moWeekReport .has-inrow-close .db-wr-wk{color:var(--hx-ink) !important;}
   body.design-heute .hx-wrap{padding-top:calc(9px + env(safe-area-inset-top,0px)) !important;}
+}
+/* Kompakte Ansicht lives in the table's Ansicht menu in Heute */
+.hxv-item{display:none !important;}
+body.design-heute .hxv-item{display:flex !important;}
+/* ── Planner bars on the header standard ──
+   Aufstellung, Saisonkader and Trainingsplaner: 76px on desktop with a 2rem
+   title, 62px on the phone; controls that need a second row sit below the
+   bar on the ground, like Statistik and Wochenbericht. */
+@media(min-width:768px){
+  body.design-heute :is(.lp-topbar,.slp-topbar){min-height:76px;padding-top:0 !important;padding-bottom:0 !important;align-items:center;box-sizing:border-box;}
+  body.design-heute .hx-lptabs button{font-size:2rem !important;line-height:1.05;}
+  body.design-heute .tpl-ov .tpl-hd{min-height:76px;padding-top:0;padding-bottom:0;align-items:center;flex-wrap:nowrap;box-sizing:border-box;}
+  body.design-heute .tpl-ov .tpl-ttl h2{font-size:2rem;line-height:1.1;}
+}
+@media(min-width:768px) and (max-width:1440px){
+  /* one row: Rückgängig, Vorlage and Drucken go into ⋯ as on the phone */
+  body.design-heute .tpl-ov .tpl-hb.mob-x,body.design-heute .tpl-ov .tpl-st:not(.warn){display:none !important;}
+  body.design-heute .tpl-ov .tpl-morebtn{display:flex !important;width:40px;padding:0;justify-content:center;}
+  body.design-heute .tpl-ov .tpl-hd-r{width:auto;flex:0 0 auto;margin-left:0;flex-wrap:nowrap;}
+}
+@media(min-width:768px) and (max-width:1180px){
+  body.design-heute .tpl-ov .tpl-tabs button{padding:8px 12px;}
+  body.design-heute .hx-lptabs button{font-size:1.7rem !important;}
+}
+@media(min-width:768px){
+  body.design-heute .tpl-ov .tpl-ttl h2{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+}
+@media(max-width:767px){
+  body.design-heute :is(.lp-overlay,.slp-overlay){padding:0 !important;}
+  body.design-heute :is(.lp-topbar,.slp-topbar){margin:0 !important;border-radius:0 !important;padding:calc(12px + env(safe-area-inset-top,0px)) 12px 10px 16px !important;row-gap:12px !important;column-gap:8px !important;
+    background:linear-gradient(var(--hx-nav),var(--hx-nav)) 0 0/100% calc(62px + env(safe-area-inset-top,0px)) no-repeat,var(--hx-ground) !important;}
+  body.design-heute :is(.lp-topbar,.slp-topbar) .lp-title{flex:1 1 calc(100% - 52px) !important;order:0;min-height:38px;display:flex;flex-direction:column;justify-content:center;}
+  body.design-heute .hx-lptabs button{font-size:1.6rem !important;line-height:1.05;padding-bottom:2px;}
+  body.design-heute :is(.lp-close-btn,#slp-close-btn){order:1 !important;width:38px !important;height:38px !important;min-height:38px !important;padding:0 !important;flex:0 0 38px !important;}
+  body.design-heute #lp-fmt-btns,body.design-heute #slp-fmt-btns{order:2 !important;}
+  body.design-heute .lp-kind-wrap,body.design-heute #slp-conf-toggle,body.design-heute #slp-conf-toggle-lbl{order:3 !important;}
+  body.design-heute #slp-status-btn{order:4 !important;}
+  /* second row on the ground: light controls */
+  body.design-heute :is(.lp-topbar,.slp-topbar) :is(.lp-fmt-btn,.slp-fmt-btn):not(.active),
+  body.design-heute :is(#lp-fmt-btns,#slp-fmt-btns) :is(select,button):not(.active){background:var(--hx-field) !important;border:1px solid var(--hx-line) !important;color:var(--hx-ink) !important;}
+  body.design-heute #slp-conf-toggle-lbl{color:var(--hx-ink) !important;}
+  /* Trainingsplaner */
+  body.design-heute .tpl-ov .tpl-hd{padding:calc(12px + env(safe-area-inset-top,0px)) 12px 10px !important;row-gap:10px;column-gap:8px;
+    background:linear-gradient(var(--tp-navy),var(--tp-navy)) 0 0/100% calc(62px + env(safe-area-inset-top,0px)) no-repeat,var(--tp-bg);}
+  body.design-heute .tpl-ov .tpl-ttl{display:contents;}
+  body.design-heute .tpl-ov .tpl-x{order:0;width:38px;height:38px;}
+  body.design-heute .tpl-ov .tpl-ttl h2{order:1;flex:1 1 auto;font-size:1.6rem;line-height:38px;min-width:0;}
+  body.design-heute .tpl-ov .tpl-hd-r{order:2;width:auto;flex:0 0 auto;margin-left:0;}
+  body.design-heute .tpl-ov .tpl-hd-r .tpl-hb{height:38px;}
+  body.design-heute .tpl-ov .tpl-sub{order:3;flex:1 1 100%;color:var(--tp-mut);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  body.design-heute .tpl-ov .tpl-tabs{order:4;flex:1 1 100%;background:none;padding:0;gap:6px;}
+  body.design-heute .tpl-ov .tpl-tabs button{flex:1 1 0;justify-content:center;background:var(--tp-card);border:1px solid var(--tp-line);color:var(--tp-ink);border-radius:999px;padding:8px 10px;}
+  body.design-heute .tpl-ov .tpl-tabs button.on{background:var(--tp-navy);border-color:var(--tp-navy);color:#fff;}
+  body.design-heute .tpl-ov .tpl-tabs button.on .cnt:not(:empty){background:rgba(255,255,255,.2);}
 }
 /* ── Kader page (#moTeamMgr) ── */
 body.design-heute #moTeamMgr > .mob{padding:30px 40px 28px !important;}
@@ -5069,6 +5123,7 @@ if(window._fbBlocked){
         <div class="view-dropdown" id="viewDropdown2" style="bottom:calc(100% + 5px);top:auto;left:auto;right:0;">
           <div class="vd-item" onclick="event.stopPropagation();toggleSec('hdr')"><span>Header</span><div class="vd-check on" id="vd2-hdr">✓</div></div>
           <div class="vd-item" onclick="event.stopPropagation();toggleSec('tools')"><span>Werkzeuge</span><div class="vd-check on" id="vd2-tools">✓</div></div>
+          <div class="vd-item hxv-item" id="vd-compact" onclick="event.stopPropagation();setAppCompact(!getAppearance().compact);_syncCompactCheck();"><span>Kompakte Ansicht</span><div class="vd-check" id="vd2-compact"></div></div>
           <div class="vd-item" onclick="event.stopPropagation();toggleSec('photos')"><span>Fotos</span><div class="vd-check on" id="vd2-photos">✓</div></div>
           <div class="vd-sep"></div>
           <div class="vd-item" style="cursor:default;" onclick="event.stopPropagation()">
@@ -5659,7 +5714,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791951025169; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791951685712; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -10395,7 +10450,11 @@ function updateRegStatusCheck(){
 function plNameClass(p){
   return (p&&p.registered!==true)?'player-unregistered':'';
 }
-function toggleViewMenu2(e){e.stopPropagation();document.getElementById('viewDropdown2').classList.toggle('open');if(typeof _syncStartViewCheck==='function')_syncStartViewCheck();}
+function toggleViewMenu2(e){e.stopPropagation();document.getElementById('viewDropdown2').classList.toggle('open');if(typeof _syncStartViewCheck==='function')_syncStartViewCheck();_syncCompactCheck();}
+function _syncCompactCheck(){
+  const on=!!getAppearance().compact,c=document.getElementById('vd2-compact');
+  if(c){c.classList.toggle('on',on);c.textContent=on?'✓':'–';}
+}
 document.addEventListener('click',e=>{
   const wrap=document.getElementById('viewMenuWrap2');
   if(wrap&&!wrap.contains(e.target))document.getElementById('viewDropdown2')?.classList.remove('open');
@@ -21719,6 +21778,17 @@ function _hxPageSync(){
 }
 // Tools that sit beside the navigation in "Heute" (Aufstellung, Saisonkader).
 // They cover pages and panels, so the navigation shows them as current.
+// Lineup pitches in "Heute": the planner's field drawing, rotated 90° and
+// scaled by 525/640 so its length fills the frame (6px grass either side)
+function _hxFillPitches(){
+  if(typeof _dgBg!=='function')return;
+  const s=525/640,tx=(340+400*s)/2;
+  document.querySelectorAll('#lp-pitch .hx-grass,#slp-pitch .hx-grass').forEach(g=>{
+    if(g.dataset.done)return;g.dataset.done='1';
+    g.innerHTML='<rect width="340" height="525" rx="6" fill="#2E7D46"/><g transform="translate('+tx+',0) scale('+s+') rotate(90)">'+_dgBg('full')+'</g>';
+  });
+}
+document.addEventListener('DOMContentLoaded',()=>{try{_hxFillPitches();}catch(e){}});
 function _hxToolOpen(){
   for(const id of ['moSeasonLineup','moLineup']){const el=document.getElementById(id);if(el&&el.classList.contains('open'))return id;}
   return '';
@@ -31340,7 +31410,7 @@ _pubCleanupSchedule();
           <filter id="glowGreen"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
         </defs>
                         <rect width="340" height="525" fill="url(#lpGrass)" rx="6"/>
-        <g class="hx-grass" aria-hidden="true"><rect width="340" height="525" rx="6" fill="#2E7D46"/><rect y="58.33" width="340" height="58.33" fill="#2A7541"/><rect y="175.0" width="340" height="58.33" fill="#2A7541"/><rect y="291.66" width="340" height="58.33" fill="#2A7541"/><rect y="408.33" width="340" height="58.33" fill="#2A7541"/></g>
+        <g class="hx-grass" aria-hidden="true"></g>
         <!-- Outer pitch boundary -->
         <rect x="5" y="5" width="330" height="515" rx="2" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
         <!-- Halfway line -->
@@ -31608,7 +31678,7 @@ _pubCleanupSchedule();
     </div>
   </div>
 
-  <div class="setting-row">
+  <div class="setting-row kl-row">
     <div>
       <div class="setting-label">📦 Kompakte Ansicht</div>
       <div class="setting-sub">Weniger Abstände in Listen und Tabellen</div>
@@ -32068,7 +32138,7 @@ _pubCleanupSchedule();
           <filter id="glowGreen"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
         </defs>
                         <rect width="340" height="525" fill="url(#slpGrass2)" rx="6"/>
-        <g class="hx-grass" aria-hidden="true"><rect width="340" height="525" rx="6" fill="#2E7D46"/><rect y="58.33" width="340" height="58.33" fill="#2A7541"/><rect y="175.0" width="340" height="58.33" fill="#2A7541"/><rect y="291.66" width="340" height="58.33" fill="#2A7541"/><rect y="408.33" width="340" height="58.33" fill="#2A7541"/></g>
+        <g class="hx-grass" aria-hidden="true"></g>
         <!-- Outer pitch boundary -->
         <rect x="5" y="5" width="330" height="515" rx="2" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
         <!-- Halfway line -->
