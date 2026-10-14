@@ -3626,6 +3626,104 @@ body.design-heute:not(.theme-dark) .tpl-ov{--tp-navy:#0E2350;--tp-yel:#F2C230;--
 body.design-heute :is(.tpl-ttl h2,.tpl-h3,.tpl-bm,.tpl-in-title,.tpl-empty h4,.tpl-dlg h4,.tpl-gyes .big,.tpl-gstep span,.tpl-gh b,.tpl-gp .nr,.tpp-timer,.tpp-title,.tpp-stats b,.tpp-cm){font-family:var(--hx-num);font-weight:800;letter-spacing:.2px;}
 body.design-heute .tpl-x{border-radius:999px;}
 body.design-heute .hx-btn.hx-plan-on{border-color:var(--hx-ok);color:var(--hx-ok);}
+/* ════════════════════════════════════════════════════════════════
+   DESIGN "HEUTE" — Aufstellung (#moLineup) and Saisonkader
+   (#moSeasonLineup) in the light planner look of the Trainingsplan:
+   navy header, light ground, white cards; the pitch stays green.
+   Rule: planning = light, on the pitch (Auf dem Platz, Anwesenheit
+   erfassen) = dark. Many parts carry inline styles from the renderer,
+   hence the !important on those.
+   ════════════════════════════════════════════════════════════════ */
+body.design-heute :is(.lp-overlay,.slp-overlay){background:#E8EDF5;color:var(--hx-ink);}
+body.design-heute :is(.lp-topbar,.slp-topbar){background:#0E2350;border-bottom:none;box-shadow:none;}
+body.design-heute :is(.lp-logo,.slp-logo){font-family:var(--hx-num);font-weight:800;font-size:1.55rem;letter-spacing:.2px;color:#fff;line-height:1.05;}
+body.design-heute :is(.lp-sub,.slp-sub){color:#C9D6EC;letter-spacing:.3px;text-transform:none;font-size:.74rem;}
+body.design-heute :is(.lp-fmt-btn,.slp-fmt-btn){border-radius:999px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;}
+body.design-heute :is(.lp-fmt-btn,.slp-fmt-btn).active{background:var(--hx-yellow);border-color:var(--hx-yellow);color:var(--hx-ink);}
+body.design-heute :is(.lp-close-btn,.slp-close-btn){border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:#fff;}
+body.design-heute :is(.lp-close-btn,.slp-close-btn):hover{background:rgba(255,255,255,.16);color:#fff;border-color:rgba(255,255,255,.3);}
+body.design-heute #slp-status-btn{background:var(--hx-yellow) !important;border-color:var(--hx-yellow) !important;color:var(--hx-ink) !important;}
+body.design-heute .lp-hint{color:#AFC0E0;}
+/* side panels → white cards */
+body.design-heute :is(.lp-sidebar,.slp-sidebar,.slp-roster-col){background:#fff;border-color:var(--hx-line);color:var(--hx-ink);}
+body.design-heute :is(.lp-sb-top,.slp-sb-top,.slp-roster-col-head){border-color:var(--hx-line);}
+body.design-heute :is(.lp-sb-label,.lp-sb-label2,.slp-sb-label,.slp-popup-title){color:var(--hx-muted);}
+body.design-heute .slp-roster-col-title{color:var(--hx-ink);font-family:var(--hx-num);font-weight:800;font-size:1.05rem;letter-spacing:.2px;}
+body.design-heute .slp-roster-col-sub{color:var(--hx-muted);}
+body.design-heute .slp-roster-col-filter button{background:#fff;border:1px solid var(--hx-line);color:var(--hx-ink2);border-radius:999px;}
+body.design-heute .slp-roster-col-filter button.active{background:var(--hx-ink);border-color:var(--hx-ink);color:#fff;}
+body.design-heute .slp-roster-col-filter button:hover:not(.active){background:var(--hx-ground);}
+body.design-heute .slp-sort-label{color:var(--hx-muted);}
+body.design-heute :is(.lp-save-btn,.slp-save-btn){background:var(--hx-yellow);color:var(--hx-ink);border-radius:999px;}
+body.design-heute :is(.lp-name-inp,.slp-name-inp){background:#fff;border:1px solid var(--hx-line);color:var(--hx-ink);border-radius:10px;}
+body.design-heute :is(.lp-name-inp,.slp-name-inp)::placeholder{color:#9AA7BF;}
+body.design-heute :is(.lp-chip,.slp-chip){background:var(--hx-ground);border-color:var(--hx-line);color:var(--hx-ink2);}
+body.design-heute :is(.lp-chip,.slp-chip).active{background:var(--hx-ink);border-color:var(--hx-ink);color:#fff;}
+body.design-heute :is(.lp-chip-x,.slp-chip-x){color:var(--hx-muted);}
+body.design-heute #lp-saves-list{color:var(--hx-muted) !important;}
+/* Kader list (Aufstellung) — rows are rendered with inline styles */
+body.design-heute #lp-kader-list > div{background:#fff !important;border:1px solid var(--hx-line) !important;border-radius:10px !important;}
+body.design-heute #lp-kader-list > div > span:nth-child(1){color:var(--hx-ink2) !important;font-family:var(--hx-num) !important;font-weight:800;}
+body.design-heute #lp-kader-list > div > span:nth-child(2){color:var(--hx-ink) !important;}
+body.design-heute #lp-kader-list > div[style*="192,57,43"]{background:#FFF4F2 !important;border-color:#F3C6BF !important;}
+body.design-heute .lp-disc-badge{background:#F8DEDF;color:var(--hx-bad);}
+body.design-heute :is(.lp-player-card){background:#fff;border-color:var(--hx-line);}
+body.design-heute .lp-card-name{color:var(--hx-ink);}
+body.design-heute .lp-card-nr{color:var(--hx-ink2);font-family:var(--hx-num);font-weight:800;}
+/* Roster (Saisonkader) */
+body.design-heute .slp-roster-col-card{background:#fff;border:1px solid var(--hx-line);color:var(--hx-ink);border-radius:12px;}
+body.design-heute .slp-roster-col-card:hover{background:var(--hx-ground);}
+body.design-heute .slp-roster-col-name{color:var(--hx-ink);}
+body.design-heute .slp-roster-col-meta{color:var(--hx-muted);}
+body.design-heute .slp-roster-col-meta .nr{color:var(--hx-ink2);font-family:var(--hx-num);font-weight:800;letter-spacing:0;}
+body.design-heute .slp-roster-col-slot-badge{background:var(--hx-ok-bg);color:var(--hx-ok);}
+body.design-heute .slp-legend-row{color:var(--hx-ink2);}
+body.design-heute .slp-legend{color:var(--hx-ink2);}
+body.design-heute .slp-legend > div[style*="color"]{color:var(--hx-ink2) !important;}
+body.design-heute #slp-kader-stats{color:var(--hx-ink) !important;}
+body.design-heute .slp-legend-dot[style*="dashed"]{border-color:#B9C5D8 !important;}
+body.design-heute #slp-saves-list{color:var(--hx-muted) !important;}
+body.design-heute .slp-legend button[style*="231,76,60"]{background:#FDECEA !important;border-color:#F3C6BF !important;color:var(--hx-bad) !important;border-radius:999px !important;}
+body.design-heute #lp-subs-col{background:transparent !important;border-color:var(--hx-line) !important;}
+body.design-heute #slp-conf-toggle-lbl{color:#fff !important;}
+/* Bench (Aufstellung) */
+body.design-heute #lp-subs-col > div:first-child{color:var(--hx-muted) !important;}
+body.design-heute .lp-sub-circle:not(.filled){background:#fff !important;border:1.5px dashed #B9C5D8 !important;}
+body.design-heute .lp-sub-circle:not(.filled) > div{color:#8A97B0 !important;}
+body.design-heute .lp-sub-circle.filled{background:var(--hx-ink) !important;border-color:var(--hx-ink) !important;}
+/* Footer stats + clear */
+body.design-heute .lp-statsbar{background:#fff;border-color:var(--hx-line);}
+body.design-heute .lp-statsbar > div[style*="width:1px"]{background:var(--hx-line) !important;}
+body.design-heute .lp-stat{background:var(--hx-ground);border-color:var(--hx-line);border-radius:12px;}
+body.design-heute .lp-stat .sv{color:var(--hx-ink);font-family:var(--hx-num);font-weight:800;}
+body.design-heute .lp-stat .sk{color:var(--hx-muted);}
+body.design-heute .lp-sidebar > div[style*="border-top"]{border-color:var(--hx-line) !important;}
+body.design-heute .lp-sidebar button[style*="231,76,60"]{background:#FDECEA !important;border-color:#F3C6BF !important;color:var(--hx-bad) !important;border-radius:999px !important;}
+body.design-heute .slp-sidebar button[style*="231,76,60"]{background:#FDECEA !important;border-color:#F3C6BF !important;color:var(--hx-bad) !important;border-radius:999px !important;}
+/* Unavailable / discipline bars */
+body.design-heute :is(.lp-unavail-bar,.lp-disc-bar){background:#FFF4E5 !important;border-color:#F3D9B1 !important;color:var(--hx-warn);}
+body.design-heute .lp-un-h{color:var(--hx-bad);}
+body.design-heute .lp-un-chip{background:#fff;border-color:var(--hx-line);color:var(--hx-ink);}
+/* Slot popup (both planners) → white card */
+body.design-heute .slp-popup{background:#fff;border:1px solid var(--hx-line);box-shadow:0 24px 50px -16px rgba(14,35,80,.45);color:var(--hx-ink);border-radius:16px;}
+body.design-heute .slp-popup :is(.slp-sb-label){color:var(--hx-muted) !important;}
+body.design-heute .slp-assigned-row{background:var(--hx-ground);}
+body.design-heute .slp-assigned-row .name{color:var(--hx-ink);}
+body.design-heute .slp-assigned-row .prio{color:var(--hx-muted);}
+body.design-heute :is(.slp-assigned-row,.slp-pick-item) .nr{color:var(--hx-ink2);font-family:var(--hx-num);font-weight:800;}
+body.design-heute .slp-assigned-row :is(.del-btn,.up-btn){color:#9AA7BF;}
+body.design-heute .slp-pick-item:hover{background:var(--hx-ground);}
+body.design-heute .slp-pick-item .name{color:var(--hx-ink);}
+body.design-heute .slp-popup-close{background:#fff;border:1px solid var(--hx-line);color:var(--hx-ink);border-radius:999px;}
+body.design-heute .slp-popup-close:hover{background:var(--hx-ground);color:var(--hx-ink);}
+body.design-heute .slp-popup [style*="color:#fff"],body.design-heute .slp-popup [style*="rgba(255,255,255"]{color:var(--hx-ink2) !important;}
+/* ── Heute: Anwesenheit erfassen stays dark (used at the pitch), Heute type and colours ── */
+body.design-heute .rc-overlay{background:linear-gradient(170deg,#0E2350 0%,#13306A 60%,#0E2350 100%);}
+body.design-heute .rc-date{font-family:var(--hx-num);font-weight:800;letter-spacing:.3px;font-size:1.9rem;}
+body.design-heute .rc-av{font-family:var(--hx-num);font-weight:800;}
+body.design-heute :is(.rc-fb,.rc-filter,.rc-g){border-radius:999px;}
+body.design-heute .rc-fb-done{background:var(--hx-yellow);color:var(--hx-ink);}
+body.design-heute .rc-bar-fill{background:linear-gradient(90deg,#2E8B5E,var(--hx-yellow));}
 /* ── Kader page (#moTeamMgr) ── */
 body.design-heute #moTeamMgr > .mob{padding:30px 40px 28px !important;}
 body.design-heute #moTeamMgr > .mob > *{width:100%;max-width:1040px;box-sizing:border-box;}
@@ -5125,7 +5223,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791942869899; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791943659366; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
