@@ -4063,6 +4063,62 @@ body.design-heute .hxv-block{border-bottom:none !important;padding-bottom:4px !i
 body.design-heute .hx-grass{display:inline;}
 body.design-heute :is(#lp-pitch,#slp-pitch) > :is(rect,line,circle,path)[stroke]{stroke:rgba(255,255,255,.78);stroke-width:2;}
 body.design-heute :is(#lp-pitch,#slp-pitch) > circle:not([stroke]){fill:rgba(255,255,255,.85);}
+/* ── Phone list (Anwesenheit) in "Heute" ──
+   Date tiles instead of pills, one summary card for the chosen session (the
+   season totals row is gone, Statistik has them), rows as cards with the
+   status buttons as one segmented control. */
+@media(max-width:767px){
+  body.design-heute .ma-sess-bar{background:var(--hx-ground) !important;border:none !important;padding:12px 12px 6px;gap:6px;align-items:stretch;scrollbar-width:none;}
+  body.design-heute .ma-sess-bar::-webkit-scrollbar{display:none;}
+  body.design-heute .hxl-mo{flex:0 0 auto;align-self:center;writing-mode:vertical-rl;transform:rotate(180deg);font:700 .7rem 'Barlow',sans-serif;letter-spacing:.4px;color:var(--hx-muted);padding:0 1px;}
+  body.design-heute .hxl-sess{flex:0 0 58px;display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 2px 8px;border-radius:14px;border:none;background:var(--hx-card);color:var(--hx-ink);cursor:pointer;box-shadow:var(--hx-shadow);position:relative;}
+  body.design-heute .hxl-sess small{font:600 .72rem 'Barlow',sans-serif;color:var(--hx-muted);}
+  body.design-heute .hxl-sess b{font-family:var(--hx-num);font-weight:800;font-size:1.65rem;line-height:1;}
+  body.design-heute .hxl-sess span{font:600 .7rem 'Barlow',sans-serif;color:var(--hx-ink2);}
+  body.design-heute .hxl-sess.match span{color:#B5651D;font-weight:700;}
+  body.design-heute .hxl-sess.past{opacity:.62;}
+  body.design-heute .hxl-sess.today::after{content:'';position:absolute;top:6px;right:7px;width:6px;height:6px;border-radius:50%;background:var(--hx-yellow);}
+  body.design-heute .hxl-sess.on{background:var(--hx-nav);color:#fff;opacity:1;}
+  body.design-heute .hxl-sess.on b{color:var(--hx-yellow);}
+  body.design-heute .hxl-sess.on :is(small,span){color:#C9D6EC;}
+  body.design-heute .hxl-sess:focus-visible{outline:2px solid var(--hx-blue);outline-offset:2px;}
+  body.design-heute .ma-sess-head{background:var(--hx-card) !important;border:none !important;margin:6px 12px 4px;padding:14px 14px 14px;border-radius:16px;box-shadow:var(--hx-shadow);}
+  body.design-heute .hxl-top{display:flex;align-items:flex-start;gap:10px;}
+  body.design-heute .hxl-tx{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:3px;}
+  body.design-heute .hxl-tx .hx-tag{font-size:.74rem;padding:3px 9px;}
+  body.design-heute .hxl-title{font-family:var(--hx-num);font-weight:800;font-size:1.5rem;line-height:1.05;color:var(--hx-ink);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  body.design-heute .hxl-meta{font-size:.84rem;color:var(--hx-muted);}
+  body.design-heute .hxl-btns{display:flex;flex-direction:column;gap:6px;flex:0 0 auto;}
+  body.design-heute .hxl-btn{height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--hx-line);background:var(--hx-field);color:var(--hx-ink);font:700 .84rem 'Barlow',sans-serif;cursor:pointer;}
+  body.design-heute .hxl-btn.pri{background:var(--hx-yellow);border-color:var(--hx-yellow);}
+  body.design-heute .hxl-att{display:flex;align-items:baseline;gap:6px;margin:12px 0 7px;flex-wrap:wrap;}
+  body.design-heute .hxl-att > b{font-family:var(--hx-num);font-weight:800;font-size:1.7rem;line-height:1;color:var(--hx-ink);}
+  body.design-heute .hxl-att > span:not(.hxl-lg){font-size:.86rem;color:var(--hx-ink2);}
+  body.design-heute .hxl-lg{margin-left:auto;display:flex;gap:10px;font-size:.78rem;color:var(--hx-muted);}
+  body.design-heute .hxl-lg span{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;}
+  body.design-heute .hxl-lg i{width:8px;height:8px;border-radius:2px;display:inline-block;}
+  body.design-heute .hxl-lg i.s-bad{background:#C9373E;}body.design-heute .hxl-lg i.s-warn{background:#E0912F;}body.design-heute .hxl-lg i.s-open{background:#C9D2E1;}
+  body.design-heute .ma-sess-head .hx-seg{height:10px;}
+  body.design-heute .ma-stats{display:none !important;}
+  body.design-heute .ma-list{padding:8px 12px 16px;}
+  body.design-heute .ma-ptr{background:var(--hx-ground);color:var(--hx-muted);}
+  body.design-heute .ma-card{background:var(--hx-card) !important;border:none !important;border-radius:16px !important;padding:10px 10px 10px 12px;box-shadow:var(--hx-shadow) !important;gap:8px;}
+  body.design-heute .ma-card-av{width:38px;height:38px;}
+  body.design-heute .ma-card-av-ph{background:var(--hx-card2) !important;color:var(--hx-ink2) !important;box-shadow:none !important;font:700 .8rem 'Barlow',sans-serif;}
+  body.design-heute .ma-card-name{color:var(--hx-ink) !important;font-size:.95rem;}
+  body.design-heute .ma-card-name span{color:var(--hx-muted) !important;}
+  body.design-heute .ma-card-meta{gap:6px;align-items:center;}
+  body.design-heute .ma-card-nr{font-family:var(--hx-num) !important;font-weight:800;font-size:.95rem !important;color:var(--hx-ink2) !important;background:none !important;padding:0 !important;}
+  body.design-heute .ma-card-pos{font-size:.7rem;font-weight:700;color:var(--hx-ink2);background:var(--hx-card2);padding:1px 7px;border-radius:999px;}
+  body.design-heute .ma-card-actions{background:var(--hx-card2);border-radius:12px;padding:3px;gap:3px;}
+  body.design-heute .ma-btn{width:36px;height:36px;border-radius:9px !important;font-size:.95rem;}
+  body.design-heute .ma-btn.dim{background:transparent !important;box-shadow:none !important;color:var(--hx-muted) !important;}
+  body.design-heute .ma-btn.ma-1:not(.dim){background:#2E8B5E;}
+  body.design-heute .ma-btn.ma-2:not(.dim){background:#C9373E;}
+  body.design-heute .ma-btn.ma-4:not(.dim){background:#E0912F;color:#fff;}
+  body.design-heute .ma-btn.ma-5:not(.dim){background:var(--hx-blue);}
+  body.design-heute .ma-btn.ma-3:not(.dim){background:var(--hx-ink);color:#fff;}
+}
 /* ── Kader page (#moTeamMgr) ── */
 body.design-heute #moTeamMgr > .mob{padding:30px 40px 28px !important;}
 body.design-heute #moTeamMgr > .mob > *{width:100%;max-width:1040px;box-sizing:border-box;}
@@ -5573,7 +5629,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791949521961; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791950092208; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -12198,8 +12254,22 @@ function renderMobileAtt(){
   const bar=document.getElementById('maSessBar');
   const today=todaySK?todaySK():null;
   let barHtml='';
+  // Design "Heute": date tiles like the start screen (weekday, day, time),
+  // a small month label where the month changes; Klassisch keeps its pills
+  const hx=typeof hxOn==='function'&&hxOn();
+  const _sk=s=>(typeof _dbSortKey==='function'?_dbSortKey(s.date,UI.currentSeason):dispToSortKey(s.date));
+  let lastMo='';
   sessions.forEach((s,si)=>{
     if(!s||!s.date)return;
+    if(hx){
+      const k=_sk(s),d=_hxDate(k);
+      const mo=d.toLocaleDateString('de-DE',{month:'short'}).replace('.','');
+      if(mo!==lastMo){barHtml+=`<span class="hxl-mo">${mo}</span>`;lastMo=mo;}
+      const wd=d.toLocaleDateString('de-DE',{weekday:'short'}).replace('.','');
+      const isM=s.type==='match',on=si===_maSelectedSi;
+      barHtml+=`<button type="button" class="hxl-sess${isM?' match':''}${on?' on':''}${today&&k<today?' past':''}${k===today?' today':''}" aria-pressed="${on}" aria-label="${escapeHtml(s.date)} ${isM?'Spiel':'Training'}" onclick="${on?`openSessStats(${si})`:`maSelectSession(${si})`}"><small>${wd}</small><b>${d.getDate()}</b><span>${isM?'Spiel':escapeHtml(s.time||'Training')}</span></button>`;
+      return;
+    }
     const isMatch=s.type==='match';
     const isActive=si===_maSelectedSi;
     const cls='ma-sess'+(isMatch?' match':'')+(isActive?' active':'');
@@ -12213,7 +12283,7 @@ function renderMobileAtt(){
   bar.innerHTML=barHtml;
   // Scroll active into view
   setTimeout(()=>{
-    const active=bar.querySelector('.ma-sess.active');
+    const active=bar.querySelector('.ma-sess.active,.hxl-sess.on');
     if(active)active.scrollIntoView({inline:'center',behavior:'smooth',block:'nearest'});
   },50);
   // Build player list for selected session
@@ -12224,7 +12294,32 @@ function renderMobileAtt(){
   const headEl=document.getElementById('maSessHead');
   if(headEl){
     const hs=sessions[_maSelectedSi];
-    if(hs){
+    if(hs&&hx){
+      // Heute: what it is, when and where, and how many are in — the
+      // season totals that stood here belong to Statistik
+      const si=_maSelectedSi,isM=hs.type==='match',k=_sk(hs);
+      const title=isM?(hs.label||'Spiel'):(hs.focus||'Training');
+      const meta=[];
+      if(hs.time)meta.push(hs.time+(_hxEnd(hs.time,hs.duration)?' – '+_hxEnd(hs.time,hs.duration):''));
+      if(isM&&hs.homeAway)meta.push(hs.homeAway==='home'?'Heimspiel':'Auswärts');
+      if((hs.location||'').trim())meta.push(hs.location.trim());
+      const roll=(typeof _isSessRollCallTime==='function')&&_isSessRollCallTime(si);
+      const c=_hxCounts(D,si,UI.currentSeason);
+      const parts=roll
+        ?[['ok',c.present,'anwesend'],['bad',c.no,'fehlend'],['warn',c.exc,'entschuldigt'],['open',c.open,'offen']]
+        :[['ok',c.yes,'zugesagt'],['bad',c.no,'abgesagt'],['warn',c.exc,'entschuldigt'],['open',c.open,'offen']];
+      const e=escapeHtml,ed=typeof canEdit==='function'&&canEdit();
+      headEl.innerHTML=`<div class="hxl-top">
+          <div class="hxl-tx"><span class="hx-tag${isM?' match':''}">${e(_hxTag(isM,title,k))}</span>
+            <div class="hxl-title">${e(title)}</div>
+            ${meta.length?`<div class="hxl-meta">${e(meta.join(' · '))}</div>`:''}</div>
+          <div class="hxl-btns">${roll&&ed?`<button type="button" class="hxl-btn pri" onclick="rcOpen(${si})">Erfassen</button>`:''}<button type="button" class="hxl-btn" onclick="openSessStats(${si})">Öffnen</button></div>
+        </div>
+        <div class="hxl-att"><b>${roll?c.present:c.yes}</b><span>von ${c.total} ${roll?'anwesend':'zugesagt'}</span>
+          <span class="hxl-lg">${parts.slice(1).filter(x=>x[1]).map(x=>`<span title="${x[2]}"><i class="s-${x[0]}"></i>${x[1]} ${x[2]}</span>`).join('')}</span></div>
+        ${_hxSeg(parts,c.total)}`;
+      headEl.style.display='block';
+    }else if(hs){
       const isM=hs.type==='match';
       const sub=[hs.time?hs.time+' Uhr':'',
                  isM?(hs.label||'Spiel'):(hs.focus||'Training'),
@@ -21464,7 +21559,7 @@ function hxIcon(k,size){
 function hxOn(){return document.body.classList.contains('design-heute');}
 document.addEventListener('DOMContentLoaded',()=>{try{hxApplyDesign();}catch(e){}});
 // Phone tab bar: same five buttons, the design's icons and names
-const HX_TABS={home:['home','Heute'],list:['table','Liste'],cal:['cal','Kalender'],team:['team','Kader'],more:['more','Mehr']};
+const HX_TABS={home:['home','Heute'],list:['table','Anwesenheit'],cal:['cal','Kalender'],team:['team','Kader'],more:['more','Mehr']};
 function hxApplyDesign(){
   // The tab bar is further down the document than this script: wait for it
   if(!document.getElementById('mn-home')){document.addEventListener('DOMContentLoaded',hxApplyDesign,{once:true});return;}
