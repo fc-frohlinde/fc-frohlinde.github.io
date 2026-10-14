@@ -3775,6 +3775,103 @@ body.design-heute #moWeekReport .wr2-side{display:flex;flex-direction:column;gap
   body.design-heute #moWeekReport .wr2s-att{grid-column:1;}
   body.design-heute #moWeekReport .wr2-side{grid-column:2;}
 }
+/* ════ Heute start screen: one grid, aligned rows ════
+   hero (next session, with the date as a calendar tile) spans two columns;
+   the week sits beside it; match, last week and "Im Blick" share row two,
+   so every card ends on the same line. */
+body.design-heute .hx-grid{display:grid;gap:16px;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(270px,.92fr);
+  grid-template-areas:"hero hero week" "match last flags";align-items:stretch;}
+body.design-heute .hx-a-hero{grid-area:hero;}
+body.design-heute .hx-a-week{grid-area:week;}
+body.design-heute .hx-a-match{grid-area:match;}
+body.design-heute .hx-a-last{grid-area:last;}
+body.design-heute .hx-a-flags{grid-area:flags;}
+body.design-heute .hx-grid > .hx-card{min-width:0;margin:0;}
+body.design-heute .hx-grid .hx-h2{font-size:1.4rem;margin:0 0 4px;}
+/* hero */
+body.design-heute .hx-hero-head{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:18px;align-items:start;}
+body.design-heute .hx-hero-tx{min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:3px;}
+body.design-heute .hx-hero-tx .hx-focus-title{margin:2px 0 0;}
+body.design-heute .hx-hero-head .hx-btns{flex-direction:column;align-items:stretch;min-width:170px;gap:8px;}
+body.design-heute .hx-hero-head .hx-btn{justify-content:center;}
+body.design-heute .hx-dtile{width:78px;height:86px;border-radius:16px;background:var(--hx-ink);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;flex-shrink:0;}
+body.design-heute .hx-dtile small{font:600 .76rem 'Barlow',sans-serif;color:#C9D6EC;}
+body.design-heute .hx-dtile b{font-family:var(--hx-num);font-weight:800;font-size:2.5rem;color:var(--hx-yellow);margin:3px 0 2px;}
+body.design-heute .hx-dtile.match{background:var(--hx-yellow);}
+body.design-heute .hx-dtile.match small{color:var(--hx-ink2);}
+body.design-heute .hx-dtile.match b{color:var(--hx-ink);}
+/* attendance: number, one bar, a legend that opens each group */
+body.design-heute .hx-att{display:flex;flex-direction:column;gap:9px;}
+body.design-heute .hx-att-n{display:flex;align-items:baseline;gap:8px;}
+body.design-heute button.hx-att-n{border:none;background:none;padding:4px 8px;margin:-4px -8px;border-radius:10px;cursor:pointer;text-align:left;align-self:flex-start;font-family:'Barlow',sans-serif;}
+body.design-heute button.hx-att-n:hover{background:var(--hx-ground);}
+body.design-heute .hx-lu{display:flex;align-items:center;gap:8px;font-size:.88rem;color:#C9D6EC;}
+body.design-heute .hx-lu::before{content:'';width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.35);}
+body.design-heute .hx-lu.on{color:#fff;}
+body.design-heute .hx-lu.on::before{background:var(--hx-yellow);}
+body.design-heute .hx-att-n b{font-family:var(--hx-num);font-weight:800;font-size:2.4rem;line-height:.9;color:var(--hx-ink);}
+body.design-heute .hx-att-n span{font-size:.95rem;color:var(--hx-muted);font-weight:500;}
+body.design-heute .hx-seg{display:flex;gap:3px;height:12px;border-radius:999px;overflow:hidden;background:#E7EBF2;}
+body.design-heute .hx-seg i{display:block;min-width:5px;}
+body.design-heute .s-ok{background:#2E8B5E;}
+body.design-heute .s-bad{background:#C9373E;}
+body.design-heute .s-warn{background:#E0912F;}
+body.design-heute .s-open{background:#C9D2E1;}
+body.design-heute .hx-legend{display:flex;flex-wrap:wrap;gap:4px 14px;}
+body.design-heute .hx-lg{display:inline-flex;align-items:center;gap:7px;border:none;background:none;padding:5px 8px;margin:0 -8px;border-radius:9px;font:500 .92rem 'Barlow',sans-serif;color:var(--hx-ink2);cursor:pointer;}
+body.design-heute button.hx-lg:hover{background:var(--hx-ground);}
+body.design-heute .hx-lg i{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+body.design-heute .hx-lg b{font-family:var(--hx-num);font-weight:800;font-size:1.1rem;color:var(--hx-ink);}
+body.design-heute .hx-lg.static{cursor:default;}
+body.design-heute .hx-a-hero .hx-divider{margin-top:2px;}
+/* match card: navy, yellow action */
+body.design-heute .hx-grid .hx-dark{background:var(--hx-ink);}
+body.design-heute .hx-match-t{font-size:1.8rem !important;color:#fff;margin:0 !important;}
+body.design-heute .hx-att.dark .hx-att-n b{color:#fff;font-size:2rem;}
+body.design-heute .hx-att.dark .hx-att-n span{color:#C9D6EC;}
+body.design-heute .hx-att.dark .hx-seg{background:rgba(255,255,255,.14);}
+body.design-heute .hx-att.dark .s-open{background:rgba(255,255,255,.32);}
+body.design-heute .hx-att.dark .hx-lg{color:#DCE5F5;}
+body.design-heute .hx-att.dark .hx-lg b{color:#fff;}
+body.design-heute .hx-a-match .hx-btns{margin-top:auto;flex-wrap:nowrap;}
+body.design-heute .hx-a-match .hx-btn{flex:1 1 auto;justify-content:center;padding:0 12px;}
+/* last week: bars on a 0–100 scale, value above each */
+body.design-heute .hx-a-last .hx-bars{flex:1 1 auto;height:auto;min-height:118px;max-height:230px;align-items:stretch;gap:8px;margin:2px 0 12px;}
+body.design-heute .hx-a-last .hx-bar{height:auto;justify-content:flex-end;gap:0;}
+body.design-heute .hx-a-last .hx-bar s{display:block;min-height:0;}
+body.design-heute .hx-a-last .hx-bar em{margin-bottom:4px;}
+body.design-heute .hx-a-last .hx-bar i{min-height:3px;}
+body.design-heute .hx-a-last .hx-bar span{margin-top:5px;}
+body.design-heute .hx-bar em{font-style:normal;font:600 .72rem 'Barlow',sans-serif;color:var(--hx-muted);}
+body.design-heute .hx-bar.cur em{color:var(--hx-ink);font-weight:800;}
+body.design-heute .hx-a-last .hx-bar i{background:#D5DEEC;}
+body.design-heute .hx-a-last .hx-bar.cur i{background:var(--hx-blue);}
+body.design-heute .hx-a-last .hx-link{margin-top:auto;}
+/* week + flags */
+body.design-heute .hx-a-week,body.design-heute .hx-a-flags{gap:2px;}
+body.design-heute .hx-a-flags .hx-flag:last-of-type{border-bottom:none;}
+@media(min-width:768px) and (max-width:1180px){
+  body.design-heute .hx-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(230px,.95fr);gap:14px;}
+  body.design-heute .hx-hero-head .hx-btns{min-width:140px;}
+  body.design-heute .hx-a-match .hx-btns{flex-wrap:wrap;gap:8px;}
+  body.design-heute .hx-a-match .hx-btn{height:40px;}
+  body.design-heute .hx-a-match .hx-mpre{display:none;}
+  body.design-heute .hx-wrap{padding-bottom:12px;}
+}
+@media(min-width:768px) and (max-width:979px){
+  body.design-heute .hx-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"hero hero" "match last" "week flags";}
+}
+@media(max-width:767px){
+  body.design-heute .hx-grid{grid-template-columns:minmax(0,1fr);grid-template-areas:"hero" "match" "week" "last" "flags";gap:14px;}
+  body.design-heute .hx-hero-head{grid-template-columns:auto minmax(0,1fr);gap:14px;}
+  body.design-heute .hx-hero-head .hx-btns{grid-column:1 / -1;flex-direction:row;min-width:0;}
+  body.design-heute .hx-hero-head .hx-btn{flex:1 1 0;}
+  body.design-heute .hx-dtile{width:64px;height:72px;border-radius:14px;}
+  body.design-heute .hx-dtile b{font-size:2rem;}
+  body.design-heute .hx-legend{gap:2px 12px;}
+  body.design-heute .hx-grid .hx-btn,body.design-heute .hx-grid .hx-btn.primary{height:48px;font-size:.98rem;}
+  body.design-heute .hx-a-last .hx-bars{min-height:100px;margin-bottom:4px;}
+}
 /* ── Kader page (#moTeamMgr) ── */
 body.design-heute #moTeamMgr > .mob{padding:30px 40px 28px !important;}
 body.design-heute #moTeamMgr > .mob > *{width:100%;max-width:1040px;box-sizing:border-box;}
@@ -5278,7 +5375,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791945495975; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791946758371; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -21287,9 +21384,17 @@ function _hxTag(isM,title,skv){
   const kind=isM?'Spiel':'Training',when=_hxWhen(skv);
   return title===kind?when.charAt(0).toUpperCase()+when.slice(1):kind+' · '+when;
 }
-// A count tile on the start card: opens the session with that group's list
-function _hxTile(cls,n,label,si,st){
-  return `<button type="button" class="hx-tile ${cls}" onclick="openSessFromMain(${si});ssAttOpen(${si},${st})"><b>${n}</b><span>${label}</span></button>`;
+// Segmented attendance bar: parts [[cls,n,…],…] of a squad of `total`
+function _hxSeg(parts,total){
+  const t=Math.max(1,total);
+  return `<div class="hx-seg" role="img" aria-label="${parts.map(x=>x[1]+' '+(x[2]||'')).join(', ')}">${parts.filter(x=>x[1]>0).map(x=>`<i class="s-${x[0]}" style="flex:${x[1]/t}"></i>`).join('')}</div>`;
+}
+// The date of the next session as a calendar tile — the one bold element
+function _hxDateTile(skv,isM){
+  const d=_hxDate(skv);
+  const wd=d.toLocaleDateString('de-DE',{weekday:'short'}).replace('.','');
+  const mo=d.toLocaleDateString('de-DE',{month:'short'}).replace('.','');
+  return `<div class="hx-dtile${isM?' match':''}" aria-hidden="true"><small>${wd}</small><b>${d.getDate()}</b><small>${mo}</small></div>`;
 }
 function _hxEnd(time,dur){
   const m=String(time||'').match(/(\d+):(\d+)/);if(!m)return '';
@@ -21334,10 +21439,10 @@ function hxRender(){
   let html=`<div class="hx-wrap">${mtop}
     <div class="hx-top"><div><h1 class="hx-h1">${esc(dateTxt)}</h1></div>
     <button type="button" class="hx-search" onclick="openSearch()">${hxIcon('search',18)}Spieler oder Termin suchen</button></div>
-    <div class="hx-cols"><div class="hx-main">`;
+    <div class="hx-grid">`;
   // ── Focus: the next session ──
   if(fi<0){
-    html+=`<section class="hx-card hx-empty">Keine anstehenden Termine. <button type="button" class="hx-link" onclick="hxGo('cal')">Kalender öffnen</button></section>`;
+    html+=`<section class="hx-card hx-empty hx-a-hero">Keine anstehenden Termine. <button type="button" class="hx-link" onclick="hxGo('cal')">Kalender öffnen</button></section>`;
   }else{
     const s=S[fi],c=_hxCounts(D,fi,season);
     const isM=s.type==='match';
@@ -21349,20 +21454,16 @@ function hxRender(){
     if(s.location)meta.push(s.location);
     // The time range already says how long it is
     if(s.duration&&!s.time)meta.push(s.duration+' Minuten');
-    const tot=Math.max(1,c.total),C=2*Math.PI*52;
-    const segA=roll?c.present:c.yes,segB=c.exc,segC=c.no;
-    const a1=C*segA/tot,a2=C*segB/tot,a3=C*segC/tot;
-    const ring=`<svg class="hx-ring" width="124" height="124" viewBox="0 0 132 132" role="img" aria-label="${segA} von ${c.total} ${roll?'anwesend':'zugesagt'}">
-      <circle cx="66" cy="66" r="52" fill="none" stroke="#E7EBF2" stroke-width="14"/>
-      <circle cx="66" cy="66" r="52" fill="none" stroke="#2E8B5E" stroke-width="14" stroke-dasharray="${a1} ${C}" transform="rotate(-90 66 66)"/>
-      <circle cx="66" cy="66" r="52" fill="none" stroke="#E0912F" stroke-width="14" stroke-dasharray="${a2} ${C}" stroke-dashoffset="${-a1}" transform="rotate(-90 66 66)"/>
-      ${segC?`<circle cx="66" cy="66" r="52" fill="none" stroke="#C9373E" stroke-width="14" stroke-dasharray="${a3} ${C}" stroke-dashoffset="${-(a1+a2)}" transform="rotate(-90 66 66)"/>`:''}
-      <text x="66" y="68" text-anchor="middle" font-family="Big Shoulders Display, Bebas Neue, sans-serif" font-weight="800" font-size="40" fill="#0E2350">${segA}</text>
-      <text x="66" y="90" text-anchor="middle" font-family="Barlow, sans-serif" font-weight="600" font-size="13" fill="#4E5D7C">von ${c.total}</text></svg>`;
-    const tiles=roll
-      ?`${_hxTile('ok',c.present,'anwesend',fi,1)}${_hxTile('bad',c.no,'fehlend',fi,0)}${_hxTile('warn',c.exc,'entschuldigt',fi,2)}`
-      :`${_hxTile('ok',c.yes,'zugesagt',fi,4)}${c.no?_hxTile('bad',c.no,'abgesagt',fi,0):''}${_hxTile('warn',c.exc,'entschuldigt',fi,2)}${_hxTile('open',c.open,'noch offen',fi,3)}`;
-    const nTiles=roll?3:(c.no?4:3);
+    // Attendance as one bar: the parts add up to the squad, the legend opens each group
+    const parts=roll
+      ?[['ok',c.present,'anwesend',1],['bad',c.no,'fehlend',0],['warn',c.exc,'entschuldigt',2],['open',c.open,'offen',4]]
+      :[['ok',c.yes,'zugesagt',4],['bad',c.no,'abgesagt',0],['warn',c.exc,'entschuldigt',2],['open',c.open,'offen',3]];
+    const lead=roll?c.present:c.yes;
+    const att=`<div class="hx-att">
+        <button type="button" class="hx-att-n" onclick="openSessFromMain(${fi});ssAttOpen(${fi},${parts[0][3]})"><b>${lead}</b><span>von ${c.total} ${roll?'anwesend':'zugesagt'}</span></button>
+        ${_hxSeg(parts,c.total)}
+        <div class="hx-legend">${parts.slice(1).filter(x=>x[1]||x[0]!=='bad').map(x=>`<button type="button" class="hx-lg" onclick="openSessFromMain(${fi});ssAttOpen(${fi},${x[3]})"><i class="s-${x[0]}"></i><b>${x[1]}</b>${x[2]}</button>`).join('')}</div>
+      </div>`;
     let btns='';
     if(roll)btns+=`<button type="button" class="hx-btn primary" onclick="rcOpen(${fi})">${hxIcon('check')}Anwesenheit erfassen</button>`;
     else btns+=`<button type="button" class="hx-btn primary" onclick="openSessFromMain(${fi})">Termin öffnen</button>`;
@@ -21370,13 +21471,15 @@ function hxRender(){
     else if(s.planLink)btns+=`<a class="hx-btn" href="${esc(s.planLink)}" target="_blank" rel="noopener">Trainingsplan</a>`;
     if(!isM&&typeof _tplHomeBtn==='function')btns+=_tplHomeBtn(fi);
     if(roll)btns+=`<button type="button" class="hx-btn" onclick="openSessFromMain(${fi})">Termin öffnen</button>`;
-    html+=`<section class="hx-card" aria-label="Nächster Termin">
-      <div class="hx-focus-head"><div>
-        <span class="hx-tag${isM?' match':''}">${esc(_hxTag(isM,title,sk(s)))}</span>
-        <h2 class="hx-focus-title">${esc(title)}</h2>
-        <div class="hx-meta">${esc(meta.join(' · '))}</div>
-      </div><div class="hx-btns">${btns}</div></div>
-      <div class="hx-counts">${ring}<div class="hx-tiles" style="--hxn:${nTiles}">${tiles}</div></div>`;
+    html+=`<section class="hx-card hx-a-hero" aria-label="Nächster Termin">
+      <div class="hx-hero-head">${_hxDateTile(sk(s),isM)}
+        <div class="hx-hero-tx">
+          <span class="hx-tag${isM?' match':''}">${esc(_hxTag(isM,title,sk(s)))}</span>
+          <h2 class="hx-focus-title">${esc(title)}</h2>
+          <div class="hx-meta">${esc(meta.join(' · '))}</div>
+        </div>
+        <div class="hx-btns">${btns}</div></div>
+      ${att}`;
     if(c.openList.length){
       html+=`<div class="hx-divider"><span class="hx-sub-h">${roll?'Noch nicht erfasst':'Noch keine Antwort'} (${c.openList.length})</span><div class="hx-chips">`
         +c.openList.slice(0,8).map(({p,pi})=>`<button type="button" class="hx-chip" onclick="openPlayerFromMain(${pi})"><i>${esc(String(p.nr||'·'))}</i>${esc(nm(p))}</button>`).join('')
@@ -21386,15 +21489,18 @@ function hxRender(){
     html+=`</section>`;
   }
   // ── Second row: next match (or the session after) + last week ──
-  html+=`<div class="hx-pair">`;
   const si2=(mi>=0&&mi!==fi)?mi:(()=>{for(let i=fi+1;i<S.length;i++)if(S[i]&&S[i].date&&sk(S[i])>=today)return i;return -1;})();
   if(si2>=0){
     const s=S[si2],c=_hxCounts(D,si2,season),isM=s.type==='match';
-    html+=`<section class="hx-card hx-dark" aria-label="${isM?'Nächstes Spiel':'Danach'}">
-      <span class="hx-meta">${isM?'Nächstes Spiel':'Danach'} · ${esc(_hxWhen(sk(s)))}${s.time?' '+esc(s.time):''}${isM&&s.homeAway?' · '+(s.homeAway==='home'?'Heimspiel':'auswärts'):''}</span>
-      <h3 class="hx-h2" style="font-size:1.9rem;">${esc(isM?(s.label||'Spiel'):(s.focus||'Training'))}</h3>
-      <div class="hx-nums"><div class="hx-num"><b style="color:var(--hx-yellow)">${c.yes}</b><span>zugesagt</span></div><div class="hx-num"><b>${c.exc+c.no}</b><span>fehlen</span></div><div class="hx-num"><b>${c.open}</b><span>offen</span></div></div>
-      <div class="hx-btns">${isM?`<button type="button" class="hx-btn dark" onclick="openSessFromMain(${si2})">Spiel öffnen</button><button type="button" class="hx-btn dark ghost" onclick="openLineupPlanner(${si2})" title="Aufstellung planen">Aufstellung</button>`:`<button type="button" class="hx-btn dark" onclick="openSessFromMain(${si2})">Termin öffnen</button>`}</div>
+    const w=_hxWhen(sk(s));
+    html+=`<section class="hx-card hx-dark hx-a-match" aria-label="${isM?'Nächstes Spiel':'Danach'}">
+      <span class="hx-meta"><span class="hx-mpre">${isM?'Nächstes Spiel':'Danach'} · </span>${esc(w.charAt(0).toUpperCase()+w.slice(1))}${s.time?', '+esc(s.time):''}${isM&&s.homeAway?' · '+(s.homeAway==='home'?'Heimspiel':'auswärts'):''}</span>
+      <h3 class="hx-h2 hx-match-t">${esc(isM?(s.label||'Spiel'):(s.focus||'Training'))}</h3>
+      <div class="hx-att dark"><div class="hx-att-n"><b>${c.yes}</b><span>von ${c.total} zugesagt</span></div>${_hxSeg([['ok',c.yes,'zugesagt'],['bad',c.no+c.exc,'fehlen'],['open',c.open,'offen']],c.total)}
+        <div class="hx-legend"><span class="hx-lg static"><i class="s-bad"></i><b>${c.no+c.exc}</b>fehlen</span><span class="hx-lg static"><i class="s-open"></i><b>${c.open}</b>offen</span></div></div>
+      ${isM?(()=>{let has=false;try{const k=_mlKey(UI.currentTeam,season,si2);const lu=G.matchLineups&&G.matchLineups[k];has=!!(lu&&lu.slots&&Object.values(lu.slots).some(v=>v!=null&&v!==''));}catch(e){}
+        return `<div class="hx-lu${has?' on':''}">${has?'Aufstellung steht':'Noch keine Aufstellung'}</div>`;})():''}
+      <div class="hx-btns">${isM?`<button type="button" class="hx-btn primary" onclick="openSessFromMain(${si2})">Spiel öffnen</button><button type="button" class="hx-btn dark ghost" onclick="openLineupPlanner(${si2})" title="Aufstellung planen">Aufstellung</button>`:`<button type="button" class="hx-btn dark" onclick="openSessFromMain(${si2})">Termin öffnen</button>`}</div>
     </section>`;
   }
   try{
@@ -21406,19 +21512,18 @@ function hxRender(){
     const d=(now.p!=null&&prev&&prev.p!=null)?now.p-prev.p:null;
     const vals=weeks.map(w=>w.p).filter(v=>v!=null);
     const lo=vals.length?Math.min(...vals):0,hi=vals.length?Math.max(...vals):100;
-    html+=`<section class="hx-card" aria-label="Letzte Woche">
+    html+=`<section class="hx-card hx-a-last" aria-label="Letzte Woche">
       <span class="hx-meta">${off===0?'Diese Woche':'Letzte Woche'} · KW ${esc(String(now.kw))}</span>
       <div class="hx-big"><b>${now.p==null?'–':now.p+'%'}</b>${d==null?'':`<span class="hx-delta ${d>0?'up':d<0?'down':'flat'}">${d>0?'+':''}${d} zur Vorwoche</span>`}</div>
-      <div class="hx-bars" role="img" aria-label="Anwesenheit der letzten Wochen">${weeks.map(w=>`<div class="hx-bar${w.cur?' cur':''}"><i style="height:${w.p==null?3:Math.max(6,Math.round(8+((w.p-lo)/Math.max(1,hi-lo))*44))}px"></i><span>KW ${w.kw}</span></div>`).join('')}</div>
+      <div class="hx-bars" role="img" aria-label="Anwesenheit der letzten Wochen">${weeks.map(w=>`<div class="hx-bar${w.cur?' cur':''}" title="KW ${w.kw}: ${w.p==null?'–':w.p+' %'}"><s style="flex:${w.p==null?100:100-w.p}"></s><em>${w.p==null?'–':w.p}</em><i style="flex:${w.p==null?0:w.p}"></i><span>${w.kw}</span></div>`).join('')}</div>
       <button type="button" class="hx-link" onclick="openWeekReport()">Wochenbericht öffnen</button>
     </section>`;
   }catch(e){console.error('[hx week]',e);}
-  html+=`</div></div><aside class="hx-side">`;
   // ── This week, Mon–Sun ──
   const b=_dbWeekBounds(0);
   const days=[];
   for(let i=0;i<7;i++){const d=new Date(b.monday);d.setDate(b.monday.getDate()+i);days.push(d);}
-  html+=`<section class="hx-card" style="gap:4px;" aria-label="Diese Woche"><h3 class="hx-h2" style="margin-bottom:8px;">Diese Woche</h3>`;
+  html+=`<section class="hx-card hx-a-week" aria-label="Diese Woche"><h3 class="hx-h2">Diese Woche</h3>`;
   days.forEach(d=>{
     const dk=d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
     const list=[];S.forEach((s,si)=>{if(s&&s.date&&sk(s)===dk)list.push(si);});
@@ -21473,15 +21578,16 @@ function hxRender(){
   try{
     dbComputeBirthdays({players:D.players}).filter(x=>x.days<=7).forEach(x=>flags.push({dot:'#F2C230',who:nm(x.p),what:(x.days===0?'hat heute Geburtstag':'Geburtstag am '+x.date)+' ('+x.turns+')',on:`openPlayerFromMain(${x.pi})`}));
   }catch(e){}
-  html+=`<section class="hx-card" style="gap:2px;" aria-label="Im Blick behalten"><h3 class="hx-h2" style="margin-bottom:8px;">Im Blick behalten</h3>`;
+  html+=`<section class="hx-card hx-a-flags" aria-label="Im Blick behalten"><h3 class="hx-h2">Im Blick behalten</h3>`;
   if(!flags.length)html+=`<div class="hx-ok">Alles im grünen Bereich.</div>`;
   else{
     // Four rows keep the start screen on one page; the rest on demand
-    const lim=window._hxFlagsAll?flags.length:4;
+    const cap=(innerWidth>=768&&innerWidth<=1180)?3:4;
+    const lim=window._hxFlagsAll?flags.length:cap;
     html+=flags.slice(0,lim).map(f=>`<button type="button" class="hx-flag" onclick="${f.on}"><span class="hx-dot" style="background:${f.dot}"></span><span class="hx-flag-x"><b>${esc(f.who)}</b><span>${esc(f.what)}</span></span></button>`).join('')
-      +(flags.length>4?`<button type="button" class="hx-link" style="padding:8px 6px 0;" onclick="window._hxFlagsAll=!window._hxFlagsAll;hxRender();">${window._hxFlagsAll?'Weniger anzeigen':'Alle '+flags.length+' anzeigen'}</button>`:'');
+      +(flags.length>cap?`<button type="button" class="hx-link" style="padding:8px 6px 0;" onclick="window._hxFlagsAll=!window._hxFlagsAll;hxRender();">${window._hxFlagsAll?'Weniger anzeigen':'Alle '+flags.length+' anzeigen'}</button>`:'');
   }
-  html+=`</section></aside></div></div>`;
+  html+=`</section></div></div>`;
   el.innerHTML=html;
 }
 
