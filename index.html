@@ -4305,6 +4305,104 @@ body.design-heute .home-overlay::before,body.design-heute .home-overlay::after{d
 .tpl-grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;}
 .tpl-fld{display:flex;flex-direction:column;gap:6px;min-width:0;}
 .tpl-fld > label{font-size:15px;font-weight:700;}
+/* ── Kader-Tafel (Konzept B) ── */
+#tab-tafel #kbBoard{display:flex;flex-direction:column;gap:14px;}
+#tab-tafel #kbBoard > *{flex-shrink:0;}
+.kb-top{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;}
+.kb-days{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;flex:0 1 auto;max-width:100%;}
+.kb-days::-webkit-scrollbar{display:none;}
+.kb-day{flex:0 0 auto;width:58px;height:64px;border-radius:12px;border:1px solid var(--hx-line);background:var(--hx-field);color:var(--hx-ink);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;font-family:'Barlow',sans-serif;padding:0;}
+.kb-day span{font-size:.72rem;font-weight:600;color:var(--hx-muted);}
+.kb-day b{font-family:var(--hx-num);font-weight:800;font-size:1.45rem;line-height:1;}
+.kb-day i{font-style:normal;font-size:.68rem;font-weight:600;color:var(--hx-muted);}
+.kb-day.m i{color:#B5600B;}
+.kb-day:hover{border-color:var(--hx-ink2);}
+.kb-day.on{background:var(--hx-nav);border-color:var(--hx-nav);color:#fff;}
+.kb-day.on b{color:var(--hx-yellow);}
+.kb-day.on span,.kb-day.on i{color:rgba(255,255,255,.78);}
+.kb-head{flex:1 1 260px;min-width:0;display:flex;flex-direction:column;gap:4px;}
+.kb-ttl{font-family:var(--hx-num);font-weight:800;font-size:1.4rem;line-height:1.1;color:var(--hx-ink);}
+.kb-meta{font-size:.84rem;color:var(--hx-muted);}
+.kb-leg{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:4px;font-size:.84rem;color:var(--hx-ink2);}
+.kb-leg span{display:inline-flex;align-items:center;gap:5px;}
+.kb-leg b{font-family:var(--hx-num);font-weight:800;font-size:1.05rem;color:var(--hx-ink);}
+.kb-leg i,.kb-bar i{display:inline-block;}
+.kb-leg i{width:9px;height:9px;border-radius:2px;}
+.kb-leg i.ok,.kb-bar i.ok{background:#2E8B57;}
+.kb-leg i.warn,.kb-bar i.warn{background:#E8912D;}
+.kb-leg i.bad,.kb-bar i.bad{background:#D9443F;}
+.kb-leg i.open{background:#C9D3E3;}
+.kb-lu{flex:0 0 auto;height:44px;padding:0 18px;border-radius:12px;border:none;background:var(--hx-yellow);color:#0E2350;font:700 .92rem 'Barlow',sans-serif;cursor:pointer;}
+.kb-lu:hover{filter:brightness(.96);}
+.kb-sum{display:none;}
+.kb-board{position:relative;border-radius:18px;overflow:hidden;background:#2E7D46;}
+.kb-pitch{position:absolute;inset:0;width:100%;height:100%;display:block;}
+.kb-cols{position:relative;display:grid;grid-template-columns:minmax(0,.82fr) repeat(3,minmax(0,1fr));gap:14px;padding:16px;min-height:420px;}
+.kb-col header{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;margin:0 0 10px;padding:9px 11px 10px;border-radius:12px;background:rgba(6,32,18,.42);color:#fff;}
+#tab-tafel .kb-col h3{margin:0;font-family:var(--hx-num);font-weight:800;font-size:1.2rem;line-height:1;color:#fff;}
+.kb-col header > span{font-size:.8rem;color:rgba(255,255,255,.82);}
+.kb-col header b{font-family:var(--hx-num);font-weight:800;font-size:1.05rem;color:#fff;}
+.kb-bar{flex:1 0 100%;display:flex;gap:2px;height:5px;margin-top:6px;border-radius:3px;overflow:hidden;}
+.kb-bar i.open{background:rgba(255,255,255,.45);}
+.kb-cards{display:flex;flex-direction:column;gap:6px;}
+.kb-card{display:grid;grid-template-columns:30px minmax(0,1fr);grid-template-areas:"nr nm" "nr row";align-items:center;gap:3px 8px;width:100%;padding:8px 10px;border:none;border-radius:12px;
+  background:#fff;color:var(--hx-ink);text-align:left;cursor:pointer;font-family:'Barlow',sans-serif;box-shadow:0 1px 2px rgba(0,0,0,.12),0 4px 10px -4px rgba(0,0,0,.28);}
+.kb-card:hover{box-shadow:0 0 0 2px var(--hx-yellow),0 4px 10px -4px rgba(0,0,0,.28);}
+.kb-card:focus-visible{outline:2px solid var(--hx-yellow);outline-offset:2px;}
+.kb-card.st-warn,.kb-card.st-bad{background:#E4EAE6;box-shadow:none;}
+.kb-card.st-warn :is(.kb-nm,.kb-nr,.kb-pb),.kb-card.st-bad :is(.kb-nm,.kb-nr,.kb-pb){opacity:.5;}
+.kb-nr{grid-area:nr;font-family:var(--hx-num);font-weight:800;font-size:1.3rem;line-height:1;color:var(--hx-blue);text-align:center;}
+.kb-nm{grid-area:nm;min-width:0;font-size:.9rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.kb-row{grid-area:row;display:flex;align-items:center;gap:4px;min-width:0;}
+.kb-pb{display:inline-flex;align-items:center;height:17px;padding:0 6px;border-radius:5px;font-size:.66rem;font-weight:800;flex:0 0 auto;}
+.kb-st{font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:999px;white-space:nowrap;margin-left:auto;}
+.st-ok .kb-st{background:#E2F4EA;color:#1C7444;}
+.st-open .kb-st{background:#EEF1F6;color:#4E5D7C;}
+.st-warn .kb-st{background:#FCEBD5;color:#9A5506;}
+.st-bad .kb-st{background:#FBE3E1;color:#B3261E;}
+.kb-dots{display:flex;gap:3px;flex:0 0 auto;}
+.kb-st + .kb-dots{margin-left:4px;}
+.kb-row > .kb-dots:not(.kb-st + .kb-dots){margin-left:auto;}
+.kb-dots i{width:7px;height:7px;border-radius:50%;background:#D5DEEC;}
+.kb-dots i.ok{background:#2E8B57;}
+.kb-dots i.warn{background:#E8912D;}
+.kb-dots i.bad{background:#D9443F;}
+.kb-empty{font-size:.84rem;color:rgba(255,255,255,.85);padding:4px 2px;}
+.kb-none{border:1px solid var(--hx-line);border-radius:16px;padding:12px;}
+.kb-none header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin:0 0 10px;}
+.kb-none h3{margin:0;font-family:var(--hx-num);font-weight:800;font-size:1.1rem;}
+.kb-none header span{font-size:.8rem;color:var(--hx-muted);}
+.kb-none .kb-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));}
+.kb-none .kb-card{box-shadow:none;border:1px solid var(--hx-line);}
+.kb-nodata{padding:24px;text-align:center;color:var(--hx-muted);}
+@media (max-width:1100px){.kb-cols{gap:10px;padding:12px;}.kb-card{grid-template-columns:22px minmax(0,1fr);padding:7px 8px;gap:3px 6px;}.kb-nr{font-size:1.1rem;}.kb-dots{display:none;}}
+@media (max-width:767px){
+  .kb-top{gap:10px;}
+  .kb-days{margin:0 -2px;}
+  .kb-lu{width:100%;}
+  /* Phone: a small pitch with the four lines as the summary, the lists below */
+  .kb-sum{display:grid;grid-template-columns:.8fr 1fr 1fr 1fr;gap:6px;padding:10px;border-radius:14px;
+    background:linear-gradient(90deg,rgba(255,255,255,.07) 0 25%,transparent 25% 50%,rgba(255,255,255,.07) 50% 75%,transparent 75%),#2E7D46;}
+  .kb-sum button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 2px;border:none;border-radius:10px;background:rgba(6,32,18,.42);color:#fff;cursor:pointer;font-family:'Barlow',sans-serif;}
+  .kb-sum b{font-family:var(--hx-num);font-weight:800;font-size:1.35rem;line-height:1;}
+  .kb-sum small{font-size:.8rem;font-weight:700;opacity:.75;}
+  .kb-sum span{font-size:.7rem;font-weight:600;color:rgba(255,255,255,.85);}
+  .kb-board{background:none;border-radius:0;overflow:visible;}
+  .kb-pitch{display:none;}
+  .kb-cols{display:flex;flex-direction:column;gap:16px;padding:0;min-height:0;}
+  .kb-col{scroll-margin-top:8px;}
+  .kb-col header{background:none;color:var(--hx-ink);padding:0 2px;margin:0 0 8px;}
+  #tab-tafel .kb-col h3{color:var(--hx-ink);}
+  .kb-dots{display:flex;}
+  .kb-col header > span{color:var(--hx-muted);}
+  .kb-col header b{color:var(--hx-ink);}
+  .kb-bar i.open{background:#D5DEEC;}
+  .kb-card{box-shadow:none;border:1px solid var(--hx-line);}
+  .kb-card.st-warn,.kb-card.st-bad{background:var(--hx-card2);border-color:var(--hx-card2);}
+  .kb-empty{color:var(--hx-muted);}
+  .kb-none .kb-cards{grid-template-columns:1fr;}
+}
 /* Trainer activity (admin) */
 .hx-act-n:not(:empty){margin-left:auto;font-size:.72rem;font-weight:700;color:#7FE0A8;display:inline-flex;align-items:center;gap:5px;}
 .hx-act-n:not(:empty)::before{content:'';width:7px;height:7px;border-radius:50%;background:#2FBF71;}
@@ -5249,9 +5347,11 @@ if(window._fbBlocked){
     <h3 id="tmgr-h" style="margin:0;flex:1;">Mannschaft</h3>
   </div>
   <div class="tbar">
-    <button class="tbtn active" onclick="switchTab('spieler')">👥 Spieler</button>
-    <button class="tbtn" onclick="switchTab('trainer')">🎽 Trainer</button>
+    <button class="tbtn" data-tab="tafel" id="tbtn-tafel" onclick="switchTab('tafel')" style="display:none;">Tafel</button>
+    <button class="tbtn active" data-tab="spieler" onclick="switchTab('spieler')">Spieler</button>
+    <button class="tbtn" data-tab="trainer" onclick="switchTab('trainer')">Trainer</button>
   </div>
+  <div class="tpanel" id="tab-tafel"><div id="kbBoard"></div></div>
   <div class="tpanel active" id="tab-spieler">
     <div class="tmgr-scroll" style="border:1px solid var(--gl);border-radius:8px;margin-bottom:10px;" id="tmgr-pl-list"></div>
     <div class="mob-btns">
@@ -5398,7 +5498,7 @@ const APP_VERSION_LABEL='1.1.0';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791963525992; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791989974595; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.1.0',date:'14.10.2026',title:'Neues Design',items:[
     {icon:'🧭',title:'Neues Design für alle',desc:'Die Übersicht zeigt den nächsten Termin, das nächste Spiel, diese und letzte Woche. Die Navigation sitzt an der Seite (auf dem Handy unten), Bereiche öffnen als Seiten statt als Fenster. Das alte Design gibt es nicht mehr.'},
@@ -10149,6 +10249,7 @@ function render(){
     updateUndoBtns();
     if(typeof _automationRenderCards==='function')_automationRenderCards();
     if(typeof hxRenderNav==='function')hxRenderNav();
+    if(typeof _kbVisible==='function'&&_kbVisible())try{kbRender();}catch(e){console.error('kbRender',e);}
     // Keep Startseite in sync: Firebase sync, undo/redo, team/season switch
     // all funnel through render() — refresh home if it's currently visible.
     const _homeOv=document.getElementById('homeOverlay');
@@ -19602,6 +19703,7 @@ function _ssxSet(si,pi,v){
   try{renderBody();renderTfoot();}catch(e){}
   try{if(_hxOn()&&typeof hxRender==='function')hxRender();}catch(e){}
   try{if(typeof renderMobileAtt==='function')renderMobileAtt();}catch(e){}
+  try{if(typeof _kbVisible==='function'&&_kbVisible())kbRender();}catch(e){}
 }
 // One message for the group chat with the names that have not answered yet
 function ssRemindOpen(si){
@@ -21364,7 +21466,7 @@ function hxGo(k){
     case 'home':homeOpen();break;
     case 'table':homeClose();break;
     case 'cal':openCalendar();break;
-    case 'team':openTeamMgr('spieler');break;
+    case 'team':openTeamMgr(_kbDefaultTab());break;
     case 'lineup':openNextMatchLineup();document.getElementById('moLineup')?.classList.add('hx-vianav');break;
     case 'stats':openDashboard();break;
     case 'week':openWeekReport();break;
@@ -22067,15 +22169,163 @@ document.addEventListener('wheel',e=>{
   e.preventDefault();
 },{passive:false});
 function switchTab(t){
-  ['spieler','trainer'].forEach((n,i)=>{
-    document.querySelectorAll('#moTeamMgr .tbtn')[i]?.classList.toggle('active',n===t);
-    document.getElementById('tab-'+n)?.classList.toggle('active',n===t);
-  });
+  if(t==='tafel'&&!_kbOn())t='spieler';
+  const tb=document.getElementById('tbtn-tafel');if(tb)tb.style.display=_kbOn()?'':'none';
+  document.querySelectorAll('#moTeamMgr .tbtn').forEach(b=>{const on=b.dataset.tab===t;b.classList.toggle('active',on);b.setAttribute('aria-pressed',on);});
+  ['tafel','spieler','trainer'].forEach(n=>document.getElementById('tab-'+n)?.classList.toggle('active',n===t));
+  if(_kbOn())try{localStorage.setItem('fcf_kader_tab',t);}catch(e){}
+  if(t==='tafel')kbRender();
   document.getElementById('tmgr-h').textContent='Kader';
   if(t==='spieler')renderMgrPlayers();
   if(t==='trainer'){document.getElementById('mgr-team-lbl').textContent=UI.currentTeam;renderMgrTrainers();buildTeamChecks('tTeamChecks');}
 }
 
+// ══ Kader-Tafel (Konzept B „Kader-Board“) ══════════════════════════════
+// The squad by lines — Tor, Abwehr, Mittelfeld, Angriff — for one date: who
+// is available, who is not, and how reliably each one came lately. On a
+// match day "Aufstellung aus Zusagen" fills the lineup from the available
+// players by position. Preview for the admin first; set
+// KB_PREVIEW_ADMIN_ONLY=false to open it for every trainer.
+const KB_PREVIEW_ADMIN_ONLY=true;
+const KB={si:null,team:null,season:null};
+function _kbOn(){
+  if(typeof isPlayerMode==='function'&&isPlayerMode())return false;
+  return !KB_PREVIEW_ADMIN_ONLY||(typeof isAdmin==='function'&&isAdmin());
+}
+function _kbVisible(){
+  const m=document.getElementById('moTeamMgr'),t=document.getElementById('tab-tafel');
+  return !!(m&&t&&m.classList.contains('open')&&t.classList.contains('active'));
+}
+function _kbDefaultTab(){
+  if(!_kbOn())return 'spieler';
+  let t='';try{t=localStorage.getItem('fcf_kader_tab')||'';}catch(e){}
+  return ['tafel','spieler','trainer'].includes(t)?t:'tafel';
+}
+// Before the session: the players' answers; from its start: attendance
+const KB_ST={
+  plan:{4:['Zugesagt','ok'],3:['Offen','open'],2:['Entschuldigt','warn'],0:['Abgesagt','bad'],1:['Anwesend','ok']},
+  roll:{1:['Anwesend','ok'],0:['Fehlend','bad'],2:['Entschuldigt','warn'],4:['Nicht erfasst','open'],3:['Offen','open']}
+};
+const KB_ORDER={ok:0,open:1,warn:2,bad:3};
+const KB_WD=['So','Mo','Di','Mi','Do','Fr','Sa'];
+function _kbList(D,season,future){
+  const today=todaySK();
+  const a=(D.sessions||[]).map((s,i)=>({s,i,k:(s&&s.date)?_dbSortKey(s.date,season):0})).filter(x=>x.s&&x.k);
+  if(future)return a.filter(x=>x.k>=today).sort((x,y)=>x.k-y.k||String(x.s.time||'').localeCompare(String(y.s.time||''))).slice(0,6);
+  // the last five held sessions, oldest first
+  return a.filter(x=>x.k<=today&&(typeof sessTookPlace!=='function'||sessTookPlace(x.s,season))).sort((x,y)=>x.k-y.k).slice(-5);
+}
+function kbPick(si){KB.si=si;kbRender();}
+function kbTap(ev,pi){
+  if(KB.si!=null&&typeof canEdit==='function'&&canEdit()&&typeof _ssxMenu==='function')_ssxMenu(ev,KB.si,pi);
+  else if(typeof openPlayerStats==='function')openPlayerStats(pi);
+}
+function kbScroll(i){const el=document.getElementById('kbL'+i);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}
+function kbRender(){
+  const host=document.getElementById('kbBoard');if(!host)return;
+  const D=cd();
+  if(!D||!Array.isArray(D.players)||!D.players.length){host.innerHTML='<div class="kb-nodata">Noch keine Spieler im Kader.</div>';return;}
+  const season=UI.currentSeason,e=escapeHtml;
+  if(KB.team!==UI.currentTeam||KB.season!==season){KB.si=null;KB.team=UI.currentTeam;KB.season=season;}
+  const ups=_kbList(D,season,true);
+  if(KB.si==null||!ups.some(x=>x.i===KB.si)){const m=ups.find(x=>x.s.type==='match');KB.si=m?m.i:(ups[0]?ups[0].i:null);}
+  const si=KB.si,s=si!=null?D.sessions[si]:null;
+  const roll=!!(s&&typeof _isSessRollCallTime==='function'&&_isSessRollCallTime(si));
+  const meta=roll?KB_ST.roll:KB_ST.plan;
+  const held=_kbList(D,season,false);
+  const ed=typeof canEdit==='function'&&canEdit();
+  const join=(p,ss)=>typeof _sessAfterJoin!=='function'||_sessAfterJoin(p,ss,season);
+  // Players by line, available first
+  const lines=SSA_LINES.map(l=>({name:l[0],list:[]}));const none=[];
+  D.players.forEach((p,pi)=>{
+    if(!p||(s&&!join(p,s)))return;
+    const v=s?((p.s&&si<p.s.length)?p.s[si]:3):null;
+    const m=s?(meta[v]||meta[3]):null;
+    const x={p,pi,cls:m?m[1]:'',lbl:m?m[0]:''};
+    const li=_ssaLineOf(p);(li<lines.length?lines[li].list:none).push(x);
+  });
+  const pIdx=q=>{const i=POS.indexOf(q);return i<0?99:i;};
+  const cmp=(a,b)=>((KB_ORDER[a.cls]??9)-(KB_ORDER[b.cls]??9))||(pIdx(a.p.pos)-pIdx(b.p.pos))||((+a.p.nr||999)-(+b.p.nr||999));
+  lines.forEach(l=>l.list.sort(cmp));none.sort(cmp);
+  const nm=p=>e((typeof getDisplayName==='function'?getDisplayName(p):p.name)||p.name||'');
+  const badge=q=>{if(!q)return '';const bc=((typeof PB_COLORS!=='undefined'&&PB_COLORS[q])||'#e6ecf5;color:#4a5b75').split(';');return `<span class="kb-pb" style="background:${bc[0]};${bc[1]||''}">${e(q)}</span>`;};
+  const dots=p=>held.map(h=>{
+    if(!join(p,h.s))return '<i></i>';
+    const v=p.s&&p.s[h.i];return `<i class="${v===1?'ok':v===0?'bad':v===2?'warn':''}"></i>`;}).join('');
+  const dotsLbl=p=>{const n=held.filter(h=>join(p,h.s)&&p.s&&p.s[h.i]===1).length;return `Letzte ${held.length} Termine: ${n}× da`;};
+  const card=x=>`<button type="button" class="kb-card${x.cls?' st-'+x.cls:''}" onclick="kbTap(event,${x.pi})">
+      <span class="kb-nr">${e(String(x.p.nr!=null&&x.p.nr!==''?x.p.nr:'–'))}</span>
+      <b class="kb-nm">${nm(x.p)}</b>
+      <span class="kb-row">${badge(x.p.pos)}${x.p.pos2?badge(x.p.pos2):''}${x.lbl?`<span class="kb-st">${e(x.lbl)}</span>`:''}${held.length?`<span class="kb-dots" title="${e(dotsLbl(x.p))}" aria-label="${e(dotsLbl(x.p))}">${dots(x.p)}</span>`:''}</span></button>`;
+  const cnt=(l,k)=>l.list.filter(x=>x.cls===k).length;
+  const bar=l=>`<span class="kb-bar" aria-hidden="true">${['ok','open','warn','bad'].map(k=>cnt(l,k)?`<i class="${k}" style="flex:${cnt(l,k)}"></i>`:'').join('')}</span>`;
+  const word=roll?'da':'zugesagt';
+  // Date strip
+  const days=ups.map(x=>{const d=_hxDate(x.k);const m=x.s.type==='match';
+    return `<button type="button" class="kb-day${x.i===si?' on':''}${m?' m':''}" onclick="kbPick(${x.i})" aria-pressed="${x.i===si}"><span>${KB_WD[d.getDay()]}</span><b>${d.getDate()}</b><i>${m?'Spiel':e(x.s.time||'Training')}</i></button>`;}).join('');
+  let head='';
+  if(s){
+    const d=_hxDate(_dbSortKey(s.date,season));const m=s.type==='match';
+    const what=m?(s.label?'Spiel gegen '+s.label:'Spiel'):(s.focus?'Training · '+s.focus:'Training');
+    const when=[KB_WD[d.getDay()]+' '+d.getDate()+'.'+(d.getMonth()+1)+'.',s.time||'',s.location||''].filter(Boolean).join(' · ');
+    const c=_hxCounts(D,si,season);
+    const parts=roll?[['ok',c.present,'da'],['bad',c.no,'fehlen'],['warn',c.exc,'entschuldigt'],['open',c.open,'offen']]
+      :[['ok',c.yes,'zugesagt'],['warn',c.exc,'entschuldigt'],['bad',c.no,'abgesagt'],['open',c.open,'offen']];
+    head=`<div class="kb-head"><div class="kb-ttl">${e(what)}</div><div class="kb-meta">${e(when)}</div>
+      <div class="kb-leg">${parts.filter(p=>p[1]).map(p=>`<span><i class="${p[0]}"></i><b>${p[1]}</b> ${p[2]}</span>`).join('')}</div></div>
+      ${m&&ed?`<button type="button" class="kb-lu" onclick="kbLineup()">Aufstellung aus Zusagen</button>`:''}`;
+  }else head=`<div class="kb-head"><div class="kb-ttl">Keine kommenden Termine</div><div class="kb-meta">Die Tafel zeigt den Kader nach Linien.</div></div>`;
+  const sum=lines.map((l,i)=>`<button type="button" onclick="kbScroll(${i})"><b>${s?cnt(l,'ok'):l.list.length}<small>${s?'/'+l.list.length:''}</small></b><span>${e(l.name)}</span></button>`).join('');
+  host.innerHTML=`<div class="kb-top">${ups.length?`<div class="kb-days" role="group" aria-label="Termin wählen">${days}</div>`:''}${head}</div>
+    <div class="kb-sum" aria-label="Linien">${sum}</div>
+    <div class="kb-board">
+      <svg class="kb-pitch" viewBox="0 0 640 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${_dgBg('full')}</svg>
+      <div class="kb-cols">${lines.map((l,i)=>`<section class="kb-col" id="kbL${i}" aria-label="${e(l.name)}">
+        <header><h3>${e(l.name)}</h3><span>${s?`<b>${cnt(l,'ok')}</b> von ${l.list.length} ${word}`:`${l.list.length} Spieler`}</span>${s&&l.list.length?bar(l):''}</header>
+        <div class="kb-cards">${l.list.map(card).join('')||'<span class="kb-empty">Kein Spieler</span>'}</div></section>`).join('')}</div>
+    </div>
+    ${none.length?`<section class="kb-none" id="kbL4"><header><h3>Ohne Position</h3><span>${none.length} Spieler · Position im Spielerprofil eintragen</span></header><div class="kb-cards">${none.map(card).join('')}</div></section>`:''}`;
+}
+// Fill the lineup of the selected match from the players who said yes:
+// empty slots only (a lineup started by hand stays), the goalkeeper slot only
+// with a goalkeeper; players who keep the training rule and come regularly
+// first; the rest goes on the bench.
+// Nothing is saved — the trainer looks it over and saves in the planner.
+function kbLineup(){
+  const D=cd();const si=KB.si;const s=D&&D.sessions&&D.sessions[si];
+  if(!s||s.type!=='match'||!(typeof canEdit==='function'&&canEdit()))return;
+  const season=UI.currentSeason;
+  const join=(p,ss)=>typeof _sessAfterJoin!=='function'||_sessAfterJoin(p,ss,season);
+  const okV=(typeof _isSessRollCallTime==='function'&&_isSessRollCallTime(si))?[1]:[4,1];
+  const avail=D.players.map((p,pi)=>({p,pi})).filter(x=>x.p&&join(x.p,s)&&okV.includes(x.p.s&&x.p.s[si]));
+  if(!avail.length){alert('Für dieses Spiel hat noch niemand zugesagt.');return;}
+  const held=(D.sessions||[]).map((ss,i)=>({ss,i})).filter(x=>typeof sessTookPlace!=='function'||sessTookPlace(x.ss,season));
+  avail.forEach(x=>{let a=0,n=0;held.forEach(h=>{if(!join(x.p,h.ss))return;const v=x.p.s&&x.p.s[h.i];if(v===1||v===0||v===2){n++;if(v===1)a++;}});x.r=n?a/n:0;});
+  openLineupPlanner(si);
+  // The training rule of the planner: whoever breaks it comes last
+  avail.forEach(x=>{try{x.d=typeof lpDisciplineState==='function'&&lpDisciplineState(x.pi)?1:0;}catch(e){x.d=0;}});
+  avail.sort((a,b)=>(a.d-b.d)||(b.r-a.r)||((+a.p.nr||999)-(+b.p.nr||999)));
+  const slots=fmtSlots(lpState.formation,lpState.customSlots);
+  const used=new Set([...Object.values(lpState.slots),...lpState.subs].filter(v=>typeof v==='number'));
+  const lineOf=q=>SSA_LINES.findIndex(l=>l[1].includes(q));
+  const tw=sl=>(sl.pos||[])[0]==='TW';
+  const passes=[
+    (x,sl)=>x.p.pos===sl.pos[0],
+    (x,sl)=>sl.pos.includes(x.p.pos),
+    (x,sl)=>!!x.p.pos2&&sl.pos.includes(x.p.pos2),
+    (x,sl)=>!tw(sl)&&x.p.pos!=='TW'&&lineOf(x.p.pos)>=0&&lineOf(x.p.pos)===lineOf(sl.pos[0]),
+    (x,sl)=>!tw(sl)&&x.p.pos!=='TW'
+  ];
+  let placed=0,bench=0;
+  passes.forEach(ok=>slots.forEach(sl=>{
+    if(lpState.slots[sl.id]!==undefined||!Array.isArray(sl.pos))return;
+    const x=avail.find(y=>!used.has(y.pi)&&ok(y,sl));
+    if(x){lpState.slots[sl.id]=x.pi;used.add(x.pi);placed++;}
+  }));
+  avail.forEach(x=>{if(used.has(x.pi)||lpState.subs.length>=lpMaxSubs())return;lpState.subs.push(x.pi);used.add(x.pi);bench++;});
+  lpRender();
+  if(typeof showSaveFlash==='function')showSaveFlash(placed+bench?`${placed} in der Startelf, ${bench} auf der Bank · noch nicht gespeichert`:'Die Aufstellung ist schon voll',4500);
+}
 
 function renderMgrPlayers(){
   const D=cd();
