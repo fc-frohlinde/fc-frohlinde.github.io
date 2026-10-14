@@ -3567,6 +3567,20 @@ body.design-heute .hx-a-last .hx-bar.cur i{background:var(--hx-blue);}
 body.design-heute .hx-a-last .hx-link{margin-top:auto;}
 /* week + flags */
 body.design-heute .hx-a-week,body.design-heute .hx-a-flags{gap:2px;}
+/* free days in the week list: one quiet line */
+body.design-heute .hx-day.rest{padding-top:1px;padding-bottom:1px;}
+body.design-heute .hx-day.rest .hx-day-d{flex-direction:row;align-items:baseline;justify-content:center;gap:4px;}
+body.design-heute .hx-day.rest .hx-day-d b{font-size:1rem;color:#8A96AD;}
+body.design-heute .hx-day.rest .hx-day-d small{color:#8A96AD;}
+body.design-heute .hx-day.rest .hx-day-t{font-weight:500;font-size:.84rem;color:#8A96AD;}
+/* the rest of the week after the date: one line beside the search on a wide
+   screen; on a tablet the week card beside the session already says it */
+body.design-heute .hx-wsum{font-weight:500;}
+@media(min-width:768px){
+  body.design-heute .hx-top .hx-hello{flex:1 1 0;min-width:0;}
+  body.design-heute .hx-top .hx-date{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+}
+@media(max-width:1180px){body.design-heute .hx-wsum{display:none;}}
 body.design-heute .hx-a-flags .hx-flag:last-of-type{border-bottom:none;}
 /* The grid follows the width it actually gets (an open panel narrows the
    start screen), not the window: container queries on .hx-wrap. */
@@ -3591,7 +3605,23 @@ body.design-heute .hx-wrap{container:hxw / inline-size;}
   body.design-heute .hx-hero-head .hx-btn{flex:1 1 0;}
 }
 @media(max-width:767px){
-  body.design-heute .hx-grid{grid-template-columns:minmax(0,1fr);grid-template-areas:"hero" "match" "week" "last" "flags";gap:14px;}
+  body.design-heute .hx-grid{grid-template-columns:minmax(0,1fr);grid-template-areas:"hero" "week" "match" "flags" "last";gap:14px;}
+  /* Phone: the start screen should read at a glance — the open names sit
+     behind "n offen" in the legend, the week is a row of tiles */
+  body.design-heute .hx-a-hero .hx-open{display:none;}
+  body.design-heute .hx-day.rest{display:none;}
+  body.design-heute .hx-a-week{display:flex;flex-direction:row;flex-wrap:wrap;gap:8px;background:none !important;box-shadow:none !important;padding:0 !important;border-radius:0;}
+  body.design-heute .hx-a-week > .hx-h2{flex:1 0 100%;margin:0 0 -2px;color:var(--hx-ink);}
+  body.design-heute .hx-a-week .hx-day{flex:0 1 calc((100% - 16px)/3);width:auto;flex-direction:column;align-items:flex-start;gap:3px;padding:11px 12px;border-radius:16px;background:var(--hx-card);box-shadow:var(--hx-shadow);min-width:0;}
+  body.design-heute .hx-a-week .hx-day.today{background:#FFF3CC;}
+  body.design-heute .hx-a-week .hx-day-d{width:auto;align-items:flex-start;}
+  body.design-heute .hx-a-week .hx-day-d b{font-size:1.6rem;}
+  body.design-heute .hx-a-week .hx-day-x{width:100%;}
+  body.design-heute .hx-a-week .hx-day-t{font-size:.86rem;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.2;}
+  body.design-heute .hx-a-week .hx-day-s{font-size:.76rem;}
+  body.design-heute .hx-a-week .hx-day-n{font-size:1rem;margin-top:auto;}
+  /* the week tiles right below say the same */
+  body.design-heute .hx-wsum{display:none;}
   body.design-heute .hx-hero-head{grid-template-columns:auto minmax(0,1fr);gap:14px;}
   body.design-heute .hx-hero-head .hx-btns{grid-column:1 / -1;flex-direction:row;min-width:0;}
   body.design-heute .hx-hero-head .hx-btn{flex:1 1 0;}
@@ -4255,13 +4285,28 @@ body.design-heute .home-overlay::before,body.design-heute .home-overlay::after{d
 .mx-seg button.on{background:var(--hx-card);color:var(--hx-ink);font-weight:700;box-shadow:0 1px 2px rgba(14,35,80,.16);}
 .mx-range{display:flex;align-items:center;gap:8px;font:600 14px 'Barlow',sans-serif;color:var(--hx-muted);}
 .mx-range select{height:40px;border-radius:10px;border:1px solid var(--hx-line);background:var(--hx-field);padding:0 10px;font:600 14px 'Barlow',sans-serif;color:var(--hx-ink);cursor:pointer;}
-.mx-fold{margin-left:auto;display:inline-flex;align-items:center;gap:9px;height:40px;padding:0 13px 0 11px;border-radius:10px;border:1px solid var(--hx-line);background:var(--hx-field);color:var(--hx-ink);font:600 14px 'Barlow',sans-serif;cursor:pointer;}
+.mx-sp{flex:1 1 0;min-width:0;}
+.mx-new{display:inline-flex;gap:8px;}
+.mx-add{display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 14px 0 11px;border-radius:10px;border:1px solid var(--hx-line);background:var(--hx-field);color:var(--hx-ink);font:700 14px 'Barlow',sans-serif;cursor:pointer;white-space:nowrap;}
+.mx-add:hover{border-color:var(--hx-ink2);}
+.mx-add.pri{background:var(--hx-yellow);border-color:var(--hx-yellow);color:#0E2350;}
+.mx-add.pri:hover{filter:brightness(.96);}
+.mx-add:focus-visible{outline:2px solid var(--hx-blue);outline-offset:2px;}
+.mx-fold{display:inline-flex;align-items:center;gap:9px;height:40px;padding:0 13px 0 11px;border-radius:10px;border:1px solid var(--hx-line);background:var(--hx-field);color:var(--hx-ink);font:600 14px 'Barlow',sans-serif;cursor:pointer;}
 .mx-fold:hover{border-color:var(--hx-ink2);}
 .mx-fold i{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--hx-muted);display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;color:transparent;}
 .mx-fold.on i{background:var(--hx-nav);border-color:var(--hx-nav);color:#fff;}
 :is(.mx-seg button,.mx-fold,.mx-range select):focus-visible{outline:2px solid var(--hx-blue);outline-offset:2px;}
-@media(max-width:1199px){body.design-heute #mxFold{display:none;}}
-@media(min-width:1200px){#vd-mxfold{display:none !important;}}
+@media(max-width:1599px){body.design-heute #mxFold{display:none;}}
+@media(min-width:1600px){#vd-mxfold{display:none !important;}}
+/* tablets: the bar stays one row */
+@media(max-width:1199px){
+  .mx-q{flex-basis:170px;min-width:140px;}
+  .mx-range{font-size:0;gap:0;}
+  .mx-range select{font-size:14px;}
+  .mx-add{height:36px;padding:0 11px 0 9px;font-size:13px;}
+  .mx-seg button{padding:0 10px;}
+}
 /* few columns: the table keeps its natural width instead of stretching the chips */
 #mainTable.mx{width:auto;}
 
@@ -5074,7 +5119,9 @@ if(window._fbBlocked){
   <label class="mx-q"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input type="search" id="mxQ" placeholder="Spieler suchen" aria-label="Spieler suchen" autocomplete="off" oninput="mxSearch(this.value)" onkeydown="if(event.key==='Escape'){this.value='';mxSearch('');}"></label>
   <div class="mx-seg" role="group" aria-label="Termine zeigen"><button type="button" data-t="all" onclick="mxType('all')">Alle</button><button type="button" data-t="training" onclick="mxType('training')">Training</button><button type="button" data-t="match" onclick="mxType('match')">Spiele</button></div>
   <label class="mx-range">Zeitraum<select id="mxRange" onchange="mxRange(this.value)"><option value="all">Ganze Saison</option><option value="4w">Letzte 4 Wochen</option><option value="past">Nur vergangene</option><option value="future">Nur kommende</option></select></label>
+  <span class="mx-sp" aria-hidden="true"></span>
   <button type="button" class="mx-fold" id="mxFold" onclick="mxFold()" aria-pressed="true"><i aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></i>Ältere Wochen zusammenfassen</button>
+  <span class="mx-new" id="mxNew"><button type="button" class="mx-add pri" onclick="openM('moSession')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Training</button><button type="button" class="mx-add" onclick="openM('moMatch')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Spiel</button></span>
 </div>
 
 <div class="table-wrap" id="tableWrap">
@@ -5641,7 +5688,7 @@ const APP_VERSION_LABEL='1.1.1';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792019882053; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792021090341; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.1.1',date:'14.10.2026',title:'Kader-Tafel',items:[
     {icon:'📋',title:'Kader als Tafel',desc:'Im Kader gibt es den neuen Reiter „Tafel“: die Mannschaft nach Linien (Tor, Abwehr, Mittelfeld, Angriff) für einen Termin. Pro Linie siehst du, wie viele zugesagt haben, pro Spieler den Status und die letzten fünf Termine als Punkte. Oben wählst du den Termin.'},
@@ -10925,6 +10972,7 @@ function mxSyncBar(){
     if(i===0&&it.previousElementSibling&&it.previousElementSibling.classList.contains('vd-sep'))it.previousElementSibling.style.display=on?'none':'';
   });
   const fi=document.getElementById('vd-mxfold');if(fi)fi.style.display=on?'':'none';
+  const nw=document.getElementById('mxNew');if(nw)nw.style.display=(on&&typeof canEdit==='function'&&canEdit())?'':'none';
   if(!on){document.getElementById('mainTable')?.classList.remove('mx');return;}
   document.querySelectorAll('#mxBar .mx-seg button').forEach(b=>{const p=b.dataset.t===MX.type;b.classList.toggle('on',p);b.setAttribute('aria-pressed',p);});
   const r=document.getElementById('mxRange');if(r&&r.value!==MX.range)r.value=MX.range;
@@ -22144,6 +22192,22 @@ function _hxGreeting(){
   const n=_hxFirstName();
   return n?g+', '+n:g;
 }
+// What is still on this week, in one line after the date: "heute 18:30
+// Training · Sonntag 13:00 Spiel gegen BSV Schüren". Nothing left this week →
+// the next session.
+function _hxWeekSummary(D){
+  const S=(D&&D.sessions)||[];const t=todaySK();
+  const b=_dbWeekBounds(0),sun=new Date(b.monday);sun.setDate(sun.getDate()+6);
+  const end=sun.getFullYear()*10000+(sun.getMonth()+1)*100+sun.getDate();
+  const day=k=>{const r=_hxRel(k);return (r==='heute'||r==='morgen')?r:_hxDate(k).toLocaleDateString('de-DE',{weekday:'long'});};
+  const what=s=>s.type==='match'?(s.label?'Spiel gegen '+s.label:'Spiel'):'Training';
+  const item=(s,k)=>[day(k),s.time||'',what(s)].filter(Boolean).join(' ');
+  const up=S.map((s,i)=>({s,i,k:(s&&s.date)?dispToSortKey(s.date):0})).filter(x=>x.s&&x.k>=t).sort((a,b2)=>a.k-b2.k||String(a.s.time||'').localeCompare(String(b2.s.time||'')));
+  const wk=up.filter(x=>x.k<=end);
+  if(wk.length){const l=wk.slice(0,3).map(x=>item(x.s,x.k));if(wk.length>3)l.push('+'+(wk.length-3));return l.join(' · ');}
+  if(up.length){const x=up[0];const d=_hxDate(x.k);return 'nächster Termin: '+d.toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'numeric'})+(x.s.time?' '+x.s.time:'')+' '+what(x.s);}
+  return '';
+}
 function hxRender(){
   const el=document.getElementById('hxHome');if(!el)return;
   const D=cd();
@@ -22170,8 +22234,9 @@ function hxRender(){
   const sk=s=>(s&&s.date)?dispToSortKey(s.date):99999999;
   const fi=findNext();
   const mi=findNextMatchIdx();
+  const wsum=_hxWeekSummary(D);
   let html=`<div class="hx-heroimg" aria-hidden="true"></div><div class="hx-wrap">${mtop}
-    <div class="hx-top"><div class="hx-hello"><span class="hx-date">${esc(dateTxt)}</span><h1 class="hx-h1">${esc(_hxGreeting())}</h1></div>
+    <div class="hx-top"><div class="hx-hello"><span class="hx-date">${esc(dateTxt)}${wsum?`<span class="hx-wsum"><span class="hx-wsep" aria-hidden="true"> · </span>${esc(wsum)}</span>`:''}</span><h1 class="hx-h1">${esc(_hxGreeting())}</h1></div>
     <span class="hx-top-r"><button type="button" class="hx-search" onclick="openSearch()">${hxIcon('search',18)}Spieler oder Termin suchen</button></span></div>
     <div class="hx-grid">`;
   // ── Focus: the next session ──
@@ -22215,7 +22280,7 @@ function hxRender(){
         <div class="hx-btns">${btns}</div></div>
       ${att}`;
     if(c.openList.length){
-      html+=`<div class="hx-divider"><span class="hx-sub-h">${roll?'Noch nicht erfasst':'Noch keine Antwort'} (${c.openList.length})</span><div class="hx-chips">`
+      html+=`<div class="hx-divider hx-open"><span class="hx-sub-h">${roll?'Noch nicht erfasst':'Noch keine Antwort'} (${c.openList.length})</span><div class="hx-chips">`
         +c.openList.slice(0,8).map(({p,pi})=>`<button type="button" class="hx-chip" onclick="openPlayerFromMain(${pi})"><i>${esc(String(p.nr||'·'))}</i>${esc(nm(p))}</button>`).join('')
         +(c.openList.length>8?`<button type="button" class="hx-chip" onclick="openSessFromMain(${fi});_ssxFocus(${roll?4:3})">+${c.openList.length-8}</button>`:'')
         +`</div></div>`;
@@ -22264,8 +22329,9 @@ function hxRender(){
     const dow=d.toLocaleDateString('de-DE',{weekday:'short'}).replace('.','');
     const isT=dk===today;
     if(!list.length){
-      // Empty days are left out — only today says that nothing is on
-      if(isT)html+=`<div class="hx-day empty today"><span class="hx-day-d"><small>${esc(dow)}</small><b>${d.getDate()}</b></span><span class="hx-day-x"><span class="hx-day-t">Heute kein Termin</span></span></div>`;
+      // Free days: a quiet row, so the week reads as a week (the phone shows
+      // only days with something on, and today)
+      html+=`<div class="hx-day empty${isT?' today':' rest'}"><span class="hx-day-d"><small>${esc(dow)}</small><b>${d.getDate()}</b></span><span class="hx-day-x"><span class="hx-day-t">${isT?'Heute kein Termin':'Kein Termin'}</span></span></div>`;
       return;
     }
     list.forEach(si=>{
@@ -22316,7 +22382,7 @@ function hxRender(){
   if(!flags.length)html+=`<div class="hx-ok">Alles im grünen Bereich.</div>`;
   else{
     // Four rows keep the start screen on one page; the rest on demand
-    const cap=(innerWidth>=768&&innerWidth<=1180)?3:4;
+    const cap=(innerWidth>=768&&innerWidth<=1180)?3:innerWidth<768?4:innerHeight>=1000?6:innerHeight>=860?5:4;
     const lim=window._hxFlagsAll?flags.length:cap;
     html+=flags.slice(0,lim).map(f=>`<button type="button" class="hx-flag" onclick="${f.on}"><span class="hx-dot" style="background:${f.dot}"></span><span class="hx-flag-x"><b>${esc(f.who)}</b><span>${esc(f.what)}</span></span></button>`).join('')
       +(flags.length>cap?`<button type="button" class="hx-link" style="padding:8px 6px 0;" onclick="window._hxFlagsAll=!window._hxFlagsAll;hxRender();">${window._hxFlagsAll?'Weniger anzeigen':'Alle '+flags.length+' anzeigen'}</button>`:'');
