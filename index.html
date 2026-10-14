@@ -3103,47 +3103,6 @@ body.theme-dark .wr2-lnm,body.theme-dark .wr2-lv{color:#dde5f0;}
   .pm-hero-card .pm-btn{min-height:56px;font-size:.84rem;}
 }
 
-/* ════════════════════════════════════════
-   GUEST MODE — read-only, hide private data
-   ════════════════════════════════════════ */
-body.guest-mode #notifWrap{display:none !important;}
-
-body.guest-mode .toolbar .btn[onclick*="openSlpFloating"],
-body.guest-mode #pickTeamBtn,
-body.guest-mode #ud-admin{display:none !important;}
-body.guest-mode #ud-dashboard{display:none !important;}
-/* Hide message system entries in notification panel via JS */
-body.guest-mode .notif-compose{display:none !important;}
-/* Hide trainer chips */
-body.guest-mode #hTrainersWrap{display:none !important;}
-/* Manager modal buttons */
-body.guest-mode #btn-mgr-addpl,body.guest-mode #btn-mgr-teamlink,
-body.guest-mode .pl-edit-btn,
-body.guest-mode .lp-fab,
-body.guest-mode .slp-fab,
-body.guest-mode .lp-floating-btn,
-body.guest-mode .next-btn{display:none !important;}
-/* Edit icons next to player photos */
-body.guest-mode .photo-edit-wrap::after{display:none !important;}
-body.guest-mode .photo-edit-wrap{cursor:default !important;}
-/* Logo not editable */
-body.guest-mode .logo-ring{cursor:default !important;}
-body.guest-mode .logo-ring.editable::after{display:none !important;}
-/* Banner indicating guest mode */
-body.guest-mode::before{
-  content:'🔗 Gast-Modus · Nur-Lese-Zugriff';
-  position:fixed;top:0;left:0;right:0;
-  background:linear-gradient(90deg,var(--ac),#f5d060);
-  color:var(--bd);
-  text-align:center;padding:3px 14px;
-  font-size:.66rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;
-  z-index:99998;
-  box-shadow:0 2px 8px rgba(0,0,0,.2);
-}
-body.guest-mode{padding-top:24px;}
-@media (max-width:767px){
-  body.guest-mode{padding-top:22px;}
-}
 
 
 .footer-l{display:flex;align-items:center;padding-left:140px;justify-self:start;min-width:0;}
@@ -3631,6 +3590,16 @@ body.design-heute :is(#moCalendar,#moDashboard,#moWeekReport) .mob-close-x,body.
   body.design-heute :is(#moDashboard,#moWeekReport) .hx-back{display:flex;align-items:center;justify-content:center;width:38px;height:38px;margin:0 2px 0 -6px;padding:0 0 3px;border:none;border-radius:999px;background:rgba(255,255,255,.1);color:#fff;font-size:1.7rem;line-height:1;cursor:pointer;flex-shrink:0;}
   body.design-heute #moSettings .set-back{display:flex;color:#fff;}
 }
+/* ── Heute: Kader = people only; Statistik / Kalender / Einstellungen took the rest ── */
+.set-hx-only{display:none;}
+body.design-heute .set-hx-only{display:block;}
+body.design-heute #moTeamMgr .tbtn:is([onclick*="'schwerpunkte'"],[onclick*="'statistik'"],[onclick*="'trainings'"],[onclick*="'spiele'"]){display:none;}
+body.design-heute #set-foc-host .note{font-size:.74rem;color:var(--hx-muted);margin:0 0 6px;}
+body.design-heute .cal-att{font-weight:700;color:var(--hx-ok);}
+body.design-heute .cal-evt .cal-att{font-weight:800;color:inherit;opacity:.75;}
+body.design-heute #moDashboard .db-alltab .full-table{width:100%;}
+body.design-heute #moDashboard .db-alltab .full-table thead th{background:var(--hx-ground);color:var(--hx-muted);cursor:pointer;white-space:nowrap;}
+body.design-heute #moDashboard .db-alltab .full-table tbody tr:hover{background:var(--hx-ground);}
 /* ── Kader page (#moTeamMgr) ── */
 body.design-heute #moTeamMgr > .mob{padding:30px 40px 28px !important;}
 body.design-heute #moTeamMgr > .mob > *{width:100%;max-width:1040px;box-sizing:border-box;}
@@ -5030,7 +4999,6 @@ if(window._fbBlocked){
   <div class="tbar">
     <button class="tbtn active" onclick="switchAdminTab('trainers')">🎽 Trainer</button>
     <button class="tbtn" onclick="switchAdminTab('teams')">👥 Teams</button>
-    <button class="tbtn" onclick="switchAdminTab('guest')">🔗 Gast-Zugriff</button>
     <button class="tbtn" onclick="switchAdminTab('wartung')">🔧 Wartung</button>
     <button class="tbtn" onclick="switchAdminTab('data')">💾 Daten</button>
     <button class="tbtn" onclick="switchAdminTab('firebase')">🌐 Online-Sync</button>
@@ -5061,10 +5029,6 @@ if(window._fbBlocked){
     <div class="mob-btns" style="margin-top:10px;">
       
     </div>
-  </div>
-  <div class="tpanel" id="atab-guest">
-    <p class="note" style="margin-bottom:10px;">Erstelle Links zum Teilen mit Eltern und Spielern. Diese sehen nur Termine, Spielerliste, Anwesenheitsstatistik und Geburtstage – ohne Bearbeitungsrechte und ohne Kontaktdaten.</p>
-    <div id="admin-guest-list"></div>
   </div>
   <div class="tpanel" id="atab-wartung">
     <p class="note" style="margin-bottom:10px;font-size:.78rem;line-height:1.5;">Hier können Aufstellungen wiederhergestellt werden, deren Verknüpfung durch frühere Spiel-/Trainingslöschungen verschoben wurde.</p>
@@ -5135,7 +5099,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791940203491; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791940929868; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -7591,7 +7555,7 @@ function initAuth(){
   loadG();
   // GLOBAL: if Firebase scripts were blocked by browser (tracking prevention/
   // adblocker), the app cannot function. Show a clear error before any other
-  // routing. Applies to all users (trainers, players, guests).
+  // routing. Applies to all users (trainers and players).
   if(window._fbBlocked){
     const overlay=document.getElementById('authOverlay');
     if(overlay){
@@ -7617,8 +7581,11 @@ function initAuth(){
   if(typeof tryPlayerUrlAuth==='function'&&tryPlayerUrlAuth())return;
   // Team URL check (?team=<name>) — shared team link, asks name + birthdate
   if(typeof tryTeamUrlAuth==='function'&&tryTeamUrlAuth())return;
-  // Guest URL check (?guest=<token>) — bypass normal auth if valid
-  if(typeof tryGuestUrlAuth==='function'&&tryGuestUrlAuth())return;
+  // Guest links (?guest=<token>) were removed; an old link lands on the
+  // normal login with the parameter dropped from the address.
+  if(new URLSearchParams(location.search).has('guest')){
+    try{const u=new URL(location.href);u.searchParams.delete('guest');history.replaceState(history.state,'',u.pathname+u.search+u.hash);}catch(e){}
+  }
   // Session-expiry check: returns true if session should be discarded.
   // Reads sessionExpiryDays from the user's per-device prefs (key fcf_prefs_<name>).
   const _sessionExpired=(u)=>{
@@ -8451,7 +8418,7 @@ function _checkRemoteAppVersion(){
   // player link opened after a deploy therefore published its reduced copy —
   // no trainer action required, and it fires again on every version bump.
   // Announcing the version is a convenience; it must never be a writer here.
-  // May this client PUBLISH its version? Players and guests may not — a
+  // May this client PUBLISH its version? Players and viewers may not — a
   // reduced copy must never be written. Being told about a new build is a
   // different question and applies to everyone.
   const _mayAnnounce=!((typeof isPlayerMode==='function'&&isPlayerMode())||(G&&G.__sanitized))
@@ -8981,14 +8948,9 @@ function confirmLogout(){
   if(typeof stopPushInterval==='function')stopPushInterval();
   if(typeof stopPresence==='function')stopPresence();
   // Log before clearing CU
-  if(CU&&CU.role!=='guest'&&CU.role!=='player')logAudit('Abmeldung','','');
+  if(CU&&CU.role!=='player')logAudit('Abmeldung','','');
   if(typeof saveG==='function')saveG();
   localStorage.removeItem(AUTH_SK);sessionStorage.removeItem(AUTH_SK);
-  // Guest mode: redirect to clean URL (without ?guest=)
-  if(CU&&CU.role==='guest'){
-    location.href=location.pathname;
-    return;
-  }
   CU=null;
   if(typeof _updateAppTitle==='function')_updateAppTitle();
   document.getElementById('authInput').value='';
@@ -9136,13 +9098,12 @@ function renderUserPill(){
   if(!CU){p.style.display='none';return;}
   p.style.display='flex';
   if(CU.role==='admin'){ri.textContent='🛡';un.textContent='Admin';p.classList.remove('view-pill');}
-  else if(CU.role==='guest'){ri.textContent='🔗';un.textContent='Gast';p.classList.add('view-pill');}
   else if(CU.role==='viewer'){ri.textContent='👁';un.textContent='Nur ansehen';p.classList.add('view-pill');}
   else{ri.textContent='👕';un.textContent=CU.name;p.classList.remove('view-pill');}
 }
 
 function applyRoleUI(){
-  const edit=canEdit(),admin=isAdmin(),guest=isGuest();
+  const edit=canEdit(),admin=isAdmin();
   ['btn-addSess','btn-addMatch','btn-mgr-addpl','btn-mgr-teamlink','vd-multisel'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=edit?'':'none';});
   ['btn-plan'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=admin?'':'none';});
   // User-menu role-specific items
@@ -9152,8 +9113,6 @@ function applyRoleUI(){
   const ta=document.getElementById('mgr-tr-add');if(ta)ta.style.display=admin?'block':'none';
   // Focus add for editors
   const fa=document.getElementById('foc-add-row');if(fa)fa.style.display=edit?'flex':'none';
-  // Guest mode: hide UI elements not relevant to guests
-  document.body.classList.toggle('guest-mode',guest);
   // Now that individual items have their display set, re-evaluate menu group
   // headers/separators (Arbeit / Administration) in updateUserMenuState.
   if(typeof updateUserMenuState==='function')updateUserMenuState();
@@ -9172,8 +9131,8 @@ function logAudit(action,target,details){
   if(!G)return;
   if(!Array.isArray(G.auditLog))G.auditLog=[];
   // Player entries live in auditLogP (a push list, see _pmAppendAudit)
-  // Skip when no user (e.g. before login) or in player/guest mode
-  if(!CU||CU.role==='guest'||CU.role==='player')return;
+  // Skip when no user (e.g. before login) or in player mode
+  if(!CU||CU.role==='player')return;
   const _entry={
     ts:Date.now(),
     user:CU.name||'?',
@@ -9259,7 +9218,7 @@ function updateSearchSelection(){
 function buildSearchCorpus(){
   // Returns array of all searchable items based on current role
   const items=[];
-  const guest=isGuest()||isPlayerMode();
+  const reduced=isPlayerMode();   // player links get a reduced corpus
   // ── Players (current team+season) ──
   const D=cd();
   if(D&&Array.isArray(D.players)){
@@ -9293,7 +9252,7 @@ function buildSearchCorpus(){
     });
   }
   // ── Calendar events (current team+season) ──
-  if(!guest&&G.calEvents){
+  if(!reduced&&G.calEvents){
     const events=G.calEvents[ck()]||[];
     events.forEach(ev=>{
       if(!ev||!ev.date)return;
@@ -9309,7 +9268,7 @@ function buildSearchCorpus(){
     });
   }
   // ── Trainers ──
-  if(!guest&&Array.isArray(G.trainers)){
+  if(!reduced&&Array.isArray(G.trainers)){
     G.trainers.forEach(t=>{
       if(!t||!t.name)return;
       items.push({
@@ -9361,7 +9320,6 @@ function buildSearchCorpus(){
     cmds.push({label:'📜 Verlauf',meta:'Audit-Log',fn:()=>typeof openAuditLog==='function'&&openAuditLog()});
     cmds.push({label:'🔧 Wartung',meta:'Daten-Konsistenz prüfen',fn:()=>{openM('moAdmin');setTimeout(()=>typeof switchAdminTab==='function'&&switchAdminTab('wartung'),50);}});
     cmds.push({label:'💾 Backups verwalten',meta:'Datensicherung',fn:()=>typeof openBackupModal==='function'&&openBackupModal()});
-    cmds.push({label:'🔗 Gast-Zugriff',meta:'Token-Verwaltung',fn:()=>{openM('moAdmin');setTimeout(()=>typeof switchAdminTab==='function'&&switchAdminTab('guest'),50);}});
   }
   cmds.push({label:'⌨️ Tastatur-Kürzel',meta:'Hotkeys-Übersicht',fn:()=>typeof openShortcutsHelp==='function'&&openShortcutsHelp()});
   cmds.push({label:'⚙️ Einstellungen',meta:'Konto, Darstellung, Benachrichtigungen',fn:()=>typeof openSettings==='function'&&openSettings()});
@@ -11606,7 +11564,7 @@ var _setLast='konto';
 function _setPhone(){return window.matchMedia('(max-width:767px)').matches;}
 function _setVisible(sec){
   const role=CU&&CU.role;
-  if(sec==='konto')return !!CU&&role!=='guest'&&role!=='player';
+  if(sec==='konto')return !!CU&&role!=='player';
   if(sec==='daten')return typeof isAdmin==='function'&&isAdmin();
   if(sec==='team')return typeof canEdit==='function'&&canEdit();
   return true;
@@ -11624,6 +11582,15 @@ function _setFill(){
     el.classList.toggle('set-hide',!_setVisible(el.dataset.sec));
   });
 }
+// Schwerpunkte: in design "Heute" they live in Einstellungen → Mannschaft,
+// in Klassisch in the Kader tab. The same elements move between the two
+// places, so every function behind them keeps working unchanged.
+function _focMoveTo(host){
+  if(!host)return;
+  const lbl=document.getElementById('foc-team-lbl');
+  const note=lbl&&lbl.closest('p');
+  [note,document.getElementById('foc-list'),document.getElementById('foc-add-row')].forEach(el=>{if(el&&el.parentNode!==host)host.appendChild(el);});
+}
 function _setLogoSync(){
   const pv=document.getElementById('setLogoPrev'),cl=document.getElementById('clogo');
   if(pv&&cl&&cl.src&&pv.src!==cl.src)pv.src=cl.src;
@@ -11632,6 +11599,7 @@ function _setLogoSync(){
 }
 function openSettings(sec){
   _setFill();
+  if(_hxOn()&&_setVisible('team')){_focMoveTo(document.getElementById('set-foc-host'));try{renderFocList();}catch(e){}}
   if(sec&&!_setVisible(sec))sec='';
   openM('moSettings');
   if(!sec&&!_setPhone())sec=_setVisible(_setLast)?_setLast:'darstellung';
@@ -12042,132 +12010,16 @@ function stopPushInterval(){
     _pushIntervalId=null;
   }
 }
-// Don't start in player/guest mode (they don't need push)
-if(!new URLSearchParams(location.search).has('player')&&!new URLSearchParams(location.search).has('guest')){
+// Don't start in player mode (players don't need push)
+if(!new URLSearchParams(location.search).has('player')){
   startPushInterval();
 }
 // Stop when page becomes hidden, restart when visible (saves battery on mobile)
 document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='hidden')stopPushInterval();
-  else if(CU&&CU.role!=='player'&&CU.role!=='guest')startPushInterval();
+  else if(CU&&CU.role!=='player')startPushInterval();
 });
 
-// ── GUEST ACCESS ────────────────────────────────────────────
-// Token-based read-only access for parents/players.
-// Storage: G.guestAccess[<team>] = {token, enabled, createdAt, createdBy}
-// URL pattern: ?guest=<token>
-
-function generateGuestToken(){
-  // 24-char random hex from secure crypto
-  const arr=new Uint8Array(12);
-  if(window.crypto&&window.crypto.getRandomValues)window.crypto.getRandomValues(arr);
-  else for(let i=0;i<arr.length;i++)arr[i]=Math.floor(Math.random()*256);
-  return Array.from(arr).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
-function ensureGuestAccessStruct(){
-  if(!G.guestAccess||typeof G.guestAccess!=='object')G.guestAccess={};
-}
-function getGuestAccessForTeam(team){
-  ensureGuestAccessStruct();
-  return G.guestAccess[team]||null;
-}
-function findTeamByGuestToken(token){
-  if(!token||!G||!G.guestAccess)return null;
-  for(const team of Object.keys(G.guestAccess)){
-    const ga=G.guestAccess[team];
-    if(ga&&ga.enabled&&ga.token===token)return team;
-  }
-  return null;
-}
-function buildGuestLink(token){
-  const base=location.origin+location.pathname;
-  return base+'?guest='+token;
-}
-function regenerateGuestLink(team){
-  if(!isAdmin())return;
-  ensureGuestAccessStruct();
-  const old=G.guestAccess[team];
-  if(old&&old.token){
-    if(!confirm('Den bestehenden Link für '+team+' ungültig machen und einen neuen erzeugen?'))return;
-  }
-  snap();
-  G.guestAccess[team]={
-    token:generateGuestToken(),
-    enabled:true,
-    createdAt:Date.now(),
-    createdBy:(CU&&CU.name)||'Admin'
-  };
-  saveG();
-  renderAdminGuestList();
-  logAudit('Gast-Link erstellt',team,old&&old.token?'(neu erzeugt)':'');
-}
-function toggleGuestLinkEnabled(team){
-  if(!isAdmin())return;
-  ensureGuestAccessStruct();
-  const ga=G.guestAccess[team];
-  if(!ga)return;
-  snap();
-  ga.enabled=!ga.enabled;
-  saveG();
-  renderAdminGuestList();
-  logAudit(ga.enabled?'Gast-Link erstellt':'Gast-Link entfernt',team,ga.enabled?'aktiviert':'deaktiviert');
-}
-function deleteGuestLink(team){
-  if(!isAdmin())return;
-  if(!confirm('Den Gast-Link für '+team+' endgültig entfernen?'))return;
-  ensureGuestAccessStruct();
-  if(!G.guestAccess[team])return;
-  snap();
-  delete G.guestAccess[team];
-  saveG();
-  renderAdminGuestList();
-  logAudit('Gast-Link entfernt',team);
-}
-function copyGuestLink(token){
-  const url=buildGuestLink(token);
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(url).then(
-      ()=>{if(typeof showSaveFlash==='function')showSaveFlash('🔗 Link kopiert');},
-      ()=>{prompt('Link kopieren:',url);}
-    );
-  } else {
-    prompt('Link kopieren:',url);
-  }
-}
-function renderAdminGuestList(){
-  const el=document.getElementById('admin-guest-list');
-  if(!el)return;
-  ensureGuestAccessStruct();
-  const teams=Array.isArray(G.teamList)?G.teamList:[];
-  if(!teams.length){
-    el.innerHTML='<p class="note">Keine Mannschaften vorhanden.</p>';
-    return;
-  }
-  let html='';
-  teams.forEach(team=>{
-    const ga=G.guestAccess[team];
-    const has=ga&&ga.token;
-    const enabled=has&&ga.enabled!==false;
-    const link=has?buildGuestLink(ga.token):'';
-    html+=`<div style="border:1px solid var(--gl);border-radius:9px;padding:10px 12px;margin-bottom:8px;background:${enabled?'rgba(39,174,96,.04)':'#fff'};">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-        <span style="font-weight:700;color:var(--bd);font-size:.95rem;">${team}</span>
-        ${enabled?'<span style="font-size:.66rem;background:var(--cp);color:#fff;padding:2px 7px;border-radius:4px;font-weight:700;">AKTIV</span>':(has?'<span style="font-size:.66rem;background:var(--gm);color:#fff;padding:2px 7px;border-radius:4px;">DEAKTIVIERT</span>':'')}
-        <span style="flex:1;"></span>
-        ${has?`<button class="btn bs" style="font-size:.7rem;padding:3px 8px;" onclick="toggleGuestLinkEnabled('${team}')">${enabled?'❌ Deaktivieren':'✓ Aktivieren'}</button>`:''}
-      </div>
-      ${has?`<div style="background:#f7f9fc;border-radius:5px;padding:6px 8px;font-family:monospace;font-size:.7rem;color:var(--gd);word-break:break-all;margin-bottom:6px;border:1px solid var(--gl);">${link}</div>`:''}
-      <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        ${has?`<button class="btn bp" style="font-size:.72rem;padding:4px 10px;" onclick="copyGuestLink('${ga.token}')">📋 Link kopieren</button>`:''}
-        <button class="btn bs" style="font-size:.72rem;padding:4px 10px;" onclick="regenerateGuestLink('${team}')">${has?'🔄 Neu erzeugen':'＋ Link erstellen'}</button>
-        ${has?`<button class="btn bd" style="font-size:.72rem;padding:4px 10px;" onclick="deleteGuestLink('${team}')">🗑 Entfernen</button>`:''}
-      </div>
-    </div>`;
-  });
-  el.innerHTML=html;
-}
-
-function isGuest(){return CU&&CU.role==='guest';}
 
 // ── ICS CALENDAR EXPORT ─────────────────────────────────────
 function _icsPad(n){return String(n).padStart(2,'0');}
@@ -15755,7 +15607,9 @@ let _dbState={team:null,season:null,weekdayTime:'past',weekdayType:'all',weekRep
 function setDbWeekdayTime(t){_dbState.weekdayTime=t;renderDashboard();}
 function setDbWeekdayType(t){_dbState.weekdayType=t;renderDashboard();}
 function openDashboard(){
-  if(!canEdit())return;
+  // Heute: read-only users get a reduced Statistik page (it replaced the
+  // Kader → Statistik tab they could see). Klassisch: trainers only, as before.
+  if(!canEdit()&&!(_hxOn()&&CU&&CU.role==='viewer'))return;
   // Default to current
   _dbState.team=UI.currentTeam;
   _dbState.season=UI.currentSeason;
@@ -16814,6 +16668,23 @@ function renderDashboard(){
   html+='<div class="db-card"><div class="db-h">📊 Status-Verteilung <span class="db-h-sub">(markiert)</span></div>'+dbRenderStatusBar(sb)+'</div>';
   html+='<div class="db-card"><div class="db-h">🗓 Termine-Übersicht</div>'+dbRenderSessionsOverview(so)+'</div>';
   html+='</div>';
+  // Read-only (Heute): figures, the player table and the monthly trend only —
+  // no Belastung, notes, birthdays or export.
+  const _ro=!canEdit();
+  // Design "Heute": the full player table lives here (it replaced the Kader →
+  // Statistik tab). Rows open the profile only for the team/season on screen.
+  if(_hxOn()){
+    const _cur=data.team===UI.currentTeam&&data.season===UI.currentSeason;
+    html+='<div class="db-section db-alltab"><div class="db-h">🏆 Alle Spieler <span class="db-h-sub">(antippen zum Sortieren)</span></div>'
+      +_statsPlayerTable(data.block,{noHead:true,wrap:'overflow-x:auto;',open:pi=>_cur?`jumpToPlayer(${pi},_hxLeave('moDashboard'));`:''})+'</div>';
+  }
+  if(_ro){
+    const months=Object.keys(monthly).sort();
+    if(months.length)html+='<div class="db-section"><div class="db-h">📈 Anwesenheit pro Monat</div>'+dbRenderTrendChart(monthly,months)+'</div>';
+    html+=`<div class="db-meta">Datenstand: ${new Date().toLocaleDateString('de-DE')} · ${data.team} · ${data.season}</div>`;
+    el.innerHTML=html;
+    return;
+  }
   // Belastung: weekly sRPE sums, spikes and under-loaded players
   try{const loadCard=dbRenderLoadCard(data);if(loadCard)html+=loadCard;}
   catch(e){console.error('loadCard:',e);}
@@ -17881,7 +17752,6 @@ function analyzeOrphans(){
     calEvents:[],     // [{key, count}]
     seasonLineups:[], // [{idx, slp}]
     slpConf:[],       // [{key}]
-    guestAccess:[],   // [{team}]
     legacyLineups:[]  // [{idx, lu}] - standalone lineups (legacy feature)
   };
   // Calendar events
@@ -17909,12 +17779,6 @@ function analyzeOrphans(){
       if(!validKeys.has(key))out.slpConf.push({key});
     });
   }
-  // Guest access for non-existent teams
-  if(G.guestAccess){
-    Object.keys(G.guestAccess).forEach(team=>{
-      if(!teams.has(team))out.guestAccess.push({team});
-    });
-  }
   // Legacy standalone lineups (no longer reachable via UI)
   if(Array.isArray(G.lineups)){
     G.lineups.forEach((lu,idx)=>{
@@ -17933,13 +17797,13 @@ function renderWartung(){
   const lineupOk=lineupIssues.filter(x=>x.status==='ok');
   const lineupAutoFixable=lineupProblems.filter(x=>x.suggestedSeason!==null&&x.suggestedIdx!==null);
   const orphans=analyzeOrphans();
-  const totalProblems=lineupProblems.length+orphans.calEvents.length+orphans.seasonLineups.length+orphans.slpConf.length+orphans.guestAccess.length+orphans.legacyLineups.length;
+  const totalProblems=lineupProblems.length+orphans.calEvents.length+orphans.seasonLineups.length+orphans.slpConf.length+orphans.legacyLineups.length;
   let html='';
   // Summary block
   html+='<div style="background:'+(totalProblems?'rgba(231,76,60,.08)':'rgba(39,174,96,.08)')+';border:1px solid '+(totalProblems?'rgba(231,76,60,.3)':'rgba(39,174,96,.3)')+';border-radius:9px;padding:12px;margin-bottom:14px;">';
   if(totalProblems===0){
     html+='<div style="display:flex;align-items:center;gap:8px;color:#1f6e30;font-weight:700;">✓ Alle Daten sind konsistent</div>';
-    html+=`<div style="font-size:.74rem;color:var(--gm);margin-top:4px;">Insgesamt ${lineupIssues.length} Aufstellung${lineupIssues.length!==1?'en':''} geprüft. Keine verwaisten Termine, Saisonkader oder Gast-Links gefunden.</div>`;
+    html+=`<div style="font-size:.74rem;color:var(--gm);margin-top:4px;">Insgesamt ${lineupIssues.length} Aufstellung${lineupIssues.length!==1?'en':''} geprüft. Keine verwaisten Termine oder Saisonkader gefunden.</div>`;
   } else {
     html+=`<div style="display:flex;align-items:center;gap:8px;color:#a02525;font-weight:700;">⚠ ${totalProblems} Problem${totalProblems!==1?'e':''} gefunden</div>`;
     const bits=[];
@@ -17947,10 +17811,9 @@ function renderWartung(){
     if(orphans.calEvents.length)bits.push(orphans.calEvents.length+' verwaiste Termin-Listen');
     if(orphans.seasonLineups.length)bits.push(orphans.seasonLineups.length+' verwaiste Saisonkader');
     if(orphans.slpConf.length)bits.push(orphans.slpConf.length+' verwaiste Bestätigungen');
-    if(orphans.guestAccess.length)bits.push(orphans.guestAccess.length+' verwaiste Gast-Link'+(orphans.guestAccess.length!==1?'s':''));
     if(orphans.legacyLineups.length)bits.push(orphans.legacyLineups.length+' Legacy-Aufstellung'+(orphans.legacyLineups.length!==1?'en':''));
     html+=`<div style="font-size:.74rem;color:var(--gm);margin-top:4px;">${bits.join(' · ')}</div>`;
-    const totalOrphans=orphans.calEvents.length+orphans.seasonLineups.length+orphans.slpConf.length+orphans.guestAccess.length+orphans.legacyLineups.length;
+    const totalOrphans=orphans.calEvents.length+orphans.seasonLineups.length+orphans.slpConf.length+orphans.legacyLineups.length;
     const actionRow=[];
     if(lineupAutoFixable.length){
       actionRow.push(`<button class="btn bp" style="font-size:.78rem;" onclick="autoFixLineups()">⚡ ${lineupAutoFixable.length} Aufstellungen reparieren</button>`);
@@ -18023,20 +17886,6 @@ function renderWartung(){
     });
   }
   html+='</div>';
-  // Section: Orphan guest access (always shown)
-  html+='<div style="margin-top:18px;"><div style="font-weight:700;color:var(--bd);font-size:.92rem;margin-bottom:8px;">🔗 Gast-Links <span style="font-weight:400;color:var(--gm);font-size:.76rem;">(verwaiste guestAccess)</span></div>';
-  if(orphans.guestAccess.length===0){
-    html+='<p class="note" style="margin:0;color:#1f6e30;font-size:.78rem;">✓ Keine verwaisten Gast-Links.</p>';
-  } else {
-    orphans.guestAccess.forEach(o=>{
-      html+=`<div style="background:#fff;border:1px solid var(--gl);border-radius:7px;padding:8px 12px;margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-        <span style="font-weight:600;color:var(--gd);font-size:.78rem;">${o.team}</span>
-        <span style="flex:1;"></span>
-        <button class="btn bd" style="font-size:.7rem;padding:3px 9px;" onclick="wtDeleteOrphanGuest('${o.team}')">🗑 Entfernen</button>
-      </div>`;
-    });
-  }
-  html+='</div>';
   // Section: Legacy standalone lineups (always shown)
   html+='<div style="margin-top:18px;"><div style="font-weight:700;color:var(--bd);font-size:.92rem;margin-bottom:8px;">🗂 Legacy-Aufstellungen <span style="font-weight:400;color:var(--gm);font-size:.76rem;">(eigenständige lineups — nicht mehr erreichbar)</span></div>';
   if(orphans.legacyLineups.length===0){
@@ -18087,22 +17936,12 @@ function wtDeleteOrphanSlp(id){
   renderWartung();
   if(typeof showSaveFlash==='function')showSaveFlash('🗑 Plan entfernt');
 }
-function wtDeleteOrphanGuest(team){
-  if(!isAdmin())return;
-  if(!confirm('Diesen verwaisten Gast-Link endgültig löschen?'))return;
-  if(!G.guestAccess||!G.guestAccess[team])return;
-  snap();
-  delete G.guestAccess[team];
-  saveG();
-  renderWartung();
-  if(typeof showSaveFlash==='function')showSaveFlash('🗑 Gast-Link entfernt');
-}
 function cleanupAllOrphans(){
   if(!isAdmin())return;
   const o=analyzeOrphans();
-  const total=o.calEvents.length+o.seasonLineups.length+o.slpConf.length+o.guestAccess.length+o.legacyLineups.length;
+  const total=o.calEvents.length+o.seasonLineups.length+o.slpConf.length+o.legacyLineups.length;
   if(!total){alert('Keine verwaisten Einträge gefunden.');return;}
-  if(!confirm(`${total} verwaiste Einträge endgültig löschen?\n\n• ${o.calEvents.length} Termin-Listen\n• ${o.seasonLineups.length} Saisonkader-Pläne\n• ${o.slpConf.length} Bestätigungen\n• ${o.guestAccess.length} Gast-Links\n• ${o.legacyLineups.length} Legacy-Aufstellungen`))return;
+  if(!confirm(`${total} verwaiste Einträge endgültig löschen?\n\n• ${o.calEvents.length} Termin-Listen\n• ${o.seasonLineups.length} Saisonkader-Pläne\n• ${o.slpConf.length} Bestätigungen\n• ${o.legacyLineups.length} Legacy-Aufstellungen`))return;
   snap();
   o.calEvents.forEach(x=>{if(G.calEvents)delete G.calEvents[x.key];});
   if(o.seasonLineups.length&&Array.isArray(G.seasonLineups)){
@@ -18110,7 +17949,6 @@ function cleanupAllOrphans(){
     G.seasonLineups=G.seasonLineups.filter(s=>!s||!s.id||!ids.has(s.id));
   }
   o.slpConf.forEach(x=>{if(G.slpConfirmations)delete G.slpConfirmations[x.key];});
-  o.guestAccess.forEach(x=>{if(G.guestAccess)delete G.guestAccess[x.team];});
   if(o.legacyLineups.length){G.lineups=[];}
   saveG();
   renderWartung();
@@ -18239,56 +18077,6 @@ function autoFixLineups(){
   alert(msg);
 }
 
-function tryGuestUrlAuth(){
-  const params=new URLSearchParams(location.search);
-  const token=params.get('guest');
-  if(!token)return false;
-  const overlay=document.getElementById('authOverlay');
-  if(overlay){
-    overlay.innerHTML='<div class="auth-box"><div style="text-align:center;padding:34px 16px;color:#fff;"><div style="font-size:1.4rem;margin-bottom:12px;">⏳</div><div style="font-size:1rem;margin-bottom:6px;font-weight:600;">Verbinde...</div><div style="opacity:.7;font-size:.82rem;">Gast-Zugriff wird geprüft</div></div></div>';
-    overlay.classList.add('open');
-  }
-  let attempts=0;
-  const tryFinalize=()=>{
-    attempts++;
-    // Wait until Firebase initial load completed (or no FB) - then G is up to date
-    if(_fbInitialLoaded||attempts>50){
-      const team=findTeamByGuestToken(token);
-      if(team){
-        // Valid token → enter guest mode
-        CU={role:'guest',name:'Gast',teams:[team]};
-        UI.currentTeam=team;
-        if(Array.isArray(G.seasonList)&&G.seasonList.length){
-          const latest=G.seasonList[G.seasonList.length-1];
-          UI.currentSeason=latest;
-        }
-        try{
-          localStorage.setItem('fcf_currentTeam',team);
-          if(UI.currentSeason)localStorage.setItem('fcf_currentSeason',UI.currentSeason);
-        }catch(e){}
-        if(overlay){
-          overlay.classList.remove('open');
-          overlay.innerHTML='';
-        }
-        showApp();
-      } else {
-        // Invalid → error screen
-        if(overlay){
-          overlay.innerHTML=`<div class="auth-box"><div style="text-align:center;padding:34px 18px;color:#fff;">
-            <div style="font-size:2rem;margin-bottom:14px;">⚠️</div>
-            <div style="font-size:1.05rem;margin-bottom:6px;font-weight:600;">Ungültiger Gast-Link</div>
-            <div style="opacity:.75;font-size:.78rem;line-height:1.5;margin-bottom:16px;">Dieser Link wurde deaktiviert oder ist nicht mehr gültig. Bitte frage den Trainer nach einem neuen Link.</div>
-            <a href="${location.pathname}" style="display:inline-block;color:var(--ac);text-decoration:underline;font-size:.85rem;font-weight:600;">Zur Anmeldung →</a>
-          </div></div>`;
-        }
-      }
-      return;
-    }
-    setTimeout(tryFinalize,200);
-  };
-  tryFinalize();
-  return true;
-}
 
 function applyClubLogo(){
   const customLogo=(G&&G.clubLogo)||null;
@@ -20649,6 +20437,22 @@ function isAtSeasonEnd(){
 }
 
 // ── Mobile calendar: chronological list ──
+// Design "Heute": held sessions show their attendance in the Kalender
+// (it replaced the Trainings / Spiele lists in Kader). '' otherwise.
+function _hxSessAtt(si){
+  if(!_hxOn())return '';
+  const D=cd(),s=D&&D.sessions&&D.sessions[si];
+  if(!s||!sessTookPlace(s)||!Array.isArray(D.players))return '';
+  let a=0,n=0,fact=0;
+  D.players.forEach(p=>{
+    if(typeof _sessAfterJoin==='function'&&!_sessAfterJoin(p,s))return;
+    n++;
+    const v=p.s?p.s[si]:3;
+    if(v===1)a++;
+    if(v===0||v===1||v===2)fact++;
+  });
+  return fact?a+'/'+n:'';
+}
 function renderCalendarMobile(el){
   const D=cd();
   const monthNames=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
@@ -20667,7 +20471,7 @@ function renderCalendarMobile(el){
         sk,type:isMatch?'match':'training',
         icon:isMatch?'⚽':'🏃',
         title:isMatch?(s.label||'Spiel'):'Training'+(s.focus?' · '+s.focus:''),
-        sub:(s.time||'')+((s.location&&s.location.trim())?' \u00b7 '+escapeHtml(s.location.trim()):''),
+        sub:(s.time||'')+((s.location&&s.location.trim())?' \u00b7 '+escapeHtml(s.location.trim()):'')+(_hxSessAtt(si)?' \u00b7 <b class="cal-att">'+_hxSessAtt(si)+' anwesend</b>':''),
         action:`jumpToSession(${si},_hxLeave('moCalendar'));`
       });
     });
@@ -20942,7 +20746,8 @@ function renderCalendarMonth(y,m,monthNames,dowNames,sessByKey,eventsByKey,bdayB
       const tip=`${time}${lbl}`.replace(/"/g,'&quot;');
       const ec=isMatch?'cal-evt-m':'cal-evt-t';
       const icon=isMatch?'⚽':'🏃';
-      evts+=`<div class="cal-evt ${ec}" title="${tip}" onclick="event.stopPropagation();jumpToSession(${s._idx},_hxLeave('moCalendar'));">${icon} ${time}${lbl}</div>`;
+      const att=_hxSessAtt(s._idx);
+      evts+=`<div class="cal-evt ${ec}" title="${tip}" onclick="event.stopPropagation();jumpToSession(${s._idx},_hxLeave('moCalendar'));">${icon} ${time}${lbl}${att?` <b class="cal-att">${att}</b>`:''}</div>`;
     });
     // Custom events
     const eList=eventsByKey[dateK]||[];
@@ -21000,7 +20805,7 @@ function jumpToPlayer(pi,from){
 // ══════════════════════════════
 // ══════════════════════════════════════════════════════════════
 // STARTSEITE (home screen)
-// Fullscreen overlay shown after login for trainers/admins/guests.
+// Fullscreen overlay shown after login for trainers and admins.
 // Player-mode users skip it entirely — their flow (Anmeldung/reports)
 // stays unchanged. Tiles are role-gated. Hero photo is uploadable by
 // editors and stored in Firebase as G.heroPhoto (JPEG dataURL).
@@ -21016,7 +20821,7 @@ function _bootVeilHide(){
 window.addEventListener('load',()=>setTimeout(_bootVeilHide,150));
 setTimeout(_bootVeilHide,5000);
 // Header title acts as "home" — always reachable, whatever the toolbar
-// visibility settings are. No-op for players/guests who have no home screen.
+// visibility settings are. No-op for players, who have no home screen.
 function headerHome(){
   if(typeof homeEligible==='function'&&!homeEligible())return;
   const ov=document.getElementById('homeOverlay');
@@ -21125,7 +20930,7 @@ function hxRenderNav(){
   const nm=(CU&&CU.name)||'';
   set('hxUserNm',nm||'–');
   set('hxUserAv',(nm||'?').trim().charAt(0).toUpperCase());
-  set('hxUserRole',CU?(CU.role==='admin'?'Administrator':CU.role==='trainer'?'Trainer':'Gast'):'');
+  set('hxUserRole',CU?(CU.role==='admin'?'Administrator':CU.role==='trainer'?'Trainer':CU.role==='viewer'?'Nur ansehen':''):'');
   const badge=document.getElementById('notifBadge'),dot=document.getElementById('hxBellDot');
   if(dot)dot.classList.toggle('on',!!(badge&&badge.textContent&&badge.textContent.trim()&&badge.textContent.trim()!=='0'));
 }
@@ -21966,7 +21771,7 @@ function homeRemoveHeroPhoto(){
 // ── Start view preference (per user, cloud-synced) ──
 // 'home' (default): Startseite opens after login. 'table': straight to table.
 // Stored in G.userSettings[name] so it follows the trainer across devices,
-// same pattern as G.userAutomation. Guests always get 'home' (no writes).
+// same pattern as G.userAutomation. Read-only users always get 'home' (no writes).
 function _homeStartViewPref(){
   const uname=CU&&CU.name;
   if(!G||!uname)return 'home';
@@ -21983,7 +21788,7 @@ function homeSetStartView(v){
   _syncStartViewCheck();
 }
 function _syncStartViewCheck(){
-  // Guests can't persist settings — hide the whole chooser for them
+  // Read-only users can't persist settings — hide the whole chooser for them
   const sec=document.getElementById('vd-startview-sec');
   if(sec)sec.style.display=(typeof canEdit==='function'&&canEdit())?'':'none';
   // Explicit two-option chooser — the selected one carries vd-active
@@ -21995,6 +21800,14 @@ function _syncStartViewCheck(){
   if(b)b.classList.toggle('vd-active',cur==='table');
 }
 function openTeamMgr(tab,fromId){
+  if(tab==='trainers')tab='trainer';
+  // Design "Heute": Kader is people only — the other former tabs have one
+  // home each (Statistik page, Kalender, Einstellungen → Mannschaft).
+  if(_hxOn()){
+    if(tab==='statistik')return openDashboard();
+    if(tab==='trainings'||tab==='spiele')return openCalendar();
+    if(tab==='schwerpunkte')return openSettings('team');
+  }
   navPush({id:fromId||'main'});
   openM('moTeamMgr');switchTab(tab||'spieler');
 }
@@ -22072,7 +21885,7 @@ function switchTab(t){
   document.getElementById('tmgr-h').textContent=_hxOn()?'Kader':{spieler:'👥 Spieler',trainer:'🎽 Trainer',schwerpunkte:'🎯 Schwerpunkte',statistik:'📊 Statistik',trainings:'📅 Trainingseinheiten',spiele:'⚽ Spiele'}[t]||'Mannschaft';
   if(t==='spieler')renderMgrPlayers();
   if(t==='trainer'){document.getElementById('mgr-team-lbl').textContent=UI.currentTeam;renderMgrTrainers();buildTeamChecks('tTeamChecks');}
-  if(t==='schwerpunkte')renderFocList();
+  if(t==='schwerpunkte'){_focMoveTo(document.getElementById('tab-schwerpunkte'));renderFocList();}
   if(t==='statistik')renderMgrStats();
   if(t==='trainings')renderMgrSessions('training');
   if(t==='spiele')renderMgrSessions('match');
@@ -22662,6 +22475,53 @@ function populateFocSel(){
 
 // Stats
 let statsSort={col:'pct',asc:false};
+// Per-player table ("Alle Spieler"). Kader → Statistik (Klassisch) and the
+// Statistik page (Heute) render the same table; opts.open(pi) builds the
+// click handler, opts.wrap the scroll box style.
+function _statsPlayerTable(D,opts){
+  opts=opts||{};
+  const ss=D.sessions||[];
+  const mS=ss.filter(s=>s.type==='match').length;
+  const _isPast=si=>{const s=ss[si];return s&&sessTookPlace(s);};
+  // Per player — same: only past sessions, factual statuses for denominator
+  const rows=(D.players||[]).map(p=>{
+    const ownIdx=i=>_isPast(i)&&_sessAfterJoin(p,ss[i]); // before he was on the team → out
+    const tIdx=ss.map((s,i)=>s.type==='training'&&ownIdx(i)?i:-1).filter(i=>i>=0);
+    const mIdx=ss.map((s,i)=>s.type==='match'&&ownIdx(i)?i:-1).filter(i=>i>=0);
+    const isFact=v=>(v===1||v===0||v===2);
+    const tA=tIdx.filter(i=>p.s&&p.s[i]===1).length,tPl=tIdx.filter(i=>p.s&&isFact(p.s[i])).length;
+    const mA=mIdx.filter(i=>p.s&&p.s[i]===1).length,mPl=mIdx.filter(i=>p.s&&isFact(p.s[i])).length;
+    const tPct=tPl?Math.round((tA/tPl)*100):0,mPct=mPl?Math.round((mA/mPl)*100):0;
+    // Leistungsnote average across all graded past sessions (trainings + matches)
+    const perfVals=[...tIdx,...mIdx].map(i=>(p.perf&&(p.perf[i]===1||p.perf[i]===2||p.perf[i]===3))?p.perf[i]:null).filter(v=>v!=null);
+    const perfAvg=perfVals.length?(perfVals.reduce((s,v)=>s+v,0)/perfVals.length):null;
+    return{pi:D.players.indexOf(p),nr:p.nr,name:p.name,shortname:p.shortname,pos:p.pos,pos2:p.pos2||'',tA,tPl,tPct,mA,mPl,mPct,pct:tPct,perfAvg,perfAvgSort:perfAvg!=null?perfAvg:99,perfCount:perfVals.length};
+  });
+  rows.sort((a,b)=>{const v=statsSort.col;const r=typeof a[v]==='string'?a[v].localeCompare(b[v]):a[v]-b[v];return statsSort.asc?r:-r;});
+  const sa=c=>statsSort.col===c?(statsSort.asc?'↑':'↓'):'';
+  const th=(c,l)=>`<th onclick="sortStats('${c}')">${l} ${sa(c)}</th>`;
+  const wrap=opts.wrap||'max-height:240px;overflow-y:auto;border:1px solid var(--gl);border-radius:8px;';
+  const open=opts.open||(pi=>`_tmLeave('statistik');openPlayerStats(${pi});`);
+  return `${opts.noHead?'':`    <div class="sec" style="margin-top:12px;margin-bottom:8px;">🏆 Alle Spieler</div>
+`}    <div style="${wrap}">
+    <table class="full-table"><thead><tr>
+      ${th('nr','#')}${th('name','Spieler')}${th('pos','Pos.')}${th('tPct','T%')}${th('tA','T-A')}${th('tPl','T-∑')}${th('perfAvgSort','⭐ Note')}
+      ${mS?th('mPct','S%')+th('mA','S-A')+th('mPl','S-∑'):''}
+    </tr></thead><tbody>
+    ${rows.map(r=>{const bc=pctColor(r.tPct);
+      const openHandler=open(r.pi);
+      const perfColor=r.perfAvg==null?'var(--gm)':r.perfAvg<=1.5?'#1a7a40':r.perfAvg<=2.5?'#0d3d80':'#a56a0a';
+      return`<tr style="cursor:pointer;" onclick="${openHandler}">
+      <td>${r.nr}</td>
+      <td style="text-align:left;">${getDisplayName(r)}</td>
+      <td class="pos-td"><div class="pos-wrap">${pbHtml(r)}</div></td>
+      <td style="font-weight:700;color:${bc};">${r.tPl?r.tPct+'%':'–'}</td>
+      <td>${r.tA}</td><td>${r.tPl}</td>
+      <td style="font-weight:700;color:${perfColor};" title="${r.perfCount} bewertete Trainings">${r.perfAvg!=null?r.perfAvg.toFixed(1).replace('.',','):'–'}</td>
+      ${mS?`<td style="font-weight:700;color:${pctColor(r.mPct)};">${r.mPl?r.mPct+'%':'–'}</td><td>${r.mA}</td><td>${r.mPl}</td>`:''}
+    </tr>`;}).join('')}
+    </tbody></table></div>`;
+}
 function renderMgrStats(){
   const D=cd(),ss=D.sessions||[];
   const tS=ss.filter(s=>s.type==='training').length,mS=ss.filter(s=>s.type==='match').length;
@@ -22693,23 +22553,6 @@ function renderMgrStats(){
       else{if(isFact)moMap[mo].mPl++;if(v===1)moMap[mo].mA++;}
     });
   });
-  // Per player — same: only past sessions, factual statuses for denominator
-  const rows=(D.players||[]).map(p=>{
-    const ownIdx=i=>_isPast(i)&&_sessAfterJoin(p,ss[i]); // before he was on the team → out
-    const tIdx=ss.map((s,i)=>s.type==='training'&&ownIdx(i)?i:-1).filter(i=>i>=0);
-    const mIdx=ss.map((s,i)=>s.type==='match'&&ownIdx(i)?i:-1).filter(i=>i>=0);
-    const isFact=v=>(v===1||v===0||v===2);
-    const tA=tIdx.filter(i=>p.s&&p.s[i]===1).length,tPl=tIdx.filter(i=>p.s&&isFact(p.s[i])).length;
-    const mA=mIdx.filter(i=>p.s&&p.s[i]===1).length,mPl=mIdx.filter(i=>p.s&&isFact(p.s[i])).length;
-    const tPct=tPl?Math.round((tA/tPl)*100):0,mPct=mPl?Math.round((mA/mPl)*100):0;
-    // Leistungsnote average across all graded past sessions (trainings + matches)
-    const perfVals=[...tIdx,...mIdx].map(i=>(p.perf&&(p.perf[i]===1||p.perf[i]===2||p.perf[i]===3))?p.perf[i]:null).filter(v=>v!=null);
-    const perfAvg=perfVals.length?(perfVals.reduce((s,v)=>s+v,0)/perfVals.length):null;
-    return{pi:D.players.indexOf(p),nr:p.nr,name:p.name,shortname:p.shortname,pos:p.pos,pos2:p.pos2||'',tA,tPl,tPct,mA,mPl,mPct,pct:tPct,perfAvg,perfAvgSort:perfAvg!=null?perfAvg:99,perfCount:perfVals.length};
-  });
-  rows.sort((a,b)=>{const v=statsSort.col;const r=typeof a[v]==='string'?a[v].localeCompare(b[v]):a[v]-b[v];return statsSort.asc?r:-r;});
-  const sa=c=>statsSort.col===c?(statsSort.asc?'↑':'↓'):'';
-  const th=(c,l)=>`<th onclick="sortStats('${c}')">${l} ${sa(c)}</th>`;
   document.getElementById('tmgr-stats').innerHTML=`
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;">
       <div class="ps-card"><div class="ct">Spieler</div><div class="cv">${D.players?D.players.length:0}</div></div>
@@ -22719,25 +22562,7 @@ function renderMgrStats(){
     </div>
     <div class="sec" style="margin-bottom:8px;">📅 Monatlich</div>
     ${Object.entries(moMap).map(([mo,st])=>{const pct=st.tPl?Math.round((st.tA/st.tPl)*100):null;const bc=pct!==null?pctColor(pct):'#ccc';return`<div class="fr"><div class="fr-nm">${mo}</div><div class="fr-bw"><div class="fr-bar" style="width:${Math.min(pct||0,100)}%;background:${bc};"></div></div><div class="fr-val" style="color:${bc};">${pct!==null?pct+'%':'–'}</div><div style="flex-shrink:0;font-size:.62rem;color:var(--gm);text-align:right;white-space:nowrap;min-width:52px;">${st.tA}/${st.tPl}${st.mPl?' ⚽'+st.mA+'/'+st.mPl:''}</div></div>`;}).join('')}
-    <div class="sec" style="margin-top:12px;margin-bottom:8px;">🏆 Alle Spieler</div>
-    <div style="max-height:240px;overflow-y:auto;border:1px solid var(--gl);border-radius:8px;">
-    <table class="full-table"><thead><tr>
-      ${th('nr','#')}${th('name','Spieler')}${th('pos','Pos.')}${th('tPct','T%')}${th('tA','T-A')}${th('tPl','T-∑')}${th('perfAvgSort','⭐ Note')}
-      ${mS?th('mPct','S%')+th('mA','S-A')+th('mPl','S-∑'):''}
-    </tr></thead><tbody>
-    ${rows.map(r=>{const bc=pctColor(r.tPct);
-      const openHandler=`_tmLeave('statistik');openPlayerStats(${r.pi});`;
-      const perfColor=r.perfAvg==null?'var(--gm)':r.perfAvg<=1.5?'#1a7a40':r.perfAvg<=2.5?'#0d3d80':'#a56a0a';
-      return`<tr style="cursor:pointer;" onclick="${openHandler}">
-      <td>${r.nr}</td>
-      <td style="text-align:left;">${getDisplayName(r)}</td>
-      <td class="pos-td"><div class="pos-wrap">${pbHtml(r)}</div></td>
-      <td style="font-weight:700;color:${bc};">${r.tPl?r.tPct+'%':'–'}</td>
-      <td>${r.tA}</td><td>${r.tPl}</td>
-      <td style="font-weight:700;color:${perfColor};" title="${r.perfCount} bewertete Trainings">${r.perfAvg!=null?r.perfAvg.toFixed(1).replace('.',','):'–'}</td>
-      ${mS?`<td style="font-weight:700;color:${pctColor(r.mPct)};">${r.mPl?r.mPct+'%':'–'}</td><td>${r.mA}</td><td>${r.mPl}</td>`:''}
-    </tr>`;}).join('')}
-    </tbody></table></div>`;
+${_statsPlayerTable(D)}`;
 }
 function sortTable(col){
   if(tableSort.col===col)tableSort.asc=!tableSort.asc;
@@ -22777,7 +22602,10 @@ function sortMgrPlayers(players){
   const {col,asc}=mgrSort;
   return [...players].sort((a,b)=>compareBySort(a,b,col,asc));
 }
-function sortStats(col){if(statsSort.col===col)statsSort.asc=!statsSort.asc;else{statsSort.col=col;statsSort.asc=false;}renderMgrStats();}
+function sortStats(col){if(statsSort.col===col)statsSort.asc=!statsSort.asc;else{statsSort.col=col;statsSort.asc=false;}renderMgrStats();
+  const db=document.getElementById('moDashboard');
+  if(_hxOn()&&db&&db.classList.contains('open'))renderDashboard();
+}
 
 // ══════════════════════════════
 //  TEAM / SEASON
@@ -23419,8 +23247,6 @@ function cleanupTeamReferences(team){
       if(ts.startsWith(team+'__'))delete G.slpConfirmations[ts];
     });
   }
-  // Guest access for this team
-  if(G.guestAccess&&G.guestAccess[team])delete G.guestAccess[team];
   // Trainers: remove team from each trainer's teams[]
   if(Array.isArray(G.trainers)){
     G.trainers.forEach(tr=>{
@@ -24358,13 +24184,12 @@ function updNr(pi,v){if(!canEdit())return;snap();cd().players[pi].nr=parseInt(v)
 //  ADMIN
 // ══════════════════════════════
 function switchAdminTab(t){
-  ['trainers','teams','guest','wartung','data','firebase'].forEach((n,i)=>{
+  ['trainers','teams','wartung','data','firebase'].forEach((n,i)=>{
     document.querySelectorAll('#moAdmin .tbtn')[i]?.classList.toggle('active',n===t);
     document.getElementById('atab-'+n)?.classList.toggle('active',n===t);
   });
   if(t==='trainers'){renderAllTr();buildTeamChecks('atTeamChecks');}
   if(t==='teams')renderAdminTeams();
-  if(t==='guest')renderAdminGuestList();
   if(t==='wartung')renderWartung();
   if(t==='firebase'){loadFbConfigFields();setFbStatus(fbRef?'connected':'offline');}
 }
@@ -24481,11 +24306,6 @@ function renameTeamReferences(oldTeam,newTeam){
       }
     });
     G.slpConfirmations=newConf;
-  }
-  // Guest access
-  if(G.guestAccess&&G.guestAccess[oldTeam]){
-    G.guestAccess[newTeam]=G.guestAccess[oldTeam];
-    delete G.guestAccess[oldTeam];
   }
 }
 function addTeamAdmin(){
@@ -25732,7 +25552,7 @@ function _genSessionId(){
 // Start presence: write our entry, listen for others
 function startPresence(){
   if(!CU){console.warn('[Presence] kein CU');return;}
-  if(CU.role==='guest'||CU.role==='player'){console.info('[Presence] Gast/Spieler — kein Presence-Tracking');return;}
+  if(CU.role==='player'){console.info('[Presence] Spieler — kein Presence-Tracking');return;}
   if(_presenceSessionId)return; // already started
   if(!fbRef){
     console.info('[Presence] fbRef noch nicht bereit — versuche in 1s erneut');
@@ -26274,6 +26094,14 @@ async function _pubCleanup(){
   console.log('[Aufräumen] '+(keys.length-failed)+' alte veröffentlichte Berichte entfernt');
   return true;
 }
+// Guest access was removed: drop the stored guest links once (admin client).
+function _guestCleanup(){
+  if(!G||!G.guestAccess||!CU||CU.role!=='admin')return;
+  try{snap();}catch(e){}
+  delete G.guestAccess;
+  try{saveG(false);}catch(e){}
+  console.log('[Aufräumen] Gast-Links entfernt');
+}
 function _pubCleanupSchedule(){
   let n=0;
   const t=setInterval(async()=>{
@@ -26281,6 +26109,7 @@ function _pubCleanupSchedule(){
     if(n>60||(CU&&CU.role==='player')){clearInterval(t);return;}
     if(!CU||CU.role!=='admin'||!_fbInitialLoaded||!fbDb)return;
     clearInterval(t);
+    try{_guestCleanup();}catch(e){}
     const done=await _pubCleanup();
     if(!done)setTimeout(_pubCleanupSchedule,10*60*1000);
   },5000);
@@ -30984,6 +30813,7 @@ _pubCleanupSchedule();
     </div>
   </div>
 
+      <div class="set-hx-only" id="set-foc-host" style="margin:16px 0 4px;"><div class="setting-label" style="margin-bottom:6px;">🎯 Schwerpunkte</div></div>
     </section>
 
     <section class="set-sec" data-sec="daten">
