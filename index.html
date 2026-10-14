@@ -678,7 +678,7 @@ input[type="date"]{cursor:pointer;}
 #moTeamMgr .mob > div:first-of-type{flex-shrink:0;}
 .tbar::-webkit-scrollbar{height:0;}
 .tbar::-webkit-scrollbar{display:none;}
-.tmgr-foot{display:none;}
+
 .tbtn{flex-shrink:0;white-space:nowrap;}
 .tbtn{padding:7px 10px;font-family:'Barlow',sans-serif;font-weight:700;font-size:.72rem;letter-spacing:.2px;color:var(--gm);cursor:pointer;border:none;background:none;text-transform:uppercase;border-bottom:2.5px solid transparent;margin-bottom:-2px;transition:all .12s;}
 .tbtn:hover{color:var(--bm);}
@@ -696,10 +696,7 @@ input[type="date"]{cursor:pointer;}
 .ps-tile-v{font-family:'Bebas Neue',sans-serif;font-size:1.35rem;color:var(--bd);line-height:1;}
 .ps-tile-l{font-size:.6rem;letter-spacing:.6px;text-transform:uppercase;color:var(--gm);margin-top:4px;}
 .ps-tile-s{font-size:.63rem;color:var(--gm);margin-top:2px;}
-.ps-card{flex:1;min-width:96px;background:var(--ow);border-radius:9px;padding:9px 11px;border:1px solid var(--gl);}
-.ps-card .ct{font-size:.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gm);margin-bottom:3px;}
-.ps-card .cv{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;line-height:1;}
-.ps-card .ca{font-size:.68rem;color:var(--gm);margin-bottom:4px;}
+
 .cbw{background:var(--gl);border-radius:3px;height:5px;overflow:hidden;}
 .cbar{height:100%;border-radius:0;display:block;}
 .fr{display:grid;grid-template-columns:72px 1fr 34px 54px;align-items:center;gap:5px;margin-bottom:6px;font-size:.73rem;}
@@ -1679,18 +1676,17 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   .mob select.am-week-sel{width:100%;max-width:none;min-height:44px;font-size:.82rem;}
   .am-week-row .am-bc-btn{width:100%;min-height:44px;justify-content:center;}
   .am-broadcast-actions .am-bc-btn{width:100%;min-height:44px;justify-content:center;}
-  #moTeamMgr #tmgr-close-top{display:none;}
+  
   /* A per-pane button row sits wherever that pane's content ends, so
      "Schließen" jumped around between tabs. One footer, always at the same
      place; pane-specific actions (＋ Spieler, CSV-Export) stay in the pane,
      and rows left with nothing but a close button disappear. */
-  #moTeamMgr .tmgr-foot{display:flex;flex-shrink:0;gap:7px;padding:9px 0 0;border-top:1px solid var(--gl);}
-  #moTeamMgr .tmgr-foot .btn{flex:1;justify-content:center;min-height:44px;}
+
   #moTeamMgr .tpanel .mob-btns .btn.bs{display:none;}
   #moTeamMgr .tpanel .mob-btns:not(:has(.btn:not(.bs))){display:none;}
   #moTeamMgr .mob > div:first-of-type{margin-bottom:6px;}
   #moTeamMgr #tmgr-h{font-size:1rem;}
-  #moTeamMgr #tmgr-back{padding:4px 9px;font-size:.72rem;}
+  
   #moTeamMgr .tbar{margin-bottom:8px;}
   /* Calendar modal: full screen, cleaner padding */
   #moCalendar .mob{padding:10px 0 0 !important;}
@@ -3039,8 +3035,8 @@ body.design-kabine .ma-card-av-ph{background:var(--d-panel2);color:var(--d-muted
 /* ── Windows: light sheets; same numerals, same ink ── */
 body.design-kabine:not(.theme-dark) .mob{border-radius:16px;box-shadow:0 24px 60px rgba(4,10,30,.35);}
 body.design-kabine:not(.theme-dark) .mob h3{font-family:var(--d-num);font-weight:800;letter-spacing:.6px;font-size:1.45rem;color:#0E2350;}
-body.design-kabine:not(.theme-dark) .ps-tile,body.design-kabine:not(.theme-dark) .ps-card{background:#F4F7FB;border-color:#E1E7F0;}
-body.design-kabine:not(.theme-dark) .ps-tile-v,body.design-kabine:not(.theme-dark) .ps-card .cv{font-family:var(--d-num);font-weight:700;font-size:1.55rem;}
+body.design-kabine:not(.theme-dark) .ps-tile{background:#F4F7FB;border-color:#E1E7F0;}
+body.design-kabine:not(.theme-dark) .ps-tile-v{font-family:var(--d-num);font-weight:700;font-size:1.55rem;}
 body.design-kabine:not(.theme-dark) .ps-tile-l{text-transform:none;letter-spacing:.2px;font-size:.66rem;font-weight:600;}
 body.design-kabine:not(.theme-dark) .mob .btn.bs{background:#fff;border:1px solid #DCE3EE;color:#0E2350;}
 body.design-kabine:not(.theme-dark) .mob .btn.bs:hover{background:#F4F7FB;}
@@ -3276,7 +3272,7 @@ body.design-heute :is(#moCalendar,#moDashboard,#moWeekReport) .mob-close-x,body.
 /* ── Heute: Kader = people only; Statistik / Kalender / Einstellungen took the rest ── */
 .set-hx-only{display:none;}
 body.design-heute .set-hx-only{display:block;}
-body.design-heute #moTeamMgr .tbtn:is([onclick*="'schwerpunkte'"],[onclick*="'statistik'"],[onclick*="'trainings'"],[onclick*="'spiele'"]){display:none;}
+
 body.design-heute #set-foc-host .note{font-size:.74rem;color:var(--hx-muted);margin:0 0 6px;}
 body.design-heute .cal-att{font-weight:700;color:var(--hx-ok);}
 body.design-heute .cal-evt .cal-att{font-weight:800;color:inherit;opacity:.75;}
@@ -3975,15 +3971,14 @@ body.design-heute #moTeamMgr > .mob{padding:30px 40px 28px !important;}
 body.design-heute #moTeamMgr > .mob > *{width:100%;max-width:1040px;box-sizing:border-box;}
 body.design-heute #moTeamMgr > .mob > div:first-child{position:static;margin:0 0 16px;padding:0;background:none;border:none;z-index:auto;}
 body.design-heute #moTeamMgr #tmgr-h{font-family:var(--hx-num);font-weight:800;font-size:2rem;letter-spacing:.2px;color:var(--hx-ink);line-height:1.1;}
-body.design-heute #moTeamMgr #tmgr-back{display:none !important;}
-body.design-heute #moTeamMgr #tmgr-close-top{display:none !important;border-radius:999px;width:40px;height:40px;padding:0;align-items:center;justify-content:center;background:var(--hx-field);border:1px solid var(--hx-line);color:var(--hx-ink);}
+
 body.design-heute #moTeamMgr .tbar{border-bottom:none;gap:6px;margin:0 0 14px;padding:2px 0;}
 body.design-heute #moTeamMgr .tbtn{padding:8px 15px;border-radius:999px;background:var(--hx-field);border:1px solid var(--hx-line);margin:0;color:var(--hx-ink2);text-transform:none;font-size:.86rem;font-weight:600;letter-spacing:0;}
 body.design-heute #moTeamMgr .tbtn:hover{border-color:var(--hx-ink2);color:var(--hx-ink);}
 body.design-heute #moTeamMgr .tbtn.active{background:var(--hx-ink);border-color:var(--hx-ink);color:#fff;}
 body.design-heute #moTeamMgr .tpanel.active{background:var(--hx-card);border-radius:18px;box-shadow:var(--hx-shadow);padding:14px 16px;overflow-y:auto;}
-body.design-heute #moTeamMgr .tmgr-foot{display:none !important;}
-body.design-heute #moTeamMgr #tmgr-pl-list,body.design-heute #moTeamMgr #tmgr-sess-list,body.design-heute #moTeamMgr #tmgr-match-list{border:none !important;border-radius:0 !important;margin-bottom:0 !important;}
+
+body.design-heute #moTeamMgr #tmgr-pl-list{border:none !important;border-radius:0 !important;margin-bottom:0 !important;}
 body.design-heute #tmgr-pl-list > div:first-child{background:var(--hx-ground) !important;border-radius:10px !important;padding:7px 10px !important;margin-bottom:4px;box-shadow:0 0 0 4px #fff;}
 body.design-heute #tmgr-pl-list > div:first-child > div{color:var(--hx-muted) !important;}
 body.design-heute #moTeamMgr .pl-row{padding:8px 10px;border-bottom-color:var(--hx-line);font-size:.84rem;}
@@ -4004,7 +3999,7 @@ body.design-heute #moTeamMgr .tpanel .note{color:var(--hx-muted);}
   body.design-heute #moTeamMgr > .mob > *{max-width:none;}
   body.design-heute #moTeamMgr > .mob > div:first-child{margin:0;padding:calc(10px + env(safe-area-inset-top,0px)) 12px 10px 16px;background:var(--hx-nav);}
   body.design-heute #moTeamMgr #tmgr-h{color:#fff;font-size:1.6rem;}
-  body.design-heute #moTeamMgr #tmgr-close-top{width:38px;height:38px;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff;}
+  
   body.design-heute #moTeamMgr .tbar{margin:0;padding:10px 12px;}
   body.design-heute #moTeamMgr .tbtn{padding:7px 13px;font-size:.82rem;}
   body.design-heute #moTeamMgr .tpanel.active{margin:0 12px 12px;width:auto;border-radius:16px;padding:10px 12px;}
@@ -5192,16 +5187,10 @@ if(window._fbBlocked){
 <div class="mo hx-page" id="moTeamMgr"><div class="mob" style="width:600px;height:min(78vh,620px);display:flex;flex-direction:column;">
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
     <h3 id="tmgr-h" style="margin:0;flex:1;">Mannschaft</h3>
-    <button class="btn" id="tmgr-back" style="font-size:.76rem;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" onclick="teamMgrGoBack()">← Zurück</button>
-    <button class="btn bs" id="tmgr-close-top" onclick="closeM('moTeamMgr')">✕</button>
   </div>
   <div class="tbar">
     <button class="tbtn active" onclick="switchTab('spieler')">👥 Spieler</button>
     <button class="tbtn" onclick="switchTab('trainer')">🎽 Trainer</button>
-    <button class="tbtn" onclick="switchTab('schwerpunkte')">🎯 Schwerpunkte</button>
-    <button class="tbtn" onclick="switchTab('statistik')">📊 Statistik</button>
-    <button class="tbtn" onclick="switchTab('trainings')">📅 Trainings</button>
-    <button class="tbtn" onclick="switchTab('spiele')">⚽ Spiele</button>
   </div>
   <div class="tpanel active" id="tab-spieler">
     <div class="tmgr-scroll" style="border:1px solid var(--gl);border-radius:8px;margin-bottom:10px;" id="tmgr-pl-list"></div>
@@ -5228,26 +5217,6 @@ if(window._fbBlocked){
         
       </div>
     </div>
-  </div>
-  <div class="tpanel" id="tab-schwerpunkte">
-    <p class="note">Schwerpunkte für <strong id="foc-team-lbl">–</strong></p>
-    <div id="foc-list" style="margin-bottom:10px;"></div>
-    <div id="foc-add-row" style="display:flex;gap:7px;">
-      <input type="text" id="newFocusName" placeholder="Neuer Schwerpunkt..." style="flex:1;margin-bottom:0;"/>
-      <button class="btn bp" onclick="addFocus()" style="flex:none;">＋</button>
-    </div>
-  </div>
-  <div class="tpanel" id="tab-statistik">
-    <div id="tmgr-stats"></div>
-  </div>
-  <div class="tpanel" id="tab-trainings">
-    <div style="border:1px solid var(--gl);border-radius:8px;" id="tmgr-sess-list"></div>
-  </div>
-  <div class="tpanel" id="tab-spiele">
-    <div style="border:1px solid var(--gl);border-radius:8px;" id="tmgr-match-list"></div>
-  </div>
-  <div class="tmgr-foot" id="tmgr-foot">
-    
   </div>
 </div></div>
 
@@ -5369,7 +5338,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791960012428; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791960582309; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -11574,12 +11543,6 @@ function _setFill(){
 // Schwerpunkte: in design "Heute" they live in Einstellungen → Mannschaft,
 // in Klassisch in the Kader tab. The same elements move between the two
 // places, so every function behind them keeps working unchanged.
-function _focMoveTo(host){
-  if(!host)return;
-  const lbl=document.getElementById('foc-team-lbl');
-  const note=lbl&&lbl.closest('p');
-  [note,document.getElementById('foc-list'),document.getElementById('foc-add-row')].forEach(el=>{if(el&&el.parentNode!==host)host.appendChild(el);});
-}
 function _setLogoSync(){
   const pv=document.getElementById('setLogoPrev'),src=_clubLogoSrc();
   if(pv&&pv.src!==src)pv.src=src;
@@ -11625,7 +11588,7 @@ function _hxSettingsSub(key){
 }
 function openSettings(sec){
   _setFill();
-  if(_hxOn()&&_setVisible('team')){_focMoveTo(document.getElementById('set-foc-host'));try{renderFocList();}catch(e){}}
+  if(_setVisible('team'))try{renderFocList();}catch(e){}
   if(sec&&!_setVisible(sec))sec='';
   openM('moSettings');
   if(!sec&&!_setPhone())sec=_setVisible(_setLast)?_setLast:'darstellung';
@@ -21823,13 +21786,11 @@ function homeRemoveHeroPhoto(){
 // ── Start view preference (per user, cloud-synced) ──
 function openTeamMgr(tab,fromId){
   if(tab==='trainers')tab='trainer';
-  // Design "Heute": Kader is people only — the other former tabs have one
-  // home each (Statistik page, Kalender, Einstellungen → Mannschaft).
-  if(_hxOn()){
-    if(tab==='statistik')return openDashboard();
-    if(tab==='trainings'||tab==='spiele')return openCalendar();
-    if(tab==='schwerpunkte')return openSettings('team');
-  }
+  // Kader is people only — the former tabs have one home each
+  // (Statistik page, Kalender, Einstellungen → Mannschaft).
+  if(tab==='statistik')return openDashboard();
+  if(tab==='trainings'||tab==='spiele')return openCalendar();
+  if(tab==='schwerpunkte')return openSettings('team');
   navPush({id:fromId||'main'});
   openM('moTeamMgr');switchTab(tab||'spieler');
 }
@@ -21867,29 +21828,6 @@ function _tmRefresh(){
   if(a&&a.id)switchTab(a.id.replace('tab-',''));
 }
 
-function renderMgrSessions(type){
-  const D=cd(),ss=D.sessions.filter(s=>s.type===type);
-  const listId=type==='training'?'tmgr-sess-list':'tmgr-match-list';
-  const el=document.getElementById(listId);if(!el)return;
-  if(!ss.length){el.innerHTML='<p style="padding:14px;font-size:.8rem;color:var(--gm);">Keine Einheiten.</p>';return;}
-  el.innerHTML=ss.map((s,i)=>{
-    const origIdx=D.sessions.indexOf(s);
-    const pres=D.players.filter(p=>p.s&&p.s[origIdx]===1).length;
-    const total=D.players.length;
-    const pct=total?Math.round((pres/total)*100):0;
-    const bc=pct>=80?'var(--cp)':pct>=60?'var(--ce)':'var(--ca)';
-    const extra=type==='match'?(s.label?' – '+s.label:''):(s.focus?' · '+s.focus:'');
-    const linkHtml=s.planLink?`<a href="${s.planLink}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="font-size:.68rem;color:var(--bm);flex-shrink:0;">🔗</a>`:'';
-    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--gl);font-size:.8rem;cursor:pointer;" onclick="_tmLeave('${type==='training'?'trainings':'spiele'}');openSessStats(${origIdx})">
-      <div style="font-weight:600;color:var(--bd);width:72px;">${s.date}</div>
-      ${type==='match'?`<div style="font-size:.68rem;padding:1px 6px;border-radius:6px;background:rgba(176,48,0,.1);color:var(--mc1);">${s.homeAway==='home'?'🏠':'🚌'}</div>`:''}
-      <div style="flex:1;color:var(--gd);">${extra}</div>
-      ${linkHtml}
-      ${s.time?`<div style="font-size:.72rem;color:var(--gm);">⏰ ${s.time}</div>`:''}
-      <div style="font-weight:700;color:${bc};min-width:36px;text-align:right;">${pres}/${total}</div>
-    </div>`;
-  }).join('');
-}
 // Wheel over the tab strip scrolls it sideways: a mouse has no horizontal
 // gesture, so without this the tabs past the edge stay unreachable.
 document.addEventListener('wheel',e=>{
@@ -21900,17 +21838,13 @@ document.addEventListener('wheel',e=>{
   e.preventDefault();
 },{passive:false});
 function switchTab(t){
-  ['spieler','trainer','schwerpunkte','statistik','trainings','spiele'].forEach((n,i)=>{
+  ['spieler','trainer'].forEach((n,i)=>{
     document.querySelectorAll('#moTeamMgr .tbtn')[i]?.classList.toggle('active',n===t);
     document.getElementById('tab-'+n)?.classList.toggle('active',n===t);
   });
-  document.getElementById('tmgr-h').textContent=_hxOn()?'Kader':{spieler:'👥 Spieler',trainer:'🎽 Trainer',schwerpunkte:'🎯 Schwerpunkte',statistik:'📊 Statistik',trainings:'📅 Trainingseinheiten',spiele:'⚽ Spiele'}[t]||'Mannschaft';
+  document.getElementById('tmgr-h').textContent='Kader';
   if(t==='spieler')renderMgrPlayers();
   if(t==='trainer'){document.getElementById('mgr-team-lbl').textContent=UI.currentTeam;renderMgrTrainers();buildTeamChecks('tTeamChecks');}
-  if(t==='schwerpunkte'){_focMoveTo(document.getElementById('tab-schwerpunkte'));renderFocList();}
-  if(t==='statistik')renderMgrStats();
-  if(t==='trainings')renderMgrSessions('training');
-  if(t==='spiele')renderMgrSessions('match');
 }
 
 
@@ -22506,9 +22440,8 @@ function populateFocSel(){
 
 // Stats
 let statsSort={col:'pct',asc:false};
-// Per-player table ("Alle Spieler"). Kader → Statistik (Klassisch) and the
-// Statistik page (Heute) render the same table; opts.open(pi) builds the
-// click handler, opts.wrap the scroll box style.
+// Per-player table ("Alle Spieler") on the Statistik page; opts.open(pi)
+// builds the click handler, opts.wrap the scroll box style.
 function _statsPlayerTable(D,opts){
   opts=opts||{};
   const ss=D.sessions||[];
@@ -22553,48 +22486,6 @@ function _statsPlayerTable(D,opts){
     </tr>`;}).join('')}
     </tbody></table></div>`;
 }
-function renderMgrStats(){
-  const D=cd(),ss=D.sessions||[];
-  const tS=ss.filter(s=>s.type==='training').length,mS=ss.filter(s=>s.type==='match').length;
-  // Aggregate: only past sessions, only factual statuses (1/0/2). Future
-  // intentions (Angemeldet=4) and missing data (Ausstehend=3) excluded.
-  const _isPast=si=>{const s=ss[si];return s&&sessTookPlace(s);}; // held incl. today's started
-  let totA=0,totPl=0;
-  (D.players||[]).forEach(p=>{
-    if(!p.s)return;
-    p.s.forEach((v,si)=>{
-      if(!_isPast(si))return;
-      if(!_sessAfterJoin(p,ss[si]))return; // before he was on the team
-      if(v===1){totA++;totPl++;}
-      else if(v===0||v===2){totPl++;}
-    });
-  });
-  const avg=totPl?Math.round((totA/totPl)*100):0;
-  // Monthly — count only past sessions, factual statuses
-  const moMap={};
-  ss.forEach((s,i)=>{if(!_isPast(i))return;const mo=moFromDisp(s.date);if(!moMap[mo])moMap[mo]={tA:0,tPl:0,mA:0,mPl:0};});
-  (D.players||[]).forEach(p=>{
-    ss.forEach((s,i)=>{
-      if(!_isPast(i))return;
-      if(!_sessAfterJoin(p,s))return; // before he was on the team
-      const mo=moFromDisp(s.date);
-      const v=p.s?p.s[i]:3;
-      const isFact=(v===1||v===0||v===2);
-      if(s.type==='training'){if(isFact)moMap[mo].tPl++;if(v===1)moMap[mo].tA++;}
-      else{if(isFact)moMap[mo].mPl++;if(v===1)moMap[mo].mA++;}
-    });
-  });
-  document.getElementById('tmgr-stats').innerHTML=`
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;">
-      <div class="ps-card"><div class="ct">Spieler</div><div class="cv">${D.players?D.players.length:0}</div></div>
-      <div class="ps-card"><div class="ct">Trainings</div><div class="cv">${tS}</div></div>
-      <div class="ps-card"><div class="ct">Spiele</div><div class="cv">${mS}</div></div>
-      <div class="ps-card"><div class="ct">Ø</div><div class="cv" style="color:${pctColor(avg)};">${avg}%</div></div>
-    </div>
-    <div class="sec" style="margin-bottom:8px;">📅 Monatlich</div>
-    ${Object.entries(moMap).map(([mo,st])=>{const pct=st.tPl?Math.round((st.tA/st.tPl)*100):null;const bc=pct!==null?pctColor(pct):'#ccc';return`<div class="fr"><div class="fr-nm">${mo}</div><div class="fr-bw"><div class="fr-bar" style="width:${Math.min(pct||0,100)}%;background:${bc};"></div></div><div class="fr-val" style="color:${bc};">${pct!==null?pct+'%':'–'}</div><div style="flex-shrink:0;font-size:.62rem;color:var(--gm);text-align:right;white-space:nowrap;min-width:52px;">${st.tA}/${st.tPl}${st.mPl?' ⚽'+st.mA+'/'+st.mPl:''}</div></div>`;}).join('')}
-${_statsPlayerTable(D)}`;
-}
 function sortTable(col){
   if(tableSort.col===col)tableSort.asc=!tableSort.asc;
   else{tableSort.col=col;tableSort.asc=true;}
@@ -22633,9 +22524,9 @@ function sortMgrPlayers(players){
   const {col,asc}=mgrSort;
   return [...players].sort((a,b)=>compareBySort(a,b,col,asc));
 }
-function sortStats(col){if(statsSort.col===col)statsSort.asc=!statsSort.asc;else{statsSort.col=col;statsSort.asc=false;}renderMgrStats();
+function sortStats(col){if(statsSort.col===col)statsSort.asc=!statsSort.asc;else{statsSort.col=col;statsSort.asc=false;}
   const db=document.getElementById('moDashboard');
-  if(_hxOn()&&db&&db.classList.contains('open'))renderDashboard();
+  if(db&&db.classList.contains('open'))renderDashboard();
 }
 
 // ══════════════════════════════
@@ -24637,7 +24528,6 @@ function initTabDrag(){
 // Navigation stack for modals
 const _navStack=[];
 function navPush(fromId){_navStack.push(fromId);}
-function teamMgrGoBack(){navBack('moTeamMgr');}
 function navBack(currentId){
   closeM(currentId);
   const prev=_navStack.pop();
@@ -30746,7 +30636,14 @@ _pubCleanupSchedule();
     </div>
   </div>
 
-      <div class="set-hx-only" id="set-foc-host" style="margin:16px 0 4px;"><div class="setting-label" style="margin-bottom:6px;">🎯 Schwerpunkte</div></div>
+      <div class="set-hx-only" id="set-foc-host" style="margin:16px 0 4px;"><div class="setting-label" style="margin-bottom:6px;">🎯 Schwerpunkte</div>
+        <p class="note">Schwerpunkte für <strong id="foc-team-lbl">–</strong></p>
+        <div id="foc-list" style="margin-bottom:10px;"></div>
+        <div id="foc-add-row" style="display:flex;gap:7px;">
+        <input type="text" id="newFocusName" placeholder="Neuer Schwerpunkt..." style="flex:1;margin-bottom:0;"/>
+        <button class="btn bp" onclick="addFocus()" style="flex:none;">＋</button>
+        </div>
+      </div>
     </section>
 
     <section class="set-sec" data-sec="daten">
