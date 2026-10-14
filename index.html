@@ -4116,6 +4116,25 @@ body.design-heute :is(#lp-pitch,#slp-pitch) > :is(rect,line,circle,path){display
   body.design-heute .ma-btn.ma-5:not(.dim){background:var(--hx-blue);}
   body.design-heute .ma-btn.ma-3:not(.dim){background:var(--hx-ink);color:#fff;}
 }
+/* One content column on every page, like the start screen: at most 1240px,
+   centred. The bar spans the full width, its title and controls line up
+   with the column (they used to stop at 1120px and leave the right empty). */
+@media(min-width:768px){
+  body.design-heute :is(#moCalendar,#moDashboard,#moWeekReport) > .mob > *:not(.mob-close-x):not(.has-inrow-close),
+  body.design-heute #moTeamMgr.hx-page > .mob > *:not(:first-child){max-width:1240px !important;margin-left:auto !important;margin-right:auto !important;}
+  body.design-heute :is(#moCalendar,#moDashboard,#moWeekReport) > .mob > .has-inrow-close,
+  body.design-heute #moTeamMgr.hx-page > .mob > div:first-child{padding-left:max(40px,calc((100% - 1240px) / 2 + 40px)) !important;padding-right:max(40px,calc((100% - 1240px) / 2 + 40px)) !important;}
+  body.design-heute #moSettings .set-body{max-width:1320px;margin-left:auto;margin-right:auto;}
+  /* the start screen: the same 1240px column and 40px edge as the pages */
+  body.design-heute .hx-wrap{max-width:1320px;padding-left:40px !important;padding-right:40px !important;}
+  body.design-heute #moSettings .set-hd{padding-left:max(40px,calc((100% - 1240px) / 2)) !important;padding-right:max(40px,calc((100% - 1240px) / 2)) !important;}
+}
+@media(min-width:768px) and (max-width:1199px){
+  body.design-heute #moWeekReport > .mob > *:not(.mob-close-x):not(.has-inrow-close){max-width:920px !important;}
+}
+/* Pages scroll inside their content, never the page box itself, so no
+   reserved scrollbar strip: the header band reaches the right edge */
+body.design-heute .mo.hx-page > .mob{scrollbar-gutter:auto;}
 /* ── One header standard ──
    Every page bar has the same height and the title the same size and place:
    desktop 76px / 2rem, phone 62px (+ safe area) / 1.6rem, centred. Controls
@@ -5757,7 +5776,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791954196703; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791955094881; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -22054,8 +22073,20 @@ function _hxWhen(sk){
 // Tag above a session title: the kind only when the title does not already
 // say it ("Training" without a focus), the day always, the time never (it is
 // on the meta line as a range).
+// Tag above a session title. The date tile next to it already gives weekday
+// and date, so the tag says how far away it is instead.
+function _hxRel(skv){
+  const t=todaySK();
+  if(skv===t)return 'heute';
+  const n=Math.round((_hxDate(skv)-_hxDate(t))/86400000);
+  if(n===1)return 'morgen';
+  if(n===2)return 'übermorgen';
+  if(n>2)return 'in '+n+' Tagen';
+  if(n===-1)return 'gestern';
+  return 'vor '+(-n)+' Tagen';
+}
 function _hxTag(isM,title,skv){
-  const kind=isM?'Spiel':'Training',when=_hxWhen(skv);
+  const kind=isM?'Spiel':'Training',when=_hxRel(skv);
   return title===kind?when.charAt(0).toUpperCase()+when.slice(1):kind+' · '+when;
 }
 // Segmented attendance bar: parts [[cls,n,…],…] of a squad of `total`
