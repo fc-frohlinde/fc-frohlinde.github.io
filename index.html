@@ -3724,6 +3724,57 @@ body.design-heute .rc-av{font-family:var(--hx-num);font-weight:800;}
 body.design-heute :is(.rc-fb,.rc-filter,.rc-g){border-radius:999px;}
 body.design-heute .rc-fb-done{background:var(--hx-yellow);color:var(--hx-ink);}
 body.design-heute .rc-bar-fill{background:linear-gradient(90deg,#2E8B5E,var(--hx-yellow));}
+/* ── Heute start screen: everything important on one page (desktop/tablet) ── */
+body.design-heute .hx-btn.dark.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.45);}
+body.design-heute .hx-btn.dark.ghost:hover{background:rgba(255,255,255,.1);}
+@media(min-width:768px){
+  body.design-heute .hx-wrap{padding:22px 32px 20px;gap:16px;}
+  body.design-heute .hx-h1{font-size:2.3rem;}
+  body.design-heute .hx-cols,body.design-heute .hx-main,body.design-heute .hx-side{gap:16px;}
+  body.design-heute .hx-main{flex:2 1 420px;}
+  body.design-heute .hx-side{flex:1 1 250px;}
+  body.design-heute .hx-pair{gap:16px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));}
+  body.design-heute .hx-dark .hx-btns{flex-wrap:nowrap;}
+  body.design-heute .hx-dark .hx-btn{padding:0 14px;}
+  body.design-heute .hx-card{padding:18px 20px;gap:12px;}
+  body.design-heute .hx-focus-title{font-size:1.9rem;margin:4px 0 2px;}
+  body.design-heute .hx-btn{height:42px;padding:0 16px;}
+  body.design-heute .hx-ring{width:104px;height:104px;}
+  body.design-heute .hx-counts{gap:18px;}
+  body.design-heute .hx-tile{padding:10px 12px;}
+  body.design-heute .hx-tile b{font-size:1.7rem;}
+  body.design-heute .hx-divider{padding-top:12px;gap:8px;}
+  body.design-heute .hx-chip{padding:3px 10px 3px 3px;}
+  body.design-heute .hx-chip i{width:24px;height:24px;}
+  body.design-heute .hx-day{padding:6px 8px;}
+  body.design-heute .hx-flag{padding:7px 6px;}
+  body.design-heute .hx-bars{height:48px;}
+  body.design-heute .hx-big b{font-size:2.8rem;}
+  body.design-heute .hx-num b{font-size:1.7rem;}
+}
+@media(max-width:767px){
+  /* Phone: four tiles in one row stay readable; shorter week card */
+  body.design-heute .hx-tile{padding:9px 8px;}
+  body.design-heute .hx-tile b{font-size:1.5rem;}
+  body.design-heute .hx-tile span{font-size:.72rem;}
+  body.design-heute .hx-bars{height:40px;}
+  body.design-heute .hx-big b{font-size:2.5rem;}
+  body.design-heute .hx-cols,body.design-heute .hx-main,body.design-heute .hx-side,body.design-heute .hx-pair{gap:14px;}
+}
+@media(min-width:768px) and (max-width:1180px){
+  /* Tablet: the four tiles carry the numbers, the ring would push them down */
+  body.design-heute .hx-ring{display:none;}
+}
+/* ── Heute: Wochenbericht uses the width — attendance grid left, the rest right ── */
+body.design-heute #moWeekReport .wr2-side{display:flex;flex-direction:column;gap:14px;min-width:0;}
+@media(min-width:1200px){
+  body.design-heute #moWeekReport > .mob > *:not(.mob-close-x){max-width:1120px;}
+  body.design-heute #moWeekReport .wr2{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:14px;align-items:start;grid-auto-flow:dense;}
+  body.design-heute #moWeekReport .wr2 > *{margin:0 !important;}
+  body.design-heute #moWeekReport :is(.wr2-top,.wr2s-team){grid-column:1 / -1;}
+  body.design-heute #moWeekReport .wr2s-att{grid-column:1;}
+  body.design-heute #moWeekReport .wr2-side{grid-column:2;}
+}
 /* ── Kader page (#moTeamMgr) ── */
 body.design-heute #moTeamMgr > .mob{padding:30px 40px 28px !important;}
 body.design-heute #moTeamMgr > .mob > *{width:100%;max-width:1040px;box-sizing:border-box;}
@@ -5227,7 +5278,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791944805363; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791945495975; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -16504,6 +16555,16 @@ function renderWeekReportModal(){
   const data={team,season,block,sessions:block.sessions,players:block.players};
   if(navSlot)navSlot.innerHTML=_dbBuildWeekNav(data);
   el.innerHTML=dbRenderWeekReportSection(data);
+  // Heute: the smaller sections form their own column next to the
+  // attendance grid (wide screens), so they stack without gaps.
+  if(_hxOn()){
+    const wr=el.querySelector('.wr2'),att=wr&&wr.querySelector('.wr2s-att');
+    if(wr&&att){
+      const side=document.createElement('div');side.className='wr2-side';
+      wr.querySelectorAll(':scope > .wr2s-flags, :scope > .wr2s-match, :scope > .wr2s-load').forEach(x=>side.appendChild(x));
+      if(side.children.length)att.after(side);
+    }
+  }
 }
 // Restored: was accidentally dropped during earlier refactor. Modal-aware: refreshes whichever container is open.
 function dbWeekReportNav(delta){
@@ -16614,7 +16675,7 @@ function dbRenderWeekReportSection(data){
     return `<span class="wr2-d ${d>0?'up':'down'}">${d>0?'▲':'▼'} ${Math.abs(d)}</span>`;
   };
   const tile=(v,l,sub)=>`<div class="ps-tile"><div class="ps-tile-v">${v==null?'–':v}</div><div class="ps-tile-l">${l}</div>${sub?`<div class="ps-tile-s">${sub}</div>`:''}</div>`;
-  html+='<div class="wr2-sec"><div class="db-h">👥 Mannschaft</div><div class="wr2-tiles">';
+  html+='<div class="wr2-sec wr2s-team"><div class="db-h">👥 Mannschaft</div><div class="wr2-tiles">';
   html+=tile(allNow==null?null:allNow+'%','Woche',delta(allNow,allPrev)+(allPrev!=null?' <span class="wr2-muted">Vorwoche '+allPrev+'%</span>':''));
   html+=tile(tNow==null?null:tNow+'%','Training',delta(tNow,tPrev));
   if(held.some(x=>x.s.type==='match'))html+=tile(mNow==null?null:mNow+'%','Spiel','');
@@ -16636,7 +16697,7 @@ function dbRenderWeekReportSection(data){
     const phy=own.filter(x=>Array.isArray(p.physio)&&p.physio[x.si]===true);
     if(phy.length)flags.push({pi,p,cls:'info',ic:'🧑‍⚕️',t:'Physio: '+phy.map(x=>x.s.date).join(', ')});
   });
-  html+='<div class="wr2-sec"><div class="db-h">⚠ Im Blick behalten</div>';
+  html+='<div class="wr2-sec wr2s-flags"><div class="db-h">⚠ Im Blick behalten</div>';
   if(!flags.length)html+='<div class="wr2-ok">✓ Nichts Auffälliges in dieser Woche.</div>';
   else{
     const order={bad:0,warn:1,info:2};
@@ -16651,7 +16712,7 @@ function dbRenderWeekReportSection(data){
     const now=pctOf(x.p,held),pr=pctOf(x.p,prevHeld);
     return Object.assign(x,{now,pr});
   }).sort((a,b)=>((b.now==null?-1:b.now)-(a.now==null?-1:a.now))||nm(a.p).localeCompare(nm(b.p)));
-  html+='<div class="wr2-sec"><div class="db-h">📅 Anwesenheit der Woche</div><div class="wr2-grid-wrap"><table class="wr2-grid"><thead><tr><th class="wr2-nm">Spieler</th>';
+  html+='<div class="wr2-sec wr2s-att"><div class="db-h">📅 Anwesenheit der Woche</div><div class="wr2-grid-wrap"><table class="wr2-grid"><thead><tr><th class="wr2-nm">Spieler</th>';
   wk.forEach(({s,held:h})=>{
     html+=`<th class="${h?'':'wr2-fut'}" title="${h?'':'noch nicht stattgefunden'}">${s.type==='match'?'⚽':''}${esc(String(s.date).replace(/\.\d{4}$/,''))}</th>`;
   });
@@ -16679,7 +16740,7 @@ function dbRenderWeekReportSection(data){
     });
     sc.sort((x,y)=>(y.g-x.g)||(y.a-x.a));
     const graded=perf[1]+perf[2]+perf[3];
-    html+=`<div class="wr2-sec"><div class="db-h">⚽ Spiel ${s.label?'gegen '+esc(s.label):''} <span class="db-h-sub">${esc(s.date)}</span></div>`;
+    html+=`<div class="wr2-sec wr2s-match"><div class="db-h">⚽ Spiel ${s.label?'gegen '+esc(s.label):''} <span class="db-h-sub">${esc(s.date)}</span></div>`;
     if(s.evalTopic)html+=`<div class="wr2-muted" style="margin-bottom:6px;">Thema: <b>${esc(s.evalTopic)}</b></div>`;
     html+='<div class="wr2-match">';
     html+='<div class="wr2-scorers">'+(sc.length?sc.map(x=>
@@ -16697,7 +16758,7 @@ function dbRenderWeekReportSection(data){
   if(loads.length){
     const missing=loads.filter(x=>x.rated<x.present);
     const max=Math.max(1,...loads.map(x=>x.now));
-    html+='<div class="wr2-sec"><div class="db-h">💪 Belastung <span class="db-h-sub">(sRPE · Minuten × Anstrengung)</span></div>';
+    html+='<div class="wr2-sec wr2s-load"><div class="db-h">💪 Belastung <span class="db-h-sub">(sRPE · Minuten × Anstrengung)</span></div>';
     html+='<div class="wr2-load">'+loads.filter(x=>x.now>0).sort((a,b)=>b.now-a.now).map(x=>{
       const ch=x.pr>0?Math.round((x.now/x.pr-1)*100):null;
       const hot=ch!=null&&ch>LOAD_SPIKE_PCT;
@@ -21270,15 +21331,8 @@ function hxRender(){
   const sk=s=>(s&&s.date)?dispToSortKey(s.date):99999999;
   const fi=findNext();
   const mi=findNextMatchIdx();
-  // Lead sentence
-  const lead=[];
-  if(fi>=0){
-    const s=S[fi];
-    lead.push((_hxWhen(sk(s))==='heute'?'Heute ':'Nächster Termin '+_hxWhen(sk(s))+': ')+(s.type==='match'?'Spiel':'Training')+(s.time?' um '+s.time:'')+'.');
-  }
-  if(mi>=0&&mi!==fi){const m=S[mi];lead.push('Spiel '+_hxWhen(sk(m))+(m.label?' gegen '+m.label:'')+'.');}
   let html=`<div class="hx-wrap">${mtop}
-    <div class="hx-top"><div><h1 class="hx-h1">${esc(dateTxt)}</h1>${lead.length?`<p class="hx-lead">${esc(lead.join(' '))}</p>`:''}</div>
+    <div class="hx-top"><div><h1 class="hx-h1">${esc(dateTxt)}</h1></div>
     <button type="button" class="hx-search" onclick="openSearch()">${hxIcon('search',18)}Spieler oder Termin suchen</button></div>
     <div class="hx-cols"><div class="hx-main">`;
   // ── Focus: the next session ──
@@ -21325,7 +21379,8 @@ function hxRender(){
       <div class="hx-counts">${ring}<div class="hx-tiles" style="--hxn:${nTiles}">${tiles}</div></div>`;
     if(c.openList.length){
       html+=`<div class="hx-divider"><span class="hx-sub-h">${roll?'Noch nicht erfasst':'Noch keine Antwort'} (${c.openList.length})</span><div class="hx-chips">`
-        +c.openList.map(({p,pi})=>`<button type="button" class="hx-chip" onclick="openPlayerFromMain(${pi})"><i>${esc(String(p.nr||'·'))}</i>${esc(nm(p))}</button>`).join('')
+        +c.openList.slice(0,8).map(({p,pi})=>`<button type="button" class="hx-chip" onclick="openPlayerFromMain(${pi})"><i>${esc(String(p.nr||'·'))}</i>${esc(nm(p))}</button>`).join('')
+        +(c.openList.length>8?`<button type="button" class="hx-chip" onclick="openSessFromMain(${fi});ssAttOpen(${fi},${roll?4:3})">+${c.openList.length-8}</button>`:'')
         +`</div></div>`;
     }
     html+=`</section>`;
@@ -21339,7 +21394,7 @@ function hxRender(){
       <span class="hx-meta">${isM?'Nächstes Spiel':'Danach'} · ${esc(_hxWhen(sk(s)))}${s.time?' '+esc(s.time):''}${isM&&s.homeAway?' · '+(s.homeAway==='home'?'Heimspiel':'auswärts'):''}</span>
       <h3 class="hx-h2" style="font-size:1.9rem;">${esc(isM?(s.label||'Spiel'):(s.focus||'Training'))}</h3>
       <div class="hx-nums"><div class="hx-num"><b style="color:var(--hx-yellow)">${c.yes}</b><span>zugesagt</span></div><div class="hx-num"><b>${c.exc+c.no}</b><span>fehlen</span></div><div class="hx-num"><b>${c.open}</b><span>offen</span></div></div>
-      <div class="hx-btns"><button type="button" class="hx-btn dark" onclick="${isM?`openLineupPlanner(${si2})`:`openSessFromMain(${si2})`}">${isM?'Aufstellung planen':'Termin öffnen'}</button></div>
+      <div class="hx-btns">${isM?`<button type="button" class="hx-btn dark" onclick="openSessFromMain(${si2})">Spiel öffnen</button><button type="button" class="hx-btn dark ghost" onclick="openLineupPlanner(${si2})" title="Aufstellung planen">Aufstellung</button>`:`<button type="button" class="hx-btn dark" onclick="openSessFromMain(${si2})">Termin öffnen</button>`}</div>
     </section>`;
   }
   try{
@@ -21370,7 +21425,8 @@ function hxRender(){
     const dow=d.toLocaleDateString('de-DE',{weekday:'short'}).replace('.','');
     const isT=dk===today;
     if(!list.length){
-      html+=`<div class="hx-day empty${isT?' today':''}"><span class="hx-day-d"><small>${esc(dow)}</small><b>${d.getDate()}</b></span><span class="hx-day-x"><span class="hx-day-t">${isT?'Heute kein Termin':'–'}</span></span></div>`;
+      // Empty days are left out — only today says that nothing is on
+      if(isT)html+=`<div class="hx-day empty today"><span class="hx-day-d"><small>${esc(dow)}</small><b>${d.getDate()}</b></span><span class="hx-day-x"><span class="hx-day-t">Heute kein Termin</span></span></div>`;
       return;
     }
     list.forEach(si=>{
@@ -21419,8 +21475,12 @@ function hxRender(){
   }catch(e){}
   html+=`<section class="hx-card" style="gap:2px;" aria-label="Im Blick behalten"><h3 class="hx-h2" style="margin-bottom:8px;">Im Blick behalten</h3>`;
   if(!flags.length)html+=`<div class="hx-ok">Alles im grünen Bereich.</div>`;
-  else html+=flags.slice(0,8).map(f=>`<button type="button" class="hx-flag" onclick="${f.on}"><span class="hx-dot" style="background:${f.dot}"></span><span class="hx-flag-x"><b>${esc(f.who)}</b><span>${esc(f.what)}</span></span></button>`).join('')
-    +(flags.length>8?`<div class="hx-meta" style="padding:8px 6px 0;">und ${flags.length-8} weitere</div>`:'');
+  else{
+    // Four rows keep the start screen on one page; the rest on demand
+    const lim=window._hxFlagsAll?flags.length:4;
+    html+=flags.slice(0,lim).map(f=>`<button type="button" class="hx-flag" onclick="${f.on}"><span class="hx-dot" style="background:${f.dot}"></span><span class="hx-flag-x"><b>${esc(f.who)}</b><span>${esc(f.what)}</span></span></button>`).join('')
+      +(flags.length>4?`<button type="button" class="hx-link" style="padding:8px 6px 0;" onclick="window._hxFlagsAll=!window._hxFlagsAll;hxRender();">${window._hxFlagsAll?'Weniger anzeigen':'Alle '+flags.length+' anzeigen'}</button>`:'');
+  }
   html+=`</section></aside></div></div>`;
   el.innerHTML=html;
 }
@@ -26835,7 +26895,7 @@ async function tplOpen(si,opts){
   const [plan,idx,lib,tpls,meta]=await Promise.all([
     _tplRead(b+'/plans/'+TPL.pid),_tplRead(b+'/idx'),_tplRead(b+'/lib'),_tplRead(b+'/tpl'),_tplRead(b+'/meta')]);
   if(seq!==TPL.openSeq||!ov.classList.contains('open'))return;
-  TPL.idx=(idx&&typeof idx==='object')?idx:{};TPL.idxCache[TPL.team]=TPL.idx;
+  TPL.idx=(idx&&typeof idx==='object')?idx:{};TPL.idxCache[TPL.team]=TPL.idx;_tplIdxRemember(TPL.team);
   TPL.lib=(lib&&typeof lib==='object')?lib:{};
   TPL.tpls=(tpls&&typeof tpls==='object')?tpls:{};
   // Libraries start empty: each team builds its own. The standard drills that
@@ -26908,6 +26968,19 @@ function tplKey(e){
   if(k==='z'&&!e.shiftKey)tplUndo();
 }
 
+// Plan summaries, remembered on this device (blocks and minutes per plan
+// only), so the start screen knows on first paint whether a plan exists
+// instead of guessing and correcting itself a moment later.
+function _tplIdxRemember(team){
+  try{
+    const idx=TPL.idxCache[team];if(!team||!idx||typeof idx!=='object')return;
+    const slim={};Object.keys(idx).forEach(k=>{const e=idx[k];if(e)slim[k]={n:e.n||0,m:e.m||0};});
+    localStorage.setItem('fcf_tpl_idx_'+team,JSON.stringify(slim));
+  }catch(e){}
+}
+function _tplIdxRecall(team){
+  try{const v=JSON.parse(localStorage.getItem('fcf_tpl_idx_'+team)||'null');return v&&typeof v==='object'?v:null;}catch(e){return null;}
+}
 // ── Heute start screen: the next training card says whether a plan exists
 // and opens the planner directly. Same tiny index as the session window.
 function _tplHomeBtn(si){
@@ -26915,15 +26988,18 @@ function _tplHomeBtn(si){
   const D=cd();const s=D&&D.sessions&&D.sessions[si];
   if(!s||s.type==='match')return '';
   const team=UI.currentTeam,idx=TPL.idxCache[team];
-  const e=(s.pid&&idx)?idx[s.pid]:null;
   if(s.pid&&!idx&&typeof fbDb!=='undefined'&&fbDb&&!TPL.idxCache['__'+team]){
     TPL.idxCache['__'+team]=1; // one request per team and page load
     _tplRead(_tplBase(team)+'/idx').then(v=>{
       if(!TPL.idxCache[team])TPL.idxCache[team]=(v&&typeof v==='object')?v:{};
+      _tplIdxRemember(team);
       if(typeof hxOn==='function'&&hxOn()&&typeof hxRender==='function')hxRender();
     }).catch(()=>{});
   }
-  const has=!!(s.pid&&(!e||e.n>0));
+  // Known index (loaded, else remembered): a plan exists only with blocks
+  const known=idx||_tplIdxRecall(team);
+  const e=(s.pid&&known)?known[s.pid]:null;
+  const has=known?!!(e&&e.n>0):!!s.pid;
   const lbl=!has?'Plan erstellen':(e&&e.n?`Plan · ${e.n} ${e.n===1?'Block':'Blöcke'} · ${e.m}′`:'Plan öffnen');
   return `<button type="button" class="hx-btn${has?' hx-plan-on':''}" onclick="tplOpen(${si})">${lbl}</button>`;
 }
@@ -26977,6 +27053,7 @@ function _tplSaveNow(){
   _tplWrite(b+'/plans/'+TPL.pid,p);
   const sum=_tplIdxSum(p);
   TPL.idx[TPL.pid]=sum;
+  _tplIdxRemember(TPL.team);
   _tplWrite(b+'/idx/'+TPL.pid,sum);
   _tplStatus();
 }
