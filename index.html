@@ -4268,6 +4268,27 @@ body.design-heute #moTrainerProfile .tp-title-row{display:flex;align-items:cente
 body.design-heute #moTrainerProfile .tp-name{font-family:var(--hx-num);font-weight:800;font-size:1.7rem;letter-spacing:.2px;text-transform:none;color:var(--hx-ink);}
 body.design-heute #moTrainerProfile .tp-sub{color:var(--hx-muted);}
 body.design-heute #moTrainerProfile .tp-title-row h3{font-family:var(--hx-num);font-weight:800;font-size:1.55rem;color:var(--hx-ink);letter-spacing:.2px;}
+/* Start screen: the team photo behind the band (Heute). Tinted with the
+   scheme's navigation colour so the title stays readable and the band still
+   reads as the frame; without a photo the band stays plain. */
+.hx-heroimg{display:none;}
+body.design-heute #hxHome{position:relative;}
+body.design-heute #hxHome.hx-has-hero .hx-heroimg{display:block;position:absolute;left:0;right:0;top:0;height:280px;z-index:0;pointer-events:none;
+  background:var(--hx-hero) center 32%/cover no-repeat;}
+body.design-heute #hxHome.hx-has-hero .hx-heroimg::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--hx-nav) 42%,transparent) 0%,color-mix(in srgb,var(--hx-nav) 66%,transparent) 40%,color-mix(in srgb,var(--hx-nav) 94%,transparent) 100%);}
+body.design-heute #hxHome.hx-has-hero .hx-h1{text-shadow:0 1px 12px rgba(0,0,0,.35);}
+body.design-heute #hxHome .hx-wrap{position:relative;z-index:1;}
+body.design-heute .hx-top-r,body.design-heute .hx-mtop-r{display:flex;align-items:center;gap:8px;}
+body.design-heute .hx-photo{width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.1);color:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto;}
+body.design-heute .hx-photo:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.35);}
+body.design-heute .hx-photo:focus-visible{outline:2px solid var(--hx-yellow);outline-offset:2px;}
+@media(min-width:768px){body.design-heute .hx-mtop-r .hx-photo{display:none;}}
+@media(max-width:767px){
+  body.design-heute #hxHome.hx-has-hero .hx-heroimg{height:230px;}
+  body.design-heute .hx-top-r .hx-photo{display:none;}
+  body.design-heute .hx-photo{width:44px;height:44px;border-radius:12px;}
+}
 /* ── Kader page (#moTeamMgr) ── */
 body.design-heute #moTeamMgr > .mob{padding:30px 40px 28px !important;}
 body.design-heute #moTeamMgr > .mob > *{width:100%;max-width:1040px;box-sizing:border-box;}
@@ -5776,7 +5797,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791955094881; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791955623963; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -21792,6 +21813,7 @@ function mobNav(what){
 // that used to hide behind toolbar buttons. Everything below only runs when
 // body.design-heute is set.
 const HX_IC={
+  camera:'<path d="M4 8h3.2l1.8-2.6h6l1.8 2.6H20v11H4z"/><circle cx="12" cy="13.2" r="3.6"/>',
   home:'<path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"/>',
   table:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/>',
   cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
@@ -22128,9 +22150,16 @@ function hxRender(){
   const crestSrc=(document.getElementById('clogo')||{}).src||'';
   const today=todaySK();
   const dateTxt=new Date().toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long'});
+  // The team photo (the same G.heroPhoto as the Klassisch start screen) sits
+  // behind the band, tinted in the scheme colour; editors change it here.
+  const _hero=(G&&typeof G.heroPhoto==='string'&&G.heroPhoto)||'';
+  if(el._hxHero!==_hero){el.style.setProperty('--hx-hero',_hero?'url("'+_hero+'")':'none');el._hxHero=_hero;}
+  el.classList.toggle('hx-has-hero',!!_hero);
+  const _ed=typeof canEdit==='function'&&canEdit();
+  const photoBtn=_ed?`<button type="button" class="hx-photo" onclick="heroPhotoMenu(this,event)" aria-label="${_hero?'Titelbild ändern':'Titelbild hinzufügen'}" title="${_hero?'Titelbild ändern':'Titelbild hinzufügen'}">${hxIcon('camera',18)}</button>`:'';
   const mtop=`<div class="hx-mtop">
       <button type="button" class="hx-mctx" onclick="mobSheetOpen()"><img src="${esc(crestSrc)}" alt="">${esc(UI.currentTeam||'')} · ${esc(season||'')}${hxIcon('down',16)}</button>
-      <button type="button" class="hx-mbell" aria-label="Benachrichtigungen" onclick="hxNotif(this,event)">${hxIcon('bell')}</button>
+      <span class="hx-mtop-r">${photoBtn}<button type="button" class="hx-mbell" aria-label="Benachrichtigungen" onclick="hxNotif(this,event)">${hxIcon('bell')}</button></span>
     </div>`;
   if(!D||!Array.isArray(D.sessions)||!Array.isArray(D.players)){
     el.innerHTML=`<div class="hx-wrap">${mtop}<h1 class="hx-h1">${esc(dateTxt)}</h1><div class="hx-card hx-empty">Für ${esc(UI.currentTeam||'')} · ${esc(season||'')} gibt es noch keine Daten.</div></div>`;
@@ -22141,9 +22170,9 @@ function hxRender(){
   const sk=s=>(s&&s.date)?dispToSortKey(s.date):99999999;
   const fi=findNext();
   const mi=findNextMatchIdx();
-  let html=`<div class="hx-wrap">${mtop}
+  let html=`<div class="hx-heroimg" aria-hidden="true"></div><div class="hx-wrap">${mtop}
     <div class="hx-top"><div><h1 class="hx-h1">${esc(dateTxt)}</h1></div>
-    <button type="button" class="hx-search" onclick="openSearch()">${hxIcon('search',18)}Spieler oder Termin suchen</button></div>
+    <span class="hx-top-r">${photoBtn}<button type="button" class="hx-search" onclick="openSearch()">${hxIcon('search',18)}Spieler oder Termin suchen</button></span></div>
     <div class="hx-grid">`;
   // ── Focus: the next session ──
   if(fi<0){
@@ -22740,6 +22769,7 @@ function homeUploadHeroPhoto(ev){
         saveG();
         logAudit('Startseiten-Foto ge\u00e4ndert','','');
         homeRender();
+        if(typeof hxRender==='function'&&_hxOn())hxRender();
       };
       img.onerror=()=>alert('Ung\u00fcltiges Bildformat');
       img.src=rv.target.result;
@@ -22828,6 +22858,7 @@ function homeRemoveHeroPhoto(){
   delete G.heroPhoto;
   saveG();
   homeRender();
+  if(typeof hxRender==='function'&&_hxOn())hxRender();
 }
 // ── Start view preference (per user, cloud-synced) ──
 // 'home' (default): Startseite opens after login. 'table': straight to table.
