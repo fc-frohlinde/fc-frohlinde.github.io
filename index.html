@@ -169,7 +169,12 @@ html,body{height:100%;font-family:'Barlow',sans-serif;font-size:16px;}
    area exposed the blank page underneath. Two fixes — contain the overscroll so
    the gesture no longer leaves the app, and paint the same dark base on <html>
    so any residual bounce shows the app's colour rather than white. */
-html{background:var(--bg-dark);overscroll-behavior:none;}
+html{background:var(--bg-dark);overscroll-behavior:none;-webkit-tap-highlight-color:transparent;}
+/* Touch press feedback, replacing the browser's tap highlight (always a
+   rectangle): _tapFx marks the control actually pressed, so it follows its shape. */
+.tap-fx{filter:brightness(.93);}
+.tap-fx.tap-dark{filter:brightness(1.22);}
+.tap-fx.tap-ghost{filter:none;opacity:.55;}
 body{overscroll-behavior:none;}
 body{background:linear-gradient(140deg,var(--bg-dark) 0%,var(--bg-mid) 55%,var(--bg-dark) 100%);height:100vh;max-height:100vh;padding:7px;display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box;}
 /* Android browsers (Edge/Chrome on Xiaomi et al.) keep a bottom toolbar that
@@ -5499,7 +5504,7 @@ const APP_VERSION_LABEL='1.1.1';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792012900485; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792013641683; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.1.1',date:'14.10.2026',title:'Kader-Tafel',items:[
     {icon:'📋',title:'Kader als Tafel',desc:'Im Kader gibt es den neuen Reiter „Tafel“: die Mannschaft nach Linien (Tor, Abwehr, Mittelfeld, Angriff) für einen Termin. Pro Linie siehst du, wie viele zugesagt haben, pro Spieler den Status und die letzten fünf Termine als Punkte. Oben wählst du den Termin.'},
@@ -22166,6 +22171,56 @@ function _tmRefresh(){
 
 // Wheel over the tab strip scrolls it sideways: a mouse has no horizontal
 // gesture, so without this the tabs past the edge stay unreachable.
+// Touch press feedback (see .tap-fx). Mouse input keeps the hover styles.
+// The pressed control dims after a short delay (so a scroll swipe does not
+// flash every row it starts on) and stays dimmed briefly after release.
+const _tapFx=(function(){
+  const SEL='button,a[href],[onclick],[role="button"],label,summary,select';
+  const PASSIVE=/^\s*(event\.stopPropagation\(\);?\s*$|if\(event\.target===this\))/;
+  let el=null,t0=null,x=0,y=0;
+  function pick(target){
+    if(!target||!target.closest||target.closest('input,textarea,[contenteditable="true"]'))return null;
+    let e=target.closest(SEL);
+    if(e&&e.tagName!=='A'&&e.tagName!=='BUTTON'&&PASSIVE.test(e.getAttribute('onclick')||''))return null;
+    if(!e){ // wired with addEventListener: the outermost element of a cursor:pointer run
+      let n=target,hit=null;
+      for(let i=0;n&&n!==document.body&&i<8;i++,n=n.parentElement){
+        if(getComputedStyle(n).cursor==='pointer')hit=n;else if(hit)break;
+      }
+      e=hit;
+    }
+    if(!e||e===document.body||e.disabled||e.getAttribute('aria-disabled')==='true')return null;
+    const r=e.getBoundingClientRect();
+    if(!r.width||r.width*r.height>innerWidth*innerHeight*.5)return null; // backdrops, whole pages
+    return e;
+  }
+  function tone(e){
+    const m=(getComputedStyle(e).backgroundColor.match(/[\d.]+/g)||[]).map(Number);
+    const a=m.length>3?m[3]:(m.length?1:0);
+    if(a<.15)return 'tap-ghost';
+    return (.299*m[0]+.587*m[1]+.114*m[2])/255<.45?'tap-dark':'';
+  }
+  function on(){if(!el)return;el.classList.add('tap-fx');const c=tone(el);if(c)el.classList.add(c);}
+  function clear(delay){
+    clearTimeout(t0);t0=null;
+    const e=el;el=null;if(!e)return;
+    const go=()=>e.classList.remove('tap-fx','tap-dark','tap-ghost');
+    if(delay)setTimeout(go,delay);else go();
+  }
+  const o={passive:true,capture:true};
+  document.addEventListener('pointerdown',ev=>{
+    clear();
+    if(ev.pointerType==='mouse'||!ev.isPrimary)return;
+    el=pick(ev.target);if(!el)return;
+    x=ev.clientX;y=ev.clientY;
+    t0=setTimeout(()=>{t0=null;on();},60);
+  },o);
+  document.addEventListener('pointermove',ev=>{if(el&&(Math.abs(ev.clientX-x)>10||Math.abs(ev.clientY-y)>10))clear();},o);
+  document.addEventListener('pointerup',()=>{if(!el)return;if(t0){clearTimeout(t0);t0=null;on();}clear(140);},o);
+  document.addEventListener('pointercancel',()=>clear(),o);
+  document.addEventListener('scroll',()=>clear(),o);
+  return {pick,tone};
+})();
 document.addEventListener('wheel',e=>{
   const bar=e.target&&e.target.closest&&e.target.closest('.tbar');
   if(!bar||bar.scrollWidth<=bar.clientWidth)return;
