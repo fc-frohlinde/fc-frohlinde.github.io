@@ -5224,7 +5224,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791943950708; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791944214712; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -19264,11 +19264,13 @@ function openSessStats(si){
   {
     // Only facts not already carried by the title or the window heading.
     const bits=[];
-    if(s.time)bits.push('\u23f0 '+escapeHtml(s.time));
+    const dur=(typeof rpeSessionMinutes==='function')?rpeSessionMinutes(s,null,si):null;
+    // Heute: "18:30 – 20:00" instead of "18:30 · 90 Min." — one fact, once
+    const _range=_hxOn()&&s.time&&dur&&typeof _hxEnd==='function';
+    if(s.time)bits.push('\u23f0 '+escapeHtml(s.time)+(_range?' \u2013 '+_hxEnd(s.time,dur):''));
     if(isMat)bits.push(s.homeAway==='home'?'\ud83c\udfe0 Heim':'\ud83d\ude8c Ausw\u00e4rts');
     else if(s.focus)bits.push('\ud83c\udfaf '+escapeHtml(s.focus)+(s.focus2?' + '+escapeHtml(s.focus2):''));
-    const dur=(typeof rpeSessionMinutes==='function')?rpeSessionMinutes(s,null,si):null;
-    if(dur)bits.push(dur+' Min.');
+    if(dur&&!_range)bits.push(dur+' Min.');
     document.getElementById('ss-meta').innerHTML=bits.join(' &nbsp;\u00b7&nbsp; ')+_locMeta;
   }
   try{renderEvalTopicRow(si);}catch(e){console.error('evalTopic:',e);}
@@ -21077,6 +21079,7 @@ function hxApplyDesign(){
     if(lb)lb.textContent=on?HX_TABS[k][1]:lb.dataset.orig;
   });
   if(on){hxRenderNav();hxSyncNav();}
+  if(typeof _hxSyncBack==='function')_hxSyncBack();
   if(typeof _mobNavMeasure==='function')setTimeout(_mobNavMeasure,30);
 }
 function hxRenderNav(){
@@ -21114,6 +21117,11 @@ function _hxClosePanels(keepId){
     if(el.id==='moPlayer'&&typeof psCloseGuard==='function')psCloseGuard();
     else closeM(el.id);
   });
+}
+function _hxSyncBack(){
+  const top=(typeof _navStack!=='undefined'&&_navStack.length)?_navStack[_navStack.length-1]:null;
+  const real=!_hxOn()||!!(top&&top.id&&top.id!=='main');
+  ['ss-back-btn','ps-back-btn'].forEach(id=>{const b=document.getElementById(id);if(b)b.style.display=real?'':'none';});
 }
 function _hxPanelSync(){
   document.body.classList.toggle('hx-panel-open',_hxOn()&&!!document.querySelector('.mo.hx-panel.open'));
@@ -21204,6 +21212,13 @@ function _hxWhen(sk){
   const wd=_hxDate(sk).toLocaleDateString('de-DE',{weekday:'long'});
   return diff>1&&diff<7?wd:wd+', '+_hxDate(sk).toLocaleDateString('de-DE',{day:'numeric',month:'numeric'});
 }
+// Tag above a session title: the kind only when the title does not already
+// say it ("Training" without a focus), the day always, the time never (it is
+// on the meta line as a range).
+function _hxTag(isM,title,skv){
+  const kind=isM?'Spiel':'Training',when=_hxWhen(skv);
+  return title===kind?when.charAt(0).toUpperCase()+when.slice(1):kind+' · '+when;
+}
 function _hxEnd(time,dur){
   const m=String(time||'').match(/(\d+):(\d+)/);if(!m)return '';
   const t=(+m[1])*60+(+m[2])+(+dur||90);
@@ -21267,7 +21282,8 @@ function hxRender(){
     if(s.time)meta.push(s.time+(_hxEnd(s.time,s.duration)?' – '+_hxEnd(s.time,s.duration):''));
     if(isM&&s.homeAway)meta.push(s.homeAway==='home'?'Heimspiel':'Auswärts');
     if(s.location)meta.push(s.location);
-    if(s.duration)meta.push(s.duration+' Minuten');
+    // The time range already says how long it is
+    if(s.duration&&!s.time)meta.push(s.duration+' Minuten');
     const tot=Math.max(1,c.total),C=2*Math.PI*52;
     const segA=roll?c.present:c.yes,segB=c.exc,segC=roll?c.no:0;
     const a1=C*segA/tot,a2=C*segB/tot,a3=C*segC/tot;
@@ -21290,7 +21306,7 @@ function hxRender(){
     if(roll)btns+=`<button type="button" class="hx-btn" onclick="openSessFromMain(${fi})">Termin öffnen</button>`;
     html+=`<section class="hx-card" aria-label="Nächster Termin">
       <div class="hx-focus-head"><div>
-        <span class="hx-tag${isM?' match':''}">${isM?'Spiel':'Training'} · ${esc(_hxWhen(sk(s)))}${s.time?' '+esc(s.time):''}</span>
+        <span class="hx-tag${isM?' match':''}">${esc(_hxTag(isM,title,sk(s)))}</span>
         <h2 class="hx-focus-title">${esc(title)}</h2>
         <div class="hx-meta">${esc(meta.join(' · '))}</div>
       </div><div class="hx-btns">${btns}</div></div>
@@ -24666,6 +24682,7 @@ function openM(id){
   if(_moEl.classList.contains('hx-panel')&&typeof _hxOn==='function'&&_hxOn()){
     if(id!=='moPlayerStatsExt'&&typeof _hxClosePanels==='function')_hxClosePanels(id);
     if(typeof _hxPanelSync==='function')_hxPanelSync();
+    if(typeof _hxSyncBack==='function')_hxSyncBack();
   }
   if(_moEl.classList.contains('hx-page')&&typeof _hxOn==='function'&&_hxOn()){
     if(typeof _hxClosePages==='function')_hxClosePages(id);   // one page at a time
