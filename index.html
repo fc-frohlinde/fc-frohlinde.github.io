@@ -4289,6 +4289,15 @@ body.design-heute .hx-photo:focus-visible{outline:2px solid var(--hx-yellow);out
   body.design-heute .hx-top-r .hx-photo{display:none;}
   body.design-heute .hx-photo{width:44px;height:44px;border-radius:12px;}
 }
+body.design-heute .ssx-sort{display:flex;align-items:center;gap:4px;margin:2px 0 4px;font-size:.78rem;color:var(--hx-muted);}
+body.design-heute .ssx-sort span{margin-right:4px;}
+body.design-heute .ssx-sort button{height:28px;padding:0 11px;border-radius:999px;border:1px solid var(--hx-line);background:var(--hx-field);color:var(--hx-ink2);font:600 .78rem 'Barlow',sans-serif;cursor:pointer;}
+body.design-heute .ssx-sort button.on{background:var(--hx-nav);border-color:var(--hx-nav);color:#fff;}
+body.design-heute .ssx-line{display:grid;grid-template-columns:92px minmax(0,1fr);gap:8px;align-items:start;padding:5px 0;border-top:1px solid var(--hx-line);}
+body.design-heute .ssx-line:first-of-type{border-top:none;}
+body.design-heute .ssx-ll{font-size:.76rem;font-weight:600;color:var(--hx-muted);padding-top:7px;white-space:nowrap;}
+body.design-heute .ssx-ll b{color:var(--hx-ink);font-family:var(--hx-num);font-weight:800;font-size:.9rem;margin-left:2px;}
+@media(max-width:420px){body.design-heute .ssx-line{grid-template-columns:78px minmax(0,1fr);}}
 /* ── Kader page (#moTeamMgr) ── */
 body.design-heute #moTeamMgr > .mob{padding:30px 40px 28px !important;}
 body.design-heute #moTeamMgr > .mob > *{width:100%;max-width:1040px;box-sizing:border-box;}
@@ -5797,7 +5806,7 @@ const APP_VERSION_LABEL='1.0.9.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1791955623963; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1791956261633; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.0.9',date:'25.07.2026',title:'Startseite',items:[
     {icon:'\u2302',title:'Neue Startseite',desc:'Beim \u00d6ffnen der App begr\u00fc\u00dft dich jetzt eine Startseite mit Mannschaftsfoto, Vereinslogo und allen Bereichen als Kacheln. Von hier aus erreichst du Tabelle, Kalender, Aufstellung, Saisonkader, Mannschaft, Statistik, Wochenbericht und Dashboard mit einem Klick \u2014 und landest nach dem Schlie\u00dfen wieder auf der Startseite.'},
@@ -20231,8 +20240,16 @@ function _ssHxAttRender(si){
     const v=(p.s&&si<p.s.length)?p.s[si]:3;
     (by[v]||by[3]).push({p,pi});
   });
+  // Sorted by position (TW → ST) unless the trainer picked name or number;
+  // by position, each group shows its lines (Tor, Abwehr, …) with a count
+  const sortBy=_ssxSort();
   const line=p=>typeof _ssaLineOf==='function'?_ssaLineOf(p):0;
-  Object.values(by).forEach(a=>a.sort((x,y)=>(line(x.p)-line(y.p))||((+x.p.nr||999)-(+y.p.nr||999))));
+  const pIdx=x=>{const i=POS.indexOf(x);return i<0?99:i;};
+  const nmOf=p=>String((getDisplayName?getDisplayName(p):p.name)||'');
+  const cmp=sortBy==='name'?(x,y)=>nmOf(x.p).localeCompare(nmOf(y.p))
+    :sortBy==='nr'?(x,y)=>((+x.p.nr||999)-(+y.p.nr||999))||nmOf(x.p).localeCompare(nmOf(y.p))
+    :(x,y)=>(pIdx(x.p.pos)-pIdx(y.p.pos))||(pIdx(x.p.pos2)-pIdx(y.p.pos2))||((+x.p.nr||999)-(+y.p.nr||999));
+  Object.values(by).forEach(a=>a.sort(cmp));
   const c=_hxCounts(D,si,season);
   const parts=roll
     ?[['ok',c.present],['bad',c.no],['warn',c.exc],['open',c.open]]
@@ -20243,20 +20260,39 @@ function _ssHxAttRender(si){
     const dl=_amSessionDeadline(si);
     frist=dl?(_amRsvpLocked(si)?'Antworten gesperrt seit '+_amFmtDeadline(dl):'Antwort bis '+_amFmtDeadline(dl)):'Keine Antwortfrist';
   }
+  const sb=(k,l)=>`<button type="button" class="${sortBy===k?'on':''}" aria-pressed="${sortBy===k}" onclick="_ssxSetSort('${k}',${si})">${l}</button>`;
   let h=`<div class="ssx-head"><h4>${roll?'Wer war da?':'Wer kommt?'}</h4>${frist?`<span class="ssx-frist">${e(frist)}</span>`:''}</div>
-    <div class="ssx-sum"><b>${roll?c.present:c.yes}</b><span>von ${c.total} ${roll?'anwesend':'zugesagt'}</span></div>${_hxSeg(parts,c.total)}`;
+    <div class="ssx-sum"><b>${roll?c.present:c.yes}</b><span>von ${c.total} ${roll?'anwesend':'zugesagt'}</span></div>${_hxSeg(parts,c.total)}
+    <div class="ssx-sort" role="group" aria-label="Sortieren"><span>Sortieren</span>${sb('pos','Position')}${sb('name','Name')}${sb('nr','Nr.')}</div>`;
+  const chip=({p,pi})=>{
+    const nm=e((getDisplayName?getDisplayName(p):p.name)||'');
+    return `<button type="button" class="ssx-chip"${ed?` onclick="_ssxMenu(event,${si},${pi})"`:' disabled'} title="${ed?'Antippen zum Ändern':''}"><b>${e(String(p.nr||'–'))}</b>${nm}${p.pos?`<i>${e(p.pos)}</i>`:''}</button>`;
+  };
   groups.forEach(([v,label,cls])=>{
     const list=by[v];if(!list||!list.length)return;
     const remind=(!roll&&v===3&&ed)?`<button type="button" class="ssx-remind" onclick="ssRemindOpen(${si})">Erinnern</button>`:'';
-    h+=`<div class="ssx-grp" data-st="${v}"><div class="ssx-gh"><i class="s-${cls}"></i>${label} <b>${list.length}</b>${remind}</div><div class="ssx-chips">`
-      +list.map(({p,pi})=>{
-        const nm=e((getDisplayName?getDisplayName(p):p.name)||'');
-        return `<button type="button" class="ssx-chip"${ed?` onclick="_ssxMenu(event,${si},${pi})"`:' disabled'} title="${ed?'Antippen zum Ändern':''}"><b>${e(String(p.nr||'–'))}</b>${nm}${p.pos?`<i>${e(p.pos)}</i>`:''}</button>`;
-      }).join('')+`</div></div>`;
+    let body='';
+    if(sortBy==='pos'){
+      // one row per line of the team — "do we have enough defenders?"
+      const rows={};list.forEach(x=>{const l=line(x.p);(rows[l]=rows[l]||[]).push(x);});
+      body=Object.keys(rows).map(Number).sort((a,b)=>a-b).map(l=>`<div class="ssx-line"><span class="ssx-ll">${l<SSA_LINES.length?SSA_LINES[l][0]:'Ohne Position'} <b>${rows[l].length}</b></span><div class="ssx-chips">${rows[l].map(chip).join('')}</div></div>`).join('');
+    }else body=`<div class="ssx-chips">${list.map(chip).join('')}</div>`;
+    h+=`<div class="ssx-grp" data-st="${v}"><div class="ssx-gh"><i class="s-${cls}"></i>${label} <b>${list.length}</b>${remind}</div>${body}</div>`;
   });
   if(roll&&s.type==='match'&&ed&&(typeof sessTookPlace!=='function'||sessTookPlace(s,season)))
     h+=`<button type="button" class="ssx-more" onclick="ssAttOpen(${si},1)">Tore und Vorlagen eintragen</button>`;
   el.innerHTML=h;
+}
+// Sort order of the list — position unless the trainer picks another one
+// here; remembered per device under its own key, so an older choice made in
+// the previous attendance window does not carry over
+function _ssxSort(){
+  let k='pos';try{k=localStorage.getItem('fcf_ssx_sort')||'pos';}catch(e){}
+  return ['pos','name','nr'].includes(k)?k:'pos';
+}
+function _ssxSetSort(k,si){
+  try{localStorage.setItem('fcf_ssx_sort',k);}catch(e){}
+  _ssHxAttRender(si);
 }
 // From a number on the start screen: open the window at that group
 function _ssxFocus(st){
