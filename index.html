@@ -4381,6 +4381,40 @@ body.design-heute .home-overlay::before,body.design-heute .home-overlay::after{d
 :is(.mx-seg button,.mx-fold,.mx-range select):focus-visible{outline:2px solid var(--hx-blue);outline-offset:2px;}
 @media(max-width:1599px){body.design-heute #mxFold{display:none;}}
 @media(min-width:1600px){#vd-mxfold{display:none !important;}}
+/* ── Page controls in the navy header band (wide screens) ──
+   Anwesenheit: the filter bar moves into #toolbarEl when it fits there in one
+   row (_hxBandFit measures); otherwise it stays above the table. Kader: the
+   tabs sit next to the title. Wochenbericht: "Spieleransicht" in the band. */
+@media(min-width:768px){
+  body.design-heute.mx-inband #toolbarEl.toolbar{flex-wrap:nowrap !important;column-gap:14px !important;}
+  body.design-heute #toolbarEl #mxBar{flex:1 1 auto;margin:0;flex-wrap:nowrap;gap:10px;}
+  body.design-heute #toolbarEl #mxBar .mx-q{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.22);color:#C9D6EC;flex:0 1 220px;min-width:168px;}
+  body.design-heute #toolbarEl #mxBar .mx-q:focus-within{border-color:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.18);}
+  body.design-heute #toolbarEl #mxBar .mx-q input{color:#fff;}
+  body.design-heute #toolbarEl #mxBar .mx-q input::placeholder{color:#AFC0E0;}
+  body.design-heute #toolbarEl #mxBar .mx-seg{background:rgba(255,255,255,.1);}
+  body.design-heute #toolbarEl #mxBar .mx-seg button{color:#DCE5F5;}
+  body.design-heute #toolbarEl #mxBar .mx-seg button:hover:not(.on){color:#fff;background:rgba(255,255,255,.1);}
+  body.design-heute #toolbarEl #mxBar .mx-seg button.on{background:#fff;color:var(--hx-ink);}
+  body.design-heute #toolbarEl #mxBar .mx-range{font-size:0;gap:0;}
+  body.design-heute #toolbarEl #mxBar .mx-range select{font-size:14px;background-color:rgba(255,255,255,.1);border-color:rgba(255,255,255,.22);color:#fff;}
+  body.design-heute #toolbarEl #mxBar .mx-range select option{color:#0E2350;background:#fff;}
+  body.design-heute #toolbarEl #mxBar .mx-add:not(.pri){background:transparent;border-color:rgba(255,255,255,.45);color:#fff;}
+  body.design-heute #toolbarEl #mxBar .mx-add:not(.pri):hover{background:rgba(255,255,255,.1);}
+  body.design-heute.mx-inband #mxFold{display:none !important;}
+  body.design-heute.mx-inband #vd-mxfold{display:flex !important;}
+  body.design-heute #moTeamMgr .tm-headrow{gap:18px !important;}
+  body.design-heute #moTeamMgr .tm-headrow #tmgr-h{flex:0 0 auto !important;}
+  body.design-heute #moTeamMgr .tm-headrow .tbar{margin:0 !important;padding:3px !important;gap:2px !important;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:999px;flex-shrink:0;}
+  body.design-heute #moTeamMgr .tm-headrow .tbtn{background:transparent !important;border-color:transparent !important;color:#DCE5F5 !important;padding:7px 15px !important;}
+  body.design-heute #moTeamMgr .tm-headrow .tbtn:hover{color:#fff !important;background:rgba(255,255,255,.1) !important;}
+  body.design-heute #moTeamMgr .tm-headrow .tbtn.active{background:#fff !important;color:var(--hx-ink) !important;}
+  body.design-heute #moWeekReport .wr-head-pv{display:inline-flex;align-items:center;gap:7px;align-self:center;height:38px;padding:0 15px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);color:#fff;font:700 .86rem 'Barlow',sans-serif;cursor:pointer;white-space:nowrap;}
+  body.design-heute #moWeekReport .wr-head-pv:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.35);}
+  body.design-heute #moWeekReport .wr2-top{display:none;}
+  body.design-heute :is(#toolbarEl,.tm-headrow,.wr-head) :is(button,a,select,input):focus-visible{outline:2px solid var(--hx-yellow);outline-offset:2px;}
+}
+.wr-head-pv{display:none;}
 /* tablets: the bar stays one row */
 @media(max-width:1199px){
   .mx-q{flex-basis:170px;min-width:140px;}
@@ -5779,7 +5813,7 @@ const APP_VERSION_LABEL='1.1.2';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792032008520; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792066141598; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.1.2',date:'15.10.2026',title:'Anwesenheit als Matrix',items:[
     {icon:'🗓️',title:'Tabelle nach Kalenderwochen',desc:'Die Anwesenheit ist nach Kalenderwochen gruppiert, diese Woche ist gelb markiert, das nächste Spiel blau. Ältere Wochen sind je zu einer Spalte zusammengefasst (z. B. 2/3 = zweimal da von drei); ein Klick öffnet die Woche wieder.'},
@@ -5788,6 +5822,7 @@ const APP_CHANGELOG=[
     {icon:'📱',title:'Handy: Ansicht „Spieler“',desc:'In der Anwesenheit oben „Termine | Spieler“: jeder Spieler mit seinen letzten 10 Terminen als Balken, sortierbar nach „Schwächste zuerst“, Position oder Nummer.'},
     {icon:'🏠',title:'Übersicht',desc:'„Diese Woche“ zeigt am Computer alle sieben Tage mit Kalenderwoche, freie Tage in einer schmalen Zeile. Als Titel steht das Thema des Trainings bzw. der Gegner, darunter die Uhrzeit; vergangene Termine haben ein Häkchen und die Zahl der Anwesenden, „–/18“ heißt: noch nicht erfasst. Von Freitag bis Sonntag zeigt die Karte daneben die laufende Woche („KW … bisher“). Steht am Wochenende das Spiel oben, zeigt die Karte darunter das nächste Training hell (dunkel bleibt dem Spiel), mit „Wer kommt?“ und dem Trainingsplan. Neu unter „Im Blick“: wer die Belastung heute noch nicht bewertet hat.'},
     {icon:'↔️',title:'Navigation einklappen',desc:'Am Computer lässt sich die Seitennavigation mit dem Doppelpfeil unten neben der Glocke auf Symbole verkleinern; so hat die Tabelle mehr Platz.'},
+    {icon:'🧭',title:'Kopfzeilen',desc:'Am Computer stehen Suche und Filter der Anwesenheit, die Reiter Tafel/Spieler/Trainer im Kader und „Spieleransicht“ im Wochenbericht in der dunklen Kopfzeile; Tabelle und Tafel beginnen dadurch weiter oben. Ist das Fenster zu schmal, bleibt die Filterleiste unter der Kopfzeile. „Ältere Wochen zusammenfassen“ steht unter „Ansicht“.'},
     {icon:'🛠️',title:'Bedienung',desc:'Handy: „Mehr“ öffnet sich über der unteren Leiste, die sichtbar bleibt; nochmal „Mehr“ schließt. Tafel: ein zweiter Klick auf denselben Spieler schließt sein Menü. Das Spielerprofil legt sich auf Laptops über die Seite, statt Tafel und Statistik zusammenzuschieben.'},
     {icon:'💻',title:'Laptops mit Skalierung',desc:'Auf Laptops mit 125 % Anzeigeskalierung passen Navigation und Übersicht wieder ohne Scrollen auf den Bildschirm; freie Tage in „Diese Woche“ stehen dafür in einer schmalen Zeile.'},
   ]},
@@ -11107,6 +11142,7 @@ function mxSyncBar(){
   const f=document.getElementById('mxFold');if(f){f.classList.toggle('on',MX.fold);f.setAttribute('aria-pressed',MX.fold);}
   const fc=document.getElementById('vd2-mxfold');if(fc){fc.classList.toggle('on',MX.fold);fc.textContent=MX.fold?'✓':'–';fc.closest('.vd-item').classList.toggle('vd-active',MX.fold);}
   const q=document.getElementById('mxQ');if(q&&q.value!==MX.q&&document.activeElement!==q)q.value=MX.q;
+  if(typeof _hxBandFit==='function')_hxBandFit();
 }
 function _mxRedraw(){
   renderHead();renderBody();renderTfoot();
@@ -22100,6 +22136,31 @@ function _hxNavMinApply(){
     else if(it.dataset.autotitle){it.removeAttribute('title');delete it.dataset.autotitle;}
   });
 }
+// ── Page controls in the header band (wide screens) ──
+// Kader: the tabs sit next to the title (not on phones). Anwesenheit: the
+// filter bar goes into the navy band when it fits there in one row — measured,
+// so a narrow window, a 150 % laptop or an open navigation keep it above the
+// table as before.
+function _hxBandFit(){
+  const on=typeof _hxOn==='function'&&_hxOn()&&innerWidth>=768;
+  const mg=document.getElementById('moTeamMgr');
+  const hr=mg&&mg.querySelector('.mob > div:first-child'),tbar=mg&&mg.querySelector('.tbar');
+  if(hr&&tbar){
+    if(on&&tbar.parentElement!==hr){hr.appendChild(tbar);hr.classList.add('tm-headrow');}
+    else if(!on&&tbar.parentElement===hr){hr.after(tbar);hr.classList.remove('tm-headrow');}
+  }
+  const tb=document.getElementById('toolbarEl'),bar=document.getElementById('mxBar'),wrap=document.getElementById('tableWrap');
+  if(!tb||!bar||!wrap)return;
+  const below=()=>{if(bar.parentElement===tb)wrap.parentElement.insertBefore(bar,wrap);document.body.classList.remove('mx-inband');};
+  if(!(on&&typeof _mxOn==='function'&&_mxOn())){below();return;}
+  // never move the bar while someone is typing in it
+  if(bar.contains(document.activeElement))return;
+  if(bar.parentElement!==tb)tb.insertBefore(bar,tb.querySelector('.toolbar-r'));
+  document.body.classList.add('mx-inband');
+  if(tb.clientWidth&&(tb.scrollWidth>tb.clientWidth+1||bar.scrollWidth>bar.clientWidth+1))below();
+}
+window.addEventListener('resize',()=>{clearTimeout(window._hxBandT);window._hxBandT=setTimeout(_hxBandFit,160);});
+try{document.fonts&&document.fonts.ready.then(()=>_hxBandFit());}catch(e){}
 function _hxFitUserName(){
   const un=document.getElementById('hxUserNm');if(!un)return;
   const full=(CU&&CU.name)||'';if(!full)return;
@@ -22130,6 +22191,7 @@ function hxRenderNav(){
   const nm=(CU&&CU.name)||'';
   set('hxUserNm',nm||'–');
   _hxFitUserName();
+  _hxBandFit();
   set('hxUserAv',(nm||'?').trim().charAt(0).toUpperCase());
   set('hxUserRole',CU?(CU.role==='admin'?'Administrator':CU.role==='trainer'?'Trainer':CU.role==='viewer'?'Nur ansehen':''):'');
   _hxActSync();
@@ -32519,6 +32581,7 @@ _pubCleanupSchedule();
     <h3 class="wr-head-title">Wochenbericht</h3>
     <div id="wr-nav-slot" class="wr-head-nav"></div>
     <div id="wr-team-meta" class="wr-head-meta"></div>
+    <button type="button" class="wr-head-pv" onclick="dbOpenPlayerReport()" title="Genau das, was die Spieler in ihrem Menü sehen"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>Spieleransicht</button>
   </div>
   <div id="wr-content" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 2px 6px;min-height:0;"></div>
 </div></div>
