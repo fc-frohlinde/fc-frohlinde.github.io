@@ -3117,7 +3117,7 @@ body.design-kabine:not(.theme-dark) .mob .db-h{font-family:var(--d-num);font-wei
 /* Design "Heute": a page next to the side navigation (desktop), a full-screen
    page in Heute colours (phone). Klassisch never sees these rules. */
 @media(min-width:768px){
-  body.design-heute #moSettings{left:232px;background:var(--hx-ground);backdrop-filter:none;align-items:stretch;justify-content:stretch;}
+  body.design-heute #moSettings{left:var(--hx-navw,232px);background:var(--hx-ground);backdrop-filter:none;align-items:stretch;justify-content:stretch;}
   body.design-heute #moSettings .set-mob{width:100% !important;max-width:none !important;height:100% !important;border-radius:0;box-shadow:none;background:transparent !important;animation:none;}
   body.design-heute #moSettings .set-hd{padding:30px 40px 18px;border:none;max-width:1120px;box-sizing:border-box;}
   body.design-heute .set-body{padding:0 40px 36px;gap:24px;max-width:1120px;box-sizing:border-box;width:100%;}
@@ -3167,7 +3167,7 @@ body.design-heute #mobSheet{z-index:490;}
 @media(min-width:768px){
   body.design-heute #userDropdown .ud-lead{display:none !important;}
 }
-@media(min-width:768px){body.design-heute .mo.hx-page{left:232px;}}
+@media(min-width:768px){body.design-heute .mo.hx-page{left:var(--hx-navw,232px);}}
 
 /* ── Kalender, Statistik, Wochenbericht as pages ── */
 
@@ -3260,7 +3260,7 @@ body.design-heute{--hx-pw:460px;}
 @keyframes hxPanelIn{from{transform:translateX(36px);opacity:.3;}to{transform:none;opacity:1;}}
 @keyframes hxPanelUp{from{transform:translateY(24px);opacity:.3;}to{transform:none;opacity:1;}}
 @media(min-width:768px){
-  body.design-heute .mo.hx-panel{left:auto;right:0;width:min(var(--hx-pw),calc(100vw - 232px));background:none;backdrop-filter:none;align-items:stretch;justify-content:stretch;padding:0 !important;}
+  body.design-heute .mo.hx-panel{left:auto;right:0;width:min(var(--hx-pw),calc(100vw - var(--hx-navw,232px)));background:none;backdrop-filter:none;align-items:stretch;justify-content:stretch;padding:0 !important;}
   body.design-heute .mo.hx-panel > .mob{width:100% !important;max-width:none !important;height:100% !important;max-height:none !important;border-radius:22px 0 0 22px;box-shadow:-30px 0 60px -24px rgba(14,35,80,.4),-1px 0 0 var(--hx-line);animation:hxPanelIn .22s cubic-bezier(.22,1,.36,1);box-sizing:border-box;padding:22px 24px 28px !important;}
   /* Detail statistics on top of the profile: give it a backdrop over the rest */
   body.design-heute :is(#moPlayerStatsExt,#moSessAtt,#moRpeAll).hx-panel > .mob{box-shadow:-40px 0 80px -20px rgba(14,35,80,.5),-1px 0 0 var(--hx-line);}
@@ -3345,7 +3345,7 @@ body.design-heute .lp-hint{color:#AFC0E0;}
    so Aufstellung behaves like the other entries; close is a round ✕ as in
    the Trainingsplaner. */
 @media(min-width:1000px){
-  body.design-heute :is(.lp-overlay,.slp-overlay){left:232px;}
+  body.design-heute :is(.lp-overlay,.slp-overlay){left:var(--hx-navw,232px);}
   body.design-heute :is(.lp-close-btn,#slp-close-btn){width:38px;height:38px;padding:0;flex:0 0 38px;display:inline-flex;align-items:center;justify-content:center;font-size:1rem;}
   body.design-heute :is(.lp-close-btn,#slp-close-btn) .fb-long{display:none;}
   body.design-heute :is(.lp-close-btn,#slp-close-btn) .fb-short{display:inline;}
@@ -4064,13 +4064,15 @@ body.design-heute{
   --hx-num:'Big Shoulders Display','Bebas Neue',sans-serif;
 }
 /* ── Side navigation (tablet and desktop) ── */
+body.design-heute{--hx-navw:232px;}
+body.design-heute.hx-navmin{--hx-navw:72px;}
 @media(min-width:768px){
-  body.design-heute{padding-left:239px;}
+  body.design-heute{padding-left:calc(var(--hx-navw) + 7px);}
   body.design-heute #hxNav{display:flex;}
   body.design-heute .header{display:none!important;}
-  body.design-heute .home-overlay{left:232px;}
+  body.design-heute .home-overlay{left:var(--hx-navw);}
 }
-#hxNav{position:fixed;left:0;top:0;bottom:0;width:232px;z-index:455;background:var(--hx-nav);color:#fff;
+#hxNav{position:fixed;left:0;top:0;bottom:0;width:var(--hx-navw,232px);z-index:455;background:var(--hx-nav);color:#fff;
   flex-direction:column;gap:4px;padding:20px 14px 16px;box-sizing:border-box;font-family:'Barlow',sans-serif;overflow-y:auto;}
 .hx-club{display:flex;align-items:center;gap:12px;padding:0 6px 16px;}
 .hx-crest{width:46px;height:46px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px var(--hx-yellow);object-fit:cover;flex-shrink:0;}
@@ -4097,6 +4099,21 @@ body.design-heute{
 .hx-bell:hover{background:rgba(255,255,255,.08);}
 .hx-bell-dot{position:absolute;top:9px;right:10px;width:8px;height:8px;border-radius:50%;background:var(--hx-yellow);display:none;}
 .hx-bell-dot.on{display:block;}
+.hx-fold-nav svg{transition:transform .2s;}
+/* collapsed: icons only */
+body.hx-navmin #hxNav{padding:16px 10px 12px;}
+body.hx-navmin .hx-club{justify-content:center;padding:0 0 12px;}
+body.hx-navmin .hx-club-nm{display:none;}
+body.hx-navmin .hx-ctx{flex-direction:column;gap:4px;margin:0 0 10px;}
+body.hx-navmin .hx-ctx button{justify-content:center;padding:5px 2px;min-height:30px;font-size:.72rem;}
+body.hx-navmin .hx-ctx button svg{display:none;}
+body.hx-navmin .hx-item{justify-content:center;gap:0;padding:10px 0;position:relative;}
+body.hx-navmin .hx-item > span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+body.hx-navmin .hx-fold-nav svg{transform:rotate(180deg);}
+body.hx-navmin .hx-user{flex-direction:column;gap:4px;}
+body.hx-navmin .hx-user-btn{flex:0 0 auto;justify-content:center;padding:4px;}
+body.hx-navmin .hx-user-btn > span:nth-child(2){display:none !important;}
+@media (prefers-reduced-motion:reduce){.hx-fold-nav svg{transition:none;}}
 
 /* ── Start screen ── */
 body.design-heute .home-overlay{background:var(--hx-ground);}
@@ -4337,6 +4354,11 @@ body.design-kabine #mainTable.mx tfoot td.mx-pct{font-size:.95rem;}
 #mainTable.mx tbody td[data-mx~="cur"]{--rowbg:#FFFBEE;}
 #mainTable.mx tbody td[data-mx~="cur"]:is(.csq,.cs-prejoin){background:#FFFBEE !important;}
 #mainTable.mx tbody td[data-mx~="old"]{--rowbg:var(--d-panel2);background:var(--d-panel2);}
+/* the next match: light blue down the column, a blue line under its date */
+#mainTable.mx thead tr.mx-r2 th[data-mx~="nm"]{background:#E6EEFB !important;box-shadow:inset 0 -3px 0 var(--hx-blue);}
+#mainTable.mx thead tr.mx-r2 th.next-col[data-mx~="nm"]{box-shadow:inset 0 4px 0 var(--d-yellow),inset 0 -3px 0 var(--hx-blue);}
+#mainTable.mx tbody td[data-mx~="nm"]{--rowbg:#F2F6FD;}
+#mainTable.mx tbody td[data-mx~="nm"]:is(.csq,.cs-prejoin){background:#F2F6FD !important;}
 /* folded week: anwesend von erfasst */
 #mainTable.mx td.mx-wc{border-radius:7px;box-shadow:inset 0 0 0 2.5px var(--rowbg);font:700 .74rem 'Barlow',sans-serif;cursor:pointer;min-width:46px;color:var(--d-ink);font-variant-numeric:tabular-nums;}
 #mainTable.mx td.mx-wc.h3{background:#CDEBD9;color:#1E6B46;}
@@ -4380,7 +4402,7 @@ body.design-kabine #mainTable.mx tfoot td.mx-pct{font-size:.95rem;}
 .mxp-nm{font-weight:700;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .mxp-bars{display:flex;gap:3px;}
 .mxp-bars i{flex:1 1 0;height:10px;max-width:22px;}
-:is(.mxp-bars,.mxp-lg) i.a{background:#2E8B5E;}
+:is(.mxp-bars,.mxp-lg) i.a{background:#5FB98C;}
 :is(.mxp-bars,.mxp-lg) i.f{background:#C9373E;}
 :is(.mxp-bars,.mxp-lg) i.e{background:#E0912F;}
 .mxp-bars i.x{background:transparent;box-shadow:inset 0 0 0 1px #DCE3EE;}
@@ -4502,6 +4524,7 @@ body.design-kabine #mainTable.mx tfoot td.mx-pct{font-size:.95rem;}
 .kb-leg i.open{background:#C9D3E3;}
 .kb-lu{flex:0 0 auto;height:44px;padding:0 18px;border-radius:12px;border:none;background:var(--hx-yellow);color:#0E2350;font:700 .92rem 'Barlow',sans-serif;cursor:pointer;}
 .kb-lu:hover{filter:brightness(.96);}
+.kb-lu-s{display:none;}
 .kb-sum{display:none;}
 .kb-board{position:relative;border-radius:18px;overflow:hidden;background:#2E7D46;}
 .kb-pitch{position:absolute;inset:0;width:100%;height:100%;display:block;}
@@ -4550,7 +4573,10 @@ body.design-kabine #mainTable.mx tfoot td.mx-pct{font-size:.95rem;}
 @media (max-width:767px){
   .kb-top{gap:10px;}
   .kb-days{margin:0 -2px;}
-  .kb-lu{width:100%;}
+  .kb-head{flex-basis:180px;}
+  .kb-lu{height:38px;padding:0 14px;font-size:.86rem;margin-left:auto;}
+  .kb-lu-l{display:none;}
+  .kb-lu-s{display:inline;}
   /* Phone: a small pitch with the four lines as the summary, the lists below */
   .kb-sum{display:grid;grid-template-columns:.8fr 1fr 1fr 1fr;gap:6px;padding:10px;border-radius:14px;
     background:linear-gradient(90deg,rgba(255,255,255,.07) 0 25%,transparent 25% 50%,rgba(255,255,255,.07) 50% 75%,transparent 75%),#2E7D46;}
@@ -5034,6 +5060,7 @@ if(window._fbBlocked){
   <button type="button" class="hx-item sub" id="hxActItem" onclick="hxActivity(this,event)" aria-haspopup="true" style="display:none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg><span>Aktivität</span><span class="hx-act-n" id="hxActN"></span></button>
   <button type="button" class="hx-item sub" id="hxLinksItem" onclick="hxLinks(this,event)" aria-haspopup="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.5-1.5"/></svg><span>Links</span></button>
   <button type="button" class="hx-item sub" data-hx="settings" onclick="hxGo('settings')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg><span>Einstellungen</span></button>
+  <button type="button" class="hx-item sub hx-fold-nav" id="hxNavFold" onclick="hxNavFold()" aria-pressed="false" title="Navigation einklappen"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m11 17-5-5 5-5M18 17l-5-5 5-5"/></svg><span>Einklappen</span></button>
   <div class="hx-user"><button type="button" class="hx-user-btn" onclick="hxUserMenu(this,event)"><span class="hx-av" id="hxUserAv">?</span><span style="display:flex;flex-direction:column;min-width:0;"><span class="hx-user-nm" id="hxUserNm">–</span><span class="hx-user-role" id="hxUserRole"></span></span></button><button type="button" class="hx-bell" aria-label="Benachrichtigungen" onclick="hxNotif(this,event)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span class="hx-bell-dot" id="hxBellDot"></span></button></div>
 </nav>
 
@@ -5683,13 +5710,21 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.1.1'; // v1.1.1: Kader-Tafel
-const APP_VERSION_LABEL='1.1.1';
+const APP_VERSION='1.1.2'; // v1.1.2: Anwesenheit als Matrix
+const APP_VERSION_LABEL='1.1.2';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792021090341; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792022433932; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.1.2',date:'15.10.2026',title:'Anwesenheit als Matrix',items:[
+    {icon:'🗓️',title:'Tabelle nach Kalenderwochen',desc:'Die Anwesenheit ist nach Kalenderwochen gruppiert, diese Woche ist gelb markiert, das nächste Spiel blau. Ältere Wochen sind je zu einer Spalte zusammengefasst (z. B. 2/3 = zweimal da von drei); ein Klick öffnet die Woche wieder.'},
+    {icon:'🔎',title:'Suche und Filter',desc:'Über der Tabelle: Spieler suchen, nur Trainings oder nur Spiele, Zeitraum (ganze Saison, letzte 4 Wochen, nur vergangene, nur kommende), dazu „+ Training“ und „+ Spiel“.'},
+    {icon:'📊',title:'Saison-Quote',desc:'Neben jedem Namen steht die Anwesenheit in der Saison; ein Klick auf „Saison“ sortiert, die Schwächsten zuerst.'},
+    {icon:'📱',title:'Handy: Ansicht „Spieler“',desc:'In der Anwesenheit oben „Termine | Spieler“: jeder Spieler mit seinen letzten 10 Terminen als Balken, sortierbar nach „Schwächste zuerst“, Position oder Nummer.'},
+    {icon:'🏠',title:'Übersicht',desc:'„Diese Woche“ zeigt alle sieben Tage, auf dem Handy als Kacheln direkt unter dem nächsten Termin. Neben dem Datum steht, was diese Woche noch ansteht.'},
+    {icon:'↔️',title:'Navigation einklappen',desc:'Am Computer lässt sich die Seitennavigation unten mit „Einklappen“ auf Symbole verkleinern; so hat die Tabelle mehr Platz.'},
+  ]},
   {version:'1.1.1',date:'14.10.2026',title:'Kader-Tafel',items:[
     {icon:'📋',title:'Kader als Tafel',desc:'Im Kader gibt es den neuen Reiter „Tafel“: die Mannschaft nach Linien (Tor, Abwehr, Mittelfeld, Angriff) für einen Termin. Pro Linie siehst du, wie viele zugesagt haben, pro Spieler den Status und die letzten fünf Termine als Punkte. Oben wählst du den Termin.'},
     {icon:'⚽',title:'Aufstellung aus Zusagen',desc:'Bei Spielen füllt der Knopf „Aufstellung aus Zusagen“ die Aufstellung mit den Spielern, die zugesagt haben, passend zu ihren Positionen; der Rest kommt auf die Bank. Bereits gesetzte Spieler bleiben. Gespeichert wird erst, wenn du speicherst.'},
@@ -10682,9 +10717,9 @@ function renderTfoot(){
 // marked; weeks before last week fold into one column each (anwesend von
 // erfasst), a click opens them again; the season rate stands next to every
 // name. On the phone a second view lists the players with their last ten
-// sessions. Admin only while it is a preview — MX_PREVIEW_ADMIN_ONLY=false
-// opens it for every trainer.
-const MX_PREVIEW_ADMIN_ONLY=true;
+// sessions. Open for everyone in the trainer app since 1.1.2;
+// MX_PREVIEW_ADMIN_ONLY=true limits it to the admin again.
+const MX_PREVIEW_ADMIN_ONLY=false;
 const MX_LS='fcf_mx';
 const MX={q:'',type:'all',range:'all',fold:true,open:new Set(),pview:'sess',psort:'weak',team:null,season:null,_m:null};
 (function(){try{
@@ -10738,6 +10773,7 @@ function _mxMatch(p,q){
 function _mxModel(D){
   if(MX.team!==UI.currentTeam||MX.season!==UI.currentSeason){MX.open.clear();MX.team=UI.currentTeam;MX.season=UI.currentSeason;}
   const today=todaySK(),tm=_mxMon(today),lm=_mxAdd(tm,-7),r4=_mxAdd(tm,-21);
+  MX._nm=typeof findNextMatchIdx==='function'?findNextMatchIdx():-1;
   const weeks=[];let cur=null;
   (D.sessions||[]).forEach((s,si)=>{
     if(!s||!s.date||!_mxTypeOk(s))return;
@@ -10771,7 +10807,7 @@ function _mxModel(D){
   });
   return {weeks,cols,groups,tm,today};
 }
-function _mxDm(c){return [c.wb?'wb':'',c.w.cur?'cur':'',c.kind==='week'?'old':''].filter(Boolean).join(' ');}
+function _mxDm(c){return [c.wb?'wb':'',c.w.cur?'cur':'',c.kind==='week'?'old':'',c.kind==='sess'&&c.it.si===MX._nm?'nm':''].filter(Boolean).join(' ');}
 
 // ── Head: week row over the date row ──
 function mxHead(){
@@ -21953,8 +21989,30 @@ async function hxLineupSwitch(to){
   openLineupPlanner(si);
   lp&&lp.classList.toggle('hx-vianav',via);
 }
+// Side navigation as a narrow icon rail — more room for the table. Remembered
+// per device; the label of each item stays for screen readers and as tooltip.
+const HX_NAVMIN_LS='fcf_navmin';
+function _hxNavMinApply(){
+  let on=false;try{on=localStorage.getItem(HX_NAVMIN_LS)==='1';}catch(e){}
+  document.body.classList.toggle('hx-navmin',on);
+  const b=document.getElementById('hxNavFold');
+  if(b){b.setAttribute('aria-pressed',on);b.title=on?'Navigation ausklappen':'Navigation einklappen';const sp=b.querySelector('span');if(sp)sp.textContent=on?'Ausklappen':'Einklappen';}
+  document.querySelectorAll('#hxNav .hx-item').forEach(it=>{
+    if(it.id==='hxNavFold')return;
+    const t=((it.querySelector('span')||{}).textContent||'').trim();
+    if(on){if(!it.title){it.title=t;it.dataset.autotitle='1';}}
+    else if(it.dataset.autotitle){it.removeAttribute('title');delete it.dataset.autotitle;}
+  });
+}
+function hxNavFold(){
+  const on=!document.body.classList.contains('hx-navmin');
+  try{localStorage.setItem(HX_NAVMIN_LS,on?'1':'0');}catch(e){}
+  _hxNavMinApply();
+  try{window.dispatchEvent(new Event('resize'));}catch(e){}
+}
 function hxRenderNav(){
   if(!hxOn())return;
+  _hxNavMinApply();
   const li=document.getElementById('hxLinksItem');
   if(li)li.style.display=((G&&G.quickLinks&&G.quickLinks.length)||(typeof isAdmin==='function'&&isAdmin()))?'':'none';
   const crest=document.getElementById('hxCrest'),src=_clubLogoSrc();
@@ -22351,6 +22409,16 @@ function hxRender(){
   }catch(e){}
   const t0=_hxDate(today);
   const inDays=(s,a,bb)=>{const d=Math.round((_hxDate(sk(s))-t0)/86400000);return d>=a&&d<=bb;};
+  // Load (sRPE) still open: rating closes at midnight of the session day, so
+  // this is the moment to remind the group
+  try{
+    if(typeof rpeIsOpen==='function')S.forEach((s,si)=>{
+      if(!s||!s.date||!inDays(s,-1,0))return;
+      let n=0;
+      D.players.forEach(p=>{if(p&&_sessAfterJoin(p,s,season)&&rpeIsOpen(s,si,p,season)&&!(Array.isArray(p.rpe)&&typeof p.rpe[si]==='number'))n++;});
+      if(n)flags.push({dot:'#E0912F',who:n+' Spieler',what:'Belastung '+(sk(s)===today?'von heute':'vom '+s.date)+' noch nicht bewertet · bis 24 Uhr',on:`openSessFromMain(${si})`});
+    });
+  }catch(e){}
   // unanswered for the coming week (the focus card already lists its own)
   {
     const parts=[];let first=-1;
@@ -22940,7 +23008,7 @@ function kbRender(){
       :[['ok',c.yes,'zugesagt'],['warn',c.exc,'entschuldigt'],['bad',c.no,'abgesagt'],['open',c.open,'offen']];
     head=`<div class="kb-head"><div class="kb-ttl">${e(what)}</div><div class="kb-meta">${e(when)}</div>
       <div class="kb-leg">${parts.filter(p=>p[1]).map(p=>`<span><i class="${p[0]}"></i><b>${p[1]}</b> ${p[2]}</span>`).join('')}</div></div>
-      ${m&&ed?`<button type="button" class="kb-lu" onclick="kbLineup()">Aufstellung aus Zusagen</button>`:''}`;
+      ${m&&ed?`<button type="button" class="kb-lu" onclick="kbLineup()" title="Aufstellung aus Zusagen"><span class="kb-lu-l">Aufstellung aus Zusagen</span><span class="kb-lu-s">Aufstellen</span></button>`:''}`;
   }else head=`<div class="kb-head"><div class="kb-ttl">Keine kommenden Termine</div><div class="kb-meta">Die Tafel zeigt den Kader nach Linien.</div></div>`;
   const sum=lines.map((l,i)=>`<button type="button" onclick="kbScroll(${i})"><b>${s?cnt(l,'ok'):l.list.length}<small>${s?'/'+l.list.length:''}</small></b><span>${e(l.name)}</span></button>`).join('');
   host.innerHTML=`<div class="kb-top">${ups.length?`<div class="kb-days" role="group" aria-label="Termin wählen">${days}</div>`:''}${head}</div>
