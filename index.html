@@ -4405,6 +4405,77 @@ body.design-heute .home-overlay::before,body.design-heute .home-overlay::after{d
 :is(.mx-seg button,.mx-fold,.mx-range select):focus-visible{outline:2px solid var(--hx-blue);outline-offset:2px;}
 @media(max-width:1599px){body.design-heute #mxFold{display:none;}}
 @media(min-width:1600px){#vd-mxfold{display:none !important;}}
+/* ── The other menus in the same card look (Heute): team and season picker,
+   user menu, notifications — they still carried the old dark style ── */
+body.design-heute :is(.team-tabs,.user-dropdown,.notif-panel){background:var(--hx-card,#fff);border:1px solid var(--hx-line,#DCE3EE);border-radius:14px;
+  box-shadow:0 18px 40px -12px rgba(14,35,80,.32),0 2px 6px rgba(14,35,80,.08);color:var(--hx-ink,#0E2350);font-family:'Barlow',sans-serif;}
+body.design-heute .team-tabs{padding:6px;gap:2px;min-width:210px;}
+body.design-heute .team-tabs .ttab{position:relative;color:var(--hx-ink);font:600 .9rem 'Barlow',sans-serif;letter-spacing:0;text-transform:none;padding:4px 6px 4px 34px;min-height:38px;border-radius:9px;cursor:pointer;}
+body.design-heute .team-tabs .ttab:hover,body.design-heute .team-tabs .ttab:focus-visible{background:var(--hx-ground);color:var(--hx-ink);}
+body.design-heute .team-tabs .ttab.active{background:none;border-color:transparent;color:var(--hx-ink);font-weight:700;}
+body.design-heute .team-tabs .ttab.active:hover{background:var(--hx-ground);}
+body.design-heute .team-tabs .ttab.active::before{content:'';position:absolute;left:10px;top:50%;width:16px;height:16px;transform:translateY(-50%);background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231659B8' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12 5 5 9-10'/%3E%3C/svg%3E") center/16px no-repeat;}
+body.design-heute .team-tabs .ttab.drag-over{background:color-mix(in srgb,var(--hx-blue) 12%,transparent);}
+body.design-heute .team-tabs .tdelt{width:28px;height:28px;padding:0;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:var(--hx-muted);font-size:.78rem;opacity:0;}
+body.design-heute .team-tabs .ttab:hover .tdelt,body.design-heute .team-tabs .ttab:focus-within .tdelt{opacity:1;}
+body.design-heute .team-tabs .tdelt:hover{background:#FDECEC;color:#C9373E;}
+body.design-heute .team-tabs .ttab-add{display:flex;align-items:center;color:var(--hx-blue);font:700 .86rem 'Barlow',sans-serif;border-top:1px solid var(--hx-line);margin-top:4px;padding:6px 10px 4px 0;border-radius:0 0 9px 9px;}
+body.design-heute .team-tabs .ttab-add i{width:34px;flex-shrink:0;text-align:center;font-style:normal;font-size:1.1rem;font-weight:700;}
+body.design-heute .team-tabs .ttab-add:hover{color:var(--hx-blue);background:var(--hx-ground);}
+body.design-heute .user-dropdown{padding:6px;min-width:250px;overflow:visible;}
+body.design-heute .user-dropdown .ud-sep{background:var(--hx-line);margin:5px 4px;}
+body.design-heute .user-dropdown .ud-group{font:700 .74rem 'Barlow',sans-serif;text-transform:none;letter-spacing:0;color:var(--hx-muted);padding:8px 10px 4px;}
+body.design-heute .user-dropdown .ud-item{gap:10px;padding:7px 10px;min-height:38px;border-radius:9px;color:var(--hx-ink);font:600 .9rem 'Barlow',sans-serif;box-sizing:border-box;}
+body.design-heute .user-dropdown .ud-item:hover{background:var(--hx-ground);color:var(--hx-ink);}
+body.design-heute .user-dropdown .ud-item svg{color:var(--hx-muted);flex-shrink:0;}
+body.design-heute .user-dropdown .ud-item.ud-out,body.design-heute .user-dropdown .ud-item.ud-out svg{color:#B42318;}
+body.design-heute .user-dropdown .ud-item.ud-warn,body.design-heute .user-dropdown .ud-item.ud-warn svg{color:#8A5212;}
+.ud-kbd{margin-left:auto;padding:1px 7px;border-radius:6px;border:1px solid var(--hx-line,#DCE3EE);background:var(--hx-field,#fff);font:700 .7rem 'Barlow',sans-serif;color:var(--hx-muted,#4E5D7C);}
+body.design-heute .user-dropdown .ud-meta{color:var(--hx-muted);font-size:.74rem;padding:6px 10px 4px;}
+body.design-heute .user-dropdown .ud-meta:hover{color:var(--hx-ink);}
+body.design-heute .notif-panel{overflow:hidden;width:392px;}
+body.design-heute .notif-hdr h4{min-width:0;white-space:nowrap;}
+body.design-heute :is(.notif-compose,.notif-mark-all){white-space:nowrap;flex-shrink:0;}
+@media(max-width:767px){body.design-heute .notif-hdr h4{font-size:1.05rem;}body.design-heute :is(.notif-compose,.notif-mark-all){padding:0 10px;}}
+body.design-heute .notif-hdr{background:none;border-bottom:1px solid var(--hx-line);padding:12px 12px 10px 16px;gap:8px;}
+body.design-heute .notif-hdr h4{color:var(--hx-ink);font-family:var(--hx-num);font-weight:800;font-size:1.2rem;letter-spacing:0;}
+body.design-heute :is(.notif-compose,.notif-mark-all){height:32px;padding:0 12px;margin:0;border-radius:999px;display:inline-flex;align-items:center;gap:6px;font:700 .8rem 'Barlow',sans-serif;cursor:pointer;}
+body.design-heute .notif-compose{background:var(--hx-yellow);border:1px solid var(--hx-yellow);color:var(--hx-ink);}
+body.design-heute .notif-compose:hover{filter:brightness(.96);background:var(--hx-yellow);}
+body.design-heute .notif-mark-all{background:var(--hx-field);border:1px solid var(--hx-line);color:var(--hx-ink);}
+body.design-heute .notif-mark-all:hover{background:var(--hx-ground);}
+body.design-heute .notif-item{border-bottom-color:var(--hx-line);padding:11px 14px 11px 18px;}
+body.design-heute .notif-item:hover{background:var(--hx-ground);}
+body.design-heute .notif-item.unread{background:color-mix(in srgb,var(--hx-yellow) 14%,var(--hx-card));}
+body.design-heute .notif-item.unread::before{background:var(--hx-blue);left:7px;}
+body.design-heute .notif-title{color:var(--hx-ink);font-weight:700;font-size:.88rem;}
+body.design-heute .notif-sub{color:var(--hx-muted);font-size:.78rem;}
+body.design-heute .notif-empty{color:var(--hx-muted);font-size:.88rem;padding:28px 20px;}
+/* ── Select fields: one chevron and a white field everywhere (the system
+   arrow and the grey default field were left over from the old design). Low
+   specificity for the field colour, so the dark header bands keep theirs. ── */
+:where(body.design-heute) :where(select:not([multiple]):not([size])){-webkit-appearance:none;appearance:none;background-color:var(--hx-field,#fff);}
+/* :not(#hxs-none) lifts the rule over id-based "background:" shorthands */
+body.design-heute select:not([multiple]):not([size]):not(#hxs-none){background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234E5D7C' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;background-repeat:no-repeat !important;background-position:right 11px center !important;background-size:12px 12px !important;padding-right:32px !important;}
+body.design-heute select.lp-fmt-sel:not([multiple]):not([size]):not(#hxs-none){background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23FFFFFF' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;}
+@media(min-width:768px){
+  body.design-heute :is(#toolbarEl,#moDashboard .has-inrow-close,.hx-dark) select:not([multiple]):not(#hxs-none){background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23FFFFFF' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;}
+}
+/* ── Select menus (computer): the open list of every <select> in the app's
+   own look (see _hxsOpen); the closed field keeps its own style ── */
+.hxs-menu{position:fixed;z-index:100000;box-sizing:border-box;max-width:min(420px,calc(100vw - 16px));max-height:min(360px,calc(100vh - 16px));overflow-y:auto;overscroll-behavior:contain;
+  padding:6px;border-radius:14px;background:var(--hx-card,#fff);border:1px solid var(--hx-line,#DCE3EE);box-shadow:0 18px 40px -12px rgba(14,35,80,.32),0 2px 6px rgba(14,35,80,.08);
+  font:600 .9rem 'Barlow',sans-serif;color:var(--hx-ink,#0E2350);outline:none;animation:hxsIn .12s ease-out;}
+@keyframes hxsIn{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:none;}}
+@media (prefers-reduced-motion:reduce){.hxs-menu{animation:none;}}
+.hxs-opt{display:flex;align-items:center;gap:8px;min-height:36px;padding:6px 14px 6px 8px;border-radius:9px;cursor:pointer;white-space:nowrap;box-sizing:border-box;}
+.hxs-opt > i{width:18px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;color:var(--hx-blue,#1659B8);}
+.hxs-opt > span{overflow:hidden;text-overflow:ellipsis;}
+.hxs-opt.act{background:var(--hx-ground,#EEF1F6);}
+.hxs-opt.on{font-weight:700;}
+.hxs-opt.dis{opacity:.45;cursor:default;}
+.hxs-grp{padding:10px 10px 4px 34px;font:700 .72rem 'Barlow',sans-serif;color:var(--hx-muted,#4E5D7C);}
+.hxs-grp:first-child{padding-top:4px;}
 /* ── Page controls in the navy header band (wide screens) ──
    Anwesenheit: the filter bar moves into #toolbarEl when it fits there in one
    row (_hxBandFit measures); otherwise it stays above the table. Kader: the
@@ -5833,7 +5904,7 @@ const APP_VERSION_LABEL='1.1.2';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792067597393; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792069148520; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.1.2',date:'15.10.2026',title:'Anwesenheit als Matrix',items:[
     {icon:'🗓️',title:'Tabelle nach Kalenderwochen',desc:'Die Anwesenheit ist nach Kalenderwochen gruppiert, diese Woche ist gelb markiert, das nächste Spiel blau. Ältere Wochen sind je zu einer Spalte zusammengefasst (z. B. 2/3 = zweimal da von drei); ein Klick öffnet die Woche wieder.'},
@@ -5842,6 +5913,7 @@ const APP_CHANGELOG=[
     {icon:'📱',title:'Handy: Ansicht „Spieler“',desc:'In der Anwesenheit oben „Termine | Spieler“: jeder Spieler mit seinen letzten 10 Terminen als Balken, sortierbar nach „Schwächste zuerst“, Position oder Nummer.'},
     {icon:'🏠',title:'Übersicht',desc:'„Diese Woche“ zeigt am Computer alle sieben Tage mit Kalenderwoche, freie Tage in einer schmalen Zeile. Als Titel steht das Thema des Trainings bzw. der Gegner, darunter die Uhrzeit; vergangene Termine haben ein Häkchen und die Zahl der Anwesenden, „–/18“ heißt: noch nicht erfasst. Von Freitag bis Sonntag zeigt die Karte daneben die laufende Woche („KW … bisher“). Steht am Wochenende das Spiel oben, zeigt die Karte darunter das nächste Training hell (dunkel bleibt dem Spiel), mit „Wer kommt?“ und dem Trainingsplan. Neu unter „Im Blick“: wer die Belastung heute noch nicht bewertet hat.'},
     {icon:'↔️',title:'Navigation einklappen',desc:'Am Computer lässt sich die Seitennavigation mit dem Doppelpfeil unten neben der Glocke auf Symbole verkleinern; so hat die Tabelle mehr Platz.'},
+    {icon:'📋',title:'Auswahllisten und Menüs',desc:'Aufklappende Listen (z. B. Mannschaft und Saison in der Statistik, Zeitraum, Formation, Ort) öffnen am Computer ein Menü im Stil der App statt der Systemliste, mit Häkchen und Tastatur (Pfeile, Enter, Esc, Anfangsbuchstabe). Alle Felder haben denselben Pfeil. Auch die Menüs für Mannschaft, Saison, Benutzer und Benachrichtigungen sind jetzt hell und einheitlich. Auf dem Handy bleibt die gewohnte Systemauswahl.'},
     {icon:'☑️',title:'Spieler auswählen',desc:'Die Mehrfach-Auswahl ist aus der Anwesenheit nach Kader → Spieler umgezogen: „Auswählen“, Spieler antippen, dann „In andere Mannschaft“ oder „Löschen“ — etwa beim Saisonwechsel. Die Position für viele auf einmal zu ändern gibt es nicht mehr; sie wird im Spielerprofil geändert.'},
     {icon:'🧭',title:'Kopfzeilen',desc:'Am Computer stehen Suche und Filter der Anwesenheit, die Reiter Tafel/Spieler/Trainer im Kader und „Spieleransicht“ im Wochenbericht in der dunklen Kopfzeile; Tabelle und Tafel beginnen dadurch weiter oben. Ist das Fenster zu schmal, bleibt die Filterleiste unter der Kopfzeile. „Ältere Wochen zusammenfassen“ steht unter „Ansicht“.'},
     {icon:'🛠️',title:'Bedienung',desc:'Handy: „Mehr“ öffnet sich über der unteren Leiste, die sichtbar bleibt; nochmal „Mehr“ schließt. Tafel: ein zweiter Klick auf denselben Spieler schließt sein Menü. Das Spielerprofil legt sich auf Laptops über die Seite, statt Tafel und Statistik zusammenzuschieben.'},
@@ -10631,9 +10703,9 @@ function renderTeamBar(){
   const tabs=document.getElementById('teamTabs');
   tabs.innerHTML=G.teamList.map(t=>`
     <button class="ttab${t===UI.currentTeam?' active':''}" data-team="${t}" draggable="true" onclick="switchTeam('${t}');closeTeamMenu();">
-      ${t}${isAdmin()?`<span class="tdelt" onclick="event.stopPropagation();delTeam('${t}')">✕</span>`:''}
+      <span class="ttab-n">${t}</span>${isAdmin()?`<span class="tdelt" role="button" title="Mannschaft löschen" aria-label="Mannschaft ${t} löschen" onclick="event.stopPropagation();delTeam('${t}')">✕</span>`:''}
     </button>`).join('')+
-    (isAdmin()?`<button class="ttab-add" onclick="closeTeamMenu();openM('moNewTeam')">＋ Neue Mannschaft</button>`:'');
+    (isAdmin()?`<button class="ttab-add" onclick="closeTeamMenu();openM('moNewTeam')"><i aria-hidden="true">+</i>Neue Mannschaft</button>`:'');
   // With a single team there is nothing to pick — the button would only take
   // space and state the obvious. This replaces the old "Tabs" toggle, which
   // could hide the picker and leave no way back to another team.
@@ -10651,9 +10723,9 @@ function renderSeasonSel(){
   if(menu){
     menu.innerHTML=sorted.map(s=>`
       <button class="ttab${s===UI.currentSeason?' active':''}" onclick="switchSeason('${s}');closeSeasonMenu();">
-        ${s}${isAdmin()?`<span class="tdelt" onclick="event.stopPropagation();deleteSeason('${s}')">✕</span>`:''}
+        <span class="ttab-n">${s}</span>${isAdmin()?`<span class="tdelt" role="button" title="Saison löschen" aria-label="Saison ${s} löschen" onclick="event.stopPropagation();deleteSeason('${s}')">✕</span>`:''}
       </button>`).join('')
-      +(isAdmin()?`<button class="ttab-add" onclick="closeSeasonMenu();openM('moSeason')">＋ Neue Saison</button>`:'');
+      +(isAdmin()?`<button class="ttab-add" onclick="closeSeasonMenu();openM('moSeason')"><i aria-hidden="true">+</i>Neue Saison</button>`:'');
   }
 }
 function closeSeasonMenu(){
@@ -12152,11 +12224,11 @@ function renderNotifPanel(){
   const canCompose=canEdit&&canEdit();
   let html=`<div class="notif-hdr">
     <h4>Benachrichtigungen</h4>
-    ${canCompose?'<button class="notif-compose" onclick="openMsgComposer()">✏️ Schreiben</button>':''}
+    ${canCompose?'<button class="notif-compose" onclick="openMsgComposer()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>Schreiben</button>':''}
     ${list.length?'<button class="notif-mark-all" onclick="markAllNotifSeen()">Alle gelesen</button>':''}
   </div>`;
   if(list.length===0){
-    html+='<div class="notif-empty">🔕 Keine Benachrichtigungen</div>';
+    html+='<div class="notif-empty">Keine Benachrichtigungen</div>';
   } else {
     html+='<div class="notif-list">';
     list.forEach(n=>{
@@ -22157,6 +22229,116 @@ function _hxNavMinApply(){
     else if(it.dataset.autotitle){it.removeAttribute('title');delete it.dataset.autotitle;}
   });
 }
+// ── Select menus in the Heute look (computer) ──
+// The closed <select> keeps its own styling and stays the real control (value,
+// onchange, forms). Only the open list changes: instead of the browser's own
+// white box with the system font, a menu like the app's other menus. Phones
+// keep the system picker, which is the better tool there.
+const HXS={sel:null,menu:null,act:-1,items:[],typed:'',typedT:0};
+function _hxsOn(sel){
+  return !!(sel&&sel.tagName==='SELECT'&&!sel.multiple&&!(sel.size>1)&&!sel.disabled
+    &&document.body.classList.contains('design-heute')
+    &&window.matchMedia&&matchMedia('(pointer:fine)').matches&&innerWidth>=768
+    &&!sel.closest('.hxs-native'));
+}
+function _hxsClose(refocus){
+  const m=HXS.menu,sel=HXS.sel;
+  if(m)m.remove();
+  HXS.menu=null;HXS.sel=null;HXS.items=[];HXS.act=-1;
+  if(sel){sel.removeAttribute('aria-expanded');if(refocus)try{sel.focus({preventScroll:true});}catch(e){}}
+}
+function _hxsSetAct(i,scroll){
+  if(!HXS.items.length)return;
+  i=Math.max(0,Math.min(HXS.items.length-1,i));
+  HXS.items.forEach((it,k)=>it.el.classList.toggle('act',k===i));
+  HXS.act=i;
+  const el=HXS.items[i].el;
+  HXS.menu.setAttribute('aria-activedescendant',el.id);
+  if(scroll)el.scrollIntoView({block:'nearest'});
+}
+function _hxsPick(i){
+  const sel=HXS.sel,it=HXS.items[i];if(!sel||!it)return;
+  const changed=sel.selectedIndex!==it.idx;
+  sel.selectedIndex=it.idx;
+  _hxsClose(true);
+  if(changed){sel.dispatchEvent(new Event('input',{bubbles:true}));sel.dispatchEvent(new Event('change',{bubbles:true}));}
+}
+function _hxsOpen(sel){
+  _hxsClose(false);
+  const m=document.createElement('div');
+  m.className='hxs-menu';m.setAttribute('role','listbox');m.tabIndex=-1;
+  const lbEl=sel.closest('label');
+  const lab=sel.getAttribute('aria-label')||(lbEl?[...lbEl.childNodes].filter(x=>x.nodeType===3).map(x=>x.textContent).join(' ').trim():'')||sel.title||'';
+  if(lab)m.setAttribute('aria-label',lab);
+  const items=[];let html='',n=0;
+  const tick='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>';
+  const addOpt=o=>{
+    if(o.hidden||o.style.display==='none')return;
+    const id='hxs-o'+(n++),on=o.selected,dis=o.disabled;
+    html+=`<div class="hxs-opt${on?' on':''}${dis?' dis':''}" id="${id}" role="option" aria-selected="${on}"${dis?' aria-disabled="true"':''} data-k="${items.length}"><i>${on?tick:''}</i><span>${_dbEscapeHtml(o.textContent)}</span></div>`;
+    items.push({idx:o.index,dis,txt:o.textContent.trim().toLowerCase(),id});
+  };
+  [...sel.children].forEach(c=>{
+    if(c.tagName==='OPTGROUP'){html+=`<div class="hxs-grp" role="presentation">${_dbEscapeHtml(c.label||'')}</div>`;[...c.children].forEach(addOpt);}
+    else if(c.tagName==='OPTION')addOpt(c);
+  });
+  if(!items.length)return;
+  m.innerHTML=html;
+  document.body.appendChild(m);
+  items.forEach(it=>it.el=document.getElementById(it.id));
+  HXS.sel=sel;HXS.menu=m;HXS.items=items;
+  sel.setAttribute('aria-expanded','true');
+  const r=sel.getBoundingClientRect();
+  m.style.minWidth=Math.min(innerWidth-16,Math.max(160,Math.round(r.width)))+'px';
+  _placePopup(m,r,{align:'left',gap:6});
+  const cur=items.findIndex(it=>it.idx===sel.selectedIndex);
+  _hxsSetAct(cur>=0?cur:items.findIndex(it=>!it.dis),true);
+  m.addEventListener('mousemove',e=>{const o=e.target.closest('.hxs-opt');if(o&&!o.classList.contains('dis'))_hxsSetAct(+o.dataset.k,false);});
+  m.addEventListener('click',e=>{const o=e.target.closest('.hxs-opt');if(o&&!o.classList.contains('dis'))_hxsPick(+o.dataset.k);});
+  m.addEventListener('keydown',_hxsKey);
+  try{m.focus({preventScroll:true});}catch(e){}
+}
+function _hxsMove(d){
+  let i=HXS.act;
+  for(let k=0;k<HXS.items.length;k++){i+=d;if(i<0||i>=HXS.items.length)return;if(!HXS.items[i].dis){_hxsSetAct(i,true);return;}}
+}
+function _hxsKey(e){
+  if(!HXS.menu)return;
+  const k=e.key;
+  if(k==='ArrowDown'){e.preventDefault();_hxsMove(1);}
+  else if(k==='ArrowUp'){e.preventDefault();_hxsMove(-1);}
+  else if(k==='Home'){e.preventDefault();_hxsSetAct(HXS.items.findIndex(x=>!x.dis),true);}
+  else if(k==='End'){e.preventDefault();let i=HXS.items.length-1;while(i>0&&HXS.items[i].dis)i--;_hxsSetAct(i,true);}
+  else if(k==='PageDown'){e.preventDefault();for(let j=0;j<8;j++)_hxsMove(1);}
+  else if(k==='PageUp'){e.preventDefault();for(let j=0;j<8;j++)_hxsMove(-1);}
+  else if(k==='Enter'||k===' '){e.preventDefault();if(HXS.act>=0&&!HXS.items[HXS.act].dis)_hxsPick(HXS.act);}
+  else if(k==='Escape'){e.preventDefault();e.stopPropagation();_hxsClose(true);}
+  else if(k==='Tab'){_hxsClose(true);}
+  else if(k.length===1&&/\S/.test(k)){
+    const now=Date.now();HXS.typed=(now-HXS.typedT<700?HXS.typed:'')+k.toLowerCase();HXS.typedT=now;
+    const start=HXS.typed.length===1?HXS.act+1:HXS.act;
+    for(let j=0;j<HXS.items.length;j++){const i=(start+j)%HXS.items.length;if(!HXS.items[i].dis&&HXS.items[i].txt.startsWith(HXS.typed)){_hxsSetAct(i,true);break;}}
+  }
+}
+document.addEventListener('mousedown',e=>{
+  const sel=e.target&&e.target.closest?e.target.closest('select'):null;
+  if(HXS.menu&&!HXS.menu.contains(e.target)){
+    const same=sel&&sel===HXS.sel;
+    _hxsClose(false);
+    if(same){e.preventDefault();return;} // a second click on the field closes it
+  }
+  if(e.button!==0||!_hxsOn(sel))return;
+  e.preventDefault();
+  try{sel.focus({preventScroll:true});}catch(err){}
+  _hxsOpen(sel);
+},true);
+document.addEventListener('keydown',e=>{
+  const sel=e.target;
+  if(!_hxsOn(sel)||HXS.menu)return;
+  if(e.key===' '||e.key==='Enter'||e.key==='F4'||(e.altKey&&(e.key==='ArrowDown'||e.key==='ArrowUp'))){e.preventDefault();_hxsOpen(sel);}
+},true);
+window.addEventListener('resize',()=>{if(HXS.menu)_hxsClose(false);});
+document.addEventListener('scroll',e=>{if(HXS.menu&&!HXS.menu.contains(e.target))_hxsClose(false);},true);
 // ── Page controls in the header band (wide screens) ──
 // Kader: the tabs sit next to the title (not on phones). Anwesenheit: the
 // filter bar goes into the navy band when it fits there in one row — measured,
@@ -32196,15 +32378,15 @@ _pubCleanupSchedule();
   <!-- ── ADMINISTRATION (admin) ── -->
   <div class="ud-sep" id="ud-admin-sep" style="display:none;"></div>
   <div class="ud-group" id="ud-admin-group" style="display:none;">Administration</div>
-  <div class="ud-item" id="ud-admin" onclick="closeUserMenu();openM('moAdmin')" style="display:none;">⚙ Administration</div>
+  <div class="ud-item" id="ud-admin" onclick="closeUserMenu();openM('moAdmin')" style="display:none;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg>Administration</div>
 
   <!-- ── SYSTEM ──
        Suchen and Kürzel used to sit under a "Navigation" heading of their own;
        they are tools, and a two-item group was one heading too many. -->
   <div class="ud-sep"></div>
   <div class="ud-group">System</div>
-  <div class="ud-item" onclick="closeUserMenu();openSearch();">🔎 Suchen <span style="margin-left:auto;font-size:.62rem;color:var(--gm);font-weight:600;">⌘K</span></div>
-  <div class="ud-item" onclick="closeUserMenu();openShortcutsHelp();">⌨️ Kürzel <span style="margin-left:auto;font-size:.62rem;color:var(--gm);font-weight:600;">?</span></div>
+  <div class="ud-item" onclick="closeUserMenu();openSearch();"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>Suchen <span class="ud-kbd">Strg K</span></div>
+  <div class="ud-item" onclick="closeUserMenu();openShortcutsHelp();"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg>Tastaturkürzel <span class="ud-kbd">?</span></div>
   <!-- Auto-Sync switch removed: with three trainers on shared data, a client
        that silently stops syncing is a data-loss risk, and the traffic reason
        it was added for disappeared once saves became diffs. The offline code
@@ -32213,11 +32395,11 @@ _pubCleanupSchedule();
   <!-- Saving and loading happen automatically; the only case left is a failed
        connection, so this appears only then. -->
   <div id="ud-manual-btns" style="display:none;">
-    <div class="ud-item" onclick="event.stopPropagation();manualSyncSave();" style="color:var(--warn-fg);">🔄 Erneut synchronisieren</div>
+    <div class="ud-item ud-warn" onclick="event.stopPropagation();manualSyncSave();"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5M3 21v-5h5"/></svg>Erneut synchronisieren</div>
   </div>
 
   <div class="ud-sep"></div>
-  <div class="ud-item" onclick="closeUserMenu();confirmLogout()" style="color:#ff9080;">🚪 Abmelden</div>
+  <div class="ud-item ud-out" onclick="closeUserMenu();confirmLogout()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg>Abmelden</div>
 
   <!-- ── FOOTER (about as fine print, not a regular menu item) ── -->
   <div class="ud-sep"></div>
