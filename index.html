@@ -1239,8 +1239,6 @@ select.lp-fmt-btn option:checked{background:var(--bm);color:#fff;}
 .mcd-row-val{font-weight:700;color:var(--bd);min-width:36px;text-align:right;font-variant-numeric:tabular-nums;}
 
 /* Multi-select rows */
-tr.msel-row td{background:rgba(235,217,168,.45) !important;}
-tr.msel-row td.tdl{box-shadow:inset 3px 0 0 rgba(150,115,40,.8);}
 /* Registration status — temporary feature.
    Activated globally when <body class="show-reg-status">.
    Player names with class .player-unregistered turn amber/yellow to signal
@@ -4068,6 +4066,32 @@ body.design-heute #moTeamMgr .pl-row{padding:8px 10px;border-bottom-color:var(--
 body.design-heute #moTeamMgr .pl-row:nth-child(even){background:none;}
 body.design-heute #moTeamMgr .pl-row:hover{background:var(--hx-ground);}
 body.design-heute #moTeamMgr .pl-nr{color:var(--hx-ink2);}
+/* Selection (Kader → Spieler → Auswählen) */
+.pl-sel-tg{position:absolute;right:6px;top:50%;transform:translateY(-50%);height:28px;padding:0 10px;border:none;border-radius:999px;background:none;color:var(--hx-blue,#1659B8);font:700 .8rem 'Barlow',sans-serif;cursor:pointer;}
+.pl-ck-sp{width:22px;flex-shrink:0;}
+/* the row keeps its edit buttons' room, so the columns stay under their heads */
+.pl-row.pl-selmode .pl-btns{visibility:hidden;}
+.pl-sel-tg:hover{background:color-mix(in srgb,var(--hx-blue,#1659B8) 10%,transparent);}
+.pl-ck{width:22px;height:22px;border-radius:50%;border:2px solid var(--hx-line,#C9D2E1);display:inline-flex;align-items:center;justify-content:center;color:transparent;flex-shrink:0;box-sizing:border-box;}
+.pl-row.pl-sel .pl-ck{background:var(--hx-blue,#1659B8);border-color:var(--hx-blue,#1659B8);color:#fff;}
+body.design-heute #moTeamMgr .pl-row.pl-sel{background:color-mix(in srgb,var(--hx-blue,#1659B8) 8%,var(--hx-card,#fff));}
+.pl-row.pl-selmode:focus-visible{outline:2px solid var(--hx-blue,#1659B8);outline-offset:-2px;}
+.mgr-selbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px;padding:10px 12px;border-radius:14px;background:var(--hx-ground,#EEF1F6);margin-bottom:10px;}
+.mgr-sel-n{font:700 .9rem 'Barlow',sans-serif;color:var(--hx-ink,#0E2350);}
+.mgr-sel-l{border:none;background:none;padding:6px 8px;border-radius:8px;color:var(--hx-blue,#1659B8);font:700 .84rem 'Barlow',sans-serif;cursor:pointer;}
+.mgr-sel-l:hover{background:color-mix(in srgb,var(--hx-blue,#1659B8) 10%,transparent);}
+.mgr-sel-acts{display:flex;gap:10px;margin-left:auto;}
+.mgr-sel-b{height:40px;padding:0 16px;border-radius:999px;border:1px solid var(--hx-line,#DCE3EE);background:var(--hx-field,#fff);color:var(--hx-ink,#0E2350);font:700 .86rem 'Barlow',sans-serif;cursor:pointer;white-space:nowrap;}
+.mgr-sel-b:hover:not(:disabled){border-color:var(--hx-ink2,#3A4A6B);}
+.mgr-sel-b.mgr-sel-del{border-color:#E4A3A6;color:#B42318;}
+.mgr-sel-b.mgr-sel-del:hover:not(:disabled){background:#FDECEC;border-color:#C9373E;}
+.mgr-sel-b:disabled{opacity:.45;cursor:default;}
+.mgr-sel-b:focus-visible,.mgr-sel-l:focus-visible,.pl-sel-tg:focus-visible{outline:2px solid var(--hx-blue,#1659B8);outline-offset:2px;}
+@media(max-width:767px){
+  .mgr-sel-n{flex:1 1 100%;}
+  .mgr-sel-acts{flex:1 1 100%;margin-left:0;}
+  .mgr-sel-b{flex:1 1 0;padding:0 10px;}
+}
 body.design-heute #moTeamMgr .pl-name{color:var(--hx-ink);}
 body.design-heute #moTeamMgr .pl-btn{padding:5px 9px;border-radius:8px;font-size:.72rem;}
 body.design-heute #moTeamMgr .tpanel .mob-btns{border-top:1px solid var(--hx-line);padding:12px 0 0;margin:12px 0 0;gap:8px;justify-content:flex-end;background:none;position:static;}
@@ -5203,7 +5227,6 @@ if(window._fbBlocked){
         <div class="vd-item" onclick="event.stopPropagation();toggleHideFuture()">Zukünftige ausblenden<div class="vd-check" id="vd2-hidefuture">–</div></div>
         <div class="vd-sep"></div>
         <div class="vd-item" id="vd-mxfold" onclick="event.stopPropagation();mxFold()" style="display:none;"><span>Ältere Wochen zusammenfassen</span><div class="vd-check" id="vd2-mxfold">–</div></div>
-        <div class="vd-item" id="vd-multisel" onclick="event.stopPropagation();document.getElementById('viewDropdown2').classList.remove('open');toggleMultiSelectMode();"><span style="display:flex;align-items:center;gap:6px;">Mehrfach-Auswahl</span><div class="vd-check" id="vd2-multisel"></div></div>
       </div>
     </div>
   </div>
@@ -5227,18 +5250,6 @@ if(window._fbBlocked){
 
 <!-- AUTOMATION reminder cards (trainer-only) — populated by _automationRenderCards() -->
 <div id="automationCards" style="display:none;padding:0 20px;margin-top:10px;"></div>
-
-<div id="multiSelBar" style="display:none;align-items:center;gap:8px;padding:7px 20px;background:color-mix(in srgb, var(--ac) 18%, transparent);border-top:1px solid color-mix(in srgb, var(--ac) 45%, transparent);border-bottom:1px solid color-mix(in srgb, var(--ac) 45%, transparent);flex-wrap:wrap;">
-  <span id="multiSelCount" style="font-weight:700;color:var(--bd);font-size:.82rem;">0 ausgewählt</span>
-  <button class="btn" style="font-size:.7rem;padding:4px 10px;background:rgba(255,255,255,.7);border:1px solid var(--gl);color:var(--bd);" onclick="multiSelectAll()">Alle</button>
-  <button class="btn" style="font-size:.7rem;padding:4px 10px;background:rgba(255,255,255,.7);border:1px solid var(--gl);color:var(--bd);" onclick="multiSelectNone()">Keine</button>
-  <button class="btn" style="font-size:.7rem;padding:4px 10px;background:rgba(255,255,255,.7);border:1px solid var(--gl);color:var(--bd);" onclick="multiSelectInvert()">Umkehren</button>
-  <span style="flex:1;"></span>
-  <button class="btn" style="font-size:.7rem;padding:4px 10px;background:var(--bm);color:#fff;" onclick="bulkChangePosition()" title="Position aller ausgewählten Spieler ändern">⚙ Position</button>
-  <button class="btn" style="font-size:.7rem;padding:4px 10px;background:rgba(39,174,96,.95);color:#fff;font-weight:700;" onclick="bulkMoveToTeam()" title="Spieler in andere Mannschaft verschieben">↔ Mannschaft</button>
-  <button class="btn bd" style="font-size:.7rem;padding:4px 10px;" onclick="bulkDeletePlayers()">🗑 Löschen</button>
-  <button class="btn bs" style="font-size:.7rem;padding:4px 10px;" onclick="toggleMultiSelectMode()">✕ Schließen</button>
-</div>
 
 <div class="mx-bar" id="mxBar" role="search" aria-label="Anwesenheit filtern" style="display:none;">
   <label class="mx-q"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input type="search" id="mxQ" placeholder="Spieler suchen" aria-label="Spieler suchen" autocomplete="off" oninput="mxSearch(this.value)" onkeydown="if(event.key==='Escape'){this.value='';mxSearch('');}"></label>
@@ -5669,6 +5680,15 @@ if(window._fbBlocked){
   <div class="tpanel" id="tab-tafel"><div id="kbBoard"></div></div>
   <div class="tpanel active" id="tab-spieler">
     <div class="tmgr-scroll" style="border:1px solid var(--gl);border-radius:8px;margin-bottom:10px;" id="tmgr-pl-list"></div>
+    <div class="mgr-selbar" id="mgrSelBar" style="display:none;" role="toolbar" aria-label="Ausgewählte Spieler">
+      <span class="mgr-sel-n" id="multiSelCount" aria-live="polite"></span>
+      <button type="button" class="mgr-sel-l" onclick="multiSelectAll()">Alle</button>
+      <button type="button" class="mgr-sel-l" onclick="multiSelectNone()">Keine</button>
+      <span class="mgr-sel-acts">
+        <button type="button" class="mgr-sel-b" id="mgrSelMove" onclick="bulkMoveToTeam()">In andere Mannschaft</button>
+        <button type="button" class="mgr-sel-b mgr-sel-del" id="mgrSelDel" onclick="bulkDeletePlayers()">Löschen</button>
+      </span>
+    </div>
     <div class="mob-btns">
       <button class="btn bp" id="btn-mgr-addpl" onclick="_tmLeave();openM('moAddPlayer');" style="display:none;">＋ Spieler</button>
       <button class="btn" id="btn-mgr-teamlink" onclick="copyTeamLink()" style="display:none;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" title="Ein Link für die ganze Mannschaft — einmal in die Gruppe geben, jeder wählt sich selbst aus">🔗 Spieler-Menü-Link</button>
@@ -5813,7 +5833,7 @@ const APP_VERSION_LABEL='1.1.2';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792066141598; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792067597393; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.1.2',date:'15.10.2026',title:'Anwesenheit als Matrix',items:[
     {icon:'🗓️',title:'Tabelle nach Kalenderwochen',desc:'Die Anwesenheit ist nach Kalenderwochen gruppiert, diese Woche ist gelb markiert, das nächste Spiel blau. Ältere Wochen sind je zu einer Spalte zusammengefasst (z. B. 2/3 = zweimal da von drei); ein Klick öffnet die Woche wieder.'},
@@ -5822,6 +5842,7 @@ const APP_CHANGELOG=[
     {icon:'📱',title:'Handy: Ansicht „Spieler“',desc:'In der Anwesenheit oben „Termine | Spieler“: jeder Spieler mit seinen letzten 10 Terminen als Balken, sortierbar nach „Schwächste zuerst“, Position oder Nummer.'},
     {icon:'🏠',title:'Übersicht',desc:'„Diese Woche“ zeigt am Computer alle sieben Tage mit Kalenderwoche, freie Tage in einer schmalen Zeile. Als Titel steht das Thema des Trainings bzw. der Gegner, darunter die Uhrzeit; vergangene Termine haben ein Häkchen und die Zahl der Anwesenden, „–/18“ heißt: noch nicht erfasst. Von Freitag bis Sonntag zeigt die Karte daneben die laufende Woche („KW … bisher“). Steht am Wochenende das Spiel oben, zeigt die Karte darunter das nächste Training hell (dunkel bleibt dem Spiel), mit „Wer kommt?“ und dem Trainingsplan. Neu unter „Im Blick“: wer die Belastung heute noch nicht bewertet hat.'},
     {icon:'↔️',title:'Navigation einklappen',desc:'Am Computer lässt sich die Seitennavigation mit dem Doppelpfeil unten neben der Glocke auf Symbole verkleinern; so hat die Tabelle mehr Platz.'},
+    {icon:'☑️',title:'Spieler auswählen',desc:'Die Mehrfach-Auswahl ist aus der Anwesenheit nach Kader → Spieler umgezogen: „Auswählen“, Spieler antippen, dann „In andere Mannschaft“ oder „Löschen“ — etwa beim Saisonwechsel. Die Position für viele auf einmal zu ändern gibt es nicht mehr; sie wird im Spielerprofil geändert.'},
     {icon:'🧭',title:'Kopfzeilen',desc:'Am Computer stehen Suche und Filter der Anwesenheit, die Reiter Tafel/Spieler/Trainer im Kader und „Spieleransicht“ im Wochenbericht in der dunklen Kopfzeile; Tabelle und Tafel beginnen dadurch weiter oben. Ist das Fenster zu schmal, bleibt die Filterleiste unter der Kopfzeile. „Ältere Wochen zusammenfassen“ steht unter „Ansicht“.'},
     {icon:'🛠️',title:'Bedienung',desc:'Handy: „Mehr“ öffnet sich über der unteren Leiste, die sichtbar bleibt; nochmal „Mehr“ schließt. Tafel: ein zweiter Klick auf denselben Spieler schließt sein Menü. Das Spielerprofil legt sich auf Laptops über die Seite, statt Tafel und Statistik zusammenzuschieben.'},
     {icon:'💻',title:'Laptops mit Skalierung',desc:'Auf Laptops mit 125 % Anzeigeskalierung passen Navigation und Übersicht wieder ohne Scrollen auf den Bildschirm; freie Tage in „Diese Woche“ stehen dafür in einer schmalen Zeile.'},
@@ -9768,7 +9789,7 @@ function renderUserPill(){
 
 function applyRoleUI(){
   const edit=canEdit(),admin=isAdmin();
-  ['btn-addSess','btn-addMatch','btn-mgr-addpl','btn-mgr-teamlink','vd-multisel'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=edit?'':'none';});
+  ['btn-addSess','btn-addMatch','btn-mgr-addpl','btn-mgr-teamlink'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=edit?'':'none';});
   ['btn-plan'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display=admin?'':'none';});
   // User-menu role-specific items
   const ba=document.getElementById('ud-admin');if(ba)ba.style.display=admin?'':'none';
@@ -10749,14 +10770,14 @@ function renderBody(){
       cells+=`<td class="${cls}" data-pi="${origPi}" data-si="${realSi}"${title} ${!ro?(isPast?`onclick="event.stopPropagation();cellOpenMenu(${origPi},${realSi},this)"`:`onclick="cycSt(${origPi},${realSi})"`):''}>${SYM[sVal]}</td>`;
     }
 
-    rows.push(`<tr class="${_multiSelMode&&_multiSelIds.has(origPi)?'msel-row':''}">
+    rows.push(`<tr>
       <td class="tdl c0">${!ro?`<input class="nri" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="${p.nr||''}" onclick="event.stopPropagation();this.select();" onchange="updNr(${origPi},this.value)" onblur="updNr(${origPi},this.value)" onkeydown="if(event.key==='Enter'){this.blur();event.preventDefault();}" title="Trikotnummer bearbeiten"/>`:`<span style="font-weight:700;color:var(--bm);">${p.nr||''}</span>`}</td>
-      <td class="tdl c1" onclick="${_multiSelMode?`multiSelectToggle(${origPi})`:`openPlayerFromMain(${origPi})`}" style="cursor:pointer;">
-        <div class="ncell">${_multiSelMode?`<input type="checkbox" class="msel-cb" data-pi="${origPi}" ${_multiSelIds.has(origPi)?'checked':''} onclick="event.stopPropagation();multiSelectToggle(${origPi})" style="margin-right:6px;width:16px;height:16px;cursor:pointer;"/>`:''}${p.photo?`<img class="nm-av" src="${p.photo}" alt="" loading="lazy">`:`<span class="nm-av nm-av-ph" aria-hidden="true">${_avIni(p)}</span>`}<span class="nm ${plNameClass(p)}">${getDisplayName(p)||''}</span>${!_multiSelMode?'<span class="ni">›</span>':''}</div>
+      <td class="tdl c1" onclick="openPlayerFromMain(${origPi})" style="cursor:pointer;">
+        <div class="ncell">${p.photo?`<img class="nm-av" src="${p.photo}" alt="" loading="lazy">`:`<span class="nm-av nm-av-ph" aria-hidden="true">${_avIni(p)}</span>`}<span class="nm ${plNameClass(p)}">${getDisplayName(p)||''}</span><span class="ni">›</span></div>
       </td>
       <td class="c2" style="padding:4px;cursor:pointer;" onclick="openPlayerFromMain(${origPi})" title="Profil öffnen">${pcHtml(p)}</td>
       ${cells}
-      <td>${!ro&&!_multiSelMode?`<button class="drb" onclick="delPlayer(${origPi})">✕</button>`:''}</td>
+      <td>${!ro?`<button class="drb" onclick="delPlayer(${origPi})">✕</button>`:''}</td>
     </tr>`);
   }
   tbody.innerHTML=rows.join('');
@@ -11060,15 +11081,15 @@ function mxBody(){
     const origPi=D.players.indexOf(p);
     const r=rate.get(p);
     const cells=M.cols.map(c=>c.kind==='week'?_mxWeekCell(p,c):_mxCell(p,origPi,c,ro)).join('');
-    rows.push(`<tr class="${_multiSelMode&&_multiSelIds.has(origPi)?'msel-row':''}">
+    rows.push(`<tr>
       <td class="tdl c0">${!ro?`<input class="nri" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="${p.nr||''}" onclick="event.stopPropagation();this.select();" onchange="updNr(${origPi},this.value)" onblur="updNr(${origPi},this.value)" onkeydown="if(event.key==='Enter'){this.blur();event.preventDefault();}" title="Trikotnummer bearbeiten"/>`:`<span style="font-weight:700;color:var(--bm);">${p.nr||''}</span>`}</td>
-      <td class="tdl c1" onclick="${_multiSelMode?`multiSelectToggle(${origPi})`:`openPlayerFromMain(${origPi})`}" style="cursor:pointer;">
-        <div class="ncell">${_multiSelMode?`<input type="checkbox" class="msel-cb" data-pi="${origPi}" ${_multiSelIds.has(origPi)?'checked':''} onclick="event.stopPropagation();multiSelectToggle(${origPi})" style="margin-right:6px;width:16px;height:16px;cursor:pointer;"/>`:''}${p.photo?`<img class="nm-av" src="${p.photo}" alt="" loading="lazy">`:`<span class="nm-av nm-av-ph" aria-hidden="true">${_avIni(p)}</span>`}<span class="nm ${plNameClass(p)}">${getDisplayName(p)||''}</span>${!_multiSelMode?'<span class="ni">›</span>':''}</div>
+      <td class="tdl c1" onclick="openPlayerFromMain(${origPi})" style="cursor:pointer;">
+        <div class="ncell">${p.photo?`<img class="nm-av" src="${p.photo}" alt="" loading="lazy">`:`<span class="nm-av nm-av-ph" aria-hidden="true">${_avIni(p)}</span>`}<span class="nm ${plNameClass(p)}">${getDisplayName(p)||''}</span><span class="ni">›</span></div>
       </td>
       <td class="c2" style="padding:4px;cursor:pointer;" onclick="openPlayerFromMain(${origPi})" title="Profil öffnen">${pcHtml(p)}</td>
       <td class="c3 mx-pct" data-mxp="${origPi}" style="color:${_mxPctCol(r)};">${r==null?'–':r+'%'}</td>
       ${cells}
-      <td>${!ro&&!_multiSelMode?`<button class="drb" onclick="delPlayer(${origPi})">✕</button>`:''}</td>
+      <td>${!ro?`<button class="drb" onclick="delPlayer(${origPi})">✕</button>`:''}</td>
     </tr>`);
   });
   tbody.innerHTML=rows.join('');
@@ -22969,6 +22990,7 @@ function homeRemoveHeroPhoto(){
 // ── Start view preference (per user, cloud-synced) ──
 function openTeamMgr(tab,fromId){
   if(tab==='trainers')tab='trainer';
+  if(_multiSelMode&&typeof _msExit==='function')_msExit();
   // Kader is people only — the former tabs have one home each
   // (Statistik page, Kalender, Einstellungen → Mannschaft).
   if(tab==='statistik')return openDashboard();
@@ -23074,6 +23096,7 @@ document.addEventListener('wheel',e=>{
 // next "Kader". Programmatic switches (opening, refresh, back) never overwrite it.
 function switchTab(t,user){
   if(t==='tafel'&&!_kbOn())t='spieler';
+  if(t!=='spieler'&&_multiSelMode&&typeof _msExit==='function')_msExit();
   const tb=document.getElementById('tbtn-tafel');if(tb)tb.style.display=_kbOn()?'':'none';
   document.querySelectorAll('#moTeamMgr .tbtn').forEach(b=>{const on=b.dataset.tab===t;b.classList.toggle('active',on);b.setAttribute('aria-pressed',on);});
   ['tafel','spieler','trainer'].forEach(n=>document.getElementById('tab-'+n)?.classList.toggle('active',n===t));
@@ -23233,36 +23256,44 @@ function kbLineup(){
 
 function renderMgrPlayers(){
   const D=cd();
+  // another team or season: the selection belongs to the old list
+  if(_multiSelMode&&(_multiSelCtx!==ck()||!canEdit())){_multiSelMode=false;_multiSelIds.clear();_multiSelIdentities.clear();_multiSelCtx='';}
+  const sm=_multiSelMode;
   const sortedP=sortMgrPlayers(D.players||[]);
   // Add sort buttons to header
   // Sticky: the sort header stays visible while the list scrolls
-  const sortHdr=`<div class="pl-sort-hdr" style="display:flex;align-items:center;gap:7px;padding:4px 10px;background:var(--bd);border-radius:7px 7px 0 0;position:sticky;top:0;z-index:2;">
+  const sortHdr=`<div class="pl-sort-hdr" style="display:flex;align-items:center;gap:7px;padding:4px 10px;background:var(--bd);border-radius:7px 7px 0 0;position:sticky;top:0;z-index:2;">${_multiSelMode?'<div class="pl-ck-sp" aria-hidden="true"></div>':''}
     <div style="width:26px;font-size:.65rem;font-weight:700;color:rgba(255,255,255,.6);cursor:pointer;" onclick="sortMgr('nr')">№${mgrSort.col==='nr'?(mgrSort.asc?'▲':'▼'):''}</div>
     <div style="width:32px;flex-shrink:0;"></div>
     <div style="flex:1;font-size:.65rem;font-weight:700;color:rgba(255,255,255,.6);cursor:pointer;" onclick="sortMgr('name')">Spieler${mgrSort.col==='name'?(mgrSort.asc?'▲':'▼'):''}</div>
     <div style="min-width:82px;font-size:.65rem;font-weight:700;color:rgba(255,255,255,.6);cursor:pointer;" onclick="sortMgr('pos')">Pos.${mgrSort.col==='pos'?(mgrSort.asc?'▲':'▼'):''}</div>
     <div style="width:60px;"></div>
+    ${canEdit()?`<button type="button" class="pl-sel-tg" id="mgrSelToggle" onclick="toggleMultiSelectMode()">${_multiSelMode?'Fertig':'Auswählen'}</button>`:''}
   </div>`;
   document.getElementById('tmgr-pl-list').innerHTML=(sortedP.length)?
     sortHdr+sortedP.map((p)=>{const i=D.players.indexOf(p);
       // All non-functional zones of the row (nr/avatar/name/pos) open the profile.
       // Functional buttons (✎ / ✕) keep their own onclick + stopPropagation.
-      const openHandler=`_tmLeave('spieler');openPlayerStats(${i});`;
+      // In selection mode a tap selects instead of opening the profile
+      const openHandler=sm?`multiSelectToggle(${i})`:`_tmLeave('spieler');openPlayerStats(${i});`;
+      const on=sm&&_multiSelIds.has(i);
       // The whole row opens the profile — gaps between the cells used to be
       // dead spots although the row lit up on hover. ✎ / ✕ stop propagation.
-      return`<div class="pl-row" style="cursor:pointer;" onclick="${openHandler}" title="Profil \u00f6ffnen">
+      return`<div class="pl-row${sm?' pl-selmode':''}${on?' pl-sel':''}" data-pi="${i}" style="cursor:pointer;" onclick="${openHandler}"${sm?` role="checkbox" aria-checked="${on}" tabindex="0" onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();multiSelectToggle(${i});}"`:` title="Profil \u00f6ffnen"`}>
+      ${sm?'<span class="pl-ck" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span>':''}
       <div class="pl-nr">${p.nr||''}</div>
       <div style="flex-shrink:0;">${renderPlayerAvatar(p,32)}</div>
       <div class="pl-name">${p.name||''}</div>
       <div class="pl-pos">${pbHtml(p)}</div>
-      <div class="pl-btns">
-        <button class="pl-btn pl-btn-e" title="Bearbeiten" onclick="event.stopPropagation();_tmLeave('spieler');openPlayerStats(${i},{edit:true});">✎</button>
-        ${canEdit()?`<button class="pl-btn pl-btn-d" onclick="event.stopPropagation();mgrDelPl(${i})">✕</button>`:''}
+      <div class="pl-btns"${sm?' aria-hidden="true"':''}>
+        <button class="pl-btn pl-btn-e" title="Bearbeiten"${sm?' tabindex="-1"':''} onclick="event.stopPropagation();_tmLeave('spieler');openPlayerStats(${i},{edit:true});">✎</button>
+        ${canEdit()?`<button class="pl-btn pl-btn-d"${sm?' tabindex="-1"':''} onclick="event.stopPropagation();mgrDelPl(${i})">✕</button>`:''}
       </div>
     </div>`;}).join('')
     :'<p style="padding:14px;font-size:.76rem;color:var(--gm);">Keine Spieler.</p>';
   document.getElementById('btn-mgr-addpl').style.display=canEdit()?'':'none';
   {const tl=document.getElementById('btn-mgr-teamlink');if(tl)tl.style.display=canEdit()?'':'none';}
+  _updateMultiSelBar();
 }
 async function mgrDelPl(pi){
   // Delegate to canonical delPlayer flow:
@@ -25022,7 +25053,7 @@ function addPlayer(){
 // Selection is tracked by player index (pi) within current team__season.
 // Identity (name + confirmToken) is also stored so the selection survives index
 // drift if another trainer deletes/reorders players while selection is active.
-let _multiSelMode=false;
+var _multiSelMode=false; // var: read by renderMgrPlayers/switchTab, which may run first
 const _multiSelIds=new Set();
 const _multiSelIdentities=new Map(); // pi -> {name, token}
 function _multiSelRememberIdentity(pi){
@@ -25060,22 +25091,44 @@ function _resolveMultiSel(){
   newIdent.forEach((v,k)=>_multiSelIdentities.set(k,v));
   return Array.from(_multiSelIds);
 }
+// Lives in Kader → Spieler ("Auswählen"): roster work — mostly at the change
+// of season (leavers out, U17 players up). It used to sit in the Anwesenheit
+// table, where nobody looked for it.
+var _multiSelCtx='';
 function toggleMultiSelectMode(){
   if(!canEdit())return;
   _multiSelMode=!_multiSelMode;
   _multiSelIds.clear();
   _multiSelIdentities.clear();
+  _multiSelCtx=_multiSelMode?ck():'';
+  if(typeof renderMgrPlayers==='function')renderMgrPlayers();
   _updateMultiSelBar();
-  document.body.classList.toggle('multi-sel-mode',_multiSelMode);
-  if(typeof render==='function')render();
+}
+function _msExit(){
+  if(!_multiSelMode&&!_multiSelIds.size)return;
+  _multiSelMode=false;_multiSelIds.clear();_multiSelIdentities.clear();_multiSelCtx='';
+  if(typeof renderMgrPlayers==='function'&&document.getElementById('tmgr-pl-list'))renderMgrPlayers();
+  _updateMultiSelBar();
+}
+// Players that can go to another team: admins any team, trainers their own
+function _msMoveTargets(){
+  const teams=(G.teamList||[]).filter(t=>t!==UI.currentTeam);
+  if(typeof isAdmin==='function'&&isAdmin())return teams;
+  const mine=(CU&&Array.isArray(CU.teams))?CU.teams:[];
+  return teams.filter(t=>mine.includes(t));
 }
 function _updateMultiSelBar(){
-  const bar=document.getElementById('multiSelBar');
+  const bar=document.getElementById('mgrSelBar');
+  const btns=document.querySelector('#tab-spieler > .mob-btns');
+  const n=_multiSelIds.size;
+  if(bar)bar.style.display=_multiSelMode?'':'none';
+  if(btns)btns.style.display=_multiSelMode?'none':'';
   const cnt=document.getElementById('multiSelCount');
-  if(bar)bar.style.display=_multiSelMode?'flex':'none';
-  if(cnt)cnt.textContent=_multiSelIds.size+' ausgewählt';
-  const chk=document.getElementById('vd2-multisel');
-  if(chk){chk.classList.toggle('on',_multiSelMode);chk.textContent=_multiSelMode?'✓':'';}
+  if(cnt)cnt.textContent=n?(n===1?'1 Spieler ausgewählt':n+' Spieler ausgewählt'):'Spieler antippen, um sie auszuwählen';
+  const mv=document.getElementById('mgrSelMove');
+  if(mv){mv.style.display=_msMoveTargets().length?'':'none';mv.disabled=!n;}
+  const dl=document.getElementById('mgrSelDel');if(dl)dl.disabled=!n;
+  const tg=document.getElementById('mgrSelToggle');if(tg)tg.textContent=_multiSelMode?'Fertig':'Auswählen';
 }
 function multiSelectToggle(pi){
   if(!_multiSelMode)return;
@@ -25087,10 +25140,8 @@ function multiSelectToggle(pi){
     _multiSelRememberIdentity(pi);
   }
   _updateMultiSelBar();
-  const cb=document.querySelector(`.msel-cb[data-pi="${pi}"]`);
-  if(cb)cb.checked=_multiSelIds.has(pi);
-  const tr=cb&&cb.closest('tr');
-  if(tr)tr.classList.toggle('msel-row',_multiSelIds.has(pi));
+  const row=document.querySelector(`#tmgr-pl-list .pl-row[data-pi="${pi}"]`);
+  if(row){const on=_multiSelIds.has(pi);row.classList.toggle('pl-sel',on);row.setAttribute('aria-checked',on);}
 }
 function multiSelectAll(){
   const D=cd();
@@ -25100,73 +25151,14 @@ function multiSelectAll(){
     _multiSelIds.add(pi);
     _multiSelRememberIdentity(pi);
   });
-  if(typeof render==='function')render();
+  if(typeof renderMgrPlayers==='function')renderMgrPlayers();
   _updateMultiSelBar();
 }
 function multiSelectNone(){
   _multiSelIds.clear();
   _multiSelIdentities.clear();
-  if(typeof render==='function')render();
+  if(typeof renderMgrPlayers==='function')renderMgrPlayers();
   _updateMultiSelBar();
-}
-function multiSelectInvert(){
-  const D=cd();
-  if(!D||!Array.isArray(D.players))return;
-  D.players.forEach((p,pi)=>{
-    if(!p)return;
-    if(_multiSelIds.has(pi)){
-      _multiSelIds.delete(pi);
-      _multiSelIdentities.delete(pi);
-    } else {
-      _multiSelIds.add(pi);
-      _multiSelRememberIdentity(pi);
-    }
-  });
-  if(typeof render==='function')render();
-  _updateMultiSelBar();
-}
-// ── Bulk: change positions ──
-function bulkChangePosition(){
-  if(!canEdit())return;
-  _resolveMultiSel();
-  if(!_multiSelIds.size){alert('Keine Spieler ausgewählt.');return;}
-  // Open modal moBulkPosition
-  document.getElementById('bp-cnt').textContent=_multiSelIds.size;
-  document.getElementById('bp-pos1').value='';
-  document.getElementById('bp-pos2').value='';
-  openM('moBulkPosition');
-}
-async function applyBulkPosition(){
-  // Re-resolve again right before apply — selection may have drifted since modal opened
-  _resolveMultiSel();
-  if(!_multiSelIds.size){alert('Keine Spieler mehr ausgewählt.');closeM('moBulkPosition');return;}
-  const p1=document.getElementById('bp-pos1').value.trim();
-  const p2=document.getElementById('bp-pos2').value.trim();
-  const setP1=document.getElementById('bp-set-pos1').checked;
-  const setP2=document.getElementById('bp-set-pos2').checked;
-  if(!setP1&&!setP2){alert('Mindestens eine Position aktivieren.');return;}
-  const D=cd();
-  if(!D)return;
-  const ok=await confirmDestructive({
-    title:`Position für ${_multiSelIds.size} Spieler ändern?`,
-    subtitle:`${setP1?`Hauptposition → ${p1||'(leer)'}\n`:''}${setP2?`2. Position → ${p2||'(leer)'}`:''}`,
-    itemsHtml:`<div class="mcd-row"><span class="mcd-row-icon">👥</span><span class="mcd-row-label">Betroffene Spieler</span><span class="mcd-row-val">${_multiSelIds.size}</span></div>`,
-    confirmLabel:'✓ Anwenden'
-  });
-  if(!ok)return;
-  snap();
-  let changed=0;
-  _multiSelIds.forEach(pi=>{
-    const p=D.players[pi];
-    if(!p)return;
-    if(setP1)p.pos=p.pos1=p1;
-    if(setP2)p.pos2=p2;
-    changed++;
-  });
-  saveG();render();
-  closeM('moBulkPosition');
-  if(typeof showSaveFlash==='function')showSaveFlash(`✓ ${changed} Spieler aktualisiert`);
-  logAudit('Position aktualisiert (Bulk)',changed+' Spieler',(setP1?'P1='+p1:'')+(setP2?' P2='+p2:''));
 }
 // ── Bulk: delete players ──
 async function bulkDeletePlayers(){
@@ -25221,10 +25213,8 @@ async function bulkDeletePlayers(){
     Dpost.players.splice(pi,1);
     cleanPlayerFromLineups(UI.currentTeam,pi);
   });
-  _multiSelIds.clear();
-  _multiSelIdentities.clear();
   saveG();render();
-  _updateMultiSelBar();
+  _msExit();
   if(typeof showSaveFlash==='function')showSaveFlash(`🗑 ${sorted.length} gelöscht`);
   logAudit('Spieler entfernt (Bulk)',sorted.length+' Spieler',names.slice(0,80));
 }
@@ -25330,9 +25320,8 @@ async function applyBulkMoveTeam(){
     D.players.splice(pi,1);
     cleanPlayerFromLineups(UI.currentTeam,pi);
   });
-  _multiSelIds.clear();
   saveG();render();
-  _updateMultiSelBar();
+  _msExit();
   closeM('moBulkMoveTeam');
   if(typeof showSaveFlash==='function')showSaveFlash(`↔ ${copied.length} Spieler → ${targetTeam}`);
   logAudit('Spieler verschoben (Bulk)',copied.length+' Spieler',UI.currentTeam+'→'+targetTeam);
@@ -32170,53 +32159,6 @@ _pubCleanupSchedule();
   <div class="mob-btns">
     <button class="btn bs" onclick="closeM('moBulkMoveTeam')">Abbrechen</button>
     <button class="btn bp" onclick="applyBulkMoveTeam()" style="margin-left:auto;background:#27ae60;">↔ Verschieben</button>
-  </div>
-</div></div>
-
-<!-- Bulk Position Change Modal -->
-<div class="mo" id="moBulkPosition" style="z-index:99997;"><div class="mob" style="width:380px;max-width:96vw;">
-  <h3 style="margin:0 0 8px;color:var(--bd);">⚙ Position für <span id="bp-cnt">0</span> Spieler ändern</h3>
-  <p style="font-size:.78rem;color:var(--gm);margin:0 0 14px;">Wähle aus, welche Positionsfelder geändert werden sollen.</p>
-
-  <label style="display:flex;align-items:center;gap:8px;font-size:.84rem;color:var(--bd);font-weight:600;cursor:pointer;margin-bottom:6px;">
-    <input type="checkbox" id="bp-set-pos1" checked style="width:16px;height:16px;cursor:pointer;"/>
-    Hauptposition setzen auf:
-  </label>
-  <select id="bp-pos1" style="width:100%;padding:7px 9px;border:1px solid var(--gl);border-radius:6px;font-size:.84rem;font-family:'Barlow',sans-serif;margin-bottom:14px;">
-    <option value="">– Keine –</option>
-    <option value="TW">TW (Torwart)</option>
-    <option value="RV">RV</option>
-    <option value="IV">IV</option>
-    <option value="LV">LV</option>
-    <option value="6er">6er</option>
-    <option value="8er">8er</option>
-    <option value="10er">10er</option>
-    <option value="RF">RF</option>
-    <option value="LF">LF</option>
-    <option value="ST">ST</option>
-  </select>
-
-  <label style="display:flex;align-items:center;gap:8px;font-size:.84rem;color:var(--bd);font-weight:600;cursor:pointer;margin-bottom:6px;">
-    <input type="checkbox" id="bp-set-pos2" style="width:16px;height:16px;cursor:pointer;"/>
-    2. Position setzen auf:
-  </label>
-  <select id="bp-pos2" style="width:100%;padding:7px 9px;border:1px solid var(--gl);border-radius:6px;font-size:.84rem;font-family:'Barlow',sans-serif;margin-bottom:14px;">
-    <option value="">– Keine –</option>
-    <option value="TW">TW</option>
-    <option value="RV">RV</option>
-    <option value="IV">IV</option>
-    <option value="LV">LV</option>
-    <option value="6er">6er</option>
-    <option value="8er">8er</option>
-    <option value="10er">10er</option>
-    <option value="RF">RF</option>
-    <option value="LF">LF</option>
-    <option value="ST">ST</option>
-  </select>
-
-  <div class="mob-btns">
-    <button class="btn bs" onclick="closeM('moBulkPosition')">Abbrechen</button>
-    <button class="btn bp" onclick="applyBulkPosition()" style="margin-left:auto;">✓ Anwenden</button>
   </div>
 </div></div>
 
