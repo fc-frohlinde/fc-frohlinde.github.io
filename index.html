@@ -3269,10 +3269,16 @@ body.design-heute{--hx-pw:460px;}
   body.design-heute :is(#moPlayerStatsExt,#moSessAtt,#moRpeAll).hx-panel > .mob{box-shadow:-40px 0 80px -20px rgba(14,35,80,.5),-1px 0 0 var(--hx-line);}
 }
 @media(min-width:1100px){
-  /* Room for the panel: pages and the start screen end where it begins (the
-     table scrolls sideways anyway and simply runs under it) */
-  body.design-heute.hx-panel-open :is(#moTeamMgr,#moCalendar,#moDashboard,#moWeekReport,#moSettings).hx-page > .mob{padding-right:calc(var(--hx-pw) + 28px) !important;}
+  /* The start screen ends where the panel begins: its grid rearranges itself
+     for the width it gets (container queries) */
   body.design-heute.hx-panel-open .home-overlay{right:var(--hx-pw);}
+}
+@media(min-width:1830px){
+  /* Pages make room for the panel only where they keep their layout (about
+     1100px left). On smaller screens the panel lies on top and nothing moves:
+     squeezed, the Tafel and the Statistik tiles broke apart. The table runs
+     under it anyway. */
+  body.design-heute.hx-panel-open :is(#moTeamMgr,#moCalendar,#moDashboard,#moWeekReport,#moSettings).hx-page > .mob{padding-right:calc(var(--hx-pw) + 28px) !important;}
 }
 @media(max-width:767px){
   body.design-heute .mo.hx-panel{bottom:var(--mob-nav-h,62px);background:var(--hx-ground);backdrop-filter:none;align-items:stretch;padding:0 !important;}
@@ -4325,6 +4331,12 @@ body.design-heute .hx-tile.open{background:#EDF1F7;}
 /* The "Mehr" sheet and its pickers must open above the start screen */
 /* Above the tab bar now, so its own bottom inset must clear nothing; keep it scrollable */
 body.design-heute #mobSheet .ms-panel{max-height:85vh;overflow-y:auto;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));}
+/* Phone: the "Mehr" sheet ends above the tab bar, so the tabs stay visible —
+   "Mehr" shows as active and a second tap closes the sheet */
+@media(max-width:767px){
+  body.design-heute #mobSheet{bottom:var(--mob-nav-h,62px);}
+  body.design-heute #mobSheet .ms-panel{max-height:calc(100% - 40px);padding-bottom:12px;box-shadow:0 -12px 30px -12px rgba(14,35,80,.35);}
+}
 
 @media(min-width:768px){body.design-heute .toolbar-l::before{content:'Anwesenheit';font-family:var(--hx-num);font-weight:800;font-size:1.55rem;color:var(--hx-ink);padding:2px 6px 0;line-height:1;}}
 /* The side navigation already holds these — the toolbar keeps only the table's own tools */
@@ -5767,7 +5779,7 @@ const APP_VERSION_LABEL='1.1.2';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792031275525; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792032008520; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.1.2',date:'15.10.2026',title:'Anwesenheit als Matrix',items:[
     {icon:'🗓️',title:'Tabelle nach Kalenderwochen',desc:'Die Anwesenheit ist nach Kalenderwochen gruppiert, diese Woche ist gelb markiert, das nächste Spiel blau. Ältere Wochen sind je zu einer Spalte zusammengefasst (z. B. 2/3 = zweimal da von drei); ein Klick öffnet die Woche wieder.'},
@@ -5776,6 +5788,7 @@ const APP_CHANGELOG=[
     {icon:'📱',title:'Handy: Ansicht „Spieler“',desc:'In der Anwesenheit oben „Termine | Spieler“: jeder Spieler mit seinen letzten 10 Terminen als Balken, sortierbar nach „Schwächste zuerst“, Position oder Nummer.'},
     {icon:'🏠',title:'Übersicht',desc:'„Diese Woche“ zeigt am Computer alle sieben Tage mit Kalenderwoche, freie Tage in einer schmalen Zeile. Als Titel steht das Thema des Trainings bzw. der Gegner, darunter die Uhrzeit; vergangene Termine haben ein Häkchen und die Zahl der Anwesenden, „–/18“ heißt: noch nicht erfasst. Von Freitag bis Sonntag zeigt die Karte daneben die laufende Woche („KW … bisher“). Steht am Wochenende das Spiel oben, zeigt die Karte darunter das nächste Training hell (dunkel bleibt dem Spiel), mit „Wer kommt?“ und dem Trainingsplan. Neu unter „Im Blick“: wer die Belastung heute noch nicht bewertet hat.'},
     {icon:'↔️',title:'Navigation einklappen',desc:'Am Computer lässt sich die Seitennavigation mit dem Doppelpfeil unten neben der Glocke auf Symbole verkleinern; so hat die Tabelle mehr Platz.'},
+    {icon:'🛠️',title:'Bedienung',desc:'Handy: „Mehr“ öffnet sich über der unteren Leiste, die sichtbar bleibt; nochmal „Mehr“ schließt. Tafel: ein zweiter Klick auf denselben Spieler schließt sein Menü. Das Spielerprofil legt sich auf Laptops über die Seite, statt Tafel und Statistik zusammenzuschieben.'},
     {icon:'💻',title:'Laptops mit Skalierung',desc:'Auf Laptops mit 125 % Anzeigeskalierung passen Navigation und Übersicht wieder ohne Scrollen auf den Bildschirm; freie Tage in „Diese Woche“ stehen dafür in einer schmalen Zeile.'},
   ]},
   {version:'1.1.1',date:'14.10.2026',title:'Kader-Tafel',items:[
@@ -20394,7 +20407,12 @@ function _ssxMenu(ev,si,pi){
   if(!canEdit())return;
   let m=document.getElementById('ssx-menu');
   if(!m){m=document.createElement('div');m.id='ssx-menu';m.className='ssx-menu';document.body.appendChild(m);
-    document.addEventListener('pointerdown',e2=>{const mm=document.getElementById('ssx-menu');if(mm&&mm.classList.contains('open')&&!mm.contains(e2.target))mm.classList.remove('open');},true);}
+    document.addEventListener('pointerdown',e2=>{const mm=document.getElementById('ssx-menu');if(mm&&mm.classList.contains('open')&&!mm.contains(e2.target)&&!(mm._anchor&&mm._anchor.contains(e2.target)))mm.classList.remove('open');},true);}
+  // A second click on the same player closes the menu (the pointerdown above
+  // leaves the opening element alone, so the click can decide)
+  const key=si+':'+pi;
+  if(m.classList.contains('open')&&m._key===key){m.classList.remove('open');return;}
+  m._key=key;m._anchor=ev.currentTarget;
   const D=cd();const p=D.players[pi];
   const cur=(p&&p.s&&si<p.s.length)?p.s[si]:3;
   const roll=typeof _isSessRollCallTime==='function'&&_isSessRollCallTime(si);
@@ -21908,7 +21926,7 @@ function mobNav(what){
     case 'list': mobSheetClose(); if(typeof homeClose==='function')homeClose(); break;
     case 'cal':  mobSheetClose(); if(typeof openCalendar==='function')openCalendar(); break;
     case 'team': mobSheetClose(); if(typeof openTeamMgr==='function')openTeamMgr(_kbDefaultTab()); break;
-    case 'more': mobSheetOpen(); break;
+    case 'more': {const sh=document.getElementById('mobSheet');if(sh&&sh.classList.contains('open')){mobSheetClose();return;}mobSheetOpen();break;}
   }
   _mobNavSync(what);
 }
