@@ -4096,8 +4096,10 @@ body.design-heute.hx-navmin{--hx-navw:72px;}
 .hx-bell-dot.on{display:block;}
 .hx-fold-nav svg{transition:transform .2s;}
 /* the fold toggle sits in the user row beside the bell, so it costs no extra row */
-.hx-user .hx-fold-nav{width:32px;flex-shrink:0;color:#AFC0E0;}
+.hx-user .hx-fold-nav{width:30px;flex-shrink:0;color:#AFC0E0;}
 #hxNav .hx-user{gap:2px;}
+#hxNav .hx-user .hx-bell:not(.hx-fold-nav){width:38px;}
+#hxNav .hx-user .hx-user-btn{padding-left:4px;padding-right:4px;gap:8px;font-family:'Barlow',sans-serif;}
 .hx-user-role{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 /* short windows (a 1080p laptop at 125–150 % scaling): a tighter nav that
    still fits without scrolling */
@@ -4126,7 +4128,7 @@ body.hx-navmin .hx-item{justify-content:center;gap:0;padding:10px 0;position:rel
 body.hx-navmin .hx-item > span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
 body.hx-navmin .hx-fold-nav svg{transform:rotate(180deg);}
 body.hx-navmin .hx-user{flex-direction:column;gap:4px;}
-body.hx-navmin .hx-user .hx-fold-nav{width:44px;}
+body.hx-navmin .hx-user .hx-fold-nav,body.hx-navmin #hxNav .hx-user .hx-bell:not(.hx-fold-nav){width:44px;}
 body.hx-navmin .hx-user-btn{flex:0 0 auto;justify-content:center;padding:4px;}
 body.hx-navmin .hx-user-btn > span:nth-child(2){display:none !important;}
 @media (prefers-reduced-motion:reduce){.hx-fold-nav svg{transition:none;}}
@@ -5730,7 +5732,7 @@ const APP_VERSION_LABEL='1.1.2';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792028110671; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792029631024; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.1.2',date:'15.10.2026',title:'Anwesenheit als Matrix',items:[
     {icon:'🗓️',title:'Tabelle nach Kalenderwochen',desc:'Die Anwesenheit ist nach Kalenderwochen gruppiert, diese Woche ist gelb markiert, das nächste Spiel blau. Ältere Wochen sind je zu einer Spalte zusammengefasst (z. B. 2/3 = zweimal da von drei); ein Klick öffnet die Woche wieder.'},
@@ -22045,10 +22047,20 @@ function _hxNavMinApply(){
     else if(it.dataset.autotitle){it.removeAttribute('title');delete it.dataset.autotitle;}
   });
 }
+function _hxFitUserName(){
+  const un=document.getElementById('hxUserNm');if(!un)return;
+  const full=(CU&&CU.name)||'';if(!full)return;
+  un.title=full;
+  if(un.textContent!==full)un.textContent=full;
+  requestAnimationFrame(()=>{
+    if(un.clientWidth&&un.scrollWidth>un.clientWidth+1){const f=full.split(/\s+/)[0];if(f&&f!==full)un.textContent=f;}
+  });
+}
 function hxNavFold(){
   const on=!document.body.classList.contains('hx-navmin');
   try{localStorage.setItem(HX_NAVMIN_LS,on?'1':'0');}catch(e){}
   _hxNavMinApply();
+  _hxFitUserName();
   try{window.dispatchEvent(new Event('resize'));}catch(e){}
 }
 function hxRenderNav(){
@@ -22064,6 +22076,7 @@ function hxRenderNav(){
   set('hxSeasonLbl',UI.currentSeason||'–');
   const nm=(CU&&CU.name)||'';
   set('hxUserNm',nm||'–');
+  _hxFitUserName();
   set('hxUserAv',(nm||'?').trim().charAt(0).toUpperCase());
   set('hxUserRole',CU?(CU.role==='admin'?'Administrator':CU.role==='trainer'?'Trainer':CU.role==='viewer'?'Nur ansehen':''):'');
   _hxActSync();
@@ -22445,7 +22458,7 @@ function hxRender(){
       if(!s||!s.date||!inDays(s,-1,0))return;
       let n=0;
       D.players.forEach(p=>{if(p&&_sessAfterJoin(p,s,season)&&rpeIsOpen(s,si,p,season)&&!(Array.isArray(p.rpe)&&typeof p.rpe[si]==='number'))n++;});
-      if(n)flags.push({dot:'#E0912F',who:n+' Spieler',what:'Belastung '+(sk(s)===today?'von heute':'vom '+s.date)+' noch nicht bewertet · bis 24 Uhr',on:`openSessFromMain(${si})`});
+      if(n)flags.push({dot:'#E0912F',who:n+' Spieler',what:'Belastung '+(sk(s)===today?'von heute':'vom '+s.date)+' noch nicht bewertet · bis 24\u00a0Uhr',on:`openSessFromMain(${si})`});
     });
   }catch(e){}
   // unanswered for the coming week (the focus card already lists its own)
