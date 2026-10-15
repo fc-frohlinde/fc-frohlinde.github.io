@@ -3547,7 +3547,9 @@ body.design-heute .hx-lg.static{cursor:default;}
 body.design-heute .hx-a-hero .hx-divider{margin-top:2px;}
 /* match card: navy, yellow action */
 body.design-heute .hx-grid .hx-dark{background:var(--hx-nav);}
-body.design-heute .hx-match-t{font-size:1.8rem !important;color:#fff;margin:0 !important;}
+body.design-heute .hx-match-t{font-size:1.8rem !important;color:var(--hx-ink);margin:0 !important;}
+body.design-heute .hx-dark .hx-match-t{color:#fff;}
+body.design-heute .hx-next .hx-att-n b{font-size:2rem;}
 body.design-heute .hx-att.dark .hx-att-n b{color:#fff;font-size:2rem;}
 body.design-heute .hx-att.dark .hx-att-n span{color:#C9D6EC;}
 body.design-heute .hx-att.dark .hx-seg{background:rgba(255,255,255,.14);}
@@ -5765,14 +5767,14 @@ const APP_VERSION_LABEL='1.1.2';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792030597449; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792031275525; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.1.2',date:'15.10.2026',title:'Anwesenheit als Matrix',items:[
     {icon:'🗓️',title:'Tabelle nach Kalenderwochen',desc:'Die Anwesenheit ist nach Kalenderwochen gruppiert, diese Woche ist gelb markiert, das nächste Spiel blau. Ältere Wochen sind je zu einer Spalte zusammengefasst (z. B. 2/3 = zweimal da von drei); ein Klick öffnet die Woche wieder.'},
     {icon:'🔎',title:'Suche und Filter',desc:'Über der Tabelle: Spieler suchen, nur Trainings oder nur Spiele, Zeitraum (ganze Saison, letzte 4 Wochen, nur vergangene, nur kommende), dazu „+ Training“ und „+ Spiel“.'},
     {icon:'📊',title:'Saison-Quote',desc:'Neben jedem Namen steht die Anwesenheit in der Saison; ein Klick auf „Saison“ sortiert, die Schwächsten zuerst.'},
     {icon:'📱',title:'Handy: Ansicht „Spieler“',desc:'In der Anwesenheit oben „Termine | Spieler“: jeder Spieler mit seinen letzten 10 Terminen als Balken, sortierbar nach „Schwächste zuerst“, Position oder Nummer.'},
-    {icon:'🏠',title:'Übersicht',desc:'„Diese Woche“ zeigt am Computer alle sieben Tage mit Kalenderwoche, freie Tage in einer schmalen Zeile. Als Titel steht das Thema des Trainings bzw. der Gegner, darunter die Uhrzeit; vergangene Termine haben ein Häkchen und die Zahl der Anwesenden, „–/18“ heißt: noch nicht erfasst. Von Freitag bis Sonntag zeigt die Karte daneben die laufende Woche („KW … bisher“). Neu unter „Im Blick“: wer die Belastung heute noch nicht bewertet hat.'},
+    {icon:'🏠',title:'Übersicht',desc:'„Diese Woche“ zeigt am Computer alle sieben Tage mit Kalenderwoche, freie Tage in einer schmalen Zeile. Als Titel steht das Thema des Trainings bzw. der Gegner, darunter die Uhrzeit; vergangene Termine haben ein Häkchen und die Zahl der Anwesenden, „–/18“ heißt: noch nicht erfasst. Von Freitag bis Sonntag zeigt die Karte daneben die laufende Woche („KW … bisher“). Steht am Wochenende das Spiel oben, zeigt die Karte darunter das nächste Training hell (dunkel bleibt dem Spiel), mit „Wer kommt?“ und dem Trainingsplan. Neu unter „Im Blick“: wer die Belastung heute noch nicht bewertet hat.'},
     {icon:'↔️',title:'Navigation einklappen',desc:'Am Computer lässt sich die Seitennavigation mit dem Doppelpfeil unten neben der Glocke auf Symbole verkleinern; so hat die Tabelle mehr Platz.'},
     {icon:'💻',title:'Laptops mit Skalierung',desc:'Auf Laptops mit 125 % Anzeigeskalierung passen Navigation und Übersicht wieder ohne Scrollen auf den Bildschirm; freie Tage in „Diese Woche“ stehen dafür in einer schmalen Zeile.'},
   ]},
@@ -22419,14 +22421,16 @@ function hxRender(){
   if(si2>=0){
     const s=S[si2],c=_hxCounts(D,si2,season),isM=s.type==='match';
     const w=_hxWhen(sk(s));
-    html+=`<section class="hx-card hx-dark hx-a-match" aria-label="${isM?'Nächstes Spiel':'Danach'}">
+    // Navy means "match": the training that follows (weekend, when the match
+    // is already the hero) gets a light card with quiet buttons
+    html+=`<section class="hx-card${isM?' hx-dark':' hx-next'} hx-a-match" aria-label="${isM?'Nächstes Spiel':'Danach'}">
       <span class="hx-meta"><span class="hx-mpre">${isM?'Nächstes Spiel':'Danach'} · </span>${esc(w.charAt(0).toUpperCase()+w.slice(1))}${s.time?', '+esc(s.time):''}${isM&&s.homeAway?' · '+(s.homeAway==='home'?'Heimspiel':'auswärts'):''}</span>
       <h3 class="hx-h2 hx-match-t">${esc(isM?(s.label||'Spiel'):(s.focus||'Training'))}</h3>
-      <div class="hx-att dark"><div class="hx-att-n"><b>${c.yes}</b><span>von ${c.total} zugesagt</span></div>${_hxSeg([['ok',c.yes,'zugesagt'],['bad',c.no+c.exc,'fehlen'],['open',c.open,'offen']],c.total)}
+      <div class="hx-att${isM?' dark':''}"><div class="hx-att-n"><b>${c.yes}</b><span>von ${c.total} zugesagt</span></div>${_hxSeg([['ok',c.yes,'zugesagt'],['bad',c.no+c.exc,'fehlen'],['open',c.open,'offen']],c.total)}
         <div class="hx-legend"><span class="hx-lg static"><i class="s-bad"></i><b>${c.no+c.exc}</b>fehlen</span><span class="hx-lg static"><i class="s-open"></i><b>${c.open}</b>offen</span></div></div>
       ${isM?(()=>{let has=false;try{const k=_mlKey(UI.currentTeam,season,si2);const lu=G.matchLineups&&G.matchLineups[k];has=!!(lu&&lu.slots&&Object.values(lu.slots).some(v=>v!=null&&v!==''));}catch(e){}
         return `<div class="hx-lu${has?' on':''}">${has?'Aufstellung steht':'Noch keine Aufstellung'}</div>`;})():''}
-      <div class="hx-btns">${isM?`<button type="button" class="hx-btn primary" onclick="openSessFromMain(${si2})">Wer kommt?</button><button type="button" class="hx-btn dark ghost" onclick="openLineupPlanner(${si2})" title="Aufstellung planen">Aufstellung</button>`:`<button type="button" class="hx-btn dark" onclick="openSessFromMain(${si2})">Wer kommt?</button>`}</div>
+      <div class="hx-btns">${isM?`<button type="button" class="hx-btn primary" onclick="openSessFromMain(${si2})">Wer kommt?</button><button type="button" class="hx-btn dark ghost" onclick="openLineupPlanner(${si2})" title="Aufstellung planen">Aufstellung</button>`:`<button type="button" class="hx-btn" onclick="openSessFromMain(${si2})">Wer kommt?</button>${typeof _tplHomeBtn==='function'?_tplHomeBtn(si2):''}`}</div>
     </section>`;
   }
   try{
