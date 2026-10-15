@@ -5189,6 +5189,108 @@ body.design-heute .a2hs{background:var(--hx-nav);bottom:calc(var(--mob-nav-h,62p
 }
 
 .tpl-blk:focus-visible,.tpl-li-h:focus-visible{outline:2px solid var(--tp-link);outline-offset:2px;}
+
+/* ══ Menus: their own colour (Einstellungen → Darstellung → Menüs) ══
+   Dunkel (default, the navigation colour), Getönt or Hell. Every pop-up menu
+   reads the --hx-pop* tokens; inside a menu the general tokens are pointed at
+   them, so rules written for cards (var(--hx-card), var(--hx-ink) …) follow
+   the menu colour without being rewritten. */
+body.design-heute{
+  --hx-pop:var(--hx-nav);--hx-pop-ink:#fff;--hx-pop-muted:color-mix(in srgb,#fff 64%,var(--hx-nav));
+  --hx-pop-line:rgba(255,255,255,.14);--hx-pop-hover:rgba(255,255,255,.1);--hx-pop-field:rgba(255,255,255,.08);
+  --hx-pop-chip:rgba(255,255,255,.13);--hx-pop-link:#A9C4FF;--hx-pop-tick:var(--hx-yellow);--hx-pop-danger:#FF9C90;--hx-pop-warn:#F2C230;
+  --hx-pop-shadow:0 20px 44px -12px rgba(5,12,30,.55),0 2px 8px rgba(5,12,30,.22);
+  --hx-og:var(--hx-ink);--hx-og-muted:var(--hx-muted);
+  --hx-page:var(--hx-ground);--hx-page-img:none;--hx-page-size:auto;--hx-page-att:scroll;}
+body.design-heute.hxm-tint{
+  --hx-pop:color-mix(in srgb,var(--hx-nav) 11%,var(--hx-card));--hx-pop-ink:var(--hx-ink);--hx-pop-muted:var(--hx-muted);
+  --hx-pop-line:color-mix(in srgb,var(--hx-nav) 20%,var(--hx-card));--hx-pop-hover:color-mix(in srgb,var(--hx-nav) 19%,var(--hx-card));
+  --hx-pop-field:var(--hx-card);--hx-pop-chip:color-mix(in srgb,var(--hx-nav) 17%,var(--hx-card));--hx-pop-link:var(--hx-blue);--hx-pop-tick:var(--hx-blue);--hx-pop-danger:#B42318;--hx-pop-warn:#8A5212;
+  --hx-pop-shadow:0 18px 40px -12px rgba(14,35,80,.34),0 2px 6px rgba(14,35,80,.1);}
+body.design-heute.hxm-light{
+  --hx-pop:var(--hx-card);--hx-pop-ink:var(--hx-ink);--hx-pop-muted:var(--hx-muted);--hx-pop-line:var(--hx-line);--hx-pop-hover:var(--hx-ground);
+  --hx-pop-field:var(--hx-field);--hx-pop-chip:var(--hx-card2);--hx-pop-link:var(--hx-blue);--hx-pop-tick:var(--hx-blue);--hx-pop-danger:#B42318;--hx-pop-warn:#8A5212;
+  --hx-pop-shadow:0 18px 40px -12px rgba(14,35,80,.32),0 2px 6px rgba(14,35,80,.08);}
+body.design-heute :is(.hxs-menu,.team-tabs,.user-dropdown,.notif-panel,.hx-act,#viewDropdown2,#linksDropdown,.legend-pop,.ssx-menu,.ssa-menu,.photo-menu){
+  --hx-card:var(--hx-pop);--hx-card2:var(--hx-pop-chip);--hx-field:var(--hx-pop-field);--hx-ground:var(--hx-pop-hover);--hx-line:var(--hx-pop-line);
+  --hx-ink:var(--hx-pop-ink);--hx-ink2:var(--hx-pop-ink);--hx-muted:var(--hx-pop-muted);--hx-blue:var(--hx-pop-link);
+  --gd:var(--hx-pop-ink);--gm:var(--hx-pop-muted);--gl:var(--hx-pop-line);--ow:var(--hx-pop-hover);--muted-bg:var(--hx-pop-hover);
+  background:var(--hx-pop) !important;border:1px solid var(--hx-pop-line) !important;color:var(--hx-pop-ink);box-shadow:var(--hx-pop-shadow) !important;border-radius:14px;}
+body.design-heute .hxs-opt > i{color:var(--hx-pop-tick);}
+body.design-heute .team-tabs .ttab.active::before{background:var(--hx-pop-tick);-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12 5 5 9-10'/%3E%3C/svg%3E") center/16px no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12 5 5 9-10'/%3E%3C/svg%3E") center/16px no-repeat;}
+body.design-heute .user-dropdown .ud-item.ud-out,body.design-heute .user-dropdown .ud-item.ud-out svg{color:var(--hx-pop-danger);}
+body.design-heute .user-dropdown .ud-item.ud-warn,body.design-heute .user-dropdown .ud-item.ud-warn svg{color:var(--hx-pop-warn);}
+body.design-heute .team-tabs .tdelt:hover,body.design-heute .notif-dismiss:hover{background:color-mix(in srgb,#C9373E 22%,transparent);color:var(--hx-pop-danger);}
+body.design-heute .notif-item.unread::before{background:var(--hx-pop-tick);}
+body.design-heute .notif-dismiss{color:var(--hx-pop-muted);}
+body.design-heute .legend-pop-h{color:var(--hx-pop-muted);}
+body.design-heute .photo-menu-item{color:var(--hx-pop-ink);}
+body.design-heute .photo-menu-del{color:var(--hx-pop-danger);}
+body.design-heute #linksDropdown :is(input,textarea){background:var(--hx-pop-field) !important;border-color:var(--hx-pop-line) !important;color:var(--hx-pop-ink) !important;}
+body.design-heute #linksDropdown :is(input,textarea)::placeholder{color:var(--hx-pop-muted);}
+body.design-heute .ssx-menu.cst-menu{min-width:200px;padding:6px;}
+/* the settings picker for the menu colour */
+.hxm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px;padding:4px 0 14px;border-bottom:1px solid var(--hx-line);}
+.hxm-pv{position:relative;display:flex;flex-direction:column;gap:5px;justify-content:center;height:58px;padding:0 12px;border-radius:9px;box-sizing:border-box;border:1px solid var(--hx-line);}
+.hxm-pv i{display:block;height:6px;border-radius:3px;background:currentColor;opacity:.75;}
+.hxm-pv i:nth-child(1){width:70%;}.hxm-pv i:nth-child(2){width:52%;opacity:.45;}.hxm-pv i:nth-child(3){width:62%;opacity:.45;}
+.hxm-pv.d{background:var(--hx-nav);color:#fff;border-color:var(--hx-nav);}
+.hxm-pv.t{background:color-mix(in srgb,var(--hx-nav) 11%,var(--hx-card));color:var(--hx-ink);}
+.hxm-pv.l{background:var(--hx-card);color:var(--hx-ink);}
+/* ══ More colour schemes ══
+   Flutlicht and Graphit: a dark page ground with light cards — the least
+   white of all. Nebel: soft grey, no pure white anywhere. */
+body.design-heute.hxs-flutlicht{--hx-nav:#0A1834;--hx-nav2:#132650;--hx-page:#1C2E54;--hx-ground:#E3E9F2;--hx-card:#EEF2F8;--hx-card2:#E1E7F1;--hx-field:#FFFFFF;--hx-line:#CBD4E3;--hx-track:#C6D0E0;--hx-ink:#0E2350;--hx-ink2:#33425F;--hx-muted:#4A5878;--hx-og:#FFFFFF;--hx-og-muted:#B6C4DE;}
+body.design-heute.hxs-graphit{--hx-nav:#14171D;--hx-nav2:#20242C;--hx-page:#2A2E36;--hx-ground:#E2E5EA;--hx-card:#ECEEF1;--hx-card2:#DFE2E7;--hx-field:#FFFFFF;--hx-line:#CDD1D8;--hx-track:#C7CBD2;--hx-ink:#1A1E26;--hx-ink2:#3A404B;--hx-muted:#4F5562;--hx-og:#FFFFFF;--hx-og-muted:#B8BEC9;}
+body.design-heute.hxs-nebel{--hx-nav:#2C3A52;--hx-nav2:#38475F;--hx-ground:#D6DCE4;--hx-card:#F0F2F5;--hx-card2:#E4E8ED;--hx-field:#FAFBFC;--hx-line:#D3D9E1;--hx-track:#CDD4DE;--hx-ink:#1B2638;--hx-ink2:#3A4659;--hx-muted:#556173;}
+body.design-heute:is(.hxs-flutlicht,.hxs-graphit,.hxs-nebel){--gm:var(--hx-muted);}
+
+/* ══ Page ground vs. inner ground ══
+   --hx-page paints the page behind the cards (with an optional pattern,
+   Einstellungen → Darstellung → Hintergrund); --hx-ground stays the light fill
+   inside cards (chips, hovers, table heads). The light schemes use one colour
+   for both, Flutlicht and Graphit split them. --hx-og is text on the page. */
+body.design-heute.design-kabine{--d-bg:var(--hx-page);}
+body.design-heute:not(.theme-dark) .page,body.design-heute .home-overlay,body.design-heute .mo.hx-page,
+body.design-heute #moSettings,body.design-heute #moSettings .set-mob,body.design-heute #mxPlayers,
+body.design-heute :is(.lp-overlay,.slp-overlay),body.design-heute:not(.theme-dark) .tpl-ov{
+  background-color:var(--hx-page);background-image:var(--hx-page-img);background-size:var(--hx-page-size);background-attachment:var(--hx-page-att);}
+body.design-heute #moSettings .set-mob,body.design-heute .mo.hx-page > .mob{background-image:none;}
+body.design-heute .home-overlay::before,body.design-heute .home-overlay::after{display:none;}
+/* the start screen: only the navy band scrolls with the content; ground and
+   pattern come from the overlay behind it */
+body.design-heute #hxHome{background:linear-gradient(var(--hx-nav),var(--hx-nav)) 0 0/100% 280px no-repeat;background-attachment:local;}
+@media(max-width:767px){body.design-heute #hxHome{background:linear-gradient(var(--hx-nav),var(--hx-nav)) 0 0/100% 230px no-repeat;background-attachment:local;}}
+@media(max-width:767px){
+  body.design-heute .mo.hx-panel{background-color:var(--hx-page);background-image:var(--hx-page-img);background-size:var(--hx-page-size);}
+  body.design-heute :is(#moDashboard,#moWeekReport) > .mob > .has-inrow-close,
+  body.design-heute :is(.lp-topbar,.slp-topbar){background:linear-gradient(var(--hx-nav),var(--hx-nav)) 0 0/100% calc(62px + env(safe-area-inset-top,0px)) no-repeat,var(--hx-page) !important;}
+  body.design-heute #moWeekReport .has-inrow-close .db-wr-wk{color:var(--hx-og) !important;}
+}
+body.design-heute #moCalendar .cal-legend{color:var(--hx-og-muted);}
+body.design-heute:is(.hxs-flutlicht,.hxs-graphit):not(.mx-inband) #mxBar .mx-range{color:var(--hx-og-muted);}
+body.design-heute:is(.hxs-flutlicht,.hxs-graphit):not(.mx-inband) #mxBar .mx-seg{background:color-mix(in srgb,var(--hx-og) 12%,transparent);}
+body.design-heute:is(.hxs-flutlicht,.hxs-graphit):not(.mx-inband) #mxBar .mx-seg button:not(.on){color:var(--hx-og-muted);}
+body.design-heute:is(.hxs-flutlicht,.hxs-graphit):not(.mx-inband) #mxBar .mx-seg button:hover:not(.on){color:var(--hx-og);background:color-mix(in srgb,var(--hx-og) 10%,transparent);}
+/* ══ Hintergrund: patterns and gradients on the page ground ══
+   Drawn in the page's own text colour at a few percent, so every pattern
+   works on light and dark grounds alike. */
+body.design-heute.hxb-verlauf{--hx-page-img:linear-gradient(170deg,transparent 0%,color-mix(in srgb,var(--hx-nav) 24%,transparent) 100%);--hx-page-att:fixed;}
+body.design-heute.hxb-licht{--hx-page-img:radial-gradient(900px 520px at 100% 0%,color-mix(in srgb,var(--hx-yellow) 26%,transparent),transparent 70%),radial-gradient(800px 600px at 0% 100%,color-mix(in srgb,var(--hx-blue) 16%,transparent),transparent 70%);--hx-page-att:fixed;}
+body.design-heute.hxb-rasen{--hx-page-img:repeating-linear-gradient(90deg,color-mix(in srgb,var(--hx-og) 5%,transparent) 0 72px,transparent 72px 144px);}
+body.design-heute.hxb-netz{--hx-page-img:repeating-linear-gradient(45deg,color-mix(in srgb,var(--hx-og) 8%,transparent) 0 1px,transparent 1px 18px),repeating-linear-gradient(-45deg,color-mix(in srgb,var(--hx-og) 8%,transparent) 0 1px,transparent 1px 18px);}
+body.design-heute.hxb-punkte{--hx-page-img:radial-gradient(color-mix(in srgb,var(--hx-og) 16%,transparent) 1.2px,transparent 1.7px);--hx-page-size:20px 20px;}
+body.design-heute.hxb-feld{--hx-page-img:radial-gradient(circle at 50% 50%,transparent 0 147px,color-mix(in srgb,var(--hx-og) 9%,transparent) 148px 150px,transparent 151px),linear-gradient(90deg,transparent calc(50% - 1px),color-mix(in srgb,var(--hx-og) 9%,transparent) calc(50% - 1px) calc(50% + 1px),transparent calc(50% + 1px)),radial-gradient(circle at 50% 50%,color-mix(in srgb,var(--hx-og) 14%,transparent) 0 4px,transparent 5px);--hx-page-att:fixed;}
+/* the settings picker for the background */
+.hxb-pv{position:relative;display:block;height:58px;border-radius:9px;border:1px solid var(--hx-line);background-color:var(--hx-page);overflow:hidden;}
+.hxb-pv::after{content:'';position:absolute;left:30%;top:22%;width:40%;height:56%;border-radius:5px;background:var(--hx-card);box-shadow:0 1px 3px rgba(0,0,0,.15);}
+.hxb-pv.b-verlauf{background-image:linear-gradient(170deg,transparent 0%,color-mix(in srgb,var(--hx-nav) 24%,transparent) 100%);}
+.hxb-pv.b-licht{background-image:radial-gradient(120px 70px at 100% 0%,color-mix(in srgb,var(--hx-yellow) 30%,transparent),transparent 75%),radial-gradient(110px 80px at 0% 100%,color-mix(in srgb,var(--hx-blue) 18%,transparent),transparent 75%);}
+.hxb-pv.b-rasen{background-image:repeating-linear-gradient(90deg,color-mix(in srgb,var(--hx-og) 7%,transparent) 0 12px,transparent 12px 24px);}
+.hxb-pv.b-netz{background-image:repeating-linear-gradient(45deg,color-mix(in srgb,var(--hx-og) 12%,transparent) 0 1px,transparent 1px 8px),repeating-linear-gradient(-45deg,color-mix(in srgb,var(--hx-og) 12%,transparent) 0 1px,transparent 1px 8px);}
+.hxb-pv.b-punkte{background-image:radial-gradient(color-mix(in srgb,var(--hx-og) 22%,transparent) 1px,transparent 1.4px);background-size:7px 7px;}
+.hxb-pv.b-feld{background-image:radial-gradient(circle at 50% 50%,transparent 0 17px,color-mix(in srgb,var(--hx-og) 16%,transparent) 18px 19px,transparent 20px),linear-gradient(90deg,transparent calc(50% - .5px),color-mix(in srgb,var(--hx-og) 16%,transparent) calc(50% - .5px) calc(50% + .5px),transparent calc(50% + .5px));}
+.hxb-pv.b-feld::after,.hxb-pv.b-licht::after{left:62%;width:30%;}
 </style>
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -5904,7 +6006,7 @@ const APP_VERSION_LABEL='1.1.2';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792069148520; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792072798142; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.1.2',date:'15.10.2026',title:'Anwesenheit als Matrix',items:[
     {icon:'🗓️',title:'Tabelle nach Kalenderwochen',desc:'Die Anwesenheit ist nach Kalenderwochen gruppiert, diese Woche ist gelb markiert, das nächste Spiel blau. Ältere Wochen sind je zu einer Spalte zusammengefasst (z. B. 2/3 = zweimal da von drei); ein Klick öffnet die Woche wieder.'},
@@ -5913,6 +6015,7 @@ const APP_CHANGELOG=[
     {icon:'📱',title:'Handy: Ansicht „Spieler“',desc:'In der Anwesenheit oben „Termine | Spieler“: jeder Spieler mit seinen letzten 10 Terminen als Balken, sortierbar nach „Schwächste zuerst“, Position oder Nummer.'},
     {icon:'🏠',title:'Übersicht',desc:'„Diese Woche“ zeigt am Computer alle sieben Tage mit Kalenderwoche, freie Tage in einer schmalen Zeile. Als Titel steht das Thema des Trainings bzw. der Gegner, darunter die Uhrzeit; vergangene Termine haben ein Häkchen und die Zahl der Anwesenden, „–/18“ heißt: noch nicht erfasst. Von Freitag bis Sonntag zeigt die Karte daneben die laufende Woche („KW … bisher“). Steht am Wochenende das Spiel oben, zeigt die Karte darunter das nächste Training hell (dunkel bleibt dem Spiel), mit „Wer kommt?“ und dem Trainingsplan. Neu unter „Im Blick“: wer die Belastung heute noch nicht bewertet hat.'},
     {icon:'↔️',title:'Navigation einklappen',desc:'Am Computer lässt sich die Seitennavigation mit dem Doppelpfeil unten neben der Glocke auf Symbole verkleinern; so hat die Tabelle mehr Platz.'},
+    {icon:'🎨',title:'Darstellung zum Ausprobieren',desc:'Einstellungen → Darstellung hat jetzt drei Auswahlen: Farbschema (neu: Nebel, Flutlicht und Graphit — die beiden letzten mit dunklem Hintergrund und hellen Karten), Menüs (dunkel wie die Navigation, getönt oder hell — Standard ist jetzt dunkel) und Hintergrund (schlicht, Verlauf, Abendlicht oder ein leises Muster: Rasen, Netz, Punkte, Mittelkreis). Alles lässt sich frei kombinieren und gilt nur für dieses Gerät. Das Menü beim Antippen einer vergangenen Zelle in der Anwesenheit ist neu gestaltet.'},
     {icon:'📋',title:'Auswahllisten und Menüs',desc:'Aufklappende Listen (z. B. Mannschaft und Saison in der Statistik, Zeitraum, Formation, Ort) öffnen am Computer ein Menü im Stil der App statt der Systemliste, mit Häkchen und Tastatur (Pfeile, Enter, Esc, Anfangsbuchstabe). Alle Felder haben denselben Pfeil. Auch die Menüs für Mannschaft, Saison, Benutzer und Benachrichtigungen sind jetzt hell und einheitlich. Auf dem Handy bleibt die gewohnte Systemauswahl.'},
     {icon:'☑️',title:'Spieler auswählen',desc:'Die Mehrfach-Auswahl ist aus der Anwesenheit nach Kader → Spieler umgezogen: „Auswählen“, Spieler antippen, dann „In andere Mannschaft“ oder „Löschen“ — etwa beim Saisonwechsel. Die Position für viele auf einmal zu ändern gibt es nicht mehr; sie wird im Spielerprofil geändert.'},
     {icon:'🧭',title:'Kopfzeilen',desc:'Am Computer stehen Suche und Filter der Anwesenheit, die Reiter Tafel/Spieler/Trainer im Kader und „Spieleransicht“ im Wochenbericht in der dunklen Kopfzeile; Tabelle und Tafel beginnen dadurch weiter oben. Ist das Fenster zu schmal, bleibt die Filterleiste unter der Kopfzeile. „Ältere Wochen zusammenfassen“ steht unter „Ansicht“.'},
@@ -11547,11 +11650,15 @@ function cellOpenMenu(pi,si,cell){
   if(!canEdit())return;
   const menu=document.getElementById('cellStMenu');
   if(!menu)return;
-  // Build menu content
-  menu.innerHTML=
-    `<div onclick="event.stopPropagation();setCellStatus(${pi},${si},1)" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.85);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">\u2705 <span>Anwesend</span></div>`+
-    `<div onclick="event.stopPropagation();setCellStatus(${pi},${si},0)" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.85);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">\u274c <span>Fehlend</span></div>`+
-    `<div onclick="event.stopPropagation();setCellStatus(${pi},${si},2)" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.85);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">\ud83d\udccb <span>Entschuldigt</span></div>`;
+  // a second click on the same cell closes the menu
+  const key=pi+':'+si;
+  if(menu.style.display==='block'&&menu._key===key){menu.style.display='none';return;}
+  menu._key=key;
+  const D=cd();const p=D&&D.players&&D.players[pi],s=D&&D.sessions&&D.sessions[si];
+  const cur=(p&&p.s&&si<p.s.length)?p.s[si]:3;
+  const nm=p?((typeof getDisplayName==='function'?getDisplayName(p):p.name)||''):'';
+  menu.innerHTML=`<div class="ssx-menu-h">${escapeHtml(nm)}${s&&s.date?' · '+escapeHtml(s.date):''}</div>`
+    +[1,0,2].map(v=>{const mt=SS_ATT_META[v];return `<button type="button" class="ssx-menu-i${v===cur?' on':''}" onclick="event.stopPropagation();setCellStatus(${pi},${si},${v})"><span class="ssa-st ${mt.cls}">${mt.i}</span>${mt.n}</button>`;}).join('');
   // Position near cell (clamped/flipped by the shared helper)
   menu.style.display='block';
   _placePopup(menu,cell.getBoundingClientRect(),{gap:3});
@@ -12397,7 +12504,7 @@ document.addEventListener('click',(e)=>{
 });
 
 // ── Appearance settings ──
-const APPEARANCE_DEFAULTS={hxScheme:'',fontScale:1,animations:true,compact:true,pushEnabled:false};
+const APPEARANCE_DEFAULTS={hxScheme:'',hxMenu:'',hxBg:'',fontScale:1,animations:true,compact:true,pushEnabled:false};
 // Colour schemes of the trainer app. '' = Hell (white cards).
 const HX_SCHEMES=[
   ['','Hell','#0E2350','#E8EDF5','#FFFFFF'],
@@ -12405,7 +12512,14 @@ const HX_SCHEMES=[
   ['himmel','Himmel','#1650A8','#C5D4EC','#EAF0FA'],
   ['rasen','Rasen','#123D2B','#C3D2C6','#EAF0EB'],
   ['schiefer','Schiefer','#23272F','#C4C8CE','#EBECEE'],
+  ['nebel','Nebel','#2C3A52','#D6DCE4','#F0F2F5'],
+  ['flutlicht','Flutlicht','#0A1834','#1C2E54','#EEF2F8'],
+  ['graphit','Graphit','#14171D','#2A2E36','#ECEEF1'],
 ];
+// Menu colour (pop-up menus): '' = Dunkel (navigation colour)
+const HX_MENUS=[['','Dunkel','d'],['tint','Getönt','t'],['light','Hell','l']];
+// Page background: '' = plain
+const HX_BGS=[['','Schlicht'],['verlauf','Verlauf'],['licht','Abendlicht'],['rasen','Rasen'],['netz','Netz'],['punkte','Punkte'],['feld','Mittelkreis']];
 
 function getAppearance(){
   try{
@@ -12434,6 +12548,9 @@ function applyAppearance(){
   document.body.classList.toggle('design-kabine',hx); // light table layer
   HX_SCHEMES.forEach(x=>{if(x[0])document.body.classList.remove('hxs-'+x[0]);});
   if(hx&&s.hxScheme&&HX_SCHEMES.some(x=>x[0]===s.hxScheme))document.body.classList.add('hxs-'+s.hxScheme);
+  document.body.classList.toggle('hxm-tint',hx&&s.hxMenu==='tint');
+  document.body.classList.toggle('hxm-light',hx&&s.hxMenu==='light');
+  HX_BGS.forEach(x=>{if(x[0])document.body.classList.toggle('hxb-'+x[0],hx&&s.hxBg===x[0]);});
   if(typeof hxApplyDesign==='function')try{hxApplyDesign();}catch(e){}
   _syncThemeColor(hx);
   document.body.classList.toggle('no-anim',!s.animations);
@@ -12451,6 +12568,16 @@ function _syncThemeColor(hx){
 function setHxScheme(v){
   const s=getAppearance();
   s.hxScheme=HX_SCHEMES.some(x=>x[0]===v)?v:'';
+  saveAppearance(s);applyAppearance();updateAppearanceUI();
+}
+function setHxBg(v){
+  const s=getAppearance();
+  s.hxBg=HX_BGS.some(x=>x[0]===v)?v:'';
+  saveAppearance(s);applyAppearance();updateAppearanceUI();
+}
+function setHxMenu(v){
+  const s=getAppearance();
+  s.hxMenu=HX_MENUS.some(x=>x[0]===v)?v:'';
   saveAppearance(s);applyAppearance();updateAppearanceUI();
 }
 function _hxSchemeCur(s){
@@ -12482,6 +12609,16 @@ function resetAppearance(){
 }
 function updateAppearanceUI(){
   const s=getAppearance();
+  const mg=document.getElementById('hxMenuGrid');
+  if(mg){
+    const cm=HX_MENUS.some(x=>x[0]===s.hxMenu)?s.hxMenu:'';
+    mg.innerHTML=HX_MENUS.map(x=>`<button type="button" class="hxs-sw${x[0]===cm?' on':''}" aria-pressed="${x[0]===cm}" onclick="setHxMenu('${x[0]}')"><span class="hxm-pv ${x[2]}" aria-hidden="true"><i></i><i></i><i></i></span><span class="hxs-nm">${x[1]}</span></button>`).join('');
+  }
+  const bg=document.getElementById('hxBgGrid');
+  if(bg){
+    const cb=HX_BGS.some(x=>x[0]===s.hxBg)?s.hxBg:'';
+    bg.innerHTML=HX_BGS.map(x=>`<button type="button" class="hxs-sw${x[0]===cb?' on':''}" aria-pressed="${x[0]===cb}" onclick="setHxBg('${x[0]}')"><span class="hxb-pv${x[0]?' b-'+x[0]:''}" aria-hidden="true"></span><span class="hxs-nm">${x[1]}</span></button>`).join('');
+  }
   const hg=document.getElementById('hxSchemeGrid');
   if(hg){
     const cur=_hxSchemeCur(s);
@@ -32141,10 +32278,24 @@ _pubCleanupSchedule();
 <div class="setting-row hxv-row hxv-block">
     <div>
       <div class="setting-label">🎨 Farbschema</div>
-      <div class="setting-sub">Farben für Menü, Hintergrund und Karten. Gilt nur für dieses Gerät.</div>
+      <div class="setting-sub">Farben für Navigation, Hintergrund und Karten. Gilt nur für dieses Gerät.</div>
     </div>
   </div>
   <div class="hxs-grid hxv-grid" id="hxSchemeGrid"></div>
+<div class="setting-row hxv-row hxv-block">
+    <div>
+      <div class="setting-label">Menüs</div>
+      <div class="setting-sub">Farbe der aufklappenden Menüs und Listen: dunkel wie die Navigation, getönt oder hell.</div>
+    </div>
+  </div>
+  <div class="hxm-grid hxv-grid" id="hxMenuGrid"></div>
+<div class="setting-row hxv-row hxv-block">
+    <div>
+      <div class="setting-label">Hintergrund</div>
+      <div class="setting-sub">Fläche hinter den Karten: schlicht, mit Verlauf oder mit einem leisen Muster.</div>
+    </div>
+  </div>
+  <div class="hxm-grid hxv-grid" id="hxBgGrid"></div>
   <div class="setting-row">
     <div>
       <div class="setting-label">🔠 Schriftgröße</div>
@@ -32897,7 +33048,7 @@ _pubCleanupSchedule();
 
 <!-- Global dropdown for editing past-session status in main table.
      Single popup, positioned near the clicked cell on demand. -->
-<div id="cellStMenu" style="display:none;position:fixed;z-index:600;background:var(--surface-dark);border:1px solid rgba(255,255,255,.2);border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.4);overflow:hidden;min-width:150px;"></div>
+<div id="cellStMenu" class="ssx-menu cst-menu" style="display:none;"></div>
 
 <!-- Trainer activity (admin only): who is online, who was when -->
 <div class="hx-act" id="hxActivity" role="dialog" aria-label="Aktivität der Trainer" hidden></div>
