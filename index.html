@@ -3570,13 +3570,40 @@ body.design-heute .hx-a-last .hx-bar.cur i{background:var(--hx-blue);}
 body.design-heute .hx-a-last .hx-link{margin-top:auto;}
 /* week + flags */
 body.design-heute .hx-a-week,body.design-heute .hx-a-flags{gap:2px;}
-/* free days in the week list: one quiet line each ("Mo 12  Kein Termin"),
-   so all seven days fit beside the hero without making the row taller */
-body.design-heute .hx-day.rest{padding-top:2px;padding-bottom:2px;}
-body.design-heute .hx-day.rest .hx-day-d{flex-direction:row;align-items:baseline;justify-content:center;gap:4px;}
-body.design-heute .hx-day.rest .hx-day-d b{font-size:.98rem;color:#8A96AD;}
-body.design-heute .hx-day.rest .hx-day-d small{color:#8A96AD;}
-body.design-heute .hx-day.rest .hx-day-t{font-weight:500;font-size:.84rem;color:#8A96AD;}
+/* ── Diese Woche ──
+   One date format for every day ("Di 13" on the title's line), so the day
+   numbers stand on one axis. Free days are one quiet line, done sessions are
+   muted with a tick. Quiet tones are mixed from the scheme's muted colour,
+   so they stay readable in every Farbschema. */
+body.design-heute .hx-h2row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:0 0 4px;}
+body.design-heute .hx-grid .hx-h2row .hx-h2{margin:0;}
+body.design-heute .hx-h2row .hx-meta{font-size:.86rem;font-weight:600;}
+body.design-heute .hx-a-week{--hx-quiet:color-mix(in srgb,var(--hx-muted) 90%,var(--hx-card));--hx-quiet2:color-mix(in srgb,var(--hx-muted) 72%,var(--hx-card));}
+body.design-heute .hx-day.rest .hx-day-d small{color:var(--hx-quiet);}
+body.design-heute .hx-day.rest .hx-day-d b{color:var(--hx-quiet2);}
+body.design-heute .hx-day.rest .hx-day-t{font-weight:500;font-size:.84rem;color:var(--hx-quiet);}
+body.design-heute .hx-day.empty.today,body.design-heute .hx-day.empty.today .hx-day-t{color:var(--hx-ink2);}
+body.design-heute .hx-a-week .hx-day.past .hx-day-t{color:var(--hx-muted);}
+body.design-heute .hx-a-week .hx-day-n > span[aria-hidden]{display:inline-flex;align-items:baseline;gap:5px;}
+body.design-heute .hx-a-week .hx-day-n.done{color:var(--hx-muted);}
+body.design-heute .hx-a-week .hx-day-n.done svg{align-self:center;color:#2E8B5E;}
+body.design-heute .hx-a-week .hx-day-n.todo{color:var(--hx-quiet2);}
+.hx-vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+@media(min-width:768px){
+  body.design-heute .hx-a-week .hx-day{align-items:baseline;}
+  body.design-heute .hx-a-week .hx-day:not(.empty){padding-top:5px;padding-bottom:5px;}
+  body.design-heute .hx-a-week .hx-day-d{flex-direction:row;align-items:baseline;justify-content:flex-start;gap:5px;width:46px;}
+  body.design-heute .hx-a-week .hx-day-d small{width:18px;text-align:right;flex-shrink:0;}
+  body.design-heute .hx-a-week .hx-day-d b{font-size:1.25rem;}
+  body.design-heute .hx-a-week .hx-day.empty .hx-day-d b{font-size:1.05rem;}
+  body.design-heute .hx-a-week .hx-day.rest{padding-top:1px;padding-bottom:1px;}
+  body.design-heute .hx-a-week .hx-day.empty.today{padding-top:4px;padding-bottom:4px;}
+  body.design-heute .hx-a-week .hx-day.empty.today .hx-day-t{font-weight:600;font-size:.88rem;}
+}
+/* keyboard focus on the Heute screens: one ring — blue on the light cards,
+   yellow on navy (navigation, header band, match card) */
+body.design-heute :is(.hx-day,.hx-flag,.hx-chip,.hx-btn,.hx-link,.hx-lg,.hx-att-n,.hx-tile):focus-visible{outline:2px solid var(--hx-blue);outline-offset:2px;}
+body.design-heute :is(#hxNav,.hx-dark,.hx-top,.hx-mtop) :is(button,a,select):focus-visible{outline:2px solid var(--hx-yellow);outline-offset:2px;}
 /* a match in the week list: kind and time in the match colour */
 body.design-heute .hx-day-s.m{color:#B5651D;font-weight:600;}
 body.design-heute .hx-a-flags .hx-flag:last-of-type{border-bottom:none;}
@@ -3603,6 +3630,12 @@ body.design-heute .hx-wrap{container:hxw / inline-size;}
   body.design-heute .hx-a-week .hx-day{gap:10px;}
   body.design-heute .hx-a-week .hx-day-t{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.15;font-size:.88rem;hyphens:auto;-webkit-hyphens:auto;overflow-wrap:anywhere;}
   body.design-heute .hx-a-week .hx-day-n{font-size:1rem;}
+  /* the narrow column keeps the title whole: tighter date, no tick */
+  body.design-heute .hx-a-week .hx-day{gap:8px;padding-left:6px;padding-right:6px;}
+  body.design-heute .hx-a-week .hx-day-d{width:36px;gap:3px;}
+  body.design-heute .hx-a-week .hx-day-d small{width:15px;}
+  body.design-heute .hx-a-week .hx-day-d b{font-size:1.1rem;}
+  body.design-heute .hx-a-week .hx-day-n.done svg{display:none;}
 }
 @container hxw (max-width:683px){
   body.design-heute .hx-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"hero hero" "match last" "week flags";}
@@ -5732,14 +5765,14 @@ const APP_VERSION_LABEL='1.1.2';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792029631024; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792030597449; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.1.2',date:'15.10.2026',title:'Anwesenheit als Matrix',items:[
     {icon:'🗓️',title:'Tabelle nach Kalenderwochen',desc:'Die Anwesenheit ist nach Kalenderwochen gruppiert, diese Woche ist gelb markiert, das nächste Spiel blau. Ältere Wochen sind je zu einer Spalte zusammengefasst (z. B. 2/3 = zweimal da von drei); ein Klick öffnet die Woche wieder.'},
     {icon:'🔎',title:'Suche und Filter',desc:'Über der Tabelle: Spieler suchen, nur Trainings oder nur Spiele, Zeitraum (ganze Saison, letzte 4 Wochen, nur vergangene, nur kommende), dazu „+ Training“ und „+ Spiel“.'},
     {icon:'📊',title:'Saison-Quote',desc:'Neben jedem Namen steht die Anwesenheit in der Saison; ein Klick auf „Saison“ sortiert, die Schwächsten zuerst.'},
     {icon:'📱',title:'Handy: Ansicht „Spieler“',desc:'In der Anwesenheit oben „Termine | Spieler“: jeder Spieler mit seinen letzten 10 Terminen als Balken, sortierbar nach „Schwächste zuerst“, Position oder Nummer.'},
-    {icon:'🏠',title:'Übersicht',desc:'„Diese Woche“ zeigt am Computer alle sieben Tage, freie Tage blass. Als Titel steht das Thema des Trainings bzw. der Gegner, darunter die Uhrzeit. Neu unter „Im Blick“: wer die Belastung heute noch nicht bewertet hat.'},
+    {icon:'🏠',title:'Übersicht',desc:'„Diese Woche“ zeigt am Computer alle sieben Tage mit Kalenderwoche, freie Tage in einer schmalen Zeile. Als Titel steht das Thema des Trainings bzw. der Gegner, darunter die Uhrzeit; vergangene Termine haben ein Häkchen und die Zahl der Anwesenden, „–/18“ heißt: noch nicht erfasst. Von Freitag bis Sonntag zeigt die Karte daneben die laufende Woche („KW … bisher“). Neu unter „Im Blick“: wer die Belastung heute noch nicht bewertet hat.'},
     {icon:'↔️',title:'Navigation einklappen',desc:'Am Computer lässt sich die Seitennavigation mit dem Doppelpfeil unten neben der Glocke auf Symbole verkleinern; so hat die Tabelle mehr Platz.'},
     {icon:'💻',title:'Laptops mit Skalierung',desc:'Auf Laptops mit 125 % Anzeigeskalierung passen Navigation und Übersicht wieder ohne Scrollen auf den Bildschirm; freie Tage in „Diese Woche“ stehen dafür in einer schmalen Zeile.'},
   ]},
@@ -22364,7 +22397,6 @@ function hxRender(){
     if(isM)btns+=`<button type="button" class="hx-btn" onclick="openLineupPlanner(${fi})">Aufstellung planen</button>`;
     else if(s.planLink)btns+=`<a class="hx-btn" href="${esc(s.planLink)}" target="_blank" rel="noopener">Trainingsplan</a>`;
     if(!isM&&typeof _tplHomeBtn==='function')btns+=_tplHomeBtn(fi);
-    if(roll)btns+=`<button type="button" class="hx-btn" onclick="openSessFromMain(${fi})">Wer ist da?</button>`;
     html+=`<section class="hx-card hx-a-hero" aria-label="Nächster Termin">
       <div class="hx-hero-head">${_hxDateTile(sk(s),isM)}
         <div class="hx-hero-tx">
@@ -22406,9 +22438,9 @@ function hxRender(){
     const d=(now.p!=null&&prev&&prev.p!=null)?now.p-prev.p:null;
     const vals=weeks.map(w=>w.p).filter(v=>v!=null);
     const lo=vals.length?Math.min(...vals):0,hi=vals.length?Math.max(...vals):100;
-    html+=`<section class="hx-card hx-a-last" aria-label="Letzte Woche">
-      <span class="hx-meta">${off===0?'Diese Woche':'Letzte Woche'} · KW ${esc(String(now.kw))}</span>
-      <div class="hx-big"><b>${now.p==null?'–':now.p+'%'}</b>${d==null?'':`<span class="hx-delta ${d>0?'up':d<0?'down':'flat'}">${d>0?'+':''}${d} zur Vorwoche</span>`}</div>
+    html+=`<section class="hx-card hx-a-last" aria-label="${off===0?'Laufende Woche':'Letzte Woche'}">
+      <span class="hx-meta">${off===0?'KW '+esc(String(now.kw))+' bisher':'Letzte Woche · KW '+esc(String(now.kw))}</span>
+      <div class="hx-big"><b>${now.p==null?'–':now.p+'%'}</b>${d==null?'':`<span class="hx-delta ${off===0?'flat':d>0?'up':d<0?'down':'flat'}">${d>0?'+':''}${d} zur Vorwoche</span>`}</div>
       <div class="hx-bars" role="img" aria-label="Anwesenheit der letzten Wochen">${weeks.map(w=>`<div class="hx-bar${w.cur?' cur':''}" title="KW ${w.kw}: ${w.p==null?'–':w.p+' %'}"><s style="flex:${w.p==null?100:100-w.p}"></s><em>${w.p==null?'–':w.p}</em><i style="flex:${w.p==null?0:w.p}"></i><span>${w.kw}</span></div>`).join('')}</div>
       <button type="button" class="hx-link" onclick="openWeekReport()">Wochenbericht öffnen</button>
     </section>`;
@@ -22417,7 +22449,7 @@ function hxRender(){
   const b=_dbWeekBounds(0);
   const days=[];
   for(let i=0;i<7;i++){const d=new Date(b.monday);d.setDate(b.monday.getDate()+i);days.push(d);}
-  html+=`<section class="hx-card hx-a-week" aria-label="Diese Woche"><h3 class="hx-h2">Diese Woche</h3>`;
+  html+=`<section class="hx-card hx-a-week" aria-label="Diese Woche"><div class="hx-h2row"><h3 class="hx-h2">Diese Woche</h3><span class="hx-meta">KW ${_dbIsoWeek(b.monday)}</span></div>`;
   days.forEach(d=>{
     const dk=d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
     const list=[];S.forEach((s,si)=>{if(s&&s.date&&sk(s)===dk)list.push(si);});
@@ -22437,9 +22469,12 @@ function hxRender(){
       const t=isM?(s.label||kind):(s.focus||kind);
       // a training is the default and needs no word; a match says so (orange)
       const sub=[isM?kind:'',s.time||'',isT?'heute':''].filter(Boolean).join(' · ');
-      // One format: present (held) or confirmed (upcoming) of all
-      const n=(held?c.present:c.yes)+'/'+c.total;
-      html+=`<button type="button" class="hx-day${isT?' today':''}${held&&!isT?' past':''}" onclick="openSessFromMain(${si})"><span class="hx-day-d"><small>${esc(dow)}</small><b>${d.getDate()}</b></span><span class="hx-day-x"><span class="hx-day-t">${esc(t)}</span><span class="hx-day-s${isM?' m':''}">${esc(sub)}</span></span><span class="hx-day-n">${esc(n)}</span></button>`;
+      // One format: present (held, with a tick) or confirmed (upcoming) of
+      // all. Held but nothing entered yet reads "–/18", not "0/18" (nobody came).
+      const todo=held&&c.present===0;
+      const n=(todo?'–':(held?c.present:c.yes))+'/'+c.total;
+      const tip=todo?'Anwesenheit noch nicht erfasst':held?c.present+' von '+c.total+' anwesend':c.yes+' von '+c.total+' zugesagt';
+      html+=`<button type="button" class="hx-day${isT?' today':''}${held&&!isT?' past':''}" onclick="openSessFromMain(${si})"><span class="hx-day-d"><small>${esc(dow)}</small><b>${d.getDate()}</b></span><span class="hx-day-x"><span class="hx-day-t">${esc(t)}</span><span class="hx-day-s${isM?' m':''}">${esc(sub)}</span></span><span class="hx-day-n${held&&!todo?' done':''}${todo?' todo':''}" title="${esc(tip)}"><span class="hx-vh">${esc(tip)}</span><span aria-hidden="true">${held&&!todo?hxIcon('check',13):''}${esc(n)}</span></span></button>`;
     });
   });
   html+=`</section>`;
