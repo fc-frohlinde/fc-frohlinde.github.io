@@ -456,6 +456,9 @@ body.compact .toolbar{padding:3px 14px !important;}
 .lbl{font-size:.64rem;font-weight:700;letter-spacing:1px;color:var(--gd);text-transform:uppercase;}
 .li{display:flex;align-items:center;gap:3px;font-size:.7rem;color:var(--gd);font-weight:500;}
 .ldot{width:11px;height:11px;border-radius:3px;display:inline-block;flex-shrink:0;}
+.ldwk{background:#FFF3CC;box-shadow:inset 0 0 0 1px #F2C230;}.ldnm{background:#E6EEFB;box-shadow:inset 0 -3px 0 #1659B8;}
+body:not(:has(#mainTable.mx)) .lg-mx{display:none;}
+body.design-kabine .legend-pop .ldq{background:transparent;border:1.5px dashed #AEBBD1;}
 .lda{background:var(--cp);}.ldf{background:var(--ca);}.lde{background:var(--ce);}.ldq{background:#ccc;border:1px solid var(--gm);}.ldm{background:#3b82c4;}
 .lhint{margin-left:auto;font-size:.66rem;color:var(--gm);font-style:italic;}
 
@@ -3567,20 +3570,13 @@ body.design-heute .hx-a-last .hx-bar.cur i{background:var(--hx-blue);}
 body.design-heute .hx-a-last .hx-link{margin-top:auto;}
 /* week + flags */
 body.design-heute .hx-a-week,body.design-heute .hx-a-flags{gap:2px;}
-/* free days in the week list: one quiet line */
-body.design-heute .hx-day.rest{padding-top:1px;padding-bottom:1px;}
-body.design-heute .hx-day.rest .hx-day-d{flex-direction:row;align-items:baseline;justify-content:center;gap:4px;}
-body.design-heute .hx-day.rest .hx-day-d b{font-size:1rem;color:#8A96AD;}
+/* free days in the week list: same layout as the other rows, only quieter */
+body.design-heute .hx-day.rest{padding-top:3px;padding-bottom:3px;}
+body.design-heute .hx-day.rest .hx-day-d b{font-size:1.1rem;color:#8A96AD;}
 body.design-heute .hx-day.rest .hx-day-d small{color:#8A96AD;}
-body.design-heute .hx-day.rest .hx-day-t{font-weight:500;font-size:.84rem;color:#8A96AD;}
-/* the rest of the week after the date: one line beside the search on a wide
-   screen; on a tablet the week card beside the session already says it */
-body.design-heute .hx-wsum{font-weight:500;}
-@media(min-width:768px){
-  body.design-heute .hx-top .hx-hello{flex:1 1 0;min-width:0;}
-  body.design-heute .hx-top .hx-date{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-}
-@media(max-width:1180px){body.design-heute .hx-wsum{display:none;}}
+body.design-heute .hx-day.rest .hx-day-t{font-weight:500;font-size:.86rem;color:#8A96AD;}
+/* a match in the week list: kind and time in the match colour */
+body.design-heute .hx-day-s.m{color:#B5651D;font-weight:600;}
 body.design-heute .hx-a-flags .hx-flag:last-of-type{border-bottom:none;}
 /* The grid follows the width it actually gets (an open panel narrows the
    start screen), not the window: container queries on .hx-wrap. */
@@ -3592,36 +3588,25 @@ body.design-heute .hx-wrap{container:hxw / inline-size;}
   body.design-heute .hx-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(230px,.95fr);gap:14px;}
   body.design-heute .hx-hero-head .hx-btns{min-width:140px;}
   body.design-heute .hx-a-match .hx-btns{flex-wrap:wrap;gap:8px;}
-  body.design-heute .hx-a-match .hx-btn{height:40px;}
-  body.design-heute .hx-a-match .hx-mpre{display:none;}
+  body.design-heute .hx-a-match .hx-btn{height:40px;padding:0 10px;font-size:.88rem;}
+  /* narrow week column: the title may take two lines instead of being cut */
+  body.design-heute .hx-a-week .hx-day{gap:10px;}
+  body.design-heute .hx-a-week .hx-day-t{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.15;font-size:.88rem;hyphens:auto;-webkit-hyphens:auto;overflow-wrap:anywhere;}
+  body.design-heute .hx-a-week .hx-day-n{font-size:1rem;}
 }
 @container hxw (max-width:683px){
   body.design-heute .hx-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"hero hero" "match last" "week flags";}
 }
 @container hxw (max-width:459px){
-  body.design-heute .hx-grid{grid-template-columns:minmax(0,1fr);grid-template-areas:"hero" "match" "week" "last" "flags";gap:14px;}
+  body.design-heute .hx-grid{grid-template-columns:minmax(0,1fr);grid-template-areas:"hero" "match" "week" "flags" "last";gap:14px;}
   body.design-heute .hx-hero-head{grid-template-columns:auto minmax(0,1fr);gap:14px;}
   body.design-heute .hx-hero-head .hx-btns{grid-column:1 / -1;flex-direction:row;min-width:0;}
   body.design-heute .hx-hero-head .hx-btn{flex:1 1 0;}
 }
 @media(max-width:767px){
-  body.design-heute .hx-grid{grid-template-columns:minmax(0,1fr);grid-template-areas:"hero" "week" "match" "flags" "last";gap:14px;}
-  /* Phone: the start screen should read at a glance — the open names sit
-     behind "n offen" in the legend, the week is a row of tiles */
-  body.design-heute .hx-a-hero .hx-open{display:none;}
+  body.design-heute .hx-grid{grid-template-columns:minmax(0,1fr);grid-template-areas:"hero" "match" "week" "flags" "last";gap:14px;}
+  /* phone: the week lists only days with something on (and today) */
   body.design-heute .hx-day.rest{display:none;}
-  body.design-heute .hx-a-week{display:flex;flex-direction:row;flex-wrap:wrap;gap:8px;background:none !important;box-shadow:none !important;padding:0 !important;border-radius:0;}
-  body.design-heute .hx-a-week > .hx-h2{flex:1 0 100%;margin:0 0 -2px;color:var(--hx-ink);}
-  body.design-heute .hx-a-week .hx-day{flex:0 1 calc((100% - 16px)/3);width:auto;flex-direction:column;align-items:flex-start;gap:3px;padding:11px 12px;border-radius:16px;background:var(--hx-card);box-shadow:var(--hx-shadow);min-width:0;}
-  body.design-heute .hx-a-week .hx-day.today{background:#FFF3CC;}
-  body.design-heute .hx-a-week .hx-day-d{width:auto;align-items:flex-start;}
-  body.design-heute .hx-a-week .hx-day-d b{font-size:1.6rem;}
-  body.design-heute .hx-a-week .hx-day-x{width:100%;}
-  body.design-heute .hx-a-week .hx-day-t{font-size:.86rem;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.2;}
-  body.design-heute .hx-a-week .hx-day-s{font-size:.76rem;}
-  body.design-heute .hx-a-week .hx-day-n{font-size:1rem;margin-top:auto;}
-  /* the week tiles right below say the same */
-  body.design-heute .hx-wsum{display:none;}
   body.design-heute .hx-hero-head{grid-template-columns:auto minmax(0,1fr);gap:14px;}
   body.design-heute .hx-hero-head .hx-btns{grid-column:1 / -1;flex-direction:row;min-width:0;}
   body.design-heute .hx-hero-head .hx-btn{flex:1 1 0;}
@@ -4524,7 +4509,6 @@ body.design-kabine #mainTable.mx tfoot td.mx-pct{font-size:.95rem;}
 .kb-leg i.open{background:#C9D3E3;}
 .kb-lu{flex:0 0 auto;height:44px;padding:0 18px;border-radius:12px;border:none;background:var(--hx-yellow);color:#0E2350;font:700 .92rem 'Barlow',sans-serif;cursor:pointer;}
 .kb-lu:hover{filter:brightness(.96);}
-.kb-lu-s{display:none;}
 .kb-sum{display:none;}
 .kb-board{position:relative;border-radius:18px;overflow:hidden;background:#2E7D46;}
 .kb-pitch{position:absolute;inset:0;width:100%;height:100%;display:block;}
@@ -4572,11 +4556,10 @@ body.design-kabine #mainTable.mx tfoot td.mx-pct{font-size:.95rem;}
 @media (max-width:1100px){.kb-cols{gap:10px;padding:12px;}.kb-card{grid-template-columns:22px minmax(0,1fr);padding:7px 8px;gap:3px 6px;}.kb-nr{font-size:1.1rem;}.kb-dots{display:none;}}
 @media (max-width:767px){
   .kb-top{gap:10px;}
-  .kb-days{margin:0 -2px;}
-  .kb-head{flex-basis:180px;}
-  .kb-lu{height:38px;padding:0 14px;font-size:.86rem;margin-left:auto;}
-  .kb-lu-l{display:none;}
-  .kb-lu-s{display:inline;}
+  .kb-days{margin:0;}
+  body.design-heute #tab-tafel.tpanel.active{flex:0 0 auto;overflow:visible;}
+  body.design-heute #tab-tafel #kbBoard{flex:0 0 auto;overflow:visible;}
+  .kb-lu{width:100%;}
   /* Phone: a small pitch with the four lines as the summary, the lists below */
   .kb-sum{display:grid;grid-template-columns:.8fr 1fr 1fr 1fr;gap:6px;padding:10px;border-radius:14px;
     background:linear-gradient(90deg,rgba(255,255,255,.07) 0 25%,transparent 25% 50%,rgba(255,255,255,.07) 50% 75%,transparent 75%),#2E7D46;}
@@ -5124,6 +5107,8 @@ if(window._fbBlocked){
   <div class="li"><span class="ldot lde"></span>Entschuldigt (E)</div>
   <div class="li"><span class="ldot ldm"></span>Angemeldet (M)</div>
   <div class="li"><span class="ldot ldq"></span>Ausstehend (?)</div>
+  <div class="li lg-mx"><span class="ldot ldwk"></span>Diese Woche</div>
+  <div class="li lg-mx"><span class="ldot ldnm"></span>Nächstes Spiel</div>
   <div class="legend-pop-hint">Name oder Datum antippen → Details<br>Zelle antippen → Status ändern</div>
 </div>
 
@@ -5715,14 +5700,14 @@ const APP_VERSION_LABEL='1.1.2';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792022433932; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792025400428; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.1.2',date:'15.10.2026',title:'Anwesenheit als Matrix',items:[
     {icon:'🗓️',title:'Tabelle nach Kalenderwochen',desc:'Die Anwesenheit ist nach Kalenderwochen gruppiert, diese Woche ist gelb markiert, das nächste Spiel blau. Ältere Wochen sind je zu einer Spalte zusammengefasst (z. B. 2/3 = zweimal da von drei); ein Klick öffnet die Woche wieder.'},
     {icon:'🔎',title:'Suche und Filter',desc:'Über der Tabelle: Spieler suchen, nur Trainings oder nur Spiele, Zeitraum (ganze Saison, letzte 4 Wochen, nur vergangene, nur kommende), dazu „+ Training“ und „+ Spiel“.'},
     {icon:'📊',title:'Saison-Quote',desc:'Neben jedem Namen steht die Anwesenheit in der Saison; ein Klick auf „Saison“ sortiert, die Schwächsten zuerst.'},
     {icon:'📱',title:'Handy: Ansicht „Spieler“',desc:'In der Anwesenheit oben „Termine | Spieler“: jeder Spieler mit seinen letzten 10 Terminen als Balken, sortierbar nach „Schwächste zuerst“, Position oder Nummer.'},
-    {icon:'🏠',title:'Übersicht',desc:'„Diese Woche“ zeigt alle sieben Tage, auf dem Handy als Kacheln direkt unter dem nächsten Termin. Neben dem Datum steht, was diese Woche noch ansteht.'},
+    {icon:'🏠',title:'Übersicht',desc:'„Diese Woche“ zeigt am Computer alle sieben Tage, freie Tage blass. Als Titel steht das Thema des Trainings bzw. der Gegner, darunter die Uhrzeit. Neu unter „Im Blick“: wer die Belastung heute noch nicht bewertet hat.'},
     {icon:'↔️',title:'Navigation einklappen',desc:'Am Computer lässt sich die Seitennavigation unten mit „Einklappen“ auf Symbole verkleinern; so hat die Tabelle mehr Platz.'},
   ]},
   {version:'1.1.1',date:'14.10.2026',title:'Kader-Tafel',items:[
@@ -10847,7 +10832,7 @@ function mxHead(){
     }
     const s=c.it.s,si=c.it.si,isMat=s.type==='match',isNext=si===nextIdx;
     const parts=s.date.split(' ');const dow=parts[0]||'';const dmy=parts[1]||s.date;
-    r2+=`<th class="dth${isMat?' match-col':''}${isNext?' next-col':''}"${dm?` data-mx="${dm}"`:''} data-wk="${c.w.wk}" onclick="openSessFromMain(${si})">`;
+    r2+=`<th class="dth${isMat?' match-col':''}${isNext?' next-col':''}"${dm?` data-mx="${dm}"`:''} data-wk="${c.w.wk}"${si===MX._nm?' title="Nächstes Spiel"':''} onclick="openSessFromMain(${si})">`;
     const isToday=c.it.k===todaySK();
     r2+=`<span class="ddow">${isMat?'⚽':''} ${isToday?'<b class="dtoday">heute</b>':dow}</span>`;
     r2+=`<span class="dnum">${dmy}</span>`;
@@ -10860,12 +10845,38 @@ function mxHead(){
   // After opening or closing a week that week stays in view; otherwise the
   // next session, as in the plain table
   const fw=MX._focus;MX._focus=null;
-  if(fw!=null||nextIdx>=0){
+  if(fw!=null){
     setTimeout(()=>{
-      const t=fw!=null?document.querySelector(`#tHead tr.mx-r2 th[data-wk="${fw}"]`):document.querySelector('#tHead th.next-col');
+      const t=document.querySelector(`#tHead tr.mx-r2 th[data-wk="${fw}"]`);
       if(t)t.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
     },100);
+    return;
   }
+  // Start position: only when the view changes (not on every sync), or the
+  // table still sits at its left edge
+  const key=[UI.currentTeam,UI.currentSeason,MX.type,MX.range,MX.fold].join('|');
+  const wrap=document.getElementById('tableWrap');
+  if(key!==MX._scrollKey||(wrap&&wrap.scrollLeft===0)){MX._scrollKey=key;setTimeout(_mxScrollHome,100);}
+}
+// Last week and this week start right after the frozen columns; if the next
+// session would then be off to the right, this week starts there instead, and
+// failing that the next session is brought to the right edge.
+function _mxScrollHome(){
+  const wrap=document.getElementById('tableWrap'),c3=document.querySelector('#tHead th.c3'),M=MX._m;
+  if(!wrap||!c3||!M||!wrap.offsetParent)return;
+  const wr=wrap.getBoundingClientRect(),edge=c3.getBoundingClientRect().right;
+  const vis=wrap.clientWidth-(edge-wr.left);
+  const ths=[...document.querySelectorAll('#tHead tr.mx-r2 th[data-wk]')];
+  const first=wk=>ths.find(th=>+th.dataset.wk===wk);
+  const at=th=>wrap.scrollLeft+(th.getBoundingClientRect().left-edge);
+  const next=document.querySelector('#tHead tr.mx-r2 th.next-col');
+  const fits=(th,left)=>!th||(at(th)-left)+th.offsetWidth<=vis;
+  const a=first(_mxAdd(M.tm,-7))||first(M.tm)||next;
+  if(!a)return;
+  let left=at(a);
+  if(!fits(next,left)){const cur=first(M.tm);if(cur)left=at(cur);}
+  if(!fits(next,left))left=at(next)+next.offsetWidth-vis+8;
+  wrap.scrollTo({left:Math.max(0,Math.round(left)),behavior:'smooth'});
 }
 function _mxCell(p,pi,c,ro){
   const si=c.it.si,s=c.it.s,dm=_mxDm(c),dma=dm?` data-mx="${dm}"`:'';
@@ -22250,22 +22261,6 @@ function _hxGreeting(){
   const n=_hxFirstName();
   return n?g+', '+n:g;
 }
-// What is still on this week, in one line after the date: "heute 18:30
-// Training · Sonntag 13:00 Spiel gegen BSV Schüren". Nothing left this week →
-// the next session.
-function _hxWeekSummary(D){
-  const S=(D&&D.sessions)||[];const t=todaySK();
-  const b=_dbWeekBounds(0),sun=new Date(b.monday);sun.setDate(sun.getDate()+6);
-  const end=sun.getFullYear()*10000+(sun.getMonth()+1)*100+sun.getDate();
-  const day=k=>{const r=_hxRel(k);return (r==='heute'||r==='morgen')?r:_hxDate(k).toLocaleDateString('de-DE',{weekday:'long'});};
-  const what=s=>s.type==='match'?(s.label?'Spiel gegen '+s.label:'Spiel'):'Training';
-  const item=(s,k)=>[day(k),s.time||'',what(s)].filter(Boolean).join(' ');
-  const up=S.map((s,i)=>({s,i,k:(s&&s.date)?dispToSortKey(s.date):0})).filter(x=>x.s&&x.k>=t).sort((a,b2)=>a.k-b2.k||String(a.s.time||'').localeCompare(String(b2.s.time||'')));
-  const wk=up.filter(x=>x.k<=end);
-  if(wk.length){const l=wk.slice(0,3).map(x=>item(x.s,x.k));if(wk.length>3)l.push('+'+(wk.length-3));return l.join(' · ');}
-  if(up.length){const x=up[0];const d=_hxDate(x.k);return 'nächster Termin: '+d.toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'numeric'})+(x.s.time?' '+x.s.time:'')+' '+what(x.s);}
-  return '';
-}
 function hxRender(){
   const el=document.getElementById('hxHome');if(!el)return;
   const D=cd();
@@ -22292,9 +22287,8 @@ function hxRender(){
   const sk=s=>(s&&s.date)?dispToSortKey(s.date):99999999;
   const fi=findNext();
   const mi=findNextMatchIdx();
-  const wsum=_hxWeekSummary(D);
   let html=`<div class="hx-heroimg" aria-hidden="true"></div><div class="hx-wrap">${mtop}
-    <div class="hx-top"><div class="hx-hello"><span class="hx-date">${esc(dateTxt)}${wsum?`<span class="hx-wsum"><span class="hx-wsep" aria-hidden="true"> · </span>${esc(wsum)}</span>`:''}</span><h1 class="hx-h1">${esc(_hxGreeting())}</h1></div>
+    <div class="hx-top"><div class="hx-hello"><span class="hx-date">${esc(dateTxt)}</span><h1 class="hx-h1">${esc(_hxGreeting())}</h1></div>
     <span class="hx-top-r"><button type="button" class="hx-search" onclick="openSearch()">${hxIcon('search',18)}Spieler oder Termin suchen</button></span></div>
     <div class="hx-grid">`;
   // ── Focus: the next session ──
@@ -22338,7 +22332,7 @@ function hxRender(){
         <div class="hx-btns">${btns}</div></div>
       ${att}`;
     if(c.openList.length){
-      html+=`<div class="hx-divider hx-open"><span class="hx-sub-h">${roll?'Noch nicht erfasst':'Noch keine Antwort'} (${c.openList.length})</span><div class="hx-chips">`
+      html+=`<div class="hx-divider"><span class="hx-sub-h">${roll?'Noch nicht erfasst':'Noch keine Antwort'} (${c.openList.length})</span><div class="hx-chips">`
         +c.openList.slice(0,8).map(({p,pi})=>`<button type="button" class="hx-chip" onclick="openPlayerFromMain(${pi})"><i>${esc(String(p.nr||'·'))}</i>${esc(nm(p))}</button>`).join('')
         +(c.openList.length>8?`<button type="button" class="hx-chip" onclick="openSessFromMain(${fi});_ssxFocus(${roll?4:3})">+${c.openList.length-8}</button>`:'')
         +`</div></div>`;
@@ -22394,10 +22388,15 @@ function hxRender(){
     }
     list.forEach(si=>{
       const s=S[si],c=_hxCounts(D,si,season),held=sessTookPlace(s,season);
-      const t=(s.type==='match'?'Spiel'+(s.label?' · '+s.label:''):'Training'+(s.focus?' · '+s.focus:''));
+      // The specific part is the title (topic / opponent) — a narrow column
+      // used to cut it off after "Training ·"; kind and time go below
+      const isM=s.type==='match',kind=isM?'Spiel':'Training';
+      const t=isM?(s.label||kind):(s.focus||kind);
+      // a training is the default and needs no word; a match says so (orange)
+      const sub=[isM?kind:'',s.time||'',isT?'heute':''].filter(Boolean).join(' · ');
       // One format: present (held) or confirmed (upcoming) of all
       const n=(held?c.present:c.yes)+'/'+c.total;
-      html+=`<button type="button" class="hx-day${isT?' today':''}${held&&!isT?' past':''}" onclick="openSessFromMain(${si})"><span class="hx-day-d"><small>${esc(dow)}</small><b>${d.getDate()}</b></span><span class="hx-day-x"><span class="hx-day-t">${esc(t)}</span><span class="hx-day-s">${esc(s.time||'')}${isT?' · heute':''}</span></span><span class="hx-day-n">${esc(n)}</span></button>`;
+      html+=`<button type="button" class="hx-day${isT?' today':''}${held&&!isT?' past':''}" onclick="openSessFromMain(${si})"><span class="hx-day-d"><small>${esc(dow)}</small><b>${d.getDate()}</b></span><span class="hx-day-x"><span class="hx-day-t">${esc(t)}</span><span class="hx-day-s${isM?' m':''}">${esc(sub)}</span></span><span class="hx-day-n">${esc(n)}</span></button>`;
     });
   });
   html+=`</section>`;
@@ -22450,7 +22449,7 @@ function hxRender(){
   if(!flags.length)html+=`<div class="hx-ok">Alles im grünen Bereich.</div>`;
   else{
     // Four rows keep the start screen on one page; the rest on demand
-    const cap=(innerWidth>=768&&innerWidth<=1180)?3:innerWidth<768?4:innerHeight>=1000?6:innerHeight>=860?5:4;
+    const cap=(innerWidth>=768&&innerWidth<=1180)?3:4;
     const lim=window._hxFlagsAll?flags.length:cap;
     html+=flags.slice(0,lim).map(f=>`<button type="button" class="hx-flag" onclick="${f.on}"><span class="hx-dot" style="background:${f.dot}"></span><span class="hx-flag-x"><b>${esc(f.who)}</b><span>${esc(f.what)}</span></span></button>`).join('')
       +(flags.length>cap?`<button type="button" class="hx-link" style="padding:8px 6px 0;" onclick="window._hxFlagsAll=!window._hxFlagsAll;hxRender();">${window._hxFlagsAll?'Weniger anzeigen':'Alle '+flags.length+' anzeigen'}</button>`:'');
@@ -23008,7 +23007,7 @@ function kbRender(){
       :[['ok',c.yes,'zugesagt'],['warn',c.exc,'entschuldigt'],['bad',c.no,'abgesagt'],['open',c.open,'offen']];
     head=`<div class="kb-head"><div class="kb-ttl">${e(what)}</div><div class="kb-meta">${e(when)}</div>
       <div class="kb-leg">${parts.filter(p=>p[1]).map(p=>`<span><i class="${p[0]}"></i><b>${p[1]}</b> ${p[2]}</span>`).join('')}</div></div>
-      ${m&&ed?`<button type="button" class="kb-lu" onclick="kbLineup()" title="Aufstellung aus Zusagen"><span class="kb-lu-l">Aufstellung aus Zusagen</span><span class="kb-lu-s">Aufstellen</span></button>`:''}`;
+      ${m&&ed?`<button type="button" class="kb-lu" onclick="kbLineup()">Aufstellung aus Zusagen</button>`:''}`;
   }else head=`<div class="kb-head"><div class="kb-ttl">Keine kommenden Termine</div><div class="kb-meta">Die Tafel zeigt den Kader nach Linien.</div></div>`;
   const sum=lines.map((l,i)=>`<button type="button" onclick="kbScroll(${i})"><b>${s?cnt(l,'ok'):l.list.length}<small>${s?'/'+l.list.length:''}</small></b><span>${e(l.name)}</span></button>`).join('');
   host.innerHTML=`<div class="kb-top">${ups.length?`<div class="kb-days" role="group" aria-label="Termin wählen">${days}</div>`:''}${head}</div>
