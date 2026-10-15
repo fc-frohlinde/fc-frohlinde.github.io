@@ -3570,11 +3570,13 @@ body.design-heute .hx-a-last .hx-bar.cur i{background:var(--hx-blue);}
 body.design-heute .hx-a-last .hx-link{margin-top:auto;}
 /* week + flags */
 body.design-heute .hx-a-week,body.design-heute .hx-a-flags{gap:2px;}
-/* free days in the week list: same layout as the other rows, only quieter */
-body.design-heute .hx-day.rest{padding-top:3px;padding-bottom:3px;}
-body.design-heute .hx-day.rest .hx-day-d b{font-size:1.1rem;color:#8A96AD;}
+/* free days in the week list: one quiet line each ("Mo 12  Kein Termin"),
+   so all seven days fit beside the hero without making the row taller */
+body.design-heute .hx-day.rest{padding-top:2px;padding-bottom:2px;}
+body.design-heute .hx-day.rest .hx-day-d{flex-direction:row;align-items:baseline;justify-content:center;gap:4px;}
+body.design-heute .hx-day.rest .hx-day-d b{font-size:.98rem;color:#8A96AD;}
 body.design-heute .hx-day.rest .hx-day-d small{color:#8A96AD;}
-body.design-heute .hx-day.rest .hx-day-t{font-weight:500;font-size:.86rem;color:#8A96AD;}
+body.design-heute .hx-day.rest .hx-day-t{font-weight:500;font-size:.84rem;color:#8A96AD;}
 /* a match in the week list: kind and time in the match colour */
 body.design-heute .hx-day-s.m{color:#B5651D;font-weight:600;}
 body.design-heute .hx-a-flags .hx-flag:last-of-type{border-bottom:none;}
@@ -3583,6 +3585,14 @@ body.design-heute .hx-a-flags .hx-flag:last-of-type{border-bottom:none;}
 body.design-heute .hx-wrap{container:hxw / inline-size;}
 @media(min-width:768px) and (max-width:1180px){
   body.design-heute .hx-wrap{padding-bottom:12px;}
+}
+/* short windows (a 1080p laptop at 125 % scaling is about 1536×730): a
+   little less air, so both rows of cards fit without scrolling */
+@media(min-width:768px) and (max-height:820px){
+  body.design-heute .hx-wrap{gap:14px;padding-bottom:12px;}
+  body.design-heute .hx-grid{gap:14px;}
+  body.design-heute .hx-grid > .hx-card{padding-top:16px;padding-bottom:16px;}
+  body.design-heute .hx-a-last .hx-bars{min-height:96px;margin-bottom:8px;}
 }
 @container hxw (max-width:884px){
   body.design-heute .hx-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(230px,.95fr);gap:14px;}
@@ -4085,6 +4095,26 @@ body.design-heute.hx-navmin{--hx-navw:72px;}
 .hx-bell-dot{position:absolute;top:9px;right:10px;width:8px;height:8px;border-radius:50%;background:var(--hx-yellow);display:none;}
 .hx-bell-dot.on{display:block;}
 .hx-fold-nav svg{transition:transform .2s;}
+/* the fold toggle sits in the user row beside the bell, so it costs no extra row */
+.hx-user .hx-fold-nav{width:32px;flex-shrink:0;color:#AFC0E0;}
+#hxNav .hx-user{gap:2px;}
+.hx-user-role{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+/* short windows (a 1080p laptop at 125–150 % scaling): a tighter nav that
+   still fits without scrolling */
+@media(min-width:768px) and (max-height:820px){
+  body.design-heute #hxNav{padding-top:14px;padding-bottom:10px;gap:2px;}
+  body.design-heute #hxNav .hx-club{padding-bottom:10px;}
+  body.design-heute #hxNav .hx-crest{width:40px;height:40px;}
+  body.design-heute #hxNav .hx-ctx{margin-bottom:10px;}
+  body.design-heute #hxNav .hx-ctx button{min-height:36px;padding-top:6px;padding-bottom:6px;}
+  body.design-heute #hxNav .hx-item{min-height:40px;padding-top:8px;padding-bottom:8px;}
+  body.design-heute #hxNav .hx-item.sub{min-height:36px;padding-top:6px;padding-bottom:6px;}
+  body.design-heute #hxNav .hx-fill{min-height:8px;}
+  body.design-heute #hxNav .hx-user{margin-top:4px;padding-top:8px;}
+  body.design-heute #hxNav :is(.hx-user-btn,.hx-bell){min-height:40px;height:40px;}
+  body.design-heute.hx-navmin #hxNav .hx-ctx button{min-height:28px;padding-top:3px;padding-bottom:3px;}
+  body.design-heute.hx-navmin #hxNav .hx-user .hx-bell{min-height:36px;height:36px;}
+}
 /* collapsed: icons only */
 body.hx-navmin #hxNav{padding:16px 10px 12px;}
 body.hx-navmin .hx-club{justify-content:center;padding:0 0 12px;}
@@ -4096,6 +4126,7 @@ body.hx-navmin .hx-item{justify-content:center;gap:0;padding:10px 0;position:rel
 body.hx-navmin .hx-item > span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
 body.hx-navmin .hx-fold-nav svg{transform:rotate(180deg);}
 body.hx-navmin .hx-user{flex-direction:column;gap:4px;}
+body.hx-navmin .hx-user .hx-fold-nav{width:44px;}
 body.hx-navmin .hx-user-btn{flex:0 0 auto;justify-content:center;padding:4px;}
 body.hx-navmin .hx-user-btn > span:nth-child(2){display:none !important;}
 @media (prefers-reduced-motion:reduce){.hx-fold-nav svg{transition:none;}}
@@ -5043,8 +5074,7 @@ if(window._fbBlocked){
   <button type="button" class="hx-item sub" id="hxActItem" onclick="hxActivity(this,event)" aria-haspopup="true" style="display:none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg><span>Aktivität</span><span class="hx-act-n" id="hxActN"></span></button>
   <button type="button" class="hx-item sub" id="hxLinksItem" onclick="hxLinks(this,event)" aria-haspopup="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.5-1.5"/></svg><span>Links</span></button>
   <button type="button" class="hx-item sub" data-hx="settings" onclick="hxGo('settings')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg><span>Einstellungen</span></button>
-  <button type="button" class="hx-item sub hx-fold-nav" id="hxNavFold" onclick="hxNavFold()" aria-pressed="false" title="Navigation einklappen"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m11 17-5-5 5-5M18 17l-5-5 5-5"/></svg><span>Einklappen</span></button>
-  <div class="hx-user"><button type="button" class="hx-user-btn" onclick="hxUserMenu(this,event)"><span class="hx-av" id="hxUserAv">?</span><span style="display:flex;flex-direction:column;min-width:0;"><span class="hx-user-nm" id="hxUserNm">–</span><span class="hx-user-role" id="hxUserRole"></span></span></button><button type="button" class="hx-bell" aria-label="Benachrichtigungen" onclick="hxNotif(this,event)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span class="hx-bell-dot" id="hxBellDot"></span></button></div>
+  <div class="hx-user"><button type="button" class="hx-user-btn" onclick="hxUserMenu(this,event)"><span class="hx-av" id="hxUserAv">?</span><span style="display:flex;flex-direction:column;min-width:0;"><span class="hx-user-nm" id="hxUserNm">–</span><span class="hx-user-role" id="hxUserRole"></span></span></button><button type="button" class="hx-bell" aria-label="Benachrichtigungen" onclick="hxNotif(this,event)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span class="hx-bell-dot" id="hxBellDot"></span></button><button type="button" class="hx-bell hx-fold-nav" id="hxNavFold" onclick="hxNavFold()" aria-label="Navigation einklappen" title="Navigation einklappen"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m11 17-5-5 5-5M18 17l-5-5 5-5"/></svg></button></div>
 </nav>
 
 <!-- MAIN PAGE -->
@@ -5700,7 +5730,7 @@ const APP_VERSION_LABEL='1.1.2';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792025400428; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792028110671; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.1.2',date:'15.10.2026',title:'Anwesenheit als Matrix',items:[
     {icon:'🗓️',title:'Tabelle nach Kalenderwochen',desc:'Die Anwesenheit ist nach Kalenderwochen gruppiert, diese Woche ist gelb markiert, das nächste Spiel blau. Ältere Wochen sind je zu einer Spalte zusammengefasst (z. B. 2/3 = zweimal da von drei); ein Klick öffnet die Woche wieder.'},
@@ -5708,7 +5738,8 @@ const APP_CHANGELOG=[
     {icon:'📊',title:'Saison-Quote',desc:'Neben jedem Namen steht die Anwesenheit in der Saison; ein Klick auf „Saison“ sortiert, die Schwächsten zuerst.'},
     {icon:'📱',title:'Handy: Ansicht „Spieler“',desc:'In der Anwesenheit oben „Termine | Spieler“: jeder Spieler mit seinen letzten 10 Terminen als Balken, sortierbar nach „Schwächste zuerst“, Position oder Nummer.'},
     {icon:'🏠',title:'Übersicht',desc:'„Diese Woche“ zeigt am Computer alle sieben Tage, freie Tage blass. Als Titel steht das Thema des Trainings bzw. der Gegner, darunter die Uhrzeit. Neu unter „Im Blick“: wer die Belastung heute noch nicht bewertet hat.'},
-    {icon:'↔️',title:'Navigation einklappen',desc:'Am Computer lässt sich die Seitennavigation unten mit „Einklappen“ auf Symbole verkleinern; so hat die Tabelle mehr Platz.'},
+    {icon:'↔️',title:'Navigation einklappen',desc:'Am Computer lässt sich die Seitennavigation mit dem Doppelpfeil unten neben der Glocke auf Symbole verkleinern; so hat die Tabelle mehr Platz.'},
+    {icon:'💻',title:'Laptops mit Skalierung',desc:'Auf Laptops mit 125 % Anzeigeskalierung passen Navigation und Übersicht wieder ohne Scrollen auf den Bildschirm; freie Tage in „Diese Woche“ stehen dafür in einer schmalen Zeile.'},
   ]},
   {version:'1.1.1',date:'14.10.2026',title:'Kader-Tafel',items:[
     {icon:'📋',title:'Kader als Tafel',desc:'Im Kader gibt es den neuen Reiter „Tafel“: die Mannschaft nach Linien (Tor, Abwehr, Mittelfeld, Angriff) für einen Termin. Pro Linie siehst du, wie viele zugesagt haben, pro Spieler den Status und die letzten fünf Termine als Punkte. Oben wählst du den Termin.'},
@@ -22007,9 +22038,8 @@ function _hxNavMinApply(){
   let on=false;try{on=localStorage.getItem(HX_NAVMIN_LS)==='1';}catch(e){}
   document.body.classList.toggle('hx-navmin',on);
   const b=document.getElementById('hxNavFold');
-  if(b){b.setAttribute('aria-pressed',on);b.title=on?'Navigation ausklappen':'Navigation einklappen';const sp=b.querySelector('span');if(sp)sp.textContent=on?'Ausklappen':'Einklappen';}
+  if(b){b.title=on?'Navigation ausklappen':'Navigation einklappen';b.setAttribute('aria-label',b.title);}
   document.querySelectorAll('#hxNav .hx-item').forEach(it=>{
-    if(it.id==='hxNavFold')return;
     const t=((it.querySelector('span')||{}).textContent||'').trim();
     if(on){if(!it.title){it.title=t;it.dataset.autotitle='1';}}
     else if(it.dataset.autotitle){it.removeAttribute('title');delete it.dataset.autotitle;}
@@ -22449,7 +22479,7 @@ function hxRender(){
   if(!flags.length)html+=`<div class="hx-ok">Alles im grünen Bereich.</div>`;
   else{
     // Four rows keep the start screen on one page; the rest on demand
-    const cap=(innerWidth>=768&&innerWidth<=1180)?3:4;
+    const cap=_hxFlagCap();window._hxFlagCapR=cap;
     const lim=window._hxFlagsAll?flags.length:cap;
     html+=flags.slice(0,lim).map(f=>`<button type="button" class="hx-flag" onclick="${f.on}"><span class="hx-dot" style="background:${f.dot}"></span><span class="hx-flag-x"><b>${esc(f.who)}</b><span>${esc(f.what)}</span></span></button>`).join('')
       +(flags.length>cap?`<button type="button" class="hx-link" style="padding:8px 6px 0;" onclick="window._hxFlagsAll=!window._hxFlagsAll;hxRender();">${window._hxFlagsAll?'Weniger anzeigen':'Alle '+flags.length+' anzeigen'}</button>`:'');
@@ -22458,6 +22488,14 @@ function hxRender(){
   el.innerHTML=html;
 }
 
+// "Im Blick": three rows on tablets and short windows, four otherwise
+function _hxFlagCap(){return (innerWidth>=768&&(innerWidth<=1180||innerHeight<=820))?3:4;}
+window.addEventListener('resize',()=>{
+  clearTimeout(window._hxCapT);
+  window._hxCapT=setTimeout(()=>{
+    if(window._hxFlagCapR!==undefined&&_hxFlagCap()!==window._hxFlagCapR&&typeof hxOn==='function'&&hxOn())hxRender();
+  },200);
+});
 function _mobNavSync(active){
   if(typeof hxSyncNav==='function')setTimeout(hxSyncNav,0);
   ['home','list','cal','team','more'].forEach(k=>{
