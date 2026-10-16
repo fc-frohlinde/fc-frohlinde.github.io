@@ -312,9 +312,9 @@ html:has(body.player-mode){background:#080f22;}
 .setting-label{font-size:.85rem;font-weight:600;color:var(--gd);}
 .setting-sub{font-size:.7rem;color:var(--gm);margin-top:2px;}
 .setting-control{display:flex;gap:4px;}
-.seg-btn{padding:5px 10px;border:1.5px solid var(--gl);background:#fff;color:var(--gd);border-radius:6px;cursor:pointer;font-family:'Barlow',sans-serif;font-size:.76rem;transition:all .12s;}
+.seg-btn{padding:5px 10px;border:1.5px solid var(--gl);background:var(--hx-field,#fff);color:var(--gd);border-radius:6px;cursor:pointer;font-family:'Barlow',sans-serif;font-size:.76rem;transition:all .12s;}
 .seg-btn:hover{border-color:var(--bl);}
-.seg-btn.active{background:var(--ac);border-color:var(--ac);color:var(--bd);font-weight:700;}
+.seg-btn.active{background:var(--ac);border-color:var(--ac);color:var(--hx-on-acc,var(--bd));font-weight:700;}
 
 .setting-switch{position:relative;display:inline-block;width:42px;height:22px;}
 .setting-switch input{opacity:0;width:0;height:0;}
@@ -5296,6 +5296,37 @@ body.design-heute.hxb-feld{--hx-page-img:radial-gradient(circle at 50% 50%,trans
 .hxb-pv.b-punkte{background-image:radial-gradient(color-mix(in srgb,var(--hx-og) 22%,transparent) 1px,transparent 1.4px);background-size:7px 7px;}
 .hxb-pv.b-feld{background-image:radial-gradient(circle at 50% 50%,transparent 0 17px,color-mix(in srgb,var(--hx-og) 16%,transparent) 18px 19px,transparent 20px),linear-gradient(90deg,transparent calc(50% - .5px),color-mix(in srgb,var(--hx-og) 16%,transparent) calc(50% - .5px) calc(50% + .5px),transparent calc(50% + .5px));}
 .hxb-pv.b-feld::after,.hxb-pv.b-licht::after{left:62%;width:30%;}
+/* ══ Aussehen: ready-made looks ══
+   Standard (Hell with a page ground a step darker than the cards' inner
+   fills, so the cards stand out), Ruhig (Stahl), Nacht (Flutlicht + dark
+   cards), Automatisch. The single settings sit under "Erweitert". */
+body.design-heute.hxs-hell{--hx-page:#D7DEE9;}
+body.design-heute .setting-sub{color:var(--hx-muted);}
+.hxp-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;padding:4px 0 16px;}
+.hxp-sw .hxs-nm{display:flex;flex-direction:column;gap:1px;font-weight:700;}
+.hxp-sw .hxs-nm small{font-weight:500;font-size:.76rem;color:var(--hx-muted);}
+.hxp-pv{position:relative;display:block;height:74px;border-radius:9px;overflow:hidden;background:var(--g);}
+.hxp-pv > i{position:absolute;left:0;top:0;bottom:0;width:18%;background:var(--n);}
+.hxp-pv > em{position:absolute;left:18%;right:0;top:0;height:30%;background:var(--n);}
+.hxp-pv > b{position:absolute;background:var(--c);border-radius:5px;box-shadow:0 1px 2px rgba(0,0,0,.14);}
+.hxp-pv > b:nth-of-type(1){left:24%;top:17%;width:48%;height:46%;}
+.hxp-pv > b:nth-of-type(2){left:76%;top:17%;width:19%;height:72%;}
+.hxp-pv > b:nth-of-type(3){left:24%;top:68%;width:48%;height:21%;}
+.hxp-pv > b u{position:absolute;left:9%;top:24%;width:44%;height:12%;border-radius:2px;background:var(--t);opacity:.85;}
+.hxp-pv > b u::after{content:'';position:absolute;left:0;top:190%;width:70%;height:100%;border-radius:2px;background:var(--t);opacity:.4;}
+.hxp-pv > b s{position:absolute;right:8%;top:20%;width:24%;height:20%;border-radius:999px;background:#F2C230;}
+.hxp-auto{position:relative;display:block;height:74px;}
+.hxp-auto .hxp-pv{position:absolute;inset:0;height:auto;}
+.hxp-auto .hxp-pv + .hxp-pv{clip-path:polygon(62% 0,100% 0,100% 100%,38% 100%);}
+.hxv-more{display:none;}
+body.design-heute .hxv-more{display:block;border-top:1px solid var(--hx-line);margin:0 0 6px;}
+.hxv-more > summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:12px 2px;font:600 .9rem 'Barlow',sans-serif;color:var(--hx-ink2);}
+.hxv-more > summary::-webkit-details-marker{display:none;}
+.hxv-more > summary::before{content:'';width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);transition:transform .15s;margin:0 3px 0 2px;}
+.hxv-more[open] > summary::before{transform:rotate(45deg);}
+.hxv-more > summary:hover{color:var(--hx-ink);}
+.hxv-more > summary:focus-visible{outline:2px solid var(--hx-blue);outline-offset:2px;border-radius:6px;}
+.hxv-more[open]{padding-bottom:6px;border-bottom:1px solid var(--hx-line);}
 /* ══ Karten (Einstellungen → Darstellung → Karten) ══
    Hell keeps the scheme's cards. Getönt, Dunkel and Tief recolour every
    card-like surface ("islands" below) by pointing the card tokens at --hk-*;
@@ -5399,6 +5430,7 @@ body.design-heute.hxk-dk #mainTable.mx td.mx-wc.h0{background:color-mix(in srgb,
 body.design-heute.hxk-dk.design-kabine thead th{border-bottom-color:color-mix(in srgb,var(--hk-ink) 30%,var(--hk-card));}
 body.design-heute.hxk-dk .bp{color:var(--hx-on-acc);}
 body.design-heute.hxk-dk #mcd-title{color:var(--hk-bad) !important;}
+body.design-heute.hxk-dk button[onclick="resetAppearance()"]{color:var(--hk-bad) !important;background:var(--hk-bad-bg) !important;border-color:color-mix(in srgb,var(--hk-bad) 35%,transparent) !important;}
 body.design-heute.hxk-dk{--hk-nr:#FFD36B;}
 body.design-heute.hxk-dk :is(.ssx-pb:not(.ssx-pb-none),.kb-pb){filter:invert(.9) hue-rotate(180deg) saturate(1.2);}
 body.design-heute.hxk-dk .radio-opt.sel{border-color:var(--hk-warn);background:color-mix(in srgb,var(--hk-warn) 14%,transparent);color:var(--hk-warn);}
@@ -5408,7 +5440,7 @@ body.design-heute.hxk-dk :is(.tpl-tot .under,.tpl-gout b.exc){color:var(--hk-war
 body.design-heute.hxk-dk .tpl-tot .over{color:var(--hk-bad);}
 body.design-heute.hxk-dk .full-table tr:nth-child(even) td{background:color-mix(in srgb,#fff 4%,var(--hk-card));}
 body.design-heute.hxk-dk .full-table tr:hover td{background:var(--hk-card2);}
-body.design-heute.hxk-dk :where(.mob,.set-pane,.tpl-col,.tpl-dlg,.lp-sidebar,.slp-sidebar,.slp-popup,#cal-content,.hx-card,.tpanel) :is(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]),textarea,select){background-color:var(--hk-field);color:var(--hk-ink);border-color:var(--hk-line);}
+body.design-heute.hxk-dk :where(.mob,.set-pane,.tpl-col,.tpl-dlg,.lp-sidebar,.slp-sidebar,.slp-popup,#cal-content,.hx-card,.tpanel) :is(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]),textarea,select){background-color:var(--hk-field);color:var(--hk-ink);border-color:var(--hk-line);color-scheme:dark;}
 body.design-heute.hxk-dk :where(.mob,.set-pane,.tpl-col,.tpl-dlg,.lp-sidebar,.slp-sidebar,.slp-popup,#cal-content,.hx-card,.tpanel) :is(input,textarea)::placeholder{color:var(--hk-muted);opacity:.85;}
 body.design-heute.hxk-dk #ss-plan-btn-wrap .btn{color:#FFE08A !important;}
 body.design-heute.hxk-dk #ss-lineup-btn-wrap .btn{color:var(--hk-ok) !important;}
@@ -6163,7 +6195,7 @@ const APP_VERSION_LABEL='1.1.2';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792077346659; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792108843255; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.1.2',date:'15.10.2026',title:'Anwesenheit als Matrix',items:[
     {icon:'🗓️',title:'Tabelle nach Kalenderwochen',desc:'Die Anwesenheit ist nach Kalenderwochen gruppiert, diese Woche ist gelb markiert, das nächste Spiel blau. Ältere Wochen sind je zu einer Spalte zusammengefasst (z. B. 2/3 = zweimal da von drei); ein Klick öffnet die Woche wieder.'},
@@ -6172,7 +6204,7 @@ const APP_CHANGELOG=[
     {icon:'📱',title:'Handy: Ansicht „Spieler“',desc:'In der Anwesenheit oben „Termine | Spieler“: jeder Spieler mit seinen letzten 10 Terminen als Balken, sortierbar nach „Schwächste zuerst“, Position oder Nummer.'},
     {icon:'🏠',title:'Übersicht',desc:'„Diese Woche“ zeigt am Computer alle sieben Tage mit Kalenderwoche, freie Tage in einer schmalen Zeile. Als Titel steht das Thema des Trainings bzw. der Gegner, darunter die Uhrzeit; vergangene Termine haben ein Häkchen und die Zahl der Anwesenden, „–/18“ heißt: noch nicht erfasst. Von Freitag bis Sonntag zeigt die Karte daneben die laufende Woche („KW … bisher“). Steht am Wochenende das Spiel oben, zeigt die Karte darunter das nächste Training hell (dunkel bleibt dem Spiel), mit „Wer kommt?“ und dem Trainingsplan. Neu unter „Im Blick“: wer die Belastung heute noch nicht bewertet hat.'},
     {icon:'↔️',title:'Navigation einklappen',desc:'Am Computer lässt sich die Seitennavigation mit dem Doppelpfeil unten neben der Glocke auf Symbole verkleinern; so hat die Tabelle mehr Platz.'},
-    {icon:'🎨',title:'Darstellung zum Ausprobieren',desc:'Einstellungen → Darstellung hat jetzt vier Auswahlen: Farbschema (neu: Nebel, Flutlicht, Graphit, Petrol, Bordeaux, Stadion und Mitternacht — Flutlicht, Graphit, Stadion und Mitternacht mit dunklem Hintergrund), Karten (hell wie im Farbschema, getönt, dunkel oder ganz dunkel „Tief“ — gilt für Karten, Tabellen, Fenster und die Leiste unten auf dem Handy), Menüs (dunkel wie die Navigation, getönt oder hell — Standard ist jetzt dunkel) und Hintergrund (schlicht, Verlauf, Abendlicht oder ein leises Muster: Rasen, Netz, Punkte, Mittelkreis). Alles lässt sich frei kombinieren und gilt nur für dieses Gerät; dunkle Karten mit einem dunklen Farbschema ergeben eine komplett dunkle Ansicht. Das Menü beim Antippen einer vergangenen Zelle in der Anwesenheit ist neu gestaltet.'},
+    {icon:'🎨',title:'Aussehen: Standard, Ruhig, Nacht, Automatisch',desc:'Einstellungen → Darstellung bietet jetzt vier fertige Ansichten: Standard (hell; der Hintergrund ist etwas dunkler, damit sich die Karten abheben), Ruhig (graublaue Karten, weniger Weiß), Nacht (alles dunkel, für abends) und Automatisch (hell, wechselt zu Nacht, wenn das Handy oder der Computer auf dunkel steht). Gilt nur für dieses Gerät. Unter „Erweitert“ lassen sich Farbschema, Karten, Menüs und Hintergrund weiter einzeln einstellen. Das Menü beim Antippen einer vergangenen Zelle in der Anwesenheit ist neu gestaltet.'},
     {icon:'📋',title:'Auswahllisten und Menüs',desc:'Aufklappende Listen (z. B. Mannschaft und Saison in der Statistik, Zeitraum, Formation, Ort) öffnen am Computer ein Menü im Stil der App statt der Systemliste, mit Häkchen und Tastatur (Pfeile, Enter, Esc, Anfangsbuchstabe). Alle Felder haben denselben Pfeil. Auch die Menüs für Mannschaft, Saison, Benutzer und Benachrichtigungen sind jetzt hell und einheitlich. Auf dem Handy bleibt die gewohnte Systemauswahl.'},
     {icon:'☑️',title:'Spieler auswählen',desc:'Die Mehrfach-Auswahl ist aus der Anwesenheit nach Kader → Spieler umgezogen: „Auswählen“, Spieler antippen, dann „In andere Mannschaft“ oder „Löschen“ — etwa beim Saisonwechsel. Die Position für viele auf einmal zu ändern gibt es nicht mehr; sie wird im Spielerprofil geändert.'},
     {icon:'🧭',title:'Kopfzeilen',desc:'Am Computer stehen Suche und Filter der Anwesenheit, die Reiter Tafel/Spieler/Trainer im Kader und „Spieleransicht“ im Wochenbericht in der dunklen Kopfzeile; Tabelle und Tafel beginnen dadurch weiter oben. Ist das Fenster zu schmal, bleibt die Filterleiste unter der Kopfzeile. „Ältere Wochen zusammenfassen“ steht unter „Ansicht“.'},
@@ -12661,10 +12693,10 @@ document.addEventListener('click',(e)=>{
 });
 
 // ── Appearance settings ──
-const APPEARANCE_DEFAULTS={hxScheme:'',hxMenu:'',hxBg:'',hxCard:'',fontScale:1,animations:true,compact:true,pushEnabled:false};
+const APPEARANCE_DEFAULTS={hxPreset:'standard',hxScheme:'',hxMenu:'',hxBg:'',hxCard:'',fontScale:1,animations:true,compact:true,pushEnabled:false};
 // Colour schemes of the trainer app. '' = Hell (white cards).
 const HX_SCHEMES=[
-  ['','Hell','#0E2350','#E8EDF5','#FFFFFF'],
+  ['','Hell','#0E2350','#D7DEE9','#FFFFFF'],
   ['stahl','Stahl','#0E2350','#BAC6D8','#E6EBF2'],
   ['himmel','Himmel','#1650A8','#C5D4EC','#EAF0FA'],
   ['rasen','Rasen','#123D2B','#C3D2C6','#EAF0EB'],
@@ -12682,13 +12714,27 @@ const HX_MENUS=[['','Dunkel','d'],['tint','Getönt','t'],['light','Hell','l']];
 // Cards: '' = Hell (the scheme's own cards). Getönt and Dunkel recolour every
 // card-like surface; the page ground stays with the scheme.
 const HX_CARDS=[['','Hell'],['tint','Getönt'],['dark','Dunkel'],['tief','Tief']];
+// Ready-made looks (Einstellungen → Darstellung). Each sets the four fine
+// settings below; "Automatisch" follows the device (light / dark mode).
+// [key, name, hint, settings, preview colours: nav, page, card, text]
+const HX_PRESETS=[
+  ['standard','Standard','Hell und klar',{hxScheme:'',hxCard:'',hxMenu:'',hxBg:''},['#0E2350','#D7DEE9','#FFFFFF','#0E2350']],
+  ['ruhig','Ruhig','Weniger Weiß',{hxScheme:'stahl',hxCard:'',hxMenu:'',hxBg:''},['#0E2350','#BAC6D8','#E6EBF2','#0E2350']],
+  ['nacht','Nacht','Dunkel, für abends',{hxScheme:'flutlicht',hxCard:'dark',hxMenu:'',hxBg:''},['#0A1834','#1C2E54','#2E3F62','#F3F6FB']],
+  ['auto','Automatisch','Wie das Gerät',null,null],
+];
 // Page background: '' = plain
 const HX_BGS=[['','Schlicht'],['verlauf','Verlauf'],['licht','Abendlicht'],['rasen','Rasen'],['netz','Netz'],['punkte','Punkte'],['feld','Mittelkreis']];
 
 function getAppearance(){
   try{
     const raw=localStorage.getItem('appearance');
-    if(raw)return Object.assign({},APPEARANCE_DEFAULTS,JSON.parse(raw));
+    if(raw){
+      const o=JSON.parse(raw)||{};
+      // Saved before the ready-made looks existed: keep a hand-picked combination
+      if(!('hxPreset' in o))o.hxPreset=(o.hxScheme||o.hxCard||o.hxMenu||o.hxBg)?'':'standard';
+      return Object.assign({},APPEARANCE_DEFAULTS,o);
+    }
   }catch(e){}
   return Object.assign({},APPEARANCE_DEFAULTS);
 }
@@ -12704,7 +12750,7 @@ function applyAppearance(){
       history.replaceState(history.state,'',u.pathname+u.search+u.hash);
     }
   }catch(e){}
-  const s=getAppearance();
+  const s=_hxEff(getAppearance());
   // Player screens have their own look — the design layer is for the trainer app.
   const _pl=/[?&](p|player|rpe|rpeteam|team)=/.test(location.search)||document.body.classList.contains('player-mode');
   const hx=!_pl;
@@ -12712,6 +12758,7 @@ function applyAppearance(){
   document.body.classList.toggle('design-kabine',hx); // light table layer
   HX_SCHEMES.forEach(x=>{if(x[0])document.body.classList.remove('hxs-'+x[0]);});
   if(hx&&s.hxScheme&&HX_SCHEMES.some(x=>x[0]===s.hxScheme))document.body.classList.add('hxs-'+s.hxScheme);
+  document.body.classList.toggle('hxs-hell',hx&&!_hxSchemeCur(s));
   document.body.classList.toggle('hxm-tint',hx&&s.hxMenu==='tint');
   document.body.classList.toggle('hxm-light',hx&&s.hxMenu==='light');
   HX_BGS.forEach(x=>{if(x[0])document.body.classList.toggle('hxb-'+x[0],hx&&s.hxBg===x[0]);});
@@ -12731,23 +12778,48 @@ function _syncThemeColor(hx){
   const c=getComputedStyle(document.body).getPropertyValue('--hx-nav').trim();
   if(c&&m.getAttribute('content')!==c)m.setAttribute('content',c);
 }
-function setHxScheme(v){
+// The settings a look stands for; "auto" picks Standard or Nacht by the
+// device's light / dark mode. Without a look the saved fine settings count.
+function _hxEff(s){
+  const p=HX_PRESETS.find(x=>x[0]===s.hxPreset);
+  if(!p)return s;
+  let k=p[0];
+  if(k==='auto')k=(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'nacht':'standard';
+  return Object.assign({},s,HX_PRESETS.find(x=>x[0]===k)[3]);
+}
+// Changing one fine setting leaves the look: start from what is on screen
+function _hxCustom(s){
+  const e=_hxEff(s);
+  s.hxScheme=e.hxScheme;s.hxCard=e.hxCard;s.hxMenu=e.hxMenu;s.hxBg=e.hxBg;s.hxPreset='';
+  return s;
+}
+function setHxPreset(v){
   const s=getAppearance();
+  s.hxPreset=HX_PRESETS.some(x=>x[0]===v)?v:'standard';
+  saveAppearance(s);applyAppearance();updateAppearanceUI();
+}
+try{
+  const _mq=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)');
+  const _f=()=>{if(getAppearance().hxPreset==='auto'){applyAppearance();updateAppearanceUI();}};
+  if(_mq)(_mq.addEventListener?_mq.addEventListener('change',_f):_mq.addListener(_f));
+}catch(e){}
+function setHxScheme(v){
+  const s=_hxCustom(getAppearance());
   s.hxScheme=HX_SCHEMES.some(x=>x[0]===v)?v:'';
   saveAppearance(s);applyAppearance();updateAppearanceUI();
 }
 function setHxBg(v){
-  const s=getAppearance();
+  const s=_hxCustom(getAppearance());
   s.hxBg=HX_BGS.some(x=>x[0]===v)?v:'';
   saveAppearance(s);applyAppearance();updateAppearanceUI();
 }
 function setHxCard(v){
-  const s=getAppearance();
+  const s=_hxCustom(getAppearance());
   s.hxCard=HX_CARDS.some(x=>x[0]===v)?v:'';
   saveAppearance(s);applyAppearance();updateAppearanceUI();
 }
 function setHxMenu(v){
-  const s=getAppearance();
+  const s=_hxCustom(getAppearance());
   s.hxMenu=HX_MENUS.some(x=>x[0]===v)?v:'';
   saveAppearance(s);applyAppearance();updateAppearanceUI();
 }
@@ -12779,7 +12851,17 @@ function resetAppearance(){
   updateAppearanceUI();
 }
 function updateAppearanceUI(){
-  const s=getAppearance();
+  const s0=getAppearance(),s=_hxEff(s0);
+  const pg=document.getElementById('hxPresetGrid');
+  if(pg){
+    const pv=c=>`<span class="hxp-pv" style="--n:${c[0]};--g:${c[1]};--c:${c[2]};--t:${c[3]}" aria-hidden="true"><i></i><em></em><b><u></u><s></s></b><b></b><b></b></span>`;
+    const P=k=>HX_PRESETS.find(x=>x[0]===k)[4];
+    pg.innerHTML=HX_PRESETS.map(x=>{const on=x[0]===s0.hxPreset;
+      const view=x[4]?pv(x[4]):`<span class="hxp-auto" aria-hidden="true">${pv(P('standard'))}${pv(P('nacht'))}</span>`;
+      return `<button type="button" class="hxs-sw hxp-sw${on?' on':''}" aria-pressed="${on}" onclick="setHxPreset('${x[0]}')">${view}<span class="hxs-nm">${x[1]}<small>${x[2]}</small></span></button>`;}).join('');
+  }
+  const more=document.getElementById('hxMore');
+  if(more&&!s0.hxPreset&&!more.dataset.seen){more.open=true;more.dataset.seen='1';}
   const mg=document.getElementById('hxMenuGrid');
   if(mg){
     const cm=HX_MENUS.some(x=>x[0]===s.hxMenu)?s.hxMenu:'';
@@ -32453,8 +32535,17 @@ _pubCleanupSchedule();
       <p class="set-sec-sub">Wird lokal in diesem Browser gespeichert.</p>
 <div class="setting-row hxv-row hxv-block">
     <div>
-      <div class="setting-label">🎨 Farbschema</div>
-      <div class="setting-sub">Farben für Navigation, Hintergrund und Karten. Gilt nur für dieses Gerät.</div>
+      <div class="setting-label">🎨 Aussehen</div>
+      <div class="setting-sub">„Automatisch“ ist hell und wechselt zu „Nacht“, wenn das Gerät auf dunkel steht.</div>
+    </div>
+  </div>
+  <div class="hxp-grid hxv-grid" id="hxPresetGrid"></div>
+<details class="hxv-more" id="hxMore">
+  <summary>Erweitert: Farben einzeln einstellen</summary>
+<div class="setting-row hxv-row hxv-block">
+    <div>
+      <div class="setting-label">Farbschema</div>
+      <div class="setting-sub">Farben für Navigation, Hintergrund und Karten.</div>
     </div>
   </div>
   <div class="hxs-grid hxv-grid" id="hxSchemeGrid"></div>
@@ -32479,6 +32570,7 @@ _pubCleanupSchedule();
     </div>
   </div>
   <div class="hxm-grid hxv-grid" id="hxBgGrid"></div>
+</details>
   <div class="setting-row">
     <div>
       <div class="setting-label">🔠 Schriftgröße</div>
