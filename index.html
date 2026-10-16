@@ -614,38 +614,6 @@ tr:hover .drb{color:var(--gm);}
 
 /* Calendar */
 .cal-wrap{display:flex;flex-direction:column;gap:14px;}
-.cal-month{background:linear-gradient(180deg,rgba(255,255,255,.96),#f5f8fc);border:1px solid var(--gl);border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04);}
-.cal-month-hdr{background:linear-gradient(135deg,var(--surface-mid) 0%,var(--surface-bright) 100%);color:#fff;padding:8px 14px;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--gl);}
-.cal-dow{background:#eef2f8;color:#456;font-size:.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;text-align:center;padding:6px 2px;}
-.cal-day{background:#fff;min-height:90px;padding:5px 6px;display:flex;flex-direction:column;gap:3px;position:relative;font-family:'Barlow',sans-serif;}
-.cal-day.empty{background:#f7f9fc;}
-.cal-day.weekend{background:#f9fafd;}
-.cal-day.today{background:linear-gradient(180deg,color-mix(in srgb,var(--bd) 10%,#fff),#fff);box-shadow:inset 0 0 0 2px var(--bm);}
-.cal-day.past{opacity:.55;}
-.cal-day-num{font-size:.72rem;font-weight:700;color:#234;align-self:flex-start;}
-.cal-day.today .cal-day-num{color:#fff;background:var(--bm);border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;}
-.cal-evt{font-size:.62rem;line-height:1.2;padding:2px 4px;border-radius:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;font-weight:600;}
-.cal-evt-m{background:#ffe0b0;color:#7a3a00;border-left:2px solid #d97a00;}
-.cal-evt-t{background:#cce5ff;color:#003d80;border-left:2px solid #0066cc;}
-.cal-evt-b{background:#ffd6e6;color:#80004d;border-left:2px solid #c71585;font-style:italic;}
-.cal-evt-e{background:#d4f4e0;color:#0a4d2c;border-left:2px solid #1a8c4a;}
-.cal-evt:hover{filter:brightness(.95);}
-/* Calendar action buttons — unified pill style, semantic colors via dot */
-.cal-btn{font-size:.74rem;padding:5px 11px;background:color-mix(in srgb,var(--bd) 5%,#fff);color:var(--gd);border:1px solid color-mix(in srgb,var(--bd) 18%,#fff);border-radius:6px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;transition:background .15s,border-color .15s;font-family:'Barlow',sans-serif;font-weight:600;}
-.cal-btn:hover{background:color-mix(in srgb,var(--bd) 12%,#fff);border-color:color-mix(in srgb,var(--bd) 28%,#fff);}
-/* The colour dots on these buttons repeated what the legend underneath the
-   calendar already explains, and on mobile they competed with the icons for
-   the little width there is. */
-
-.cal-legend{display:flex;gap:14px;flex-wrap:wrap;padding:8px 12px;font-size:.72rem;color:#456;background:#f7f9fc;border-radius:8px;}
-.cal-legend-item{display:flex;align-items:center;gap:5px;}
-.cal-legend-sw{width:16px;height:10px;border-radius:2px;}
-@media (max-width:680px){
-  .cal-day{min-height:55px;padding:2px 3px;}
-  .cal-day-num{font-size:.65rem;}
-  .cal-evt{font-size:.56rem;padding:1px 3px;}
-}
 .mo.open{display:flex;}
 .mob{background:#fff;border-radius:14px;padding:20px 24px;max-width:96vw;box-shadow:0 10px 44px rgba(0,0,0,.25);max-height:92vh;overflow-y:auto;}
 /* Sticky header: keeps close (×) / back buttons visible while scrolling long modals.
@@ -1403,25 +1371,6 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
 .ma-btn.ma-5.dim{background:#c9dcec;color:#6b8aa8;}
 .ma-empty{text-align:center;padding:40px 20px;color:var(--gm);font-size:.8rem;}
 
-/* Mobile calendar list view */
-.cal-section-mob{padding:12px 14px 6px;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1.5px;color:var(--bd);position:sticky;top:0;background:#fff;z-index:2;border-bottom:2px solid var(--ac);}
-.cal-section-mob.cal-section-past{color:var(--gm);border-color:var(--gl);margin-top:14px;}
-.cal-mo-hdr-mob{padding:8px 14px 4px;font-size:.74rem;font-weight:700;color:var(--gm);text-transform:uppercase;letter-spacing:1px;}
-.cal-evt-mob{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--gl);cursor:pointer;transition:background .12s;background:#fff;}
-.cal-evt-mob:hover,.cal-evt-mob:active{background:var(--ow);}
-.cal-evt-mob.today{background:color-mix(in srgb,var(--bd) 7%,#fff);border-left:3px solid var(--bm);}
-.cal-evt-mob-date{flex-shrink:0;width:42px;text-align:center;}
-.cal-evt-mob-day{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;line-height:1;color:var(--bd);}
-.cal-evt-mob-dow{font-size:.6rem;text-transform:uppercase;color:var(--gm);font-weight:700;letter-spacing:.5px;}
-.cal-evt-mob-icon{font-size:1.1rem;flex-shrink:0;}
-.cal-evt-mob-content{flex:1;min-width:0;}
-.cal-evt-mob-title{font-size:.86rem;font-weight:600;color:var(--gd);line-height:1.2;}
-.cal-evt-mob-sub{font-size:.7rem;color:var(--gm);margin-top:2px;}
-.cal-evt-mob-match .cal-evt-mob-day{color:#cc6500;}
-.cal-evt-mob-event .cal-evt-mob-day{color:#1a8758;}
-.cal-evt-mob-birthday .cal-evt-mob-day{color:#7a2db8;}
-.cal-empty-mob{text-align:center;padding:60px 20px;color:var(--gm);font-size:.86rem;}
-
 /* Mobile mode toggle visibility */
 @media (max-width:767px){
   .table-wrap{display:none !important;}
@@ -1540,20 +1489,6 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   .btn{min-height:36px;}
   /* View dropdown wider for thumbs */
   .view-dropdown{min-width:240px;}
-  /* Calendar in modal: take full width with smaller cells */
-  .cal-day{min-height:48px !important;padding:2px !important;}
-  .cal-day-num{font-size:.62rem !important;}
-  .cal-evt{font-size:.5rem !important;padding:1px 2px !important;line-height:1.1;}
-  .cal-month-hdr{font-size:.95rem !important;padding:5px 8px !important;}
-  /* Hide month navigation on mobile - list view shows entire season */
-  .cal-nav{display:none !important;}
-  /* Calendar actions: five icon buttons on ONE row. Labels are dropped on
-     phones (titles keep them discoverable) — a 2-column grid of labelled
-     buttons ate half the screen before the calendar even appeared. */
-  #moCalendar .cb-lbl{display:none;}
-  #moCalendar .mob > div:first-of-type{gap:5px;flex-wrap:nowrap;}
-  #moCalendar .cal-btn{flex:1;min-width:0;justify-content:center;min-height:40px;padding:6px 4px;font-size:1rem;}
-  #moCalendar #cal-ctx{display:none;}
   /* ══ PLANNERS ON PHONES ══════════════════════════════════════
      Both planners were pure desktop: a 230px sidebar next to the pitch,
      a topbar assuming a wide row, and a popup positioned like a tooltip.
@@ -3176,11 +3111,127 @@ body.design-heute :is(#moCalendar,#moDashboard,#moWeekReport) .has-inrow-close h
 body.design-heute .hx-page .mob-close-x{border-radius:999px !important;width:40px !important;height:40px !important;min-width:0 !important;min-height:0 !important;padding:0 !important;background:var(--hx-field);border:1px solid var(--hx-line);color:var(--hx-ink);flex-shrink:0;font-size:.9rem;}
 body.design-heute .hx-page .mob-close-x:hover{border-color:var(--hx-ink2);}
 /* Kalender */
-body.design-heute #moCalendar .cal-btn{border-radius:999px;background:var(--hx-field);border-color:var(--hx-line);color:var(--hx-ink);padding:7px 13px;font-size:.8rem;}
-body.design-heute #moCalendar .cal-btn:hover{border-color:var(--hx-ink2);}
-body.design-heute #moCalendar #cal-ctx{color:var(--hx-muted);font-weight:600;}
-body.design-heute #moCalendar .cal-legend{background:none;padding:0 2px;color:var(--hx-muted);}
 body.design-heute #moCalendar #cal-content{background:var(--hx-card);border-radius:18px;box-shadow:var(--hx-shadow);padding:16px !important;}
+/* ══ Kalender (16.10.) ══
+   Band: title · ‹ Monat › Heute · + Training (gelb) + Spiel + Termin · ⋯.
+   Narrow band (container query): the three add buttons become one "Neu"
+   menu; very narrow: the month switcher takes its own row. Phone: "+" and
+   ⋯ only, the list has no months to switch. */
+body.design-heute #moCalendar .calx-head{container:calxh / inline-size;gap:8px !important;}
+body.design-heute #moCalendar .calx-head h3{flex:0 0 auto !important;margin:0 12px 0 0 !important;}
+.calx-nav{display:flex;align-items:center;gap:6px;}
+.calx-nb{width:36px;height:36px;border-radius:999px;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;flex-shrink:0;}
+.calx-mo{font-family:var(--hx-num);font-weight:800;font-size:1.4rem;line-height:1;min-width:150px;text-align:center;white-space:nowrap;}
+.calx-today{height:36px;padding:0 14px;border-radius:999px;font:600 .84rem 'Barlow',sans-serif;cursor:pointer;margin-left:4px;}
+.calx-sp{flex:1 1 0;min-width:0;}
+.calx-acts,.calx-many{display:flex;align-items:center;gap:8px;}
+.calx-one{display:none !important;}
+.calx-more{width:40px;padding:0 !important;justify-content:center;}
+.calx-ro :is(.calx-many,.calx-one){display:none !important;}
+@container calxh (max-width:880px){
+  .calx-many{display:none !important;}
+  .calx-head:not(.calx-ro) .calx-one,.calx-acts > .calx-one{display:inline-flex !important;}
+}
+@container calxh (max-width:600px){
+  .calx-nav{order:9;width:100%;padding-bottom:14px;}
+}
+@media(min-width:768px){
+  body.design-heute #moCalendar .calx-head :is(.calx-nb,.calx-today){background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);color:#fff;}
+  body.design-heute #moCalendar .calx-head :is(.calx-nb,.calx-today):hover:not(:disabled){background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.35);}
+  body.design-heute #moCalendar .calx-head :is(.calx-nb,.calx-today):disabled{opacity:.38;cursor:default;}
+  body.design-heute #moCalendar .calx-mo{color:#fff;}
+  body.design-heute #moCalendar .calx-head .mx-add:not(.pri){background:transparent;border-color:rgba(255,255,255,.45);color:#fff;}
+  body.design-heute #moCalendar .calx-head .mx-add:not(.pri):hover{background:rgba(255,255,255,.1);}
+  body.design-heute #moCalendar #cal-content{padding:0 !important;display:flex;flex-direction:column;}
+}
+/* the month grid */
+.calx-grid{--calx-wk:#FFF7E0;--calx-quiet:color-mix(in srgb,var(--hx-muted) 55%,var(--hx-card));
+  flex:1 0 auto;display:grid;grid-template-columns:46px repeat(7,minmax(0,1fr));grid-template-rows:auto repeat(var(--calx-rows,5),minmax(88px,1fr));
+  font-family:'Barlow',sans-serif;color:var(--hx-ink);}
+.calx-grid > *{border-bottom:1px solid var(--hx-line);border-right:1px solid var(--hx-line);min-width:0;}
+.calx-grid > :nth-child(8n){border-right:none;}
+.calx-grid > :nth-last-child(-n+8){border-bottom:none;}
+.calx-h{position:sticky;top:0;z-index:2;background:var(--hx-card);padding:12px 10px 8px;font-size:.8rem;font-weight:600;color:var(--hx-muted);border-right-color:transparent !important;}
+.calx-kwh{text-align:center;padding-left:0;padding-right:0;}
+.calx-kw{display:flex;justify-content:center;padding-top:10px;font-size:.8rem;font-weight:600;color:var(--hx-muted);}
+.calx-kw.cur{color:var(--hx-ink);font-weight:800;background:var(--calx-wk);}
+.calx-day{position:relative;display:flex;flex-direction:column;gap:3px;padding:6px 6px 8px;}
+.calx-day.cw{background:var(--calx-wk);}
+.calx-day.can{cursor:pointer;}
+.calx-day.can:hover{background:var(--hx-card2);}
+.calx-dn{font-family:var(--hx-num);font-weight:800;font-size:1.05rem;line-height:24px;height:24px;min-width:24px;padding:0 4px;box-sizing:border-box;align-self:flex-start;text-align:center;border-radius:999px;margin:-1px 0 1px -2px;}
+.calx-day.out .calx-dn{color:var(--calx-quiet);}
+.calx-day.today .calx-dn{background:var(--hx-yellow);color:#0E2350;}
+.calx-add{position:absolute;top:5px;right:5px;width:24px;height:24px;border-radius:999px;border:1px solid var(--hx-line);background:var(--hx-field);color:var(--hx-ink2);
+  display:flex;align-items:center;justify-content:center;padding:0;opacity:0;cursor:pointer;}
+.calx-day.can:hover .calx-add,.calx-add:focus-visible{opacity:1;}
+.calx-add:hover{border-color:var(--hx-ink2);color:var(--hx-ink);}
+@media (hover:none){.calx-add{display:none;}}
+.calx-e{display:flex;flex-direction:column;width:100%;min-width:0;text-align:left;border:none;border-radius:7px;padding:3px 7px 4px;margin:0;
+  font:inherit;color:var(--hx-ink);background:none;cursor:pointer;}
+.calx-e1{display:flex;align-items:baseline;gap:5px;min-width:0;font-size:.8rem;line-height:1.25;white-space:nowrap;}
+.calx-e1 b{font-weight:700;}
+.calx-e1 > span{overflow:hidden;text-overflow:ellipsis;min-width:0;}
+.calx-e2{font-size:.8rem;font-weight:600;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.calx-n{margin-left:auto;padding-left:4px;font-style:normal;font-weight:700;font-size:.76rem;}
+.calx-e.t{background:color-mix(in srgb,var(--hx-blue) 11%,var(--hx-card));box-shadow:inset 3px 0 0 var(--hx-blue);}
+.calx-e.t .calx-e1 > span{color:var(--hx-ink2);}
+.calx-e.m{background:var(--hx-solid,var(--hx-ink));color:var(--hx-on-solid,#fff);}
+.calx-e.e{background:color-mix(in srgb,var(--hx-ok) 12%,var(--hx-card));box-shadow:inset 3px 0 0 var(--hx-ok);}
+.calx-e.e .calx-e1 > span{color:var(--hx-ok);font-weight:600;}
+.calx-e.b{flex-direction:row;align-items:center;gap:5px;padding:1px 4px;font-size:.78rem;font-weight:500;color:var(--hx-muted);white-space:nowrap;}
+.calx-e.b svg{flex-shrink:0;}
+.calx-e.b span{overflow:hidden;text-overflow:ellipsis;}
+.calx-e.past:is(.t,.e){background:var(--hx-card2);box-shadow:inset 3px 0 0 var(--calx-quiet);}
+.calx-e.past:is(.t,.e) :is(.calx-e1,.calx-e2){color:var(--hx-ink2);}
+.calx-e.past .calx-n{color:var(--hx-ok);}
+.calx-e.m .calx-n{color:inherit;opacity:.85;}
+body.design-heute.hxk-dk .calx-grid{--calx-wk:color-mix(in srgb,#fff 5%,var(--hx-card));}
+/* narrow cells (tablet, open panel): time and topic say enough — the kind
+   word goes (blue = Training, navy = Spiel); the full text is the tooltip */
+.calx-grid{container:calxg / inline-size;}
+@container calxg (max-width:860px){
+  .calx-e.has2:is(.t,.m) .calx-e1 > span{display:none;}
+}
+.calx-e.past.m{background:color-mix(in srgb,var(--hx-solid,var(--hx-ink)) 72%,var(--hx-card));}
+.calx-day.out .calx-e{opacity:.55;}
+.calx-e:hover{filter:brightness(.95);}
+body.design-heute.hxk-dk .calx-e:hover{filter:brightness(1.15);}
+.calx-e:focus-visible{outline:2px solid var(--hx-blue);outline-offset:1px;}
+/* menus of the band (Neu, ⋯) — in the menu colour like every menu */
+.calx-menu{position:fixed;z-index:99999;min-width:230px;padding:6px;display:flex;flex-direction:column;gap:1px;font-family:'Barlow',sans-serif;}
+.calx-menu[hidden]{display:none;}
+.calx-mi{display:flex;align-items:center;gap:11px;width:100%;min-height:42px;padding:7px 10px;border:none;border-radius:9px;background:none;color:var(--hx-pop-ink,#fff);font:600 .92rem 'Barlow',sans-serif;text-align:left;cursor:pointer;}
+.calx-mi:hover,.calx-mi:focus-visible{background:var(--hx-pop-hover,rgba(255,255,255,.1));outline:none;}
+.calx-mi svg{flex-shrink:0;color:var(--hx-pop-muted,#B8C4DA);}
+.calx-mi span{display:flex;flex-direction:column;line-height:1.2;}
+.calx-mi small{font-size:.76rem;font-weight:500;color:var(--hx-pop-muted,#B8C4DA);}
+/* phone: the season as a list by week */
+@media(max-width:767px){
+  body.design-heute #moCalendar .calx-nav,body.design-heute #moCalendar .calx-many{display:none !important;}
+  body.design-heute #moCalendar .calx-head h3{flex:1 1 auto !important;}
+  body.design-heute #moCalendar .calx-head:not(.calx-ro) .calx-one{display:inline-flex !important;}
+  body.design-heute #moCalendar .calx-head :is(.calx-one,.calx-more){width:38px;height:38px;padding:0 !important;justify-content:center;border-radius:999px;}
+  body.design-heute #moCalendar .calx-one span{display:none;}
+  body.design-heute #moCalendar .calx-head .calx-more{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.22);color:#fff;}
+  body.design-heute #moCalendar #cal-content.calm-list{background:transparent !important;box-shadow:none !important;border-radius:0 !important;margin:0 !important;padding:6px 12px 18px !important;}
+}
+.calm-more{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin:4px 0 2px;min-height:44px;border-radius:12px;
+  border:1px dashed color-mix(in srgb,var(--hx-og) 35%,transparent);background:none;color:var(--hx-og);font:600 .9rem 'Barlow',sans-serif;cursor:pointer;}
+.calm-more span{font-size:.76rem;font-weight:700;padding:1px 8px;border-radius:999px;background:color-mix(in srgb,var(--hx-og) 12%,transparent);}
+.calm-mo{margin:16px 4px 8px;font:800 1.3rem/1.1 var(--hx-num);color:var(--hx-og);}
+.calm-wk{margin:0 0 12px;}
+.calm-wh{display:flex;align-items:baseline;gap:8px;margin:0 4px 6px;font-size:.84rem;color:var(--hx-og-muted);}
+.calm-wh b{color:var(--hx-og);font-weight:700;}
+.calm-wh i{font-style:normal;font-weight:700;font-size:.74rem;padding:2px 8px;border-radius:999px;background:var(--hx-yellow);color:#0E2350;align-self:center;}
+.calm-card{background:var(--hx-card);border-radius:16px;box-shadow:var(--hx-shadow);padding:4px;}
+.calm-card .calm-r{min-height:52px;}
+.calm-card .hx-day-s.e{color:var(--hx-ok);font-weight:600;}
+.calm-card .calm-bd{min-height:40px;padding-top:4px;padding-bottom:4px;}
+.calm-bdt{display:inline-flex;align-items:center;gap:7px;font-size:.88rem;font-weight:500;color:var(--hx-muted);}
+.calm-bdt svg{flex-shrink:0;}
+.calm-n{color:var(--hx-muted);font-size:1rem;}
+.calm-empty{padding:48px 16px;text-align:center;color:var(--hx-og-muted);font-size:.92rem;}
 /* Statistik */
 body.design-heute #moDashboard .db-sel{border-radius:999px;border:1px solid var(--hx-line);color:var(--hx-ink);min-height:40px;}
 body.design-heute #moDashboard .db-kpi{background:var(--hx-card);border:none;border-radius:16px;box-shadow:var(--hx-shadow);}
@@ -3208,10 +3259,8 @@ body.design-heute #moWeekReport .wr2-pv{border-radius:999px;background:var(--hx-
   body.design-heute :is(#moCalendar,#moDashboard,#moWeekReport) .has-inrow-close h3{color:#fff !important;font-size:1.6rem !important;flex:1 1 auto !important;}
   body.design-heute .hx-page .mob-close-x{position:absolute !important;top:calc(10px + env(safe-area-inset-top,0px)) !important;right:12px !important;width:38px !important;height:38px !important;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff;z-index:3;margin:0 !important;}
   body.design-heute #moSettings .mob-close-x,body.design-heute #moTeamMgr .mob-close-x{position:static !important;}
-  body.design-heute #moCalendar .cal-btn{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff;flex:0 0 34px;width:34px;min-height:34px;height:34px;padding:0;font-size:.9rem;}
   body.design-heute #moCalendar .has-inrow-close{gap:5px !important;flex-wrap:nowrap !important;}
   body.design-heute #moCalendar .has-inrow-close h3{flex:1 1 auto !important;white-space:nowrap;}
-  body.design-heute #moCalendar .cal-legend{margin:10px 14px 0;width:auto !important;}
   body.design-heute #moCalendar #cal-content{margin:10px 12px 12px !important;width:auto !important;border-radius:16px;padding:6px 10px !important;}
   body.design-heute #moDashboard .db-header-actions{width:100%;}
   body.design-heute #moDashboard .db-sel{flex:1;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff;min-height:38px;}
@@ -3294,8 +3343,6 @@ body.design-heute :is(#moCalendar,#moDashboard,#moWeekReport) .mob-close-x{displ
 body.design-heute .set-hx-only{display:block;}
 
 body.design-heute #set-foc-host .note{font-size:.74rem;color:var(--hx-muted);margin:0 0 6px;}
-body.design-heute .cal-att{font-weight:700;color:var(--hx-ok);}
-body.design-heute .cal-evt .cal-att{font-weight:800;color:inherit;opacity:.75;}
 body.design-heute #moDashboard .db-alltab .full-table{width:100%;}
 body.design-heute #moDashboard .db-alltab .full-table thead th{background:var(--hx-ground);color:var(--hx-muted);cursor:pointer;white-space:nowrap;}
 body.design-heute #moDashboard .db-alltab .full-table tbody tr:hover{background:var(--hx-ground);}
@@ -3732,15 +3779,12 @@ body.design-heute.hxs-stahl{--hx-nav:#0E2350;--hx-nav2:#1A3260;--hx-ground:#BAC6
 body.design-heute:not(.theme-dark){--ow:var(--hx-card2);--gl:var(--hx-line);}
 body.design-heute:not(.theme-dark) .mob{background:var(--hx-card);}
 body.design-heute:not(.theme-dark) :is(.ps-sticky,.ss-sticky,.ps-title-row){background:var(--hx-card);}
-body.design-heute:not(.theme-dark) #moCalendar .cal-day{background:var(--hx-card);}
-body.design-heute:not(.theme-dark) #moCalendar .cal-day.empty{background:var(--hx-card2);}
 body.design-heute:not(.theme-dark) :is(.db-sbar,.pse-sbar,.db-sess-cell,.pse-wd-col){background:var(--hx-card2);}
 body.design-heute:not(.theme-dark) #moWeekReport .wr2-sec,body.design-heute:not(.theme-dark) .wr2-grid .wr2-nm{background:var(--hx-card);}
 body.design-heute:not(.theme-dark) .set-link{background:var(--hx-card2);}
 body.design-heute:not(.theme-dark) .page{background:var(--hx-ground);}
 /* On tinted cards the old light-blue secondary text loses contrast */
 body.design-heute.hxs-stahl{--gm:var(--hx-muted);}
-body.design-heute:not(.theme-dark) #moCalendar :is(.cal-evt-mob,.cal-section-mob){background:var(--hx-card);}
 /* Klassisch-only colour rows; the picker replaces them in Heute */
 
 .hxv-grid{display:none;}
@@ -3759,11 +3803,9 @@ body.design-heute .hxv-block{border-bottom:none !important;padding-bottom:4px !i
   /* Kalender, Statistik, Wochenbericht */
   body.design-heute :is(#moCalendar,#moDashboard,#moWeekReport) > .mob > .has-inrow-close{background:var(--hx-nav);margin:-30px -40px 18px !important;padding:22px max(40px,calc(100% - 1080px)) 18px 40px !important;max-width:none !important;width:auto !important;min-height:76px;box-sizing:border-box;}
   body.design-heute :is(#moCalendar,#moDashboard,#moWeekReport) > .mob > .has-inrow-close h3{color:#fff !important;}
-  body.design-heute #moCalendar #cal-ctx,body.design-heute #moWeekReport .wr-head-meta{color:#C9D6EC !important;}
-  body.design-heute #moCalendar .has-inrow-close .cal-btn,
+  body.design-heute #moWeekReport .wr-head-meta{color:#C9D6EC !important;}
   body.design-heute #moWeekReport .has-inrow-close .db-wr-nav button,
   body.design-heute #moDashboard .has-inrow-close .db-sel{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);color:#fff;}
-  body.design-heute #moCalendar .has-inrow-close .cal-btn:hover,
   body.design-heute #moWeekReport .has-inrow-close .db-wr-nav button:hover,
   body.design-heute #moDashboard .has-inrow-close .db-sel:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.35);}
   body.design-heute #moDashboard .has-inrow-close .db-sel option{color:#0E2350;background:#fff;}
@@ -3901,7 +3943,6 @@ body.design-heute .mo.hx-page > .mob{scrollbar-gutter:auto;}
   body.design-heute #hxListTop{min-height:calc(62px + env(safe-area-inset-top,0px)) !important;padding-top:calc(12px + env(safe-area-inset-top,0px)) !important;padding-bottom:12px !important;align-items:center !important;box-sizing:border-box;}
   body.design-heute :is(#moCalendar,#moDashboard,#moWeekReport) .has-inrow-close h3,
   body.design-heute #moTeamMgr #tmgr-h,body.design-heute #moSettings .set-title,body.design-heute .hx-ltop-t{font-size:1.6rem !important;line-height:38px !important;min-height:38px;margin:0 !important;}
-  body.design-heute #moCalendar .has-inrow-close .cal-btn{flex:0 0 38px !important;width:38px !important;height:38px !important;min-height:38px !important;}
   /* Second row (Statistik, Wochenbericht) on the ground below a 62px bar */
   body.design-heute :is(#moDashboard,#moWeekReport) > .mob > .has-inrow-close{background:linear-gradient(var(--hx-nav),var(--hx-nav)) 0 0/100% calc(62px + env(safe-area-inset-top,0px)) no-repeat,var(--hx-ground) !important;row-gap:12px !important;padding-bottom:4px !important;align-content:flex-start;}
   body.design-heute #moDashboard .has-inrow-close .db-header-actions{flex:1 1 100%;order:9;}
@@ -5245,7 +5286,7 @@ body.design-heute{
   --hx-pop-shadow:0 20px 44px -12px rgba(5,12,30,.55),0 2px 8px rgba(5,12,30,.22);
   --hx-og:var(--hx-ink);--hx-og-muted:var(--hx-muted);--hk0-card:var(--hx-card);--hk0-ink:var(--hx-ink);
   --hx-page:var(--hx-ground);--hx-page-img:none;--hx-page-size:auto;--hx-page-att:scroll;}
-body.design-heute :is(.hxs-menu,.team-tabs,.user-dropdown,.notif-panel,.hx-act,#viewDropdown2,#linksDropdown,.legend-pop,.ssx-menu,.ssa-menu,.photo-menu,.pos-dd-list,.tpl-moremenu,.db-export-dd){
+body.design-heute :is(.hxs-menu,.team-tabs,.user-dropdown,.notif-panel,.hx-act,#viewDropdown2,#linksDropdown,.legend-pop,.ssx-menu,.ssa-menu,.photo-menu,.pos-dd-list,.tpl-moremenu,.db-export-dd,.calx-menu){
   --hx-card:var(--hx-pop);--hx-card2:var(--hx-pop-chip);--hx-field:var(--hx-pop-field);--hx-ground:var(--hx-pop-hover);--hx-line:var(--hx-pop-line);
   --hx-ink:var(--hx-pop-ink);--hx-ink2:var(--hx-pop-ink);--hx-muted:var(--hx-pop-muted);--hx-blue:var(--hx-pop-link);
   --gd:var(--hx-pop-ink);--gm:var(--hx-pop-muted);--gl:var(--hx-pop-line);--ow:var(--hx-pop-hover);--muted-bg:var(--hx-pop-hover);
@@ -5296,7 +5337,6 @@ body.design-heute #hxHome{background:linear-gradient(var(--hx-nav),var(--hx-nav)
   body.design-heute :is(.lp-topbar,.slp-topbar){background:linear-gradient(var(--hx-nav),var(--hx-nav)) 0 0/100% calc(62px + env(safe-area-inset-top,0px)) no-repeat,var(--hx-page) !important;}
   body.design-heute #moWeekReport .has-inrow-close .db-wr-wk{color:var(--hx-og) !important;}
 }
-body.design-heute #moCalendar .cal-legend{color:var(--hx-og-muted);}
 body.design-heute.hxs-flutlicht:not(.mx-inband) #mxBar .mx-range{color:var(--hx-og-muted);}
 body.design-heute.hxs-flutlicht:not(.mx-inband) #mxBar .mx-seg{background:color-mix(in srgb,var(--hx-og) 12%,transparent);}
 body.design-heute.hxs-flutlicht:not(.mx-inband) #mxBar .mx-seg button:not(.on){color:var(--hx-og-muted);}
@@ -5346,7 +5386,7 @@ body.design-heute.hxk-dk{
   --hx-on-acc:var(--hx-ink);}
 /* dark-page schemes: cards a step lighter than the page */
 body.design-heute.hxk-dark.hxs-flutlicht{--hk-base:var(--hx-page);--hk-lift:8%;}
-body.design-heute.hxk-dk :is(.hx-card,.set-nav,.set-pane,#cal-content,#moCalendar :is(.cal-evt-mob,.cal-section-mob),
+body.design-heute.hxk-dk :is(.hx-card,.set-nav,.set-pane,#cal-content,
   #moDashboard :is(.db-kpi,.db-card,.db-rank-col),#db-content > .db-section,.lp-sidebar,.slp-sidebar,.slp-roster-col,.lp-statsbar,.slp-popup,
   #moTeamMgr .tpanel.active,#mobNav,#mobSheet .ms-panel,.table-wrap,.mxp-row,.hxl-sess,.ma-sess-head,.ma-card,.mo:not(.hx-page) > .mob,
   #moWeekReport .wr2-sec,.wr2-grid .wr2-nm,.tpl-col,.tpl-gcard,.tst-kpi,.tpl-dlg,.tst-tip,.hk-isle){
@@ -5401,13 +5441,6 @@ body.design-heute.hxk-dk #mainTable.mx td.mx-wc.h1{background:color-mix(in srgb,
 body.design-heute.hxk-dk .player-avatar{background:var(--hk-card2);color:var(--hk-ink);}
 body.design-heute.hxk-dk .pl-btn-e{background:color-mix(in srgb,var(--hk-blue) 16%,transparent);color:var(--hk-blue);}
 body.design-heute.hxk-dk .pl-btn-d{background:color-mix(in srgb,var(--hk-bad) 16%,transparent);color:var(--hk-bad);}
-body.design-heute.hxk-dk .cal-day:not(.today) .cal-day-num{color:var(--hk-ink2);}
-body.design-heute.hxk-dk .cal-dow{background:var(--hk-card2);color:var(--hk-muted);}
-body.design-heute.hxk-dk .cal-day.today{background:color-mix(in srgb,var(--hk-blue) 12%,var(--hk-card));box-shadow:inset 0 0 0 2px var(--hk-blue);}
-body.design-heute.hxk-dk .cal-evt-m{background:color-mix(in srgb,#E08A1E 36%,var(--hk-card));color:#FFDCAE;border-left-color:#F4A84A;}
-body.design-heute.hxk-dk .cal-evt-t{background:color-mix(in srgb,#3D7FE0 36%,var(--hk-card));color:#D3E4FF;border-left-color:#7CB0FF;}
-body.design-heute.hxk-dk .cal-evt-b{background:color-mix(in srgb,#C71585 30%,var(--hk-card));color:#FFC8E4;border-left-color:#F06BB5;}
-body.design-heute.hxk-dk .cal-evt-e{background:color-mix(in srgb,#1A8C4A 36%,var(--hk-card));color:#BDF2D3;border-left-color:#4CC782;}
 body.design-heute.hxk-dk #mainTable.mx td.mx-wc.h0{background:color-mix(in srgb,#D9434B 36%,var(--hk-card));color:#FFC7C3;}
 body.design-heute.hxk-dk.design-kabine thead th{border-bottom-color:color-mix(in srgb,var(--hk-ink) 30%,var(--hk-card));}
 body.design-heute.hxk-dk .bp{color:var(--hx-on-acc);}
@@ -5479,9 +5512,6 @@ body.design-heute.hxk-dk svg.hx-chart [stroke="#1659b8"]{stroke:#6FA3F2;}
 body.design-heute.hxk-dk svg.hx-chart :is(circle,text,rect)[fill="#1659b8"]{fill:#6FA3F2;}
 body.design-heute.hxk-dk svg.hx-chart rect[fill="#cc6500"]{fill:#E8923A;}
 body.design-heute.hxk-dk svg.hx-chart path[fill="rgba(22,89,184,.08)"]{fill:rgba(111,163,242,.14);}
-body.design-heute.hxk-dk .cal-evt-mob-birthday .cal-evt-mob-day{color:#D9A6FF;}
-body.design-heute.hxk-dk .cal-evt-mob-match .cal-evt-mob-day{color:#F4A84A;}
-body.design-heute.hxk-dk .cal-evt-mob-event .cal-evt-mob-day{color:#6FD69E;}
 body.design-heute.hxk-dk .lp-card-pos1{filter:invert(.9) hue-rotate(180deg) saturate(1.2);}
 /* ══ Controls and text directly on a dark page ground ══
    (Flutlicht, so the look Nacht.) The card
@@ -6220,7 +6250,7 @@ const APP_VERSION_LABEL='1.1.2';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792118256482; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792120354073; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.1.2',date:'15.10.2026',title:'Anwesenheit als Matrix',items:[
     {icon:'🗓️',title:'Tabelle nach Kalenderwochen',desc:'Die Anwesenheit ist nach Kalenderwochen gruppiert, diese Woche ist gelb markiert, das nächste Spiel blau. Ältere Wochen sind je zu einer Spalte zusammengefasst (z. B. 2/3 = zweimal da von drei); ein Klick öffnet die Woche wieder.'},
@@ -6229,6 +6259,7 @@ const APP_CHANGELOG=[
     {icon:'📱',title:'Handy: Ansicht „Spieler“',desc:'In der Anwesenheit oben „Termine | Spieler“: jeder Spieler mit seinen letzten 10 Terminen als Balken, sortierbar nach „Schwächste zuerst“, Position oder Nummer.'},
     {icon:'🏠',title:'Übersicht',desc:'„Diese Woche“ zeigt am Computer alle sieben Tage mit Kalenderwoche, freie Tage in einer schmalen Zeile. Als Titel steht das Thema des Trainings bzw. der Gegner, darunter die Uhrzeit; vergangene Termine haben ein Häkchen und die Zahl der Anwesenden, „–/18“ heißt: noch nicht erfasst. Von Freitag bis Sonntag zeigt die Karte daneben die laufende Woche („KW … bisher“). Steht am Wochenende das Spiel oben, zeigt die Karte darunter das nächste Training hell (dunkel bleibt dem Spiel), mit „Wer kommt?“ und dem Trainingsplan. Neu unter „Im Blick“: wer die Belastung heute noch nicht bewertet hat.'},
     {icon:'↔️',title:'Navigation einklappen',desc:'Am Computer lässt sich die Seitennavigation mit dem Doppelpfeil unten neben dem eigenen Namen auf Symbole verkleinern; so hat die Tabelle mehr Platz.'},
+    {icon:'📅',title:'Kalender neu',desc:'Am Computer: Monat mit Kalenderwochen, diese Woche hervorgehoben, heute gelb. Jeder Eintrag zeigt Uhrzeit und Thema bzw. Gegner, Spiele dunkelblau, vergangene Termine mit Anwesenheit. Monat wechseln, „+ Training“, „+ Spiel“, „+ Termin“ oben in der Kopfzeile; Saisonplan und Export unter „⋯“. Ein Klick auf einen Tag legt dort etwas an. Am Handy: die Saison als Liste nach Wochen wie „Diese Woche“ auf der Übersicht, frühere Wochen auf Knopfdruck, oben „+“ und „⋯“.'},
     {icon:'🧑‍💼',title:'Navigation und Menü unter dem Namen',desc:'Am Computer steht die Suche (Strg K) jetzt direkt in der Seitennavigation, die Glocke oben neben dem Vereinsnamen; Statistik und Wochenbericht sind etwas abgesetzt. Ein Klick auf den eigenen Namen öffnet Konto, die Darstellung (Standard, Ruhig, Nacht, Auto) zum direkten Umschalten, Tastaturkürzel und Abmelden. Am Handy hat „Mehr“ dieselben Symbole und Namen wie am Computer, unten das eigene Konto und „Abmelden“; den Saisonkader erreicht man über Aufstellung → Saison. Gibt es kein kommendes Spiel, öffnet Aufstellung direkt den Saisonkader.'},
     {icon:'🎨',title:'Aussehen: Standard, Ruhig, Nacht, Automatisch',desc:'Einstellungen → Darstellung bietet jetzt vier fertige Ansichten: Standard (hell; der Hintergrund ist etwas dunkler, damit sich die Karten abheben), Ruhig (graublaue Karten, weniger Weiß), Nacht (alles dunkel in Vereinsblau, für abends) und Automatisch (hell, wechselt zu Nacht, wenn das Handy oder der Computer auf dunkel steht). Gilt nur für dieses Gerät. Alle Menüs sind einheitlich dunkel. Das Menü beim Antippen einer vergangenen Zelle in der Anwesenheit ist neu gestaltet.'},
     {icon:'📋',title:'Auswahllisten und Menüs',desc:'Aufklappende Listen (z. B. Mannschaft und Saison in der Statistik, Zeitraum, Formation, Ort) öffnen am Computer ein Menü im Stil der App statt der Systemliste, mit Häkchen und Tastatur (Pfeile, Enter, Esc, Anfangsbuchstabe). Alle Felder haben denselben Pfeil. Auch die Menüs für Mannschaft, Saison, Benutzer und Benachrichtigungen sind jetzt hell und einheitlich. Auf dem Handy bleibt die gewohnte Systemauswahl.'},
@@ -22028,126 +22059,153 @@ function _hxSessAtt(si){
   });
   return fact?a+'/'+n:'';
 }
-function renderCalendarMobile(el){
-  const D=cd();
-  const monthNames=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
-  const dowNames=['So','Mo','Di','Mi','Do','Fr','Sa'];
-  const r=getSeasonRange();
-  const seasonStartSK=r.sy*10000+r.sm*100+1;
-  const seasonEndSK=r.ey*10000+r.em*100+31;
-  const events=[];
-  if(D&&Array.isArray(D.sessions)){
-    D.sessions.forEach((s,si)=>{
-      if(!s||!s.date)return;
-      const sk=dispToSortKey(s.date);
-      if(sk<seasonStartSK||sk>seasonEndSK)return;
-      const isMatch=s.type==='match';
-      events.push({
-        sk,type:isMatch?'match':'training',
-        icon:isMatch?'⚽':'🏃',
-        title:isMatch?(s.label||'Spiel'):'Training'+(s.focus?' · '+s.focus:''),
-        sub:(s.time||'')+((s.location&&s.location.trim())?' \u00b7 '+escapeHtml(s.location.trim()):'')+(_hxSessAtt(si)?' \u00b7 <b class="cal-att">'+_hxSessAtt(si)+' anwesend</b>':''),
-        action:`jumpToSession(${si},_hxLeave('moCalendar'));`
-      });
-    });
-  }
-  const ts=UI.currentTeam+'__'+UI.currentSeason;
-  const calEvts=(G.calEvents&&G.calEvents[ts])||[];
-  calEvts.forEach(ev=>{
-    if(!ev||!ev.date)return;
-    const sk=dispToSortKey(ev.date);
-    if(sk<seasonStartSK||sk>seasonEndSK)return;
-    events.push({
-      sk,type:'event',icon:'📌',
-      title:ev.name||'Termin',
-      sub:(ev.time||'')+(ev.note?' · '+ev.note.slice(0,40):''),
-      action:`viewCalEvent('${ev.id}');`
-    });
+// ── Kalender (Heute, seit 16.10.2026) ──
+// Computer: the month as a grid with a KW column, the month switcher in the
+// band. Phone: the season as a list by week, in the same rows as "Diese
+// Woche" on the Übersicht. One collection of entries feeds both.
+const CAL_MON=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+const CAL_MON3=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+const CAL_DOW=['So','Mo','Di','Mi','Do','Fr','Sa'];
+const _CAL_IC={
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  left:'<path d="m15 6-6 6 6 6"/>',right:'<path d="m9 6 6 6-6 6"/>',
+  pin:'<path d="M12 21s-6.5-5.7-6.5-11a6.5 6.5 0 0 1 13 0c0 5.3-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/>',
+  cake:'<path d="M20 21v-7.5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2V21"/><path d="M4 16.2c1.3 1 2.7 1 4 0s2.7-1 4 0 2.7 1 4 0 2.7-1 4 0"/><path d="M2.5 21h19M8 8v3.5M12 8v3.5M16 8v3.5M8 4.5h.01M12 4.5h.01M16 4.5h.01"/>',
+  train:'<circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.6 2.2M9.5 2.5h5M12 2.5V6"/>',
+  ball:'<circle cx="12" cy="12" r="9"/><path d="m12 7.2 3.9 2.8-1.5 4.6H9.6L8.1 10z"/><path d="M12 3v4.2M20.6 9.3l-4.7.7M17.4 19.3l-3-4.7M6.6 19.3l3-4.7M3.4 9.3l4.7.7"/>',
+  plan:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M7.5 14h3M7.5 17.5h6"/>',
+  exp:'<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>'
+};
+function _calSvg(k,sz,sw){return `<svg width="${sz||16}" height="${sz||16}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw||2}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${_CAL_IC[k]||''}</svg>`;}
+const _calK=d=>d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
+const _calD=k=>new Date(Math.floor(k/10000),Math.floor(k/100)%100-1,k%100);
+// Sessions and Termine by date key; birthdays by month*100+day (every year)
+function _calCollect(){
+  const D=cd(),map={},bd={};
+  const add=(k,e)=>{(map[k]=map[k]||[]).push(e);};
+  if(D&&Array.isArray(D.sessions))D.sessions.forEach((s,si)=>{
+    if(!s||!s.date)return;
+    const k=dispToSortKey(s.date);if(!k||k>=99999999)return;
+    const m=s.type==='match';
+    add(k,{kind:m?'m':'t',si,time:s.time||'',title:m?(s.label||''):(s.focus||''),loc:String(s.location||'').trim(),att:_hxSessAtt(si)});
   });
-  if(D&&Array.isArray(D.players)){
-    D.players.forEach((p,pi)=>{
-      if(!p||!p.birthdate)return;
-      let mo=null,da=null,yr=null;
-      const _bd=parseBirthdate(p.birthdate);
-      if(_bd){yr=_bd.y;mo=_bd.m;da=_bd.d;}
-      if(!mo||!da)return;
-      [r.sy,r.ey].forEach(y=>{
-        const sk=y*10000+mo*100+da;
-        if(sk<seasonStartSK||sk>seasonEndSK)return;
-        const age=yr?(y-yr):null;
-        const nm=getDisplayName?getDisplayName(p):p.name;
-        events.push({
-          sk,type:'birthday',icon:'🎂',
-          title:`${nm} – Geburtstag`,
-          sub:age?`wird ${age}`:'',
-          action:`jumpToPlayer(${pi},_hxLeave('moCalendar'));`
-        });
+  (typeof getCalEvents==='function'?getCalEvents():[]).forEach(ev=>{
+    if(!ev||!ev.date)return;
+    const k=dispToSortKey(ev.date);if(!k||k>=99999999)return;
+    add(k,{kind:'e',id:ev.id,time:ev.time||'',title:ev.name||'Termin',note:String(ev.note||'').trim()});
+  });
+  if(D&&Array.isArray(D.players))D.players.forEach((p,pi)=>{
+    if(!p||!p.birthdate)return;
+    const b=parseBirthdate(p.birthdate);if(!b)return;
+    const key=b.m*100+b.d;
+    (bd[key]=bd[key]||[]).push({kind:'b',pi,nm:(typeof getDisplayName==='function'?getDisplayName(p):p.name)||p.name||'',yr:b.y});
+  });
+  return {map,bd};
+}
+// One day: sessions and Termine by time, birthdays last
+function _calDayList(k,c){
+  const l=(c.map[k]||[]).slice().sort((a,b)=>String(a.time||'99').localeCompare(String(b.time||'99')));
+  (c.bd[k%10000]||[]).forEach(b=>l.push(Object.assign({age:b.yr?Math.floor(k/10000)-b.yr:null},b)));
+  return l;
+}
+function _calOpen(e){
+  return e.kind==='b'?`jumpToPlayer(${e.pi},_hxLeave('moCalendar'))`
+    :e.kind==='e'?`viewCalEvent('${String(e.id).replace(/'/g,'')}')`
+    :`jumpToSession(${e.si},_hxLeave('moCalendar'))`;
+}
+// Computer: an entry in a day cell — first line time and kind, second line
+// what it is about (topic, opponent, name); attendance once it is entered
+function _calEntry(e,past){
+  const esc=escapeHtml;
+  if(e.kind==='b'){
+    const t=e.nm+(e.age!=null?' ('+e.age+')':'');
+    return `<button type="button" class="calx-e b" onclick="event.stopPropagation();${_calOpen(e)}" title="Geburtstag: ${esc(t)}">${_calSvg('cake',13)}<span>${esc(t)}</span></button>`;
+  }
+  const kind=e.kind==='m'?'Spiel':e.kind==='e'?'Termin':'Training';
+  const what=e.title;
+  const tip=[e.time,kind,what,e.loc,e.att?e.att+' anwesend':''].filter(Boolean).join(' · ');
+  return `<button type="button" class="calx-e ${e.kind}${what?' has2':''}${past?' past':''}" onclick="event.stopPropagation();${_calOpen(e)}" title="${esc(tip)}">`
+    +`<span class="calx-e1">${e.time?`<b>${esc(e.time)}</b>`:''}<span>${kind}</span>${e.att?`<em class="calx-n">${esc(e.att)}</em>`:''}</span>`
+    +(what?`<span class="calx-e2">${esc(what)}</span>`:'')
+    +'</button>';
+}
+function _calNavRender(){
+  const n=document.getElementById('calx-nav');if(!n||!_calCur||!_calCur.y)return;
+  const now=new Date(),cur=_calCur.y===now.getFullYear()&&_calCur.m===now.getMonth()+1;
+  const a=isAtSeasonStart(),z=isAtSeasonEnd();
+  n.innerHTML=`<button type="button" class="calx-nb" onclick="calNavMonth(-1)" aria-label="Vorheriger Monat" title="Vorheriger Monat"${a?' disabled':''}>${_calSvg('left',18,2.4)}</button>`
+    +`<span class="calx-mo" aria-live="polite">${CAL_MON[_calCur.m-1]} ${_calCur.y}</span>`
+    +`<button type="button" class="calx-nb" onclick="calNavMonth(1)" aria-label="Nächster Monat" title="Nächster Monat"${z?' disabled':''}>${_calSvg('right',18,2.4)}</button>`
+    +`<button type="button" class="calx-today" onclick="calGoToday()"${cur?' disabled':''} title="Zum aktuellen Monat">Heute</button>`;
+}
+// Phone: the season by week. Past weeks wait behind a button, so the list
+// opens at this week; the choice lasts until the calendar is closed.
+let _calmPast=false;
+function renderCalendarMobile(el){
+  const c=_calCollect(),today=todaySK(),esc=escapeHtml;
+  const r=getSeasonRange();
+  const lo=r.sy*10000+r.sm*100+1,hi=r.ey*10000+r.em*100+31;
+  const keys=new Set(Object.keys(c.map).map(Number).filter(k=>k>=lo&&k<=hi));
+  for(let y=r.sy;y<=r.ey;y++)Object.keys(c.bd).forEach(md=>{const k=y*10000+(+md);if(k>=lo&&k<=hi)keys.add(k);});
+  if(today>=lo&&today<=hi)keys.add(today);
+  const monOf=k=>{const d=_calD(k);d.setDate(d.getDate()-((d.getDay()+6)%7));return _calK(d);};
+  const weeks=new Map();
+  [...keys].sort((a,b)=>a-b).forEach(k=>{const m=monOf(k);if(!weeks.has(m))weeks.set(m,[]);weeks.get(m).push(k);});
+  const curMon=monOf(today);
+  const all=[...weeks.keys()];
+  const past=all.filter(m=>m<curMon),ahead=all.filter(m=>m>=curMon);
+  const showPast=_calmPast||!ahead.length;
+  if(!all.length){el.innerHTML='<div class="calm-empty">Für diese Saison sind noch keine Termine eingetragen.</div>';return;}
+  let h='';
+  if(past.length&&!showPast)h+=`<button type="button" class="calm-more" onclick="_calmShowPast()">Frühere Wochen anzeigen <span>${past.length}</span></button>`;
+  let lastMonth=null;
+  (showPast?all:ahead).forEach(mon=>{
+    const md=_calD(mon),su=new Date(md);su.setDate(md.getDate()+6);
+    const mk=md.getFullYear()*100+md.getMonth();
+    if(mk!==lastMonth){h+=`<h4 class="calm-mo">${CAL_MON[md.getMonth()]} ${md.getFullYear()}</h4>`;lastMonth=mk;}
+    const cur=mon===curMon;
+    const range=md.getMonth()===su.getMonth()?`${md.getDate()}.–${su.getDate()}. ${CAL_MON3[su.getMonth()]}`:`${md.getDate()}. ${CAL_MON3[md.getMonth()]} – ${su.getDate()}. ${CAL_MON3[su.getMonth()]}`;
+    h+=`<section class="calm-wk${cur?' cur':''}${mon<curMon?' pastwk':''}"${cur?' id="calmCur"':''}><div class="calm-wh"><b>KW ${_dbIsoWeek(md)}</b><span>${range}</span>${cur?'<i>diese Woche</i>':''}</div><div class="calm-card hk-isle">`;
+    weeks.get(mon).forEach(k=>{
+      const d=_calD(k),dow=CAL_DOW[d.getDay()],isT=k===today,isP=k<today;
+      const list=_calDayList(k,c);
+      if(!list.length){
+        if(isT)h+=`<div class="hx-day empty today calm-r"><span class="hx-day-d"><small>${dow}</small><b>${d.getDate()}</b></span><span class="hx-day-x"><span class="hx-day-t">Heute kein Termin</span></span></div>`;
+        return;
+      }
+      list.forEach((e,i)=>{
+        const dd=i===0?`<small>${dow}</small><b>${d.getDate()}</b>`:'';
+        if(e.kind==='b'){
+          h+=`<button type="button" class="hx-day calm-r calm-bd${isT?' today':''}" onclick="${_calOpen(e)}"><span class="hx-day-d">${dd}</span><span class="hx-day-x"><span class="calm-bdt">${_calSvg('cake',15)}${esc(e.nm)}${e.age!=null?' wird '+e.age:' hat Geburtstag'}</span></span></button>`;
+          return;
+        }
+        const m=e.kind==='m',ev=e.kind==='e';
+        const t=e.title||(m?'Spiel':ev?'Termin':'Training');
+        const sub=[m?'Spiel':ev?'Termin':(e.title?'Training':''),e.time,ev?e.note.slice(0,40):e.loc].filter(Boolean).join(' · ');
+        h+=`<button type="button" class="hx-day calm-r${isT?' today':''}${isP&&!isT?' past':''}" onclick="${_calOpen(e)}"><span class="hx-day-d">${dd}</span><span class="hx-day-x"><span class="hx-day-t">${esc(t)}</span>${sub?`<span class="hx-day-s${m?' m':ev?' e':''}">${esc(sub)}</span>`:''}</span>${e.att?`<span class="hx-day-n calm-n" title="${esc(e.att)} anwesend">${esc(e.att)}</span>`:''}</button>`;
       });
     });
-  }
-  events.sort((a,b)=>a.sk-b.sk);
-  const today=todaySK();
-  const upcoming=events.filter(e=>e.sk>=today);
-  const past=events.filter(e=>e.sk<today);
-  function groupByMonth(list){
-    const groups={};
-    list.forEach(e=>{
-      const y=Math.floor(e.sk/10000),m=Math.floor((e.sk%10000)/100);
-      const key=y*100+m;
-      if(!groups[key])groups[key]={y,m,items:[]};
-      groups[key].items.push(e);
-    });
-    return Object.keys(groups).sort((a,b)=>+a-+b).map(k=>groups[k]);
-  }
-  function renderGroup(g){
-    let h=`<div class="cal-mo-hdr-mob">${monthNames[g.m-1]} ${g.y}</div>`;
-    g.items.forEach(e=>{
-      const dt=new Date(Math.floor(e.sk/10000),Math.floor((e.sk%10000)/100)-1,e.sk%100);
-      const dow=dowNames[dt.getDay()];
-      const isToday=e.sk===today;
-      h+=`<div class="cal-evt-mob cal-evt-mob-${e.type}${isToday?' today':''}" onclick="${e.action.replace(/"/g,'&quot;')}">
-        <div class="cal-evt-mob-date">
-          <div class="cal-evt-mob-day">${e.sk%100}</div>
-          <div class="cal-evt-mob-dow">${dow}</div>
-        </div>
-        <div class="cal-evt-mob-icon">${e.icon}</div>
-        <div class="cal-evt-mob-content">
-          <div class="cal-evt-mob-title">${e.title}</div>
-          ${e.sub?'<div class="cal-evt-mob-sub">'+e.sub+'</div>':''}
-        </div>
-      </div>`;
-    });
-    return h;
-  }
-  let html='';
-  if(upcoming.length===0&&past.length===0){
-    html='<div class="cal-empty-mob">📅 Keine Termine in dieser Saison</div>';
-  } else {
-    if(upcoming.length){
-      html+='<div class="cal-section-mob">Bevorstehend</div>';
-      groupByMonth(upcoming).forEach(g=>{html+=renderGroup(g);});
-    }
-    if(past.length){
-      html+='<div class="cal-section-mob cal-section-past">Vergangen</div>';
-      groupByMonth(past).reverse().forEach(g=>{g.items=g.items.slice().reverse();html+=renderGroup(g);});
-    }
-  }
-  el.innerHTML=html;
+    h+='</div></section>';
+  });
+  el.innerHTML=h;
 }
-
+function _calmShowPast(){
+  const el=document.getElementById('cal-content');if(!el)return;
+  const a=document.getElementById('calmCur'),y0=a?a.getBoundingClientRect().top:0;
+  _calmPast=true;renderCalendarMobile(el);
+  // keep this week where it was; the earlier weeks appear above it
+  const b=document.getElementById('calmCur');
+  if(b)el.scrollTop+=b.getBoundingClientRect().top-y0;
+}
 function openCalendar(){
-  const ctx=document.getElementById('cal-ctx');
-  if(ctx)ctx.textContent=`${UI.currentTeam} · Saison ${UI.currentSeason}`;
   // Presence: notify others
   if(typeof setPresenceContext==='function')setPresenceContext('📅 Kalender');
   if(typeof updateInlinePresence==='function')setTimeout(()=>updateInlinePresence(),50);
   const editable=canEdit&&canEdit();
-  const adminOnly=isAdmin&&isAdmin();
-  ['cal-add-btn','cal-add-train','cal-add-match','cal-gen-plan'].forEach(id=>{
-    const b=document.getElementById(id);
-    if(b)b.style.display=editable?'':'none';
-  });
-  // Set initial month: first session of season, or current month
+  document.querySelector('#moCalendar .calx-head')?.classList.toggle('calx-ro',!editable);
+  _calmPast=false;
+  // Initial month: the current one inside the season, else the season's
+  // first month with a session
   const D=cd();
   let initY=null,initM=null;
   if(D&&Array.isArray(D.sessions)){
@@ -22161,7 +22219,9 @@ function openCalendar(){
       if(earliestK===null||k<earliestK)earliestK=k;
       if(k>=today&&(nextK===null||k<nextK))nextK=k;
     });
-    const useK=nextK||earliestK;
+    const r=getSeasonRange(),n=new Date(),nk=n.getFullYear()*100+n.getMonth()+1;
+    const inSeason=nk>=r.sy*100+r.sm&&nk<=r.ey*100+r.em;
+    const useK=inSeason?_calK(n):(nextK||earliestK);
     if(useK){initY=Math.floor(useK/10000);initM=Math.floor((useK%10000)/100);}
   }
   if(initY===null){
@@ -22172,7 +22232,15 @@ function openCalendar(){
   _calCur={y:clamped.y,m:clamped.m};
   renderCalendar();
   openM('moCalendar');
+  if(window.matchMedia('(max-width:767px)').matches)requestAnimationFrame(()=>{
+    const el=document.getElementById('cal-content');if(el)el.scrollTop=0;
+  });
 }
+// Phone ↔ computer width while it is open (turning a tablet, resizing)
+try{matchMedia('(max-width:767px)').addEventListener('change',()=>{
+  const mo=document.getElementById('moCalendar');
+  if(mo&&mo.classList.contains('open'))renderCalendar();
+});}catch(e){}
 
 function calNavMonth(delta){
   let y=_calCur.y,m=_calCur.m+delta;
@@ -22197,61 +22265,60 @@ function calGoToday(){
 function renderCalendar(){
   const el=document.getElementById('cal-content');
   if(!el)return;
-  // Mobile: render compact list view
-  if(window.matchMedia('(max-width:767px)').matches){
-    renderCalendarMobile(el);
-    return;
-  }
-  const D=cd();
-  const monthNames=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
-  const dowNames=['Mo','Di','Mi','Do','Fr','Sa','So'];
-  // Build sessions index by sortKey for quick lookup
-  const sessByKey={};
-  if(D&&Array.isArray(D.sessions)){
-    D.sessions.forEach((s,si)=>{
-      if(!s||!s.date)return;
-      const k=dispToSortKey(s.date);
-      if(k>=99999999)return;
-      if(!sessByKey[k])sessByKey[k]=[];
-      sessByKey[k].push({...s,_idx:si});
+  _calNavRender();
+  const phone=window.matchMedia('(max-width:767px)').matches;
+  el.classList.toggle('calm-list',phone);
+  if(phone){renderCalendarMobile(el);return;}
+  el.innerHTML=renderCalendarMonth(_calCur.y,_calCur.m);
+}
+
+// ── Adding and the ⋯ menu ──
+function _calMenu(btn,items){
+  let m=document.getElementById('calxMenu');
+  if(m&&!m.hidden&&m._btn===btn){m.hidden=true;return;}
+  if(!m){
+    m=document.createElement('div');m.id='calxMenu';m.className='calx-menu';m.setAttribute('role','menu');m.hidden=true;
+    document.body.appendChild(m);
+    document.addEventListener('pointerdown',ev=>{
+      const mm=document.getElementById('calxMenu');if(!mm||mm.hidden)return;
+      if(mm.contains(ev.target)||(mm._btn&&mm._btn.contains(ev.target)))return;
+      mm.hidden=true;
+    },true);
+    document.addEventListener('keydown',ev=>{
+      const mm=document.getElementById('calxMenu');if(!mm||mm.hidden)return;
+      if(ev.key==='Escape'){mm.hidden=true;try{mm._btn&&mm._btn.focus();}catch(e){}}
+      else if(ev.key==='ArrowDown'||ev.key==='ArrowUp'){
+        const its=[...mm.querySelectorAll('.calx-mi')];if(!its.length)return;
+        let i=its.indexOf(document.activeElement);
+        i=ev.key==='ArrowDown'?(i+1)%its.length:(i<=0?its.length-1:i-1);
+        its[i].focus();ev.preventDefault();
+      }
     });
   }
-  // Build custom events index by sortKey
-  const eventsByKey={};
-  getCalEvents().forEach(ev=>{
-    if(!ev||!ev.date)return;
-    const k=dispToSortKey(ev.date);
-    if(k>=99999999)return;
-    if(!eventsByKey[k])eventsByKey[k]=[];
-    eventsByKey[k].push(ev);
-  });
-  // Build birthdays index by month-day (MM-DD)
-  const bdayByMD={};
-  if(D&&Array.isArray(D.players)){
-    D.players.forEach((p,pi)=>{
-      if(!p||!p.birthdate)return;
-      let mo=null,da=null,yr=null;
-      const _bd=parseBirthdate(p.birthdate);
-      if(_bd){yr=_bd.y;mo=_bd.m;da=_bd.d;}
-      if(!mo||!da)return;
-      const key=String(mo).padStart(2,'0')+'-'+String(da).padStart(2,'0');
-      if(!bdayByMD[key])bdayByMD[key]=[];
-      bdayByMD[key].push({p,yr,pi});
-    });
-  }
-  const today=todaySK();
-  const y=_calCur.y,m=_calCur.m;
-  // Header with navigation
-  const atStart=isAtSeasonStart();
-  const atEnd=isAtSeasonEnd();
-  let html=`<div class="cal-nav" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px;">
-    <button class="btn bs" style="font-size:1rem;padding:4px 12px;${atStart?'opacity:.35;cursor:not-allowed;':''}" onclick="calNavMonth(-1)" title="Vorheriger Monat" ${atStart?'disabled':''}>◀</button>
-    <div style="min-width:180px;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;color:var(--bd);">${monthNames[m-1]} ${y}</div>
-    <button class="btn bs" style="font-size:1rem;padding:4px 12px;${atEnd?'opacity:.35;cursor:not-allowed;':''}" onclick="calNavMonth(1)" title="Nächster Monat" ${atEnd?'disabled':''}>▶</button>
-    <button class="btn bs" style="margin-left:10px;font-size:.78rem;" onclick="calGoToday()" title="Zum aktuellen Monat springen">Heute</button>
-  </div>`;
-  html+=renderCalendarMonth(y,m,monthNames,dowNames,sessByKey,eventsByKey,bdayByMD,today);
-  el.innerHTML=html;
+  m._btn=btn;m._fns=items.map(x=>x.fn);
+  m.innerHTML=items.map((x,i)=>`<button type="button" role="menuitem" class="calx-mi" data-i="${i}">${_calSvg(x.ic,18)}<span>${x.label}${x.sub?`<small>${x.sub}</small>`:''}</span></button>`).join('');
+  m.querySelectorAll('.calx-mi').forEach(b=>b.addEventListener('click',ev=>{
+    ev.stopPropagation();m.hidden=true;const f=m._fns[+b.dataset.i];if(f)f();
+  }));
+  m.hidden=false;
+  _placePopup(m,btn.getBoundingClientRect(),{align:'right',gap:6});
+}
+function calAddMenu(btn,e){
+  if(e)e.stopPropagation();
+  if(!(typeof canEdit==='function'&&canEdit()))return;
+  _calMenu(btn,[
+    {ic:'train',label:'Training',fn:()=>openM('moSession')},
+    {ic:'ball',label:'Spiel',fn:()=>openM('moMatch')},
+    {ic:'pin',label:'Termin',sub:'Turnier, Feier, Treffen …',fn:()=>openCalEvent(null)},
+  ]);
+}
+function calMoreMenu(btn,e){
+  if(e)e.stopPropagation();
+  const ed=typeof canEdit==='function'&&canEdit();
+  _calMenu(btn,[
+    ed?{ic:'plan',label:'Saisonplan erstellen',sub:'Trainings und Spiele auf einmal',fn:()=>openGenSch()}:null,
+    {ic:'exp',label:'Exportieren',sub:'In Google- oder Apple-Kalender',fn:()=>openExportIcs()},
+  ].filter(Boolean));
 }
 
 // ── Event type chooser (calendar quick-add) ──
@@ -22294,65 +22361,37 @@ function chooseEventType(type){
   }
 }
 
-function renderCalendarMonth(y,m,monthNames,dowNames,sessByKey,eventsByKey,bdayByMD,today){
-  const firstDay=new Date(y,m-1,1);
-  const daysInMonth=new Date(y,m,0).getDate();
-  let startDow=(firstDay.getDay()+6)%7;
-  let html=`<div class="cal-month">
-    <div class="cal-grid">`;
-  dowNames.forEach(d=>{html+=`<div class="cal-dow">${d}</div>`;});
-  for(let i=0;i<startDow;i++)html+='<div class="cal-day empty"></div>';
-  for(let d=1;d<=daysInMonth;d++){
-    const dateK=y*10000+m*100+d;
-    const isToday=dateK===today;
-    const isPast=dateK<today;
-    const dow=(new Date(y,m-1,d).getDay()+6)%7;
-    const weekend=(dow===5||dow===6);
-    let cls='cal-day';
-    if(isToday)cls+=' today';
-    else if(isPast)cls+=' past';
-    if(weekend)cls+=' weekend';
-    let evts='';
-    const sList=sessByKey[dateK]||[];
-    sList.forEach(s=>{
-      const isMatch=s.type==='match';
-      const lbl=isMatch?(s.label||'Spiel'):'Training';
-      const time=s.time?`${s.time} `:'';
-      const tip=`${time}${lbl}`.replace(/"/g,'&quot;');
-      const ec=isMatch?'cal-evt-m':'cal-evt-t';
-      const icon=isMatch?'⚽':'🏃';
-      const att=_hxSessAtt(s._idx);
-      evts+=`<div class="cal-evt ${ec}" title="${tip}" onclick="event.stopPropagation();jumpToSession(${s._idx},_hxLeave('moCalendar'));">${icon} ${time}${lbl}${att?` <b class="cal-att">${att}</b>`:''}</div>`;
-    });
-    // Custom events
-    const eList=eventsByKey[dateK]||[];
-    eList.forEach(ev=>{
-      const time=ev.time?ev.time+' ':'';
-      const tip=(time+ev.name).replace(/"/g,'&quot;');
-      evts+=`<div class="cal-evt cal-evt-e" title="${tip}" onclick="event.stopPropagation();viewCalEvent('${ev.id}');">📌 ${time}${ev.name}</div>`;
-    });
-    const md=String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');
-    const bList=bdayByMD[md]||[];
-    bList.forEach(b=>{
-      const age=b.yr?(y-b.yr):null;
-      const ageStr=age!==null?` (${age})`:'';
-      const nm=getDisplayName?getDisplayName(b.p):b.p.name;
-      const tip=`Geburtstag: ${b.p.name}${ageStr}`.replace(/"/g,'&quot;');
-      evts+=`<div class="cal-evt cal-evt-b" title="${tip}" onclick="event.stopPropagation();jumpToPlayer(${b.pi},_hxLeave('moCalendar'));">🎂 ${nm}${ageStr}</div>`;
-    });
-    // Click on empty area in day → quick-add event (with type chooser)
-    const canAdd=canEdit&&canEdit();
-    const dayClick=canAdd?` onclick="openEventTypeChooser(${dateK});" style="cursor:pointer;"`:'';
-    html+=`<div class="${cls}"${dayClick}>
-      <div class="cal-day-num">${d}</div>
-      ${evts}
-    </div>`;
+// Computer: the month as weeks (Mo–So) with the KW in front. Days of the
+// neighbouring months fill the first and last week, quieter. A click on a
+// day (or its +) adds something on that date.
+function renderCalendarMonth(y,m){
+  const c=_calCollect(),today=todaySK();
+  const canAdd=typeof canEdit==='function'&&canEdit();
+  const first=new Date(y,m-1,1),last=new Date(y,m,0);
+  const start=new Date(first);start.setDate(1-((first.getDay()+6)%7));
+  const end=new Date(last);end.setDate(last.getDate()+(6-((last.getDay()+6)%7)));
+  const weeks=Math.round((end-start)/86400000+1)/7;
+  let h=`<div class="calx-grid" style="--calx-rows:${weeks}" aria-label="${CAL_MON[m-1]} ${y}">`
+    +'<div class="calx-h calx-kwh" title="Kalenderwoche">KW</div>'
+    +['Mo','Di','Mi','Do','Fr','Sa','So'].map(d=>`<div class="calx-h">${d}</div>`).join('');
+  const d=new Date(start);
+  for(let w=0;w<weeks;w++){
+    const mk=_calK(d),su=new Date(d);su.setDate(d.getDate()+6);
+    const cw=today>=mk&&today<=_calK(su);
+    h+=`<div class="calx-kw${cw?' cur':''}"${cw?' title="Diese Woche"':''}>${_dbIsoWeek(d)}</div>`;
+    for(let i=0;i<7;i++){
+      const k=_calK(d),out=d.getMonth()!==m-1,past=k<today;
+      const cls='calx-day'+(out?' out':'')+(k===today?' today':'')+(past?' past':'')+(cw?' cw':'')+(canAdd?' can':'')+(i>4?' we':'');
+      const lbl=d.getDate()+'. '+CAL_MON[d.getMonth()];
+      h+=`<div class="${cls}"${canAdd?` onclick="openEventTypeChooser(${k})"`:''}>`
+        +`<span class="calx-dn"${k===today?' title="Heute"':''}>${d.getDate()}</span>`
+        +(canAdd?`<button type="button" class="calx-add" onclick="event.stopPropagation();openEventTypeChooser(${k})" aria-label="Am ${lbl} anlegen" title="Am ${lbl} anlegen">${_calSvg('plus',14,2.4)}</button>`:'')
+        +_calDayList(k,c).map(e=>_calEntry(e,past)).join('')
+        +'</div>';
+      d.setDate(d.getDate()+1);
+    }
   }
-  const totalCells=startDow+daysInMonth;
-  const trailing=(7-(totalCells%7))%7;
-  for(let i=0;i<trailing;i++)html+='<div class="cal-day empty"></div>';
-  html+='</div></div>';
-  return html;
+  return h+'</div>';
 }
 
 // Jump to a specific session profile, optionally with back-button context.
@@ -33049,20 +33088,22 @@ _pubCleanupSchedule();
 <!-- Calendar -->
 <div class="mo hx-page" id="moCalendar"><div class="mob" style="width:880px;max-width:96vw;max-height:92vh;display:flex;flex-direction:column;position:relative;">
   <button class="mob-close-x" onclick="closeM('moCalendar')" aria-label="Schließen">✕</button>
-  <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;flex-shrink:0;flex-wrap:wrap;padding-right:32px;">
-    <h3 style="flex:1;margin:0;color:var(--bd);min-width:140px;">Kalender <span id="cal-presence-inline" class="inline-presence"></span></h3>
-    <span id="cal-ctx" style="font-size:.78rem;color:var(--gm);"></span>
-    <button class="cal-btn cal-btn-plan" id="cal-gen-plan" onclick="openGenSch();" title="Saisonplan generieren">⚙️<span class="cb-lbl"> Plan</span></button>
-    <button class="cal-btn cal-btn-train" id="cal-add-train" onclick="openM('moSession');" title="Training anlegen">🏃<span class="cb-lbl"> Training</span></button>
-    <button class="cal-btn cal-btn-match" id="cal-add-match" onclick="openM('moMatch');" title="Spiel anlegen">⚽<span class="cb-lbl"> Spiel</span></button>
-    <button class="cal-btn cal-btn-termin" id="cal-add-btn" onclick="openCalEvent(null)" title="Termin anlegen">📌<span class="cb-lbl"> Termin</span></button>
-    <button class="cal-btn cal-btn-export" id="cal-export-btn" onclick="openExportIcs()" title="In Google/Apple Kalender importieren">📥<span class="cb-lbl"> Export</span></button>
-  </div>
-  <div class="cal-legend">
-    <div class="cal-legend-item"><div class="cal-legend-sw" style="background:#ffe0b0;border-left:2px solid #d97a00;"></div>Spiel</div>
-    <div class="cal-legend-item"><div class="cal-legend-sw" style="background:#cce5ff;border-left:2px solid #0066cc;"></div>Training</div>
-    <div class="cal-legend-item"><div class="cal-legend-sw" style="background:#d4f4e0;border-left:2px solid #1a8c4a;"></div>📌 Termin</div>
-    <div class="cal-legend-item"><div class="cal-legend-sw" style="background:#ffd6e6;border-left:2px solid #c71585;"></div>🎂 Geburtstag</div>
+  <!-- Band: title, month switcher (computer), adding, and ⋯ for the rare
+       things (Saisonplan, Export). The three add buttons fold into one
+       "Neu" menu when the band is narrow (container query) and on the phone. -->
+  <div class="calx-head" style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-shrink:0;flex-wrap:wrap;">
+    <h3 style="margin:0;color:var(--bd);">Kalender <span id="cal-presence-inline" class="inline-presence"></span></h3>
+    <div class="calx-nav" id="calx-nav" aria-label="Monat"></div>
+    <span class="calx-sp"></span>
+    <div class="calx-acts">
+      <span class="calx-many">
+        <button type="button" class="mx-add pri" id="cal-add-train" onclick="openM('moSession')" title="Training anlegen"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Training</button>
+        <button type="button" class="mx-add" id="cal-add-match" onclick="openM('moMatch')" title="Spiel anlegen"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Spiel</button>
+        <button type="button" class="mx-add" id="cal-add-btn" onclick="openCalEvent(null)" title="Termin anlegen"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Termin</button>
+      </span>
+      <button type="button" class="mx-add pri calx-one" id="cal-add-one" onclick="calAddMenu(this,event)" aria-haspopup="menu" aria-label="Neu: Training, Spiel oder Termin" title="Training, Spiel oder Termin anlegen"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Neu</span></button>
+      <button type="button" class="mx-add calx-more" id="cal-more" onclick="calMoreMenu(this,event)" aria-haspopup="menu" aria-label="Weitere: Saisonplan, Export" title="Saisonplan, Export"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg></button>
+    </div>
   </div>
   <div id="cal-content" class="cal-wrap" style="overflow-y:auto;flex:1;margin-top:12px;padding-right:4px;"></div>
 </div></div>
