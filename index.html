@@ -3730,9 +3730,6 @@ body.design-heute :is(.lp-sub,.slp-sub){margin-top:3px;}
    tinted schemes keep text and status colours, and move cards off white. */
 body.design-heute.design-kabine{--d-bg:var(--hx-ground);--d-panel:var(--hx-card);--d-panel2:var(--hx-card2);--d-line:var(--hx-line);--d-text:var(--hx-ink);--d-ink:var(--hx-ink);--d-hover:var(--hx-card2);--rowbg:var(--hx-card);}
 body.design-heute.hxs-stahl{--hx-nav:#0E2350;--hx-nav2:#1A3260;--hx-ground:#BAC6D8;--hx-card:#E6EBF2;--hx-card2:#DAE1EB;--hx-field:#F5F7FA;--hx-line:#C8D1DE;--hx-track:#C0CAD8;--hx-ink:#0E2350;--hx-ink2:#33425F;--hx-muted:#465472;}
-body.design-heute.hxs-himmel{--hx-nav:#1650A8;--hx-nav2:#2260BD;--hx-ground:#C5D4EC;--hx-card:#EAF0FA;--hx-card2:#DCE6F6;--hx-field:#F7FAFE;--hx-line:#C9D7EE;--hx-track:#C2D1EA;--hx-ink:#0E2350;--hx-ink2:#2E4268;--hx-muted:#465A80;}
-body.design-heute.hxs-rasen{--hx-nav:#123D2B;--hx-nav2:#1B5039;--hx-ground:#C3D2C6;--hx-card:#EAF0EB;--hx-card2:#DDE6DF;--hx-field:#F7FAF7;--hx-line:#C8D6CB;--hx-track:#BFCEC3;--hx-ink:#14291D;--hx-ink2:#2E4537;--hx-muted:#465E4F;--hx-blue:#1D6B46;}
-body.design-heute.hxs-schiefer{--hx-nav:#23272F;--hx-nav2:#333943;--hx-ground:#C4C8CE;--hx-card:#EBECEE;--hx-card2:#DFE1E5;--hx-field:#F8F8F9;--hx-line:#CFD2D7;--hx-track:#C6CAD0;--hx-ink:#1C2029;--hx-ink2:#3A404B;--hx-muted:#535A66;}
 /* Surfaces from the shared (Klassisch) styles that sit inside Heute pages,
    panels and dialogs — they follow the scheme as well. Off-white and the
    light grey-blue line colour are mapped once through --ow / --gl. */
@@ -3746,24 +3743,17 @@ body.design-heute:not(.theme-dark) #moWeekReport .wr2-sec,body.design-heute:not(
 body.design-heute:not(.theme-dark) .set-link{background:var(--hx-card2);}
 body.design-heute:not(.theme-dark) .page{background:var(--hx-ground);}
 /* On tinted cards the old light-blue secondary text loses contrast */
-body.design-heute:is(.hxs-stahl,.hxs-himmel,.hxs-rasen,.hxs-schiefer){--gm:var(--hx-muted);}
+body.design-heute.hxs-stahl{--gm:var(--hx-muted);}
 body.design-heute:not(.theme-dark) #moCalendar :is(.cal-evt-mob,.cal-section-mob){background:var(--hx-card);}
 /* Klassisch-only colour rows; the picker replaces them in Heute */
 
 .hxv-grid{display:none;}
 body.design-heute .hxv-grid{display:grid;}
 body.design-heute .hxv-block{border-bottom:none !important;padding-bottom:4px !important;}
-.hxs-grid{grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px;padding:4px 0 14px;border-bottom:1px solid var(--hx-line);}
 .hxs-sw{display:flex;flex-direction:column;gap:7px;padding:7px;border-radius:14px;border:1.5px solid var(--hx-line);background:var(--hx-field);cursor:pointer;text-align:left;font:600 .86rem 'Barlow',sans-serif;color:var(--hx-ink);}
 .hxs-sw:hover{border-color:var(--hx-ink2);}
 .hxs-sw.on{border-color:var(--hx-ink);box-shadow:0 0 0 2px var(--hx-yellow);}
 .hxs-sw:focus-visible{outline:2px solid var(--hx-blue);outline-offset:2px;}
-.hxs-pv{position:relative;display:block;height:58px;border-radius:9px;overflow:hidden;background:var(--g);}
-.hxs-pv i{position:absolute;left:0;top:0;bottom:0;width:22%;background:var(--n);}
-.hxs-pv b{position:absolute;background:var(--c);border-radius:4px;}
-.hxs-pv b:nth-of-type(1){left:29%;top:12%;width:44%;height:40%;}
-.hxs-pv b:nth-of-type(2){left:77%;top:12%;width:17%;height:76%;}
-.hxs-pv b:nth-of-type(3){left:29%;top:58%;width:44%;height:30%;}
 .hxs-nm{padding:0 3px 1px;}
 /* ── One header for every page ──
    A band in the scheme's navigation colour with the page title, the same on
@@ -5191,8 +5181,9 @@ body.design-heute .tst-filter .tpl-hint{color:var(--hx-og-muted);}
 
 .tpl-blk:focus-visible,.tpl-li-h:focus-visible{outline:2px solid var(--tp-link);outline-offset:2px;}
 
-/* ══ Menus: their own colour (Einstellungen → Darstellung → Menüs) ══
-   Dunkel (default, the navigation colour lifted by 6 % so a menu stands out from the side navigation and the band), Getönt or Hell. Every pop-up menu
+/* ══ Menus: one dark colour in every look ══
+   The navigation colour lifted by 6 %, so a menu stands out from the side
+   navigation and the band. Every pop-up menu
    reads the --hx-pop* tokens; inside a menu the general tokens are pointed at
    them, so rules written for cards (var(--hx-card), var(--hx-ink) …) follow
    the menu colour without being rewritten. */
@@ -5203,16 +5194,7 @@ body.design-heute{
   --hx-pop-shadow:0 20px 44px -12px rgba(5,12,30,.55),0 2px 8px rgba(5,12,30,.22);
   --hx-og:var(--hx-ink);--hx-og-muted:var(--hx-muted);--hk0-card:var(--hx-card);--hk0-ink:var(--hx-ink);
   --hx-page:var(--hx-ground);--hx-page-img:none;--hx-page-size:auto;--hx-page-att:scroll;}
-body.design-heute.hxm-tint{
-  --hx-pop:color-mix(in srgb,var(--hx-nav) 11%,var(--hx-card));--hx-pop-ink:var(--hx-ink);--hx-pop-muted:var(--hx-muted);
-  --hx-pop-line:color-mix(in srgb,var(--hx-nav) 20%,var(--hx-card));--hx-pop-hover:color-mix(in srgb,var(--hx-nav) 19%,var(--hx-card));
-  --hx-pop-field:var(--hx-card);--hx-pop-chip:color-mix(in srgb,var(--hx-nav) 17%,var(--hx-card));--hx-pop-link:var(--hx-blue);--hx-pop-tick:var(--hx-blue);--hx-pop-danger:#B42318;--hx-pop-warn:#8A5212;
-  --hx-pop-shadow:0 18px 40px -12px rgba(14,35,80,.34),0 2px 6px rgba(14,35,80,.1);}
-body.design-heute.hxm-light{
-  --hx-pop:var(--hx-card);--hx-pop-ink:var(--hx-ink);--hx-pop-muted:var(--hx-muted);--hx-pop-line:var(--hx-line);--hx-pop-hover:var(--hx-ground);
-  --hx-pop-field:var(--hx-field);--hx-pop-chip:var(--hx-card2);--hx-pop-link:var(--hx-blue);--hx-pop-tick:var(--hx-blue);--hx-pop-danger:#B42318;--hx-pop-warn:#8A5212;
-  --hx-pop-shadow:0 18px 40px -12px rgba(14,35,80,.32),0 2px 6px rgba(14,35,80,.08);}
-body.design-heute :is(.hxs-menu,.team-tabs,.user-dropdown,.notif-panel,.hx-act,#viewDropdown2,#linksDropdown,.legend-pop,.ssx-menu,.ssa-menu,.photo-menu,.pos-dd-list,.tpl-moremenu){
+body.design-heute :is(.hxs-menu,.team-tabs,.user-dropdown,.notif-panel,.hx-act,#viewDropdown2,#linksDropdown,.legend-pop,.ssx-menu,.ssa-menu,.photo-menu,.pos-dd-list,.tpl-moremenu,.db-export-dd){
   --hx-card:var(--hx-pop);--hx-card2:var(--hx-pop-chip);--hx-field:var(--hx-pop-field);--hx-ground:var(--hx-pop-hover);--hx-line:var(--hx-pop-line);
   --hx-ink:var(--hx-pop-ink);--hx-ink2:var(--hx-pop-ink);--hx-muted:var(--hx-pop-muted);--hx-blue:var(--hx-pop-link);
   --gd:var(--hx-pop-ink);--gm:var(--hx-pop-muted);--gl:var(--hx-pop-line);--ow:var(--hx-pop-hover);--muted-bg:var(--hx-pop-hover);
@@ -5222,6 +5204,9 @@ body.design-heute .tpl-moremenu{--tp-card:var(--hx-pop);--tp-ink:var(--hx-pop-in
 body.design-heute .pos-dd-list{padding:4px;}
 body.design-heute .pos-dd-opt:hover{background:var(--hx-pop-hover);}
 body.design-heute .pos-dd-opt.sel{background:var(--hx-pop-chip);}
+body.design-heute .db-export-dd{padding:6px;}
+body.design-heute .db-export-dd>div{border-radius:10px;color:var(--hx-pop-ink);}
+body.design-heute .db-export-dd>div:hover{background:var(--hx-pop-hover);}
 body.design-heute .team-tabs .ttab.active::before{background:var(--hx-pop-tick);-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12 5 5 9-10'/%3E%3C/svg%3E") center/16px no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12 5 5 9-10'/%3E%3C/svg%3E") center/16px no-repeat;}
 body.design-heute .user-dropdown .ud-item.ud-out,body.design-heute .user-dropdown .ud-item.ud-out svg{color:var(--hx-pop-danger);}
 body.design-heute .user-dropdown .ud-item.ud-warn,body.design-heute .user-dropdown .ud-item.ud-warn svg{color:var(--hx-pop-warn);}
@@ -5234,25 +5219,9 @@ body.design-heute .photo-menu-del{color:var(--hx-pop-danger);}
 body.design-heute #linksDropdown :is(input,textarea){background:var(--hx-pop-field) !important;border-color:var(--hx-pop-line) !important;color:var(--hx-pop-ink) !important;}
 body.design-heute #linksDropdown :is(input,textarea)::placeholder{color:var(--hx-pop-muted);}
 body.design-heute .ssx-menu.cst-menu{min-width:200px;padding:6px;}
-/* the settings picker for the menu colour */
-.hxm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px;padding:4px 0 14px;border-bottom:1px solid var(--hx-line);}
-.hxm-pv{position:relative;display:flex;flex-direction:column;gap:5px;justify-content:center;height:58px;padding:0 12px;border-radius:9px;box-sizing:border-box;border:1px solid var(--hx-line);}
-.hxm-pv i{display:block;height:6px;border-radius:3px;background:currentColor;opacity:.75;}
-.hxm-pv i:nth-child(1){width:70%;}.hxm-pv i:nth-child(2){width:52%;opacity:.45;}.hxm-pv i:nth-child(3){width:62%;opacity:.45;}
-.hxm-pv.d{background:color-mix(in srgb,#fff 6%,var(--hx-nav));color:#fff;border-color:var(--hx-nav);}
-.hxm-pv.t{background:color-mix(in srgb,var(--hx-nav) 11%,var(--hk0-card));color:var(--hk0-ink);}
-.hxm-pv.l{background:var(--hk0-card);color:var(--hk0-ink);}
-/* ══ More colour schemes ══
-   Flutlicht and Graphit: a dark page ground with light cards — the least
-   white of all. Nebel: soft grey, no pure white anywhere. */
+/* ══ Flutlicht: dark page ground (used by the look "Nacht" with dark cards) ══ */
 body.design-heute.hxs-flutlicht{--hx-nav:#0A1328;--hx-nav2:#142040;--hx-page:#141E36;--hx-ground:#E3E9F2;--hx-card:#EEF2F8;--hx-card2:#E1E7F1;--hx-field:#FFFFFF;--hx-line:#CBD4E3;--hx-track:#C6D0E0;--hx-ink:#0E2350;--hx-ink2:#33425F;--hx-muted:#4A5878;--hx-og:#FFFFFF;--hx-og-muted:#B6C4DE;}
-body.design-heute.hxs-graphit{--hx-nav:#14171D;--hx-nav2:#20242C;--hx-page:#2A2E36;--hx-ground:#E2E5EA;--hx-card:#ECEEF1;--hx-card2:#DFE2E7;--hx-field:#FFFFFF;--hx-line:#CDD1D8;--hx-track:#C7CBD2;--hx-ink:#1A1E26;--hx-ink2:#3A404B;--hx-muted:#4F5562;--hx-og:#FFFFFF;--hx-og-muted:#B8BEC9;}
-body.design-heute.hxs-nebel{--hx-nav:#2C3A52;--hx-nav2:#38475F;--hx-ground:#D6DCE4;--hx-card:#F0F2F5;--hx-card2:#E4E8ED;--hx-field:#FAFBFC;--hx-line:#D3D9E1;--hx-track:#CDD4DE;--hx-ink:#1B2638;--hx-ink2:#3A4659;--hx-muted:#556173;}
-body.design-heute.hxs-petrol{--hx-nav:#0D4650;--hx-nav2:#145A66;--hx-ground:#C6D8DA;--hx-card:#EAF1F1;--hx-card2:#DCE8E9;--hx-field:#F6FAFA;--hx-line:#C3D6D8;--hx-track:#BACFD2;--hx-ink:#0B2E35;--hx-ink2:#2C4A51;--hx-muted:#45636A;--hx-blue:#0E6B78;}
-body.design-heute.hxs-bordeaux{--hx-nav:#4A1424;--hx-nav2:#5E1D31;--hx-ground:#DCD2D4;--hx-card:#F4EFF0;--hx-card2:#EAE2E4;--hx-field:#FBF8F9;--hx-line:#DDD0D3;--hx-track:#D4C5C9;--hx-ink:#2C1119;--hx-ink2:#4E2E37;--hx-muted:#6A4F57;--hx-blue:#8E2442;}
-body.design-heute.hxs-stadion{--hx-nav:#0B2A1C;--hx-nav2:#123825;--hx-page:#1A4230;--hx-ground:#E1EAE3;--hx-card:#EDF3EE;--hx-card2:#E0E9E2;--hx-field:#FFFFFF;--hx-line:#C9D8CD;--hx-track:#C1D2C5;--hx-ink:#11291C;--hx-ink2:#2E4537;--hx-muted:#475F51;--hx-blue:#1D6B46;--hx-og:#FFFFFF;--hx-og-muted:#B5CCBD;}
-body.design-heute.hxs-nacht{--hx-nav:#07090E;--hx-nav2:#10141B;--hx-page:#141922;--hx-ground:#E1E4EA;--hx-card:#ECEEF2;--hx-card2:#DFE3E9;--hx-field:#FFFFFF;--hx-line:#CCD1D9;--hx-track:#C5CBD4;--hx-ink:#121722;--hx-ink2:#353D4B;--hx-muted:#4E5666;--hx-og:#FFFFFF;--hx-og-muted:#AEB6C4;}
-body.design-heute:is(.hxs-flutlicht,.hxs-graphit,.hxs-nebel,.hxs-petrol,.hxs-bordeaux,.hxs-stadion,.hxs-nacht){--gm:var(--hx-muted);}
+body.design-heute.hxs-flutlicht{--gm:var(--hx-muted);}
 
 /* ══ Page ground vs. inner ground ══
    --hx-page paints the page behind the cards (with an optional pattern,
@@ -5277,29 +5246,10 @@ body.design-heute #hxHome{background:linear-gradient(var(--hx-nav),var(--hx-nav)
   body.design-heute #moWeekReport .has-inrow-close .db-wr-wk{color:var(--hx-og) !important;}
 }
 body.design-heute #moCalendar .cal-legend{color:var(--hx-og-muted);}
-body.design-heute:is(.hxs-flutlicht,.hxs-graphit,.hxs-stadion,.hxs-nacht):not(.mx-inband) #mxBar .mx-range{color:var(--hx-og-muted);}
-body.design-heute:is(.hxs-flutlicht,.hxs-graphit,.hxs-stadion,.hxs-nacht):not(.mx-inband) #mxBar .mx-seg{background:color-mix(in srgb,var(--hx-og) 12%,transparent);}
-body.design-heute:is(.hxs-flutlicht,.hxs-graphit,.hxs-stadion,.hxs-nacht):not(.mx-inband) #mxBar .mx-seg button:not(.on){color:var(--hx-og-muted);}
-body.design-heute:is(.hxs-flutlicht,.hxs-graphit,.hxs-stadion,.hxs-nacht):not(.mx-inband) #mxBar .mx-seg button:hover:not(.on){color:var(--hx-og);background:color-mix(in srgb,var(--hx-og) 10%,transparent);}
-/* ══ Hintergrund: patterns and gradients on the page ground ══
-   Drawn in the page's own text colour at a few percent, so every pattern
-   works on light and dark grounds alike. */
-body.design-heute.hxb-verlauf{--hx-page-img:linear-gradient(170deg,transparent 0%,color-mix(in srgb,var(--hx-nav) 24%,transparent) 100%);--hx-page-att:fixed;}
-body.design-heute.hxb-licht{--hx-page-img:radial-gradient(900px 520px at 100% 0%,color-mix(in srgb,var(--hx-yellow) 26%,transparent),transparent 70%),radial-gradient(800px 600px at 0% 100%,color-mix(in srgb,var(--hx-blue) 16%,transparent),transparent 70%);--hx-page-att:fixed;}
-body.design-heute.hxb-rasen{--hx-page-img:repeating-linear-gradient(90deg,color-mix(in srgb,var(--hx-og) 5%,transparent) 0 72px,transparent 72px 144px);}
-body.design-heute.hxb-netz{--hx-page-img:repeating-linear-gradient(45deg,color-mix(in srgb,var(--hx-og) 8%,transparent) 0 1px,transparent 1px 18px),repeating-linear-gradient(-45deg,color-mix(in srgb,var(--hx-og) 8%,transparent) 0 1px,transparent 1px 18px);}
-body.design-heute.hxb-punkte{--hx-page-img:radial-gradient(color-mix(in srgb,var(--hx-og) 16%,transparent) 1.2px,transparent 1.7px);--hx-page-size:20px 20px;}
-body.design-heute.hxb-feld{--hx-page-img:radial-gradient(circle at 50% 50%,transparent 0 147px,color-mix(in srgb,var(--hx-og) 9%,transparent) 148px 150px,transparent 151px),linear-gradient(90deg,transparent calc(50% - 1px),color-mix(in srgb,var(--hx-og) 9%,transparent) calc(50% - 1px) calc(50% + 1px),transparent calc(50% + 1px)),radial-gradient(circle at 50% 50%,color-mix(in srgb,var(--hx-og) 14%,transparent) 0 4px,transparent 5px);--hx-page-att:fixed;}
-/* the settings picker for the background */
-.hxb-pv{position:relative;display:block;height:58px;border-radius:9px;border:1px solid var(--hx-line);background-color:var(--hx-page);overflow:hidden;}
-.hxb-pv::after{content:'';position:absolute;left:30%;top:22%;width:40%;height:56%;border-radius:5px;background:var(--hx-card);box-shadow:0 1px 3px rgba(0,0,0,.15);}
-.hxb-pv.b-verlauf{background-image:linear-gradient(170deg,transparent 0%,color-mix(in srgb,var(--hx-nav) 24%,transparent) 100%);}
-.hxb-pv.b-licht{background-image:radial-gradient(120px 70px at 100% 0%,color-mix(in srgb,var(--hx-yellow) 30%,transparent),transparent 75%),radial-gradient(110px 80px at 0% 100%,color-mix(in srgb,var(--hx-blue) 18%,transparent),transparent 75%);}
-.hxb-pv.b-rasen{background-image:repeating-linear-gradient(90deg,color-mix(in srgb,var(--hx-og) 7%,transparent) 0 12px,transparent 12px 24px);}
-.hxb-pv.b-netz{background-image:repeating-linear-gradient(45deg,color-mix(in srgb,var(--hx-og) 12%,transparent) 0 1px,transparent 1px 8px),repeating-linear-gradient(-45deg,color-mix(in srgb,var(--hx-og) 12%,transparent) 0 1px,transparent 1px 8px);}
-.hxb-pv.b-punkte{background-image:radial-gradient(color-mix(in srgb,var(--hx-og) 22%,transparent) 1px,transparent 1.4px);background-size:7px 7px;}
-.hxb-pv.b-feld{background-image:radial-gradient(circle at 50% 50%,transparent 0 17px,color-mix(in srgb,var(--hx-og) 16%,transparent) 18px 19px,transparent 20px),linear-gradient(90deg,transparent calc(50% - .5px),color-mix(in srgb,var(--hx-og) 16%,transparent) calc(50% - .5px) calc(50% + .5px),transparent calc(50% + .5px));}
-.hxb-pv.b-feld::after,.hxb-pv.b-licht::after{left:62%;width:30%;}
+body.design-heute.hxs-flutlicht:not(.mx-inband) #mxBar .mx-range{color:var(--hx-og-muted);}
+body.design-heute.hxs-flutlicht:not(.mx-inband) #mxBar .mx-seg{background:color-mix(in srgb,var(--hx-og) 12%,transparent);}
+body.design-heute.hxs-flutlicht:not(.mx-inband) #mxBar .mx-seg button:not(.on){color:var(--hx-og-muted);}
+body.design-heute.hxs-flutlicht:not(.mx-inband) #mxBar .mx-seg button:hover:not(.on){color:var(--hx-og);background:color-mix(in srgb,var(--hx-og) 10%,transparent);}
 /* ══ Aussehen: ready-made looks ══
    Standard (Hell with a page ground a step darker than the cards' inner
    fills, so the cards stand out), Ruhig (Stahl), Nacht (Flutlicht + dark
@@ -5322,31 +5272,11 @@ body.design-heute .setting-sub{color:var(--hx-muted);}
 .hxp-auto{position:relative;display:block;height:74px;}
 .hxp-auto .hxp-pv{position:absolute;inset:0;height:auto;}
 .hxp-auto .hxp-pv + .hxp-pv{clip-path:polygon(62% 0,100% 0,100% 100%,38% 100%);}
-.hxv-more{display:none;}
-body.design-heute .hxv-more{display:block;border-top:1px solid var(--hx-line);margin:0 0 6px;}
-.hxv-more > summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:12px 2px;font:600 .9rem 'Barlow',sans-serif;color:var(--hx-ink2);}
-.hxv-more > summary::-webkit-details-marker{display:none;}
-.hxv-more > summary::before{content:'';width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);transition:transform .15s;margin:0 3px 0 2px;}
-.hxv-more[open] > summary::before{transform:rotate(45deg);}
-.hxv-more > summary:hover{color:var(--hx-ink);}
-.hxv-more > summary:focus-visible{outline:2px solid var(--hx-blue);outline-offset:2px;border-radius:6px;}
-.hxv-more[open]{padding-bottom:6px;border-bottom:1px solid var(--hx-line);}
-/* ══ Karten (Einstellungen → Darstellung → Karten) ══
-   Hell keeps the scheme's cards. Getönt, Dunkel and Tief recolour every
-   card-like surface ("islands" below) by pointing the card tokens at --hk-*;
+/* ══ Dark cards (the look "Nacht") ══
+   Every card-like surface ("islands" below) points the card tokens at --hk-*;
    the page ground and the text on it stay with the scheme. --hk-* are worked
    out once on <body> from the scheme, so nested islands resolve to the same
-   values. Dunkel lifts the navigation colour (light schemes) or the page
-   colour (dark-page schemes); Tief goes near black. */
-body.design-heute.hxk-tint{
-  --hk-card:color-mix(in srgb,var(--hx-nav) 11%,var(--hx-card));--hk-card2:color-mix(in srgb,var(--hx-nav) 17%,var(--hx-card));
-  --hk-field:color-mix(in srgb,var(--hx-nav) 5%,var(--hx-field));--hk-ground:color-mix(in srgb,var(--hx-nav) 19%,var(--hx-card));
-  --hk-line:color-mix(in srgb,var(--hx-nav) 22%,var(--hx-card));--hk-track:color-mix(in srgb,var(--hx-nav) 27%,var(--hx-card));
-  --hk-ink:var(--hx-ink);--hk-ink2:var(--hx-ink2);--hk-muted:var(--hx-muted);--hk-blue:var(--hx-blue);
-  --hk-ok:var(--hx-ok);--hk-ok-bg:var(--hx-ok-bg);--hk-warn:var(--hx-warn);--hk-warn-bg:var(--hx-warn-bg);--hk-bad:var(--hx-bad);--hk-bad-bg:var(--hx-bad-bg);
-  --hk-solid:var(--hx-ink);--hk-on-solid:#fff;--hk-today:color-mix(in srgb,var(--hx-yellow) 26%,var(--hk-card));
-  --hk-bd:var(--bd);--hk-bm:var(--bm);--hk-bl:var(--bl);--hk-dmuted:var(--d-muted);--hk-da-bg:var(--d-a-bg);--hk-da-fg:var(--d-a-fg);
-  --hk-dm-bg:var(--d-m-bg);--hk-dm-fg:var(--d-m-fg);--hk-dq:var(--d-q-fg);--hk-sel:color-mix(in srgb,var(--hx-blue) 12%,var(--hk-card));}
+   values: the page colour of Flutlicht, lifted a step. */
 body.design-heute.hxk-dk{
   --hk-base:var(--hx-nav);--hk-lift:9%;
   --hk-card:color-mix(in srgb,#fff var(--hk-lift),var(--hk-base));
@@ -5364,11 +5294,8 @@ body.design-heute.hxk-dk{
   --hk-da-bg:color-mix(in srgb,#2FA36B 32%,var(--hk-card));--hk-da-fg:#8BE3B2;--hk-dm-bg:color-mix(in srgb,#5C8BCD 32%,var(--hk-card));--hk-dm-fg:#C4D9FF;--hk-dq:var(--hk-muted);--hk-sel:color-mix(in srgb,#5C8BCD 26%,var(--hk-card));
   --hx-on-acc:var(--hx-ink);}
 /* dark-page schemes: cards a step lighter than the page */
-body.design-heute.hxk-dark:is(.hxs-flutlicht,.hxs-graphit,.hxs-stadion,.hxs-nacht){--hk-base:var(--hx-page);--hk-lift:8%;}
-body.design-heute.hxk-dark.hxs-himmel{--hk-base:color-mix(in srgb,var(--hx-nav) 68%,#000);}
-body.design-heute.hxk-tief{--hk-base:color-mix(in srgb,var(--hx-nav) 30%,#0B0D12);--hk-lift:5%;}
-body.design-heute.hxk-tief:is(.hxs-flutlicht,.hxs-graphit,.hxs-stadion,.hxs-nacht){--hk-base:color-mix(in srgb,var(--hx-nav) 40%,#06080B);--hk-lift:3%;}
-body.design-heute:is(.hxk-tint,.hxk-dk) :is(.hx-card,.set-nav,.set-pane,#cal-content,#moCalendar :is(.cal-evt-mob,.cal-section-mob),
+body.design-heute.hxk-dark.hxs-flutlicht{--hk-base:var(--hx-page);--hk-lift:8%;}
+body.design-heute.hxk-dk :is(.hx-card,.set-nav,.set-pane,#cal-content,#moCalendar :is(.cal-evt-mob,.cal-section-mob),
   #moDashboard :is(.db-kpi,.db-card,.db-rank-col),#db-content > .db-section,.lp-sidebar,.slp-sidebar,.slp-roster-col,.lp-statsbar,.slp-popup,
   #moTeamMgr .tpanel.active,#mobNav,#mobSheet .ms-panel,.table-wrap,.mxp-row,.hxl-sess,.ma-sess-head,.ma-card,.mo:not(.hx-page) > .mob,
   #moWeekReport .wr2-sec,.wr2-grid .wr2-nm,.tpl-col,.tpl-gcard,.tst-kpi,.tpl-dlg,.tst-tip,.hk-isle){
@@ -5388,7 +5315,7 @@ body.design-heute.hxk-dk :is(.hx-card,.set-nav,.set-pane,#cal-content,#moDashboa
   --hx-shadow:0 1px 2px rgba(0,0,0,.18),0 14px 30px -14px rgba(0,0,0,.42);}
 body.design-heute.hxk-dk .hx-card:not(.hx-dark){color:var(--hx-ink);}
 /* light fills written as constants */
-body.design-heute:is(.hxk-tint,.hxk-dk) .hx-day.today{background:var(--hk-today);}
+body.design-heute.hxk-dk .hx-day.today{background:var(--hk-today);}
 body.design-heute.hxk-dk .hx-tile.ok{background:var(--hx-ok-bg);}
 body.design-heute.hxk-dk .hx-tile.warn{background:var(--hx-warn-bg);}
 body.design-heute.hxk-dk .hx-tile.open{background:var(--hx-card2);}
@@ -5506,36 +5433,26 @@ body.design-heute.hxk-dk .cal-evt-mob-match .cal-evt-mob-day{color:#F4A84A;}
 body.design-heute.hxk-dk .cal-evt-mob-event .cal-evt-mob-day{color:#6FD69E;}
 body.design-heute.hxk-dk .lp-card-pos1{filter:invert(.9) hue-rotate(180deg) saturate(1.2);}
 /* ══ Controls and text directly on a dark page ground ══
-   (Flutlicht, Graphit, Stadion, Mitternacht — and so Nacht.) The card
+   (Flutlicht, so the look Nacht.) The card
    tokens are light there, so page-level areas get their own "on ground"
    tokens: translucent fills in the page's text colour. */
 body.design-heute .db-meta{color:var(--hx-og-muted);}
 body.design-heute .db-export-row{border-top-color:color-mix(in srgb,var(--hx-og) 14%,transparent);}
-body.design-heute:is(.hxs-flutlicht,.hxs-graphit,.hxs-stadion,.hxs-nacht) :is(.db-export-row,.wr2-top,.tst-filter,#lp-subs-col){
+body.design-heute.hxs-flutlicht :is(.db-export-row,.wr2-top,.tst-filter,#lp-subs-col){
   --hx-field:color-mix(in srgb,var(--hx-og) 9%,transparent);--hx-card:color-mix(in srgb,var(--hx-og) 16%,transparent);--hx-card2:color-mix(in srgb,var(--hx-og) 8%,transparent);
   --hx-line:color-mix(in srgb,var(--hx-og) 22%,transparent);--hx-ground:color-mix(in srgb,var(--hx-og) 12%,transparent);
   --hx-ink:var(--hx-og);--hx-ink2:var(--hx-og-muted);--hx-muted:var(--hx-og-muted);
   --tp-chip:color-mix(in srgb,var(--hx-og) 10%,transparent);--tp-card:color-mix(in srgb,var(--hx-og) 18%,transparent);--tp-ink:var(--hx-og);--tp-mut:var(--hx-og-muted);
   --gd:var(--hx-og);--gm:var(--hx-og-muted);--gl:color-mix(in srgb,var(--hx-og) 18%,transparent);--bd:var(--hx-og);}
-body.design-heute:is(.hxs-flutlicht,.hxs-graphit,.hxs-stadion,.hxs-nacht) :is(.db-export-row,.wr2-top) .btn.bs{background:var(--hx-field);color:var(--hx-ink);border:1px solid var(--hx-line);}
-body.design-heute:is(.hxs-flutlicht,.hxs-graphit,.hxs-stadion,.hxs-nacht) .ma-sess-bar{background:var(--hx-page) !important;}
-body.design-heute:is(.hxs-flutlicht,.hxs-graphit,.hxs-stadion,.hxs-nacht) #lp-subs-col .lp-sub-circle:not(.filled){background:color-mix(in srgb,var(--hx-og) 6%,transparent) !important;border-color:color-mix(in srgb,var(--hx-og) 30%,transparent) !important;}
-body.design-heute:is(.hxs-flutlicht,.hxs-graphit,.hxs-stadion,.hxs-nacht) #lp-subs-col .lp-sub-circle:not(.filled) > div{color:var(--hx-og-muted) !important;}
+body.design-heute.hxs-flutlicht :is(.db-export-row,.wr2-top) .btn.bs{background:var(--hx-field);color:var(--hx-ink);border:1px solid var(--hx-line);}
+body.design-heute.hxs-flutlicht .ma-sess-bar{background:var(--hx-page) !important;}
+body.design-heute.hxs-flutlicht #lp-subs-col .lp-sub-circle:not(.filled){background:color-mix(in srgb,var(--hx-og) 6%,transparent) !important;border-color:color-mix(in srgb,var(--hx-og) 30%,transparent) !important;}
+body.design-heute.hxs-flutlicht #lp-subs-col .lp-sub-circle:not(.filled) > div{color:var(--hx-og-muted) !important;}
 @media(max-width:767px){
-  body.design-heute:is(.hxs-flutlicht,.hxs-graphit,.hxs-stadion,.hxs-nacht) :is(#moWeekReport .wr-head-nav,#moDashboard .db-header-actions){
+  body.design-heute.hxs-flutlicht :is(#moWeekReport .wr-head-nav,#moDashboard .db-header-actions){
     --hx-field:color-mix(in srgb,var(--hx-og) 9%,transparent);--hx-line:color-mix(in srgb,var(--hx-og) 22%,transparent);--hx-ink:var(--hx-og);--gl:color-mix(in srgb,var(--hx-og) 22%,transparent);--gd:var(--hx-og);}
-  body.design-heute:is(.hxs-flutlicht,.hxs-graphit,.hxs-stadion,.hxs-nacht) #moDashboard .db-header-actions .db-sel{background-color:var(--hx-field);color:var(--hx-ink);color-scheme:dark;}
+  body.design-heute.hxs-flutlicht #moDashboard .db-header-actions .db-sel{background-color:var(--hx-field);color:var(--hx-ink);color-scheme:dark;}
 }
-/* the picker */
-.hxk-pv{position:relative;display:flex;flex-direction:column;justify-content:center;gap:6px;height:58px;padding:0 10px;border-radius:9px;box-sizing:border-box;border:1px solid var(--hx-line);background:var(--hx-page);}
-.hxk-pv i{display:block;height:17px;border-radius:5px;background:var(--hk0-card);box-shadow:0 1px 2px rgba(0,0,0,.12);}
-.hxk-pv i:nth-child(2){width:64%;}
-.hxk-pv.k-tint i{background:color-mix(in srgb,var(--hx-nav) 11%,var(--hk0-card));}
-.hxk-pv.k-dark i{background:color-mix(in srgb,#fff 9%,var(--hx-nav));}
-body:is(.hxs-flutlicht,.hxs-graphit,.hxs-stadion,.hxs-nacht) .hxk-pv.k-dark i{background:color-mix(in srgb,#fff 8%,var(--hx-page));}
-.hxk-pv.k-tief i{background:color-mix(in srgb,#fff 5%,color-mix(in srgb,var(--hx-nav) 30%,#0B0D12));}
-.hxk-pv:is(.k-dark,.k-tief) i::after{content:'';display:block;width:46%;height:3px;margin:7px 0 0 7px;border-radius:2px;background:rgba(255,255,255,.75);}
-.hxk-pv:not(.k-dark):not(.k-tief) i::after{content:'';display:block;width:46%;height:3px;margin:7px 0 0 7px;border-radius:2px;background:var(--hk0-ink);opacity:.7;}
 </style>
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -6251,7 +6168,7 @@ const APP_VERSION_LABEL='1.1.2';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792112865414; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792114239074; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.1.2',date:'15.10.2026',title:'Anwesenheit als Matrix',items:[
     {icon:'🗓️',title:'Tabelle nach Kalenderwochen',desc:'Die Anwesenheit ist nach Kalenderwochen gruppiert, diese Woche ist gelb markiert, das nächste Spiel blau. Ältere Wochen sind je zu einer Spalte zusammengefasst (z. B. 2/3 = zweimal da von drei); ein Klick öffnet die Woche wieder.'},
@@ -6260,7 +6177,7 @@ const APP_CHANGELOG=[
     {icon:'📱',title:'Handy: Ansicht „Spieler“',desc:'In der Anwesenheit oben „Termine | Spieler“: jeder Spieler mit seinen letzten 10 Terminen als Balken, sortierbar nach „Schwächste zuerst“, Position oder Nummer.'},
     {icon:'🏠',title:'Übersicht',desc:'„Diese Woche“ zeigt am Computer alle sieben Tage mit Kalenderwoche, freie Tage in einer schmalen Zeile. Als Titel steht das Thema des Trainings bzw. der Gegner, darunter die Uhrzeit; vergangene Termine haben ein Häkchen und die Zahl der Anwesenden, „–/18“ heißt: noch nicht erfasst. Von Freitag bis Sonntag zeigt die Karte daneben die laufende Woche („KW … bisher“). Steht am Wochenende das Spiel oben, zeigt die Karte darunter das nächste Training hell (dunkel bleibt dem Spiel), mit „Wer kommt?“ und dem Trainingsplan. Neu unter „Im Blick“: wer die Belastung heute noch nicht bewertet hat.'},
     {icon:'↔️',title:'Navigation einklappen',desc:'Am Computer lässt sich die Seitennavigation mit dem Doppelpfeil unten neben der Glocke auf Symbole verkleinern; so hat die Tabelle mehr Platz.'},
-    {icon:'🎨',title:'Aussehen: Standard, Ruhig, Nacht, Automatisch',desc:'Einstellungen → Darstellung bietet jetzt vier fertige Ansichten: Standard (hell; der Hintergrund ist etwas dunkler, damit sich die Karten abheben), Ruhig (graublaue Karten, weniger Weiß), Nacht (alles dunkel in Vereinsblau, für abends) und Automatisch (hell, wechselt zu Nacht, wenn das Handy oder der Computer auf dunkel steht). Gilt nur für dieses Gerät. Unter „Erweitert“ lassen sich Farbschema, Karten, Menüs und Hintergrund weiter einzeln einstellen. Das Menü beim Antippen einer vergangenen Zelle in der Anwesenheit ist neu gestaltet.'},
+    {icon:'🎨',title:'Aussehen: Standard, Ruhig, Nacht, Automatisch',desc:'Einstellungen → Darstellung bietet jetzt vier fertige Ansichten: Standard (hell; der Hintergrund ist etwas dunkler, damit sich die Karten abheben), Ruhig (graublaue Karten, weniger Weiß), Nacht (alles dunkel in Vereinsblau, für abends) und Automatisch (hell, wechselt zu Nacht, wenn das Handy oder der Computer auf dunkel steht). Gilt nur für dieses Gerät. Alle Menüs sind einheitlich dunkel. Das Menü beim Antippen einer vergangenen Zelle in der Anwesenheit ist neu gestaltet.'},
     {icon:'📋',title:'Auswahllisten und Menüs',desc:'Aufklappende Listen (z. B. Mannschaft und Saison in der Statistik, Zeitraum, Formation, Ort) öffnen am Computer ein Menü im Stil der App statt der Systemliste, mit Häkchen und Tastatur (Pfeile, Enter, Esc, Anfangsbuchstabe). Alle Felder haben denselben Pfeil. Auch die Menüs für Mannschaft, Saison, Benutzer und Benachrichtigungen sind jetzt hell und einheitlich. Auf dem Handy bleibt die gewohnte Systemauswahl.'},
     {icon:'☑️',title:'Spieler auswählen',desc:'Die Mehrfach-Auswahl ist aus der Anwesenheit nach Kader → Spieler umgezogen: „Auswählen“, Spieler antippen, dann „In andere Mannschaft“ oder „Löschen“ — etwa beim Saisonwechsel. Die Position für viele auf einmal zu ändern gibt es nicht mehr; sie wird im Spielerprofil geändert.'},
     {icon:'🧭',title:'Kopfzeilen',desc:'Am Computer stehen Suche und Filter der Anwesenheit, die Reiter Tafel/Spieler/Trainer im Kader und „Spieleransicht“ im Wochenbericht in der dunklen Kopfzeile; Tabelle und Tafel beginnen dadurch weiter oben. Ist das Fenster zu schmal, bleibt die Filterleiste unter der Kopfzeile. „Ältere Wochen zusammenfassen“ steht unter „Ansicht“.'},
@@ -10427,7 +10344,7 @@ function buildSearchCorpus(){
   }
   cmds.push({label:'⌨️ Tastatur-Kürzel',meta:'Hotkeys-Übersicht',fn:()=>typeof openShortcutsHelp==='function'&&openShortcutsHelp()});
   cmds.push({label:'⚙️ Einstellungen',meta:'Konto, Darstellung, Benachrichtigungen',fn:()=>typeof openSettings==='function'&&openSettings()});
-  cmds.push({label:'🎨 Darstellung',meta:'Farbschema, Schrift',fn:()=>typeof openSettings==='function'&&openSettings('darstellung')});
+  cmds.push({label:'🎨 Darstellung',meta:'Aussehen, Schrift',fn:()=>typeof openSettings==='function'&&openSettings('darstellung')});
   cmds.push({label:'👤 Konto',meta:'Passwort, PIN, Passkey',fn:()=>typeof openSettings==='function'&&openSettings('konto')});
   cmds.push({label:'🚪 Abmelden',meta:'Logout',fn:()=>typeof confirmLogout==='function'&&confirmLogout()});
   cmds.forEach(c=>{
@@ -12749,46 +12666,28 @@ document.addEventListener('click',(e)=>{
 });
 
 // ── Appearance settings ──
-const APPEARANCE_DEFAULTS={hxPreset:'standard',hxScheme:'',hxMenu:'',hxBg:'',hxCard:'',fontScale:1,animations:true,compact:true,pushEnabled:false};
-// Colour schemes of the trainer app. '' = Hell (white cards).
-const HX_SCHEMES=[
-  ['','Hell','#0E2350','#D7DEE9','#FFFFFF'],
-  ['stahl','Stahl','#0E2350','#BAC6D8','#E6EBF2'],
-  ['himmel','Himmel','#1650A8','#C5D4EC','#EAF0FA'],
-  ['rasen','Rasen','#123D2B','#C3D2C6','#EAF0EB'],
-  ['schiefer','Schiefer','#23272F','#C4C8CE','#EBECEE'],
-  ['nebel','Nebel','#2C3A52','#D6DCE4','#F0F2F5'],
-  ['flutlicht','Flutlicht','#0A1328','#141E36','#EEF2F8'],
-  ['graphit','Graphit','#14171D','#2A2E36','#ECEEF1'],
-  ['petrol','Petrol','#0D4650','#C6D8DA','#EAF1F1'],
-  ['bordeaux','Bordeaux','#4A1424','#DCD2D4','#F4EFF0'],
-  ['stadion','Stadion','#0B2A1C','#1A4230','#EDF3EE'],
-  ['nacht','Mitternacht','#07090E','#141922','#E8EBF0'],
-];
-// Menu colour (pop-up menus): '' = Dunkel (navigation colour)
-const HX_MENUS=[['','Dunkel','d'],['tint','Getönt','t'],['light','Hell','l']];
-// Cards: '' = Hell (the scheme's own cards). Getönt and Dunkel recolour every
-// card-like surface; the page ground stays with the scheme.
-const HX_CARDS=[['','Hell'],['tint','Getönt'],['dark','Dunkel'],['tief','Tief']];
+const APPEARANCE_DEFAULTS={hxPreset:'standard',fontScale:1,animations:true,compact:true,pushEnabled:false};
+// Colour schemes behind the looks: Hell (Standard), Stahl (Ruhig), Flutlicht (Nacht)
+const HX_SCHEMES=[['','Hell'],['stahl','Stahl'],['flutlicht','Flutlicht']];
+// Cards: '' = light, 'dark' = dark cards (Nacht)
+const HX_CARDS=[['',''],['dark','']];
 // Ready-made looks (Einstellungen → Darstellung). Each sets the four fine
 // settings below; "Automatisch" follows the device (light / dark mode).
 // [key, name, hint, settings, preview colours: nav, page, card, text]
 const HX_PRESETS=[
-  ['standard','Standard','Hell und klar',{hxScheme:'',hxCard:'',hxMenu:'',hxBg:''},['#0E2350','#D7DEE9','#FFFFFF','#0E2350']],
-  ['ruhig','Ruhig','Weniger Weiß',{hxScheme:'stahl',hxCard:'',hxMenu:'',hxBg:''},['#0E2350','#BAC6D8','#E6EBF2','#0E2350']],
-  ['nacht','Nacht','Dunkel, für abends',{hxScheme:'flutlicht',hxCard:'dark',hxMenu:'',hxBg:''},['#0A1328','#141E36','#273046','#F3F6FB']],
+  ['standard','Standard','Hell und klar',{hxScheme:'',hxCard:''},['#0E2350','#D7DEE9','#FFFFFF','#0E2350']],
+  ['ruhig','Ruhig','Weniger Weiß',{hxScheme:'stahl',hxCard:''},['#0E2350','#BAC6D8','#E6EBF2','#0E2350']],
+  ['nacht','Nacht','Dunkel, für abends',{hxScheme:'flutlicht',hxCard:'dark'},['#0A1328','#141E36','#273046','#F3F6FB']],
   ['auto','Automatisch','Wie das Gerät',null,null],
 ];
-// Page background: '' = plain
-const HX_BGS=[['','Schlicht'],['verlauf','Verlauf'],['licht','Abendlicht'],['rasen','Rasen'],['netz','Netz'],['punkte','Punkte'],['feld','Mittelkreis']];
 
 function getAppearance(){
   try{
     const raw=localStorage.getItem('appearance');
     if(raw){
       const o=JSON.parse(raw)||{};
-      // Saved before the ready-made looks existed: keep a hand-picked combination
-      if(!('hxPreset' in o))o.hxPreset=(o.hxScheme||o.hxCard||o.hxMenu||o.hxBg)?'':'standard';
+      // Older saves (single settings, removed schemes) fall back to Standard
+      if(!HX_PRESETS.some(x=>x[0]===o.hxPreset))o.hxPreset='standard';
       return Object.assign({},APPEARANCE_DEFAULTS,o);
     }
   }catch(e){}
@@ -12815,11 +12714,8 @@ function applyAppearance(){
   HX_SCHEMES.forEach(x=>{if(x[0])document.body.classList.remove('hxs-'+x[0]);});
   if(hx&&s.hxScheme&&HX_SCHEMES.some(x=>x[0]===s.hxScheme))document.body.classList.add('hxs-'+s.hxScheme);
   document.body.classList.toggle('hxs-hell',hx&&!_hxSchemeCur(s));
-  document.body.classList.toggle('hxm-tint',hx&&s.hxMenu==='tint');
-  document.body.classList.toggle('hxm-light',hx&&s.hxMenu==='light');
-  HX_BGS.forEach(x=>{if(x[0])document.body.classList.toggle('hxb-'+x[0],hx&&s.hxBg===x[0]);});
   HX_CARDS.forEach(x=>{if(x[0])document.body.classList.toggle('hxk-'+x[0],hx&&s.hxCard===x[0]);});
-  document.body.classList.toggle('hxk-dk',hx&&(s.hxCard==='dark'||s.hxCard==='tief'));
+  document.body.classList.toggle('hxk-dk',hx&&s.hxCard==='dark');
   if(typeof hxApplyDesign==='function')try{hxApplyDesign();}catch(e){}
   _syncThemeColor(hx);
   document.body.classList.toggle('no-anim',!s.animations);
@@ -12835,19 +12731,12 @@ function _syncThemeColor(hx){
   if(c&&m.getAttribute('content')!==c)m.setAttribute('content',c);
 }
 // The settings a look stands for; "auto" picks Standard or Nacht by the
-// device's light / dark mode. Without a look the saved fine settings count.
+// device's light / dark mode.
 function _hxEff(s){
-  const p=HX_PRESETS.find(x=>x[0]===s.hxPreset);
-  if(!p)return s;
+  const p=HX_PRESETS.find(x=>x[0]===s.hxPreset)||HX_PRESETS[0];
   let k=p[0];
   if(k==='auto')k=(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'nacht':'standard';
   return Object.assign({},s,HX_PRESETS.find(x=>x[0]===k)[3]);
-}
-// Changing one fine setting leaves the look: start from what is on screen
-function _hxCustom(s){
-  const e=_hxEff(s);
-  s.hxScheme=e.hxScheme;s.hxCard=e.hxCard;s.hxMenu=e.hxMenu;s.hxBg=e.hxBg;s.hxPreset='';
-  return s;
 }
 function setHxPreset(v){
   const s=getAppearance();
@@ -12859,26 +12748,6 @@ try{
   const _f=()=>{if(getAppearance().hxPreset==='auto'){applyAppearance();updateAppearanceUI();}};
   if(_mq)(_mq.addEventListener?_mq.addEventListener('change',_f):_mq.addListener(_f));
 }catch(e){}
-function setHxScheme(v){
-  const s=_hxCustom(getAppearance());
-  s.hxScheme=HX_SCHEMES.some(x=>x[0]===v)?v:'';
-  saveAppearance(s);applyAppearance();updateAppearanceUI();
-}
-function setHxBg(v){
-  const s=_hxCustom(getAppearance());
-  s.hxBg=HX_BGS.some(x=>x[0]===v)?v:'';
-  saveAppearance(s);applyAppearance();updateAppearanceUI();
-}
-function setHxCard(v){
-  const s=_hxCustom(getAppearance());
-  s.hxCard=HX_CARDS.some(x=>x[0]===v)?v:'';
-  saveAppearance(s);applyAppearance();updateAppearanceUI();
-}
-function setHxMenu(v){
-  const s=_hxCustom(getAppearance());
-  s.hxMenu=HX_MENUS.some(x=>x[0]===v)?v:'';
-  saveAppearance(s);applyAppearance();updateAppearanceUI();
-}
 function _hxSchemeCur(s){
   s=s||getAppearance();
   return HX_SCHEMES.some(x=>x[0]===s.hxScheme)?s.hxScheme:'';
@@ -12915,28 +12784,6 @@ function updateAppearanceUI(){
     pg.innerHTML=HX_PRESETS.map(x=>{const on=x[0]===s0.hxPreset;
       const view=x[4]?pv(x[4]):`<span class="hxp-auto" aria-hidden="true">${pv(P('standard'))}${pv(P('nacht'))}</span>`;
       return `<button type="button" class="hxs-sw hxp-sw${on?' on':''}" aria-pressed="${on}" onclick="setHxPreset('${x[0]}')">${view}<span class="hxs-nm">${x[1]}<small>${x[2]}</small></span></button>`;}).join('');
-  }
-  const more=document.getElementById('hxMore');
-  if(more&&!s0.hxPreset&&!more.dataset.seen){more.open=true;more.dataset.seen='1';}
-  const mg=document.getElementById('hxMenuGrid');
-  if(mg){
-    const cm=HX_MENUS.some(x=>x[0]===s.hxMenu)?s.hxMenu:'';
-    mg.innerHTML=HX_MENUS.map(x=>`<button type="button" class="hxs-sw${x[0]===cm?' on':''}" aria-pressed="${x[0]===cm}" onclick="setHxMenu('${x[0]}')"><span class="hxm-pv ${x[2]}" aria-hidden="true"><i></i><i></i><i></i></span><span class="hxs-nm">${x[1]}</span></button>`).join('');
-  }
-  const kg=document.getElementById('hxCardGrid');
-  if(kg){
-    const ck=HX_CARDS.some(x=>x[0]===s.hxCard)?s.hxCard:'';
-    kg.innerHTML=HX_CARDS.map(x=>`<button type="button" class="hxs-sw${x[0]===ck?' on':''}" aria-pressed="${x[0]===ck}" onclick="setHxCard('${x[0]}')"><span class="hxk-pv${x[0]?' k-'+x[0]:''}" aria-hidden="true"><i></i><i></i></span><span class="hxs-nm">${x[1]}</span></button>`).join('');
-  }
-  const bg=document.getElementById('hxBgGrid');
-  if(bg){
-    const cb=HX_BGS.some(x=>x[0]===s.hxBg)?s.hxBg:'';
-    bg.innerHTML=HX_BGS.map(x=>`<button type="button" class="hxs-sw${x[0]===cb?' on':''}" aria-pressed="${x[0]===cb}" onclick="setHxBg('${x[0]}')"><span class="hxb-pv${x[0]?' b-'+x[0]:''}" aria-hidden="true"></span><span class="hxs-nm">${x[1]}</span></button>`).join('');
-  }
-  const hg=document.getElementById('hxSchemeGrid');
-  if(hg){
-    const cur=_hxSchemeCur(s);
-    hg.innerHTML=HX_SCHEMES.map(x=>`<button type="button" class="hxs-sw${x[0]===cur?' on':''}" aria-pressed="${x[0]===cur}" onclick="setHxScheme('${x[0]}')"><span class="hxs-pv" style="--n:${x[2]};--g:${x[3]};--c:${x[4]}" aria-hidden="true"><i></i><b></b><b></b><b></b></span><span class="hxs-nm">${x[1]}</span></button>`).join('');
   }
   document.getElementById('fs-s')?.classList.toggle('active',s.fontScale<0.95);
   document.getElementById('fs-m')?.classList.toggle('active',s.fontScale>=0.95&&s.fontScale<=1.05);
@@ -32498,7 +32345,7 @@ _pubCleanupSchedule();
   <div class="set-body">
     <nav class="set-nav" id="set-nav">
       <button type="button" class="set-nav-it" data-sec="konto" onclick="settingsShow('konto')"><span class="set-nav-ic">👤</span><span class="set-nav-tx"><b>Konto</b><small>Passwort, PIN, Passkey, Sitzung</small></span></button>
-      <button type="button" class="set-nav-it" data-sec="darstellung" onclick="settingsShow('darstellung')"><span class="set-nav-ic">🎨</span><span class="set-nav-tx"><b>Darstellung</b><small>Farbschema, Schrift</small></span></button>
+      <button type="button" class="set-nav-it" data-sec="darstellung" onclick="settingsShow('darstellung')"><span class="set-nav-ic">🎨</span><span class="set-nav-tx"><b>Darstellung</b><small>Aussehen, Schrift</small></span></button>
       <button type="button" class="set-nav-it" data-sec="benach" onclick="settingsShow('benach')"><span class="set-nav-ic">🔔</span><span class="set-nav-tx"><b>Benachrichtigungen</b><small>Push, Erinnerungen</small></span></button>
       <button type="button" class="set-nav-it" data-sec="team" onclick="settingsShow('team')"><span class="set-nav-ic">👥</span><span class="set-nav-tx"><b>Mannschaft</b><small>Vereinslogo, Titelbild, Anzeige der Spieler</small></span></button>
       <button type="button" class="set-nav-it" data-sec="daten" onclick="settingsShow('daten')"><span class="set-nav-ic">💾</span><span class="set-nav-tx"><b>Daten</b><small>Backups, Papierkorb, Verlauf</small></span></button>
@@ -32596,37 +32443,6 @@ _pubCleanupSchedule();
     </div>
   </div>
   <div class="hxp-grid hxv-grid" id="hxPresetGrid"></div>
-<details class="hxv-more" id="hxMore">
-  <summary>Erweitert: Farben einzeln einstellen</summary>
-<div class="setting-row hxv-row hxv-block">
-    <div>
-      <div class="setting-label">Farbschema</div>
-      <div class="setting-sub">Farben für Navigation, Hintergrund und Karten.</div>
-    </div>
-  </div>
-  <div class="hxs-grid hxv-grid" id="hxSchemeGrid"></div>
-<div class="setting-row hxv-row hxv-block">
-    <div>
-      <div class="setting-label">Karten</div>
-      <div class="setting-sub">Farbe der Karten und Tabellen: hell wie im Farbschema, getönt, dunkel oder ganz dunkel. Der Hintergrund bleibt.</div>
-    </div>
-  </div>
-  <div class="hxm-grid hxv-grid" id="hxCardGrid"></div>
-<div class="setting-row hxv-row hxv-block">
-    <div>
-      <div class="setting-label">Menüs</div>
-      <div class="setting-sub">Farbe der aufklappenden Menüs und Listen: dunkel wie die Navigation, getönt oder hell.</div>
-    </div>
-  </div>
-  <div class="hxm-grid hxv-grid" id="hxMenuGrid"></div>
-<div class="setting-row hxv-row hxv-block">
-    <div>
-      <div class="setting-label">Hintergrund</div>
-      <div class="setting-sub">Fläche hinter den Karten: schlicht, mit Verlauf oder mit einem leisen Muster.</div>
-    </div>
-  </div>
-  <div class="hxm-grid hxv-grid" id="hxBgGrid"></div>
-</details>
   <div class="setting-row">
     <div>
       <div class="setting-label">🔠 Schriftgröße</div>
