@@ -6220,7 +6220,7 @@ const APP_VERSION_LABEL='1.1.2';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792116401984; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792118256482; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.1.2',date:'15.10.2026',title:'Anwesenheit als Matrix',items:[
     {icon:'🗓️',title:'Tabelle nach Kalenderwochen',desc:'Die Anwesenheit ist nach Kalenderwochen gruppiert, diese Woche ist gelb markiert, das nächste Spiel blau. Ältere Wochen sind je zu einer Spalte zusammengefasst (z. B. 2/3 = zweimal da von drei); ein Klick öffnet die Woche wieder.'},
@@ -13635,9 +13635,10 @@ function generatePlayerToken(){
   else for(let i=0;i<arr.length;i++)arr[i]=Math.floor(Math.random()*256);
   return 'p_'+Array.from(arr).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
-// Open a player's own screen in a new tab, exactly as the player sees it.
-// &preview=1 additionally widens the sRPE window to 30 days, otherwise there
-// is nothing to test unless a training happened in the last 72 hours.
+// Open a player's own screen in a new tab, exactly as the player sees it —
+// the rating question included: it appears only in the player's own window
+// (end of the session until midnight). &preview=1 only keeps taps from being
+// saved under the player's name.
 function pmExitPreview(){
   let back='';
   try{back=sessionStorage.getItem('fcf_preview_back')||'';}catch(e){}
@@ -13647,7 +13648,7 @@ function pmExitPreview(){
   location.href=location.origin+location.pathname;
 }
 function previewPlayer(token){
-  if(!isAdmin()&&!canEdit())return;
+  if(!isAdmin())return;
   if(!token){alert('Dieser Spieler hat noch keinen Link.');return;}
   const url=buildHubLink(token)+'&preview=1';
   // Remember where to return to — the standalone app has no tab to close.
@@ -14600,8 +14601,8 @@ const RPE_SCALE=[
 ];
 const RPE_DEFAULT_MIN=90;      // used when the trainer set no duration
 const RPE_WINDOW_H=72;         // entry stays open this long after the session
-// Trainer preview (&preview=1): 30 days, so any recent session can be tried
-// out. Never affects a real player link — the flag has to be in the URL.
+// Trainer preview (&preview=1): the screen is identical to the player's, the
+// rating window too; preview only stops answers from being saved.
 const RPE_IS_PREVIEW=(()=>{
   try{return new URLSearchParams(location.search).get('preview')==='1';}catch(e){return false;}
 })();
@@ -14639,7 +14640,6 @@ function rpeIsOpen(s,si,p,season){
   const endMs=start.getTime()+rpeSessionMinutes(s,p,si)*60000;
   const now=Date.now();
   if(now<endMs)return false;
-  if(RPE_IS_PREVIEW)return (now-endMs)/3600000<=24*30;
   const midnight=new Date(y,m-1,d,23,59,59,999).getTime();
   return now<=midnight;
 }
@@ -15268,8 +15268,8 @@ function _pmSaveTargeted(si){
 //   repairRpe(true)  → applies + saves
 // ── ADMIN: window.checkRpeOrigin() ───────────────────────────
 // A real player can only rate between the end of a session and midnight of
-// that same day — the app enforced that window. Trainer preview widened it to
-// 30 days, so any journal entry whose timestamp falls OUTSIDE the session's
+// that same day — the app enforced that window. Trainer preview used to widen
+// it to 30 days (until 16.10.2026), so any journal entry whose timestamp falls OUTSIDE the session's
 // own evening cannot come from a player on that day: it is a preview tap (or
 // a correction made later). That timestamp is the only reliable signal —
 // preview entries carry the player's name and role like any other.
@@ -19530,7 +19530,7 @@ function applyClubLogo(){
 // opts.edit: open straight in the form — used by the pencil in the team
 // manager, where the icon already states the intent.
 function psPreviewPlayer(){
-  const pi=window._psCurrentPi;if(pi==null||!canEdit())return;
+  const pi=window._psCurrentPi;if(pi==null||!isAdmin())return;
   previewPlayer(ensurePlayerToken(pi));
 }
 function openPlayerStats(pi,opts){
@@ -19543,7 +19543,8 @@ function openPlayerStats(pi,opts){
   window._psCurrentPi=pi;
   const D=cd(),p=D.players[pi],ss=D.sessions,foc=teamFoc();
   if(!p)return;
-  {const pb=document.getElementById('ps-preview-btn');if(pb)pb.style.display=(canEdit()&&!(typeof isPlayerMode==='function'&&isPlayerMode()))?'':'none';}
+  // Spieleransicht is a test tool: admin only
+  {const pb=document.getElementById('ps-preview-btn');if(pb)pb.style.display=(typeof isAdmin==='function'&&isAdmin()&&!(typeof isPlayerMode==='function'&&isPlayerMode()))?'':'none';}
   // Presence: notify others we're viewing this player
   if(typeof setPresenceContext==='function')setPresenceContext('👤 '+(p.name||'Spieler'));
   if(typeof updateInlinePresence==='function')setTimeout(()=>updateInlinePresence(),50);
