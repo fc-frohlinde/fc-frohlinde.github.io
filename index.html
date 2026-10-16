@@ -6250,7 +6250,7 @@ const APP_VERSION_LABEL='1.1.2';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792120354073; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792149174566; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.1.2',date:'15.10.2026',title:'Anwesenheit als Matrix',items:[
     {icon:'🗓️',title:'Tabelle nach Kalenderwochen',desc:'Die Anwesenheit ist nach Kalenderwochen gruppiert, diese Woche ist gelb markiert, das nächste Spiel blau. Ältere Wochen sind je zu einer Spalte zusammengefasst (z. B. 2/3 = zweimal da von drei); ein Klick öffnet die Woche wieder.'},
@@ -9878,7 +9878,7 @@ function _navCloseLayer(el){
     // through to the class strip below and lost unsaved work in silence.
     if(el.id==='moLineup'&&typeof closeLineupPlanner==='function')return closeLineupPlanner();
     if(el.id==='moSeasonLineup'&&typeof closeSeasonLineup==='function')return closeSeasonLineup();
-    if(el.classList.contains('mo')&&el.id&&typeof closeM==='function')return closeM(el.id);
+    if(el.classList.contains('mo')&&el.id)return _navGuardClose(el.id);
   }catch(e){}
   el.classList.remove('open'); // planners and anything without a dedicated closer
 }
@@ -10555,6 +10555,20 @@ function _isTextInputFocused(){
   return false;
 }
 function _isModalOpen(){return !!document.querySelector('.mo.open, .lp-overlay.open, .tpl-ov.open');}
+// Menus and popovers have no history entry and no ✕: Esc closes them first
+function _escPopover(){
+  if(typeof HXS!=='undefined'&&HXS.menu&&typeof _hxsClose==='function'){_hxsClose(true);return true;}
+  let hit=false;
+  document.querySelectorAll('.user-dropdown.open,.notif-panel.open,#linksDropdown.open,#viewDropdown2.open,.team-tabs.open,.legend-pop.open,.ssx-menu.open,.ssa-menu.open')
+    .forEach(el=>{el.classList.remove('open');hit=true;});
+  ['hxActivity','calxMenu'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el&&!el.hidden){el.hidden=true;hit=true;if(el._btn)try{el._btn.focus();}catch(e){}}
+  });
+  const ex=document.getElementById('db-export-dd');
+  if(ex&&ex.style.display&&ex.style.display!=='none'){ex.style.display='none';hit=true;}
+  return hit;
+}
 document.addEventListener('keydown',ev=>{
   // Cmd+K / Ctrl+K → Search (works globally, even with modal open if not typing)
   if((ev.metaKey||ev.ctrlKey)&&(ev.key==='k'||ev.key==='K')){
@@ -10563,23 +10577,25 @@ document.addEventListener('keydown',ev=>{
     openSearch();
     return;
   }
-  // Esc → Close topmost open modal (overlay or .mo). Works even when typing inside.
+  // Esc closes what lies ON a page — a menu, a dialog, the player or session
+  // panel, a tool opened from somewhere — through the same close as its ✕
+  // (save questions included). Pages (Übersicht, Kalender, Kader …) are
+  // places, not layers: Esc never leaves them. It used to strip the "open"
+  // class from whatever was on top, so a page and then the Übersicht went
+  // away and the attendance table underneath was left.
   if(ev.key==='Escape'){
     if(typeof tplHandleEsc==='function'&&tplHandleEsc(ev))return; // saves before closing
-    const openModals=Array.from(document.querySelectorAll('.mo.open, .lp-overlay.open, .slp-overlay.open, .home-overlay.open'));
-    if(openModals.length){
-      // Find the one with highest z-index (visually on top)
-      let top=openModals[0];
-      let topZ=parseInt(getComputedStyle(top).zIndex,10)||0;
-      openModals.forEach(m=>{
-        const z=parseInt(getComputedStyle(m).zIndex,10)||0;
-        if(z>=topZ){topZ=z;top=m;}
-      });
-      top.classList.remove('open');
-      ev.preventDefault();
-      // Blur any focused element to drop focus back to body (so subsequent keys work)
-      if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
-    }
+    if(_escPopover()){ev.preventDefault();return;}
+    const top=typeof _navTopLayer==='function'?_navTopLayer():null;
+    if(!top||top.classList.contains('hx-page'))return;
+    // Aufstellung / Saisonkader opened from the navigation are places too
+    if((top.id==='moLineup'||top.id==='moSeasonLineup')&&top.classList.contains('hx-vianav'))return;
+    ev.preventDefault();
+    if(_navStackLen()>0&&top.classList.contains('mo')&&top.id&&typeof navBack==='function'){
+      try{navBack(top.id);}catch(e){_navCloseLayer(top);}
+    }else _navCloseLayer(top);
+    // drop focus back to the page, so the next keys work
+    if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
     return;
   }
   // All single-key shortcuts below: skip when typing or when a modal is open
@@ -10666,7 +10682,7 @@ function renderShortcutsList(){
       {keys:[cmd+'+K','/'],label:'Suche / Befehlspalette öffnen'},
       {keys:[cmd+'+Z'],label:'Rückgängig'},
       {keys:[cmd+'+Shift+Z',cmd+'+Y'],label:'Wiederholen'},
-      {keys:['Esc'],label:'Modal schließen'},
+      {keys:['Esc'],label:'Menü, Fenster oder Profil schließen (die Seite bleibt offen)'},
       {keys:['?','H'],label:'Diese Hilfe anzeigen'}
     ]},
     {title:'Navigation',rows:[
@@ -26545,8 +26561,14 @@ function initTabDrag(){
 // Navigation stack for modals
 const _navStack=[];
 function navPush(fromId){_navStack.push(fromId);}
+// The player and trainer panels ask about unsaved edits, as their ✕ does
+function _navGuardClose(id){
+  if(id==='moPlayer'&&typeof psCloseGuard==='function')return psCloseGuard();
+  if(id==='moTrainerProfile'&&typeof tpCloseGuard==='function')return tpCloseGuard();
+  return closeM(id);
+}
 function navBack(currentId){
-  closeM(currentId);
+  _navGuardClose(currentId);
   const prev=_navStack.pop();
   if(prev){
     if(prev.id==='moSession2')openSessStats(prev.si);
