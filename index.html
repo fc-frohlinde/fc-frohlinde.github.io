@@ -3369,7 +3369,7 @@ body.design-heute #moSettings #set-host-audit .db-sel{border-radius:999px !impor
 }
 /* ── Heute: training planner in Heute type and colours (full screen as before) ── */
 body.design-heute:not(.theme-dark) .tpl-ov{--tp-navy:var(--hx-nav);--tp-yel:#F2C230;--tp-bg:var(--hx-ground);--tp-card:var(--hx-card);--tp-soft:var(--hx-card2);--tp-chip:var(--hx-card2);--tp-line:var(--hx-line);--tp-line2:var(--hx-line);--tp-ink:var(--hx-ink);--tp-mut:var(--hx-muted);}
-body.design-heute :is(.tpl-ttl h2,.tpl-h3,.tpl-bm,.tpl-in-title,.tpl-ro-ttl,.tpl-empty h4,.tpl-dlg h4,.tpl-gyes .big,.tpl-gstep span,.tpl-gh b,.tpl-gp .nr,.tpp-timer,.tpp-title,.tpp-stats b,.tpp-cm){font-family:var(--hx-num);font-weight:800;letter-spacing:.2px;}
+body.design-heute :is(.tpl-ttl h2,.tpl-h3,.tpl-bm,.tpl-in-title,.tpl-ro-ttl,.tpl-empty h4,.tpl-dlg h4,.tpl-gyes .big,.tpl-gstep span,.tpl-gh b,.tpl-wxh b,.tpl-gp .nr,.tpp-timer,.tpp-title,.tpp-stats b,.tpp-cm){font-family:var(--hx-num);font-weight:800;letter-spacing:.2px;}
 body.design-heute .tpl-x{border-radius:999px;}
 body.design-heute .hx-btn.hx-plan-on{border-color:var(--hx-ok);color:var(--hx-ok);}
 /* ════════════════════════════════════════════════════════════════
@@ -4914,7 +4914,7 @@ body.design-heute .a2hs{background:var(--hx-nav);bottom:calc(var(--mob-nav-h,62p
 .tpl-ov.tpl-ro #tplLib{display:none;}
 .tpl-ov.tpl-ro #tplMain{grid-template-columns:minmax(280px,360px) minmax(0,1fr);}
 .tpl-ov.tpl-ro :is(#tplUndoBtn,#tplMoreUndo,[onclick="tplSaveTplDlg()"],[onclick="tplMoreDo(tplSaveTplDlg)"]){display:none !important;}
-.tpl-ov.tpl-ro .tpl-gset > :not(.tpl-gyes){display:none !important;}
+.tpl-ov.tpl-ro .tpl-gset > .tpl-gsett{display:none !important;}
 .tpl-ov.tpl-ro .tpl-gp{pointer-events:none;cursor:default;}
 .tpl-ov.tpl-ro .tpl-gset{align-self:start;}
 .tpl-ro-ttl{font-family:'Bebas Neue',sans-serif;font-weight:400;font-size:34px;letter-spacing:1px;line-height:1.1;color:var(--tp-ink);margin:0;}
@@ -4984,7 +4984,7 @@ body.design-heute .a2hs{background:var(--hx-nav);bottom:calc(var(--mob-nav-h,62p
 .tpl-pk .tpl-bt span{font-size:13px;color:var(--tp-mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .tpl-pk-del{width:32px;height:32px;border-radius:9px;border:1px solid var(--tp-line2);background:var(--tp-card);color:var(--tp-mut);cursor:pointer;flex:0 0 auto;}
 .tpl-pk-del.arm{background:#D9443F;border-color:#D9443F;color:#fff;width:auto;padding:0 10px;font-weight:700;font-size:12px;}
-.tpl-toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);z-index:812;background:rgba(10,20,40,.95);color:#fff;padding:10px 12px 10px 18px;border-radius:999px;font-weight:600;font-size:14px;display:flex;align-items:center;gap:12px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;box-shadow:0 6px 22px rgba(0,0,0,.35);max-width:92vw;}
+.tpl-toast{width:max-content;max-width:calc(100vw - 32px);box-sizing:border-box;position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);z-index:812;background:rgba(10,20,40,.95);color:#fff;padding:10px 12px 10px 18px;border-radius:999px;font-weight:600;font-size:14px;display:flex;align-items:center;gap:12px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;box-shadow:0 6px 22px rgba(0,0,0,.35);max-width:92vw;}
 .tpl-toast.show{opacity:1;transform:translateX(-50%);pointer-events:auto;}
 .tpl-toast button{background:var(--tp-yel);color:#0B2550;border:none;border-radius:999px;padding:6px 12px;font-weight:700;font-size:13px;cursor:pointer;}
 .tpl-toast button:empty{display:none;}
@@ -5024,7 +5024,12 @@ body.design-heute .a2hs{background:var(--hx-nav);bottom:calc(var(--mob-nav-h,62p
 .tpl-tabs button.on{background:var(--tp-yel);color:#0B2550;font-weight:700;}
 .tpl-tabs .cnt:not(:empty){font-size:11px;font-weight:700;min-width:18px;height:18px;border-radius:9px;background:rgba(255,255,255,.18);display:inline-flex;align-items:center;justify-content:center;padding:0 5px;}
 .tpl-tabs button.on .cnt:not(:empty){background:rgba(11,37,80,.15);}
-.tpl-gmain{grid-template-columns:minmax(250px,290px) minmax(0,1fr) minmax(240px,290px);}
+.tpl-gmain{grid-template-columns:minmax(250px,290px) minmax(0,1fr) minmax(240px,290px);grid-template-rows:auto minmax(0,1fr);
+  grid-template-areas:"set tabs side" "set mid side";}
+.tpl-gmain > .tpl-gset{grid-area:set;}
+.tpl-gmain > .tpl-gtabs{grid-area:tabs;align-self:start;}
+.tpl-gmain > .tpl-gmid{grid-area:mid;}
+.tpl-gmain > .tpl-gside{grid-area:side;}
 .tpl-gset{gap:16px;}
 .tpl-gyes{display:flex;flex-direction:column;gap:2px;}
 .tpl-gyes .big{font-family:'Bebas Neue',sans-serif;font-size:48px;line-height:.9;color:#1E8A55;}
@@ -5071,12 +5076,77 @@ body.design-heute .a2hs{background:var(--hx-nav);bottom:calc(var(--mob-nav-h,62p
 .tpl-gchip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:var(--tp-chip);font-size:13px;font-weight:700;}
 .tpl-gchip i{width:10px;height:10px;border-radius:50%;display:inline-block;}
 .tpl-grow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:4px;}
+/* Einteilungen (16.10.): tabs above the cards, "Gruppen im Ablauf", Wechsel */
+.tpl-gsett{display:flex;flex-direction:column;gap:16px;}
+.tpl-gmid{display:flex;flex-direction:column;gap:12px;min-height:0;min-width:0;}
+.tpl-gmid > .tpl-ggrid{flex:1 1 auto;}
+.tpl-gtabs{display:flex;gap:8px;overflow-x:auto;flex:0 0 auto;padding:2px;scrollbar-width:thin;min-width:0;}
+.tpl-gtab{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;min-width:150px;max-width:280px;padding:9px 14px;border-radius:14px;
+  border:1px solid var(--tp-line2);background:var(--tp-card);color:var(--tp-ink);font:inherit;text-align:left;cursor:pointer;flex:0 0 auto;}
+.tpl-gtab:hover{border-color:var(--tp-mut);}
+.tpl-gtab.on{border-color:var(--tp-navy);box-shadow:inset 0 0 0 1px var(--tp-navy);}
+.tpl-gtab .t{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;white-space:nowrap;}
+.tpl-gtab .t > b{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:7px;background:var(--tp-navy);color:#FFFFFF;font-size:14px;}
+.tpl-gtab .t .tpl-bgd{margin:0;}
+.tpl-gtab .s{font-size:12.5px;color:var(--tp-mut);max-width:250px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tpl-gtab.add{border-style:dashed;min-width:0;}
+.tpl-gtab.add .t{color:var(--tp-link);}
+.tpl-gtab.wx{margin-left:auto;min-width:0;}
+.tpl-gtab.wx .t svg{color:var(--tp-link);}
+.tpl-gtab .cnt{font-size:11px;font-weight:700;min-width:18px;height:18px;border-radius:9px;background:var(--tp-chip);display:inline-flex;align-items:center;justify-content:center;padding:0 5px;}
+.tpl-gdot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:0 0 auto;}
+.tpl-gdot.new{background:transparent;border:1.5px dashed var(--tp-mut);box-sizing:border-box;}
+.tpl-bgd b{font-size:12px;font-weight:800;color:var(--tp-ink);margin-right:2px;}
+.tpl-bchg{display:inline-flex;align-items:center;gap:2px;margin-right:6px;color:var(--tp-link);font-weight:700;vertical-align:middle;}
+.tpl-bchg svg{width:13px;height:13px;}
+.tpl-gabl{gap:4px;}
+.tpl-gabl > b{margin-bottom:4px;}
+.tpl-gab{display:flex;align-items:center;gap:8px;min-height:36px;}
+.tpl-gab .nm{flex:1 1 auto;min-width:0;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.tpl-gseg{display:inline-flex;gap:2px;padding:2px;border-radius:9px;background:var(--tp-chip);flex:0 0 auto;max-width:100%;overflow-x:auto;}
+.tpl-gseg button{min-width:28px;height:28px;padding:0 7px;border:none;border-radius:7px;background:none;font:700 13px 'Barlow',sans-serif;color:var(--tp-mut);cursor:pointer;white-space:nowrap;}
+.tpl-gseg button:hover:not(:disabled):not(.on){color:var(--tp-ink);background:var(--tp-card);}
+.tpl-gseg button.on{background:var(--tp-navy);color:#FFFFFF;}
+.tpl-gseg button:disabled{cursor:default;}
+.tpl-gseg button:disabled:not(.on){opacity:.4;}
+.tpl-gseg.wide button{height:32px;padding:0 11px;}
+.tpl-gseg button.add{color:var(--tp-link);}
+.tpl-glbl{font-size:13px;font-weight:700;color:var(--tp-mut);}
+.tpl-glet{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:var(--tp-navy);color:#FFFFFF;font-weight:800;font-size:13px;}
+.tpl-gchg{display:inline-flex;align-items:center;gap:6px;align-self:flex-start;margin:2px 0 2px 16px;padding:4px 10px;border:none;border-radius:999px;
+  background:color-mix(in srgb,var(--tp-link) 11%,var(--tp-card));color:var(--tp-link);font:700 12.5px 'Barlow',sans-serif;cursor:pointer;}
+.tpl-org .tpl-gchg{margin-left:0;margin-top:6px;}
+.tpl-gchg:hover{background:color-mix(in srgb,var(--tp-link) 18%,var(--tp-card));}
+.tpl-gdel{align-self:flex-start;color:#B42318;font-size:14px;}
+.tpl-gdel.arm{font-weight:700;}
+.tpl-wxs{display:flex;flex-direction:column;gap:14px;min-height:0;overflow:auto;padding:2px;flex:1 1 auto;}
+.tpl-wx{flex:0 0 auto;overflow:visible;}
+.tpl-wxh{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;}
+.tpl-wxh .k{width:100%;font-size:13px;font-weight:700;color:var(--tp-mut);}
+.tpl-wxh b{font-size:20px;}
+.tpl-wxh .m{font-size:14px;color:var(--tp-mut);}
+.tpl-wxg{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;align-items:start;}
+.tpl-wxc{border:1px solid var(--tp-line2);border-radius:14px;overflow:hidden;}
+.tpl-wxc .tpl-gh{padding:8px 14px;}
+.tpl-wxc .tpl-gh b{font-size:22px;}
+.tpl-wxp{display:flex;align-items:center;gap:9px;padding:8px 8px;border-bottom:1px solid var(--tp-line);}
+.tpl-wxp:last-child{border-bottom:none;}
+.tpl-wxp .nm{flex:1 1 auto;min-width:0;font-weight:700;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.tpl-wxp .tpl-wxf{font-size:12.5px;font-weight:700;color:var(--tp-ink);white-space:nowrap;}
+.tpl-wxp.stay .nm{font-weight:500;color:var(--tp-mut);}
+.tpl-wxp.stay .tpl-wxf{font-weight:500;color:var(--tp-mut);}
+.tpp-wx{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:12px;background:rgba(232,200,64,.16);color:#F3E3A2;font-weight:700;font-size:15px;}
+.tpp-nm{white-space:nowrap;}
+.tpp-nm .tpl-gdot{width:9px;height:9px;margin-right:5px;vertical-align:1px;}
+.tpp-gnote{font-size:12px;color:#9FB0CF;}
+.tpp-gl{background:#E8C840 !important;color:#0B2550 !important;}
 .tpl-grow .tpl-lnk{padding:4px;}
 .tpl-bgd{display:inline-flex;gap:3px;margin-right:6px;vertical-align:middle;}
 .tpl-bgd i{width:8px;height:8px;border-radius:50%;display:inline-block;}
 @media (max-width:1180px){
-  .tpl-gmain{grid-template-columns:minmax(240px,280px) minmax(0,1fr);}
+  .tpl-gmain{grid-template-columns:minmax(240px,280px) minmax(0,1fr);grid-template-areas:"set tabs" "set mid" "side side";grid-template-rows:max-content max-content max-content;}
   .tpl-ggrid{overflow:visible;}
+  .tpl-wxs{overflow:visible;}
   .tpl-gside{grid-column:1/-1;overflow:visible;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));align-items:start;}
 }
 @media (max-width:760px){
@@ -5088,6 +5158,11 @@ body.design-heute .a2hs{background:var(--hx-nav);bottom:calc(var(--mob-nav-h,62p
   .tpl-hb{width:38px;padding:0;justify-content:center;}
   .tpl-tabs button{padding:7px 12px;}
   .tpl-ggrid{grid-template-columns:1fr;flex:0 0 auto;min-height:auto;}
+  .tpl-gmid,.tpl-wxs{flex:0 0 auto;min-height:auto;overflow:visible;}
+  .tpl-gmain > .tpl-gtabs{order:-1;}
+  .tpl-gtab{min-width:132px;padding:8px 12px;}
+  .tpl-gtab.wx{margin-left:0;}
+  .tpl-wxg{grid-template-columns:1fr;}
   .tpl-gside{display:flex;flex:0 0 auto;min-height:auto;align-items:stretch;}
 }
 /* Auf dem Platz */
@@ -6250,7 +6325,7 @@ const APP_VERSION_LABEL='1.1.2';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792149174566; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792153143639; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.1.2',date:'15.10.2026',title:'Anwesenheit als Matrix',items:[
     {icon:'🗓️',title:'Tabelle nach Kalenderwochen',desc:'Die Anwesenheit ist nach Kalenderwochen gruppiert, diese Woche ist gelb markiert, das nächste Spiel blau. Ältere Wochen sind je zu einer Spalte zusammengefasst (z. B. 2/3 = zweimal da von drei); ein Klick öffnet die Woche wieder.'},
@@ -6259,6 +6334,7 @@ const APP_CHANGELOG=[
     {icon:'📱',title:'Handy: Ansicht „Spieler“',desc:'In der Anwesenheit oben „Termine | Spieler“: jeder Spieler mit seinen letzten 10 Terminen als Balken, sortierbar nach „Schwächste zuerst“, Position oder Nummer.'},
     {icon:'🏠',title:'Übersicht',desc:'„Diese Woche“ zeigt am Computer alle sieben Tage mit Kalenderwoche, freie Tage in einer schmalen Zeile. Als Titel steht das Thema des Trainings bzw. der Gegner, darunter die Uhrzeit; vergangene Termine haben ein Häkchen und die Zahl der Anwesenden, „–/18“ heißt: noch nicht erfasst. Von Freitag bis Sonntag zeigt die Karte daneben die laufende Woche („KW … bisher“). Steht am Wochenende das Spiel oben, zeigt die Karte darunter das nächste Training hell (dunkel bleibt dem Spiel), mit „Wer kommt?“ und dem Trainingsplan. Neu unter „Im Blick“: wer die Belastung heute noch nicht bewertet hat.'},
     {icon:'↔️',title:'Navigation einklappen',desc:'Am Computer lässt sich die Seitennavigation mit dem Doppelpfeil unten neben dem eigenen Namen auf Symbole verkleinern; so hat die Tabelle mehr Platz.'},
+    {icon:'🔀',title:'Trainingsplaner: Gruppen pro Übung',desc:'Im Reiter „Gruppen“ kann ein Training mehrere Einteilungen haben (A, B, C …), z. B. vier Gruppen fürs Rondo und zwei Teams für die Spielform. Unter „Gruppen im Ablauf“ bekommt jede Übung ihre Einteilung. Eine neue Einteilung entsteht aus der vorigen mit möglichst wenigen Leibchenwechseln. „Wechsel“ zeigt vor jeder Übung mit neuer Einteilung, wer in welche Gruppe geht und aus welcher Farbe er kommt — auch „Auf dem Platz“ und auf dem Ausdruck.',admin:true},
     {icon:'📅',title:'Kalender neu',desc:'Am Computer: Monat mit Kalenderwochen, diese Woche hervorgehoben, heute gelb. Jeder Eintrag zeigt Uhrzeit und Thema bzw. Gegner, Spiele dunkelblau, vergangene Termine mit Anwesenheit. Monat wechseln, „+ Training“, „+ Spiel“, „+ Termin“ oben in der Kopfzeile; Saisonplan und Export unter „⋯“. Ein Klick auf einen Tag legt dort etwas an. Am Handy: die Saison als Liste nach Wochen wie „Diese Woche“ auf der Übersicht, frühere Wochen auf Knopfdruck, oben „+“ und „⋯“.'},
     {icon:'🧑‍💼',title:'Navigation und Menü unter dem Namen',desc:'Am Computer steht die Suche (Strg K) jetzt direkt in der Seitennavigation, die Glocke oben neben dem Vereinsnamen; Statistik und Wochenbericht sind etwas abgesetzt. Ein Klick auf den eigenen Namen öffnet Konto, die Darstellung (Standard, Ruhig, Nacht, Auto) zum direkten Umschalten, Tastaturkürzel und Abmelden. Am Handy hat „Mehr“ dieselben Symbole und Namen wie am Computer, unten das eigene Konto und „Abmelden“; den Saisonkader erreicht man über Aufstellung → Saison. Gibt es kein kommendes Spiel, öffnet Aufstellung direkt den Saisonkader.'},
     {icon:'🎨',title:'Aussehen: Standard, Ruhig, Nacht, Automatisch',desc:'Einstellungen → Darstellung bietet jetzt vier fertige Ansichten: Standard (hell; der Hintergrund ist etwas dunkler, damit sich die Karten abheben), Ruhig (graublaue Karten, weniger Weiß), Nacht (alles dunkel in Vereinsblau, für abends) und Automatisch (hell, wechselt zu Nacht, wenn das Handy oder der Computer auf dunkel steht). Gilt nur für dieses Gerät. Alle Menüs sind einheitlich dunkel. Das Menü beim Antippen einer vergangenen Zelle in der Anwesenheit ist neu gestaltet.'},
@@ -28463,6 +28539,16 @@ function _tplNorm(p){
   if(!p||typeof p!=='object')return null;
   p=Object.assign({},p);
   p.blocks=_tplArr(p.blocks).map(b=>_tplNewBlock(b,true));
+  // Einteilungen (since 16.10.2026); a plan from before had one split in
+  // plan.grp and b.grp = 1 — that becomes Einteilung A
+  let L=_tplArr(p.grps).filter(g=>g&&typeof g==='object'&&g.id);
+  if(!L.length&&p.grp&&typeof p.grp==='object'){
+    L=[Object.assign({},p.grp,{id:'g1',l:'A',keep:0,from:''})];
+    p.blocks.forEach(b=>{if(b.grp===1)b.grp='g1';});
+  }
+  L.forEach(g=>{g.a=_tplArr(g.a);if(!g.l)g.l='?';});
+  p.blocks.forEach(b=>{if(!b.grp||!L.some(g=>g.id===b.grp))b.grp='';});
+  p.grps=L;delete p.grp;
   return p;
 }
 function _tplNewBlock(src,keepId){
@@ -28470,7 +28556,8 @@ function _tplNewBlock(src,keepId){
   return {id:(keepId&&src.id)||_tplId('b'),cat:src.cat||'Sonstiges',title:src.title||'',
     min:(src.min===0||src.min)?(+src.min||0):15,players:src.players||'',area:src.area||'',
     desc:src.desc||'',coach:src.coach||'',org:src.org||'',libId:src.libId||'',int:(+src.int>=1&&+src.int<=10)?+src.int:'',
-    dia:(src.dia&&typeof src.dia==='object')?_tplClean(src.dia):null,grp:src.grp?1:0};
+    dia:(src.dia&&typeof src.dia==='object')?_tplClean(src.dia):null,
+    grp:(typeof src.grp==='string'&&src.grp)?src.grp:((src.grp===1||src.grp===true)?1:'')};
 }
 
 // ── Open / close
@@ -28489,7 +28576,7 @@ async function tplOpen(si,opts){
     ov._dgFocusHook=true;
     ov.addEventListener('pointerdown',e=>{DG.focus=!!(e.target.closest&&e.target.closest('#dgWrap'));},true);
   }
-  DG.focus=false;DG.tool='sel';DG.bid=null;TPL.tab='a';TPL.gOpen=null;tplTab('a');
+  DG.focus=false;DG.tool='sel';DG.bid=null;TPL.tab='a';TPL.gOpen=null;TPL.gSel=null;TPL.gView='set';tplTab('a');
   ov.classList.toggle('tpl-ro',!_tplEditor());
   {const c=document.getElementById('tplTabGCnt');if(c)c.textContent='';}
   ov.classList.add('open');
@@ -28673,14 +28760,14 @@ function _tplSaveNow(){
 
 // ── Undo (structure only — text fields keep their own undo)
 function _tplPushUndo(){
-  TPL.undo.push(JSON.stringify({b:TPL.plan.blocks,s:TPL.sel,g:TPL.plan.grp||null}));
+  TPL.undo.push(JSON.stringify({b:TPL.plan.blocks,s:TPL.sel,g:_tplGrps(),gs:TPL.gSel||null}));
   if(TPL.undo.length>40)TPL.undo.shift();
   _tplUndoBtn();
 }
 function tplUndo(){
   const x=TPL.undo.pop();if(!x||!TPL.plan)return;
   const o=JSON.parse(x);TPL.plan.blocks=o.b;TPL.sel=o.s;
-  if('g' in o){if(o.g)TPL.plan.grp=o.g;else delete TPL.plan.grp;}
+  if('g' in o){TPL.plan.grps=Array.isArray(o.g)?o.g:[];TPL.gSel=o.gs||null;}
   _tplRenderList();_tplRenderEd();_tplUndoBtn();_tplTouch();
   if(TPL.tab==='g')_tplRenderGrp();
   _tplToast('Rückgängig gemacht');
@@ -28689,7 +28776,7 @@ function _tplUndoBtn(){const b=document.getElementById('tplUndoBtn');if(b)b.disa
 
 // ── Rendering
 function _tplRenderAll(){_tplHead();_tplRenderList();_tplRenderEd();_tplRenderLib();_tplUndoBtn();_tplStatus();tplTab(TPL.tab);
-  const c=document.getElementById('tplTabGCnt');if(c)c.textContent=(TPL.plan&&TPL.plan.grp)?String(TPL.plan.grp.n):'';}
+  const c=document.getElementById('tplTabGCnt');if(c)c.textContent=TPL.plan?_tplGrpCntTxt():'';}
 function _tplHead(){
   const el=document.getElementById('tplSub');if(!el)return;
   const s=_tplSess();if(!s){el.textContent='';return;}
@@ -28715,7 +28802,8 @@ function _tplRenderList(){
       <span class="tpl-stripe" style="background:${_tplCatColor(b.cat)}"></span>${_dgThumb(b.dia)}
       <span class="tpl-bt"><span class="tpl-bk">${st[i].clock?st[i].clock+' · ':''}${_tplE(b.cat)}</span>
         <span class="tpl-bn${b.title?'':' empty'}">${b.title?_tplE(b.title):'Ohne Titel'}</span>
-        ${(b.org||(b.grp&&TPL.plan.grp))?`<span class="tpl-bo">${(b.grp&&TPL.plan.grp)?`<span class="tpl-bgd" title="In Gruppen">${_tplGrpDots()}</span>`:''}${_tplE(b.org||'In Gruppen')}</span>`:''}</span>
+        ${(()=>{const n=_tplBlkGrpNote(i);if(!b.org&&!n)return '';
+          return `<span class="tpl-bo">${n?`<span class="tpl-bgd" title="${n.many?'Einteilung '+_tplE(n.g.l)+' · ':''}${n.g.n} Gruppen">${n.many?`<b>${_tplE(n.g.l)}</b>`:''}${_tplGrpDots(n.g)}</span>`:''}${n&&n.d?`<span class="tpl-bchg" title="${n.d.moved} ${n.d.moved===1?'wechselt':'wechseln'} das Leibchen">${TPL_IC_SWAP}${n.d.moved}</span>`:''}${_tplE(b.org||(n?n.g.n+' Gruppen':''))}</span>`;})()}</span>
       <span class="tpl-bm">${+b.min||0}′</span></div>`).join('');
   let msg='';
   const dn=TPL.plan.done;
@@ -28756,9 +28844,11 @@ function _tplReadView(b,i){
       ${b.desc?`<div class="tpl-fld"><label>Ablauf</label><div class="tpl-ro-txt">${txt(b.desc)}</div></div>`:''}
       ${coach.length?`<div class="tpl-fld"><label>Coaching-Punkte</label><ul class="tpl-ro-list">${coach.map(c=>`<li>${_tplE(c)}</li>`).join('')}</ul></div>`:''}
     </div>`:''}
-    ${(org||(b.grp&&TPL.plan.grp))?`<div class="tpl-fld tpl-org"><label>Gruppen / Organisation</label>
+    ${(()=>{const n=_tplBlkGrpNote(i);if(!org&&!n)return '';
+      return `<div class="tpl-fld tpl-org"><label>Gruppen / Organisation</label>
       ${org?`<div class="tpl-ro-txt">${_tplE(org)}</div>`:''}
-      ${(b.grp&&TPL.plan.grp)?`<div class="tpl-grow">${_tplGrpChips(false)}<button type="button" class="tpl-lnk" onclick="tplTab('g')">Gruppen ansehen</button></div>`:''}</div>`:''}`;
+      ${n?`<div class="tpl-grow">${n.many?`<span class="tpl-glet">${_tplE(n.g.l)}</span>`:''}${_tplGrpChips(false,n.g)}<button type="button" class="tpl-lnk" onclick="tplGrpOpen('${n.g.id}')">Gruppen ansehen</button></div>
+        ${n.d?`<button type="button" class="tpl-gchg" onclick="tplGrpWx(${i})">${TPL_IC_SWAP}Einteilung ${_tplE(n.c.from.l)} → ${_tplE(n.g.l)} · ${n.d.moved} ${n.d.moved===1?'wechselt':'wechseln'} das Leibchen</button>`:''}`:''}</div>`;})()}`;
 }
 function _tplRenderEd(){
   const el=document.getElementById('tplEd');if(!el||!TPL.plan)return;
@@ -28807,8 +28897,11 @@ function _tplRenderEd(){
     <div class="tpl-fld"><label for="tplCoach">Coaching-Punkte</label><textarea id="tplCoach" placeholder="Ein Punkt pro Zeile" oninput="tplSetF('coach',this.value)">${_tplE(b.coach)}</textarea></div>
   </div>
   <div class="tpl-fld tpl-org"><label for="tplOrg">Gruppen / Organisation</label><input id="tplOrg" value="${_tplE(b.org)}" placeholder="z. B. Gelb + Blau → Feld 1 · Torhüter separat" oninput="tplSetF('org',this.value)">
-    <div class="tpl-grow"><label class="tpl-chk sm"><input type="checkbox"${b.grp?' checked':''} onchange="tplBlockGrp(this.checked)">In Trainingsgruppen</label>
-      ${b.grp?_tplGrpChips(false)+`<button type="button" class="tpl-lnk" onclick="tplTab('g')">Gruppen bearbeiten</button>`:''}</div></div>`;
+    ${(()=>{const L=_tplGrpsOrdered();const n=_tplBlkGrpNote(i);const cur=b.grp||'';
+      const opts=[{id:'',t:'Keine'}].concat(L.map(g=>({id:g.id,t:(L.length>1?g.l+' · ':'')+g.n+' Gruppen'}))).concat([{id:'+',t:L.length?'+ Neue Einteilung':'+ In Gruppen'}]);
+      return `<div class="tpl-grow"><span class="tpl-glbl">Trainingsgruppen</span><span class="tpl-gseg wide" role="group" aria-label="Trainingsgruppen für diese Übung">${opts.map(o=>`<button type="button" class="${cur===o.id?'on':''}${o.id==='+'?' add':''}" aria-pressed="${cur===o.id}" onclick="tplBlockGrpSet('${o.id}')">${_tplE(o.t)}</button>`).join('')}</span></div>
+      ${n?`<div class="tpl-grow">${_tplGrpChips(false,n.g)}<button type="button" class="tpl-lnk" onclick="tplGrpOpen('${n.g.id}')">Gruppen bearbeiten</button></div>
+        ${n.d?`<button type="button" class="tpl-gchg" onclick="tplGrpWx(${i})">${TPL_IC_SWAP}Einteilung ${_tplE(n.c.from.l)} → ${_tplE(n.g.l)} · ${n.d.moved} ${n.d.moved===1?'wechselt':'wechseln'} das Leibchen</button>`:''}`:''}`;})()}</div>`;
   _tplGrow(document.getElementById('tplTitle'));
   _dgMount();
 }
@@ -29031,13 +29124,30 @@ function _tplMiniBar(bl){
   const tot=_tplTotal(bl)||1;
   return `<span style="display:flex;flex-direction:column;width:6px;align-self:stretch;border-radius:3px;overflow:hidden;gap:1px;flex:0 0 auto">${_tplArr(bl).map(b=>`<span style="flex:${Math.max(+b.min||0,1)} 1 0;background:${_tplCatColor(b.cat)}"></span>`).join('')||'<span style="flex:1;background:#DCE3EE"></span>'}</span>`;
 }
-function _tplApplyBlocks(src,label){
+// The splits come along with their settings, not with the names: the squad
+// of that day was a different one, so each is distributed afresh, in Ablauf
+// order (fewest bib changes where the original asked for it).
+function _tplApplyBlocks(src,label,srcGrps){
   const bl=_tplArr(src).map(b=>_tplNewBlock(b));
   if(!bl.length){_tplToast('Dieser Plan ist leer');return;}
   _tplPushUndo();
-  if(TPL.mode==='append'&&TPL.plan.blocks.length){TPL.sel=TPL.plan.blocks.length;TPL.plan.blocks=TPL.plan.blocks.concat(bl);}
+  const append=TPL.mode==='append'&&TPL.plan.blocks.length;
+  if(!append){TPL.plan.grps=[];TPL.gSel=null;}
+  const S=_tplArr(srcGrps).filter(g=>g&&g.id);const map={},made=[];
+  bl.forEach(b=>{
+    if(!b.grp){b.grp='';return;}
+    const key=String(b.grp);
+    if(!map[key]){
+      const sg=S.find(g=>g.id===key);const g=_tplGrpAdd(null,true);
+      if(sg)Object.assign(g,{n:Math.max(2,Math.min(TPL_GRP.length,+sg.n||g.n)),bal:sg.bal?1:0,gk:sg.gk?1:0,perf:sg.perf?1:0,keep:sg.keep?1:0});
+      map[key]=g.id;made.push(g);
+    }
+    b.grp=map[key];
+  });
+  if(append){TPL.sel=TPL.plan.blocks.length;TPL.plan.blocks=TPL.plan.blocks.concat(bl);}
   else{TPL.plan.blocks=bl;TPL.sel=0;}
-  tplDlgClose();_tplRedraw();
+  made.forEach(g=>_tplDistribute(g));
+  tplDlgClose();_tplRedraw();if(TPL.tab==='g')_tplRenderGrp();
   _tplToast(label+' übernommen','Rückgängig',tplUndo);
 }
 function tplSaveTplDlg(){
@@ -29054,7 +29164,8 @@ function tplSaveTplDlg(){
 function tplSaveTpl(){
   const inp=document.getElementById('ttName');const name=(inp&&inp.value.trim())||'Vorlage';
   const blocks=_tplClean(TPL.plan.blocks).map(b=>{delete b.id;return b;});
-  const id=_tplId('t');const t={name:name,blocks:blocks,n:blocks.length,m:_tplTotal(blocks),upd:Date.now()};
+  const id=_tplId('t');const t={name:name,blocks:blocks,n:blocks.length,m:_tplTotal(blocks),upd:Date.now(),
+    grps:_tplGrps().map(g=>({id:g.id,l:g.l,n:g.n,bal:g.bal?1:0,gk:g.gk?1:0,perf:g.perf?1:0,keep:g.keep?1:0}))};
   TPL.tpls[id]=t;_tplWrite(_tplBase()+'/tpl/'+id,t);
   tplDlgClose();_tplToast(`Vorlage „${name}“ gespeichert`);
 }
@@ -29069,7 +29180,7 @@ function tplLoadTplDlg(){
   _tplDlg(`<h4>Vorlage laden</h4>${_tplModeSeg()}<div class="tpl-pick">${rows}</div>
     <div class="tpl-dlg-f"><button type="button" class="tpl-btn" onclick="tplDlgClose()">Schließen</button></div>`);
 }
-function tplApplyTpl(id){const t=TPL.tpls[id];if(!t)return;_tplApplyBlocks(t.blocks,`Vorlage „${t.name}“`);}
+function tplApplyTpl(id){const t=TPL.tpls[id];if(!t)return;_tplApplyBlocks(t.blocks,`Vorlage „${t.name}“`,t.grps);}
 function tplTplDel(btn,id){
   if(!btn.dataset.arm){btn.dataset.arm='1';btn.classList.add('arm');btn.textContent='Löschen?';return;}
   delete TPL.tpls[id];_tplWrite(_tplBase()+'/tpl/'+id,null);
@@ -29094,7 +29205,7 @@ async function tplApplyCopy(btn,pid){
   const p=_tplNorm(await _tplRead(_tplBase()+'/plans/'+pid));
   if(btn){btn.disabled=false;btn.style.opacity='';}
   if(!p||!p.blocks.length){_tplToast('Dieser Plan konnte nicht geladen werden');return;}
-  _tplApplyBlocks(p.blocks,'Plan vom '+(e?_tplDateLong(e.d,e.s,'short'):''));
+  _tplApplyBlocks(p.blocks,'Plan vom '+(e?_tplDateLong(e.d,e.s,'short'):''),p.grps);
 }
 
 // ── Dialog and toast
@@ -29133,7 +29244,7 @@ function _tplPrintHtml(s){
     const coach=String(b.coach||'').split(/\n+/).map(x=>x.replace(/^[-•*]\s*/,'').trim()).filter(Boolean);
     const meta=[b.players?_tplPlayersTxt(b.players):'',b.area||''].filter(Boolean).map(E).join(' · ');
     return `<section class="b"><div class="tm"><b>${starts[i].clock||('+'+starts[i].from+'′')}</b><span>${+b.min||0} Min.</span></div>
-      ${_dgHas(b.dia)?`<div class="dg">${_dgSvg(b.dia,'Skizze: '+(b.title||''))}</div>`:''}<div class="bd"><div class="k"><i style="background:${_tplCatColor(b.cat)}"></i>${E(b.cat)}${(b.grp&&TPL.plan.grp)?' · in Gruppen':''}${b.org?' · '+E(b.org):''}</div>
+      ${_dgHas(b.dia)?`<div class="dg">${_dgSvg(b.dia,'Skizze: '+(b.title||''))}</div>`:''}<div class="bd"><div class="k"><i style="background:${_tplCatColor(b.cat)}"></i>${E(b.cat)}${(()=>{const g=_tplBlkGrp(b);return g?(_tplGrps().length>1?' · Einteilung '+E(g.l):' · in Gruppen'):'';})()}${b.org?' · '+E(b.org):''}</div>
       <h2>${E(b.title||'Ohne Titel')}</h2>${meta?`<div class="m">${meta}</div>`:''}${b.desc?`<p>${E(b.desc)}</p>`:''}
       ${coach.length?`<ul>${coach.map(c=>'<li>'+E(c)+'</li>').join('')}</ul>`:''}</div></section>`;
   }).join('');
@@ -29173,6 +29284,7 @@ ul{margin:4px 0 0;padding-left:18px;font-size:12.5px;line-height:1.45;color:#2C3
 .gb{border:1px solid #DCE3EE;border-radius:6px;overflow:hidden;break-inside:avoid}
 .gbh{padding:4px 8px;font-weight:700;font-size:12px}
 .gbl{padding:5px 8px;font-size:11px;line-height:1.5}
+.gbl .fr{color:#7A879E;font-size:10px}
 .notes b{font-size:12px;color:#3A4A6B}
 .notes div{height:22px;border-bottom:1px solid #D5DCE7}
 footer{margin-top:10px;font-size:10px;color:#8A97AE;display:flex;justify-content:space-between}
@@ -29561,15 +29673,25 @@ function dgRedo(){
 }
 
 
-// ── Trainingsgruppen (Stufe 3) ───────────────────────────────
-// One split per training: plan.grp = {n, bal, gk, perf, a:[[Name, Gruppe]]}
-// (Gruppe −1 = Torhüter). Players are kept by name — indices shift when the
-// squad changes. Who is in is read live from the session's answers: new
-// Zusagen land in the smallest group, withdrawals drop out of the cards.
+// ── Trainingsgruppen (Stufe 3; Einteilungen pro Übung seit 16.10.2026) ──
+// A training can split the squad differently for different exercises:
+// plan.grps lists the splits ("Einteilungen" A, B, …), each
+//   {id, l (letter), n, bal, gk, perf, keep, from, a:[[Name, Gruppe]]}
+// (Gruppe −1 = Torhüter), and a block names its split in b.grp (id, '' =
+// none). Group i has the same colour in every split — the colour is the bib
+// — so a player whose group index changes between two splits changes bibs.
+// keep: distribute with as few bib changes as possible from the split used
+// before (from = the split it was made from, while no block uses it yet).
+// Players are kept by name — indices shift when the squad changes. Who is in
+// is read live from the session's answers: new Zusagen land in the smallest
+// group, withdrawals drop out of the cards. Plans from before 16.10. had one
+// split in plan.grp and b.grp = 1; _tplNorm turns that into Einteilung A.
 const TPL_GRP=[{n:'Gelb',bg:'#E8C840',fg:'#0B2550'},{n:'Blau',bg:'#1E5BC6',fg:'#FFFFFF'},{n:'Orange',bg:'#EE7A2E',fg:'#2B1400'},
   {n:'Weiß',bg:'#F4F7FB',fg:'#0B2550',bd:'#C9D3E3'},{n:'Rot',bg:'#D9443F',fg:'#FFFFFF'},{n:'Grün',bg:'#2E9D5B',fg:'#FFFFFF'}];
+const TPL_GK={n:'Torhüter',bg:'#14181F',fg:'#FFFFFF'};
 const TPL_LINES=[{n:'Tor',s:'TW',bg:'#EEE6FA',fg:'#5B3A9C'},{n:'Abwehr',s:'AW',bg:'#DCE8FB',fg:'#1A4E9E'},
   {n:'Mittelfeld',s:'MF',bg:'#DDF1E5',fg:'#1E6B46'},{n:'Angriff',s:'ST',bg:'#FBE3DF',fg:'#A52F35'},{n:'ohne Position',s:'–',bg:'#EEF2F8',fg:'#4E5D7C'}];
+const TPL_GL='ABCDEFGH';
 function _tplLine(p){return (typeof _ssaLineOf==='function')?_ssaLineOf(p):4;}
 function _tplPerfAvg(p){
   const a=(Array.isArray(p.perf)?p.perf:[]).filter(v=>v===1||v===2||v===3);
@@ -29588,35 +29710,79 @@ function _tplRoster(){
   });
   return R;
 }
-function _tplGrpDefault(cnt){return {n:cnt>=16?4:cnt>=9?3:2,bal:1,gk:1,perf:0,a:[]};}
+function _tplGrpDefault(cnt){return {n:cnt>=16?4:cnt>=9?3:2,bal:1,gk:1,perf:0,keep:0,from:'',a:[]};}
+function _tplGrpColor(i){return i===-1?TPL_GK:(TPL_GRP[i]||TPL_GRP[0]);}
+function _tplGrps(){
+  if(!TPL.plan)return [];
+  if(!Array.isArray(TPL.plan.grps))TPL.plan.grps=_tplArr(TPL.plan.grps).filter(g=>g&&g.id);
+  return TPL.plan.grps;
+}
+function _tplGrpById(id){return id?(_tplGrps().find(g=>g.id===id)||null):null;}
+function _tplBlkGrp(b){return (b&&b.grp)?_tplGrpById(b.grp):null;}
+// In the order the Ablauf uses them; splits no block uses yet come last
+function _tplGrpsOrdered(){
+  const L=_tplGrps(),first={};
+  (TPL.plan?TPL.plan.blocks:[]).forEach((b,i)=>{if(b.grp&&first[b.grp]==null)first[b.grp]=i;});
+  const f=g=>first[g.id]!=null?first[g.id]:999;
+  return L.slice().sort((a,b)=>(f(a)-f(b))||(L.indexOf(a)-L.indexOf(b)));
+}
+// The split shown in the Gruppen tab
+function _tplGrpCur(){
+  let g=_tplGrpById(TPL.gSel);
+  if(!g){g=_tplGrpsOrdered()[0]||null;TPL.gSel=g?g.id:null;}
+  return g;
+}
+function _tplGrpBlocks(g){return (g&&TPL.plan)?TPL.plan.blocks.map((b,i)=>({b:b,i:i})).filter(x=>x.b.grp===g.id):[];}
+// The split used just before g in the Ablauf — where the bibs come from. A
+// split no block uses yet counts from the one it was made from.
+function _tplGrpPrev(g){
+  if(!g||!TPL.plan)return null;
+  const bl=TPL.plan.blocks;const fi=bl.findIndex(b=>b.grp===g.id);
+  if(fi<0)return (g.from&&g.from!==g.id)?_tplGrpById(g.from):null;
+  for(let i=fi-1;i>=0;i--){const h=_tplBlkGrp(bl[i]);if(h&&h.id!==g.id)return h;}
+  return null;
+}
+function _tplGrpMap(g){const m={};_tplArr(g&&g.a).forEach(e=>{if(Array.isArray(e)&&e.length===2)m[e[0]]=e[1];});return m;}
 function _tplCmp(a,b){for(let i=0;i<a.length;i++){if(a[i]!==b[i])return a[i]-b[i];}return 0;}
 // Greedy split: each player goes to the group that has the fewest players;
 // ties go to fewest of his line, then to the weaker group, then by chance.
-function _tplPlace(groups,x,g){
+// With pref (his bib in the split before) and cap, he keeps his colour while
+// that group still has room.
+function _tplPlace(groups,x,g,pref,cap){
   let best=0,bk=null;
   groups.forEach((gr,i)=>{
-    const k=[gr.length,g.bal?gr.filter(y=>y.line===x.line).length:0,g.perf?gr.reduce((s,y)=>s+(4-y.perf),0):0,Math.random()];
+    const k=[(cap&&gr.length>=cap)?1:0,(pref!=null&&pref!==i)?1:0,gr.length,g.bal?gr.filter(y=>y.line===x.line).length:0,
+      g.perf?gr.reduce((s,y)=>s+(4-y.perf),0):0,Math.random()];
     if(!bk||_tplCmp(k,bk)<0){bk=k;best=i;}
   });
   groups[best].push(x);
 }
-function _tplDistribute(){
-  const g=TPL.plan.grp;const R=_tplRoster();
+function _tplDistribute(g){
+  g=g||_tplGrpCur();if(!g)return;
+  const R=_tplRoster();
   let field=R.yes.slice();const gk=[];
   if(g.gk)field=field.filter(x=>{if(x.line===0){gk.push(x);return false;}return true;});
   for(let i=field.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[field[i],field[j]]=[field[j],field[i]];}
   if(g.perf)field.sort((a,b)=>a.perf-b.perf);     // strongest first, so they spread out
   if(g.bal)field.sort((a,b)=>a.line-b.line);      // line by line (stable: keeps the order above)
   const groups=Array.from({length:g.n},()=>[]);
-  field.forEach(x=>_tplPlace(groups,x,g));
+  const base=g.keep?_tplGrpPrev(g):null,bm=base?_tplGrpMap(base):null;
+  const pref=x=>{if(!bm)return null;const o=bm[x.p.name];return (typeof o==='number'&&o>=0&&o<g.n)?o:null;};
+  let cap=0;
+  if(bm){ // players who can keep their bib go first, so the others fill up
+    cap=Math.ceil(field.length/g.n);
+    field=field.map((x,i)=>({x:x,i:i,k:pref(x)==null?1:0})).sort((a,b)=>(a.k-b.k)||(a.i-b.i)).map(o=>o.x);
+  }
+  field.forEach(x=>_tplPlace(groups,x,g,pref(x),cap));
   g.a=[];groups.forEach((gr,i)=>gr.forEach(x=>g.a.push([x.p.name,i])));gk.forEach(x=>g.a.push([x.p.name,-1]));
 }
-// Current picture: stored assignment + whoever answered since.
-function _tplGrpView(){
-  const g=TPL.plan&&TPL.plan.grp;const R=_tplRoster();
-  const V={R:R,groups:[],gk:[],changed:false};
+// Current picture of one split: stored assignment + whoever answered since.
+function _tplGrpView(g){
+  if(g===undefined)g=_tplGrpCur();
+  const R=_tplRoster();
+  const V={R:R,groups:[],gk:[],changed:false,g:g};
   if(!g)return V;
-  const map={};_tplArr(g.a).forEach(e=>{if(Array.isArray(e)&&e.length===2)map[e[0]]=e[1];});
+  const map=_tplGrpMap(g);
   V.groups=Array.from({length:g.n},()=>[]);
   const late=[];
   R.yes.forEach(x=>{
@@ -29637,13 +29803,47 @@ function _tplGrpView(){
   }
   return V;
 }
+// A first split when there is none; returns the one shown in the tab
 function _tplGrpEnsure(){
   if(!TPL.plan)return null;
-  if(!TPL.plan.grp||typeof TPL.plan.grp!=='object'){
-    TPL.plan.grp=_tplGrpDefault(_tplRoster().yes.length);_tplDistribute();_tplTouch();
+  const L=_tplGrps();
+  if(!L.length){
+    const g=Object.assign(_tplGrpDefault(_tplRoster().yes.length),{id:_tplId('g'),l:'A'});
+    L.push(g);_tplDistribute(g);TPL.gSel=g.id;_tplTouch();
   }
-  const g=TPL.plan.grp;g.n=Math.max(2,Math.min(TPL_GRP.length,+g.n||4));
+  const g=_tplGrpCur();if(g)g.n=Math.max(2,Math.min(TPL_GRP.length,+g.n||4));
   return g;
+}
+// A new split, made from `from`: the usual next step from small groups is
+// two teams, from two teams four groups — with as few bib changes as possible
+function _tplGrpAdd(from,noDist){
+  const L=_tplGrps();const used=new Set(L.map(x=>x.l));
+  const l=TPL_GL.split('').find(c=>!used.has(c))||String(L.length+1);
+  const g=Object.assign(_tplGrpDefault(_tplRoster().yes.length),{id:_tplId('g'),l:l});
+  if(from)Object.assign(g,{n:from.n>2?2:Math.min(4,TPL_GRP.length),bal:from.bal,gk:from.gk,perf:from.perf,keep:1,from:from.id});
+  L.push(g);if(!noDist)_tplDistribute(g);
+  return g;
+}
+// Where the split changes along the Ablauf: [{from, to, i (first block of to), pi (last block of from)}]
+function _tplGrpChanges(){
+  const out=[];let prev=null,prevI=-1;
+  if(!TPL.plan)return out;
+  TPL.plan.blocks.forEach((b,i)=>{
+    const g=_tplBlkGrp(b);if(!g)return;
+    if(prev&&prev.id!==g.id)out.push({from:prev,to:g,i:i,pi:prevI});
+    prev=g;prevI=i;
+  });
+  return out;
+}
+// Who goes where between two splits: per target group the players with the
+// group they come from (−1 Torhüter, null = not in the split before)
+function _tplGrpDiff(A,B){
+  const VA=_tplGrpView(A),VB=_tplGrpView(B);
+  const was={};VA.groups.forEach((gr,i)=>gr.forEach(x=>{was[x.p.name]=i;}));VA.gk.forEach(x=>{was[x.p.name]=-1;});
+  let moved=0,total=0;
+  const col=(gr,j)=>gr.map(x=>{const f=Object.prototype.hasOwnProperty.call(was,x.p.name)?was[x.p.name]:null;total++;if(f!==j)moved++;return {x:x,from:f,stay:f===j};})
+    .sort((a,b)=>(b.stay-a.stay)||((a.from==null?99:a.from)-(b.from==null?99:b.from)));
+  return {cols:VB.groups.map((gr,j)=>col(gr,j)),gk:col(VB.gk,-1),moved:moved,total:total,VB:VB};
 }
 
 // ── Tabs
@@ -29659,13 +29859,15 @@ function tplTab(t){
 }
 
 // ── Gruppen view
+const TPL_IC_SWAP='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h13l-3.5-3.5M20 16H7l3.5 3.5"/></svg>';
 function _tplPosBadge(x){const L=TPL_LINES[x.line]||TPL_LINES[4];return `<span class="tpl-pos" style="background:${L.bg};color:${L.fg}">${_tplE(x.p.pos||L.s)}</span>`;}
 function _tplMix(gr){
   const c=[0,0,0,0,0];gr.forEach(x=>c[Math.min(x.line,4)]++);
   return TPL_LINES.map((L,i)=>c[i]?L.n+' '+c[i]:'').filter(Boolean).join(' · ')||'leer';
 }
-function _tplGpRow(x,cur){
-  const g=TPL.plan.grp;const open=TPL.gOpen===x.p.name;
+function _tplDot(i){const G=_tplGrpColor(i);return `<i class="tpl-gdot" style="background:${G.bg};${G.bd?'box-shadow:inset 0 0 0 1px '+G.bd:(i===-1?'box-shadow:inset 0 0 0 1px #fff':'')}"></i>`;}
+function _tplGpRow(x,cur,g){
+  const open=TPL.gOpen===x.p.name;
   const targets=TPL_GRP.slice(0,g.n).map((G,i)=>i===cur?'':`<button type="button" style="background:${G.bg};color:${G.fg};border-color:${G.bd||G.bg}" onclick="event.stopPropagation();tplGrpMove(${x.pi},${i})">${G.n}</button>`).join('')
     +(cur!==-1?`<button type="button" class="gk" onclick="event.stopPropagation();tplGrpMove(${x.pi},-1)">Torhüter</button>`:'');
   return `<div class="tpl-gp${open?' open':''}" role="button" tabindex="0" draggable="true" data-pi="${x.pi}"
@@ -29674,54 +29876,116 @@ function _tplGpRow(x,cur){
       <span class="nr">${_tplE(x.p.nr!=null?x.p.nr:'')}</span><span class="nm">${_tplE(x.p.name)}</span>${_tplPosBadge(x)}</div>
     ${open?`<div class="tpl-gmove"><span>Nach:</span>${targets}</div>`:''}`;
 }
+function _tplGrpCntTxt(){
+  const L=_tplGrpsOrdered();
+  return !L.length?'':L.length===1?String(L[0].n):L.map(g=>g.l).join('·');
+}
+// The splits as tabs (in Ablauf order), a new one, and the changes
+function _tplGrpTabs(cur,wx){
+  const L=_tplGrpsOrdered();const ch=_tplGrpChanges();
+  const tabs=L.map(g=>{const on=!wx&&cur&&cur.id===g.id;const bl=_tplGrpBlocks(g).map(x=>x.b.title||'Ohne Titel');
+    return `<button type="button" role="tab" aria-selected="${on}" class="tpl-gtab hk-isle${on?' on':''}" onclick="tplGrpSel('${g.id}')">
+      <span class="t"><b>${_tplE(g.l)}</b><span class="tpl-bgd">${_tplGrpDots(g)}</span>${g.n} Gruppen</span>
+      <span class="s">${bl.length?_tplE(bl.join(' · ')):'noch keiner Übung zugeordnet'}</span></button>`;}).join('');
+  const add=_tplEditor()?`<button type="button" class="tpl-gtab add hk-isle" onclick="tplGrpNew()" title="Eine weitere Einteilung für andere Übungen"><span class="t">+ Neue Einteilung</span><span class="s">für andere Übungen</span></button>`:'';
+  const wb=ch.length?`<button type="button" role="tab" aria-selected="${!!wx}" class="tpl-gtab wx hk-isle${wx?' on':''}" onclick="tplGrpWx()">
+      <span class="t">${TPL_IC_SWAP}Wechsel<span class="cnt">${ch.length}</span></span><span class="s">Wer in welche Gruppe geht</span></button>`:'';
+  return `<div class="tpl-gtabs" role="tablist" aria-label="Einteilungen">${tabs}${add}${wb}</div>`;
+}
+// "Gruppen im Ablauf": every block with its split; where it changes, how
+// many change bibs (opens the Wechsel view there)
+function _tplGrpAbl(){
+  const bl=TPL.plan.blocks;if(!bl.length)return '<span class="tpl-hint">Noch keine Blöcke im Ablauf.</span>';
+  const L=_tplGrpsOrdered();const ed=_tplEditor();const ch=_tplGrpChanges();
+  let h='';
+  bl.forEach((b,i)=>{
+    const c=ch.find(x=>x.i===i);
+    if(c){const d=_tplGrpDiff(c.from,c.to);
+      h+=`<button type="button" class="tpl-gchg" onclick="tplGrpWx(${i})" title="Zeigen, wer in welche Gruppe geht">${TPL_IC_SWAP}${_tplE(c.from.l)} → ${_tplE(c.to.l)} · ${d.moved?d.moved+' '+(d.moved===1?'wechselt':'wechseln'):'niemand wechselt'}</button>`;}
+    const seg=[{id:'',t:'–',tip:'Ohne Gruppen'}].concat(L.map(g=>({id:g.id,t:g.l,tip:'Einteilung '+g.l+' · '+g.n+' Gruppen'})));
+    const cur=b.grp||'';
+    h+=`<div class="tpl-gab"><span class="tpl-catdot" style="background:${_tplCatColor(b.cat)}"></span><span class="nm">${_tplE(b.title||'Ohne Titel')}</span>
+      <span class="tpl-gseg" role="group" aria-label="Gruppen für ${_tplE(b.title||'Block '+(i+1))}">${seg.map(o=>`<button type="button" class="${cur===o.id?'on':''}" title="${_tplE(o.tip)}" aria-pressed="${cur===o.id}" onclick="tplGrpAssign(${i},'${o.id}')"${ed?'':' disabled'}>${_tplE(o.t)}</button>`).join('')}</span></div>`;
+  });
+  return h;
+}
+// The changes along the Ablauf: per target group who stays and who comes from where
+function _tplWxHtml(){
+  const ch=_tplGrpChanges();const st=_tplStarts();
+  return `<div class="tpl-wxs">`+ch.map(c=>{
+    const d=_tplGrpDiff(c.from,c.to);const b=TPL.plan.blocks[c.i];
+    const box=(list,j)=>{const G=_tplGrpColor(j);
+      return `<div class="tpl-wxc"><div class="tpl-gh" style="background:${G.bg};color:${G.fg};${G.bd?'border-bottom:1px solid '+G.bd:''}"><b>${G.n}</b><span>${list.length} Spieler</span></div>
+        <div class="tpl-gl">${list.map(o=>{const F=o.from==null?null:_tplGrpColor(o.from);
+          return `<div class="tpl-wxp${o.stay?' stay':''}">${F?_tplDot(o.from):'<i class="tpl-gdot new"></i>'}<span class="nm">${_tplE(o.x.p.name)}</span><span class="tpl-wxf">${o.stay?'bleibt':F?'aus '+F.n:'neu dabei'}</span></div>`;}).join('')||'<span class="tpl-none">–</span>'}</div></div>`;};
+    return `<section class="tpl-col tpl-wx" id="tplWx${c.i}" aria-label="Wechsel vor ${_tplE(b.title||'Block '+(c.i+1))}">
+      <div class="tpl-wxh"><span class="k">${st[c.i]&&st[c.i].clock?st[c.i].clock+' · ':''}vor „${_tplE(b.title||'Ohne Titel')}“</span>
+        <b>Einteilung ${_tplE(c.from.l)} → ${_tplE(c.to.l)}</b><span class="m">${d.moved===0?'Niemand wechselt das Leibchen':d.moved+' von '+d.total+' '+(d.moved===1?'wechselt':'wechseln')+' das Leibchen'}</span></div>
+      <div class="tpl-wxg">${d.cols.map((l,j)=>box(l,j)).join('')}${d.gk.length?box(d.gk,-1):''}</div></section>`;
+  }).join('')+`</div>`;
+}
 function _tplRenderGrp(){
   const el=document.getElementById('tplGrp');if(!el||!TPL.plan)return;
-  const g=_tplGrpEnsure();const V=_tplGrpView();
+  const g=_tplGrpEnsure();if(!g)return;
+  const wx=TPL.gView==='wx'&&_tplGrpChanges().length>0;if(!wx)TPL.gView='set';
+  const V=_tplGrpView(g);
   if(V.changed)_tplTouch();
   const R=V.R;const yes=R.yes.length;const gkN=R.yes.filter(x=>x.line===0).length;
-  const blocks=TPL.plan.blocks;
+  const prev=_tplGrpPrev(g);const used=_tplGrpBlocks(g).length;const many=_tplGrps().length>1;
   const set=`<section class="tpl-col tpl-gset" aria-label="Einteilung">
-    <div class="tpl-gyes"><span class="big">${yes}</span><b>${yes===1?'Spieler zugesagt':'Spieler zugesagt'}</b>
-      <span class="tpl-hint">${gkN?`davon ${gkN} ${gkN===1?'Torhüter':'Torhüter'} · `:''}aktualisiert sich bei neuen Antworten</span></div>
-    <div class="tpl-row" style="align-items:center"><b style="font-size:15px">Gruppen</b>
-      <div class="tpl-gstep"><button type="button" aria-label="Eine Gruppe weniger" onclick="tplGrpN(-1)"${g.n<=2?' disabled':''}>−</button><span aria-live="polite">${g.n}</span><button type="button" aria-label="Eine Gruppe mehr" onclick="tplGrpN(1)"${g.n>=TPL_GRP.length?' disabled':''}>+</button></div></div>
-    <label class="tpl-chk"><input type="checkbox"${g.bal?' checked':''} onchange="tplGrpOpt('bal',this.checked)">Positionen ausgleichen</label>
-    <label class="tpl-chk"><input type="checkbox"${g.gk?' checked':''} onchange="tplGrpOpt('gk',this.checked)">Torhüter separat</label>
-    <label class="tpl-chk"><input type="checkbox"${g.perf?' checked':''} onchange="tplGrpOpt('perf',this.checked)">Nach Leistungsnote mischen</label>
-    <button type="button" class="tpl-gbtn" onclick="tplGrpShuffle()">Neu verteilen</button>
-    <div class="tpl-gfor"><b>Gilt für</b>
-      ${blocks.length?blocks.map((b,i)=>`<label class="tpl-chk sm"><input type="checkbox"${b.grp?' checked':''} onchange="tplGrpFor(${i},this.checked)"><span class="tpl-catdot" style="background:${_tplCatColor(b.cat)}"></span>${_tplE(b.title||'Ohne Titel')}</label>`).join('')
-        :'<span class="tpl-hint">Noch keine Blöcke im Ablauf.</span>'}
-    </div>
+    <div class="tpl-gyes"><span class="big">${yes}</span><b>Spieler zugesagt</b>
+      <span class="tpl-hint">${gkN?`davon ${gkN} Torhüter · `:''}aktualisiert sich bei neuen Antworten</span></div>
+    ${wx?'':`<div class="tpl-gsett">
+      <div class="tpl-row" style="align-items:center"><b style="font-size:15px">${many?'Einteilung '+_tplE(g.l):'Gruppen'}</b>
+        <div class="tpl-gstep"><button type="button" aria-label="Eine Gruppe weniger" onclick="tplGrpN(-1)"${g.n<=2?' disabled':''}>−</button><span aria-live="polite">${g.n}</span><button type="button" aria-label="Eine Gruppe mehr" onclick="tplGrpN(1)"${g.n>=TPL_GRP.length?' disabled':''}>+</button></div></div>
+      <label class="tpl-chk"><input type="checkbox"${g.bal?' checked':''} onchange="tplGrpOpt('bal',this.checked)">Positionen ausgleichen</label>
+      <label class="tpl-chk"><input type="checkbox"${g.gk?' checked':''} onchange="tplGrpOpt('gk',this.checked)">Torhüter separat</label>
+      <label class="tpl-chk"><input type="checkbox"${g.perf?' checked':''} onchange="tplGrpOpt('perf',this.checked)">Nach Leistungsnote mischen</label>
+      ${prev?`<label class="tpl-chk" title="Wer kann, behält beim Wechsel aus Einteilung ${_tplE(prev.l)} seine Leibchenfarbe"><input type="checkbox"${g.keep?' checked':''} onchange="tplGrpOpt('keep',this.checked)">Wenige Leibchenwechsel ab ${_tplE(prev.l)}</label>`:''}
+      <button type="button" class="tpl-gbtn" onclick="tplGrpShuffle()">Neu verteilen</button>
+      ${many?`<button type="button" class="tpl-lnk tpl-gdel" onclick="tplGrpDel(this)">Einteilung ${_tplE(g.l)} löschen</button>`:''}
+    </div>`}
+    <div class="tpl-gfor tpl-gabl"><b>Gruppen im Ablauf</b>${_tplGrpAbl()}</div>
   </section>`;
   const cards=V.groups.map((gr,i)=>{const G=TPL_GRP[i];
     return `<div class="tpl-gcard" ondragover="tplGrpOver(event)" ondragleave="tplDragLeave(event)" ondrop="tplGrpDrop(event,${i})">
       <div class="tpl-gh" style="background:${G.bg};color:${G.fg};${G.bd?'border-bottom:1px solid '+G.bd:''}"><b>${G.n}</b><span>${gr.length} Spieler</span></div>
-      <div class="tpl-gl">${gr.map(x=>_tplGpRow(x,i)).join('')||'<span class="tpl-none">Hierher ziehen oder Spieler antippen.</span>'}</div>
+      <div class="tpl-gl">${gr.map(x=>_tplGpRow(x,i,g)).join('')||'<span class="tpl-none">Hierher ziehen oder Spieler antippen.</span>'}</div>
       <div class="tpl-gf">${_tplMix(gr)}</div></div>`;}).join('');
   const names=a=>a.map(x=>_tplE(x.p.name)).join(', ');
   const gkCard=(g.gk||V.gk.length)?`<section class="tpl-col tpl-gcard gk" ondragover="tplGrpOver(event)" ondragleave="tplDragLeave(event)" ondrop="tplGrpDrop(event,-1)" aria-label="Torhüter">
-      <h3 class="tpl-h3">Torhüter</h3><div class="tpl-gl">${V.gk.map(x=>_tplGpRow(x,-1)).join('')||'<span class="tpl-none">Kein Torhüter zugesagt.</span>'}</div></section>`:'';
+      <h3 class="tpl-h3">Torhüter</h3><div class="tpl-gl">${V.gk.map(x=>_tplGpRow(x,-1,g)).join('')||'<span class="tpl-none">Kein Torhüter zugesagt.</span>'}</div></section>`:'';
   const out=`<section class="tpl-col tpl-gout" aria-label="Nicht dabei"><h3 class="tpl-h3">Nicht dabei</h3>
       ${R.exc.length?`<b class="exc">Entschuldigt</b><span>${names(R.exc)}</span>`:''}
       ${R.abs.length?`<b>Fehlt</b><span>${names(R.abs)}</span>`:''}
       ${R.open.length?`<b>Noch keine Antwort</b><span>${names(R.open)}</span>`:''}
       ${(R.exc.length||R.abs.length||R.open.length)?'':'<span class="tpl-hint">Alle haben zugesagt.</span>'}
       <span class="tpl-hint">Sagt jemand nachträglich zu, landet er in der kleinsten Gruppe.</span></section>`;
-  el.innerHTML=set+`<section class="tpl-ggrid" aria-label="Gruppen">${yes?cards:'<div class="tpl-col"><div class="tpl-empty"><h4>Noch keine Zusagen</h4><p>Sobald Spieler zusagen, werden sie hier auf die Gruppen verteilt.</p></div></div>'}</section>`
-    +`<div class="tpl-gside">${gkCard}${out}</div>`;
-  const cnt=document.getElementById('tplTabGCnt');if(cnt)cnt.textContent=yes?String(g.n):'';
+  const hint=(!wx&&!used&&TPL.plan.blocks.length)?`<div class="tpl-warnbar">Einteilung ${_tplE(g.l)} gilt noch für keine Übung. Links unter „Gruppen im Ablauf“ die Übungen auf ${_tplE(g.l)} stellen.</div>`:'';
+  const mid=wx?_tplWxHtml()
+    :`<section class="tpl-ggrid" aria-label="Gruppen">${yes?cards:'<div class="tpl-col"><div class="tpl-empty"><h4>Noch keine Zusagen</h4><p>Sobald Spieler zusagen, werden sie hier auf die Gruppen verteilt.</p></div></div>'}</section>`;
+  el.innerHTML=_tplGrpTabs(g,wx)+set+`<div class="tpl-gmid">${hint}${mid}</div>`
+    +`<div class="tpl-gside">${wx?'':gkCard}${out}</div>`;
+  const cnt=document.getElementById('tplTabGCnt');if(cnt)cnt.textContent=yes?_tplGrpCntTxt():'';
 }
 function _tplGrpChanged(msg,undo){
   _tplRenderGrp();_tplRenderList();_tplTouch();
   if(msg)_tplToast(msg,undo?'Rückgängig':'',undo?tplUndo:null);
 }
+function tplGrpSel(id){if(!_tplGrpById(id))return;TPL.gSel=id;TPL.gView='set';TPL.gOpen=null;_tplRenderGrp();}
+function tplGrpWx(i){
+  TPL.gView='wx';TPL.gOpen=null;
+  if(TPL.tab!=='g')tplTab('g');else _tplRenderGrp();
+  if(i!=null){const e=document.getElementById('tplWx'+i);if(e)try{e.scrollIntoView({block:'start',behavior:'smooth'});}catch(x){e.scrollIntoView();}}
+}
+// Open the Gruppen tab at one split (from the Ablauf / block editor)
+function tplGrpOpen(id){if(id&&_tplGrpById(id))TPL.gSel=id;TPL.gView='set';tplTab('g');}
 function tplGrpToggle(pi){
   const p=(_tplD()||{}).players[pi];if(!p)return;
   TPL.gOpen=(TPL.gOpen===p.name)?null:p.name;_tplRenderGrp();
 }
 function tplGrpMove(pi,to){
-  const g=TPL.plan&&TPL.plan.grp;const p=(_tplD()||{}).players[pi];if(!g||!p)return;
+  const g=_tplGrpCur();const p=(_tplD()||{}).players[pi];if(!g||!p)return;
   _tplPushUndo();
   g.a=_tplArr(g.a).filter(e=>!(Array.isArray(e)&&e[0]===p.name));g.a.push([p.name,to]);
   TPL.gOpen=null;
@@ -29730,27 +29994,65 @@ function tplGrpMove(pi,to){
 function tplGrpN(d){
   const g=_tplGrpEnsure();if(!g)return;
   const n=Math.max(2,Math.min(TPL_GRP.length,g.n+d));if(n===g.n)return;
-  _tplPushUndo();g.n=n;_tplDistribute();
+  _tplPushUndo();g.n=n;_tplDistribute(g);
   _tplGrpChanged(n+' Gruppen, neu verteilt',true);
 }
 function tplGrpOpt(k,v){
   const g=_tplGrpEnsure();if(!g)return;
-  _tplPushUndo();g[k]=v?1:0;_tplDistribute();
+  _tplPushUndo();g[k]=v?1:0;_tplDistribute(g);
   _tplGrpChanged('Neu verteilt',true);
 }
 function tplGrpShuffle(){
   const g=_tplGrpEnsure();if(!g)return;
-  _tplPushUndo();_tplDistribute();
+  _tplPushUndo();_tplDistribute(g);
   _tplGrpChanged('Neu verteilt',true);
 }
-function tplGrpFor(i,v){
-  const b=TPL.plan&&TPL.plan.blocks[i];if(!b)return;
-  b.grp=v?1:0;_tplRenderList();if(i===TPL.sel)_tplRenderEd();_tplTouch();
+// A further split, made from the one shown (as few bib changes as possible)
+function tplGrpNew(){
+  const cur=_tplGrpEnsure();if(!cur)return;
+  _tplPushUndo();
+  const g=_tplGrpAdd(cur);TPL.gSel=g.id;TPL.gView='set';TPL.gOpen=null;
+  _tplGrpChanged(`Einteilung ${g.l} angelegt`,true);
 }
-function tplBlockGrp(v){
+function tplGrpDel(btn){
+  const g=_tplGrpCur();if(!g||_tplGrps().length<2)return;
+  if(btn&&!btn.dataset.arm){btn.dataset.arm='1';btn.textContent=`Einteilung ${g.l} wirklich löschen?`;btn.classList.add('arm');return;}
+  _tplPushUndo();
+  TPL.plan.blocks.forEach(b=>{if(b.grp===g.id)b.grp='';});
+  TPL.plan.grps=_tplGrps().filter(x=>x!==g);
+  _tplGrps().forEach(x=>{if(x.from===g.id)x.from='';});
+  TPL.gSel=null;TPL.gView='set';
+  _tplGrpChanged(`Einteilung ${g.l} gelöscht`,true);
+  _tplRenderEd();
+}
+// One block onto a split ('' = without groups)
+function tplGrpAssign(i,id){
+  const b=TPL.plan&&TPL.plan.blocks[i];if(!b)return;
+  id=id||'';if(id&&!_tplGrpById(id))return;
+  if((b.grp||'')===id)return;
+  _tplPushUndo();b.grp=id;
+  _tplGrpChanged();if(i===TPL.sel)_tplRenderEd();
+}
+// Older entry points: on = the split shown in the Gruppen tab
+function tplGrpFor(i,v){const g=v?_tplGrpEnsure():null;tplGrpAssign(i,g?g.id:'');}
+function tplBlockGrp(v){const g=v?_tplGrpEnsure():null;tplGrpAssign(TPL.sel,g?g.id:'');}
+// Block editor: none / an existing split / a new one made from the split before
+function tplBlockGrpSet(id){
   const b=_tplCur();if(!b)return;
-  b.grp=v?1:0;if(v)_tplGrpEnsure();
-  _tplRenderList();_tplRenderEd();_tplTouch();
+  if(id==='+'){
+    const bl=TPL.plan.blocks;let base=null;
+    for(let i=TPL.sel-1;i>=0&&!base;i--)base=_tplBlkGrp(bl[i]);
+    if(!base)base=_tplGrpsOrdered()[0]||null;
+    _tplPushUndo();
+    let g;
+    if(!_tplGrps().length){g=_tplGrpEnsure();}
+    else{g=_tplGrpAdd(base,true);}
+    b.grp=g.id;_tplDistribute(g);TPL.gSel=g.id;
+    _tplRenderList();_tplRenderEd();_tplTouch();if(TPL.tab==='g')_tplRenderGrp();
+    _tplToast(`Einteilung ${g.l} angelegt (${g.n} Gruppen)`,'Gruppen bearbeiten',()=>tplGrpOpen(g.id));
+    return;
+  }
+  tplGrpAssign(TPL.sel,id);
 }
 function tplGrpDrag(e,pi){
   TPL.drag={k:'gp',pi:pi};
@@ -29766,22 +30068,41 @@ function tplGrpDrop(e,to){
   if(d&&d.k==='gp')tplGrpMove(d.pi,to);
 }
 // Chips for the block editor, the Ablauf list and print
-function _tplGrpChips(small){
-  const g=TPL.plan&&TPL.plan.grp;if(!g)return '';
-  const V=_tplGrpView();
+function _tplGrpChips(small,g){
+  if(g===undefined)g=_tplGrpCur();if(!g)return '';
+  const V=_tplGrpView(g);
   return V.groups.map((gr,i)=>{const G=TPL_GRP[i];
     return `<span class="tpl-gchip${small?' sm':''}"><i style="background:${G.bg};${G.bd?'box-shadow:inset 0 0 0 1px '+G.bd:''}"></i>${G.n}${small?'':' · '+gr.length}</span>`;}).join('')
     +((V.gk.length&&!small)?`<span class="tpl-gchip"><i style="background:#14181F"></i>Torhüter · ${V.gk.length}</span>`:'');
 }
-function _tplGrpDots(){
-  const g=TPL.plan&&TPL.plan.grp;if(!g)return '';
+function _tplGrpDots(g){
+  if(g===undefined)g=_tplGrpCur();if(!g)return '';
   return TPL_GRP.slice(0,g.n).map(G=>`<i style="background:${G.bg};${G.bd?'box-shadow:inset 0 0 0 1px '+G.bd:''}"></i>`).join('');
 }
+// The block's split as a line for the Ablauf list, the editor and the read
+// view; at a change also how many change bibs
+function _tplBlkGrpNote(i){
+  const b=TPL.plan.blocks[i];const g=_tplBlkGrp(b);if(!g)return null;
+  const c=_tplGrpChanges().find(x=>x.i===i);
+  return {g:g,many:_tplGrps().length>1,d:c?_tplGrpDiff(c.from,c.to):null,c:c};
+}
+// Groups on the printed page: every split that is used, players who changed
+// bibs at the split's first change with the colour they come from
 function _tplGrpPrint(){
-  const g=TPL.plan&&TPL.plan.grp;if(!g)return '';
-  const V=_tplGrpView();if(!V.R.yes.length)return '';
-  const box=(name,bg,fg,bd,list)=>`<div class="gb"><div class="gbh" style="background:${bg};color:${fg};${bd?'border-bottom:1px solid '+bd:''}">${name} · ${list.length}</div><div class="gbl">${list.map(x=>_tplE((x.p.nr!=null&&x.p.nr!==''?x.p.nr+' ':'')+x.p.name)).join('<br>')||'–'}</div></div>`;
-  return `<div class="grp"><b class="gt">Gruppen</b><div class="gbs">${V.groups.map((gr,i)=>box(TPL_GRP[i].n,TPL_GRP[i].bg,TPL_GRP[i].fg,TPL_GRP[i].bd,gr)).join('')}${V.gk.length?box('Torhüter','#14181F','#FFFFFF','',V.gk):''}</div></div>`;
+  const L=_tplGrpsOrdered().filter(g=>_tplGrpBlocks(g).length);
+  if(!L.length)return '';
+  const R=_tplRoster();if(!R.yes.length)return '';
+  const ch=_tplGrpChanges();const multi=L.length>1;
+  return L.map(g=>{
+    const V=_tplGrpView(g);
+    const c=ch.find(x=>x.to.id===g.id);const d=c?_tplGrpDiff(c.from,c.to):null;const fm={};
+    if(d){d.cols.forEach(l=>l.forEach(o=>{fm[o.x.p.name]=o;}));d.gk.forEach(o=>{fm[o.x.p.name]=o;});}
+    const nm=x=>{const o=fm[x.p.name];
+      return _tplE((x.p.nr!=null&&x.p.nr!==''?x.p.nr+' ':'')+x.p.name)+((o&&!o.stay)?` <span class="fr">← ${o.from==null?'neu':_tplE(_tplGrpColor(o.from).n)}</span>`:'');};
+    const box=(G,list)=>`<div class="gb"><div class="gbh" style="background:${G.bg};color:${G.fg};${G.bd?'border-bottom:1px solid '+G.bd:''}">${G.n} · ${list.length}</div><div class="gbl">${list.map(nm).join('<br>')||'–'}</div></div>`;
+    const t=multi?`Einteilung ${_tplE(g.l)} · ${_tplGrpBlocks(g).map(x=>_tplE(x.b.title||'Ohne Titel')).join(', ')}${d?` · ${d.moved} ${d.moved===1?'wechselt':'wechseln'} das Leibchen (← = vorher)`:''}`:'Gruppen';
+    return `<div class="grp"><b class="gt">${t}</b><div class="gbs">${V.groups.map((gr,i)=>box(TPL_GRP[i],gr)).join('')}${V.gk.length?box(TPL_GK,V.gk):''}</div></div>`;
+  }).join('');
 }
 
 // ── Auf dem Platz (Stufe 4) ──────────────────────────────────
@@ -29939,10 +30260,19 @@ function _tplPitchRender(){
   const coach=String(b.coach||'').split(/\n+/).map(x=>x.replace(/^[-•*]\s*/,'').trim()).filter(Boolean);
   const nx=bl[bi+1];
   let grp='';
-  if(b.grp&&TPL.plan.grp){
-    const V=_tplGrpView();
-    grp=`<button type="button" class="tpp-grp" onclick="tplPitchGroups()" aria-expanded="${TPL.pv.gOpen}">${V.groups.map((gr,i)=>{const G=TPL_GRP[i];return `<span class="tpl-gchip"><i style="background:${G.bg};${G.bd?'box-shadow:inset 0 0 0 1px '+G.bd:''}"></i>${G.n} · ${gr.length}</span>`;}).join('')}${V.gk.length?`<span class="tpl-gchip"><i style="background:#14181F;box-shadow:inset 0 0 0 1px #fff"></i>TW · ${V.gk.length}</span>`:''}<span class="tpp-more">${TPL.pv.gOpen?'Namen ausblenden':'Namen zeigen'}</span></button>`
-      +(TPL.pv.gOpen?`<div class="tpp-glist">${V.groups.map((gr,i)=>`<div><b style="color:${TPL_GRP[i].bg===('#F4F7FB')?'#FFFFFF':TPL_GRP[i].bg}">${TPL_GRP[i].n}</b>${gr.map(x=>_tplE(x.p.name)).join(', ')||'–'}</div>`).join('')}${V.gk.length?`<div><b>Torhüter</b>${V.gk.map(x=>_tplE(x.p.name)).join(', ')}</div>`:''}</div>`:'');
+  const bg=_tplBlkGrp(b);
+  if(bg){
+    const V=_tplGrpView(bg);
+    // a new split starts here: who changes bibs, with the colour they come from
+    const c=_tplGrpChanges().find(x=>x.i===bi);const d=c?_tplGrpDiff(c.from,c.to):null;const fm={};
+    if(d){d.cols.forEach(l=>l.forEach(o=>{fm[o.x.p.name]=o;}));d.gk.forEach(o=>{fm[o.x.p.name]=o;});}
+    const nm=x=>{const o=fm[x.p.name];return `<span class="tpp-nm">${(o&&!o.stay&&o.from!=null)?_tplDot(o.from):''}${_tplE(x.p.name)}</span>`;};
+    const many=_tplGrps().length>1;
+    grp=(d?`<div class="tpp-wx">${TPL_IC_SWAP}<span>Neue Einteilung ${_tplE(bg.l)} · ${d.moved===0?'niemand wechselt das Leibchen':d.moved+' '+(d.moved===1?'wechselt':'wechseln')+' das Leibchen'}</span></div>`:'')
+      +`<button type="button" class="tpp-grp" onclick="tplPitchGroups()" aria-expanded="${TPL.pv.gOpen}">${many&&!d?`<span class="tpl-gchip tpp-gl">${_tplE(bg.l)}</span>`:''}${V.groups.map((gr,i)=>{const G=TPL_GRP[i];return `<span class="tpl-gchip"><i style="background:${G.bg};${G.bd?'box-shadow:inset 0 0 0 1px '+G.bd:''}"></i>${G.n} · ${gr.length}</span>`;}).join('')}${V.gk.length?`<span class="tpl-gchip"><i style="background:#14181F;box-shadow:inset 0 0 0 1px #fff"></i>TW · ${V.gk.length}</span>`:''}<span class="tpp-more">${TPL.pv.gOpen?'Namen ausblenden':(d?'Wer wohin':'Namen zeigen')}</span></button>`
+      // at a change: who stays first, then who comes, by the colour they come from
+      +(TPL.pv.gOpen?(()=>{const lists=d?d.cols.map(l=>l.map(o=>o.x)):V.groups,gkl=d?d.gk.map(o=>o.x):V.gk;
+        return `<div class="tpp-glist">${lists.map((gr,i)=>`<div><b style="color:${TPL_GRP[i].bg===('#F4F7FB')?'#FFFFFF':TPL_GRP[i].bg}">${TPL_GRP[i].n}</b>${gr.map(nm).join(', ')||'–'}</div>`).join('')}${gkl.length?`<div><b>Torhüter</b>${gkl.map(nm).join(', ')}</div>`:''}${d&&d.moved?'<div class="tpp-gnote">Punkt = Farbe vorher</div>':''}</div>`;})():'');
   }
   const running=r&&!r.paused;
   el.innerHTML=`
@@ -30286,7 +30616,8 @@ function tplMoreDo(fn){const m=document.getElementById('tplMoreMenu');if(m)m.hid
   ['tplSetF','tplSetMin','tplStepMin','tplAddBlock','tplAddLib','tplDel','tplDup','tplMove','tplDragStart','tplLibDragStart','tplDrop',
    'tplLibEdit','tplLibSave','tplLibDel','tplToLib','tplSaveTplDlg','tplSaveTpl','tplLoadTplDlg','tplApplyTpl','tplTplDel','tplCopyDlg','tplApplyCopy',
    'tplUndo','dgTool','dgSet','dgStraight','dgRotate','dgDel','dgDup','dgSetBg','dgClear','dgUndo','dgRedo',
-   'tplGrpToggle','tplGrpMove','tplGrpN','tplGrpOpt','tplGrpShuffle','tplGrpFor','tplBlockGrp','tplGrpDrag','tplGrpDrop','tplPitchSave'
+   'tplGrpToggle','tplGrpMove','tplGrpN','tplGrpOpt','tplGrpShuffle','tplGrpFor','tplBlockGrp','tplGrpDrag','tplGrpDrop','tplPitchSave',
+   'tplGrpNew','tplGrpDel','tplGrpAssign','tplBlockGrpSet'
   ].forEach(n=>{
     const f=window[n];if(typeof f!=='function')return;
     window[n]=function(){
