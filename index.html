@@ -3164,10 +3164,6 @@ body.design-heute .mo.hx-page > .mob{width:100% !important;max-width:none !impor
 body.design-heute .mo.hx-page > .mob::before{display:none;}
 
 body.design-heute #mobSheet{z-index:490;}
-/* A separator left at the very top of the user menu is hidden (hxUserMenu) */
-@media(min-width:768px){
-  body.design-heute #userDropdown .ud-lead{display:none !important;}
-}
 @media(min-width:768px){body.design-heute .mo.hx-page{left:var(--hx-navw,232px);}}
 
 /* ── Kalender, Statistik, Wochenbericht as pages ── */
@@ -4126,8 +4122,21 @@ body.design-heute.hx-navmin{--hx-navw:72px;}
   flex-direction:column;gap:4px;padding:20px 14px 16px;box-sizing:border-box;font-family:'Barlow',sans-serif;overflow-y:auto;}
 .hx-club{display:flex;align-items:center;gap:12px;padding:0 6px 16px;}
 .hx-crest{width:46px;height:46px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px var(--hx-yellow);object-fit:cover;flex-shrink:0;}
-.hx-club-nm{font-family:var(--hx-num);font-weight:800;font-size:1.3rem;line-height:1.05;letter-spacing:.2px;}
-.hx-ctx{display:flex;gap:6px;margin:0 2px 14px;}
+.hx-club-nm{font-family:var(--hx-num);font-weight:800;font-size:1.3rem;line-height:1.05;letter-spacing:.2px;flex:1;min-width:0;overflow-wrap:anywhere;}
+/* the bell sits beside the club name: news belong at the top, where the eye starts */
+#hxNav .hx-club{padding-right:0;gap:10px;}
+.hx-club .hx-club-bell{width:38px;height:38px;flex-shrink:0;margin-right:-4px;}
+.hx-ctx{display:flex;gap:6px;margin:0 2px 8px;}
+/* search for the whole app (Strg K opens the same palette) */
+.hx-nsearch{display:flex;align-items:center;gap:10px;margin:0 2px 14px;padding:0 8px 0 11px;min-height:40px;border-radius:10px;box-sizing:border-box;
+  border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#AFC0E0;font:500 .9rem 'Barlow',sans-serif;cursor:pointer;text-align:left;}
+.hx-nsearch:hover{background:rgba(255,255,255,.12);color:#fff;}
+.hx-nsearch svg{flex-shrink:0;}
+.hx-nsearch span{flex:1;min-width:0;}
+.hx-nsearch kbd{font:700 .7rem 'Barlow',sans-serif;color:#AFC0E0;border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:1px 6px;}
+@media (hover:none){.hx-nsearch kbd{display:none;}}
+/* a small break between the daily pages and the reports */
+.hx-item.grp{margin-top:10px;}
 .hx-ctx button{flex:1;display:flex;align-items:center;justify-content:space-between;gap:6px;padding:9px 11px;border-radius:10px;
   border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#fff;font:600 .86rem 'Barlow',sans-serif;cursor:pointer;min-height:40px;}
 .hx-ctx button:hover{background:rgba(255,255,255,.12);}
@@ -4162,7 +4171,9 @@ body.design-heute.hx-navmin{--hx-navw:72px;}
   body.design-heute #hxNav{padding-top:14px;padding-bottom:10px;gap:2px;}
   body.design-heute #hxNav .hx-club{padding-bottom:10px;}
   body.design-heute #hxNav .hx-crest{width:40px;height:40px;}
-  body.design-heute #hxNav .hx-ctx{margin-bottom:10px;}
+  body.design-heute #hxNav .hx-ctx{margin-bottom:6px;}
+  body.design-heute #hxNav .hx-nsearch{min-height:36px;margin-bottom:10px;}
+  body.design-heute #hxNav .hx-item.grp{margin-top:6px;}
   body.design-heute #hxNav .hx-ctx button{min-height:36px;padding-top:6px;padding-bottom:6px;}
   body.design-heute #hxNav .hx-item{min-height:40px;padding-top:8px;padding-bottom:8px;}
   body.design-heute #hxNav .hx-item.sub{min-height:36px;padding-top:6px;padding-bottom:6px;}
@@ -4170,12 +4181,34 @@ body.design-heute.hx-navmin{--hx-navw:72px;}
   body.design-heute #hxNav .hx-user{margin-top:4px;padding-top:8px;}
   body.design-heute #hxNav :is(.hx-user-btn,.hx-bell){min-height:40px;height:40px;}
   body.design-heute.hx-navmin #hxNav .hx-ctx button{min-height:28px;padding-top:3px;padding-bottom:3px;}
-  body.design-heute.hx-navmin #hxNav .hx-user .hx-bell{min-height:36px;height:36px;}
+  body.design-heute.hx-navmin #hxNav .hx-user .hx-bell{min-height:32px;height:32px;}
+  /* the icon rail carries the bell and search at the top too: tighter rows */
+  body.design-heute.hx-navmin #hxNav .hx-club{gap:2px;padding-bottom:8px;}
+  body.design-heute.hx-navmin #hxNav .hx-club .hx-club-bell{min-height:32px;height:32px;}
+  body.design-heute.hx-navmin #hxNav .hx-nsearch{min-height:32px;margin-bottom:8px;}
+  body.design-heute.hx-navmin #hxNav .hx-item{min-height:36px;padding-top:6px;padding-bottom:6px;}
+  body.design-heute.hx-navmin #hxNav .hx-item.sub{min-height:32px;padding-top:4px;padding-bottom:4px;}
+  body.design-heute.hx-navmin #hxNav .hx-item.grp{margin-top:4px;}
+  body.design-heute.hx-navmin #hxNav .hx-user-btn{min-height:36px;height:36px;}
+}
+/* very short windows (1366×768 with taskbar and bookmarks): one step tighter */
+@media(min-width:768px) and (max-height:660px){
+  body.design-heute #hxNav .hx-crest{width:34px;height:34px;}
+  body.design-heute #hxNav .hx-club{padding-bottom:8px;}
+  body.design-heute #hxNav .hx-ctx{margin-bottom:4px;}
+  body.design-heute #hxNav .hx-nsearch{min-height:34px;margin-bottom:8px;}
+  body.design-heute #hxNav .hx-item{min-height:36px;padding-top:6px;padding-bottom:6px;}
+  body.design-heute #hxNav .hx-item.sub{min-height:32px;padding-top:4px;padding-bottom:4px;}
+  body.design-heute #hxNav .hx-item.grp{margin-top:4px;}
 }
 /* collapsed: icons only */
 body.hx-navmin #hxNav{padding:16px 10px 12px;}
 body.hx-navmin .hx-club{justify-content:center;padding:0 0 12px;}
 body.hx-navmin .hx-club-nm{display:none;}
+body.hx-navmin .hx-club{flex-direction:column;gap:6px;}
+body.hx-navmin .hx-club .hx-club-bell{width:44px;margin:0;}
+body.hx-navmin .hx-nsearch{justify-content:center;padding:0;margin:0 0 10px;}
+body.hx-navmin .hx-nsearch :is(span,kbd){display:none;}
 body.hx-navmin .hx-ctx{flex-direction:column;gap:4px;margin:0 0 10px;}
 body.hx-navmin .hx-ctx button{justify-content:center;padding:5px 2px;min-height:30px;font-size:.72rem;}
 body.hx-navmin .hx-ctx button svg{display:none;}
@@ -4199,9 +4232,6 @@ body.design-heute #hxHome{display:block;height:100%;overflow-y:auto;-webkit-over
 .hx-date{display:block;font:600 .95rem/1.2 'Barlow',sans-serif;color:rgba(255,255,255,.75);margin:0 0 4px;}
 body.design-heute #hxHome.hx-has-hero .hx-date{text-shadow:0 1px 8px rgba(0,0,0,.35);}
 .hx-lead{margin:6px 0 0;font-size:1rem;color:var(--hx-muted);}
-.hx-search{display:flex;align-items:center;gap:8px;height:44px;padding:0 16px;border-radius:12px;border:1px solid var(--hx-line);background:#fff;
-  color:var(--hx-muted);font:500 .94rem 'Barlow',sans-serif;cursor:pointer;min-width:240px;}
-.hx-search:hover{border-color:#B9C6DB;}
 .hx-mtop{display:none;}
 .hx-cols{display:flex;flex-wrap:wrap;gap:22px;align-items:flex-start;}
 .hx-main{flex:2 1 540px;min-width:0;display:flex;flex-direction:column;gap:22px;}
@@ -4288,9 +4318,8 @@ button.hx-tile:active{transform:scale(.98);}
   .hx-mtop{display:flex;align-items:center;justify-content:space-between;}
   .hx-mctx{display:flex;align-items:center;gap:10px;background:none;border:none;padding:0;color:var(--hx-ink);font:700 .95rem 'Barlow',sans-serif;cursor:pointer;min-height:44px;}
   .hx-mctx img{width:36px;height:36px;border-radius:50%;box-shadow:0 0 0 2px var(--hx-yellow);background:#fff;object-fit:cover;}
-  .hx-mbell{width:44px;height:44px;border-radius:12px;border:1px solid var(--hx-line);background:var(--hx-field);color:var(--hx-ink);display:flex;align-items:center;justify-content:center;}
+  .hx-mbell{position:relative;width:44px;height:44px;border-radius:12px;border:1px solid var(--hx-line);background:var(--hx-field);color:var(--hx-ink);display:flex;align-items:center;justify-content:center;}
   .hx-h1{font-size:2.2rem;}
-  .hx-search{display:none;}
   .hx-card{padding:18px;border-radius:18px;}
   .hx-focus-title{font-size:1.7rem;}
   .hx-ring{width:84px;height:84px;}
@@ -4316,8 +4345,6 @@ body.design-heute .home-overlay{background:var(--hx-ground);}
 body.design-heute #hxHome{background:linear-gradient(var(--hx-nav),var(--hx-nav)) 0 0/100% 280px no-repeat,var(--hx-ground);background-attachment:local;}
 body.design-heute .hx-h1{color:#fff;}
 body.design-heute .hx-lead{color:#C9D6EC;}
-body.design-heute .hx-search{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18);color:#DCE5F5;}
-body.design-heute .hx-search:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.3);}
 body.design-heute .hx-top{padding-bottom:6px;}
 body.design-heute .hx-card{box-shadow:var(--hx-shadow);border:none;}
 body.design-heute .hx-dark{background:#1659B8;}
@@ -4345,6 +4372,20 @@ body.design-heute .hx-tile.open{background:#EDF1F7;}
 /* The "Mehr" sheet and its pickers must open above the start screen */
 /* Above the tab bar now, so its own bottom inset must clear nothing; keep it scrollable */
 body.design-heute #mobSheet .ms-panel{max-height:85vh;overflow-y:auto;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));}
+body.design-heute #mobSheet .ms-ctx{display:flex;gap:8px;padding:0 8px 6px;}
+body.design-heute #mobSheet .ms-ctx .ms-sel{flex:1 1 0;min-width:0;font-weight:600;}
+body.design-heute #mobSheet .ms-ctx .ms-sel[hidden]{display:none;}
+body.design-heute #mobSheet .ms-hr{height:1px;background:var(--gl);margin:6px 12px;}
+body.design-heute #mobSheet .ms-row-ic{display:flex;align-items:center;justify-content:center;width:26px;color:var(--gm);font-size:1.1rem;}
+body.design-heute #mobSheet .ms-inline{padding-top:4px;padding-bottom:4px;}
+body.design-heute #mobSheet .ms-acct{gap:12px;padding-top:8px;padding-bottom:8px;}
+body.design-heute #mobSheet .ms-acct[hidden]{display:none;}
+body.design-heute #mobSheet .ms-av{width:34px;height:34px;border-radius:50%;background:#1659B8;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;flex-shrink:0;}
+body.design-heute #mobSheet .ms-acct-tx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.2;}
+body.design-heute #mobSheet .ms-acct-tx b{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+body.design-heute #mobSheet .ms-acct-tx small{font-size:.8rem;font-weight:500;color:var(--gm);}
+body.design-heute #mobSheet .ms-acct-go{display:flex;color:var(--gm);}
+body.design-heute #mobSheet .ms-out,body.design-heute #mobSheet .ms-out .ms-row-ic{color:var(--hx-bad);}
 /* Phone: the "Mehr" sheet ends above the tab bar, so the tabs stay visible —
    "Mehr" shows as active and a second tap closes the sheet */
 @media(max-width:767px){
@@ -4420,6 +4461,16 @@ body.design-heute .user-dropdown .ud-item:hover{background:var(--hx-ground);colo
 body.design-heute .user-dropdown .ud-item svg{color:var(--hx-muted);flex-shrink:0;}
 body.design-heute .user-dropdown .ud-item.ud-out,body.design-heute .user-dropdown .ud-item.ud-out svg{color:#B42318;}
 body.design-heute .user-dropdown .ud-item.ud-warn,body.design-heute .user-dropdown .ud-item.ud-warn svg{color:#8A5212;}
+body.design-heute .user-dropdown .ud-look{padding:4px 4px 6px;cursor:default;}
+body.design-heute .user-dropdown .ud-look-h{font:600 .78rem 'Barlow',sans-serif;color:var(--hx-muted);padding:2px 6px 6px;}
+.ud-seg{display:flex;gap:2px;padding:3px;border-radius:10px;background:var(--hx-pop-field,rgba(255,255,255,.08));}
+.ud-seg button{flex:1 1 auto;min-height:32px;padding:0 7px;border:none;border-radius:8px;background:none;cursor:pointer;
+  font:600 .82rem 'Barlow',sans-serif;color:var(--hx-pop-muted,rgba(255,255,255,.7));white-space:nowrap;}
+.ud-seg button:hover{color:var(--hx-pop-ink,#fff);background:var(--hx-pop-hover,rgba(255,255,255,.1));}
+.ud-seg button.on{background:color-mix(in srgb,#fff 17%,transparent);color:var(--hx-pop-ink,#fff);box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);}
+.ud-seg button:focus-visible{outline:2px solid var(--hx-yellow,#F2C230);outline-offset:1px;}
+/* keyboard shortcuts mean nothing on a touch screen */
+@media (hover:none){.user-dropdown .ud-keys{display:none !important;}}
 .ud-kbd{margin-left:auto;padding:1px 7px;border-radius:6px;border:1px solid var(--hx-line,#DCE3EE);background:var(--hx-field,#fff);font:700 .7rem 'Barlow',sans-serif;color:var(--hx-muted,#4E5D7C);}
 body.design-heute .user-dropdown .ud-meta{color:var(--hx-muted);font-size:.74rem;padding:6px 10px 4px;}
 body.design-heute .user-dropdown .ud-meta:hover{color:var(--hx-ink);}
@@ -5503,20 +5554,21 @@ if(window._fbBlocked){
 
 <!-- Design "Heute": side navigation (hidden unless body.design-heute) -->
 <nav id="hxNav" aria-label="Hauptnavigation">
-  <div class="hx-club"><img class="hx-crest" id="hxCrest" alt=""><span class="hx-club-nm" id="hxClub">FC Frohlinde</span></div>
+  <div class="hx-club"><img class="hx-crest" id="hxCrest" alt=""><span class="hx-club-nm" id="hxClub">FC Frohlinde</span><button type="button" class="hx-bell hx-club-bell" title="Benachrichtigungen" aria-label="Benachrichtigungen" onclick="hxNotif(this,event)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span class="hx-bell-dot" id="hxBellDot"></span></button></div>
   <div class="hx-ctx"><button type="button" onclick="hxTeamMenu(this,event)" title="Mannschaft wechseln"><span id="hxTeamLbl">–</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><button type="button" onclick="hxSeasonMenu(this,event)" title="Saison wechseln"><span id="hxSeasonLbl">–</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></div>
+  <button type="button" class="hx-nsearch" id="hxSearchBtn" onclick="openSearch()" title="Suchen (Strg K)" aria-label="Suchen" aria-keyshortcuts="Control+K"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><span>Suchen</span><kbd>Strg K</kbd></button>
   <button type="button" class="hx-item" data-hx="home" onclick="hxGo('home')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"/></svg><span>Übersicht</span></button>
   <button type="button" class="hx-item" data-hx="table" onclick="hxGo('table')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg><span>Anwesenheit</span></button>
   <button type="button" class="hx-item" data-hx="cal" onclick="hxGo('cal')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Kalender</span></button>
   <button type="button" class="hx-item" data-hx="team" onclick="hxGo('team')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.8c1.9.7 3.1 2.4 3.5 5.2"/></svg><span>Kader</span></button>
   <button type="button" class="hx-item" data-hx="lineup" onclick="hxGo('lineup')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 12h18"/><circle cx="12" cy="12" r="3"/></svg><span>Aufstellung</span></button>
-  <button type="button" class="hx-item" data-hx="stats" onclick="hxGo('stats')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Statistik</span></button>
+  <button type="button" class="hx-item grp" data-hx="stats" onclick="hxGo('stats')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Statistik</span></button>
   <button type="button" class="hx-item" data-hx="week" onclick="hxGo('week')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/></svg><span>Wochenbericht</span></button>
   <div class="hx-fill"></div>
   <button type="button" class="hx-item sub" id="hxActItem" onclick="hxActivity(this,event)" aria-haspopup="true" style="display:none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg><span>Aktivität</span><span class="hx-act-n" id="hxActN"></span></button>
   <button type="button" class="hx-item sub" id="hxLinksItem" onclick="hxLinks(this,event)" aria-haspopup="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.5-1.5"/></svg><span>Links</span></button>
   <button type="button" class="hx-item sub" data-hx="settings" onclick="hxGo('settings')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg><span>Einstellungen</span></button>
-  <div class="hx-user"><button type="button" class="hx-user-btn" onclick="hxUserMenu(this,event)"><span class="hx-av" id="hxUserAv">?</span><span style="display:flex;flex-direction:column;min-width:0;"><span class="hx-user-nm" id="hxUserNm">–</span><span class="hx-user-role" id="hxUserRole"></span></span></button><button type="button" class="hx-bell" aria-label="Benachrichtigungen" onclick="hxNotif(this,event)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span class="hx-bell-dot" id="hxBellDot"></span></button><button type="button" class="hx-bell hx-fold-nav" id="hxNavFold" onclick="hxNavFold()" aria-label="Navigation einklappen" title="Navigation einklappen"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m11 17-5-5 5-5M18 17l-5-5 5-5"/></svg></button></div>
+  <div class="hx-user"><button type="button" class="hx-user-btn" onclick="hxUserMenu(this,event)"><span class="hx-av" id="hxUserAv">?</span><span style="display:flex;flex-direction:column;min-width:0;"><span class="hx-user-nm" id="hxUserNm">–</span><span class="hx-user-role" id="hxUserRole"></span></span></button><button type="button" class="hx-bell hx-fold-nav" id="hxNavFold" onclick="hxNavFold()" aria-label="Navigation einklappen" title="Navigation einklappen"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m11 17-5-5 5-5M18 17l-5-5 5-5"/></svg></button></div>
 </nav>
 
 <!-- MAIN PAGE -->
@@ -6168,7 +6220,7 @@ const APP_VERSION_LABEL='1.1.2';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792114239074; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792116401984; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.1.2',date:'15.10.2026',title:'Anwesenheit als Matrix',items:[
     {icon:'🗓️',title:'Tabelle nach Kalenderwochen',desc:'Die Anwesenheit ist nach Kalenderwochen gruppiert, diese Woche ist gelb markiert, das nächste Spiel blau. Ältere Wochen sind je zu einer Spalte zusammengefasst (z. B. 2/3 = zweimal da von drei); ein Klick öffnet die Woche wieder.'},
@@ -6176,7 +6228,8 @@ const APP_CHANGELOG=[
     {icon:'📊',title:'Saison-Quote',desc:'Neben jedem Namen steht die Anwesenheit in der Saison; ein Klick auf „Saison“ sortiert, die Schwächsten zuerst.'},
     {icon:'📱',title:'Handy: Ansicht „Spieler“',desc:'In der Anwesenheit oben „Termine | Spieler“: jeder Spieler mit seinen letzten 10 Terminen als Balken, sortierbar nach „Schwächste zuerst“, Position oder Nummer.'},
     {icon:'🏠',title:'Übersicht',desc:'„Diese Woche“ zeigt am Computer alle sieben Tage mit Kalenderwoche, freie Tage in einer schmalen Zeile. Als Titel steht das Thema des Trainings bzw. der Gegner, darunter die Uhrzeit; vergangene Termine haben ein Häkchen und die Zahl der Anwesenden, „–/18“ heißt: noch nicht erfasst. Von Freitag bis Sonntag zeigt die Karte daneben die laufende Woche („KW … bisher“). Steht am Wochenende das Spiel oben, zeigt die Karte darunter das nächste Training hell (dunkel bleibt dem Spiel), mit „Wer kommt?“ und dem Trainingsplan. Neu unter „Im Blick“: wer die Belastung heute noch nicht bewertet hat.'},
-    {icon:'↔️',title:'Navigation einklappen',desc:'Am Computer lässt sich die Seitennavigation mit dem Doppelpfeil unten neben der Glocke auf Symbole verkleinern; so hat die Tabelle mehr Platz.'},
+    {icon:'↔️',title:'Navigation einklappen',desc:'Am Computer lässt sich die Seitennavigation mit dem Doppelpfeil unten neben dem eigenen Namen auf Symbole verkleinern; so hat die Tabelle mehr Platz.'},
+    {icon:'🧑‍💼',title:'Navigation und Menü unter dem Namen',desc:'Am Computer steht die Suche (Strg K) jetzt direkt in der Seitennavigation, die Glocke oben neben dem Vereinsnamen; Statistik und Wochenbericht sind etwas abgesetzt. Ein Klick auf den eigenen Namen öffnet Konto, die Darstellung (Standard, Ruhig, Nacht, Auto) zum direkten Umschalten, Tastaturkürzel und Abmelden. Am Handy hat „Mehr“ dieselben Symbole und Namen wie am Computer, unten das eigene Konto und „Abmelden“; den Saisonkader erreicht man über Aufstellung → Saison. Gibt es kein kommendes Spiel, öffnet Aufstellung direkt den Saisonkader.'},
     {icon:'🎨',title:'Aussehen: Standard, Ruhig, Nacht, Automatisch',desc:'Einstellungen → Darstellung bietet jetzt vier fertige Ansichten: Standard (hell; der Hintergrund ist etwas dunkler, damit sich die Karten abheben), Ruhig (graublaue Karten, weniger Weiß), Nacht (alles dunkel in Vereinsblau, für abends) und Automatisch (hell, wechselt zu Nacht, wenn das Handy oder der Computer auf dunkel steht). Gilt nur für dieses Gerät. Alle Menüs sind einheitlich dunkel. Das Menü beim Antippen einer vergangenen Zelle in der Anwesenheit ist neu gestaltet.'},
     {icon:'📋',title:'Auswahllisten und Menüs',desc:'Aufklappende Listen (z. B. Mannschaft und Saison in der Statistik, Zeitraum, Formation, Ort) öffnen am Computer ein Menü im Stil der App statt der Systemliste, mit Häkchen und Tastatur (Pfeile, Enter, Esc, Anfangsbuchstabe). Alle Felder haben denselben Pfeil. Auch die Menüs für Mannschaft, Saison, Benutzer und Benachrichtigungen sind jetzt hell und einheitlich. Auf dem Handy bleibt die gewohnte Systemauswahl.'},
     {icon:'☑️',title:'Spieler auswählen',desc:'Die Mehrfach-Auswahl ist aus der Anwesenheit nach Kader → Spieler umgezogen: „Auswählen“, Spieler antippen, dann „In andere Mannschaft“ oder „Löschen“ — etwa beim Saisonwechsel. Die Position für viele auf einmal zu ändern gibt es nicht mehr; sie wird im Spielerprofil geändert.'},
@@ -9929,6 +9982,30 @@ function _placePopup(el,rect,opt){
   el.style.left=left+'px';
   el.style.top=top+'px';
 }
+// The look, right under the user's name: the same four choices as
+// Einstellungen → Darstellung, short names so they fit on one line.
+function _udLookRender(){
+  const g=document.getElementById('ud-look');if(!g||typeof HX_PRESETS==='undefined')return;
+  const cur=getAppearance().hxPreset;
+  const nm={standard:'Standard',ruhig:'Ruhig',nacht:'Nacht',auto:'Auto'};
+  g.innerHTML=HX_PRESETS.map(x=>{const on=x[0]===cur;
+    return `<button type="button" role="radio" aria-checked="${on}" class="${on?'on':''}" title="${x[1]} – ${x[2]}" onclick="event.stopPropagation();setHxPreset('${x[0]}');_udLookRender();">${nm[x[0]]||x[1]}</button>`;}).join('');
+}
+// A separator only between two visible groups: none at the top, none at the
+// end, never two in a row (items come and go by role, connection, device).
+function _udTidy(dd){
+  if(!dd)return;
+  const kids=Array.from(dd.children);
+  kids.forEach(el=>{if(el.classList.contains('ud-sep'))el.style.display='';});
+  let prevSep=true,lastSep=null;
+  kids.forEach(el=>{
+    if(getComputedStyle(el).display==='none')return;
+    const sep=el.classList.contains('ud-sep');
+    if(sep&&prevSep){el.style.display='none';return;}
+    prevSep=sep;lastSep=sep?el:null;
+  });
+  if(lastSep)lastSep.style.display='none';
+}
 function closeUserMenu(){
   const dd=document.getElementById('userDropdown');
   if(dd)dd.classList.remove('open');
@@ -9954,12 +10031,9 @@ function updateUserMenuState(){
   // Konto, Papierkorb and Verlauf live in the Einstellungen window (openSettings).
   // The bin moved into Einstellungen → Daten, so the admin group is just the
   // admin panel now.
-  const adminBtn=document.getElementById('ud-admin');
-  const anyAdmin=[adminBtn].some(el=>el&&el.style.display!=='none');
-  ['ud-admin-sep','ud-admin-group'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el)el.style.display=anyAdmin?'':'none';
-  });
+  const ko=document.getElementById('ud-konto');
+  if(ko)ko.style.display=(typeof _setVisible==='function'&&!_setVisible('konto'))?'none':'';
+  _udLookRender();
   // Version tag: shows current version, with red dot if user hasn't seen changelog
   const vt=document.getElementById('ud-version-tag');
   if(vt){
@@ -12472,9 +12546,10 @@ function getUnreadNotifCount(){
   return computeNotifications().filter(n=>!seen.has(n.id)).length;
 }
 // The dot on the bell in the side navigation
+function _hxUnreadOn(){try{return getUnreadNotifCount()>0;}catch(e){return false;}}
 function refreshNotifBadge(){
-  const dot=document.getElementById('hxBellDot');
-  if(dot)dot.classList.toggle('on',getUnreadNotifCount()>0);
+  const on=_hxUnreadOn();
+  document.querySelectorAll('.hx-bell-dot').forEach(d=>d.classList.toggle('on',on));
 }
 function ensureNotifPanel(){
   let panel=document.getElementById('notifPanel');
@@ -22375,6 +22450,12 @@ const HX_IC={
   settings:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>',
   bell:'<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/>',
   search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>',
+  links:'<path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.5-1.5"/>',
+  activity:'<path d="M3 12h4l3-8 4 16 3-8h4"/>',
+  logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/>',
+  undo:'<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',
+  redo:'<path d="m15 14 5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/>',
+  right:'<path d="m9 6 6 6-6 6"/>',
   down:'<path d="m6 9 6 6 6-6"/>',
   check:'<path d="m5 12 5 5 9-10"/>',
   more:'<circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/>'
@@ -22776,6 +22857,19 @@ function hxSyncNav(){
     if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');
   });
 }
+// Aufstellung from the navigation (side bar or "Mehr"): the next match, or
+// the season plan when no match is coming up — summer break, a new season
+// without fixtures — instead of a dead end
+function hxOpenLineup(){
+  if(typeof canEdit==='function'&&!canEdit())return;
+  if(findNextMatchIdx()<0&&typeof openSeasonLineup==='function'){
+    openSeasonLineup();
+    document.getElementById('moSeasonLineup')?.classList.add('hx-vianav');
+    return;
+  }
+  openNextMatchLineup();
+  document.getElementById('moLineup')?.classList.add('hx-vianav');
+}
 function hxGo(k){
   const tool=_hxToolOpen();
   if(tool){
@@ -22792,7 +22886,7 @@ function hxGo(k){
     case 'table':homeClose();break;
     case 'cal':openCalendar();break;
     case 'team':openTeamMgr(_kbDefaultTab());break;
-    case 'lineup':openNextMatchLineup();document.getElementById('moLineup')?.classList.add('hx-vianav');break;
+    case 'lineup':hxOpenLineup();break;
     case 'stats':openDashboard();break;
     case 'week':openWeekReport();break;
     case 'settings':openSettings();break;
@@ -22832,11 +22926,7 @@ function hxUserMenu(btn,e){
   const willOpen=!dd.classList.contains('open');
   dd.classList.toggle('open',willOpen);
   if(typeof updateUserMenuState==='function')updateUserMenuState();
-  // Items the side navigation already offers are hidden here, which can leave
-  // a separator at the very top — hide that one.
-  dd.querySelectorAll('.ud-lead').forEach(el=>el.classList.remove('ud-lead'));
-  const first=Array.from(dd.children).find(el=>getComputedStyle(el).display!=='none');
-  if(first&&first.classList.contains('ud-sep'))first.classList.add('ud-lead');
+  _udTidy(dd);
   if(willOpen)_placePopup(dd,btn.getBoundingClientRect(),{align:'left',gap:6});
 }
 function hxNotif(btn,e){
@@ -22845,7 +22935,13 @@ function hxNotif(btn,e){
   if(panel.classList.contains('open')){panel.classList.remove('open');return;}
   renderNotifPanel();
   panel.classList.add('open');
-  _placePopup(panel,btn.getBoundingClientRect(),{align:'left',gap:8});
+  // From the side navigation the list opens beside it, level with the bell,
+  // so it covers the page and not the team, season and search controls
+  const nav=btn.closest&&btn.closest('#hxNav');
+  if(nav&&window.innerWidth>767){
+    const r=btn.getBoundingClientRect(),nr=nav.getBoundingClientRect();
+    _placePopup(panel,{left:nr.right+8,right:nr.right+8,top:r.top-8,bottom:r.top-8},{align:'left',gap:0});
+  }else _placePopup(panel,btn.getBoundingClientRect(),{align:'left',gap:8});
 }
 // ── Start screen ──
 function _hxDate(sk){const y=Math.floor(sk/10000),m=Math.floor(sk/100)%100,d=sk%100;return new Date(y,m-1,d);}
@@ -22935,7 +23031,7 @@ function hxRender(){
   el.classList.toggle('hx-has-hero',!!_hero);
   const mtop=`<div class="hx-mtop">
       <button type="button" class="hx-mctx" onclick="mobSheetOpen()"><img src="${esc(crestSrc)}" alt="">${esc(UI.currentTeam||'')} · ${esc(season||'')}${hxIcon('down',16)}</button>
-      <span class="hx-mtop-r"><button type="button" class="hx-mbell" aria-label="Benachrichtigungen" onclick="hxNotif(this,event)">${hxIcon('bell')}</button></span>
+      <span class="hx-mtop-r"><button type="button" class="hx-mbell" aria-label="Benachrichtigungen" onclick="hxNotif(this,event)">${hxIcon('bell')}<span class="hx-bell-dot${_hxUnreadOn()?' on':''}"></span></button></span>
     </div>`;
   if(!D||!Array.isArray(D.sessions)||!Array.isArray(D.players)){
     el.innerHTML=`<div class="hx-wrap">${mtop}<div class="hx-hello"><span class="hx-date">${esc(dateTxt)}</span><h1 class="hx-h1">${esc(_hxGreeting())}</h1></div><div class="hx-card hx-empty">Für ${esc(UI.currentTeam||'')} · ${esc(season||'')} gibt es noch keine Daten.</div></div>`;
@@ -22948,7 +23044,7 @@ function hxRender(){
   const mi=findNextMatchIdx();
   let html=`<div class="hx-heroimg" aria-hidden="true"></div><div class="hx-wrap">${mtop}
     <div class="hx-top"><div class="hx-hello"><span class="hx-date">${esc(dateTxt)}</span><h1 class="hx-h1">${esc(_hxGreeting())}</h1></div>
-    <span class="hx-top-r"><button type="button" class="hx-search" onclick="openSearch()">${hxIcon('search',18)}Spieler oder Termin suchen</button></span></div>
+    </div>
     <div class="hx-grid">`;
   // ── Focus: the next session ──
   if(fi<0){
@@ -23138,6 +23234,12 @@ function _mobNavSync(active){
 }
 // Tapping the season chip on a phone opens the sheet (where the picker lives).
 // On desktop the chip stays decorative — the toolbar has its own select.
+function mobPickTeam(v){
+  if(!v||v===UI.currentTeam){mobSheetClose();return;}
+  mobSheetClose();
+  if(typeof switchTeam==='function')switchTeam(v);
+  if(typeof showSaveFlash==='function')showSaveFlash('Mannschaft: '+v);
+}
 function mobPickSeason(v){
   if(!v||v===UI.currentSeason){mobSheetClose();return;}
   if(typeof switchSeason==='function')switchSeason(v);
@@ -23157,26 +23259,49 @@ function mobSheetOpen(){
     if(!Array.isArray(list))list=list&&typeof list==='object'?Object.values(list):[];
     list=list.filter(Boolean);
     if(!list.length&&UI.currentSeason)list=[UI.currentSeason];
-    sel.innerHTML=list.map(s=>'<option value="'+escapeHtml(s)+'"'+(s===UI.currentSeason?' selected':'')+'>'+escapeHtml(s)+'</option>').join('');
+    sel.innerHTML=list.map(s=>'<option value="'+escapeHtml(s)+'"'+(s===UI.currentSeason?' selected':'')+'>Saison '+escapeHtml(s)+'</option>').join('');
     sel.value=UI.currentSeason||'';
   }
-  // Area rows — the same permissions as the side navigation
+  // Team picker only when there is more than one team to pick from
+  const tsel=document.getElementById('ms-team');
+  if(tsel){
+    const teams=(G&&Array.isArray(G.teamList))?G.teamList.filter(Boolean):[];
+    tsel.hidden=teams.length<2;
+    tsel.innerHTML=teams.map(t=>'<option value="'+escapeHtml(t)+'"'+(t===UI.currentTeam?' selected':'')+'>'+escapeHtml(t)+'</option>').join('');
+    tsel.value=UI.currentTeam||'';
+  }
+  // Area rows — the same items, names, icons and permissions as the side
+  // navigation (Saisonkader is the second tab of Aufstellung there and here)
   const ed=(typeof canEdit==='function')&&canEdit();
-  const rows=[
-    ['\ud83d\udcc4','Wochenbericht','openWeekReport()',ed],
-    ['\u26bd','Aufstellung','openNextMatchLineup()',ed],
-    ['\ud83d\udccb','Saisonkader','openSeasonLineup()',ed],
-    ['\ud83d\udcca','Statistik','openDashboard()',true],
-    ['\ud83d\udd17','Links','toggleLinksMenu(event)',true],
-    ['\ud83d\udfe2','Aktivität der Trainer','hxActivity(null,event)',typeof isAdmin==='function'&&isAdmin()],
-    ['\u2699\ufe0f','Einstellungen','openSettings()',true],
-  ].filter(r=>r[3]);
+  const adm=typeof isAdmin==='function'&&isAdmin();
+  const groups=[[
+    ['lineup','Aufstellung','hxOpenLineup()',ed],
+    ['stats','Statistik','openDashboard()',true],
+    ['week','Wochenbericht','openWeekReport()',ed],
+  ],[
+    ['activity','Aktivität','hxActivity(null,event)',adm],
+    ['links','Links','toggleLinksMenu(event)',!!((G&&G.quickLinks&&G.quickLinks.length)||adm)],
+    ['settings','Einstellungen','openSettings()',true],
+  ]].map(g=>g.filter(r=>r[3])).filter(g=>g.length);
   const areas=document.getElementById('ms-areas');
   if(areas){
-    areas.innerHTML=rows.map(r=>
+    areas.innerHTML=groups.map(g=>g.map(r=>
       '<button class="ms-row" onclick="mobSheetClose();'+r[2]+'">'
-      +'<span class="ms-row-ic">'+r[0]+'</span>'+r[1]+'</button>'
-    ).join('');
+      +'<span class="ms-row-ic">'+hxIcon(r[0],20)+'</span>'+r[1]+'</button>'
+    ).join('')).join('<div class="ms-hr"></div>');
+  }
+  [['ms-ic-undo','undo'],['ms-ic-redo','redo'],['ms-ic-out','logout']].forEach(([id,k])=>{
+    const e=document.getElementById(id);if(e&&!e.dataset.hx){e.innerHTML=hxIcon(k,20);e.dataset.hx='1';}
+  });
+  // The account, as at the foot of the side navigation; opens Einstellungen → Konto
+  const ac=document.getElementById('ms-acct');
+  if(ac){
+    const nm=(CU&&CU.name)||'';
+    const role=CU?(CU.role==='admin'?'Administrator':CU.role==='trainer'?'Trainer':CU.role==='viewer'?'Nur ansehen':''):'';
+    ac.hidden=!(typeof _setVisible==='function'&&_setVisible('konto'));
+    ac.innerHTML='<span class="ms-av" aria-hidden="true">'+escapeHtml((nm||'?').trim().charAt(0).toUpperCase())+'</span>'
+      +'<span class="ms-acct-tx"><b>'+escapeHtml(nm||'Konto')+'</b><small>'+escapeHtml(role?role+' · Konto':'Konto')+'</small></span>'
+      +'<span class="ms-acct-go" aria-hidden="true">'+hxIcon('right',18)+'</span>';
   }
   sh.classList.add('open');
 }
@@ -32670,36 +32795,26 @@ _pubCleanupSchedule();
 </div></div>
 
 <div class="user-dropdown" id="userDropdown" style="z-index:99999;">
-
-  <!-- Einstellungen and Statistik are in the side navigation, not repeated here -->
-
-  <!-- ── ADMINISTRATION (admin) ── -->
-  <div class="ud-sep" id="ud-admin-sep" style="display:none;"></div>
-  <div class="ud-group" id="ud-admin-group" style="display:none;">Administration</div>
-  <div class="ud-item" id="ud-admin" onclick="closeUserMenu();openM('moAdmin')" style="display:none;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg>Administration</div>
-
-  <!-- ── SYSTEM ──
-       Suchen and Kürzel used to sit under a "Navigation" heading of their own;
-       they are tools, and a two-item group was one heading too many. -->
+  <!-- What people look for under their own name: their account, the look,
+       the way out. No group headings — with this few items they only add
+       noise. Suchen sits in the side navigation (and Strg K); Einstellungen
+       and Statistik are there too. Empty sections lose their separator
+       (_udTidy). -->
+  <div class="ud-item" id="ud-konto" onclick="closeUserMenu();openSettings('konto')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.2-4 4.3-6 8-6s6.8 2 8 6"/></svg>Konto</div>
+  <div class="ud-look" onclick="event.stopPropagation()">
+    <div class="ud-look-h" id="ud-look-h">Darstellung</div>
+    <div class="ud-seg" id="ud-look" role="radiogroup" aria-labelledby="ud-look-h"></div>
+  </div>
   <div class="ud-sep"></div>
-  <div class="ud-group">System</div>
-  <div class="ud-item" onclick="closeUserMenu();openSearch();"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>Suchen <span class="ud-kbd">Strg K</span></div>
-  <div class="ud-item" onclick="closeUserMenu();openShortcutsHelp();"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg>Tastaturkürzel <span class="ud-kbd">?</span></div>
-  <!-- Auto-Sync switch removed: with three trainers on shared data, a client
-       that silently stops syncing is a data-loss risk, and the traffic reason
-       it was added for disappeared once saves became diffs. The offline code
-       paths stay in place, so re-adding the switch is a markup change.
-       The manual buttons remain for admins as a diagnostic. -->
-  <!-- Saving and loading happen automatically; the only case left is a failed
-       connection, so this appears only then. -->
+  <div class="ud-item" id="ud-admin" onclick="closeUserMenu();openM('moAdmin')" style="display:none;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg>Administration</div>
+  <div class="ud-item ud-keys" onclick="closeUserMenu();openShortcutsHelp();"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg>Tastaturkürzel <span class="ud-kbd">?</span></div>
+  <div class="ud-sep"></div>
+  <!-- Saving and loading happen automatically; the retry appears only when the
+       connection failed (updateUserMenuState). -->
   <div id="ud-manual-btns" style="display:none;">
     <div class="ud-item ud-warn" onclick="event.stopPropagation();manualSyncSave();"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"/><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8"/><path d="M21 3v5h-5M3 21v-5h5"/></svg>Erneut synchronisieren</div>
   </div>
-
-  <div class="ud-sep"></div>
   <div class="ud-item ud-out" onclick="closeUserMenu();confirmLogout()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg>Abmelden</div>
-
-  <!-- ── FOOTER (about as fine print, not a regular menu item) ── -->
   <div class="ud-sep"></div>
   <div class="ud-meta" onclick="closeUserMenu();openAbout();">footy.ai · <span id="ud-version-tag">v1.0.5-beta</span></div>
 </div>
@@ -32715,15 +32830,21 @@ _pubCleanupSchedule();
 <div id="mobSheet" onclick="if(event.target===this)mobSheetClose()">
   <div class="ms-panel">
     <div class="ms-grip"></div>
-    <div class="ms-sec">Saison</div>
-    <div style="padding:0 8px 4px;"><select class="ms-sel" id="ms-season" onchange="mobPickSeason(this.value)"></select></div>
-    <div class="ms-sec">Bereiche</div>
-    <div id="ms-areas"></div>
-    <div class="ms-sec">Aktionen</div>
-    <div class="ms-inline">
-      <button class="ms-row" onclick="undo();mobSheetClose();"><span class="ms-row-ic">↩</span> Rückgängig</button>
-      <button class="ms-row" onclick="redo();mobSheetClose();"><span class="ms-row-ic">↪</span> Wiederholen</button>
+    <!-- Same order as the side navigation on the computer: team and season,
+         the pages the tab bar has no room for, the small things, the account. -->
+    <div class="ms-ctx">
+      <select class="ms-sel" id="ms-team" aria-label="Mannschaft" onchange="mobPickTeam(this.value)" hidden></select>
+      <select class="ms-sel" id="ms-season" aria-label="Saison" onchange="mobPickSeason(this.value)"></select>
     </div>
+    <div id="ms-areas"></div>
+    <div class="ms-hr"></div>
+    <div class="ms-inline">
+      <button class="ms-row" onclick="undo();mobSheetClose();"><span class="ms-row-ic" id="ms-ic-undo">↩</span> Rückgängig</button>
+      <button class="ms-row" onclick="redo();mobSheetClose();"><span class="ms-row-ic" id="ms-ic-redo">↪</span> Wiederholen</button>
+    </div>
+    <div class="ms-hr"></div>
+    <button class="ms-row ms-acct" id="ms-acct" onclick="mobSheetClose();openSettings('konto')"></button>
+    <button class="ms-row ms-out" onclick="mobSheetClose();confirmLogout()"><span class="ms-row-ic" id="ms-ic-out">⎋</span>Abmelden</button>
   </div>
 </div>
 
