@@ -5192,12 +5192,12 @@ body.design-heute .tst-filter .tpl-hint{color:var(--hx-og-muted);}
 .tpl-blk:focus-visible,.tpl-li-h:focus-visible{outline:2px solid var(--tp-link);outline-offset:2px;}
 
 /* ══ Menus: their own colour (Einstellungen → Darstellung → Menüs) ══
-   Dunkel (default, the navigation colour), Getönt or Hell. Every pop-up menu
+   Dunkel (default, the navigation colour lifted by 6 % so a menu stands out from the side navigation and the band), Getönt or Hell. Every pop-up menu
    reads the --hx-pop* tokens; inside a menu the general tokens are pointed at
    them, so rules written for cards (var(--hx-card), var(--hx-ink) …) follow
    the menu colour without being rewritten. */
 body.design-heute{
-  --hx-pop:var(--hx-nav);--hx-pop-ink:#fff;--hx-pop-muted:color-mix(in srgb,#fff 64%,var(--hx-nav));
+  --hx-pop:color-mix(in srgb,#fff 6%,var(--hx-nav));--hx-pop-ink:#fff;--hx-pop-muted:color-mix(in srgb,#fff 64%,var(--hx-nav));
   --hx-pop-line:rgba(255,255,255,.14);--hx-pop-hover:rgba(255,255,255,.1);--hx-pop-field:rgba(255,255,255,.08);
   --hx-pop-chip:rgba(255,255,255,.13);--hx-pop-link:#A9C4FF;--hx-pop-tick:var(--hx-yellow);--hx-pop-danger:#FF9C90;--hx-pop-warn:#F2C230;
   --hx-pop-shadow:0 20px 44px -12px rgba(5,12,30,.55),0 2px 8px rgba(5,12,30,.22);
@@ -5235,7 +5235,7 @@ body.design-heute .ssx-menu.cst-menu{min-width:200px;padding:6px;}
 .hxm-pv{position:relative;display:flex;flex-direction:column;gap:5px;justify-content:center;height:58px;padding:0 12px;border-radius:9px;box-sizing:border-box;border:1px solid var(--hx-line);}
 .hxm-pv i{display:block;height:6px;border-radius:3px;background:currentColor;opacity:.75;}
 .hxm-pv i:nth-child(1){width:70%;}.hxm-pv i:nth-child(2){width:52%;opacity:.45;}.hxm-pv i:nth-child(3){width:62%;opacity:.45;}
-.hxm-pv.d{background:var(--hx-nav);color:#fff;border-color:var(--hx-nav);}
+.hxm-pv.d{background:color-mix(in srgb,#fff 6%,var(--hx-nav));color:#fff;border-color:var(--hx-nav);}
 .hxm-pv.t{background:color-mix(in srgb,var(--hx-nav) 11%,var(--hk0-card));color:var(--hk0-ink);}
 .hxm-pv.l{background:var(--hk0-card);color:var(--hk0-ink);}
 /* ══ More colour schemes ══
@@ -6195,7 +6195,7 @@ const APP_VERSION_LABEL='1.1.2';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792111160056; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792111885357; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.1.2',date:'15.10.2026',title:'Anwesenheit als Matrix',items:[
     {icon:'🗓️',title:'Tabelle nach Kalenderwochen',desc:'Die Anwesenheit ist nach Kalenderwochen gruppiert, diese Woche ist gelb markiert, das nächste Spiel blau. Ältere Wochen sind je zu einer Spalte zusammengefasst (z. B. 2/3 = zweimal da von drei); ein Klick öffnet die Woche wieder.'},
