@@ -981,7 +981,7 @@ input[type="date"]{cursor:pointer;}
 #moPlayer .mob{overflow-x:hidden;}
 
 #moPlayer .tp-in,#moPlayer .tp-in-wrap{min-width:0;max-width:100%;box-sizing:border-box;}
-#moTrainerProfile .tp-head{position:sticky;top:0;z-index:2;background:#fff;}
+#moTrainerProfile .tp-head{position:sticky;top:0;z-index:2;background:var(--hx-card,#fff);}
 /* The first section draws a top border of its own, doubling the divider the
    sticky header already has. NOTE: :first-of-type matches by TAG, and the
    header is also a div — so it never matched the section. Target the section
@@ -1087,6 +1087,8 @@ button.tp-qbtn{border:none;font-family:inherit;cursor:pointer;}
 .tr-teams{font-size:.67rem;color:var(--gm);}
 .tr-del{background:none;border:none;cursor:pointer;color:var(--gm);font-size:.85rem;padding:2px 4px;border-radius:3px;}
 .tr-del:hover{background:rgba(231,76,60,.1);color:var(--ca);}
+/* Night: the dark-amber text of "Reset" disappeared on the dark row */
+html.hx-dark .tr-reset{background:rgba(242,194,48,.16)!important;color:#F2C230!important;}
 .fi-row{display:flex;align-items:center;gap:7px;padding:6px 10px;background:var(--ow);border-radius:7px;margin-bottom:5px;}
 .fi-nm{flex:1;font-weight:600;color:var(--bd);font-size:.8rem;}
 .fi-del{background:none;border:none;cursor:pointer;color:var(--gm);font-size:.85rem;padding:2px 4px;border-radius:3px;}
@@ -6448,7 +6450,7 @@ const APP_VERSION_LABEL='1.1.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792215578878; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792215862923; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.1.5',date:'17.10.2026',title:'Spieler-App',items:[
     {icon:'📲',title:'Link an die Mannschaft',desc:'Kader → Spieler → „Link an die Mannschaft“: eine fertige Nachricht für die WhatsApp-Gruppe. Jeder wählt seinen Namen, bestätigt mit dem Geburtsdatum und legt die App auf den Startbildschirm.'},
@@ -25002,7 +25004,7 @@ function renderMgrTrainers(){
       const hasPw=!!(t.passwordHash&&t.passwordSalt);
       // Lock icon visible only to admin — reveals security state, others don't need to see it
       const lockIcon=showLock?(hasPw?'<span title="Passwort gesetzt" style="margin-left:5px;color:#27ae60;">🔒</span>':'<span title="Kein Passwort" style="margin-left:5px;color:#aaa;opacity:.5;">🔓</span>'):'';
-      const resetBtn=isAdmin()&&hasPw?`<button class="tr-del" style="background:rgba(241,196,15,.15);color:#9a6e00;margin-right:4px;font-size:.66rem;padding:3px 7px;" onclick="adminResetPasswordByIdx(${gi})" title="Passwort zurücksetzen">🔓 Reset</button>`:'';
+      const resetBtn=isAdmin()&&hasPw?`<button class="tr-del tr-reset" style="background:rgba(241,196,15,.15);color:#9a6e00;margin-right:4px;font-size:.66rem;padding:3px 7px;" onclick="adminResetPasswordByIdx(${gi})" title="Passwort zurücksetzen">🔓 Reset</button>`:'';
       const av=t.photo
         ?`<img class="tr-av" src="${t.photo}" alt="">`
         :`<div class="tr-av tr-av-ph">${escapeHtml((t.name||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase())}</div>`;
