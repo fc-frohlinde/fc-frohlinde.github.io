@@ -2752,6 +2752,40 @@ html:has(body.hub-mode){background:#080f22;}
 .rpe-open-b{font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:600;padding:6px 12px;border-radius:999px;
   border:1.5px dashed var(--hx-line,var(--gl));background:transparent;color:var(--hx-ink,var(--gd));cursor:pointer;}
 .rpe-open-b:hover{border-style:solid;border-color:var(--bm);}
+.rpe-open-b small{font-size:.66rem;font-weight:600;color:var(--hx-muted,var(--gm));margin-left:5px;}
+.rpe-remind{display:block;width:100%;margin-top:14px;padding:11px;border-radius:10px;border:none;cursor:pointer;
+  background:#1F8F4E;color:#fff;font-family:'Barlow',sans-serif;font-size:.86rem;font-weight:700;}
+.rpe-remind:hover{filter:brightness(1.06);}
+/* Kader: last time in the player app */
+.pl-app-h{width:58px;flex:none;font-size:.65rem;font-weight:700;color:rgba(255,255,255,.6);cursor:pointer;}
+.pl-app{width:58px;flex:none;display:flex;align-items:center;gap:3px;font-size:.72rem;font-weight:600;color:var(--hx-ink,var(--gd));white-space:nowrap;}
+.pl-app.old{color:var(--hx-muted,var(--gm));font-weight:500;}
+.pl-app.never{color:var(--hx-muted,var(--gm));font-weight:500;}
+.pl-app svg{flex:none;color:#1F8F4E;}
+.pl-app-sub{display:none;}
+/* Phones: no room for a column, the line goes under the name */
+@media (max-width:600px){
+  .pl-app{display:none;}
+  .pl-app-h{width:auto;margin-right:2px;}
+  .pl-app-sub{display:flex;align-items:center;gap:3px;font-size:.68rem;font-weight:500;color:var(--hx-muted,var(--gm));margin-top:1px;}
+  .pl-app-sub.recent{color:var(--hx-ink2,var(--gd));}
+  .pl-app-sub svg{flex:none;color:#1F8F4E;}
+}
+/* Profile: Spieler-App */
+.ps-app-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.ps-app-st{flex:1;min-width:160px;display:flex;align-items:center;gap:5px;font-size:.84rem;color:var(--hx-ink,var(--gd));}
+.ps-app-st.never,.ps-app-st.old{color:var(--hx-muted,var(--gm));}
+.ps-app-st svg{flex:none;color:#1F8F4E;}
+.ps-app-send{flex:none;}
+/* Link an die Mannschaft */
+.app-sh-p{font-size:.84rem;line-height:1.5;color:var(--hx-ink,var(--gd));margin:0 0 10px;}
+.mob textarea.app-sh-text,.app-sh-text{display:block;width:100%;box-sizing:border-box;font-family:'Barlow',sans-serif;font-size:.84rem;line-height:1.45;
+  padding:10px 12px;border-radius:10px;border:1.5px solid var(--hx-line,var(--gl));background:var(--hx-field,#fff);color:var(--hx-ink,var(--gd));resize:vertical;margin:0;}
+.app-sh-btns{display:flex;gap:8px;margin:10px 0 4px;flex-wrap:wrap;}
+.app-sh-btns .btn{flex:1;justify-content:center;}
+.app-sh-warn{margin-top:12px;padding:10px 12px;border-radius:10px;background:rgba(243,156,18,.12);border:1px solid rgba(243,156,18,.35);font-size:.78rem;line-height:1.45;color:var(--hx-ink,var(--gd));}
+.app-sh-stat{margin-top:12px;font-size:.78rem;line-height:1.45;color:var(--hx-muted,var(--gm));}
+.app-sh-stat b{color:var(--hx-ink,var(--gd));}
 /* ── Editor ──────────────────────────────────────────────── */
 .rpe-ed-sec{font-size:.64rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
   color:var(--gm);margin:12px 0 6px;}
@@ -5895,6 +5929,10 @@ if(window._fbBlocked){
     <div id="ps-contact" class="tp-quick"></div>
     <div id="ps-contact-rows"></div>
   </div>
+  <div class="tp-sec" id="ps-sec-app" style="display:none;">
+    <div class="tp-sec-h">Spieler-App</div>
+    <div id="ps-app"></div>
+  </div>
   <div class="tp-sec" id="ps-sec-person">
     <div class="tp-sec-h">Person</div>
     <div id="ps-note-display" class="ps-info"></div>
@@ -6265,7 +6303,7 @@ if(window._fbBlocked){
     </div>
     <div class="mob-btns">
       <button class="btn bp" id="btn-mgr-addpl" onclick="_tmLeave();openM('moAddPlayer');" style="display:none;">＋ Spieler</button>
-      <button class="btn" id="btn-mgr-teamlink" onclick="copyTeamLink()" style="display:none;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" title="Ein Link für die ganze Mannschaft — einmal in die Gruppe geben, jeder wählt sich selbst aus">🔗 Spieler-Menü-Link</button>
+      <button class="btn" id="btn-mgr-teamlink" onclick="appShareOpen()" style="display:none;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" title="Ein Link für die ganze Mannschaft — einmal in die Gruppe geben, jeder wählt sich selbst aus">Link an die Mannschaft</button>
       
     </div>
   </div>
@@ -6400,13 +6438,19 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.1.4'; // v1.1.4: Belastung — eine Skala, „nicht dabei“, wer fehlt
-const APP_VERSION_LABEL='1.1.4';
+const APP_VERSION='1.1.5'; // v1.1.5: Spieler-App — Link an die Mannschaft, wer sie nutzt, Erinnerung
+const APP_VERSION_LABEL='1.1.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792209753187; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792214444418; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.1.5',date:'17.10.2026',title:'Spieler-App',items:[
+    {icon:'📲',title:'Link an die Mannschaft',desc:'Kader → Spieler → „Link an die Mannschaft“: eine fertige Nachricht für die WhatsApp-Gruppe. Jeder wählt seinen Namen, bestätigt mit dem Geburtsdatum und legt die App auf den Startbildschirm.'},
+    {icon:'👀',title:'Wer die App nutzt',desc:'Im Kader zeigt die Spalte „App“, wann ein Spieler die App zuletzt geöffnet hat (📱 = als App installiert). Im Profil steht dasselbe, dazu „Link per WhatsApp“ mit seinem persönlichen Link. Erfasst seit 17.10.'},
+    {icon:'🚪',title:'Bewerten schon in der Kabine',desc:'Die Bewertung öffnet 15 Minuten vor dem geplanten Ende — wer etwas früher fertig ist, kann direkt in der Kabine bewerten. War die App im Hintergrund offen, springt sie beim Zurückkehren direkt zur Bewertung.'},
+    {icon:'⏰',title:'Erinnerung nach dem Training',desc:'„Im Blick behalten“ führt direkt zur Liste, wer noch nicht bewertet hat. Dort gibt es „Erinnerung in die WhatsApp-Gruppe“ — ohne Namen.'},
+  ]},
   {version:'1.1.4',date:'17.10.2026',title:'Belastung',items:[
     {icon:'💪',title:'Eine Skala von 0 bis 10',desc:'Spieler sehen die Skala jetzt als Liste mit den Worten der Original-Skala (0 Ruhe … 10 Maximal). Dieselbe Skala gilt im Trainer-Fenster und im Trainingsplaner.'},
     {icon:'🙋',title:'„Ich war nicht dabei“',desc:'Wer zugesagt hatte und nicht da war, kann das statt einer Zahl angeben. Unter „Belastung“ im Termin steht er dann mit „Als fehlend eintragen“.'},
@@ -14175,6 +14219,106 @@ function deletePlayerToken(pi){
   saveG();
   renderPeConfirmLink(pi);
 }
+// The link as it can be shared: a test copy opened from disk has no address
+// a phone could open.
+function _shareBase(){
+  return (location.protocol==='file:')?_SHARE_FALLBACK_HOST+'/':location.origin+location.pathname;
+}
+function buildShareHubLink(token){return _shareBase()+'?p='+encodeURIComponent(token||'');}
+// Profile: is he using the app, and a way to send him his own link
+function renderPlayerApp(p,pi){
+  const sec=document.getElementById('ps-sec-app'),box=document.getElementById('ps-app');
+  if(!sec||!box)return;
+  if(!canEdit()||!p){sec.style.display='none';return;}
+  sec.style.display='';
+  const si=playerSeenInfo(p);
+  const hasPhone=!!_amCleanPhone(p.phone);
+  box.innerHTML=`<div class="ps-app-row">
+      <span class="ps-app-st ${si.state}">${si.app?'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></svg>':''}${escapeHtml(si.state==='never'?si.text:si.text)}</span>
+      <button class="tp-qbtn ps-app-send" onclick="psSendAppLink(${pi})">${hasPhone?'Link per WhatsApp':'Link kopieren'}</button>
+    </div>`;
+}
+function _appLinkText(link,first){
+  return 'Hi '+(first||'')+'! Das ist dein pers\u00f6nlicher Link zur Team-App Flutlicht:\n'+link
+    +'\n\nAm besten gleich auf den Startbildschirm legen:\n'
+    +'iPhone: Teilen > Zum Home-Bildschirm\n'
+    +'Android: Men\u00fc (drei Punkte) > App installieren\n\n'
+    +'Nach jedem Training und Spiel: App \u00f6ffnen, eine Zahl tippen.';
+}
+function psSendAppLink(pi){
+  if(!canEdit())return;
+  const D=cd();const p=D&&D.players&&D.players[pi];if(!p)return;
+  const tok=ensurePlayerToken(pi);if(!tok)return;
+  const link=buildShareHubLink(tok);
+  const first=(p.shortname||String(p.name||'').split(' ')[0]||'').trim();
+  const wa=_amWhatsAppLink(p.phone,_appLinkText(link,first));
+  if(wa){window.open(wa,'_blank','noopener');return;}
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(link).then(
+      ()=>{if(typeof showSaveFlash==='function')showSaveFlash('\ud83d\udd17 Pers\u00f6nlicher Link kopiert');},
+      ()=>{prompt('Link kopieren:',link);});
+  }else prompt('Link kopieren:',link);
+}
+// One message for the WhatsApp group: the team link, how to put the app on
+// the home screen, and what it is for. Each player picks his name, confirms
+// with his birthdate, and lands in his own overview; the device remembers him.
+function _appShareText(){
+  return 'Unsere Team-App hei\u00dft jetzt Flutlicht (vorher footy.ai).\n\n'
+    +'1. Link \u00f6ffnen, deinen Namen w\u00e4hlen, mit deinem Geburtsdatum best\u00e4tigen.\n'
+    +'2. Auf den Startbildschirm legen:\n'
+    +'   iPhone: Teilen > Zum Home-Bildschirm\n'
+    +'   Android: Men\u00fc (drei Punkte) > App installieren\n'
+    +'3. Nach jedem Training und Spiel: App \u00f6ffnen, eine Zahl tippen. Dauert 10 Sekunden.\n\n'
+    +buildTeamLink(UI.currentTeam);
+}
+function appShareOpen(){
+  if(!canEdit())return;
+  const D=cd();if(!D)return;
+  // The team link needs a token per player; create the missing ones first
+  let made=0;
+  (D.players||[]).forEach(p=>{if(p&&!p.confirmToken){p.confirmToken=generatePlayerToken();made++;}});
+  if(made){snap();saveG();}
+  const pl=(D.players||[]).filter(Boolean);
+  const noBday=pl.filter(p=>!p.birthdate);
+  const seen=pl.filter(p=>p.seen&&p.seen.t),app=pl.filter(p=>p.seen&&p.seen.a);
+  const body=document.getElementById('app-share-body');if(!body)return;
+  body.innerHTML=`
+    <p class="app-sh-p">Einmal in die WhatsApp-Gruppe. Jeder w\u00e4hlt seinen Namen, best\u00e4tigt mit dem Geburtsdatum und landet in seiner eigenen \u00dcbersicht. Das Handy merkt sich die Wahl.</p>
+    <textarea id="app-share-text" class="app-sh-text" rows="11" spellcheck="false">${escapeHtml(_appShareText())}</textarea>
+    <div class="app-sh-btns">
+      <button class="btn bp" onclick="appShareSend()">In WhatsApp \u00f6ffnen</button>
+      <button class="btn bs" onclick="appShareCopy()">Text kopieren</button>
+    </div>
+    ${noBday.length?`<div class="app-sh-warn"><b>Ohne Geburtsdatum (${noBday.length}):</b> ${noBday.map(p=>escapeHtml(getDisplayName?getDisplayName(p):p.name)).join(', ')}. ${noBday.length===1?'Er kann sich \u00fcber diesen Link nicht anmelden \u2014 Geburtsdatum im Profil eintragen oder ihm den pers\u00f6nlichen Link aus dem Profil schicken.':'Sie k\u00f6nnen sich \u00fcber diesen Link nicht anmelden \u2014 Geburtsdatum im Profil eintragen oder ihnen den pers\u00f6nlichen Link aus dem Profil schicken.'}</div>`:''}
+    <div class="app-sh-stat">Seit ${SEEN_SINCE} ge\u00f6ffnet: <b>${seen.length} von ${pl.length}</b>${app.length?' \u00b7 als App installiert: <b>'+app.length+'</b>':''}. Wer fehlt, steht in der Spalte \u201eApp\u201c ganz oben, wenn du danach sortierst.</div>`;
+  openM('moAppShare');
+}
+function appShareSend(){
+  const t=document.getElementById('app-share-text');
+  _openWhatsAppGroupCompose(t?t.value:_appShareText());
+}
+function appShareCopy(){
+  const t=document.getElementById('app-share-text');const txt=t?t.value:_appShareText();
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(
+      ()=>{if(typeof showSaveFlash==='function')showSaveFlash('\ud83d\udccb Text kopiert \u00b7 in die Gruppe einf\u00fcgen');},
+      ()=>{if(t){t.select();}});
+  }else if(t)t.select();
+}
+// After a session: one message to the group, no names in it
+function rpeRemindGroup(si){
+  if(!canEdit())return;
+  const D=cd();const s=D&&D.sessions&&D.sessions[si];if(!s)return;
+  const what=s.type==='match'?'vom Spiel':'vom Training';
+  const txt='Belastung '+what+' heute ('+String(s.date||'').trim()+'.) bitte bis 24 Uhr eintragen: App \u00f6ffnen, Zahl tippen.\n'
+    +buildTeamLink(UI.currentTeam);
+  _openWhatsAppGroupCompose(txt);
+}
+// "Im Blick" → straight to who has rated and who has not
+function rpeOpenFromHome(si){
+  if(canEdit()){try{rpeAllOpen(si);return;}catch(e){}}
+  openSessFromMain(si);
+}
 function copyPlayerLink(token){
   const url=buildHubLink(token);
   if(navigator.clipboard&&navigator.clipboard.writeText){
@@ -14887,6 +15031,7 @@ const RPE_SCALE=[
 function rpeLabel(n){const r=RPE_SCALE[n];return r?r[1]:'';}
 const RPE_DEFAULT_MIN=90;      // used when the trainer set no duration
 const RPE_WINDOW_H=72;         // entry stays open this long after the session
+const RPE_EARLY_MIN=15;        // rating opens this many minutes before the planned end
 // Trainer preview (&preview=1): the screen is identical to the player's, the
 // rating window too; preview only stops answers from being saved.
 const RPE_IS_PREVIEW=(()=>{
@@ -14961,12 +15106,14 @@ function rpeIsOpen(s,si,p,season){
   const y=Math.floor(sk/10000),m=Math.floor(sk/100)%100,d=sk%100;
   const hm=String(s.time||'').split(':').map(Number);
   const start=new Date(y,m-1,d,(hm.length===2&&!isNaN(hm[0]))?hm[0]:18,(hm.length===2&&!isNaN(hm[1]))?hm[1]:0);
-  // Window runs from the END of the session — asking mid-training would get a
+  // Window runs from the end of the session — asking mid-training would get a
   // rating of half a session — and closes at midnight the same day. A rating
-  // given the next morning describes a memory, not the session.
+  // given the next morning describes a memory, not the session. It opens
+  // RPE_EARLY_MIN before the PLANNED end: sessions often finish a little early,
+  // and the cabin, right after, is where the team rates together.
   const endMs=start.getTime()+rpeSessionMinutes(s,p,si)*60000;
   const now=Date.now();
-  if(now<endMs)return false;
+  if(now<endMs-RPE_EARLY_MIN*60000)return false;
   const midnight=new Date(y,m-1,d,23,59,59,999).getTime();
   return now<=midnight;
 }
@@ -15322,7 +15469,7 @@ function _rpeSessGroups(D,s,si,season){
     const st=(p.s&&si<p.s.length)?p.s[si]:3;
     if(st===0||st===2)return;
     if(!_sessAfterJoin(p,s,season))return;
-    (m&&m.nd?nd:open).push({n,pi,st});
+    (m&&m.nd?nd:open).push({n,pi,st,never:!(p.seen&&p.seen.t)});
   });
   const byName=(a,b)=>String(a.n||'').localeCompare(String(b.n||''));
   nd.sort(byName);open.sort(byName);
@@ -15407,8 +15554,9 @@ function rpeAllOpen(si){
   if(c.open.length){
     html+=`<div class="rpe-sec-h">${c.winOpen?'Noch offen':'Ohne Bewertung'} <span>${c.open.length}</span></div>`
       +`<div class="rpe-open">${c.open.map(x=>
-        `<button class="rpe-open-b" onclick="rpeEditOpen(${si},${x.pi})">${escapeHtml(x.n)}</button>`).join('')}</div>`
-      +`<div class="rpe-hint">${c.winOpen?'Spieler können bis 24 Uhr bewerten. ':''}Nennt dir ein Spieler seinen Wert: Namen antippen und eintragen.</div>`;
+        `<button class="rpe-open-b" onclick="rpeEditOpen(${si},${x.pi})"${x.never?` title="Seit ${SEEN_SINCE} nicht in der App"`:''}>${escapeHtml(x.n)}${x.never?'<small>nicht in der App</small>':''}</button>`).join('')}</div>`
+      +`<div class="rpe-hint">${c.winOpen?'Spieler können bis 24 Uhr bewerten. ':''}Nennt dir ein Spieler seinen Wert: Namen antippen und eintragen.</div>`
+      +(c.winOpen?`<button class="rpe-remind" onclick="rpeRemindGroup(${si})">Erinnerung in die WhatsApp-Gruppe</button>`:'');
   }
   body.innerHTML=html;
   const mo=document.getElementById('moRpeAll');
@@ -15610,6 +15758,59 @@ function pmSetRpe(si,val){
       :'Keine Note, kein richtig oder falsch \u2014 dein ehrliches Gef\u00fchl z\u00e4hlt.';
   }
 }
+// A key as it appears in a Firebase path (same escaping as fbEncodeValue)
+function _fbPathKey(k){
+  return String(k||'').replace(/\//g,'__SL__').replace(/\./g,'__DOT__').replace(/#/g,'__HASH__').replace(/\[/g,'__LB__').replace(/\]/g,'__RB__');
+}
+// ── Spieler-App: when a player last opened it ─────────────────
+// p.seen = {t, a}: last time the player opened his link (t), last time he
+// opened it as the installed app (a). His own device writes it, at most every
+// 30 minutes, into his own record. Recorded since SEEN_SINCE, so "nicht
+// geöffnet" means "not since then", not "never".
+const SEEN_SINCE='17.10.';
+function _pmIsStandalone(){
+  try{return window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;}catch(e){return false;}
+}
+let _pmSeenDone=false;
+function _pmMarkSeen(){
+  if(_pmSeenDone||!isPlayerMode()||RPE_IS_PREVIEW||!fbDb||!fbRef)return;
+  const myTeam=UI.currentTeam,mySeason=UI.currentSeason;
+  const myPi=_pmValidateIdx();
+  if(!myTeam||!mySeason||myPi==null)return;
+  const D=G.db[myTeam+'__'+mySeason];
+  const p=D&&Array.isArray(D.players)?D.players[myPi]:null;
+  if(!p)return;
+  _pmSeenDone=true;
+  const now=Date.now(),app=_pmIsStandalone(),GAP=30*60000;
+  const lsKey='fcf_seen_'+(CU.playerToken||'');
+  let last={};
+  try{last=JSON.parse(localStorage.getItem(lsKey)||'{}')||{};}catch(e){}
+  // Opening as the app for the first time is news even inside the gap
+  if(now-(last.t||0)<GAP&&(!app||now-(last.a||0)<GAP))return;
+  const prevA=(p.seen&&typeof p.seen==='object'&&p.seen.a)||0;
+  const v={t:now};
+  if(app)v.a=now;else if(prevA)v.a=prevA;
+  p.seen=v;
+  try{localStorage.setItem(lsKey,JSON.stringify({t:now,a:app?now:(last.a||0)}));}catch(e){}
+  const path='fcf_data/db/'+_fbPathKey(myTeam+'__'+mySeason)+'/players/v/'+myPi+'/seen';
+  fbDb.ref().update({[path]:v}).catch(e=>console.warn('[Seen]',e&&e.message));
+}
+// For the trainer: what the record says, in words
+function _seenDays(t){
+  const d=new Date(t),n=new Date();
+  return Math.round((new Date(n.getFullYear(),n.getMonth(),n.getDate())-new Date(d.getFullYear(),d.getMonth(),d.getDate()))/86400000);
+}
+function playerSeenInfo(p){
+  const s=(p&&p.seen&&typeof p.seen==='object')?p.seen:null;
+  if(!s||!s.t)return {state:'never',app:false,t:0,short:'\u2013',when:'',text:'Seit '+SEEN_SINCE+' nicht ge\u00f6ffnet'};
+  const d=new Date(s.t),days=_seenDays(s.t);
+  const hm=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+  const when=days<=0?'heute '+hm:days===1?'gestern '+hm:days<7?'vor '+days+' Tagen':d.getDate()+'.'+(d.getMonth()+1)+'.';
+  const short=days<=0?'heute':days===1?'gestern':days<7?days+' T.':d.getDate()+'.'+(d.getMonth()+1)+'.';
+  const app=!!s.a;
+  return {state:days<=7?'recent':'old',app,t:s.t,short,when,
+    text:(app?'Als App installiert':'Im Browser')+' \u00b7 zuletzt '+when};
+}
 // "Ich war nicht dabei": an answer in place of a number. The trainer sees it
 // and can record the player absent; until then the claim is all there is.
 function pmSetNotThere(si){
@@ -15648,8 +15849,7 @@ function _pmSaveMeta(s){
   const p=D&&Array.isArray(D.players)?D.players[myPi]:null;
   const k=rpeMetaKey(s);
   if(!p||!k)return;
-  const enc=x=>String(x||'').replace(/\//g,'__SL__').replace(/\./g,'__DOT__').replace(/#/g,'__HASH__').replace(/\[/g,'__LB__').replace(/\]/g,'__RB__');
-  const path='fcf_data/db/'+enc(myTeam+'__'+mySeason)+'/players/v/'+myPi+'/rpeMeta/'+k;
+  const path='fcf_data/db/'+_fbPathKey(myTeam+'__'+mySeason)+'/players/v/'+myPi+'/rpeMeta/'+k;
   fbDb.ref().update({[path]:rpeMetaGet(p,s)||null}).catch(e=>{
     console.warn('[PlayerSave] Herkunft der Bewertung nicht gespeichert:',e&&e.message);
   });
@@ -15822,7 +16022,7 @@ window.checkRpeOrigin=function(){
         const endMs=start.getTime()+((typeof s.duration==='number'&&s.duration>0)?s.duration:90)*60000;
         const midnight=new Date(y,m-1,d,23,59,59,999).getTime();
         fenster=new Date(endMs).toLocaleString('de-DE')+' \u2013 24:00';
-        verdict=(e.ts>=endMs&&e.ts<=midnight)?'\u2705 plausibel':'\u26a0\ufe0f VORSCHAU/sp\u00e4ter';
+        verdict=(e.ts>=endMs-RPE_EARLY_MIN*60000&&e.ts<=midnight)?'\u2705 plausibel':'\u26a0\ufe0f VORSCHAU/sp\u00e4ter';
       }else verdict='\u2753 Datum unbekannt';
       rows.push({
         Spieler:e.user,Einheit:e.target,Wert:(e.detail||'').replace('RPE ',''),
@@ -16690,6 +16890,7 @@ function pmAnswerPhysio(si,yes){
 function renderRpeOnly(){
   const wrap=document.getElementById('playerModeWrap');
   if(!wrap)return;
+  try{_pmMarkSeen();}catch(e){}
   const D=cd();
   const pi=_pmValidateIdx();
   const p=(pi!=null)?D.players[pi]:null;
@@ -16780,6 +16981,7 @@ function rpoMin(si,delta,abs){
 function renderHub(){
   const wrap=document.getElementById('playerModeWrap');
   if(!wrap)return;
+  _hubNoteOffered();   // a due rating shown here as a card counts as offered
   const D=cd();
   const pi=_pmValidateIdx();
   const p=(pi!=null)?D.players[pi]:null;
@@ -16919,10 +17121,40 @@ function _hubAutoRoute(){
     if(t)sessionStorage.setItem('fcf_hub_walked',t);
   }catch(e){}
   const c=_hubOpenCounts();
+  _hubNoteOffered();
   if(c.rpe>0){window._hubAction='rpe';window._rpeOnly=true;window._rpeOnlySi=c.rpeLast;_hubEntry.rpe=c.rpe;}
   else if(c.week>0){window._hubAction='week';_hubEntry.week=c.week;}
   else if(c.physio>0){window._hubAction='physio';_hubEntry.physio=c.physio;}
 }
+// Ratings the player has already been taken to (or saw due when the hub
+// opened). A rating that becomes due later — the app left open in the
+// background since the morning — opens by itself when he comes back; one he
+// already walked away from does not chase him.
+const _hubOffered=new Set();
+function _hubDueRpe(){
+  const D=cd();const pi=_pmValidateIdx();const p=(pi!=null&&D)?D.players[pi]:null;
+  if(!p)return [];
+  const out=[];
+  (D.sessions||[]).forEach((s,si)=>{if(s&&rpeIsOpen(s,si,p,UI.currentSeason)&&!rpeAnswered(p,si,s))out.push(si);});
+  return out;
+}
+function _hubNoteOffered(){try{_hubDueRpe().forEach(si=>_hubOffered.add(si));}catch(e){}}
+function _hubOnResume(){
+  if(!isPlayerMode()||!window._hubMode)return;
+  try{_pmSeenDone=false;_pmMarkSeen();}catch(e){}
+  if(document.getElementById('hubThanks')||document.querySelector('.mo.open'))return;
+  if(window._hubAction==='rpe')return;   // already on a rating
+  const fresh=_hubDueRpe().filter(si=>!_hubOffered.has(si));
+  if(!fresh.length)return;
+  _hubNoteOffered();
+  const c=_hubOpenCounts();
+  window._hubAction='rpe';window._rpeOnly=true;window._rpeOnlySi=c.rpeLast;
+  if(!_hubEntry.rpe)_hubEntry.rpe=c.rpe;
+  _hubSyncUrl();
+  try{renderPlayerMode();}catch(e){}
+}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')_hubOnResume();});
+window.addEventListener('pageshow',e=>{if(e.persisted)_hubOnResume();});
 // Shown when the last answer lands: a moment of acknowledgement, then the
 // overview. Without it the screen would simply swap and look like a glitch.
 function _hubThanks(kind){
@@ -17050,6 +17282,7 @@ function hubBack(){
 function renderPlayerMode(){
   const wrap=document.getElementById('playerModeWrap');
   if(!wrap||!isPlayerMode())return;
+  try{_pmMarkSeen();}catch(e){}
   if(typeof _a2hsArm==='function')_a2hsArm('player');
   if(window._hubDecide)_hubAutoRoute();
   // Entering a screen records what was outstanding, so the thank-you can tell
@@ -20082,6 +20315,7 @@ function openPlayerStats(pi,opts){
     {const jd=document.getElementById('pe-joinDate');if(jd)jd.value=p.joinDate||'';}
     document.getElementById('pe-phone').value=p.phone||'';
     try{renderPlayerContact(p);}catch(e){}
+    try{renderPlayerApp(p,pi);}catch(e){}
     try{renderPlayerFront(p,pi);}catch(e){}
     document.getElementById('pe-email').value=p.email||'';
     _currentFoot=p.foot||'right';
@@ -23670,7 +23904,7 @@ function hxRender(){
       if(!s||!s.date||!inDays(s,-1,0))return;
       let n=0;
       D.players.forEach(p=>{if(p&&_sessAfterJoin(p,s,season)&&rpeIsOpen(s,si,p,season)&&!rpeAnswered(p,si,s))n++;});
-      if(n)flags.push({dot:'#E0912F',who:n+' Spieler',what:'Belastung '+(sk(s)===today?'von heute':'vom '+s.date)+' noch nicht bewertet · bis 24\u00a0Uhr',on:`openSessFromMain(${si})`});
+      if(n)flags.push({dot:'#E0912F',who:n+' Spieler',what:'Belastung '+(sk(s)===today?'von heute':'vom '+s.date)+' noch nicht bewertet · bis 24\u00a0Uhr',on:`rpeOpenFromHome(${si})`});
     });
   }catch(e){}
   // unanswered for the coming week (the focus card already lists its own)
@@ -24013,6 +24247,9 @@ function _a2hsMaybe(){
   if(!mode)return; // this browser can do neither (e.g. an in-app browser)
   // Not on top of something the user is busy with — try again a bit later
   if(document.querySelector('.mo.open:not(.hx-page),.tpl-ov.open,#moLineup.open,#moSeasonLineup.open,#rcOverlay.open,#mobSheet.open')){_a2hsLater_(15000);return;}
+  // Not over the rating either: it would cover the bottom of the scale. The
+  // moment after "Danke" is the better one to ask.
+  if(document.querySelector('.rpo-list,#hubThanks')){_a2hsLater_(8000);return;}
   _a2hsShow(mode);
 }
 function _a2hsShow(mode){
@@ -24368,6 +24605,7 @@ function renderMgrPlayers(){
     <div style="width:32px;flex-shrink:0;"></div>
     <div style="flex:1;font-size:.65rem;font-weight:700;color:rgba(255,255,255,.6);cursor:pointer;" onclick="sortMgr('name')">Spieler${mgrSort.col==='name'?(mgrSort.asc?'▲':'▼'):''}</div>
     <div style="min-width:82px;font-size:.65rem;font-weight:700;color:rgba(255,255,255,.6);cursor:pointer;" onclick="sortMgr('pos')">Pos.${mgrSort.col==='pos'?(mgrSort.asc?'▲':'▼'):''}</div>
+    ${canEdit()?`<div class="pl-app-h" onclick="sortMgr('seen')" title="Zuletzt in der Spieler-App (seit ${SEEN_SINCE})">App${mgrSort.col==='seen'?(mgrSort.asc?'▲':'▼'):''}</div>`:''}
     <div style="width:60px;"></div>
     ${canEdit()?`<button type="button" class="pl-sel-tg" id="mgrSelToggle" onclick="toggleMultiSelectMode()">${_multiSelMode?'Fertig':'Auswählen'}</button>`:''}
   </div>`;
@@ -24384,8 +24622,9 @@ function renderMgrPlayers(){
       ${sm?'<span class="pl-ck" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span>':''}
       <div class="pl-nr">${p.nr||''}</div>
       <div style="flex-shrink:0;">${renderPlayerAvatar(p,32)}</div>
-      <div class="pl-name">${p.name||''}</div>
+      ${(()=>{const si=canEdit()?playerSeenInfo(p):null;return `<div class="pl-name">${p.name||''}${si?`<span class="pl-app-sub ${si.state}">${si.app?'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></svg>':''}App: ${si.state==='never'?'nicht ge\u00f6ffnet':escapeHtml(si.short)}</span>`:''}</div>`;})()}
       <div class="pl-pos">${pbHtml(p)}</div>
+      ${canEdit()?(()=>{const si=playerSeenInfo(p);return `<div class="pl-app ${si.state}" title="${escapeHtml(si.text)}">${si.app?'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></svg>':''}<span>${escapeHtml(si.short)}</span></div>`;})():''}
       <div class="pl-btns"${sm?' aria-hidden="true"':''}>
         <button class="pl-btn pl-btn-e" title="Bearbeiten"${sm?' tabindex="-1"':''} onclick="event.stopPropagation();_tmLeave('spieler');openPlayerStats(${i},{edit:true});">✎</button>
         ${canEdit()?`<button class="pl-btn pl-btn-d"${sm?' tabindex="-1"':''} onclick="event.stopPropagation();mgrDelPl(${i})">✕</button>`:''}
@@ -25037,6 +25276,11 @@ function sortPlayers(players){
 }
 function sortMgrPlayers(players){
   const {col,asc}=mgrSort;
+  // Longest without the app first: those are the ones to talk to
+  if(col==='seen'){
+    const t=p=>(p&&p.seen&&typeof p.seen==='object'&&p.seen.t)||0;
+    return [...players].sort((a,b)=>(asc?t(a)-t(b):t(b)-t(a))||String((a&&a.name)||'').localeCompare(String((b&&b.name)||'')));
+  }
   return [...players].sort((a,b)=>compareBySort(a,b,col,asc));
 }
 function sortStats(col){if(statsSort.col===col)statsSort.asc=!statsSort.asc;else{statsSort.col=col;statsSort.asc=false;}
@@ -33634,6 +33878,14 @@ _pubCleanupSchedule();
   </div>
   <div id="rpe-all-sub" class="rpe-all-sub"></div>
   <div id="rpe-all-body"></div>
+</div></div>
+
+<div class="mo" id="moAppShare" style="z-index:870;"><div class="mob" style="width:460px;max-width:94vw;">
+  <div class="ps-title-row">
+    <h3 class="ps-title">Link an die Mannschaft</h3>
+    <button class="btn bs" onclick="closeM('moAppShare')" aria-label="Schließen">✕</button>
+  </div>
+  <div id="app-share-body"></div>
 </div></div>
 
 <div class="mo" id="moRpeEdit" style="z-index:880;"><div class="mob" style="width:340px;max-width:94vw;">
