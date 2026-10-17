@@ -2647,6 +2647,25 @@ html:has(body.hub-mode){background:#080f22;}
 .rpo-nd{display:block;width:100%;margin-top:12px;padding:12px;border-radius:11px;border:1.5px dashed #C8D2E2;
   background:transparent;color:var(--gm);font-family:'Barlow',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;}
 .rpo-nd.on{border-style:solid;border-color:var(--bd);background:#EAF0FA;color:var(--bd);}
+.rpo-next{margin-top:12px;font-size:.8rem;font-weight:600;color:var(--gm);}
+/* Spieler des Spiels */
+.mvp-list{display:flex;flex-direction:column;gap:4px;text-align:left;max-height:52vh;overflow-y:auto;margin:2px -4px 0;padding:0 4px;}
+.mvp-opt{display:flex;align-items:center;gap:10px;min-height:44px;padding:4px 12px 4px 6px;border-radius:11px;border:1.5px solid #E1E7F0;
+  background:#fff;color:var(--gd);cursor:pointer;font-family:'Barlow',sans-serif;text-align:left;-webkit-tap-highlight-color:transparent;}
+.mvp-opt:hover{background:#F4F7FB;}
+.mvp-opt.on{border-color:var(--bd);background:#EAF0FA;}
+.mvp-opt:focus-visible,.mvp-go:focus-visible{outline:3px solid #1659B8;outline-offset:1px;}
+.mvp-nr{flex:none;width:30px;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.15rem;color:var(--gm);}
+.mvp-nm{flex:1;font-size:.94rem;font-weight:600;}
+.mvp-dot{flex:none;width:20px;height:20px;border-radius:50%;border:2px solid #C8D2E2;}
+.mvp-opt.on .mvp-dot{border-color:var(--bd);background:radial-gradient(circle,var(--bd) 0 5px,transparent 6px);}
+.mvp-go{display:block;width:100%;margin-top:14px;height:50px;border-radius:12px;border:none;background:#F2C230;color:#0E2350;
+  font-family:'Barlow',sans-serif;font-size:.98rem;font-weight:700;cursor:pointer;}
+.mvp-go:disabled{background:#E6EBF2;color:#8A97B0;cursor:default;}
+.hub-mvp{cursor:default;}
+.wr2-mvp{margin-top:6px;font-size:.84rem;}
+.mvp-card{cursor:default;margin-top:8px;}
+.mvp-card:hover{transform:none;box-shadow:none;}
 @media (max-height:700px){.rpo-opt{min-height:36px;}.rpo-num{height:29px;font-size:1.2rem;}.rpo-list{gap:2px;}.rpo-q{margin:12px 0 10px;}}
 .rpo-scale{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;}
 .rpo-n{height:52px;border-radius:11px;border:1px solid transparent;cursor:pointer;
@@ -6107,6 +6126,7 @@ if(window._fbBlocked){
       </div>
       </div><!-- /ss-actions -->
       <div id="ss-rpe-wrap" style="display:none;"></div>
+      <div id="ss-mvp-wrap" style="display:none;"></div>
       <div id="ss-physio-wrap" style="display:none;"></div>
       <div style="margin-top:8px;">
       </div>
@@ -6471,13 +6491,17 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.1.6'; // v1.1.6: Anwesenheit erfassen neu, Einsatz
-const APP_VERSION_LABEL='1.1.6';
+const APP_VERSION='1.1.7'; // v1.1.7: Spieler des Spiels
+const APP_VERSION_LABEL='1.1.7';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792217427429; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792251564521; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.1.7',date:'17.10.2026',title:'Spieler des Spiels',items:[
+    {icon:'🏆',title:'Abstimmung nach jedem Spiel',desc:'Wer das Spiel bewertet hat, wählt danach anonym den Spieler des Spiels — bis zum nächsten Tag 24 Uhr. Danach sehen alle in ihrer Übersicht den Gewinner, aber keine Stimmenzahlen. Bei Gleichstand teilen sich zwei den Titel.'},
+    {icon:'👀',title:'Für Trainer',desc:'Im Spiel steht, wie viele schon abgestimmt haben, nach dem Ende die drei Ersten mit Stimmen; der Wochenbericht nennt den Gewinner. Wer wen gewählt hat, wird nirgends gespeichert.'},
+  ]},
   {version:'1.1.6',date:'17.10.2026',title:'Anwesenheit erfassen',items:[
     {icon:'✅',title:'Was der Spieler gesagt hat',desc:'Unter jedem Namen steht, was er selbst angegeben hat: zugesagt, entschuldigt mit Grund, „sagt: war nicht dabei“ oder „hat Belastung bewertet“. Sortiert nach Rückennummer; Spieler, die erst später dazukamen, stehen nicht mehr in der Liste.'},
     {icon:'⭐',title:'Einsatz statt Leistungsnote',desc:'Eigener Reiter „Einsatz“: nur wer auffällt bekommt ▲ stark oder ▼ schwach. Bei „Fertig“ zählen alle anderen Anwesenden als normal. Die bisherigen Noten bleiben erhalten (Sehr gut = stark, Gut = normal, Nicht gut = schwach). Spieler sehen den Einsatz nicht.'},
@@ -7563,6 +7587,7 @@ function _adoptData(data){
     let copy;
     try{copy=JSON.parse(JSON.stringify(clean));}catch(e){copy=clean;}
     G=copy;
+    try{if(typeof _pmRosterSnap==='function')_pmRosterSnap();}catch(e){}
     try{if(typeof _pmSanitizeG==='function')_pmSanitizeG();}catch(e){console.error('[PlayerPrivacy]',e);}
     return;
   }
@@ -15035,6 +15060,8 @@ function _pmSanitizeG(){
           // Availability only — the player needs to know the physio is there,
           // not who else signed up.
           physio:(typeof sessPhysioOn==='function'&&sessPhysioOn(s))?true:undefined,
+          // Spieler des Spiels: the winner(s) once the vote has closed — never the counts
+          mvpWin:(()=>{try{const r=mvpResult(s);return (r&&r.winners.length)?r.winners.slice():undefined;}catch(e){return undefined;}})(),
           // Player-visible session info — explicitly whitelisted
           location:s.location||''
           // note deliberately omitted — trainers' own record
@@ -15556,6 +15583,42 @@ function renderSessRpe(si){
   _rpeCache={si,vals,nd:g.nd,open:g.open,avg,min,max,avgLoad,mins,asked,isMatch,winOpen};
 }
 let _rpeCache=null;
+// Trainer: the vote of a match — how many have voted while it runs, the top
+// three with their votes once it has closed.
+function renderSessMvp(si){
+  const box=document.getElementById('ss-mvp-wrap');
+  if(!box)return;
+  const D=cd();const s=D&&D.sessions&&D.sessions[si];
+  if(!s||s.type!=='match'||!canEdit()||!sessTookPlace(s,UI.currentSeason)){box.style.display='none';return;}
+  const total=mvpTotal(s);
+  const w=_mvpSpan(s);
+  if(!w||Date.now()<w.start){box.style.display='none';return;}
+  const open=Date.now()<=w.end;
+  if(!open&&!total){box.style.display='none';return;}
+  const nm=n=>{const p=(D.players||[]).find(x=>x&&x.name===n);return p?(getDisplayName?getDisplayName(p):p.name):n;};
+  let main,sub;
+  if(open){
+    main=total?total+' Stimme'+(total===1?'':'n'):'Noch keine Stimme';
+    sub='Abstimmung l\u00e4uft bis '+mvpEndsLabel(s)+' \u00b7 Ergebnis danach';
+  }else{
+    const r=mvpResult(s);
+    if(r&&r.winners.length){
+      main=r.winners.map(n=>escapeHtml(nm(n))).join(' & ');
+      sub=r.rows.slice(0,3).map(x=>escapeHtml(nm(x.n))+' '+x.v).join(' \u00b7 ')+' \u00b7 '+total+' Stimmen';
+    }else if(r&&r.rows.length&&total>=MVP_MIN_VOTES&&r.rows[0].v>=2){
+      // three or more level at the top: nobody is announced to the team
+      main='Kein klarer Sieger';
+      sub=r.rows.slice(0,4).map(x=>escapeHtml(nm(x.n))+' '+x.v).join(' \u00b7 ')+' \u00b7 '+total+' Stimmen';
+    }else{
+      main='Zu wenige Stimmen';sub=total+' Stimme'+(total===1?'':'n')+(r&&r.rows.length&&total>=MVP_MIN_VOTES?' \u00b7 niemand mit 2 oder mehr':' von mindestens '+MVP_MIN_VOTES);
+    }
+  }
+  box.style.display='block';
+  box.innerHTML=`<div class="rpe-card rpe-none mvp-card">
+    <span class="rpe-card-ic">\ud83c\udfc6</span>
+    <span class="rpe-card-txt"><b>Spieler des Spiels${open?'':': '+main}</b><span>${open?main+' \u00b7 ':''}${sub}</span></span>
+  </div>`;
+}
 // Everyone's answer, opened from the summary tile: a tile per rating, then who
 // says he was not there, then who has not answered — tapping a name enters the
 // value he tells the trainer.
@@ -15851,6 +15914,177 @@ function playerSeenInfo(p){
   const app=!!s.a;
   return {state:days<=7?'recent':'old',app,t:s.t,short,when,
     text:(app?'Als App installiert':'Im Browser')+' \u00b7 zuletzt '+when};
+}
+// ── SPIELER DES SPIELS ───────────────────────────────────────
+// After a match, everyone who rated it may vote once for the best player of
+// the match. Rating first: the vote is the reason to open the app, the rating
+// the reason it exists.
+//   s.mvp.c[name] = votes      (on the session; counts only)
+//   p.mvpV[key]   = 1          (on the voter: "has voted", not for whom)
+// So nobody can read who voted for whom — not even the admin in the raw data.
+// The vote runs from the rating window's start until midnight of the next day;
+// the result appears once it has closed, and only the winner is shown to the
+// team, so nobody is put on display as the one without votes.
+const MVP_MIN_VOTES=3;          // fewer than this: no winner is named
+const MVP_SHOW_DAYS=7;          // the result stays on the overview this long
+function _mvpSpan(s){
+  const sk=(s&&s.date)?dispToSortKey(s.date):null;
+  if(!sk||sk===99999999)return null;
+  const y=Math.floor(sk/10000),m=Math.floor(sk/100)%100,d=sk%100;
+  const hm=String(s.time||'').split(':').map(Number);
+  const start=new Date(y,m-1,d,(hm.length===2&&!isNaN(hm[0]))?hm[0]:15,(hm.length===2&&!isNaN(hm[1]))?hm[1]:0).getTime()
+    +(rpeSessionMinutes(s,null,null)-RPE_EARLY_MIN)*60000;
+  const end=new Date(y,m-1,d+1,23,59,59,999).getTime();
+  return {start,end};
+}
+function mvpIsOpen(s,season){
+  if(!s||s.type!=='match')return false;
+  if(typeof sessTookPlace==='function'&&!sessTookPlace(s,season))return false;
+  const w=_mvpSpan(s);if(!w)return false;
+  const now=Date.now();
+  return now>=w.start&&now<=w.end;
+}
+// "bis Mo 24 Uhr": the day the vote closes
+function mvpEndsLabel(s){
+  const w=_mvpSpan(s);if(!w)return '';
+  return ['So','Mo','Di','Mi','Do','Fr','Sa'][new Date(w.end).getDay()]+' 24 Uhr';
+}
+function mvpVoted(p,s){
+  const k=rpeMetaKey(s);
+  return !!(k&&p&&p.mvpV&&typeof p.mvpV==='object'&&p.mvpV[k]);
+}
+// Who may be voted for: was at the match by the list or by his own answers
+function mvpEligible(p,s,si,season){
+  if(!p||!p.name)return false;
+  if(typeof _sessAfterJoin==='function'&&!_sessAfterJoin(p,s,season))return false;
+  const st=(p.s&&si<p.s.length)?p.s[si]:3;
+  if(st===0||st===2)return false;
+  if(typeof rpeNotThere==='function'&&rpeNotThere(p,s))return false;
+  return st===1||st===4||(Array.isArray(p.rpe)&&typeof p.rpe[si]==='number');
+}
+// May this player vote now: open, he rated the match, not yet voted
+function mvpCanVote(p,s,si,season){
+  return mvpIsOpen(s,season)&&Array.isArray(p.rpe)&&typeof p.rpe[si]==='number'&&!mvpVoted(p,s);
+}
+// Winner(s) once closed: null while open, with too few votes, or without votes
+function mvpResult(s){
+  const w=_mvpSpan(s);if(!w||Date.now()<=w.end)return null;
+  const c=(s.mvp&&s.mvp.c&&typeof s.mvp.c==='object')?s.mvp.c:{};
+  const rows=Object.entries(c).map(([n,v])=>({n,v:+v||0})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v);
+  const total=rows.reduce((a,b)=>a+b.v,0);
+  if(total<MVP_MIN_VOTES||rows[0].v<2)return {total,rows,winners:[]};
+  // A tie at the top shares the title — two at most. Three or more level
+  // with each other is no result to announce; the trainer still sees it.
+  const top=rows.filter(x=>x.v===rows[0].v).map(x=>x.n);
+  return {total,rows,winners:top.length<=2?top:[],tie:top.length>1};
+}
+function mvpTotal(s){
+  const c=(s&&s.mvp&&s.mvp.c&&typeof s.mvp.c==='object')?s.mvp.c:{};
+  return Object.values(c).reduce((a,v)=>a+(+v||0),0);
+}
+// Teammates for the vote, taken before player mode strips the roster down to
+// the link holder: display names, numbers and who can be voted for in matches
+// whose vote is open. Nothing else about the others is kept.
+let _pmRoster=null;
+function _pmRosterSnap(){
+  try{
+    const D=G&&G.db&&G.db[UI.currentTeam+'__'+UI.currentSeason];
+    if(!D||!Array.isArray(D.players)||!Array.isArray(D.sessions))return;
+    const season=UI.currentSeason;
+    const disp={},nr={},elig={};
+    D.players.forEach(p=>{if(p&&p.name){disp[p.name]=(typeof getDisplayName==='function'?getDisplayName(p):p.name)||p.name;nr[p.name]=p.nr||'';}});
+    D.sessions.forEach((s,si)=>{
+      if(!s||s.type!=='match'||!mvpIsOpen(s,season))return;
+      elig[si]=D.players.filter(p=>mvpEligible(p,s,si,season)).map(p=>p.name);
+    });
+    _pmRoster={disp,nr,elig};
+  }catch(e){console.warn('[Roster]',e);}
+}
+function _mvpName(n){return (_pmRoster&&_pmRoster.disp&&_pmRoster.disp[n])||n;}
+function mvpVote(si,name){
+  if(!isPlayerMode())return false;
+  const D=cd();const myPi=_pmValidateIdx();
+  if(myPi==null||!D||!D.players||!D.players[myPi])return false;
+  const p=D.players[myPi];const s=D.sessions&&D.sessions[si];
+  if(!s||!mvpCanVote(p,s,si,UI.currentSeason)||!name||name===p.name)return false;
+  const k=rpeMetaKey(s);if(!k)return false;
+  if(!p.mvpV||typeof p.mvpV!=='object'||Array.isArray(p.mvpV))p.mvpV={};
+  p.mvpV[k]=1;
+  if(!s.mvp||typeof s.mvp!=='object')s.mvp={};
+  if(!s.mvp.c||typeof s.mvp.c!=='object')s.mvp.c={};
+  s.mvp.c[name]=(+s.mvp.c[name]||0)+1;
+  if(RPE_IS_PREVIEW){
+    if(typeof showSaveFlash==='function')showSaveFlash('👁 Vorschau — nicht gespeichert');
+    return true;
+  }
+  const SV=(typeof firebase!=='undefined'&&firebase.database&&firebase.database.ServerValue)||null;
+  if(!fbDb||!fbRef||!SV||typeof SV.increment!=='function')return true;
+  // One atomic update: the count goes up and the voter is marked together
+  const base='fcf_data/db/'+_fbPathKey(UI.currentTeam+'__'+UI.currentSeason);
+  const upd={};
+  upd[base+'/sessions/v/'+si+'/mvp/c/'+_fbPathKey(name)]=SV.increment(1);
+  upd[base+'/players/v/'+myPi+'/mvpV/'+k]=1;
+  fbDb.ref().update(upd).catch(e=>console.warn('[Vote]',e&&e.message));
+  try{_pmAppendAudit({ts:Date.now(),user:p.name||'Spieler',role:'player',action:'Spieler des Spiels gewählt',target:s.date||'?',detail:'Stimme abgegeben'});}catch(e){}
+  return true;
+}
+// The vote screen: one name, then "Stimme abgeben" — a single stray tap must
+// not cast an anonymous vote that can never be taken back.
+let _mvpPick=null;
+function renderMvpVote(){
+  const wrap=document.getElementById('playerModeWrap');
+  if(!wrap)return;
+  const D=cd();const pi=_pmValidateIdx();
+  const p=(pi!=null)?D.players[pi]:null;
+  let si=window._mvpSi;
+  if(p&&(si==null||!D.sessions[si])){
+    const c=_hubOpenCounts();si=c.voteLast!=null?c.voteLast:null;
+  }
+  const s=(si!=null)?D.sessions[si]:null;
+  const back=window._hubMode?'<button class="hub-back" onclick="hubBack()">‹ Übersicht</button>':'';
+  const prev=RPE_IS_PREVIEW?'<div class="rpo-prev">👁 Vorschau · Eingaben werden <b>nicht</b> gespeichert</div>':'';
+  const head=s?`<div class="rpo-h">⚽ ${escapeHtml(s.date)}${s.label?' – '+escapeHtml(s.label):''}</div>`:'';
+  const card=inner=>`<div class="rpo-wrap">${back}${prev}<div class="rpo-card">${inner}</div><div class="rpo-foot">Abstimmung ist anonym — niemand sieht, wen du gewählt hast.</div></div>`;
+  if(!p||!s){wrap.innerHTML=card('<div class="rpo-h">Gerade keine Abstimmung</div>');return;}
+  if(mvpVoted(p,s)){
+    wrap.innerHTML=card(`${head}<div class="rpo-ok">🏆</div><div class="rpo-h" style="margin-top:4px;">Stimme abgegeben</div>
+      <div class="rpo-sub">Das Ergebnis siehst du in deiner Übersicht ab ${escapeHtml(mvpEndsLabel(s))}.</div>`);
+    return;
+  }
+  if(!mvpIsOpen(s,UI.currentSeason)){
+    wrap.innerHTML=card(`${head}<div class="rpo-sub">Die Abstimmung für dieses Spiel ist beendet.</div>`);
+    return;
+  }
+  if(!(Array.isArray(p.rpe)&&typeof p.rpe[si]==='number')){
+    wrap.innerHTML=card(`${head}<div class="rpo-q">Erst die Belastung bewerten, dann abstimmen.</div>
+      ${rpeIsOpen(s,si,p,UI.currentSeason)?`<button class="mvp-go" onclick="window._hubAction='rpe';window._rpeOnly=true;window._rpeOnlySi=${si};_hubSyncUrl();renderPlayerMode();">Belastung bewerten</button>`:'<div class="rpo-sub">Die Bewertung für dieses Spiel ist schon geschlossen.</div>'}`);
+    return;
+  }
+  const names=((_pmRoster&&_pmRoster.elig&&_pmRoster.elig[si])||[]).filter(n=>n!==p.name)
+    .sort((a,b)=>{const na=parseInt((_pmRoster.nr||{})[a],10),nb=parseInt((_pmRoster.nr||{})[b],10);
+      if(isNaN(na)!==isNaN(nb))return isNaN(na)?1:-1;if(!isNaN(na)&&na!==nb)return na-nb;return _mvpName(a).localeCompare(_mvpName(b));});
+  if(_mvpPick&&!names.includes(_mvpPick))_mvpPick=null;
+  const rows=names.map((n,i)=>`<button class="mvp-opt${_mvpPick===n?' on':''}" data-i="${i}" onclick="mvpPick(${i})" aria-pressed="${_mvpPick===n}">
+      <span class="mvp-nr">${escapeHtml(String((_pmRoster.nr||{})[n]||''))}</span><span class="mvp-nm">${escapeHtml(_mvpName(n))}</span>
+      <span class="mvp-dot" aria-hidden="true"></span></button>`).join('');
+  window._mvpNames=names;
+  wrap.innerHTML=card(`<div class="rpo-hi">Hi ${escapeHtml((getDisplayName?getDisplayName(p):p.name)||'')}!</div>${head}
+    <div class="rpo-q">Wer war für dich der Spieler des Spiels?</div>
+    <div class="rpo-q-sub">Eine Stimme, bis ${escapeHtml(mvpEndsLabel(s))}. Danach siehst du, wer gewonnen hat.</div>
+    ${names.length?`<div class="mvp-list" role="radiogroup" aria-label="Spieler des Spiels">${rows}</div>
+    <button class="mvp-go" id="mvp-go" onclick="mvpSubmit(${si})"${_mvpPick?'':' disabled'}>${_mvpPick?'Stimme für '+escapeHtml(_mvpName(_mvpPick))+' abgeben':'Spieler auswählen'}</button>`
+    :'<div class="rpo-sub">Noch keine Mitspieler für dieses Spiel eingetragen.</div>'}`);
+}
+function mvpPick(i){
+  const n=(window._mvpNames||[])[i];if(!n)return;
+  _mvpPick=n;renderMvpVote();
+}
+function mvpSubmit(si){
+  if(!_mvpPick)return;
+  const ok=mvpVote(si,_mvpPick);
+  _mvpPick=null;
+  renderMvpVote();
+  if(ok)try{_hubCheckDone('vote');}catch(e){}
 }
 // "Ich war nicht dabei": an answer in place of a number. The trainer sees it
 // and can record the player absent; until then the claim is all there is.
@@ -16279,6 +16513,7 @@ function tryPlayerUrlAuth(){
         // full roster — before privacy strips the other players. Nothing has to
         // be published any more.
         if(window._hubMode)try{_hubBuildLive(found);}catch(e){console.error('[HubLive]',e);}
+        try{_pmRosterSnap();}catch(e){}
         try{_pmSanitizeG();}catch(e){console.error('[PlayerPrivacy auth]',e);}
         try{
           localStorage.setItem('fcf_currentTeam',found.team);
@@ -16984,6 +17219,7 @@ function renderRpeOnly(){
       <div class="rpo-q-sub">Die ganze Einheit z\u00e4hlt, nicht nur das Ende.</div>
       <div class="rpo-list" role="group" aria-label="Anstrengung von 0 bis 10">${opts}</div>
       <button class="rpo-nd${nd?' on':''}" aria-pressed="${nd}" onclick="rpoNotThere(${si})">${nd?'\u2713 ':''}Ich war nicht dabei</button>
+      ${isMatch&&window._hubMode&&mvpIsOpen(s,UI.currentSeason)&&!mvpVoted(p,s)?'<div class="rpo-next">Danach: \ud83c\udfc6 Spieler des Spiels w\u00e4hlen</div>':''}
 
     </div>
     <div class="rpo-foot">Deine Angabe sehen nur die Trainer.</div>
@@ -17073,6 +17309,30 @@ function renderHub(){
       escapeHtml(s2.date)+(cnt.rpe?' \u00b7 noch offen':' \u00b7 beantwortet'),
       cnt.rpe||'',buildHubLink(tok,'rpe',si2));
   }
+  if(cnt.vote>0){
+    const sv=D.sessions[cnt.voteLast];
+    cards+=card('\ud83c\udfc6','Spieler des Spiels w\u00e4hlen',
+      (sv.label?'gegen '+escapeHtml(sv.label)+' \u00b7 ':'')+'bis '+escapeHtml(mvpEndsLabel(sv)),
+      cnt.vote,buildHubLink(tok,'vote',cnt.voteLast));
+  }
+  // The latest result, for a week: the winner only
+  {
+    let best=null;
+    (D.sessions||[]).forEach((sx,six)=>{
+      if(!sx||sx.type!=='match')return;
+      const w=_mvpSpan(sx);if(!w||Date.now()<=w.end||Date.now()>w.end+MVP_SHOW_DAYS*86400000)return;
+      // Players never get the counts: player mode keeps only the winner(s)
+      const wn=Array.isArray(sx.mvpWin)?sx.mvpWin:null;if(!wn||!wn.length)return;
+      if(!best||w.end>best.end)best={sx,winners:wn,end:w.end};
+    });
+    if(best){
+      const me=best.winners.includes(p.name);
+      const others=best.winners.filter(n=>n!==p.name).map(n=>escapeHtml(_mvpName(n)));
+      const who=me?(others.length?'Du und '+others.join(' & ')+' \ud83c\udf89':'Du! \ud83c\udf89'):others.join(' & ');
+      cards+=`<div class="hub-card hub-mvp"><span class="hub-ic">\ud83c\udfc6</span>
+        <span class="hub-txt"><b>Spieler des Spiels: ${who}</b><span>${best.sx.label?'gegen '+escapeHtml(best.sx.label)+' \u00b7 ':''}${escapeHtml(best.sx.date)}</span></span></div>`;
+    }
+  }
   // Visible while the offer stands, so a booking can be cancelled or added —
   // it used to disappear the moment he answered.
   if(cnt.physioTotal>0){
@@ -17112,7 +17372,7 @@ function _hubOpenCounts(){
   const D=cd();
   const pi=_pmValidateIdx();
   const p=(pi!=null)?D.players[pi]:null;
-  const out={week:0,weekTotal:0,rpe:0,rpeTotal:0,physio:0,physioTotal:0,physioList:[]};
+  const out={week:0,weekTotal:0,rpe:0,rpeTotal:0,physio:0,physioTotal:0,physioList:[],vote:0,voteLast:null};
   if(!p)return out;
   const weekStart=(typeof _pmWeekStart==='function')?_pmWeekStart():todaySK();
   const horizon=(typeof _pmWeekHorizon==='function')?_pmWeekHorizon():todaySK();
@@ -17126,6 +17386,8 @@ function _hubOpenCounts(){
         if(v===3)out.week++;
       }
     }
+    // A match he rated and can still vote for
+    if(s.type==='match'&&mvpCanVote(p,s,si,UI.currentSeason)){out.vote++;out.voteLast=si;}
     // A session whose rating window is still open, rated or not
     if(rpeIsOpen(s,si,p,UI.currentSeason)){
       out.rpeTotal++;
@@ -17164,6 +17426,7 @@ function _hubAutoRoute(){
   const c=_hubOpenCounts();
   _hubNoteOffered();
   if(c.rpe>0){window._hubAction='rpe';window._rpeOnly=true;window._rpeOnlySi=c.rpeLast;_hubEntry.rpe=c.rpe;}
+  else if(c.vote>0){window._hubAction='vote';window._mvpSi=c.voteLast;}
   else if(c.week>0){window._hubAction='week';_hubEntry.week=c.week;}
   else if(c.physio>0){window._hubAction='physio';_hubEntry.physio=c.physio;}
 }
@@ -17202,9 +17465,10 @@ function _hubThanks(kind){
   if(document.getElementById('hubThanks'))return;   // never twice
   const onHub=!!window._hubMode;
   const nd=(kind==='rpe')&&!!window._rpeThanksNd;
-  const icon=nd?'\u2713':(kind==='rpe')?'\ud83d\udcaa':(kind==='physio')?'\ud83e\uddd1\u200d\u2695\ufe0f':'\u2713';
+  const icon=nd?'\u2713':(kind==='rpe')?'\ud83d\udcaa':(kind==='vote')?'\ud83c\udfc6':(kind==='physio')?'\ud83e\uddd1\u200d\u2695\ufe0f':'\u2713';
   const head=nd?'Alles klar':(kind==='rpe')?'Danke dir!':'Danke!';
   const sub=nd?'Gespeichert: du warst nicht dabei'
+    :(kind==='vote')?'Deine Stimme ist gespeichert'
     :(kind==='rpe')?'Deine Belastung ist gespeichert'
     :(kind==='physio')?'Deine Physio-Antwort ist gespeichert'
     :'Alles beantwortet';
@@ -17258,7 +17522,7 @@ function _hubSyncUrl(){
     const tok=(CU&&CU.playerToken)||'';
     if(!tok)return;
     const want=buildHubLink(tok,window._hubAction||'',
-      (window._hubAction==='rpe')?window._rpeOnlySi:null)
+      (window._hubAction==='rpe')?window._rpeOnlySi:(window._hubAction==='vote')?window._mvpSi:null)
       +(RPE_IS_PREVIEW?'&preview=1':'');
     if(location.href!==want)history.replaceState(null,'',want);
   }catch(e){}
@@ -17268,6 +17532,8 @@ function _hubGoNext(){
   if(c.rpe>0){
     window._hubAction='rpe';window._rpeOnly=true;window._rpeOnlySi=c.rpeLast;
     if(!_hubEntry.rpe)_hubEntry.rpe=c.rpe;
+  }else if(c.vote>0){
+    window._hubAction='vote';window._rpeOnly=false;window._mvpSi=c.voteLast;
   }else if(c.week>0){
     window._hubAction='week';window._rpeOnly=false;
     if(!_hubEntry.week)_hubEntry.week=c.week;
@@ -17288,11 +17554,14 @@ function _hubCheckDone(kind){
   // Load block: thanks as soon as every rating is in.
   if(kind==='rpe'){
     if(c.rpe>0)return _hubGoNext();
+    // Rated a match: the vote comes next, the thanks after it
+    if(c.vote>0)return _hubGoNext();
     // Whether he came through the chain or opened the card to revise, the
     // rating is in — say so and return to the overview.
     _hubEntry.rpe=0;
     return _hubThanks('rpe');
   }
+  if(kind==='vote')return _hubThanks('vote');
   // Registration + physio: thanks only once both are settled.
   const arrived=(_hubEntry.week||0)+(_hubEntry.physio||0);
   if(arrived<=0){
@@ -17337,6 +17606,10 @@ function renderPlayerMode(){
   document.body.classList.toggle('hub-home',!!(window._hubMode&&!window._hubAction));
   // Hub without a deep link: show the overview
   if(window._hubAction==='physio')return renderPhysioAsk();
+  if(window._hubAction==='vote'){
+    if(window._mvpSi==null&&window._hubSi!=null)window._mvpSi=window._hubSi;
+    return renderMvpVote();
+  }
   if(window._hubMode&&!window._hubAction)return renderHub();
   if(window._rpeOnly)return renderRpeOnly();
   const D=cd();
@@ -18713,6 +18986,9 @@ function dbRenderWeekReportSection(data){
       `<span class="wr2-sc" ${open(x.pi)}>${esc(nm(x.p))}${x.g?' ⚽'+(x.g>1?'×'+x.g:''):''}${x.a?' 🎯'+(x.a>1?'×'+x.a:''):''}</span>`).join('')
       :'<span class="wr2-muted">Keine Tore/Vorlagen eingetragen</span>')+'</div>';
     if(graded)html+=`<div class="wr2-perf"><span>🟢 ${perf[1]}</span><span>🔵 ${perf[2]}</span><span>🟠 ${perf[3]}</span><span class="wr2-muted">${graded} bewertet</span></div>`;
+    {const r=(typeof mvpResult==='function')?mvpResult(s):null;
+     if(r&&r.winners.length){const nmx=n=>{const q=players.find(x=>x&&x.name===n);return q?nm(q):n;};
+       html+=`<div class="wr2-mvp">🏆 Spieler des Spiels: <b>${r.winners.map(n=>esc(nmx(n))).join(' & ')}</b> <span class="wr2-muted">${r.rows[0].v} von ${r.total} Stimmen</span></div>`;}}
     html+='</div></div>';
   });
   // ── 5. Load ──
@@ -21376,6 +21652,7 @@ function openSessStats(si){
   try{renderLocationDatalist();}catch(e){console.error('locList:',e);}
   try{renderSessPhysio(si);}catch(e){console.error('sessPhysio:',e);}
   try{renderSessRpe(si);}catch(e){console.error('sessRpe:',e);}
+  try{renderSessMvp(si);}catch(e){console.error('sessMvp:',e);}
   try{_ssSyncMore();}catch(e){}
   const rcw=document.getElementById('ss-rollcall-wrap');
   if(rcw)rcw.style.display=(canEdit()&&typeof _isSessRollCallTime==='function'&&_isSessRollCallTime(si))?'block':'none';
