@@ -2741,6 +2741,13 @@ html:has(body.hub-mode){background:#080f22;}
 .rpe-mid{background:rgba(52,152,219,.14);border-color:rgba(52,152,219,.3);color:#1f6ea8;}
 .rpe-high{background:rgba(243,156,18,.16);border-color:rgba(243,156,18,.35);color:#9a6000;}
 .rpe-max{background:rgba(231,76,60,.16);border-color:rgba(231,76,60,.38);color:#b03024;}
+/* Night: the dark text tones of the bands vanished on dark cards */
+body.design-heute.hxk-dk .rpe-low{color:#8FD9AE;}
+body.design-heute.hxk-dk .rpe-mid{color:#9CC8F0;}
+body.design-heute.hxk-dk .rpe-high{color:#F5C26B;}
+body.design-heute.hxk-dk .rpe-max{color:#FF9C90;}
+/* Night: note cards follow the card colours (they were fixed white) */
+body.design-heute.hxk-dk .ss-comm-act[title="L\00f6schen"]{color:#FF9C90 !important;}
 .rpe-hint{font-size:.66rem;color:var(--gm);margin-top:8px;}
 .rpe-none{background:var(--hx-field,var(--ow));border-color:var(--hx-line,var(--gl));color:var(--hx-ink,var(--gd));}
 .rpe-tile{position:relative;}
@@ -6450,7 +6457,7 @@ const APP_VERSION_LABEL='1.1.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792215862923; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792217085186; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.1.5',date:'17.10.2026',title:'Spieler-App',items:[
     {icon:'📲',title:'Link an die Mannschaft',desc:'Kader → Spieler → „Link an die Mannschaft“: eine fertige Nachricht für die WhatsApp-Gruppe. Jeder wählt seinen Namen, bestätigt mit dem Geburtsdatum und legt die App auf den Startbildschirm.'},
@@ -21712,7 +21719,7 @@ function renderComments(si){
     const time=c.ts?relTime(c.ts):'';
     const fullTime=c.ts?new Date(c.ts).toLocaleString('de-DE'):'';
     const roleIcon=c.role==='admin'?'🛡':'🎽';
-    html+=`<div class="ss-comm-item" data-id="${escapeHtml(id)}" style="background:#fff;border:1px solid var(--gl);border-radius:8px;padding:9px 12px;margin-bottom:6px;">
+    html+=`<div class="ss-comm-item" data-id="${escapeHtml(id)}" style="background:var(--hx-field,#fff);border:1px solid var(--gl);border-radius:8px;padding:9px 12px;margin-bottom:6px;">
       <div style="display:flex;align-items:center;gap:6px;font-size:.7rem;color:var(--gm);margin-bottom:4px;">
         <span>${roleIcon}</span>
         <b style="color:var(--bd);">${escapeHtml(c.author||'?')}</b>
