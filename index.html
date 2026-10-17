@@ -2663,6 +2663,49 @@ html:has(body.hub-mode){background:#080f22;}
   font-family:'Barlow',sans-serif;font-size:.98rem;font-weight:700;cursor:pointer;}
 .mvp-go:disabled{background:#E6EBF2;color:#8A97B0;cursor:default;}
 .hub-mvp{cursor:default;}
+/* ── Meine Karte ── */
+.mk{--mk-ink:#F2C230;max-width:420px;margin:0 auto;padding:0 16px 34px;font-family:'Barlow',sans-serif;color:var(--htx);}
+.mk.mk-t-bronze{--mk-ink:#E9B78C;}.mk.mk-t-silber{--mk-ink:#DDE4EF;}.mk.mk-t-gold{--mk-ink:#F2C230;}.mk.mk-t-flutlicht{--mk-ink:#FFF3C4;}
+.mk-prev{font-size:.74rem;color:var(--hdim);text-align:center;margin:0 0 8px;}
+.mk-stage{position:relative;display:flex;justify-content:center;padding:4px 0 2px;}
+.mk-stage::before{content:'';position:absolute;left:50%;top:-40px;width:130%;height:75%;transform:translateX(-50%);
+  background:radial-gradient(closest-side,rgba(255,226,140,.09),rgba(255,226,140,0));pointer-events:none;}
+.mk-cv{position:relative;width:100%;max-width:340px;height:auto;aspect-ratio:360/504;display:block;
+  filter:drop-shadow(0 18px 34px rgba(0,0,0,.55));}
+.mk-next{max-width:340px;margin:20px auto 0;}
+.mk-msg{font-size:.95rem;font-weight:600;line-height:1.4;}
+.mk-lad{position:relative;height:6px;border-radius:3px;background:var(--hbr);margin:14px 0 7px;}
+.mk-lad-fill{position:absolute;left:0;top:0;bottom:0;width:var(--p);border-radius:3px;background:var(--mk-ink);}
+.mk-lad i{position:absolute;top:-3px;width:2px;height:12px;margin-left:-1px;background:#080f22;}
+.mk-lad-l{position:relative;height:15px;font-size:.68rem;color:var(--hdim);}
+.mk-lad-l span{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap;}
+.mk-lad-l span.l0{transform:none;}
+.mk-lad-l span.l3{left:auto!important;right:0;transform:none;}
+.mk-lad-l span.on{color:var(--mk-ink);font-weight:700;}
+.mk-week{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:16px;}
+.mk-wl{font-size:.74rem;color:var(--hdim);margin-right:2px;}
+.mk-chip{font-size:.74rem;font-weight:700;padding:4px 9px;border-radius:999px;border:1px solid var(--hbr);color:var(--htx);}
+.mk-chip.ok{background:rgba(242,194,48,.14);border-color:rgba(242,194,48,.55);color:#F2C230;}
+.mk-chip.no{color:var(--hdim);text-decoration:line-through;opacity:.7;}
+.mk-chip.wait{border-style:dashed;color:var(--hdim);}
+.mk-acts{display:flex;flex-direction:column;gap:8px;max-width:340px;margin:22px auto 0;}
+.mk-share{height:50px;border-radius:12px;border:none;background:#F2C230;color:#0E2350;
+  font-family:'Barlow',sans-serif;font-size:.98rem;font-weight:800;cursor:pointer;}
+.mk-save{height:44px;border-radius:12px;border:1px solid var(--hbr);background:none;color:var(--htx);
+  font-family:'Barlow',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;}
+.mk-share:active,.mk-save:active{transform:scale(.98);}
+.mk-share:focus-visible,.mk-save:focus-visible{outline:2px solid #fff;outline-offset:2px;}
+.mk-foot{max-width:340px;margin:16px auto 0;font-size:.72rem;line-height:1.45;color:var(--hdim);}
+.mk-empty{margin:40px auto 0;max-width:340px;text-align:center;color:var(--hdim);font-size:.9rem;line-height:1.45;}
+/* The hub's little card: the colour of his card, as wide as the emoji beside it */
+.hub-badge.hub-badge-new{background:#F2C230;color:#0E2350;}
+.hub-ic .mk-mini{margin:0 4.5px;}
+.mk-mini{display:inline-block;position:relative;width:20px;height:27px;border-radius:4px;vertical-align:middle;
+  background:linear-gradient(165deg,#173066,#0A1630);box-shadow:inset 0 0 0 1.5px var(--a,#F2C230);}
+.mk-mini::before{content:'';position:absolute;left:5px;right:5px;top:4px;height:4px;border-radius:2px;background:var(--a,#F2C230);}
+.mk-mini::after{content:'';position:absolute;left:6px;right:6px;top:12px;height:8px;border-radius:50%;background:rgba(255,255,255,.28);}
+.mk-mini.mk-t-bronze{--a:#D99A66;}.mk-mini.mk-t-silber{--a:#DDE4EF;}.mk-mini.mk-t-gold{--a:#F2C230;}
+.mk-mini.mk-t-flutlicht{--a:#FFF3C4;box-shadow:inset 0 0 0 1.5px #FFF3C4,0 0 10px rgba(255,226,140,.55);}
 .wr2-mvp{margin-top:6px;font-size:.84rem;}
 .mvp-card{cursor:default;margin-top:8px;}
 .mvp-card:hover{transform:none;box-shadow:none;}
@@ -6491,13 +6534,17 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.1.7'; // v1.1.7: Spieler des Spiels
-const APP_VERSION_LABEL='1.1.7';
+const APP_VERSION='1.1.8'; // v1.1.8: Meine Karte
+const APP_VERSION_LABEL='1.1.8';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792251564521; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792255904466; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.1.8',date:'17.10.2026',title:'Meine Karte',items:[
+    {icon:'💡',title:'Die Saison auf einer Karte',desc:'In der Spieler-App: Anwesenheit der Saison groß, dazu Serie, Spiele, Tore, Vorlagen, wie oft er die Belastung bewertet hat und wie oft er Spieler des Spiels war. Je öfter er da ist, desto mehr Lampen brennen: Bronze, Silber ab 60 %, Gold ab 80 %, Flutlicht ab 95 % bei mindestens 8 Terminen und fast immer bewertet.'},
+    {icon:'📤',title:'Zum Teilen',desc:'Die Karte lässt sich als Bild teilen oder speichern, etwa für den WhatsApp-Status. Geteilt wird nur das Bild, nie der persönliche Link. Einsatz und alles über andere Spieler stehen nicht darauf.'},
+  ]},
   {version:'1.1.7',date:'17.10.2026',title:'Spieler des Spiels',items:[
     {icon:'🏆',title:'Abstimmung nach jedem Spiel',desc:'Wer das Spiel bewertet hat, wählt danach anonym den Spieler des Spiels — bis zum nächsten Tag 24 Uhr. Danach sehen alle in ihrer Übersicht den Gewinner, aber keine Stimmenzahlen. Bei Gleichstand teilen sich zwei den Titel.'},
     {icon:'👀',title:'Für Trainer',desc:'Im Spiel steht, wie viele schon abgestimmt haben, nach dem Ende die drei Ersten mit Stimmen; der Wochenbericht nennt den Gewinner. Wer wen gewählt hat, wird nirgends gespeichert.'},
@@ -16031,6 +16078,345 @@ function mvpVote(si,name){
 // The vote screen: one name, then "Stimme abgeben" — a single stray tap must
 // not cast an anonymous vote that can never be taken back.
 let _mvpPick=null;
+// ── Meine Karte ──────────────────────────────────────────────
+// The season on one card. The more often a player is there, the more lamps of
+// the floodlight burn: Bronze 3, Silber 4, Gold 5, Flutlicht all 6. Only his
+// own numbers and only what he controls himself — Einsatz is a trainer's
+// judgement and stays out, nothing about anyone else goes in.
+const CARD_TIERS=[
+  {k:'bronze',name:'Bronze',min:0,lamps:3,m:['#7A4A28','#E8B386','#9A6238'],ink:'#E9B78C',hi:'#F6D2B0',lo:'#C07A47'},
+  {k:'silber',name:'Silber',min:60,lamps:4,m:['#7D8AA0','#F3F6FB','#98A4B8'],ink:'#DDE4EF',hi:'#FFFFFF',lo:'#A9B5C8'},
+  {k:'gold',name:'Gold',min:80,lamps:5,m:['#B07D0C','#FFE48F','#D9A21B'],ink:'#F2C230',hi:'#FFE897',lo:'#E0A51C'},
+  {k:'flutlicht',name:'Flutlicht',min:95,lamps:6,m:['#F2C230','#FFFFFF','#FFE9A0'],ink:'#FFF3C4',hi:'#FFFFFF',lo:'#FFDD7A'}
+];
+const CARD_FL_MIN=8;            // Flutlicht needs a real sample, not 2 of 2
+const CARD_FL_RATED=80;         // … and the load rated after (nearly) every session
+const CARD_RATED_FROM=20261017; // ratings count from the day the app asked every player for them
+function cardData(p,D,season){
+  if(!p||!D||!Array.isArray(D.sessions))return null;
+  const ov=computePlayerOverallStats([{p,block:D,season}]);
+  if(!ov.marked)return null;
+  let apps=0,goals=0,assists=0,mvp=0,rq=0,ra=0;
+  D.sessions.forEach((s,si)=>{
+    if(!s||!s.date)return;
+    if(typeof _sessAfterJoin==='function'&&!_sessAfterJoin(p,s,season))return;
+    const v=(p.s&&si<p.s.length)?p.s[si]:3;
+    const held=sessTookPlace(s,season);
+    if(s.type==='match'){
+      if(v===1&&held)apps++;
+      goals+=(Array.isArray(p.goals)?+p.goals[si]:0)||0;
+      assists+=(Array.isArray(p.assists)?+p.assists[si]:0)||0;
+      // Players only get the winners; the trainer's copy has the counts
+      let w=Array.isArray(s.mvpWin)?s.mvpWin:null;
+      if(!w){try{const r=mvpResult(s);w=r?r.winners:[];}catch(e){w=[];}}
+      if(w.includes(p.name))mvp++;
+    }
+    // Rated: of the sessions he was at since the app asked. One he can still
+    // rate today does not count against him yet.
+    if(v===1&&held&&_dbSortKey(s.date,season)>=CARD_RATED_FROM){
+      const ans=rpeAnswered(p,si,s);
+      if(!ans&&rpeIsOpen(s,si,p,season))return;
+      rq++;if(ans)ra++;
+    }
+  });
+  const pct=ov.overall,t=ov.marked,a=ov.cA;
+  const rated=rq?Math.round(ra/rq*100):null;
+  // Too few sessions to judge the rating yet: it does not hold anyone back
+  const rateOk=rq<3||rated>=CARD_FL_RATED;
+  let ti=pct>=80?2:pct>=60?1:0;
+  if(pct>=95&&t>=CARD_FL_MIN&&rateOk)ti=3;
+  const name=String(p.name||'').trim();
+  return {ti,pct,a,t,rated,rq,rateOk,apps,goals,assists,mvp,
+    streak:_playerStreak(p,D,season),
+    name,ini:name.split(/\s+/).map(x=>x[0]||'').join('').slice(0,2).toUpperCase()||'?',
+    nr:(p.nr!=null&&p.nr!=='')?String(p.nr):'',pos:typeof p.pos==='string'?p.pos:'',
+    season:season||'',team:UI.currentTeam||'',club:(G&&G.clubName)||'FC Frohlinde'};
+}
+// What it takes to reach the next colour, assuming he is there every time
+function _cardNext(d){
+  if(d.ti===3)return {done:true};
+  const nx=CARD_TIERS[d.ti+1];
+  const fl=(d.ti+1===3);
+  const reached=(a,t)=>Math.round(a/t*100)>=nx.min&&(!fl||t>=CARD_FL_MIN);
+  let n=0;
+  if(!reached(d.a,d.t)){for(n=1;n<=99;n++)if(reached(d.a+n,d.t+n))break;}
+  return {tier:nx,n,needRate:fl&&!d.rateOk};
+}
+// This week, Monday to Sunday: what already counts and what is still to come
+function _cardWeek(p,D,season){
+  const now=new Date(),dow=(now.getDay()+6)%7;
+  const mon=new Date(now.getFullYear(),now.getMonth(),now.getDate()-dow);
+  const sun=new Date(mon.getFullYear(),mon.getMonth(),mon.getDate()+6);
+  const k=x=>x.getFullYear()*10000+(x.getMonth()+1)*100+x.getDate();
+  const a=k(mon),b=k(sun),out=[];
+  (D.sessions||[]).forEach((s,si)=>{
+    if(!s||!s.date)return;
+    const sk=_dbSortKey(s.date,season);
+    if(sk<a||sk>b)return;
+    if(typeof _sessAfterJoin==='function'&&!_sessAfterJoin(p,s,season))return;
+    const v=(p.s&&si<p.s.length)?p.s[si]:3;
+    let st;
+    if(sessTookPlace(s,season))st=v===1?'ok':(v===0||v===2)?'no':'wait';
+    else st=(v===0||v===2)?'no':'next';
+    out.push({sk,t:s.time||'',day:String(s.date).split(' ')[0],st,match:s.type==='match'});
+  });
+  return out.sort((x,y)=>x.sk-y.sk||String(x.t).localeCompare(String(y.t)));
+}
+// canvas letterSpacing is not in every browser yet: letter by letter
+function _mkSpaced(x,t,X,Y,sp,align){
+  const ch=[...t];
+  const w=ch.reduce((a,c)=>a+x.measureText(c).width,0)+sp*Math.max(0,ch.length-1);
+  let cx=align==='right'?X-w:align==='center'?X-w/2:X;
+  const old=x.textAlign;x.textAlign='left';
+  ch.forEach(c=>{x.fillText(c,cx,Y);cx+=x.measureText(c).width+sp;});
+  x.textAlign=old;
+  return w;
+}
+// Drawn at 360×504 units, scaled to the canvas. o.lit: lamps burning so far,
+// o.glow 0..1: how far the light has come up, o.photo: a loaded image.
+function cardDraw(cv,d,o){
+  o=o||{};
+  const W=360,H=504,S=cv.width/W;
+  const x=cv.getContext('2d');
+  const T=CARD_TIERS[d.ti],N=T.lamps;
+  const lit=Math.max(0,Math.min(N,o.lit==null?N:o.lit)),glow=o.glow==null?1:o.glow;
+  const BS='"Big Shoulders Display",Impact,sans-serif',BA='Barlow,Arial,sans-serif';
+  x.setTransform(S,0,0,S,0,0);
+  x.clearRect(0,0,W,H);
+  x.textBaseline='alphabetic';
+  const rr=(X,Y,w,h,r)=>{x.beginPath();x.moveTo(X+r,Y);x.arcTo(X+w,Y,X+w,Y+h,r);x.arcTo(X+w,Y+h,X,Y+h,r);x.arcTo(X,Y+h,X,Y,r);x.arcTo(X,Y,X+w,Y,r);x.closePath();};
+  const metal=(x0,y0,x1,y1)=>{const g=x.createLinearGradient(x0,y0,x1,y1);g.addColorStop(0,T.m[0]);g.addColorStop(.45,T.m[1]);g.addColorStop(1,T.m[2]);return g;};
+  x.save();rr(0,0,W,H,24);x.clip();
+  // Ground: club blue, darker towards the bottom
+  let g=x.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#14295C');g.addColorStop(.5,'#0E2350');g.addColorStop(1,'#081430');
+  x.fillStyle=g;x.fillRect(0,0,W,H);
+  // The light: a cone from the lamp head down over the player, stronger
+  // the more lamps the colour has
+  const al=glow*(.10+.035*N);
+  if(al>0){
+    g=x.createLinearGradient(0,90,0,330);
+    g.addColorStop(0,'rgba(255,236,170,'+(al*1.5).toFixed(3)+')');
+    g.addColorStop(.55,'rgba(255,233,160,'+(al*.5).toFixed(3)+')');
+    g.addColorStop(1,'rgba(255,233,160,0)');
+    x.fillStyle=g;x.beginPath();x.moveTo(146,88);x.lineTo(214,88);x.lineTo(356,330);x.lineTo(4,330);x.closePath();x.fill();
+    g=x.createRadialGradient(180,66,0,180,66,150);
+    g.addColorStop(0,'rgba(255,233,160,'+(al*1.7).toFixed(3)+')');g.addColorStop(1,'rgba(255,233,160,0)');
+    x.fillStyle=g;x.fillRect(0,0,W,240);
+  }
+  // The pitch: halfway line and centre circle — he stands on the spot
+  x.strokeStyle='rgba(255,255,255,.075)';x.lineWidth=1.2;
+  x.beginPath();x.moveTo(0,160);x.lineTo(W,160);x.stroke();
+  x.beginPath();x.arc(180,160,84,0,Math.PI*2);x.stroke();
+  // Lamp head, 2×3 as in the logo
+  rr(138,40,84,52,9);x.fillStyle='#1A2F63';x.fill();x.strokeStyle='#2B4683';x.lineWidth=1.4;x.stroke();
+  [[156,56],[180,56],[204,56],[156,76],[180,76],[204,76]].forEach(([cx,cy],i)=>{
+    x.save();
+    if(i<lit){
+      x.shadowColor='rgba(255,222,130,.95)';x.shadowBlur=12;
+      const lg=x.createRadialGradient(cx-2,cy-2,0,cx,cy,8);
+      lg.addColorStop(0,'#FFFFFF');lg.addColorStop(.35,'#FFF3C4');lg.addColorStop(.75,'#F2C230');lg.addColorStop(1,'#E3AC1A');
+      x.fillStyle=lg;
+    }else x.fillStyle='#24396E';
+    x.beginPath();x.arc(cx,cy,8,0,Math.PI*2);x.fill();
+    x.restore();
+  });
+  // The player
+  x.save();x.beginPath();x.arc(180,160,54,0,Math.PI*2);x.closePath();
+  if(o.photo&&o.photo.width){
+    x.clip();
+    const im=o.photo,m=Math.min(im.width,im.height);
+    x.drawImage(im,(im.width-m)/2,(im.height-m)/2,m,m,126,106,108,108);
+  }else{
+    x.fillStyle='#1B3266';x.fill();
+    x.fillStyle='rgba(255,255,255,.9)';x.font='800 46px '+BS;x.textAlign='center';
+    x.fillText(d.ini,180,176);
+  }
+  x.restore();
+  x.strokeStyle=metal(126,106,234,214);x.lineWidth=3;
+  x.beginPath();x.arc(180,160,55.5,0,Math.PI*2);x.stroke();
+  // Colour and season
+  x.font='800 15px '+BS;x.fillStyle=T.ink;_mkSpaced(x,T.name.toUpperCase(),22,32,2.2,'left');
+  x.font='600 11px '+BA;x.fillStyle='rgba(255,255,255,.55)';x.textAlign='right';x.fillText(d.season,338,31);
+  // Name, fitted to the width
+  x.textAlign='center';x.fillStyle='#FFFFFF';
+  const nm=(d.name||'').toUpperCase();
+  let fs=38;
+  for(;fs>18;fs--){x.font='800 '+fs+'px '+BS;if(x.measureText(nm).width<=304)break;}
+  x.fillText(nm,180,256);
+  const sub=[d.nr?'Nr. '+d.nr:'',d.pos].filter(Boolean).join(' · ')||d.team;
+  x.font='600 12.5px '+BA;x.fillStyle='rgba(255,255,255,.62)';x.fillText(sub,180,276);
+  // The number: season attendance
+  const num=String(d.pct);
+  x.font='800 78px '+BS;const wn=x.measureText(num).width;
+  x.font='700 32px '+BS;const wp=x.measureText('%').width;
+  const sx=180-(wn+3+wp)/2;
+  g=x.createLinearGradient(0,290,0,347);g.addColorStop(0,T.hi);g.addColorStop(1,T.lo);
+  x.fillStyle=g;x.textAlign='left';
+  x.font='800 78px '+BS;x.fillText(num,sx,347);
+  x.font='700 32px '+BS;x.fillText('%',sx+wn+3,347);
+  x.textAlign='center';x.font='600 11.5px '+BA;x.fillStyle='rgba(255,255,255,.6)';
+  x.fillText('Anwesenheit · '+d.a+' von '+d.t,180,365);
+  x.fillStyle='rgba(255,255,255,.12)';x.fillRect(28,379,304,1);
+  // Six numbers he controls himself
+  const cells=[[d.streak,'Serie'],[d.apps,'Spiele'],[d.goals,'Tore'],
+    [d.assists,'Vorlagen'],[d.rated==null?'–':d.rated+' %','Bewertet'],[d.mvp,'Spieler des Spiels']];
+  cells.forEach(([v,l],i)=>{
+    const cx=[66,180,294][i%3],y=i<3?407:449;
+    x.font='700 27px '+BS;x.fillStyle='#FFFFFF';x.fillText(String(v),cx,y);
+    x.font='600 10px '+BA;x.fillStyle='rgba(255,255,255,.55)';
+    if(x.measureText(l).width>104)x.font='600 9px '+BA;
+    x.fillText(l,cx,y+14);
+  });
+  x.fillStyle='rgba(255,255,255,.12)';x.fillRect(28,475,304,1);
+  // Footer: the app's lamp head in small, and the team
+  x.fillStyle='rgba(255,226,140,.85)';
+  [0,1,2].forEach(c=>[0,1].forEach(r=>{x.beginPath();x.arc(25+c*4.4,484.5+r*4.4,1.5,0,Math.PI*2);x.fill();}));
+  x.textAlign='left';x.font='800 12px '+BS;x.fillStyle='rgba(255,255,255,.8)';_mkSpaced(x,'Flutlicht',38,491.5,.6,'left');
+  x.textAlign='right';x.font='600 10px '+BA;x.fillStyle='rgba(255,255,255,.5)';
+  x.fillText([d.club,d.team].filter(Boolean).join(' · '),338,491);
+  x.restore();
+  // Frame in the colour's metal, with a fine inner line
+  x.strokeStyle=metal(0,0,W,H);
+  x.lineWidth=2.5;rr(1.25,1.25,W-2.5,H-2.5,23);x.stroke();
+  x.globalAlpha=.3;x.lineWidth=1;rr(7,7,W-14,H-14,18);x.stroke();x.globalAlpha=1;
+}
+function _mkFonts(){
+  if(!document.fonts||!document.fonts.load)return Promise.resolve();
+  const f=['800 40px "Big Shoulders Display"','700 27px "Big Shoulders Display"','600 12px Barlow'];
+  return Promise.race([Promise.all(f.map(x=>document.fonts.load(x))),new Promise(r=>setTimeout(r,1500))]).catch(()=>{});
+}
+function _mkImg(src){
+  return new Promise(res=>{
+    if(!src||typeof src!=='string'){res(null);return;}
+    const im=new Image();
+    if(!/^(data|blob):/.test(src))im.crossOrigin='anonymous';
+    im.onload=()=>res(im);im.onerror=()=>res(null);
+    im.src=src;
+  });
+}
+let _mkData=null,_mkFile=null,_mkPhoto=null,_mkSig='',_mkAnimDone=false;
+const _mkWait=ms=>new Promise(r=>setTimeout(r,ms));
+// Once per opening: the lamps come on one after another, then the light
+async function _mkShow(){
+  const cv=document.getElementById('mk-cv');if(!cv||!_mkData)return;
+  const d=_mkData;
+  await _mkFonts();
+  _mkPhoto=await _mkImg(d.photo);
+  if(!cv.isConnected)return;
+  const N=CARD_TIERS[d.ti].lamps;
+  const draw=(lit,glow)=>{try{cardDraw(cv,d,{lit,glow,photo:_mkPhoto});}catch(e){console.error('[Karte]',e);}};
+  let reduce=_mkAnimDone;   // the lamps come on once per visit, not on every refresh
+  try{reduce=reduce||window.matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
+  _mkAnimDone=true;
+  if(reduce){draw(N,1);}
+  else{
+    draw(0,0);
+    for(let i=1;i<=N;i++){await _mkWait(i===1?260:120);if(!cv.isConnected)return;draw(i,i/N*.55);}
+    for(let k=1;k<=5;k++){await _mkWait(40);if(!cv.isConnected)return;draw(N,.55+.09*k);}
+  }
+  cv.classList.add('on');
+  _mkFile=null;
+}
+// The shared picture: the card on the night background, 1080×1440. Built on
+// the tap itself, synchronously, so the share sheet still counts as a reaction
+// to it (Safari refuses share() after a wait).
+function _mkExport(cv){
+  const e=document.createElement('canvas');e.width=1080;e.height=1440;
+  const x=e.getContext('2d');
+  const g=x.createLinearGradient(0,0,0,1440);
+  g.addColorStop(0,'#0E2350');g.addColorStop(1,'#080f22');
+  x.fillStyle=g;x.fillRect(0,0,1080,1440);
+  x.drawImage(cv,90,90,900,1260);
+  return e.toDataURL('image/jpeg',.92);
+}
+function _mkBuildFile(){
+  const cv=document.getElementById('mk-cv');if(!cv||!_mkData)return null;
+  let url=null;
+  try{cardDraw(cv,_mkData,{photo:_mkPhoto});url=_mkExport(cv);}
+  catch(e){
+    // A photo from another origin locks the canvas: share without it
+    try{const c2=document.createElement('canvas');c2.width=1080;c2.height=1512;cardDraw(c2,_mkData,{photo:null});url=_mkExport(c2);}catch(e2){}
+  }
+  if(!url)return null;
+  const b=atob(url.split(',')[1]);const u=new Uint8Array(b.length);
+  for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);
+  const slug=String(_mkData.name||'').toLowerCase().replace(/ß/g,'ss').normalize('NFD').replace(/[̀-ͯ]/g,'')
+    .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'spieler';
+  _mkFile=new File([u],'flutlicht-karte-'+slug+'.jpg',{type:'image/jpeg'});
+  return _mkFile;
+}
+// Only the picture leaves the phone — never the link: it is his key to the app
+function cardShare(){
+  const f=_mkFile||_mkBuildFile();if(!f)return;
+  let can=false;
+  try{can=!!(navigator.share&&navigator.canShare&&navigator.canShare({files:[f]}));}catch(e){}
+  if(!can)return cardSave();
+  const T=CARD_TIERS[_mkData.ti];
+  navigator.share({files:[f],title:'Meine Flutlicht-Karte',
+    text:'Meine Flutlicht-Karte: '+T.name+', '+_mkData.pct+' % Anwesenheit'})
+    .catch(e=>{if(!e||e.name!=='AbortError')cardSave();});
+}
+function cardSave(){
+  const f=_mkFile||_mkBuildFile();if(!f)return;
+  const u=URL.createObjectURL(f);
+  const a=document.createElement('a');a.href=u;a.download=f.name;
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(u),5000);
+}
+function _mkSeenGet(tok){try{const v=localStorage.getItem('fcf_card_'+tok);return v==null?null:+v;}catch(e){return null;}}
+function _mkSeenSet(tok,ti){if(RPE_IS_PREVIEW)return;try{localStorage.setItem('fcf_card_'+tok,String(ti));}catch(e){}}
+function renderPlayerCard(){
+  const wrap=document.getElementById('playerModeWrap');
+  if(!wrap)return;
+  const D=cd();const pi=_pmValidateIdx();
+  const p=(pi!=null&&D&&D.players)?D.players[pi]:null;
+  const back=window._hubMode?'<button class="hub-back" onclick="hubBack()">‹ Übersicht</button>':'';
+  const prev=RPE_IS_PREVIEW?'<div class="mk-prev">👁 Vorschau · so sieht der Spieler seine Karte</div>':'';
+  const d=p?cardData(p,D,UI.currentSeason):null;
+  if(!d){
+    wrap.innerHTML=`<div class="mk">${back}${prev}<div class="mk-empty">Deine Karte gibt es, sobald die erste Anwesenheit eingetragen ist.</div></div>`;
+    return;
+  }
+  d.photo=p.photo||null;
+  // Data arriving from the server re-renders the screen; an unchanged card
+  // stays as it is instead of going blank and lighting up again.
+  const sig=JSON.stringify(d)+'|'+JSON.stringify(_cardWeek(p,D,UI.currentSeason));
+  if(sig===_mkSig&&document.getElementById('mk-cv'))return;
+  _mkSig=sig;
+  _mkData=d;_mkFile=null;
+  _mkSeenSet(p.confirmToken||'',d.ti);
+  const T=CARD_TIERS[d.ti],nx=_cardNext(d);
+  let msg;
+  if(nx.done)msg='Alle Lampen brennen. Bleib dran – die Karte zählt die ganze Saison.';
+  else if(nx.n===0&&nx.needRate)msg=`Für Flutlicht fehlt nur das Bewerten: jetzt ${d.rated} %, ab ${CARD_FL_RATED} % gehen alle Lampen an.`;
+  else if(nx.n<=15)msg=`Noch ${nx.n}× dabei${nx.needRate?' und die Belastung bewerten':''}, dann ${nx.tier.name}.`;
+  else msg=`Jedes Mal, wenn du dabei bist, kommst du ${nx.tier.name} näher.`;
+  const lad=CARD_TIERS.slice(1).map((t,i)=>`<i style="left:${t.min}%"></i>`).join('');
+  const labs=CARD_TIERS.map((t,i)=>`<span class="${i===d.ti?'on':''}${i===0?' l0':i===3?' l3':''}" style="left:${t.min}%">${t.name}</span>`).join('');
+  const wk=_cardWeek(p,D,UI.currentSeason);
+  const wkHtml=wk.length?`<div class="mk-week"><span class="mk-wl">Diese Woche</span>${wk.map(w=>{
+    const tip=w.st==='ok'?'dabei':w.st==='no'?'nicht dabei':w.st==='wait'?'noch nicht eingetragen':'kommt noch';
+    return `<span class="mk-chip ${w.st}" title="${tip}">${escapeHtml(w.day)}${w.match?' ⚽':''}${w.st==='ok'?' ✓':''}</span>`;}).join('')}</div>`:'';
+  let canShare=false;
+  try{canShare=!!(navigator.share&&navigator.canShare&&navigator.canShare({files:[new File([new Uint8Array(1)],'x.jpg',{type:'image/jpeg'})]}));}catch(e){}
+  const aria=`Karte ${T.name}. Anwesenheit ${d.pct} Prozent, ${d.a} von ${d.t}. Serie ${d.streak}, Spiele ${d.apps}, Tore ${d.goals}, Vorlagen ${d.assists}, Bewertet ${d.rated==null?'noch nichts':d.rated+' Prozent'}, Spieler des Spiels ${d.mvp}.`;
+  wrap.innerHTML=`<div class="mk mk-t-${T.k}">${back}${prev}
+    <div class="mk-stage"><canvas id="mk-cv" class="mk-cv" width="1080" height="1512" role="img" aria-label="${escapeHtml(aria)}"></canvas></div>
+    <div class="mk-next">
+      <div class="mk-msg">${escapeHtml(msg)}</div>
+      <div class="mk-lad" style="--p:${Math.max(2,d.pct)}%"><div class="mk-lad-fill"></div>${lad}</div>
+      <div class="mk-lad-l">${labs}</div>
+      ${wkHtml}
+    </div>
+    <div class="mk-acts">
+      ${canShare?'<button class="mk-share" onclick="cardShare()">Karte teilen</button><button class="mk-save" onclick="cardSave()">Als Bild speichern</button>'
+        :'<button class="mk-share" onclick="cardSave()">Als Bild speichern</button>'}
+    </div>
+    <div class="mk-foot">Zählt die ganze Saison: wie oft du bei Training und Spiel dabei warst. Silber ab 60 %, Gold ab 80 %, Flutlicht ab 95 % bei mindestens ${CARD_FL_MIN} Terminen – und wenn du die Belastung fast immer bewertest.</div>
+  </div>`;
+  _mkShow();
+}
 function renderMvpVote(){
   const wrap=document.getElementById('playerModeWrap');
   if(!wrap)return;
@@ -17290,6 +17676,11 @@ function renderHub(){
       <span class="hub-txt"><b>${title}</b><span>${sub}</span></span>
       ${badge?`<span class="hub-badge">${badge}</span>`:''}
       <span class="hub-chev">\u203a</span>`;
+    // In the trainer's preview every screen stays a preview — without it a
+    // tap on a registration would be saved as the player's answer.
+    if(RPE_IS_PREVIEW&&href.indexOf('javascript:')!==0)href+='&preview=1';
+    const nb=(badge==='Neu')?inner.replace('class="hub-badge"','class="hub-badge hub-badge-new"'):inner;
+    if(nb!==inner)return `<a class="hub-card" href="${href}">${nb}</a>`;
     return `<a class="hub-card" href="${href}">${inner}</a>`;
   };
   const tok=p.confirmToken||'';
@@ -17339,6 +17730,15 @@ function renderHub(){
     cards+=card('\ud83e\uddd1\u200d\u2695\ufe0f','Physiotherapie',
       cnt.physio?(cnt.physio+' offen'):'beantwortet',
       cnt.physio||'',buildHubLink(tok,'physio'));
+  }
+  {
+    const cdx=cardData(p,D,UI.currentSeason);
+    if(cdx){
+      const T=CARD_TIERS[cdx.ti],seen=_mkSeenGet(tok);
+      const isNew=seen==null||cdx.ti>seen;
+      cards+=card(`<span class="mk-mini mk-t-${T.k}" aria-hidden="true"></span>`,'Meine Karte',
+        T.name+' \u00b7 '+cdx.pct+' % Anwesenheit',isNew?'Neu':'',buildHubLink(tok,'card'));
+    }
   }
   if(live.stats)cards+=card('\ud83d\udcca','Meine Statistik','Anwesenheit, Serie, Verlauf','',"javascript:hubOpenLive('stats')");
   if(rep)cards+=card('\ud83d\udccb','Wochenbericht','KW '+((rep.week&&rep.week.kw)||'')+' \u00b7 die ganze Mannschaft','',"javascript:hubOpenLive('report')");
@@ -17597,15 +17997,16 @@ function renderPlayerMode(){
   if(window._hubDecide)_hubAutoRoute();
   // Entering a screen records what was outstanding, so the thank-you can tell
   // "finished the task" from "changed an answer".
-  if(window._hubAction){
+  if(window._hubAction&&window._hubAction!=='card'){
     const k=(window._hubAction==='rpe')?'rpe':'week';
     if(_hubEntry[k]===null)_hubEntry[k]=_hubOpenCounts()[k];
   }
   // Only the overview scrolls the page itself; the other screens keep the
   // pinned layout they were built for.
-  document.body.classList.toggle('hub-home',!!(window._hubMode&&!window._hubAction));
+  document.body.classList.toggle('hub-home',!!(window._hubMode&&(!window._hubAction||window._hubAction==='card')));
   // Hub without a deep link: show the overview
   if(window._hubAction==='physio')return renderPhysioAsk();
+  if(window._hubAction==='card')return renderPlayerCard();
   if(window._hubAction==='vote'){
     if(window._mvpSi==null&&window._hubSi!=null)window._mvpSi=window._hubSi;
     return renderMvpVote();
@@ -18610,16 +19011,9 @@ function _psWeekSeries(p,block,season,weeks){
     .slice(-(weeks||10))
     .map(([k,v])=>({kw:parseInt(k.split('-W')[1],10),pct:Math.round(v.a/v.t*100),a:v.a,t:v.t}));
 }
-function dbBuildPlayerStatsSnapshot(data,pi,offset,includePhoto){
-  const {block,season,team}=data;
-  const p=data.players[pi];
-  if(!p)return null;
-  const r=dbComputeWeekReport(data,offset);
-  const row=r.playerRows.find(x=>x.pi===pi);
-  const occ=[{p,block,season}];
-  const ov=computePlayerOverallStats(occ);
-  const wd=computePlayerWeekday(occ).filter(x=>x.total>0);
-  // Current streak, most recent backwards
+// Current streak, most recent backwards. Not yet recorded (3/4/empty) neither
+// counts nor breaks it.
+function _playerStreak(p,block,season){
   const held=[];
   (block.sessions||[]).forEach((s,si)=>{
     if(s&&sessTookPlace(s,season)&&_sessAfterJoin(p,s,season))held.push({si,sk:_dbSortKey(s.date,season)});
@@ -18632,6 +19026,18 @@ function dbBuildPlayerStatsSnapshot(data,pi,offset,includePhoto){
     else if(v===3||v===4||v==null)continue;
     else break;
   }
+  return streak;
+}
+function dbBuildPlayerStatsSnapshot(data,pi,offset,includePhoto){
+  const {block,season,team}=data;
+  const p=data.players[pi];
+  if(!p)return null;
+  const r=dbComputeWeekReport(data,offset);
+  const row=r.playerRows.find(x=>x.pi===pi);
+  const occ=[{p,block,season}];
+  const ov=computePlayerOverallStats(occ);
+  const wd=computePlayerWeekday(occ).filter(x=>x.total>0);
+  const streak=_playerStreak(p,block,season);
   // Competition rank on the rounded season percentage — ties share a rank
   const pcts=data.players.map(pp=>{
     if(!pp||!Array.isArray(pp.s))return null;
