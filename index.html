@@ -2603,6 +2603,25 @@ html:has(body.hub-mode){background:#080f22;}
 .rpo-hi{font-size:.8rem;color:var(--gm);margin-bottom:2px;}
 .rpo-h{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:1px;color:var(--bd);}
 .rpo-q{font-size:.94rem;font-weight:700;color:var(--gd);margin:16px 0 12px;}
+/* The rating: one row per step, number and words side by side */
+.rpo-q+.rpo-q-sub{margin:-8px 0 12px;}
+.rpo-q-sub{font-size:.76rem;color:var(--gm);}
+.rpo-list{display:flex;flex-direction:column;gap:3px;text-align:left;}
+.rpo-opt{display:flex;align-items:center;gap:12px;min-height:40px;padding:3px 12px 3px 3px;border-radius:11px;
+  border:1.5px solid transparent;background:transparent;color:var(--gd);cursor:pointer;
+  font-family:'Barlow',sans-serif;text-align:left;transition:background .12s,border-color .12s;-webkit-tap-highlight-color:transparent;}
+.rpo-opt:hover{background:#F2F5FA;}
+.rpo-opt:active{transform:scale(.99);}
+.rpo-opt:focus-visible,.rpo-nd:focus-visible{outline:3px solid #1659B8;outline-offset:1px;}
+.rpo-opt.on{border-color:var(--bd);background:#EAF0FA;}
+.rpo-num{flex:none;width:46px;height:32px;border-radius:8px;border:1px solid transparent;display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.5px;line-height:1;}
+.rpo-lbl{flex:1;font-size:.92rem;font-weight:600;}
+.rpo-tick{flex:none;font-weight:800;color:var(--bd);}
+.rpo-nd{display:block;width:100%;margin-top:12px;padding:12px;border-radius:11px;border:1.5px dashed #C8D2E2;
+  background:transparent;color:var(--gm);font-family:'Barlow',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;}
+.rpo-nd.on{border-style:solid;border-color:var(--bd);background:#EAF0FA;color:var(--bd);}
+@media (max-height:700px){.rpo-opt{min-height:36px;}.rpo-num{height:29px;font-size:1.2rem;}.rpo-list{gap:2px;}.rpo-q{margin:12px 0 10px;}}
 .rpo-scale{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;}
 .rpo-n{height:52px;border-radius:11px;border:1px solid transparent;cursor:pointer;
   font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:1px;transition:all .1s;}
@@ -2716,15 +2735,37 @@ html:has(body.hub-mode){background:#080f22;}
 .rpe-high{background:rgba(243,156,18,.16);border-color:rgba(243,156,18,.35);color:#9a6000;}
 .rpe-max{background:rgba(231,76,60,.16);border-color:rgba(231,76,60,.38);color:#b03024;}
 .rpe-hint{font-size:.66rem;color:var(--gm);margin-top:8px;}
+.rpe-none{background:var(--hx-field,var(--ow));border-color:var(--hx-line,var(--gl));color:var(--hx-ink,var(--gd));}
+.rpe-tile{position:relative;}
+.rpe-tile-src{position:absolute;top:3px;right:6px;font-size:.62rem;opacity:.7;}
+.rpe-sec-h{display:flex;align-items:baseline;gap:6px;font-size:.78rem;font-weight:700;color:var(--hx-ink,var(--gd));margin:16px 0 6px;}
+.rpe-sec-h span{color:var(--hx-muted,var(--gm));font-weight:600;}
+.rpe-nd-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-top:1px solid var(--hx-line,var(--gl));}
+.rpe-nd-row:first-child{border-top:none;}
+.rpe-nd-n{flex:1;min-width:0;font-size:.84rem;font-weight:600;color:var(--hx-ink,var(--gd));overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.rpe-nd-st{font-size:.7rem;color:var(--hx-muted,var(--gm));white-space:nowrap;}
+.rpe-nd-st.warn{color:#9a6000;font-weight:600;}
+.rpe-nd-btn,.rpe-ed-act{flex:none;font-family:'Barlow',sans-serif;font-size:.74rem;font-weight:700;padding:7px 10px;border-radius:8px;
+  border:1.5px solid var(--hx-line,var(--gl));background:var(--hx-card,#fff);color:var(--hx-ink,var(--bd));cursor:pointer;}
+.rpe-nd-btn:hover,.rpe-ed-act:hover{border-color:var(--bm);}
+.rpe-open{display:flex;flex-wrap:wrap;gap:6px;}
+.rpe-open-b{font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:600;padding:6px 12px;border-radius:999px;
+  border:1.5px dashed var(--hx-line,var(--gl));background:transparent;color:var(--hx-ink,var(--gd));cursor:pointer;}
+.rpe-open-b:hover{border-style:solid;border-color:var(--bm);}
 /* ── Editor ──────────────────────────────────────────────── */
 .rpe-ed-sec{font-size:.64rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
   color:var(--gm);margin:12px 0 6px;}
-.rpe-ed-scale{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;}
+.rpe-ed-src{font-size:.76rem;color:var(--hx-muted,var(--gm));margin:-2px 0 12px;}
+.rpe-ed-scale{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;}
 .rpe-ed-n{height:42px;border-radius:9px;border:1px solid transparent;cursor:pointer;
   font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:1px;transition:all .1s;}
 .rpe-ed-n:hover{transform:translateY(-1px);}
 .rpe-ed-n.on{outline:2.5px solid var(--bd);outline-offset:1px;font-weight:700;}
-.rpe-ed-legend{display:flex;justify-content:space-between;font-size:.62rem;color:var(--gm);margin-top:4px;}
+.rpe-ed-legend{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:.62rem;color:var(--gm);margin-top:5px;}
+.rpe-ed-legend b{font-size:.74rem;color:var(--hx-ink,var(--bd));}
+.rpe-ed-foot{display:flex;align-items:center;gap:8px;margin-top:14px;}
+.rpe-ed-foot .rpe-ed-load{margin:0 0 0 auto;}
+.rpe-ed-del{color:#A52F35;}
 .rpe-ed-min{display:flex;align-items:center;gap:6px;}
 .mob input#rpe-ed-min-in{width:74px;flex:0 0 74px;text-align:center;margin:0;
   font-family:'Bebas Neue',sans-serif;font-size:1.1rem;padding:6px;}
@@ -6359,13 +6400,19 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.1.3'; // v1.1.3: footy.ai heißt jetzt Flutlicht
-const APP_VERSION_LABEL='1.1.3';
+const APP_VERSION='1.1.4'; // v1.1.4: Belastung — eine Skala, „nicht dabei“, wer fehlt
+const APP_VERSION_LABEL='1.1.4';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792199864284; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792209753187; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.1.4',date:'17.10.2026',title:'Belastung',items:[
+    {icon:'💪',title:'Eine Skala von 0 bis 10',desc:'Spieler sehen die Skala jetzt als Liste mit den Worten der Original-Skala (0 Ruhe … 10 Maximal). Dieselbe Skala gilt im Trainer-Fenster und im Trainingsplaner.'},
+    {icon:'🙋',title:'„Ich war nicht dabei“',desc:'Wer zugesagt hatte und nicht da war, kann das statt einer Zahl angeben. Unter „Belastung“ im Termin steht er dann mit „Als fehlend eintragen“.'},
+    {icon:'📋',title:'Wer noch fehlt',desc:'Unter „Belastung“ im Termin stehen jetzt auch alle, die noch nicht bewertet haben. Nennt dir einer seinen Wert, Namen antippen und eintragen; solche Werte sind mit ✎ markiert.'},
+    {icon:'🔧',title:'Termin löschen oder verschieben',desc:'Bewertungen, Einsatzminuten, Physio, Tore und Vorlagen bleiben jetzt beim richtigen Termin. Bisher rutschten sie dabei auf den Nachbartermin.'},
+  ]},
   {version:'1.1.3',date:'17.10.2026',title:'Flutlicht',items:[
     {icon:'💡',title:'footy.ai heißt jetzt Flutlicht',desc:'Neuer Name, neues Logo – sonst bleibt alles gleich: dieselbe Adresse, dieselben Links für die Spieler, alle Daten bleiben erhalten. Wer die App als Symbol auf dem Startbildschirm hat: Symbol einmal löschen und neu hinzufügen (iPhone: „Teilen → Zum Home-Bildschirm“, Android: Chrome-Menü ⋮ → „App installieren“ bzw. „Zum Startbildschirm hinzufügen“), dann erscheinen Name und Logo neu.'},
   ]},
@@ -6672,11 +6719,63 @@ function dispToISO(s){
   const yr=+m[2]>=7?String(sy.y1):String(sy.y2);
   return yr+'-'+mo+'-'+d;
 }
+// Every array on a player that is indexed by session. Inserting or removing a
+// session must shift all of them together: shifting only s and perf left
+// ratings, match minutes, physio bookings, excuses, goals and assists on the
+// neighbouring session.
+const SESS_PLAYER_FIELDS=['s','perf','rpe','rpeMin','physio','excOK','preconfReason','goals','assists'];
+function _sessFieldBlank(f){return f==='s'?3:(f==='preconfReason'?'':null);}
+// Opens a slot at `at` in each array; vals gives values for it (e.g. restore)
+function _sessInsertAt(p,at,vals){
+  if(!p)return;
+  SESS_PLAYER_FIELDS.forEach(f=>{
+    const blank=_sessFieldBlank(f);
+    const v=(vals&&vals[f]!==undefined&&vals[f]!==null)?vals[f]:blank;
+    let a=p[f];
+    if(!Array.isArray(a)){
+      if(v===blank)return;
+      a=p[f]=[];
+    }
+    // Shorter than `at`: nothing stored at or after it, nothing to shift
+    if(a.length<at){
+      if(v===blank)return;
+      while(a.length<at)a.push(blank);
+    }
+    a.splice(at,0,v);
+  });
+}
+// Removes slot `at` from each array; returns what was there
+function _sessRemoveAt(p,at){
+  const out={};
+  if(!p)return out;
+  SESS_PLAYER_FIELDS.forEach(f=>{
+    const a=p[f];
+    if(!Array.isArray(a)||at>=a.length)return;
+    out[f]=a.splice(at,1)[0];
+  });
+  return out;
+}
+// Writes values into slot `at`, padding where an array is short
+function _sessSetAt(p,at,vals){
+  if(!p||!vals)return;
+  Object.keys(vals).forEach(f=>{
+    const v=vals[f];
+    const blank=_sessFieldBlank(f);
+    if(v===undefined||v===null||v===blank){
+      if(Array.isArray(p[f])&&at<p[f].length)p[f][at]=blank;
+      return;
+    }
+    if(!Array.isArray(p[f]))p[f]=[];
+    const a=p[f];
+    while(a.length<at)a.push(blank);
+    a[at]=v;
+  });
+}
 function insertSorted(D,sess){
   const k=dispToSortKey(sess.date);let at=D.sessions.length;
   for(let i=0;i<D.sessions.length;i++)if(dispToSortKey(D.sessions[i].date)>k){at=i;break;}
   D.sessions.splice(at,0,sess);
-  D.players.forEach(p=>{if(p.s)p.s.splice(at,0,3);if(p&&p.perf)p.perf.splice(at,0,null);});
+  D.players.forEach(p=>_sessInsertAt(p,at));
   // Detect team/season from the D reference so we shift the right block's lineups,
   // even when this is called for a non-current block (e.g. _applySchedulePattern).
   let team=UI.currentTeam,season=UI.currentSeason;
@@ -14768,19 +14867,24 @@ function _pmSanitizeG(){
 // of the method rests entirely on honest numbers, so the UI must never frame
 // it as a grade — no good/bad colouring of the scale itself, no comparison
 // with team-mates shown to the player.
+// The scale is Foster's modified CR-10, the one the method was validated with:
+// words at 0–5, 7 and 10, the steps between deliberately without one. German
+// says "anstrengend", not "schwer" — "schwer" reads as "difficult to do".
+// Players, the trainer's editor and the planner all use this one list.
 const RPE_SCALE=[
-  [0,'Nichts','Ruhe'],
-  [1,'Sehr leicht',''],
+  [0,'Ruhe',''],
+  [1,'Sehr, sehr leicht',''],
   [2,'Leicht',''],
   [3,'Moderat',''],
-  [4,'Etwas fordernd',''],
-  [5,'Fordernd',''],
-  [6,'Anstrengend',''],
+  [4,'Etwas anstrengend',''],
+  [5,'Anstrengend',''],
+  [6,'',''],
   [7,'Sehr anstrengend',''],
-  [8,'Sehr, sehr anstrengend',''],
-  [9,'Fast maximal',''],
-  [10,'Maximal','Alles gegeben']
+  [8,'',''],
+  [9,'',''],
+  [10,'Maximal','']
 ];
+function rpeLabel(n){const r=RPE_SCALE[n];return r?r[1]:'';}
 const RPE_DEFAULT_MIN=90;      // used when the trainer set no duration
 const RPE_WINDOW_H=72;         // entry stays open this long after the session
 // Trainer preview (&preview=1): the screen is identical to the player's, the
@@ -14797,6 +14901,47 @@ function rpeLoad(s,p,si){
   const r=(p&&Array.isArray(p.rpe))?p.rpe[si]:null;
   if(typeof r!=='number')return null;
   return Math.round(r*rpeSessionMinutes(s,p,si));
+}
+// Who gave a rating, and when: p.rpeMeta[key] = {s, t, by, nd}
+//   s   'p' the player himself, 't' entered by a trainer (told, or corrected)
+//   t   when (ms)        by  the trainer's name, for 't'
+//   nd  1 = the player answered "Ich war nicht dabei" instead of a number
+// Ratings from before this existed have no entry and count as the player's.
+// Keyed by the session's date, start time and type, not by its index: the
+// per-session arrays have drifted from their sessions before, and a key that
+// names the session cannot. The leading letter keeps Firebase from ever
+// reading the object as an array.
+function rpeMetaKey(s){
+  const m=String((s&&s.date)||'').match(/(\d+)\.(\d+)/);
+  if(!m)return null;
+  const hm=String(s.time||'').replace(/\D/g,'').padStart(4,'0').slice(0,4);
+  return 'k'+String(+m[2]).padStart(2,'0')+String(+m[1]).padStart(2,'0')+'-'+hm+(s.type==='match'?'m':'t');
+}
+function rpeMetaGet(p,s){
+  const k=rpeMetaKey(s);
+  const m=(k&&p&&p.rpeMeta&&typeof p.rpeMeta==='object')?p.rpeMeta[k]:null;
+  return (m&&typeof m==='object')?m:null;
+}
+function rpeMetaSet(p,s,v){
+  const k=rpeMetaKey(s);
+  if(!k||!p)return null;
+  if(!p.rpeMeta||typeof p.rpeMeta!=='object'||Array.isArray(p.rpeMeta))p.rpeMeta={};
+  if(v)p.rpeMeta[k]=v;else delete p.rpeMeta[k];
+  return k;
+}
+// A session's date or time changed: its entries move with it.
+function rpeMetaRekey(D,oldKey,newKey){
+  if(!D||!oldKey||!newKey||oldKey===newKey)return;
+  (D.players||[]).forEach(p=>{
+    if(!p||!p.rpeMeta||typeof p.rpeMeta!=='object'||!p.rpeMeta[oldKey])return;
+    p.rpeMeta[newKey]=p.rpeMeta[oldKey];
+    delete p.rpeMeta[oldKey];
+  });
+}
+function rpeNotThere(p,s){const m=rpeMetaGet(p,s);return !!(m&&m.nd);}
+// Answered: a number, or "Ich war nicht dabei"
+function rpeAnswered(p,si,s){
+  return (Array.isArray(p.rpe)&&typeof p.rpe[si]==='number')||rpeNotThere(p,s);
 }
 // Open only for sessions that actually took place, where the player was
 // present, and only for a few days afterwards — a rating given a fortnight
@@ -14940,6 +15085,8 @@ function sessSetPlayerRpe(si,pi,val,blockKey){
   if(before===n)return;
   snap();
   p.rpe[si]=n;
+  // Marked as the trainer's entry; a deleted value takes its record with it.
+  rpeMetaSet(p,s,n==null?null:{s:'t',t:Date.now(),by:(CU&&CU.name)||''});
   saveG();
   logAudit('Belastung korrigiert',(getDisplayName?getDisplayName(p):p.name)+' \u00b7 '+(s.date||'?'),
     (before==null?'\u2013':before)+' \u2192 '+(n==null?'gel\u00f6scht':n));
@@ -15157,65 +15304,125 @@ function dbRenderLoadCard(data){
 // Remembers whether the individual-values fold is open, so a redraw does not
 // collapse it under the cursor.
 let _ssRpeOpen=false;
+// Everyone a session's rating concerns, in three groups: rated, says he was
+// not there, not answered. Absent and excused players are not asked; a value
+// one of them has anyway still counts as rated.
+function _rpeSessGroups(D,s,si,season){
+  const rated=[],nd=[],open=[];
+  (D.players||[]).forEach((p,pi)=>{
+    if(!p)return;
+    const n=getDisplayName?getDisplayName(p):p.name;
+    const r=Array.isArray(p.rpe)?p.rpe[si]:null;
+    const m=rpeMetaGet(p,s);
+    if(typeof r==='number'){
+      rated.push({n,r,pi,load:rpeLoad(s,p,si),min:(Array.isArray(p.rpeMin)?p.rpeMin[si]:null),
+        src:(m&&m.s==='t')?'t':'p',by:(m&&m.by)||''});
+      return;
+    }
+    const st=(p.s&&si<p.s.length)?p.s[si]:3;
+    if(st===0||st===2)return;
+    if(!_sessAfterJoin(p,s,season))return;
+    (m&&m.nd?nd:open).push({n,pi,st});
+  });
+  const byName=(a,b)=>String(a.n||'').localeCompare(String(b.n||''));
+  nd.sort(byName);open.sort(byName);
+  return {rated,nd,open};
+}
+// Players can still answer: from the end of the session until midnight
+function _rpeSessWindowOpen(s,si,season){return rpeIsOpen(s,si,{s:[]},season);}
 function renderSessRpe(si){
   const box=document.getElementById('ss-rpe-wrap');
   if(!box)return;
   const D=cd();const s=D&&D.sessions&&D.sessions[si];
   if(!s||!canEdit()||!sessTookPlace(s,UI.currentSeason)){box.style.display='none';return;}
-  const vals=[];
-  (D.players||[]).forEach((p,_pi)=>{
-    if(!p||!Array.isArray(p.rpe))return;
-    const r=p.rpe[si];
-    if(typeof r==='number')vals.push({n:getDisplayName?getDisplayName(p):p.name,r,
-      load:rpeLoad(s,p,si),pi:_pi,min:(Array.isArray(p.rpeMin)?p.rpeMin[si]:null)});
-  });
-  const present=(D.players||[]).filter(p=>p&&p.s&&p.s[si]===1).length;
-  if(!vals.length){
-    box.style.display='block';
-    box.innerHTML='<div class="u-empty" style="padding:10px;"><div class="u-empty-txt">'
-      +'\ud83d\udcaa Noch keine Belastungs-R\u00fcckmeldung'+(present?' (0 von '+present+')':'')+'</div></div>';
-    return;
-  }
-  const avg=vals.reduce((a,b)=>a+b.r,0)/vals.length;
-  const min=Math.min(...vals.map(v=>v.r)),max=Math.max(...vals.map(v=>v.r));
-  const avgLoad=Math.round(vals.reduce((a,b)=>a+(b.load||0),0)/vals.length);
+  const g=_rpeSessGroups(D,s,si,UI.currentSeason);
+  const vals=g.rated;
+  if(!vals.length&&!g.nd.length&&!g.open.length){box.style.display='none';_rpeCache=null;return;}
+  const asked=vals.length+g.open.length;
   const mins=rpeSessionMinutes(s,null,si);
   const isMatch=s.type==='match';
+  const winOpen=_rpeSessWindowOpen(s,si,UI.currentSeason);
+  let avg=null,min=null,max=null,avgLoad=null;
+  if(vals.length){
+    avg=vals.reduce((a,b)=>a+b.r,0)/vals.length;
+    min=Math.min(...vals.map(v=>v.r));max=Math.max(...vals.map(v=>v.r));
+    avgLoad=Math.round(vals.reduce((a,b)=>a+(b.load||0),0)/vals.length);
+  }
+  const bits=[vals.length+(asked?' von '+asked:'')+' bewertet'];
+  if(g.nd.length)bits.push(g.nd.length+' nicht da');
+  if(vals.length>1&&min!==max)bits.push('Spanne '+min+'–'+max);
+  else if(!vals.length&&winOpen)bits.push('bis 24 Uhr');
   box.style.display='block';
-  // On the card this is one summary tile — the squad's average with a hint of
-  // its spread. The per-player tiles are a level down, where they have room
-  // and do not push everything else off the screen.
-  box.innerHTML=`<button class="rpe-card ${_rpeBand(Math.round(avg))}" onclick="rpeAllOpen(${si})">
-    <span class="rpe-card-ic">\ud83d\udcaa</span>
+  // On the card this is one summary tile; who rated what, who said he was not
+  // there and who is still open are a level down.
+  box.innerHTML=`<button class="rpe-card ${avg==null?'rpe-none':_rpeBand(Math.round(avg))}" onclick="rpeAllOpen(${si})">
+    <span class="rpe-card-ic">💪</span>
     <span class="rpe-card-txt">
       <b>Belastung</b>
-      <span>${vals.length}${present?' von '+present:''} bewertet \u00b7 Spanne ${min}\u2013${max}</span>
+      <span>${bits.join(' · ')}</span>
     </span>
-    <span class="rpe-card-v">${avg.toFixed(1)}</span>
-    <span class="rpe-card-chev">\u203a</span>
+    <span class="rpe-card-v">${avg==null?'–':avg.toFixed(1)}</span>
+    <span class="rpe-card-chev">›</span>
   </button>`;
   // Kept for the detail view, which reads them when it opens
-  _rpeCache={si,vals,avg,min,max,avgLoad,mins,present,isMatch};
+  _rpeCache={si,vals,nd:g.nd,open:g.open,avg,min,max,avgLoad,mins,asked,isMatch,winOpen};
 }
 let _rpeCache=null;
-// Every player's rating, one tile each — opened from the summary tile.
+// Everyone's answer, opened from the summary tile: a tile per rating, then who
+// says he was not there, then who has not answered — tapping a name enters the
+// value he tells the trainer.
 function rpeAllOpen(si){
-  if(!_rpeCache||_rpeCache.si!==si){try{renderSessRpe(si);}catch(e){}}
+  try{renderSessRpe(si);}catch(e){}
   const c=_rpeCache;
-  if(!c)return;
+  if(!c||c.si!==si)return;
   const body=document.getElementById('rpe-all-body');
   const ttl=document.getElementById('rpe-all-sub');
   if(!body)return;
-  if(ttl)ttl.textContent=`\u00d8 ${c.avg.toFixed(1)} \u00b7 Spanne ${c.min}\u2013${c.max} \u00b7 \u00d8 Load ${c.avgLoad} \u00b7 ${c.mins} Min`;
+  if(ttl)ttl.textContent=c.vals.length
+    ?`Ø ${c.avg.toFixed(1)} · Spanne ${c.min}–${c.max} · Ø Load ${c.avgLoad} · ${c.mins} Min`
+    :`Noch keine Bewertung · ${c.mins} Min`;
   const tile=v=>`<button class="rpe-tile ${_rpeBand(v.r)}" onclick="rpeEditOpen(${si},${v.pi})"
-      title="${escapeHtml(v.n)} \u2014 ${v.r}/10${v.min!=null?', '+v.min+' Min':''}">
+      title="${escapeHtml(v.n)} — ${v.r}/10${v.min!=null?', '+v.min+' Min':''}${v.src==='t'?' · eingetragen von '+escapeHtml(v.by||'Trainer'):''}">
+      ${v.src==='t'?'<span class="rpe-tile-src" aria-label="vom Trainer eingetragen">✎</span>':''}
       <span class="rpe-tile-v">${v.r}</span>
       <span class="rpe-tile-n">${escapeHtml(v.n)}</span>
-      <span class="rpe-tile-m">${c.isMatch?(v.min!=null?v.min+'\u2032':'\u2013'):(v.load==null?'':v.load)}</span>
+      <span class="rpe-tile-m">${c.isMatch?(v.min!=null?v.min+'′':'–'):(v.load==null?'':v.load)}</span>
     </button>`;
-  body.innerHTML=`<div class="rpe-grid">${c.vals.slice().sort((a,b)=>b.r-a.r).map(tile).join('')}</div>`
-    +(c.isMatch?'<div class="rpe-hint">Auf eine Kachel tippen, um Bewertung und Einsatzminuten zu \u00e4ndern</div>':'');
-  openM('moRpeAll');
+  let html='';
+  if(c.vals.length){
+    html+=`<div class="rpe-grid">${c.vals.slice().sort((a,b)=>b.r-a.r).map(tile).join('')}</div>`;
+    const notes=[];
+    if(c.vals.some(v=>v.src==='t'))notes.push('✎ vom Trainer eingetragen');
+    if(c.isMatch)notes.push('Kachel antippen: Bewertung und Einsatzminuten ändern');
+    if(notes.length)html+=`<div class="rpe-hint">${notes.join(' · ')}</div>`;
+  }
+  if(c.nd.length){
+    html+=`<div class="rpe-sec-h">Sagt: war nicht dabei <span>${c.nd.length}</span></div>`
+      +`<div class="rpe-nd-list">${c.nd.map(x=>`<div class="rpe-nd-row">
+          <span class="rpe-nd-n">${escapeHtml(x.n)}</span>
+          <span class="rpe-nd-st${x.st===1?' warn':''}">${x.st===1?'laut Liste anwesend':_statusName(x.st)}</span>
+          <button class="rpe-nd-btn" onclick="rpeMarkAbsent(${si},${x.pi})">Als fehlend eintragen</button>
+        </div>`).join('')}</div>`;
+  }
+  if(c.open.length){
+    html+=`<div class="rpe-sec-h">${c.winOpen?'Noch offen':'Ohne Bewertung'} <span>${c.open.length}</span></div>`
+      +`<div class="rpe-open">${c.open.map(x=>
+        `<button class="rpe-open-b" onclick="rpeEditOpen(${si},${x.pi})">${escapeHtml(x.n)}</button>`).join('')}</div>`
+      +`<div class="rpe-hint">${c.winOpen?'Spieler können bis 24 Uhr bewerten. ':''}Nennt dir ein Spieler seinen Wert: Namen antippen und eintragen.</div>`;
+  }
+  body.innerHTML=html;
+  const mo=document.getElementById('moRpeAll');
+  if(mo&&!mo.classList.contains('open'))openM('moRpeAll');
+}
+// The player said he was not there. One tap records him absent, which also
+// takes the session out of his rating questions.
+function rpeMarkAbsent(si,pi){
+  if(!canEdit())return;
+  setSessPlayerStatus(pi,si,0);
+  if(typeof _currentSessIdx!=='undefined'&&_currentSessIdx===si){try{buildSessAtt(si);}catch(e){}}
+  const mo=document.getElementById('moRpeAll');
+  if(mo&&mo.classList.contains('open')){try{rpeAllOpen(si);}catch(e){}}
+  else{try{renderSessRpe(si);}catch(e){}}
 }
 // Colour band for a 0–10 rating: low is calm, high is loud.
 function _rpeBand(r){
@@ -15223,6 +15430,14 @@ function _rpeBand(r){
   if(r<=6)return 'rpe-mid';
   if(r<=8)return 'rpe-high';
   return 'rpe-max';
+}
+// When a rating was given: the time alone on the session's own day.
+function _rpeWhen(t,s){
+  if(!t)return '';
+  const d=new Date(t);
+  const hm=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+  const k=d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
+  return (k===_dbSortKey(s.date,UI.currentSeason)?'':d.getDate()+'.'+(d.getMonth()+1)+'. ')+hm+' Uhr';
 }
 // Editor for one player: the rating scale and, for a match, the minutes —
 // large enough to hit on a phone, and nothing else competing for attention.
@@ -15233,28 +15448,40 @@ function rpeEditOpen(si,pi){
   const box=document.getElementById('rpe-edit-body');
   const ttl=document.getElementById('rpe-edit-title');
   if(!box||!ttl)return;
-  const cur=Array.isArray(p.rpe)?p.rpe[si]:null;
+  const cur=(Array.isArray(p.rpe)&&typeof p.rpe[si]==='number')?p.rpe[si]:null;
   const curMin=Array.isArray(p.rpeMin)?p.rpeMin[si]:null;
   const isMatch=s.type==='match';
   const defMin=rpeSessionMinutes(s,null,si);
+  const m=rpeMetaGet(p,s);
+  const st=(p.s&&si<p.s.length)?p.s[si]:3;
   ttl.textContent=(getDisplayName?getDisplayName(p):p.name)||'?';
+  let src;
+  if(cur!=null)src=(m&&m.s==='t')
+    ?'Eingetragen von '+escapeHtml(m.by||'Trainer')+(m.t?' · '+_rpeWhen(m.t,s):'')
+    :'Vom Spieler'+(m&&m.t?' · '+_rpeWhen(m.t,s):'');
+  else if(m&&m.nd)src='Sagt: war nicht dabei'+(m.t?' · '+_rpeWhen(m.t,s):'');
+  else src='Noch keine Bewertung';
+  const acts=[];
+  if(cur==null&&m&&m.nd&&st!==0)acts.push(`<button class="rpe-ed-act" onclick="rpeEditClose();rpeMarkAbsent(${si},${pi})">Als fehlend eintragen</button>`);
+  if(cur!=null)acts.push(`<button class="rpe-ed-act rpe-ed-del" onclick="rpeEditSet('')">Wert löschen</button>`);
   box.innerHTML=`
-    <div class="rpe-ed-sec">Belastung</div>
-    <div class="rpe-ed-scale">${[1,2,3,4,5,6,7,8,9,10].map(n=>
-      `<button class="rpe-ed-n ${_rpeBand(n)}${n===cur?' on':''}" onclick="rpeEditSet(${n})">${n}</button>`).join('')}</div>
-    <div class="rpe-ed-legend"><span>leicht</span><span>sehr hart</span></div>
+    <div class="rpe-ed-src">${src}</div>
+    <div class="rpe-ed-scale">${RPE_SCALE.map(([n])=>
+      `<button class="rpe-ed-n ${_rpeBand(n)}${n===cur?' on':''}" onclick="rpeEditSet(${n})" title="${n}${rpeLabel(n)?' · '+rpeLabel(n):''}">${n}</button>`).join('')}</div>
+    <div class="rpe-ed-legend"><span>0 Ruhe</span><b>${cur!=null&&rpeLabel(cur)?escapeHtml(rpeLabel(cur)):''}</b><span>10 Maximal</span></div>
     ${isMatch?`
     <div class="rpe-ed-sec">Einsatzminuten</div>
     <div class="rpe-ed-min">
-      <button class="rpe-ed-step" onclick="rpeEditMin(-5)">\u2212</button>
+      <button class="rpe-ed-step" onclick="rpeEditMin(-5)">−</button>
       <input id="rpe-ed-min-in" type="number" min="0" max="240" step="5" placeholder="${defMin}"
         value="${curMin==null?'':curMin}" onchange="rpeEditMin(0,this.value)">
       <button class="rpe-ed-step" onclick="rpeEditMin(5)">+</button>
-      <button class="rpe-ed-full" onclick="rpeEditMin(0,${defMin})">volle ${defMin}\u2032</button>
+      <button class="rpe-ed-full" onclick="rpeEditMin(0,${defMin})">volle ${defMin}′</button>
     </div>`:''}
-    <div class="rpe-ed-load" id="rpe-ed-load"></div>`;
+    <div class="rpe-ed-foot">${acts.join('')}<span class="rpe-ed-load" id="rpe-ed-load"></span></div>`;
   _rpeEditLoad();
-  openM('moRpeEdit');
+  const mo=document.getElementById('moRpeEdit');
+  if(mo&&!mo.classList.contains('open'))openM('moRpeEdit');
 }
 let _rpeEdit=null;
 function _rpeEditLoad(){
@@ -15264,10 +15491,19 @@ function _rpeEditLoad(){
   const l=rpeLoad(s,p,_rpeEdit.si);
   el.innerHTML=l==null?'':`Load <b>${l}</b>`;
 }
+// Keeps the list behind the editor current: the editor can be closed by the
+// back gesture, which never reaches rpeEditClose.
+function _rpeRefreshBehind(si){
+  const mo=document.getElementById('moRpeAll');
+  if(mo&&mo.classList.contains('open')){try{rpeAllOpen(si);}catch(e){}}
+  else{try{renderSessRpe(si);}catch(e){}}
+}
 function rpeEditSet(n){
   if(!_rpeEdit)return;
-  sessSetPlayerRpe(_rpeEdit.si,_rpeEdit.pi,n);
-  rpeEditOpen(_rpeEdit.si,_rpeEdit.pi);
+  const {si,pi}=_rpeEdit;
+  sessSetPlayerRpe(si,pi,n);
+  rpeEditOpen(si,pi);
+  _rpeRefreshBehind(si);
 }
 function rpeEditMin(delta,abs){
   if(!_rpeEdit)return;
@@ -15284,7 +15520,7 @@ function rpeEditClose(){
   const si=_rpeEdit&&_rpeEdit.si;
   _rpeEdit=null;
   closeM('moRpeEdit');
-  if(si!=null){try{renderSessRpe(si);}catch(e){}}
+  if(si!=null)_rpeRefreshBehind(si);
 }
 function pmSetRpe(si,val){
   if(!isPlayerMode())return;
@@ -15299,6 +15535,8 @@ function pmSetRpe(si,val){
   // so one stray tap turned an answer into a gap in the trainer's data.
   if(p.rpe[si]===val)return;
   p.rpe[si]=val;
+  // Replaces a "nicht dabei" given earlier
+  rpeMetaSet(p,s,{s:'p',t:Date.now()});
   // Trainer preview is for LOOKING at the screen. Writing real ratings under a
   // player's name from a test session corrupts exactly the data the feature
   // exists to collect — and produces values the player never gave. The UI
@@ -15307,6 +15545,7 @@ function pmSetRpe(si,val){
     if(typeof showSaveFlash==='function')showSaveFlash('\ud83d\udc41 Vorschau \u2014 nicht gespeichert');
   }else{
     _pmSaveTargeted(si);
+    _pmSaveMeta(s);
   }
   // Audit is debounced per session: a player trying 6, then 7, then 8 before
   // settling produced one journal entry per tap. Only the value they end up
@@ -15319,7 +15558,7 @@ function pmSetRpe(si,val){
       c.querySelectorAll('.pm-rpe-n').forEach((b,n)=>b.classList.toggle('on',p.rpe[si]===n));
       const f=document.getElementById('pm-rpe-fb-'+si);
       if(f)f.textContent=(p.rpe[si]!=null)
-        ?('\u2713 '+RPE_SCALE[p.rpe[si]][1]+' \u2014 danke!')
+        ?('\u2713 '+(rpeLabel(p.rpe[si])||p.rpe[si])+' \u2014 danke!')
         :'Keine Note, kein richtig oder falsch \u2014 dein ehrliches Gef\u00fchl z\u00e4hlt.';
     }
     return;
@@ -15358,7 +15597,7 @@ function pmSetRpe(si,val){
   // Focus mode showed only this question — once answered, show the week
   if(document.querySelector('.pm-focus')&&p.rpe[si]!=null){
     const stillOpen=(D.sessions||[]).some((s2,i2)=>
-      rpeIsOpen(s2,i2,p,UI.currentSeason)&&!(Array.isArray(p.rpe)&&typeof p.rpe[i2]==='number'));
+      rpeIsOpen(s2,i2,p,UI.currentSeason)&&!rpeAnswered(p,i2,s2));
     if(!stillOpen){setTimeout(()=>{try{renderPlayerMode();}catch(e){}},420);return;}
   }
   const card=document.querySelector('.pm-rpe[data-si="'+si+'"]');
@@ -15367,9 +15606,53 @@ function pmSetRpe(si,val){
     card.querySelectorAll('.pm-rpe-n').forEach((b,n)=>b.classList.toggle('on',p.rpe[si]===n));
     const fb=document.getElementById('pm-rpe-fb-'+si);
     if(fb)fb.textContent=(p.rpe[si]!=null)
-      ?('\u2713 '+RPE_SCALE[p.rpe[si]][1]+' \u2014 danke!')
+      ?('\u2713 '+(rpeLabel(p.rpe[si])||p.rpe[si])+' \u2014 danke!')
       :'Keine Note, kein richtig oder falsch \u2014 dein ehrliches Gef\u00fchl z\u00e4hlt.';
   }
+}
+// "Ich war nicht dabei": an answer in place of a number. The trainer sees it
+// and can record the player absent; until then the claim is all there is.
+function pmSetNotThere(si){
+  if(!isPlayerMode())return;
+  const D=cd();const myPi=_pmValidateIdx();
+  if(myPi==null||!D||!D.players||!D.players[myPi])return;
+  const p=D.players[myPi];
+  const s=D.sessions&&D.sessions[si];
+  if(!rpeIsOpen(s,si,p,UI.currentSeason))return;
+  const had=Array.isArray(p.rpe)&&typeof p.rpe[si]==='number';
+  if(!had&&rpeNotThere(p,s))return;
+  // A number and "not there" contradict each other: the number goes
+  if(had)p.rpe[si]=null;
+  rpeMetaSet(p,s,{s:'p',t:Date.now(),nd:1});
+  if(RPE_IS_PREVIEW){
+    if(typeof showSaveFlash==='function')showSaveFlash('\ud83d\udc41 Vorschau \u2014 nicht gespeichert');
+    return;
+  }
+  if(had)_pmSaveTargeted(si);
+  _pmSaveMeta(s);
+  if(window._rpeAuditTimers&&window._rpeAuditTimers[si]){clearTimeout(window._rpeAuditTimers[si]);window._rpeAuditTimers[si]=null;}
+  try{
+    _pmAppendAudit({ts:Date.now(),user:p.name||'Spieler',role:'player',
+      action:'Belastung bewertet',target:(s&&s.date)||'?',detail:'nicht dabei'});
+  }catch(e){}
+}
+// Written apart from _pmSaveTargeted on purpose: update() is all or nothing,
+// so database rules that ever refused this newer field must not take the
+// rating down with it.
+function _pmSaveMeta(s){
+  if(!isPlayerMode()||!fbDb||!fbRef||RPE_IS_PREVIEW)return;
+  const myTeam=UI.currentTeam,mySeason=UI.currentSeason;
+  const myPi=_pmValidateIdx();
+  if(!myTeam||!mySeason||myPi==null)return;
+  const D=G.db[myTeam+'__'+mySeason];
+  const p=D&&Array.isArray(D.players)?D.players[myPi]:null;
+  const k=rpeMetaKey(s);
+  if(!p||!k)return;
+  const enc=x=>String(x||'').replace(/\//g,'__SL__').replace(/\./g,'__DOT__').replace(/#/g,'__HASH__').replace(/\[/g,'__LB__').replace(/\]/g,'__RB__');
+  const path='fcf_data/db/'+enc(myTeam+'__'+mySeason)+'/players/v/'+myPi+'/rpeMeta/'+k;
+  fbDb.ref().update({[path]:rpeMetaGet(p,s)||null}).catch(e=>{
+    console.warn('[PlayerSave] Herkunft der Bewertung nicht gespeichert:',e&&e.message);
+  });
 }
 function _pmSaveTargeted(si){
   // CRITICAL: player-mode G is sanitized (other players = null) — never write it to
@@ -16230,6 +16513,7 @@ function _pmSanitizeGTeam(){
       players:(blk.players||[]).map(p=>p?{name:p.name,shortname:p.shortname||'',
         nr:p.nr||'',rpe:Array.isArray(p.rpe)?p.rpe.slice():[],
         rpeMin:Array.isArray(p.rpeMin)?p.rpeMin.slice():[],
+        rpeMeta:(p.rpeMeta&&typeof p.rpeMeta==='object')?JSON.parse(JSON.stringify(p.rpeMeta)):{},
         // Needed to verify who is answering; nothing else personal is kept.
         birthdate:p.birthdate||'',
         s:Array.isArray(p.s)?p.s.slice():[],confirmToken:p.confirmToken}:p)
@@ -16441,19 +16725,23 @@ function renderRpeOnly(){
     </div></div>`;
     return;
   }
-  const labels={1:'sehr leicht',2:'leicht',3:'locker',4:'etwas fordernd',5:'mittel',
-    6:'fordernd',7:'hart',8:'sehr hart',9:'extrem hart',10:'maximal'};
+  const nd=cur==null&&rpeNotThere(p,s);
+  // A list, 0 at the top, every number beside its words: the words are part of
+  // the scale, and reading them is what makes two players' 6 mean the same.
+  const opts=RPE_SCALE.map(([n,lbl])=>
+    `<button class="rpo-opt${n===cur?' on':''}" data-v="${n}" aria-pressed="${n===cur}" onclick="rpoSet(${si},${n})">
+      <span class="rpo-num ${_rpeBand(n)}">${n}</span><span class="rpo-lbl">${lbl}</span>
+      ${n===cur?'<span class="rpo-tick" aria-hidden="true">\u2713</span>':''}</button>`).join('');
   wrap.innerHTML=`<div class="rpo-wrap">
     ${window._hubMode?'<button class="hub-back" onclick="hubBack()">\u2039 \u00dcbersicht</button>':''}
     ${RPE_IS_PREVIEW?'<div class="rpo-prev">\ud83d\udc41 Vorschau \u00b7 Eingaben werden <b>nicht</b> gespeichert</div>':''}
     <div class="rpo-card">
       <div class="rpo-hi">Hi ${escapeHtml(nm)}!</div>
       <div class="rpo-h">${isMatch?'\u26bd':'\ud83c\udfc3'} ${escapeHtml(s.date)}${isMatch&&s.label?' \u2013 '+escapeHtml(s.label):''}</div>
-      <div class="rpo-q">Wie anstrengend war es f\u00fcr dich?</div>
-      <div class="rpo-scale">${[1,2,3,4,5,6,7,8,9,10].map(n=>
-        `<button class="rpo-n ${_rpeBand(n)}${n===cur?' on':''}" onclick="rpoSet(${si},${n})">${n}</button>`).join('')}</div>
-      <div class="rpo-legend"><span>leicht</span><span>maximal</span></div>
-      <div class="rpo-echo" id="rpo-echo">${cur?('\u2713 '+cur+' \u2014 '+labels[cur]):'&nbsp;'}</div>
+      <div class="rpo-q">Wie anstrengend war ${isMatch?'das Spiel':'das Training'} f\u00fcr dich?</div>
+      <div class="rpo-q-sub">Die ganze Einheit z\u00e4hlt, nicht nur das Ende.</div>
+      <div class="rpo-list" role="group" aria-label="Anstrengung von 0 bis 10">${opts}</div>
+      <button class="rpo-nd${nd?' on':''}" aria-pressed="${nd}" onclick="rpoNotThere(${si})">${nd?'\u2713 ':''}Ich war nicht dabei</button>
 
     </div>
     <div class="rpo-foot">Deine Angabe sehen nur die Trainer.</div>
@@ -16463,6 +16751,13 @@ function rpoSet(si,n){
   pmSetRpe(si,n);
   renderRpeOnly();
   try{_hubCheckDone('rpe');}catch(e){}
+}
+function rpoNotThere(si){
+  pmSetNotThere(si);
+  renderRpeOnly();
+  window._rpeThanksNd=true;
+  try{_hubCheckDone('rpe');}catch(e){}
+  window._rpeThanksNd=false;
 }
 function rpoMin(si,delta,abs){
   const D=cd();const pi=_pmValidateIdx();
@@ -16506,7 +16801,7 @@ function renderHub(){
   const rpeDue=[];
   (D.sessions||[]).forEach((s,si)=>{
     if(!s)return;
-    if(rpeIsOpen(s,si,p,UI.currentSeason)&&!(Array.isArray(p.rpe)&&typeof p.rpe[si]==='number'))rpeDue.push({s,si});
+    if(rpeIsOpen(s,si,p,UI.currentSeason)&&!rpeAnswered(p,si,s))rpeDue.push({s,si});
   });
   // Built live when the hub opened — nothing is published any more.
   const live=_hubLive||{};
@@ -16592,7 +16887,7 @@ function _hubOpenCounts(){
     if(rpeIsOpen(s,si,p,UI.currentSeason)){
       out.rpeTotal++;
       out.rpeLast=si;
-      if(!(Array.isArray(p.rpe)&&typeof p.rpe[si]==='number'))out.rpe++;
+      if(!rpeAnswered(p,si,s))out.rpe++;
     }
     // Physio: only where it is offered, the player is coming, and the deadline
     // has not passed. The button on the session card is easy to miss, so this
@@ -16633,9 +16928,11 @@ function _hubAutoRoute(){
 function _hubThanks(kind){
   if(document.getElementById('hubThanks'))return;   // never twice
   const onHub=!!window._hubMode;
-  const icon=(kind==='rpe')?'\ud83d\udcaa':(kind==='physio')?'\ud83e\uddd1\u200d\u2695\ufe0f':'\u2713';
-  const head=(kind==='rpe')?'Danke dir!':'Danke!';
-  const sub=(kind==='rpe')?'Deine Belastung ist gespeichert'
+  const nd=(kind==='rpe')&&!!window._rpeThanksNd;
+  const icon=nd?'\u2713':(kind==='rpe')?'\ud83d\udcaa':(kind==='physio')?'\ud83e\uddd1\u200d\u2695\ufe0f':'\u2713';
+  const head=nd?'Alles klar':(kind==='rpe')?'Danke dir!':'Danke!';
+  const sub=nd?'Gespeichert: du warst nicht dabei'
+    :(kind==='rpe')?'Deine Belastung ist gespeichert'
     :(kind==='physio')?'Deine Physio-Antwort ist gespeichert'
     :'Alles beantwortet';
   const el=document.createElement('div');
@@ -16993,7 +17290,7 @@ function renderPlayerMode(){
       html+=`</div>
         <div class="pm-rpe-legend"><span>0 \u00b7 gar nicht</span><span>10 \u00b7 maximal</span></div>
         <div class="pm-rpe-ramp" aria-hidden="true"></div>
-        <div class="pm-rpe-fb" id="pm-rpe-fb-${si}">${done?('\u2713 '+_amEscapeText(RPE_SCALE[cur][1])+' \u2014 danke!'):'Keine Note, kein richtig oder falsch \u2014 dein ehrliches Gef\u00fchl z\u00e4hlt.'}</div>
+        <div class="pm-rpe-fb" id="pm-rpe-fb-${si}">${done?('\u2713 '+_amEscapeText(rpeLabel(cur)||String(cur))+' \u2014 danke!'):'Keine Note, kein richtig oder falsch \u2014 dein ehrliches Gef\u00fchl z\u00e4hlt.'}</div>
       </div>`;
     });
   }
@@ -21429,24 +21726,23 @@ function updSessDate(si,iso){
   const team=UI.currentTeam;
   const lineupKey=_mlKey(team,UI.currentSeason,si);
   const savedLineup=(G.matchLineups&&G.matchLineups[lineupKey])?G.matchLineups[lineupKey]:null;
-  // Capture each player's status for this session
-  const playerStatuses=D.players.map(p=>(p&&p.s&&si<p.s.length)?p.s[si]:3);
-  const playerPerfs=D.players.map(p=>(p&&p.perf&&si<p.perf.length)?p.perf[si]:null);
-  // Remove from current position
+  const metaKey0=rpeMetaKey(sess);
+  // Remove from current position, keeping what each player had there
   D.sessions.splice(si,1);
-  D.players.forEach(p=>{if(p&&p.s)p.s.splice(si,1);if(p&&p.perf)p.perf.splice(si,1);});
+  const moved=D.players.map(p=>_sessRemoveAt(p,si));
   shiftMatchLineupsIndices(team,si,-1); // drop old lineup at si, shift higher down
   // Update date and reinsert in sorted position
   sess.date=disp;
   sess.month=moFromDisp(disp);
   const newPos=insertSorted(D,sess); // also shifts matchLineups +1 from newPos
-  // Restore status for each player at the new position
+  // Put each player's values back at the new position
   D.players.forEach((p,pi)=>{
     if(!p)return;
-    if(!p.s)p.s=[];
-    p.s[newPos]=playerStatuses[pi];
-    if(playerPerfs[pi]!=null){if(!p.perf)p.perf=[];p.perf[newPos]=playerPerfs[pi];}
+    const v=moved[pi]||{};
+    if(v.s===undefined)v.s=3;
+    _sessSetAt(p,newPos,v);
   });
+  rpeMetaRekey(D,metaKey0,rpeMetaKey(sess));
   // Restore lineup at new position with updated sessDate
   if(savedLineup){
     if(!G.matchLineups)G.matchLineups={};
@@ -21460,7 +21756,15 @@ function updSessDate(si,iso){
   const titleEl=document.getElementById('ss-title');
   if(titleEl)titleEl.textContent=disp;
 }
-function updSessTime(si,v){if(!canEdit())return;snap();cd().sessions[si].time=v;saveG();}
+function updSessTime(si,v){
+  if(!canEdit())return;
+  snap();
+  const D=cd(),s=D.sessions[si];
+  const k0=rpeMetaKey(s);
+  s.time=v;
+  rpeMetaRekey(D,k0,rpeMetaKey(s));
+  saveG();
+}
 function updSessLabel(si,v){if(!canEdit())return;snap();cd().sessions[si].label=v;saveG();}
 function updSessHA(si,v){if(!canEdit())return;snap();cd().sessions[si].homeAway=v;saveG();}
 function updSessLink(si,v){if(!canEdit())return;snap();cd().sessions[si].planLink=v.trim();saveG();}
@@ -21802,7 +22106,7 @@ async function delCurrSess(){
   // Save to recycle bin BEFORE removing
   const snapItem=_trashSnapSession(currentSI);
   if(snapItem)_trashAdd(snapItem);
-  snap();const D=cd();D.sessions.splice(currentSI,1);D.players.forEach(p=>{if(p.s)p.s.splice(currentSI,1);if(p&&p.perf)p.perf.splice(currentSI,1);});
+  snap();const D=cd();D.sessions.splice(currentSI,1);D.players.forEach(p=>_sessRemoveAt(p,currentSI));
   shiftMatchLineupsIndices(UI.currentTeam,currentSI,-1);
   saveG();render();closeM('moSession2');
   // AUDIT: was missing — silent deletion bypassed Verlauf
@@ -23365,7 +23669,7 @@ function hxRender(){
     if(typeof rpeIsOpen==='function')S.forEach((s,si)=>{
       if(!s||!s.date||!inDays(s,-1,0))return;
       let n=0;
-      D.players.forEach(p=>{if(p&&_sessAfterJoin(p,s,season)&&rpeIsOpen(s,si,p,season)&&!(Array.isArray(p.rpe)&&typeof p.rpe[si]==='number'))n++;});
+      D.players.forEach(p=>{if(p&&_sessAfterJoin(p,s,season)&&rpeIsOpen(s,si,p,season)&&!rpeAnswered(p,si,s))n++;});
       if(n)flags.push({dot:'#E0912F',who:n+' Spieler',what:'Belastung '+(sk(s)===today?'von heute':'vom '+s.date)+' noch nicht bewertet · bis 24\u00a0Uhr',on:`openSessFromMain(${si})`});
     });
   }catch(e){}
@@ -24864,6 +25168,7 @@ function _trashSnapSession(si){
   // Attendance by player NAME (so restore works even if pi has shifted)
   const attMap={};
   const perfMap={};
+  const moreMap={};   // ratings, minutes, physio, excuses, goals, assists
   D.players.forEach(p=>{
     if(p&&p.name&&Array.isArray(p.s)&&p.s[si]!==undefined){
       attMap[p.name]=p.s[si];
@@ -24871,6 +25176,12 @@ function _trashSnapSession(si){
     if(p&&p.name&&Array.isArray(p.perf)&&p.perf[si]!=null){
       perfMap[p.name]=p.perf[si];
     }
+    if(p&&p.name)SESS_PLAYER_FIELDS.forEach(f=>{
+      if(f==='s'||f==='perf'||!Array.isArray(p[f]))return;
+      const v=p[f][si];
+      if(v===undefined||v===null||v===_sessFieldBlank(f))return;
+      (moreMap[p.name]=moreMap[p.name]||{})[f]=v;
+    });
   });
   // Match lineup if present (key includes season for uniqueness)
   const season=teamSeason.split('__')[1];
@@ -24886,6 +25197,7 @@ function _trashSnapSession(si){
       session:JSON.parse(JSON.stringify(sess)),
       attendanceByName:attMap,
       perfByName:perfMap,
+      moreByName:moreMap,
       lineup
     }
   };
@@ -25021,18 +25333,16 @@ function _restoreSession(t){
   shiftMatchLineupsIndices(t.teamName,insertIdx,+1,t.seasonName);
   // Insert session at chronological position
   block.sessions.splice(insertIdx,0,sess);
-  // For each player, splice their s[] (and perf[]) array at insertIdx
+  // Every player's per-session arrays get the slot back, with his values
+  const moreMap=t.payload.moreByName||{};
   block.players.forEach(p=>{
     if(!p)return;
+    const vals=Object.assign({},(p.name&&moreMap[p.name])||{});
+    vals.s=(p.name&&attMap[p.name]!==undefined)?attMap[p.name]:3;
+    vals.perf=(p.name&&perfMap[p.name]!==undefined)?perfMap[p.name]:null;
     if(!Array.isArray(p.s))p.s=[];
-    // Pad p.s to insertIdx if shorter
-    while(p.s.length<insertIdx)p.s.push(3);
-    const val=(p.name&&attMap[p.name]!==undefined)?attMap[p.name]:3;
-    p.s.splice(insertIdx,0,val);
-    if(!Array.isArray(p.perf))p.perf=[];
-    while(p.perf.length<insertIdx)p.perf.push(null);
-    const pval=(p.name&&perfMap[p.name]!==undefined)?perfMap[p.name]:null;
-    p.perf.splice(insertIdx,0,pval);
+    while(p.s.length<insertIdx)p.s.push(3);   // s always reaches the slot
+    _sessInsertAt(p,insertIdx,vals);
   });
   // Restore matchLineup at the (now-empty) slot at insertIdx
   if(t.payload.lineup){
@@ -25705,7 +26015,7 @@ async function delSess(si){
   // Save to recycle bin BEFORE removing
   const snapItem=_trashSnapSession(si);
   if(snapItem)_trashAdd(snapItem);
-  snap();D.sessions.splice(si,1);D.players.forEach(p=>{if(p.s)p.s.splice(si,1);if(p&&p.perf)p.perf.splice(si,1);});
+  snap();D.sessions.splice(si,1);D.players.forEach(p=>_sessRemoveAt(p,si));
   shiftMatchLineupsIndices(UI.currentTeam,si,-1);
   saveG();render();
   logAudit('Sitzung entfernt',sLabel);
@@ -25793,7 +26103,7 @@ function doGen(){
     }
   });
   // Remove in reverse order
-  toRemove.reverse().forEach(i=>{D.sessions.splice(i,1);D.players.forEach(p=>{if(p.s)p.s.splice(i,1);if(p&&p.perf)p.perf.splice(i,1);});shiftMatchLineupsIndices(UI.currentTeam,i,-1);});
+  toRemove.reverse().forEach(i=>{D.sessions.splice(i,1);D.players.forEach(p=>_sessRemoveAt(p,i));shiftMatchLineupsIndices(UI.currentTeam,i,-1);});
   // Prevent same day for training AND match
   const tSet=new Set(tD),mSet=new Set(mD);
   const overlap=[...tSet].filter(d=>mSet.has(d));
@@ -28940,7 +29250,7 @@ function _tplRenderEd(){
         <span class="tpl-chip"><span>Dauer</span><button type="button" class="tpl-step" onclick="tplStepMin(-5)" aria-label="5 Minuten weniger">–</button><input class="w-min" id="tplMinIn" type="number" inputmode="numeric" min="1" max="240" value="${+b.min||0}" aria-label="Dauer in Minuten" oninput="tplSetMin(this.value)"><span>Min.</span><button type="button" class="tpl-step" onclick="tplStepMin(5)" aria-label="5 Minuten mehr">+</button></span>
         <label class="tpl-chip"><span>Spieler</span><input class="w-txt" value="${_tplE(b.players)}" placeholder="z. B. 7 pro Feld" oninput="tplSetF('players',this.value)"></label>
         <label class="tpl-chip"><span>Feld</span><input class="w-txt" value="${_tplE(b.area)}" placeholder="z. B. 15 × 15 m" oninput="tplSetF('area',this.value)"></label>
-        <label class="tpl-chip" title="Geplante Intensität auf der Skala der Spieler (0–10). Ohne Angabe gilt der Wert der Kategorie."><span>Intensität</span><select aria-label="Geplante Intensität" onchange="tplSetF('int',this.value?+this.value:'')"><option value=""${(+b.int>=1)?'':' selected'}>auto · ${TPL_CAT_INT[b.cat]||5}</option>${[1,2,3,4,5,6,7,8,9,10].map(v=>`<option value="${v}"${+b.int===v?' selected':''}>${v} · ${RPE_SCALE[v][1]}</option>`).join('')}</select></label>
+        <label class="tpl-chip" title="Geplante Intensität auf der Skala der Spieler (0–10). Ohne Angabe gilt der Wert der Kategorie."><span>Intensität</span><select aria-label="Geplante Intensität" onchange="tplSetF('int',this.value?+this.value:'')"><option value=""${(+b.int>=1)?'':' selected'}>auto · ${TPL_CAT_INT[b.cat]||5}</option>${[1,2,3,4,5,6,7,8,9,10].map(v=>`<option value="${v}"${+b.int===v?' selected':''}>${v}${rpeLabel(v)?' · '+rpeLabel(v):''}</option>`).join('')}</select></label>
       </div>
     </div>
     <div class="tpl-acts">
