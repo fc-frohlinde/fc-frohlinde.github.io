@@ -6364,7 +6364,7 @@ const APP_VERSION_LABEL='1.1.3';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792195817080; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792196259335; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.1.3',date:'17.10.2026',title:'Flutlicht',items:[
     {icon:'💡',title:'footy.ai heißt jetzt Flutlicht',desc:'Neuer Name, neues Logo – sonst bleibt alles gleich: dieselbe Adresse, dieselben Links für die Spieler, alle Daten bleiben erhalten. Wer die App als Symbol auf dem Startbildschirm hat: Symbol einmal löschen und neu hinzufügen (iPhone: „Teilen → Zum Home-Bildschirm“, Android: Chrome-Menü ⋮ → „App installieren“ bzw. „Zum Startbildschirm hinzufügen“), dann erscheinen Name und Logo neu.'},
@@ -9786,7 +9786,20 @@ window.addEventListener('pageshow',(e)=>{
 // Plain location.reload(true) is unreliable on Safari (the `true` parameter is
 // deprecated and often ignored), causing trainers to stay stuck on cached HTML
 // even after the update banner. This nukes the SW cache first, then reloads.
+// Night veil while the new version loads: same ground as the boot veil, so the
+// switch reads as a short start screen instead of the page flashing.
+function _updVeil(){
+  try{
+    if(document.getElementById('_updVeil'))return;
+    const v=document.createElement('div');v.id='_updVeil';
+    v.style.cssText="position:fixed;inset:0;z-index:100001;display:flex;align-items:center;justify-content:center;background:radial-gradient(120% 85% at 50% 0%,#142A5C 0%,#0A1328 62%) #0A1328;color:#8FA0C4;font:500 .95rem 'Barlow',sans-serif;opacity:0;transition:opacity .15s ease;";
+    v.textContent='Neue Version wird geladen \u2026';
+    document.body.appendChild(v);
+    requestAnimationFrame(()=>{v.style.opacity='1';});
+  }catch(e){}
+}
 async function _hardReload(){
+  _updVeil();
   try{
     if('caches' in window){
       const keys=await caches.keys();
