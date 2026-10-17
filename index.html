@@ -1072,6 +1072,8 @@ body.no-photos .nm-av,body.no-photos .ma-card-av,body.no-photos .tr-av{display:n
 .tp-qbtn{display:inline-flex;align-items:center;gap:5px;background:var(--bm);color:#fff;text-decoration:none;
   border-radius:var(--r-pill);padding:7px 13px;font-size:.75rem;font-weight:700;min-height:36px;}
 .tp-qbtn:hover{background:var(--bd);}
+/* the same pill as a <button> (Spieler-App: Link senden): no browser border */
+button.tp-qbtn{border:none;font-family:inherit;cursor:pointer;}
 .tp-warn{margin-top:10px;background:var(--warn-bg);color:var(--warn-fg);border-radius:8px;
   padding:8px 11px;font-size:.75rem;font-weight:600;}
 .tp-warn-bad{background:rgba(231,76,60,.12);color:#a5301f;}
@@ -1113,6 +1115,9 @@ body.no-photos .nm-av,body.no-photos .ma-card-av,body.no-photos .tr-av{display:n
 .mob::-webkit-scrollbar-thumb{background:rgba(13,59,124,.2);border-radius:4px;}
 .mob::-webkit-scrollbar-thumb:hover{background:rgba(13,59,124,.4);}
 .mob{scrollbar-gutter:stable;}
+html.hx-dark{color-scheme:dark;}
+html.hx-dark .mob::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);}
+html.hx-dark .mob::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.32);}
 
 /* ══ LINEUP PLANNER ══════════════════════════════════════════ */
 
@@ -6443,7 +6448,7 @@ const APP_VERSION_LABEL='1.1.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792214444418; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792215578878; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.1.5',date:'17.10.2026',title:'Spieler-App',items:[
     {icon:'📲',title:'Link an die Mannschaft',desc:'Kader → Spieler → „Link an die Mannschaft“: eine fertige Nachricht für die WhatsApp-Gruppe. Jeder wählt seinen Namen, bestätigt mit dem Geburtsdatum und legt die App auf den Startbildschirm.'},
@@ -13114,6 +13119,10 @@ function applyAppearance(){
   document.body.classList.toggle('hxs-hell',hx&&!_hxSchemeCur(s));
   HX_CARDS.forEach(x=>{if(x[0])document.body.classList.toggle('hxk-'+x[0],hx&&s.hxCard===x[0]);});
   document.body.classList.toggle('hxk-dk',hx&&s.hxCard==='dark');
+  // Night look: the browser's own parts (scrollbars, date and select pickers)
+  // dark as well. Without it every scrollbar kept its light track, a white
+  // stripe along tables and panels.
+  document.documentElement.classList.toggle('hx-dark',hx&&s.hxCard==='dark');
   if(typeof hxApplyDesign==='function')try{hxApplyDesign();}catch(e){}
   _syncThemeColor(hx);
   document.body.classList.toggle('no-anim',!s.animations);
