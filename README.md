@@ -1,4 +1,4 @@
-# footy.ai
+# Flutlicht (ehemals footy.ai)
 
 > Die digitale Plattform für Fußballtrainer.
 
@@ -21,7 +21,7 @@ Eine vollständige App für die tägliche Arbeit eines Vereinstrainers — Anwes
 
 🧪 **Beta-Phase** — Version `1.0.9` (Juli 2026)
 
-Die App wird kontinuierlich weiterentwickelt. Eine vollständige Versionshistorie ist in der App unter **Mein Konto → ℹ Über footy.ai** einsehbar.
+Die App wird kontinuierlich weiterentwickelt. Eine vollständige Versionshistorie ist in der App unter **Menü unter dem eigenen Namen → Version** einsehbar.
 
 ## Aktueller Einsatz
 
