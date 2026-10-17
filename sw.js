@@ -1,9 +1,11 @@
 // Flutlicht service worker.
 // Makes the app installable and keeps the last loaded page so the app still
 // opens without a connection. Every page load goes to the network first: the
-// app must always run the newest version. Everything that is not a page load
+// app must always run the newest version; on a weak signal it waits at most
+// NET_WAIT and then opens the saved copy. Everything that is not a page load
 // (Firebase, fonts, images) is left to the browser untouched.
 const CACHE='footy-page-v1';
+const NET_WAIT=1000; // ms
 self.addEventListener('install',()=>self.skipWaiting());
 self.addEventListener('activate',e=>{
   e.waitUntil((async()=>{
@@ -22,12 +24,22 @@ self.addEventListener('fetch',e=>{
   // open an old version right after a deploy, and the app then reloaded itself.
   const net=fetch(r.url,{cache:'no-cache',credentials:'same-origin'})
     .then(res=>res.redirected?fetch(r):res)
-    .catch(()=>fetch(r));
-  e.respondWith(net.then(res=>{
-    if(res&&res.ok&&res.type==='basic'){
-      const copy=res.clone();
-      caches.open(CACHE).then(c=>c.put(key.href,copy)).catch(()=>{});
-    }
-    return res;
-  }).catch(err=>caches.match(key.href).then(hit=>{if(hit)return hit;throw err;})));
+    .catch(()=>fetch(r))
+    .then(res=>{
+      // Whenever the server answers (also after the wait below gave up), keep the copy.
+      if(res&&res.ok&&res.type==='basic'){
+        const copy=res.clone();
+        e.waitUntil(caches.open(CACHE).then(c=>c.put(key.href,copy)).catch(()=>{}));
+      }
+      return res;
+    });
+  e.waitUntil(net.catch(()=>{}));
+  // Weak signal (pitch, changing room): wait for the server at most NET_WAIT ms,
+  // then open the saved copy. Offline the saved copy opens at once.
+  e.respondWith(caches.match(key.href).then(hit=>{
+    if(!hit)return net;
+    let t;
+    const late=new Promise(res=>{t=setTimeout(()=>res(hit),NET_WAIT);});
+    return Promise.race([net.catch(()=>hit),late]).finally(()=>clearTimeout(t));
+  }));
 });
