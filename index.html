@@ -122,7 +122,7 @@ if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostnam
    one hand, 27 names to mark. One player per row, thumb-sized targets
    (44px min), progress always visible, and the list can collapse to the
    players still missing a mark. */
-.rc-overlay{position:fixed;inset:0;z-index:520;background:linear-gradient(165deg,var(--planner-dark) 0%,var(--planner-mid) 55%,var(--planner-dark) 100%);display:none;flex-direction:column;}
+.rc-overlay{position:fixed;inset:0;z-index:520;background:linear-gradient(165deg,var(--planner-dark) 0%,var(--planner-mid) 55%,var(--planner-dark) 100%);display:none;flex-direction:column;color-scheme:dark;}
 .rc-overlay.open{display:flex;}
 .rc-head{flex-shrink:0;padding:calc(var(--sp-4) + env(safe-area-inset-top,0px)) var(--sp-4) var(--sp-3);border-bottom:1px solid rgba(255,255,255,.1);}
 .rc-head-top{display:flex;align-items:flex-start;gap:var(--sp-3);}
@@ -143,17 +143,36 @@ if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostnam
 .rc-row.done{background:rgba(255,255,255,.025);}
 .rc-av{width:38px;height:38px;border-radius:50%;flex-shrink:0;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1rem;color:rgba(255,255,255,.85);overflow:hidden;}
 .rc-av img{width:100%;height:100%;object-fit:cover;}
-.rc-name{flex:1;min-width:0;font-size:var(--fs-md);font-weight:600;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.rc-nr{font-size:var(--fs-xs);color:rgba(255,255,255,.4);font-weight:700;margin-right:2px;}
+.rc-who{flex:1;min-width:0;}
+.rc-name{font-size:var(--fs-md);font-weight:600;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.rc-nr{display:inline-block;min-width:1.5em;font-size:var(--fs-xs);color:rgba(255,255,255,.45);font-weight:700;margin-right:4px;}
+.rc-hint{font-size:.74rem;color:rgba(255,255,255,.5);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.rc-hint.ok{color:#8FD9AE;}
+.rc-hint.warn{color:#F5C26B;}
+.rc-hint.bad{color:#FF9C90;font-weight:600;}
+.rc-empty{text-align:center;color:rgba(255,255,255,.55);font-size:.88rem;padding:40px 16px;}
+.rc-kind{font-size:.74rem;font-weight:700;color:rgba(255,255,255,.6);margin-bottom:1px;}
+.rc-tabs{display:flex;gap:3px;margin-top:12px;padding:3px;border-radius:999px;background:rgba(255,255,255,.08);}
+.rc-tabs[hidden]{display:none;}
+.rc-tabs button{flex:1;border:none;border-radius:999px;padding:8px 10px;background:transparent;color:rgba(255,255,255,.65);
+  font-family:'Barlow',sans-serif;font-size:.86rem;font-weight:700;cursor:pointer;}
+.rc-tabs button.on{background:#fff;color:#0E2350;}
+.rc-tabs button:focus-visible,.rc-b:focus-visible,.rc-g:focus-visible,.rc-fb:focus-visible{outline:3px solid #F2C230;outline-offset:2px;}
+.rc-gbtns{display:flex;gap:4px;flex-shrink:0;}
+.rc-legend{font-size:.76rem;color:rgba(255,255,255,.6);text-align:center;margin:2px 0 10px;}
+.rc-grading .rc-fb-all{display:none;}
 .rc-btns{display:flex;gap:var(--sp-1);flex-shrink:0;}
 .rc-b{width:44px;height:44px;border-radius:var(--r-md);border:1.5px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:rgba(255,255,255,.5);font-size:1.05rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .12s,background .15s,color .15s;font-family:'Barlow',sans-serif;}
 .rc-b:active{transform:scale(.92);}
 .rc-b.sel-a{background:var(--ok);border-color:var(--ok);color:#fff;}
 .rc-b.sel-f{background:var(--bad);border-color:var(--bad);color:#fff;}
 .rc-b.sel-e{background:var(--warn);border-color:var(--warn);color:#fff;}
-.rc-grade{display:flex;gap:var(--sp-1);margin:0 0 var(--sp-2) 54px;}
-.rc-g{padding:5px 12px;border-radius:var(--r-pill);border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.05);color:rgba(255,255,255,.55);font-size:var(--fs-xs);font-weight:600;cursor:pointer;font-family:'Barlow',sans-serif;transition:all .14s;}
-.rc-g.on{background:rgba(255,255,255,.9);color:var(--planner-dark);border-color:transparent;}
+.rc-g{display:flex;align-items:center;gap:5px;height:44px;padding:0 11px;border-radius:var(--r-md);border:1.5px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:rgba(255,255,255,.7);font-size:.8rem;font-weight:700;cursor:pointer;font-family:'Barlow',sans-serif;transition:background .14s,border-color .14s;}
+.rc-g.on{background:#fff;color:#0E2350;border-color:#fff;}
+.rc-g.rc-up.on{background:#1F8F4E;border-color:#1F8F4E;color:#fff;}
+.rc-g.rc-down.on{background:#D98316;border-color:#D98316;color:#fff;}
+.rc-filter[hidden]{display:none;}
+@media(max-width:480px){.rc-g span{display:none;}.rc-g{width:44px;justify-content:center;padding:0;font-size:1.05rem;}}
 .rc-foot{flex-shrink:0;padding:var(--sp-3) var(--sp-4) calc(var(--sp-4) + env(safe-area-inset-bottom,0px));border-top:1px solid rgba(255,255,255,.1);display:flex;gap:var(--sp-2);}
 .rc-fb{flex:1;padding:13px;border-radius:var(--r-md);border:none;font-family:'Barlow',sans-serif;font-size:var(--fs-md);font-weight:700;cursor:pointer;transition:transform .12s;}
 .rc-fb:active{transform:scale(.97);}
@@ -3615,7 +3634,7 @@ body.design-heute .slp-popup [style*="color:#fff"],body.design-heute .slp-popup 
 body.design-heute .rc-overlay{background:linear-gradient(170deg,#0E2350 0%,#13306A 60%,#0E2350 100%);}
 body.design-heute .rc-date{font-family:var(--hx-num);font-weight:800;letter-spacing:.3px;font-size:1.9rem;}
 body.design-heute .rc-av{font-family:var(--hx-num);font-weight:800;}
-body.design-heute :is(.rc-fb,.rc-filter,.rc-g){border-radius:999px;}
+body.design-heute :is(.rc-fb,.rc-filter){border-radius:999px;}
 body.design-heute .rc-fb-done{background:var(--hx-yellow);color:var(--hx-on-acc,var(--hx-ink));}
 body.design-heute .rc-bar-fill{background:linear-gradient(90deg,#2E8B5E,var(--hx-yellow));}
 /* ── Heute start screen: everything important on one page (desktop/tablet) ── */
@@ -6452,13 +6471,17 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.1.5'; // v1.1.5: Spieler-App — Link an die Mannschaft, wer sie nutzt, Erinnerung
-const APP_VERSION_LABEL='1.1.5';
+const APP_VERSION='1.1.6'; // v1.1.6: Anwesenheit erfassen neu, Einsatz
+const APP_VERSION_LABEL='1.1.6';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792217085186; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792217427429; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.1.6',date:'17.10.2026',title:'Anwesenheit erfassen',items:[
+    {icon:'✅',title:'Was der Spieler gesagt hat',desc:'Unter jedem Namen steht, was er selbst angegeben hat: zugesagt, entschuldigt mit Grund, „sagt: war nicht dabei“ oder „hat Belastung bewertet“. Sortiert nach Rückennummer; Spieler, die erst später dazukamen, stehen nicht mehr in der Liste.'},
+    {icon:'⭐',title:'Einsatz statt Leistungsnote',desc:'Eigener Reiter „Einsatz“: nur wer auffällt bekommt ▲ stark oder ▼ schwach. Bei „Fertig“ zählen alle anderen Anwesenden als normal. Die bisherigen Noten bleiben erhalten (Sehr gut = stark, Gut = normal, Nicht gut = schwach). Spieler sehen den Einsatz nicht.'},
+  ]},
   {version:'1.1.5',date:'17.10.2026',title:'Spieler-App',items:[
     {icon:'📲',title:'Link an die Mannschaft',desc:'Kader → Spieler → „Link an die Mannschaft“: eine fertige Nachricht für die WhatsApp-Gruppe. Jeder wählt seinen Namen, bestätigt mit dem Geburtsdatum und legt die App auf den Startbildschirm.'},
     {icon:'👀',title:'Wer die App nutzt',desc:'Im Kader zeigt die Spalte „App“, wann ein Spieler die App zuletzt geöffnet hat (📱 = als App installiert). Im Profil steht dasselbe, dazu „Link per WhatsApp“ mit seinem persönlichen Link. Erfasst seit 17.10.'},
@@ -11069,7 +11092,7 @@ function _auActionIcon(a){
   if(/^Status|^Sammel-Anwesenheit|^Bulk-Status/.test(s))return '\u2713';
   if(/Spieler-App|^Anmeldung \(Spieler/.test(s))return '\ud83d\udcf1';
   if(/^Belastung/.test(s))return '\ud83d\udcaa';
-  if(/^Leistungsnote|^Bewertungsthema/.test(s))return '\u2b50';
+  if(/^Leistungsnote|^Einsatz|^Bewertungsthema/.test(s))return '\u2b50';
   if(/^Training/.test(s))return '\ud83c\udfc3';
   if(/^Spiel erstellt/.test(s))return '\u26bd';
   if(/^Aufstellung|^Saisonkader/.test(s))return '\u26bd';
@@ -12075,7 +12098,7 @@ function setSessPlayerStatus(pi,si,val){
 // Stored as p.perf[si], parallel array to p.s[si] — kept in sync at every
 // point that splices D.sessions / p.s (insertSorted, delCurrSess, delSess,
 // doGen, updSessDate, trash restore).
-const PERF_LABEL={1:'Sehr gut',2:'Gut',3:'Nicht gut'};
+const PERF_LABEL={1:'Stark',2:'Normal',3:'Schwach'};
 const PERF_ICON={1:'🟢',2:'🔵',3:'🟠'};
 function getPerf(pi,si){
   const D=cd();const p=D&&D.players&&D.players[pi];
@@ -12111,7 +12134,7 @@ function setPerf(pi,si,val){
   saveG();
   const sess=D.sessions[si];
   const sessLabel=sess?sess.date:'?';
-  logAudit('Leistungsnote geändert',p.name||'?',sessLabel+': '+(oldVal?PERF_LABEL[oldVal]:'–')+' → '+(newVal?PERF_LABEL[newVal]:'–'));
+  logAudit('Einsatz geändert',p.name||'?',sessLabel+': '+(oldVal?PERF_LABEL[oldVal]:'–')+' → '+(newVal?PERF_LABEL[newVal]:'–'));
 }
 function cycStForce(pi,si){
   // Bypass past lock - allowed in session detail modal
@@ -18762,7 +18785,7 @@ function dbRenderTopicCard(data){
   });
   const keys=Object.keys(topics).sort((a,b)=>topics[b].length-topics[a].length);
   if(!keys.length)return '';
-  let html='<div class="db-card"><div class="db-h">\ud83c\udfaf Spiel-Themen <span class="db-h-sub">(Team-\u00d8 Leistungsnote \u00b7 1 = sehr gut)</span></div>';
+  let html='<div class="db-card"><div class="db-h">\ud83c\udfaf Spiel-Themen <span class="db-h-sub">(Team-\u00d8 Einsatz \u00b7 1 = stark)</span></div>';
   keys.forEach(t=>{
     const arr=topics[t].sort((a,b)=>a.k-b.k);
     const overall=arr.reduce((s,e)=>s+e.avg,0)/arr.length;
@@ -19639,8 +19662,8 @@ function openPlayerStatsExt(){
   // ── 2b. LEISTUNGSNOTE CHART ──
   const perfSeries=computePerfSeries(occurrences);
   if(perfSeries.length){
-    html+='<div class="pse-section"><div class="pse-h">\u2b50 Leistungsnote \u00b7 Verlauf</div>';
-    html+='<div style="font-size:.7rem;color:var(--gm);margin-bottom:6px;">'+perfSeries.length+' Bewertungen \u00b7 \u25cf Training \u25a0 Spiel \u00b7 1 = sehr gut</div>';
+    html+='<div class="pse-section"><div class="pse-h">\u2b50 Einsatz \u00b7 Verlauf</div>';
+    html+='<div style="font-size:.7rem;color:var(--gm);margin-bottom:6px;">'+perfSeries.length+' Bewertungen \u00b7 \u25cf Training \u25a0 Spiel \u00b7 1 = stark</div>';
     html+=renderPerfChart(perfSeries);
     html+='</div>';
   }
@@ -19649,7 +19672,7 @@ function openPlayerStatsExt(){
   const topicKeys=Object.keys(topicMap).sort((a,b)=>topicMap[b].length-topicMap[a].length);
   if(topicKeys.length){
     html+='<div class="pse-section"><div class="pse-h">\ud83c\udfaf Themen-Entwicklung</div>';
-    html+='<div style="font-size:.7rem;color:var(--gm);margin-bottom:6px;">Leistungsnoten der Spiele, gruppiert nach Bewertungsthema \u00b7 1 = sehr gut</div>';
+    html+='<div style="font-size:.7rem;color:var(--gm);margin-bottom:6px;">Einsatz in den Spielen, gruppiert nach Bewertungsthema \u00b7 1 = stark</div>';
     topicKeys.forEach(t=>{
       const ser=topicMap[t];
       const avg=ser.reduce((s,e)=>s+e.grade,0)/ser.length;
@@ -20421,7 +20444,7 @@ function openPlayerStats(pi,opts){
       const avgColor=avg<=1.5?'#1a7a40':avg<=2.5?'#0d3d80':'#a56a0a';
       let html=`<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;padding:8px 12px;background:var(--ow);border-radius:8px;">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:${avgColor};line-height:1;">${avg.toFixed(1).replace('.',',')}</div>
-        <div style="font-size:.72rem;color:var(--gm);">Ø Note aus ${perfEntries.length} bewerteten Einheit${perfEntries.length===1?'':'en'}</div>
+        <div style="font-size:.72rem;color:var(--gm);">Ø Einsatz aus ${perfEntries.length} bewerteten Einheit${perfEntries.length===1?'':'en'} · 1 = stark</div>
       </div>`;
       html+=perfEntries.map(e=>{
         const c=e.grade===1?'#1a7a40':e.grade===2?'#0d3d80':'#a56a0a';
@@ -21074,7 +21097,7 @@ function deleteEvalTopic(si,ti){
   const D=cd();
   const used=(D.sessions||[]).filter(x=>x&&x.evalTopic===t).length;
   if(used>0){
-    if(!confirm('Thema "'+t+'" ist bei '+used+' Spiel(en) gesetzt.\n\nL\u00f6schen entfernt das Thema auch von diesen Spielen \u2014 die Leistungsnoten selbst bleiben erhalten, nur die Themen-Zuordnung entf\u00e4llt.\n\nWirklich l\u00f6schen?'))return;
+    if(!confirm('Thema "'+t+'" ist bei '+used+' Spiel(en) gesetzt.\n\nL\u00f6schen entfernt das Thema auch von diesen Spielen \u2014 die Einsatz-Bewertungen selbst bleiben erhalten, nur die Themen-Zuordnung entf\u00e4llt.\n\nWirklich l\u00f6schen?'))return;
   } else {
     if(!confirm('Thema "'+t+'" l\u00f6schen?'))return;
   }
@@ -21114,7 +21137,41 @@ function setEvalTopic(si,topic){
 // through the SAME helpers as the table (setSessPlayerStatus / setPerf),
 // so undo, audit log, Firebase sync and stats stay identical — this is a
 // different input surface, not a second source of truth.
-let _rcSi=null,_rcOnlyOpen=false;
+let _rcSi=null,_rcOnlyOpen=false,_rcMode='att';
+// Two jobs, two modes: who is here (at the start), how they worked (at the end).
+// The grade rows under every name made the list twice as long for the first.
+function rcMode(m){
+  _rcMode=(m==='grade')?'grade':'att';
+  _rcOnlyOpen=false;
+  const f=document.getElementById('rc-filter');if(f)f.classList.remove('on');
+  rcRender();
+  const l=document.getElementById('rc-list');if(l)l.scrollTop=0;
+}
+// What the player said himself, under his name: so the trainer knows whom to
+// expect and why someone is missing.
+function _rcHint(p,si,s){
+  const v=(p.s&&si<p.s.length)?p.s[si]:3;
+  if(typeof rpeNotThere==='function'&&rpeNotThere(p,s)&&v!==0)return {t:'sagt: war nicht dabei',c:'bad'};
+  const why=Array.isArray(p.preconfReason)?String(p.preconfReason[si]||'').trim():'';
+  if((v===2||v===0)&&why)return {t:(v===2?'entschuldigt':'abgesagt')+': '+why,c:'warn'};
+  // Having rated the load is proof of presence; a Zusage only a plan
+  if(v!==1&&Array.isArray(p.rpe)&&typeof p.rpe[si]==='number')return {t:'hat Belastung bewertet',c:'ok'};
+  if(v===4)return {t:'zugesagt',c:'ok'};
+  if(v===3)return {t:'keine Antwort',c:''};
+  return null;
+}
+// Squad order: by number, players without one by name at the end
+function _rcSorted(D,s,season){
+  const nm=p=>String((typeof getDisplayName==='function'?getDisplayName(p):p.name)||'');
+  return (D.players||[]).map((p,pi)=>({p,pi}))
+    .filter(x=>x.p&&(typeof _sessAfterJoin!=='function'||_sessAfterJoin(x.p,s,season)))
+    .sort((a,b)=>{
+      const na=parseInt(a.p.nr,10),nb=parseInt(b.p.nr,10);
+      if(isNaN(na)!==isNaN(nb))return isNaN(na)?1:-1;
+      if(!isNaN(na)&&na!==nb)return na-nb;
+      return nm(a.p).localeCompare(nm(b.p));
+    });
+}
 function rcOpen(si){
   if(!canEdit())return;
   const D=cd();const s=D&&D.sessions&&D.sessions[si];
@@ -21122,15 +21179,14 @@ function rcOpen(si){
   if(typeof _navArm==='function')_navArm();
   _rcSi=si;
   _rcOnlyOpen=false;
+  _rcMode='att';
   const ov=document.getElementById('rcOverlay');
   if(!ov)return;
   ov.classList.add('open');
   document.getElementById('rc-date').textContent=s.date||'';
+  {const k=document.getElementById('rc-kind');if(k)k.textContent=s.type==='match'?'Spiel':'Training';}
   document.getElementById('rc-sub').textContent=
-    (s.type==='match'?'\u26bd Spiel':'\ud83c\udfc3 Training')
-    +(s.type==='match'&&s.label?' \u00b7 '+s.label:'')
-    +(s.type!=='match'&&s.focus?' \u00b7 '+s.focus:'')
-    +(s.time?' \u00b7 '+s.time:'');
+    [s.type==='match'?(s.label?'gegen '+s.label:''):(s.focus||''),s.time||''].filter(Boolean).join(' \u00b7 ');
   const f=document.getElementById('rc-filter');
   if(f)f.classList.remove('on');
   rcRender();
@@ -21141,7 +21197,7 @@ function rcClose(){
   _rcSi=null;
   // Refresh whatever is behind us
   if(typeof render==='function')render();
-  if(typeof buildSessAtt==='function'&&_currentSessIdx!=null){try{buildSessAtt(_currentSessIdx);}catch(e){}}
+  if(typeof buildSessAtt==='function'&&typeof _currentSessIdx!=='undefined'&&_currentSessIdx!=null){try{buildSessAtt(_currentSessIdx);}catch(e){}}
 }
 function rcToggleFilter(){
   _rcOnlyOpen=!_rcOnlyOpen;
@@ -21155,50 +21211,73 @@ function rcRender(){
   const D=cd();const s=D&&D.sessions&&D.sessions[si];
   const listEl=document.getElementById('rc-list');
   if(!s||!listEl)return;
-  const players=D.players||[];
+  const season=UI.currentSeason;
+  const rows=_rcSorted(D,s,season);
   // "Marked" = a real decision was taken (Anwesend / Fehlend / Entschuldigt).
   // Ausstehend (3/null) and Angemeldet (4) are pre-states → still open.
   const isMarked=v=>(v===1||v===0||v===2);
-  let done=0;
-  players.forEach(p=>{if(p&&p.s&&isMarked(p.s[si]))done++;});
-  const total=players.length;
-  const pct=total?Math.round(done/total*100):0;
-  const bar=document.getElementById('rc-bar');
-  if(bar)bar.style.width=pct+'%';
-  const prog=document.getElementById('rc-prog');
-  if(prog)prog.textContent=done+' von '+total+' erfasst';
-  // Grading is offered right here when the session already took place —
-  // it is the same moment on the pitch, and saves a second pass later.
+  const st=p=>(p.s&&si<p.s.length)?p.s[si]:3;
+  // Grading is offered once the session has started — it is the same visit to
+  // the window, but its own mode.
   const gradable=(typeof canGradeSession==='function')&&canGradeSession(si);
+  if(!gradable)_rcMode='att';
+  const tabs=document.getElementById('rc-tabs');
+  if(tabs){
+    tabs.hidden=!gradable;
+    tabs.querySelectorAll('button').forEach(b=>{const on=b.dataset.m===_rcMode;b.classList.toggle('on',on);b.setAttribute('aria-selected',on);});
+  }
+  const ov=document.getElementById('rcOverlay');
+  if(ov)ov.classList.toggle('rc-grading',_rcMode==='grade');
+  const name=p=>(typeof getDisplayName==='function'?getDisplayName(p):p.name)||'?';
+  const avatar=p=>{
+    const n=name(p);
+    const ini=(n.split(' ').map(x=>x[0]).join('').slice(0,2)||'?').toUpperCase();
+    return '<div class="rc-av">'+(p.photo?('<img src="'+p.photo+'" alt="">'):escapeHtml(ini))+'</div>';
+  };
+  const who=(p,hint)=>'<div class="rc-who"><div class="rc-name">'
+    +(p.nr?('<span class="rc-nr">'+escapeHtml(String(p.nr))+'</span>'):'')+escapeHtml(name(p))+'</div>'
+    +(hint?'<div class="rc-hint'+(hint.c?' '+hint.c:'')+'">'+escapeHtml(hint.t)+'</div>':'')+'</div>';
+  const bar=document.getElementById('rc-bar');
+  const prog=document.getElementById('rc-prog');
+  const filt=document.getElementById('rc-filter');
+  if(filt)filt.hidden=(_rcMode==='grade');
   let html='';
-  players.forEach((p,pi)=>{
-    if(!p)return;
-    const v=p.s?p.s[si]:3;
-    const marked=isMarked(v);
-    if(_rcOnlyOpen&&marked)return;
-    const nm=(typeof getDisplayName==='function'?getDisplayName(p):p.name)||'?';
-    const initials=(nm.split(' ').map(x=>x[0]).join('').slice(0,2)||'?').toUpperCase();
-    const av=p.photo?('<img src="'+p.photo+'" alt="">'):escapeHtml(initials);
-    html+='<div class="rc-row'+(marked?' done':'')+'">'
-      +'<div class="rc-av">'+av+'</div>'
-      +'<div class="rc-name">'+(p.nr?('<span class="rc-nr">#'+escapeHtml(String(p.nr))+'</span> '):'')+escapeHtml(nm)+'</div>'
-      +'<div class="rc-btns">'
-        +'<button class="rc-b'+(v===1?' sel-a':'')+'" onclick="rcSet('+pi+',1)" title="Anwesend">\u2713</button>'
-        +'<button class="rc-b'+(v===0?' sel-f':'')+'" onclick="rcSet('+pi+',0)" title="Fehlend">\u2715</button>'
-        +'<button class="rc-b'+(v===2?' sel-e':'')+'" onclick="rcSet('+pi+',2)" title="Entschuldigt">E</button>'
-      +'</div></div>';
-    // Grade row appears only for players actually present at a held session
-    if(gradable&&v===1){
-      const g=(typeof getPerf==='function')?getPerf(pi,si):null;
-      html+='<div class="rc-grade">'
-        +[1,2,3].map(x=>'<button class="rc-g'+(g===x?' on':'')+'" onclick="rcGrade('+pi+','+x+')">'+PERF_ICON[x]+' '+PERF_LABEL[x]+'</button>').join('')
-        +'</div>';
-    }
-  });
-  if(!html){
-    html='<div class="u-empty" style="color:rgba(255,255,255,.5);">'
-      +'<div class="u-empty-icon">\u2705</div>'
-      +'<div class="u-empty-txt">Alle Spieler erfasst.</div></div>';
+  if(_rcMode==='grade'){
+    // Only those who were there. Marked is only who stood out; everyone else
+    // becomes "normal" when the trainer finishes (rcDone), so a session that
+    // was looked at has a complete record and one that was not stays empty.
+    const here=rows.filter(x=>st(x.p)===1);
+    const up=here.filter(x=>getPerf(x.pi,si)===1).length,down=here.filter(x=>getPerf(x.pi,si)===3).length;
+    const open=here.filter(x=>getPerf(x.pi,si)==null).length;
+    if(bar)bar.style.width=(here.length?Math.round((here.length-open)/here.length*100):0)+'%';
+    if(prog)prog.textContent=up+' stark \u00b7 '+down+' schwach'+(open?' \u00b7 '+open+' noch ohne':'');
+    if(here.length)html+='<div class="rc-legend">Nur wer auff\u00e4llt: \u25b2 stark, \u25bc schwach. Bei \u201eFertig\u201c z\u00e4hlen alle anderen als normal.</div>';
+    here.forEach(({p,pi})=>{
+      const g=getPerf(pi,si);
+      html+='<div class="rc-row rc-row-g'+(g!=null?' done':'')+'">'+avatar(p)+who(p,g===2?{t:'normal',c:''}:null)
+        +'<div class="rc-gbtns">'
+          +'<button class="rc-g rc-up'+(g===1?' on':'')+'" onclick="rcGrade('+pi+',1)" aria-pressed="'+(g===1)+'" title="Stark">\u25b2<span>Stark</span></button>'
+          +'<button class="rc-g rc-down'+(g===3?' on':'')+'" onclick="rcGrade('+pi+',3)" aria-pressed="'+(g===3)+'" title="Schwach">\u25bc<span>Schwach</span></button>'
+        +'</div></div>';
+    });
+    if(!here.length)html='<div class="rc-empty">Noch niemand als anwesend erfasst.</div>';
+  }else{
+    const done=rows.filter(x=>isMarked(st(x.p))).length;
+    if(bar)bar.style.width=(rows.length?Math.round(done/rows.length*100):0)+'%';
+    if(prog)prog.textContent=done+' von '+rows.length+' erfasst';
+    if(filt)filt.textContent='Nur offene';
+    rows.forEach(({p,pi})=>{
+      const v=st(p);
+      const marked=isMarked(v);
+      if(_rcOnlyOpen&&marked)return;
+      html+='<div class="rc-row'+(marked?' done':'')+'">'+avatar(p)+who(p,_rcHint(p,si,s))
+        +'<div class="rc-btns">'
+          +'<button class="rc-b'+(v===1?' sel-a':'')+'" onclick="rcSet('+pi+',1)" title="Anwesend" aria-label="Anwesend">✓</button>'
+          +'<button class="rc-b'+(v===0?' sel-f':'')+'" onclick="rcSet('+pi+',0)" title="Fehlend" aria-label="Fehlend">✕</button>'
+          +'<button class="rc-b'+(v===2?' sel-e':'')+'" onclick="rcSet('+pi+',2)" title="Entschuldigt" aria-label="Entschuldigt">E</button>'
+        +'</div></div>';
+    });
+    if(!html)html='<div class="rc-empty">✅ Alle Spieler erfasst.</div>';
   }
   listEl.innerHTML=html;
 }
@@ -21211,6 +21290,23 @@ function rcSet(pi,val){
   setSessPlayerStatus(pi,_rcSi,cur===val?3:val);
   rcRender();
 }
+function rcDone(){
+  if(_rcSi!=null&&_rcMode==='grade'&&canEdit()&&typeof canGradeSession==='function'&&canGradeSession(_rcSi)){
+    const si=_rcSi,D=cd(),s=D.sessions[si];
+    const fill=_rcSorted(D,s,UI.currentSeason).filter(({p,pi})=>p.s&&p.s[si]===1&&getPerf(pi,si)==null);
+    if(fill.length){
+      snap();
+      fill.forEach(({p})=>{
+        if(!Array.isArray(p.perf))p.perf=[];
+        while(p.perf.length<=si)p.perf.push(null);
+        p.perf[si]=2;
+      });
+      saveG();
+      logAudit('Einsatz bewertet',(s&&s.date)||'?',fill.length+' Spieler normal');
+    }
+  }
+  rcClose();
+}
 function rcGrade(pi,val){
   if(_rcSi==null)return;
   const cur=(typeof getPerf==='function')?getPerf(pi,_rcSi):null;
@@ -21222,7 +21318,7 @@ function rcMarkRest(){
   if(_rcSi==null||!canEdit())return;
   const si=_rcSi;
   const D=cd();
-  const open=(D.players||[]).map((p,pi)=>({p,pi})).filter(({p})=>{
+  const open=_rcSorted(D,D.sessions[si],UI.currentSeason).filter(({p})=>{
     const v=p&&p.s?p.s[si]:3;
     return !(v===1||v===0||v===2);
   });
@@ -21468,11 +21564,11 @@ function buildSessAtt(si){
       const curGrade=((key===1||_existing!=null)&&_gradable)?_existing:null;
       const gradeHtml=((key===1||_existing!=null)&&_gradable)?`
         <div style="position:relative;display:inline-block;">
-          <button class="perf-btn ${curGrade?'perf-'+curGrade:'perf-none'}" style="cursor:${canEdit()?'pointer':'default'};border:none;" title="${curGrade?PERF_LABEL[curGrade]:'Note vergeben'}" onclick="${canEdit()?`event.stopPropagation();togPerfMenu('pm_${pi}_${si}',${pi},${si})`:'event.stopPropagation()'}">${curGrade?PERF_ICON[curGrade]:'☆'}</button>
+          <button class="perf-btn ${curGrade?'perf-'+curGrade:'perf-none'}" style="cursor:${canEdit()?'pointer':'default'};border:none;" title="${curGrade?'Einsatz: '+PERF_LABEL[curGrade]:'Einsatz bewerten'}" onclick="${canEdit()?`event.stopPropagation();togPerfMenu('pm_${pi}_${si}',${pi},${si})`:'event.stopPropagation()'}">${curGrade?PERF_ICON[curGrade]:'☆'}</button>
           <div id="pm_${pi}_${si}" style="display:none;position:fixed;z-index:600;background:var(--surface-dark);border:1px solid rgba(255,255,255,.2);border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.4);overflow:hidden;min-width:160px;">
-            <div onclick="event.stopPropagation();setPerf(${pi},${si},1);buildSessAtt(${si});" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.85);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">🟢 <span>1 – Sehr gut</span></div>
-            <div onclick="event.stopPropagation();setPerf(${pi},${si},2);buildSessAtt(${si});" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.85);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">🔵 <span>2 – Gut</span></div>
-            <div onclick="event.stopPropagation();setPerf(${pi},${si},3);buildSessAtt(${si});" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.85);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">🟠 <span>3 – Nicht gut</span></div>
+            <div onclick="event.stopPropagation();setPerf(${pi},${si},1);buildSessAtt(${si});" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.85);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">🟢 <span>Stark</span></div>
+            <div onclick="event.stopPropagation();setPerf(${pi},${si},2);buildSessAtt(${si});" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.85);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">🔵 <span>Normal</span></div>
+            <div onclick="event.stopPropagation();setPerf(${pi},${si},3);buildSessAtt(${si});" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.85);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">🟠 <span>Schwach</span></div>
             ${curGrade?`<div onclick="event.stopPropagation();setPerf(${pi},${si},null);buildSessAtt(${si});" style="padding:6px 14px;font-size:.74rem;font-weight:600;color:rgba(255,255,255,.5);cursor:pointer;display:flex;align-items:center;gap:8px;border-top:1px solid rgba(255,255,255,.08);" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">✕ <span>Kein Eintrag</span></div>`:''}
           </div>
         </div>
@@ -25241,7 +25337,7 @@ function _statsPlayerTable(D,opts){
   return `${opts.noHead?'':`    <div class="sec" style="margin-top:12px;margin-bottom:8px;">🏆 Alle Spieler</div>
 `}    <div style="${wrap}">
     <table class="full-table"><thead><tr>
-      ${th('nr','#')}${th('name','Spieler')}${th('pos','Pos.')}${th('tPct','T%')}${th('tA','T-A')}${th('tPl','T-∑')}${th('perfAvgSort','⭐ Note')}
+      ${th('nr','#')}${th('name','Spieler')}${th('pos','Pos.')}${th('tPct','T%')}${th('tA','T-A')}${th('tPl','T-∑')}${th('perfAvgSort','⭐ Einsatz')}
       ${mS?th('mPct','S%')+th('mA','S-A')+th('mPl','S-∑'):''}
     </tr></thead><tbody>
     ${rows.map(r=>{const bc=pctColor(r.tPct);
@@ -30572,7 +30668,7 @@ function _tplRenderGrp(){
         <div class="tpl-gstep"><button type="button" aria-label="Eine Gruppe weniger" onclick="tplGrpN(-1)"${g.n<=2?' disabled':''}>−</button><span aria-live="polite">${g.n}</span><button type="button" aria-label="Eine Gruppe mehr" onclick="tplGrpN(1)"${g.n>=TPL_GRP.length?' disabled':''}>+</button></div></div>
       <label class="tpl-chk"><input type="checkbox"${g.bal?' checked':''} onchange="tplGrpOpt('bal',this.checked)">Positionen ausgleichen</label>
       <label class="tpl-chk"><input type="checkbox"${g.gk?' checked':''} onchange="tplGrpOpt('gk',this.checked)">Torhüter separat</label>
-      <label class="tpl-chk"><input type="checkbox"${g.perf?' checked':''} onchange="tplGrpOpt('perf',this.checked)">Nach Leistungsnote mischen</label>
+      <label class="tpl-chk"><input type="checkbox"${g.perf?' checked':''} onchange="tplGrpOpt('perf',this.checked)">Nach Einsatz mischen</label>
       ${prev?`<label class="tpl-chk" title="Wer kann, behält beim Wechsel aus Einteilung ${_tplE(prev.l)} seine Leibchenfarbe"><input type="checkbox"${g.keep?' checked':''} onchange="tplGrpOpt('keep',this.checked)">Wenige Leibchenwechsel ab ${_tplE(prev.l)}</label>`:''}
       <button type="button" class="tpl-gbtn" onclick="tplGrpShuffle()">Neu verteilen</button>
       ${many?`<button type="button" class="tpl-lnk tpl-gdel" onclick="tplGrpDel(this)">Einteilung ${_tplE(g.l)} löschen</button>`:''}
@@ -33938,10 +34034,15 @@ _pubCleanupSchedule();
   <div class="rc-head">
     <div class="rc-head-top">
       <div class="rc-title">
+        <div class="rc-kind" id="rc-kind"></div>
         <div class="rc-date" id="rc-date">–</div>
         <div class="rc-sub" id="rc-sub"></div>
       </div>
-      <button class="rc-x" onclick="rcClose()" title="Schließen">✕</button>
+      <button class="rc-x" onclick="rcClose()" title="Schließen" aria-label="Schließen">✕</button>
+    </div>
+    <div class="rc-tabs" id="rc-tabs" role="tablist" hidden>
+      <button type="button" role="tab" data-m="att" onclick="rcMode('att')">Anwesenheit</button>
+      <button type="button" role="tab" data-m="grade" onclick="rcMode('grade')">Einsatz</button>
     </div>
     <div class="rc-progress">
       <div class="rc-bar"><div class="rc-bar-fill" id="rc-bar" style="width:0%;"></div></div>
@@ -33953,8 +34054,8 @@ _pubCleanupSchedule();
   </div>
   <div class="rc-list" id="rc-list"></div>
   <div class="rc-foot">
-    <button class="rc-fb rc-fb-all" onclick="rcMarkRest()">Rest anwesend</button>
-    <button class="rc-fb rc-fb-done" onclick="rcClose()">Fertig</button>
+    <button class="rc-fb rc-fb-all" id="rc-rest" onclick="rcMarkRest()">Rest anwesend</button>
+    <button class="rc-fb rc-fb-done" onclick="rcDone()">Fertig</button>
   </div>
 </div>
 
