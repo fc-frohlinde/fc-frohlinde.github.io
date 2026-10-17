@@ -6539,10 +6539,11 @@ const APP_VERSION_LABEL='1.1.8';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792255904466; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792256824029; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.1.8',date:'17.10.2026',title:'Meine Karte',items:[
     {icon:'💡',title:'Die Saison auf einer Karte',desc:'In der Spieler-App: Anwesenheit der Saison groß, dazu Serie, Spiele, Tore, Vorlagen, wie oft er die Belastung bewertet hat und wie oft er Spieler des Spiels war. Je öfter er da ist, desto mehr Lampen brennen: Bronze, Silber ab 60 %, Gold ab 80 %, Flutlicht ab 95 % bei mindestens 8 Terminen und fast immer bewertet.'},
+    {icon:'💪',title:'Nach dem Bewerten',desc:'Das „Danke“ nach der Belastung (nach Spielen nach der Stimme) zeigt die Karte mit Stufe und „Bewertet“; ein Tippen öffnet sie. Eine Bewertung zählt sofort, nicht erst, wenn die Anwesenheit eingetragen ist.'},
     {icon:'📤',title:'Zum Teilen',desc:'Die Karte lässt sich als Bild teilen oder speichern, etwa für den WhatsApp-Status. Geteilt wird nur das Bild, nie der persönliche Link. Einsatz und alles über andere Spieler stehen nicht darauf.'},
   ]},
   {version:'1.1.7',date:'17.10.2026',title:'Spieler des Spiels',items:[
@@ -16112,11 +16113,16 @@ function cardData(p,D,season){
       if(w.includes(p.name))mvp++;
     }
     // Rated: of the sessions he was at since the app asked. One he can still
-    // rate today does not count against him yet.
-    if(v===1&&held&&_dbSortKey(s.date,season)>=CARD_RATED_FROM){
-      const ans=rpeAnswered(p,si,s);
-      if(!ans&&rpeIsOpen(s,si,p,season))return;
-      rq++;if(ans)ra++;
+    // rate today does not count against him yet. A number he gave counts
+    // straight away, before the trainer has taken the roll — unless the
+    // trainer has him down as absent or excused.
+    if(held&&v!==0&&v!==2&&_dbSortKey(s.date,season)>=CARD_RATED_FROM){
+      const num=Array.isArray(p.rpe)&&typeof p.rpe[si]==='number';
+      if(v===1){
+        const ans=rpeAnswered(p,si,s);
+        if(!ans&&rpeIsOpen(s,si,p,season))return;
+        rq++;if(ans)ra++;
+      }else if(num){rq++;ra++;}
     }
   });
   const pct=ov.overall,t=ov.marked,a=ov.cA;
@@ -17887,6 +17893,7 @@ function _hubThanks(kind){
     +'<div style="font-family:\'Bebas Neue\',sans-serif;font-size:2.1rem;'
     +'letter-spacing:1.2px;color:#eef2fb;margin-top:16px;">'+head+'</div>'
     +'<div style="font-size:.88rem;color:#9aa8c8;margin-top:4px;">'+sub+'</div>'
+    +_hubThanksCard(kind,nd,onHub)
     +'<button id="hubThanksBtn" style="margin-top:24px;padding:13px 32px;'
     +'border-radius:12px;border:none;background:#2e7de4;color:#fff;'
     +'font-family:\'Barlow\',sans-serif;font-size:.94rem;font-weight:700;'
@@ -17894,6 +17901,7 @@ function _hubThanks(kind){
     +'</div>';
   document.documentElement.appendChild(el);
   el.querySelector('#hubThanksBtn').addEventListener('click',_hubThanksClose);
+  {const cb=el.querySelector('#hubThanksCard');if(cb)cb.addEventListener('click',_hubThanksToCard);}
   el.style.opacity='1';
   // Safety net: if a transition or a repaint were ever to leave it hidden, it
   // still ends up on screen rather than silently absent.
@@ -17977,6 +17985,39 @@ function _hubCheckDone(kind){
   // general thank-you — naming only the physio would describe the last tap
   // rather than what was completed.
   _hubThanks('week');
+}
+// The card under the thank-you, after a rating or a match vote: shown at the
+// moment the player has just done what moves it. Not after "nicht dabei".
+function _hubThanksCard(kind,nd,onHub){
+  if(!onHub||nd||(kind!=='rpe'&&kind!=='vote'))return '';
+  try{
+    const D=cd(),pi=_pmValidateIdx();
+    const p=(pi!=null&&D&&D.players)?D.players[pi]:null;
+    const d=p?cardData(p,D,UI.currentSeason):null;
+    if(!d)return '';
+    const T=CARD_TIERS[d.ti],seen=_mkSeenGet(p.confirmToken||'');
+    const up=seen!=null&&d.ti>seen;
+    const nx=_cardNext(d);
+    const line=(nx.needRate&&nx.n===0&&d.rated!=null)
+      ?'Bewertet '+d.rated+' % \u00b7 ab '+CARD_FL_RATED+' % Flutlicht'
+      :[d.rated!=null?'Bewertet '+d.rated+' %':'','Anwesenheit '+d.pct+' %'].filter(Boolean).join(' \u00b7 ');
+    return '<button id="hubThanksCard" style="display:flex;align-items:center;gap:12px;width:100%;margin-top:22px;'
+      +'padding:12px 14px;border-radius:14px;background:#131f3d;border:1px solid '+(up?'#F2C230':'#22335f')+';color:#eef2fb;'
+      +'text-align:left;cursor:pointer;font-family:\'Barlow\',sans-serif;">'
+      +'<span class="mk-mini mk-t-'+T.k+'" aria-hidden="true" style="flex-shrink:0;"></span>'
+      +'<span style="flex:1;min-width:0;"><b style="display:block;font-size:.92rem;">'
+      +(up?'Aufgestiegen: '+T.name+'!':'Meine Karte: '+T.name)+'</b>'
+      +'<span style="display:block;font-size:.76rem;color:#9aa8c8;margin-top:2px;">'+line+'</span></span>'
+      +'<span style="color:#9aa8c8;font-size:1.3rem;flex-shrink:0;" aria-hidden="true">\u203a</span></button>';
+  }catch(e){return '';}
+}
+function _hubThanksToCard(){
+  const el=document.getElementById('hubThanks');
+  if(el){el.style.opacity='0';setTimeout(()=>el.remove(),260);}
+  window._hubAction='card';window._rpeOnly=false;
+  _hubSyncUrl();
+  try{window.scrollTo(0,0);}catch(e){}
+  renderPlayerMode();
 }
 function _hubThanksClose(){
   const el=document.getElementById('hubThanks');
