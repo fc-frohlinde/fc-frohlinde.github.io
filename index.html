@@ -2663,6 +2663,16 @@ html:has(body.hub-mode){background:#080f22;}
   font-family:'Barlow',sans-serif;font-size:.98rem;font-weight:700;cursor:pointer;}
 .mvp-go:disabled{background:#E6EBF2;color:#8A97B0;cursor:default;}
 .hub-mvp{cursor:default;}
+/* The reminder offer: an offer with two answers, not a link */
+.hub-push{cursor:default;align-items:flex-start;}
+.hub-push:hover{transform:none;border-color:var(--hbr);}
+.hub-push .hub-txt span{line-height:1.4;}
+.hub-push-btns{display:flex!important;gap:8px;margin-top:10px;}
+.hub-push-on{height:36px;padding:0 16px;border-radius:10px;border:none;background:#F2C230;color:#0E2350;
+  font-family:'Barlow',sans-serif;font-size:.86rem;font-weight:800;cursor:pointer;}
+.hub-push-later{height:36px;padding:0 12px;border-radius:10px;border:1px solid var(--hbr);background:none;color:var(--hdim);
+  font-family:'Barlow',sans-serif;font-size:.84rem;font-weight:600;cursor:pointer;}
+.hub-push-line{margin-top:14px;}
 /* ── Meine Karte ── */
 .mk{--mk-ink:#F2C230;max-width:420px;margin:0 auto;padding:0 16px 34px;font-family:'Barlow',sans-serif;color:var(--htx);}
 .mk.mk-t-bronze{--mk-ink:#E9B78C;}.mk.mk-t-silber{--mk-ink:#DDE4EF;}.mk.mk-t-gold{--mk-ink:#F2C230;}.mk.mk-t-flutlicht{--mk-ink:#FFF3C4;}
@@ -2881,6 +2891,18 @@ body.design-heute.hxk-dk .ss-comm-act[title="L\00f6schen"]{color:#FF9C90 !import
 .app-sh-warn{margin-top:12px;padding:10px 12px;border-radius:10px;background:rgba(243,156,18,.12);border:1px solid rgba(243,156,18,.35);font-size:.78rem;line-height:1.45;color:var(--hx-ink,var(--gd));}
 .app-sh-stat{margin-top:12px;font-size:.78rem;line-height:1.45;color:var(--hx-muted,var(--gm));}
 .app-sh-stat b{color:var(--hx-ink,var(--gd));}
+.push-adm{margin-top:16px;padding-top:14px;border-top:1px solid var(--hx-line,var(--gl));}
+.push-adm-h{font-size:.86rem;font-weight:700;color:var(--hx-ink,var(--gd));margin-bottom:8px;}
+.push-adm-h span{display:block;font-size:.74rem;font-weight:500;color:var(--hx-muted,var(--gm));margin-top:2px;}
+.mob label.push-adm-row{display:flex;align-items:flex-start;gap:10px;padding:7px 0;margin:0;cursor:pointer;
+  font-size:inherit;font-weight:400;text-transform:none;letter-spacing:normal;line-height:1.3;}
+.mob label.push-adm-row input[type=checkbox]{margin:2px 0 0;padding:0;width:17px;height:17px;accent-color:var(--hx-nav,#0E2350);flex-shrink:0;}
+.push-adm-row b{display:block;font-size:.84rem;color:var(--hx-ink,var(--gd));}
+.push-adm-row small{display:block;font-size:.74rem;color:var(--hx-muted,var(--gm));margin-top:1px;}
+.push-adm-st{margin-top:8px;font-size:.76rem;line-height:1.45;color:var(--hx-muted,var(--gm));}
+.push-adm-st.warn{color:#B9770E;}
+.push-adm-test{margin-top:10px;}
+.push-bell{margin-left:4px;vertical-align:-1px;color:var(--hx-muted,var(--gm));}
 /* ── Editor ──────────────────────────────────────────────── */
 .rpe-ed-sec{font-size:.64rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
   color:var(--gm);margin:12px 0 6px;}
@@ -6534,13 +6556,17 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.1.9'; // v1.1.9: Rest anwesend schützt „nicht dabei“
-const APP_VERSION_LABEL='1.1.9';
+const APP_VERSION='1.2.0'; // v1.2.0: Erinnerungen (Web Push)
+const APP_VERSION_LABEL='1.2.0';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792257909281; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792262222018; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.0',date:'17.10.2026',title:'Erinnerungen',items:[
+    {icon:'🔔',title:'Erinnerungen aufs Handy',desc:'Spieler können in ihrer Übersicht Erinnerungen einschalten. Dann kommt eine Benachrichtigung, wenn die Belastung nach einer Einheit noch fehlt (etwa 20–45 Minuten nach dem Ende), am Tag nach dem Spiel ab 17 Uhr, wenn die Stimme für den Spieler des Spiels fehlt, und am Vorabend ab 18 Uhr, wenn er für morgen noch nicht zu- oder abgesagt hat. Jede nur einmal, nie zwischen 22:30 und 8 Uhr. Auf dem iPhone nur in der installierten App.'},
+    {icon:'👀',title:'Für Trainer',desc:'Unter „Link an die Mannschaft“: wer Erinnerungen an hat, welche Arten laufen (Admin schaltet sie an und aus), wann die letzte Runde war und „Test an dieses Handy“. In der Liste „Noch offen“ und im Kader zeigt 🔔, wer automatisch erinnert wird.'},
+  ]},
   {version:'1.1.9',date:'17.10.2026',title:'Rest anwesend',items:[
     {icon:'✅',title:'Antwort „nicht dabei“ bleibt',desc:'Wer selbst „Ich war nicht dabei“ geantwortet hat, wird bei „Rest anwesend“ nicht mehr mit als anwesend markiert. Er bleibt offen, bis der Trainer ihn einzeln einträgt; die Rückfrage nennt ihn.'},
   ]},
@@ -14351,7 +14377,7 @@ function renderPlayerApp(p,pi){
   const si=playerSeenInfo(p);
   const hasPhone=!!_amCleanPhone(p.phone);
   box.innerHTML=`<div class="ps-app-row">
-      <span class="ps-app-st ${si.state}">${si.app?'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></svg>':''}${escapeHtml(si.state==='never'?si.text:si.text)}</span>
+      <span class="ps-app-st ${si.state}">${si.app?'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></svg>':''}${escapeHtml(si.state==='never'?si.text:si.text)}${p.push&&p.push.t?' · 🔔 Erinnerungen an':''}</span>
       <button class="tp-qbtn ps-app-send" onclick="psSendAppLink(${pi})">${hasPhone?'Link per WhatsApp':'Link kopieren'}</button>
     </div>`;
 }
@@ -14407,8 +14433,10 @@ function appShareOpen(){
       <button class="btn bs" onclick="appShareCopy()">Text kopieren</button>
     </div>
     ${noBday.length?`<div class="app-sh-warn"><b>Ohne Geburtsdatum (${noBday.length}):</b> ${noBday.map(p=>escapeHtml(getDisplayName?getDisplayName(p):p.name)).join(', ')}. ${noBday.length===1?'Er kann sich \u00fcber diesen Link nicht anmelden \u2014 Geburtsdatum im Profil eintragen oder ihm den pers\u00f6nlichen Link aus dem Profil schicken.':'Sie k\u00f6nnen sich \u00fcber diesen Link nicht anmelden \u2014 Geburtsdatum im Profil eintragen oder ihnen den pers\u00f6nlichen Link aus dem Profil schicken.'}</div>`:''}
-    <div class="app-sh-stat">Seit ${SEEN_SINCE} ge\u00f6ffnet: <b>${seen.length} von ${pl.length}</b>${app.length?' \u00b7 als App installiert: <b>'+app.length+'</b>':''}. Wer fehlt, steht in der Spalte \u201eApp\u201c ganz oben, wenn du danach sortierst.</div>`;
+    <div class="app-sh-stat">Seit ${SEEN_SINCE} ge\u00f6ffnet: <b>${seen.length} von ${pl.length}</b>${app.length?' \u00b7 als App installiert: <b>'+app.length+'</b>':''}. Wer fehlt, steht in der Spalte \u201eApp\u201c ganz oben, wenn du danach sortierst.</div>
+    <div id="app-sh-push">${pushAdminHtml(pl)}</div>`;
   openM('moAppShare');
+  pushAdminLoad().then(()=>{const b=document.getElementById('app-sh-push');if(b)b.innerHTML=pushAdminHtml(pl);});
 }
 function appShareSend(){
   const t=document.getElementById('app-share-text');
@@ -15588,7 +15616,7 @@ function _rpeSessGroups(D,s,si,season){
     const st=(p.s&&si<p.s.length)?p.s[si]:3;
     if(st===0||st===2)return;
     if(!_sessAfterJoin(p,s,season))return;
-    (m&&m.nd?nd:open).push({n,pi,st,never:!(p.seen&&p.seen.t)});
+    (m&&m.nd?nd:open).push({n,pi,st,never:!(p.seen&&p.seen.t),push:!!(p.push&&p.push.t)});
   });
   const byName=(a,b)=>String(a.n||'').localeCompare(String(b.n||''));
   nd.sort(byName);open.sort(byName);
@@ -15709,8 +15737,8 @@ function rpeAllOpen(si){
   if(c.open.length){
     html+=`<div class="rpe-sec-h">${c.winOpen?'Noch offen':'Ohne Bewertung'} <span>${c.open.length}</span></div>`
       +`<div class="rpe-open">${c.open.map(x=>
-        `<button class="rpe-open-b" onclick="rpeEditOpen(${si},${x.pi})"${x.never?` title="Seit ${SEEN_SINCE} nicht in der App"`:''}>${escapeHtml(x.n)}${x.never?'<small>nicht in der App</small>':''}</button>`).join('')}</div>`
-      +`<div class="rpe-hint">${c.winOpen?'Spieler können bis 24 Uhr bewerten. ':''}Nennt dir ein Spieler seinen Wert: Namen antippen und eintragen.</div>`
+        `<button class="rpe-open-b" onclick="rpeEditOpen(${si},${x.pi})"${x.never?` title="Seit ${SEEN_SINCE} nicht in der App"`:''}>${escapeHtml(x.n)}${x.push?' 🔔':''}${x.never?'<small>nicht in der App</small>':''}</button>`).join('')}</div>`
+      +`<div class="rpe-hint">${c.winOpen?'Spieler können bis 24 Uhr bewerten. ':''}${c.open.some(x=>x.push)?'🔔 bekommt automatisch eine Erinnerung. ':''}Nennt dir ein Spieler seinen Wert: Namen antippen und eintragen.</div>`
       +(c.winOpen?`<button class="rpe-remind" onclick="rpeRemindGroup(${si})">Erinnerung in die WhatsApp-Gruppe</button>`:'');
   }
   body.innerHTML=html;
@@ -16426,6 +16454,277 @@ function renderPlayerCard(){
   </div>`;
   _mkShow();
 }
+// ── Erinnerungen (Web Push) ──────────────────────────────────
+// The app cannot call a player who does not open it. A scheduled job on
+// GitHub (tools/erinnerungen) looks every 15 minutes at what is due and sends
+// a push to the players who switched reminders on:
+//   Belastung   ~20 Min. nach dem Ende einer Einheit, wenn noch nicht bewertet
+//   Abstimmung  am Tag nach dem Spiel ab 17 Uhr, wenn bewertet, aber nicht gewählt
+//   Zusage      am Vorabend ab 18 Uhr, wenn er noch nicht geantwortet hat
+// never between 22:30 and 8:00, each one once. Subscriptions live in fcf_push,
+// not in fcf_data: nobody else needs them and fcf_data is what every device
+// downloads. The player's own record only carries p.push={t} so the trainers
+// can see who gets reminders.
+// The job makes the key pair on its first run and publishes the public half
+// in fcf_push/pub. Until then reminders are not set up and nothing is offered.
+let _pushPub=null,_pushPubP=null;
+function pushLoadPub(){
+  if(!_pushPubP)_pushPubP=(fbDb?fbDb.ref('fcf_push/pub').once('value').then(x=>{_pushPub=x.val()||null;return _pushPub;}).catch(()=>null):Promise.resolve(null));
+  return _pushPubP;
+}
+const PUSH_KINDS=[
+  ['rpe','Belastung','nach jeder Einheit, etwa 20–45 Min. nach dem Ende'],
+  ['vote','Spieler des Spiels','am Tag nach dem Spiel ab 17 Uhr'],
+  ['rsvp','Zu- oder Absage','am Vorabend ab 18 Uhr, wer noch nicht geantwortet hat']];
+let _pushOn=null;     // this device: null = not checked yet
+function pushCan(){
+  try{return 'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window;}catch(e){return false;}
+}
+function _pushLs(k,v){
+  const key='fcf_push_'+k;
+  try{if(v===undefined)return localStorage.getItem(key);if(v===null)localStorage.removeItem(key);else localStorage.setItem(key,String(v));}catch(e){}
+  return null;
+}
+// off | on | denied | ios (iPhone in the browser: push only in the installed app) | none
+function pushPlayerState(){
+  const tok0=(CU&&CU.playerToken)||'';
+  const onHere=_pushOn===true||(_pushOn===null&&pushCan()&&Notification.permission==='granted'&&_pushLs('on_'+tok0)==='1');
+  if(!_pushPub&&!onHere)return 'none';     // not set up yet
+  if(typeof _a2hsIOS==='function'&&_a2hsIOS()&&!_a2hsStandalone())return 'ios';
+  if(!pushCan())return 'none';
+  if(Notification.permission==='denied')return 'denied';
+  const tok=(CU&&CU.playerToken)||'';
+  if(_pushOn===true||(_pushOn===null&&Notification.permission==='granted'&&_pushLs('on_'+tok)==='1'))return 'on';
+  return 'off';
+}
+// "Später" on the offer: ask again in two weeks
+function _pushSnoozed(){const t=+(_pushLs('later')||0);return t&&Date.now()<t;}
+function pushLater(){_pushLs('later',Date.now()+14*864e5);if(isPlayerMode())renderPlayerMode();}
+async function _pushSha(t){
+  const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(String(t)));
+  return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+function _pushKey(b64){
+  const p='='.repeat((4-b64.length%4)%4),raw=atob((b64+p).replace(/-/g,'+').replace(/_/g,'/'));
+  return Uint8Array.from(raw,c=>c.charCodeAt(0));
+}
+function _pushDev(){
+  const ua=navigator.userAgent||'';
+  return /iPhone|iPad|iPod/.test(ua)?'ios':/Android/.test(ua)?'android':'other';
+}
+async function _pushReg(){
+  if(!pushCan())return null;
+  return navigator.serviceWorker.ready;
+}
+// owner: 'p' + token hash (player) or 't' + name hash (trainer test device)
+async function _pushStore(sub,owner,extra){
+  if(!fbDb)return false;
+  const j=sub.toJSON();
+  const eh=(await _pushSha(j.endpoint)).slice(0,16);
+  const rec=Object.assign({e:j.endpoint,k:j.keys,t:Date.now(),dev:_pushDev(),
+    team:UI.currentTeam||'',season:UI.currentSeason||''},extra||{});
+  await fbDb.ref('fcf_push/subs/'+owner+'/'+eh).set(rec);
+  return eh;
+}
+// The bell the trainers see: in the player's own record, like p.seen
+function _pmSavePush(on){
+  if(!isPlayerMode()||RPE_IS_PREVIEW||!fbDb)return;
+  const myPi=_pmValidateIdx();if(myPi==null)return;
+  const D=G.db[UI.currentTeam+'__'+UI.currentSeason];
+  const p=D&&D.players&&D.players[myPi];if(!p)return;
+  p.push=on?{t:Date.now()}:null;
+  const path='fcf_data/db/'+_fbPathKey(UI.currentTeam+'__'+UI.currentSeason)+'/players/v/'+myPi+'/push';
+  fbDb.ref().update({[path]:p.push}).catch(e=>console.warn('[Push]',e&&e.message));
+}
+async function _pushOwner(){
+  const tok=(CU&&CU.playerToken)||'';
+  return tok?'p'+(await _pushSha(tok)).slice(0,24):null;
+}
+// On every visit: is this device still subscribed? Refresh the record once a
+// week, and at once if the browser handed out a new address.
+async function pushCheck(){
+  if(!isPlayerMode())return;
+  const before=pushPlayerState();
+  await pushLoadPub();
+  if(RPE_IS_PREVIEW||!pushCan()){
+    if(before!==pushPlayerState()&&window._hubMode&&!window._hubAction)renderPlayerMode();
+    return;
+  }
+  try{
+    const reg=await navigator.serviceWorker.getRegistration();
+    const sub=reg?await reg.pushManager.getSubscription():null;
+    const on=!!(sub&&Notification.permission==='granted');
+    const tok=CU.playerToken||'';
+    _pushOn=on;_pushLs('on_'+tok,on?1:null);
+    if(on){
+      const ep=sub.endpoint,last=JSON.parse(_pushLs('rec_'+tok)||'{}');
+      if(last.ep!==ep||Date.now()-(last.t||0)>7*864e5){
+        const owner=await _pushOwner();
+        if(owner&&await _pushStore(sub,owner)){_pushLs('rec_'+tok,JSON.stringify({ep,t:Date.now()}));_pmSavePush(true);}
+      }
+    }
+  }catch(e){console.warn('[Push] check',e&&e.message);}
+  if(before!==pushPlayerState()&&window._hubMode&&!window._hubAction)renderPlayerMode();
+}
+async function pushEnable(from){
+  if(RPE_IS_PREVIEW){if(typeof showSaveFlash==='function')showSaveFlash('👁 Vorschau — nicht gespeichert');return;}
+  if(!pushCan())return;
+  let perm='default';
+  try{perm=await Notification.requestPermission();}catch(e){perm='denied';}
+  if(perm!=='granted'){
+    _pushOn=false;
+    if(perm==='denied')pushDeniedHelp();
+    if(isPlayerMode())_pushRefreshUi(from);
+    return;
+  }
+  try{
+    const pub=_pushPub||await pushLoadPub();
+    if(!pub)throw new Error('kein Schlüssel');
+    const reg=await _pushReg();
+    let sub=await reg.pushManager.getSubscription();
+    if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:_pushKey(pub)});
+    const owner=await _pushOwner();
+    if(!owner||!await _pushStore(sub,owner))throw new Error('nicht gespeichert');
+    const tok=CU.playerToken||'';
+    _pushOn=true;_pushLs('on_'+tok,1);_pushLs('rec_'+tok,JSON.stringify({ep:sub.endpoint,t:Date.now()}));
+    _pmSavePush(true);
+    if(typeof showSaveFlash==='function')showSaveFlash('🔔 Erinnerungen an');
+  }catch(e){
+    console.warn('[Push] enable',e);
+    alert('Erinnerungen konnten nicht eingeschaltet werden. Bitte später noch einmal versuchen.');
+  }
+  _pushRefreshUi(from);
+}
+function _pushRefreshUi(from){
+  if(from==='thanks'){
+    const b=document.getElementById('hubThanksPush');
+    if(b){const on=pushPlayerState()==='on';b.disabled=on;b.textContent=on?'✓ Erinnerungen an':'🔔 Beim nächsten Mal erinnern';}
+    return;
+  }
+  if(window._hubMode&&!window._hubAction)renderPlayerMode();
+}
+async function pushDisable(){
+  if(!confirm('Erinnerungen auf diesem Handy ausschalten?'))return;
+  const tok=CU&&CU.playerToken||'';
+  try{
+    const reg=await navigator.serviceWorker.getRegistration();
+    const sub=reg?await reg.pushManager.getSubscription():null;
+    const owner=await _pushOwner();
+    if(sub&&owner){
+      const eh=(await _pushSha(sub.endpoint)).slice(0,16);
+      await fbDb.ref('fcf_push/subs/'+owner+'/'+eh).remove();
+      try{await sub.unsubscribe();}catch(e){}
+      // Another phone of his may still get them: the bell stays then
+      const rest=await fbDb.ref('fcf_push/subs/'+owner).once('value');
+      if(!rest.exists())_pmSavePush(false);
+    }
+  }catch(e){console.warn('[Push] disable',e&&e.message);}
+  _pushOn=false;_pushLs('on_'+tok,null);_pushLs('rec_'+tok,null);
+  _pushRefreshUi();
+}
+function pushDeniedHelp(){
+  alert(_pushDev()==='ios'
+    ?'Erinnerungen sind für Flutlicht ausgeschaltet.\n\nEinstellungen → Mitteilungen → Flutlicht → „Mitteilungen erlauben“ einschalten. Danach die App neu öffnen.'
+    :'Erinnerungen sind im Browser blockiert.\n\nAuf das Schloss- oder Info-Symbol neben der Adresse tippen (in der installierten App: lange auf das App-Symbol drücken → App-Info) → Berechtigungen → Benachrichtigungen → „Zulassen“. Danach die App neu öffnen.');
+}
+function pushIosHelp(){
+  if(typeof _a2hsShow==='function'){_a2hsHide&&_a2hsHide();_a2hsShown=false;_a2hsKind=_a2hsKind||'player';_a2hsShow('ios');}
+}
+// The offer in the overview and the line at its foot
+function _hubPushCard(){
+  if(!window._hubMode)return '';
+  const ps=pushPlayerState();
+  if((ps==='off'||ps==='ios')&&!_pushSnoozed()){
+    const ios=ps==='ios';
+    return `<div class="hub-card hub-push"><span class="hub-ic">🔔</span>
+      <span class="hub-txt"><b>Erinnerungen aufs Handy</b><span>${ios
+        ?'Nach Training und Spiel, wenn du noch nicht bewertet hast. Auf dem iPhone nur in der installierten App.'
+        :'Nach Training und Spiel, wenn du noch nicht bewertet hast. Ein Mal, nie nachts.'}</span>
+        <span class="hub-push-btns"><button class="hub-push-on" onclick="${ios?'pushIosHelp()':"pushEnable('hub')"}">${ios?'So geht’s':'Einschalten'}</button><button class="hub-push-later" onclick="pushLater()">Später</button></span>
+      </span></div>`;
+  }
+  return '';
+}
+function _hubPushLine(){
+  if(!window._hubMode)return '';
+  const ps=pushPlayerState();
+  if(ps==='on')return '<button class="hub-switch hub-push-line" onclick="pushDisable()">🔔 Erinnerungen an · ausschalten</button>';
+  if(ps==='denied')return '<button class="hub-switch hub-push-line" onclick="pushDeniedHelp()">🔕 Erinnerungen sind blockiert · so änderst du das</button>';
+  if((ps==='off'||ps==='ios')&&_pushSnoozed())return `<button class="hub-switch hub-push-line" onclick="${ps==='ios'?'pushIosHelp()':"pushEnable('hub')"}">🔔 Erinnerungen einschalten</button>`;
+  return '';
+}
+// In the thank-you: the moment he has just done what the reminder is for
+function _hubThanksPush(kind,nd,onHub){
+  if(!onHub||nd||(kind!=='rpe'&&kind!=='vote'))return '';
+  if(pushPlayerState()!=='off'||_pushSnoozed())return '';
+  return '<button id="hubThanksPush" style="display:block;margin:12px auto 0;padding:10px 18px;border-radius:12px;'
+    +'border:1px solid #22335f;background:none;color:#eef2fb;font-family:\'Barlow\',sans-serif;font-size:.86rem;'
+    +'font-weight:600;cursor:pointer;">🔔 Beim nächsten Mal erinnern</button>';
+}
+// ── Trainer side ──
+function pushBell(p){
+  return (p&&p.push&&p.push.t)?'<svg class="push-bell" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-label="Erinnerungen an"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>':'';
+}
+let _pushAdm=null;   // {config, status} as last read
+async function pushAdminLoad(){
+  if(!fbDb)return null;
+  const tk=_fbPathKey(UI.currentTeam||'');
+  try{
+    const [c,st]=await Promise.all([fbDb.ref('fcf_push/config/'+tk).once('value'),fbDb.ref('fcf_push/status').once('value'),pushLoadPub()]);
+    _pushAdm={config:c.val()||{},status:st.val()||null};
+  }catch(e){_pushAdm={config:{},status:null,err:true};}
+  return _pushAdm;
+}
+function pushKindOn(cfg,k){return !(cfg&&cfg[k]===false);}
+function pushAdminSet(k,on){
+  if(!canEdit()||!CU||CU.role!=='admin'||!fbDb)return;
+  const tk=_fbPathKey(UI.currentTeam||'');
+  fbDb.ref('fcf_push/config/'+tk+'/'+k).set(!!on).then(()=>{
+    if(_pushAdm){_pushAdm.config[k]=!!on;}
+    if(typeof showSaveFlash==='function')showSaveFlash(on?'🔔 Erinnerung an':'🔕 Erinnerung aus');
+    logAudit('Erinnerungen',PUSH_KINDS.find(x=>x[0]===k)[1],on?'an':'aus');
+  }).catch(e=>alert('Nicht gespeichert: '+(e&&e.message)));
+}
+// A trainer's own phone: one test notification at the next run
+async function pushAdminTest(){
+  if(!CU||CU.role!=='admin')return;
+  if(!pushCan()){alert('Dieser Browser kann keine Benachrichtigungen empfangen.'+(_a2hsIOS()&&!_a2hsStandalone()?' Auf dem iPhone nur in der installierten App.':''));return;}
+  let perm='default';try{perm=await Notification.requestPermission();}catch(e){}
+  if(perm!=='granted'){pushDeniedHelp();return;}
+  try{
+    const pub=_pushPub||await pushLoadPub();
+    if(!pub){alert('Erinnerungen sind noch nicht eingerichtet: die Runde auf GitHub ist noch nicht gelaufen.');return;}
+    const reg=await _pushReg();
+    let sub=await reg.pushManager.getSubscription();
+    if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:_pushKey(pub)});
+    const owner='t'+(await _pushSha('trainer:'+(CU.name||''))).slice(0,24);
+    await _pushStore(sub,owner,{test:Date.now(),trainer:CU.name||''});
+    alert('Angemeldet. Die Test-Benachrichtigung kommt mit der nächsten Runde, spätestens in etwa 15–30 Minuten.');
+  }catch(e){alert('Hat nicht geklappt: '+(e&&e.message));}
+}
+function _pushAgo(t){
+  if(!t)return '';
+  const m=Math.round((Date.now()-t)/60000);
+  if(m<1)return 'gerade eben';if(m<60)return 'vor '+m+' Min.';
+  const h=Math.round(m/60);if(h<24)return 'vor '+h+' Std.';
+  return 'vor '+Math.round(h/24)+' Tagen';
+}
+function pushAdminHtml(pl){
+  const on=pl.filter(p=>p.push&&p.push.t).length;
+  const a=_pushAdm||{config:{},status:null};
+  const st=a.status;
+  const stale=st&&st.t&&Date.now()-st.t>6*3600e3;
+  const isAdm=CU&&CU.role==='admin';
+  return `<div class="push-adm">
+    <div class="push-adm-h">Automatische Erinnerungen <span>${on} von ${pl.length} Spielern haben sie an</span></div>
+    ${PUSH_KINDS.map(([k,t,d])=>`<label class="push-adm-row"><input type="checkbox" ${pushKindOn(a.config,k)?'checked':''} ${isAdm?'':'disabled'} onchange="pushAdminSet('${k}',this.checked)"><span><b>${t}</b><small>${d}</small></span></label>`).join('')}
+    <div class="push-adm-st${!st||stale||st.fail?' warn':''}">${!st?'Noch nicht eingerichtet: die Runde auf GitHub ist noch nicht gelaufen.'
+      :st.fail?'⚠ Letzte Runde '+_pushAgo(st.t)+' abgebrochen: '+escapeHtml(st.fail)
+      :(stale?'⚠ Letzte Runde '+_pushAgo(st.t)+' — die Erinnerungen laufen gerade nicht.':'Letzte Runde '+_pushAgo(st.t)+' · heute verschickt: '+(st.day===_pushDayKey()?(st.sent||0):0))}</div>
+    ${isAdm?'<button class="btn bs push-adm-test" onclick="pushAdminTest()">Test an dieses Handy</button>':''}
+  </div>`;
+}
+function _pushDayKey(){const d=new Date();return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();}
 function renderMvpVote(){
   const wrap=document.getElementById('playerModeWrap');
   if(!wrap)return;
@@ -17740,6 +18039,7 @@ function renderHub(){
       cnt.physio?(cnt.physio+' offen'):'beantwortet',
       cnt.physio||'',buildHubLink(tok,'physio'));
   }
+  cards+=_hubPushCard();
   {
     const cdx=cardData(p,D,UI.currentSeason);
     if(cdx){
@@ -17761,6 +18061,7 @@ function renderHub(){
       <div class="hub-sub">${escapeHtml(UI.currentTeam||'')} \u00b7 ${escapeHtml(UI.currentSeason||'')}</div>
     </div>
     ${cards||'<div class="hub-empty">\u2713<span>Gerade nichts zu tun</span></div>'}
+    ${_hubPushLine()}
     ${RPE_IS_PREVIEW?'':'<button class="hub-switch" onclick="hubSwitchPlayer()">Nicht '+escapeHtml(getDisplayName?getDisplayName(p):p.name)+'? Anderen Spieler w\u00e4hlen</button>'}
   </div>`;
 }
@@ -17901,10 +18202,12 @@ function _hubThanks(kind){
     +'border-radius:12px;border:none;background:#2e7de4;color:#fff;'
     +'font-family:\'Barlow\',sans-serif;font-size:.94rem;font-weight:700;'
     +'cursor:pointer;">'+(onHub?'Zur \u00dcbersicht':'Schlie\u00dfen')+'</button>'
+    +_hubThanksPush(kind,nd,onHub)
     +'</div>';
   document.documentElement.appendChild(el);
   el.querySelector('#hubThanksBtn').addEventListener('click',_hubThanksClose);
   {const cb=el.querySelector('#hubThanksCard');if(cb)cb.addEventListener('click',_hubThanksToCard);}
+  {const pb=el.querySelector('#hubThanksPush');if(pb)pb.addEventListener('click',()=>pushEnable('thanks'));}
   el.style.opacity='1';
   // Safety net: if a transition or a repaint were ever to leave it hidden, it
   // still ends up on screen rather than silently absent.
@@ -18037,6 +18340,8 @@ function renderPlayerMode(){
   const wrap=document.getElementById('playerModeWrap');
   if(!wrap||!isPlayerMode())return;
   try{_pmMarkSeen();}catch(e){}
+  // Once per visit: is reminders set up, is this phone subscribed
+  if(!window._pushChecked){window._pushChecked=true;try{pushCheck();}catch(e){}}
   if(typeof _a2hsArm==='function')_a2hsArm('player');
   if(window._hubDecide)_hubAutoRoute();
   // Entering a screen records what was outstanding, so the thank-you can tell
@@ -25474,9 +25779,9 @@ function renderMgrPlayers(){
       ${sm?'<span class="pl-ck" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span>':''}
       <div class="pl-nr">${p.nr||''}</div>
       <div style="flex-shrink:0;">${renderPlayerAvatar(p,32)}</div>
-      ${(()=>{const si=canEdit()?playerSeenInfo(p):null;return `<div class="pl-name">${p.name||''}${si?`<span class="pl-app-sub ${si.state}">${si.app?'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></svg>':''}App: ${si.state==='never'?'nicht ge\u00f6ffnet':escapeHtml(si.short)}</span>`:''}</div>`;})()}
+      ${(()=>{const si=canEdit()?playerSeenInfo(p):null;return `<div class="pl-name">${p.name||''}${si?`<span class="pl-app-sub ${si.state}">${si.app?'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></svg>':''}App: ${si.state==='never'?'nicht ge\u00f6ffnet':escapeHtml(si.short)}${pushBell(p)}</span>`:''}</div>`;})()}
       <div class="pl-pos">${pbHtml(p)}</div>
-      ${canEdit()?(()=>{const si=playerSeenInfo(p);return `<div class="pl-app ${si.state}" title="${escapeHtml(si.text)}">${si.app?'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></svg>':''}<span>${escapeHtml(si.short)}</span></div>`;})():''}
+      ${canEdit()?(()=>{const si=playerSeenInfo(p);return `<div class="pl-app ${si.state}" title="${escapeHtml(si.text)}">${si.app?'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></svg>':''}<span>${escapeHtml(si.short)}</span>${pushBell(p)}</div>`;})():''}
       <div class="pl-btns"${sm?' aria-hidden="true"':''}>
         <button class="pl-btn pl-btn-e" title="Bearbeiten"${sm?' tabindex="-1"':''} onclick="event.stopPropagation();_tmLeave('spieler');openPlayerStats(${i},{edit:true});">✎</button>
         ${canEdit()?`<button class="pl-btn pl-btn-d"${sm?' tabindex="-1"':''} onclick="event.stopPropagation();mgrDelPl(${i})">✕</button>`:''}

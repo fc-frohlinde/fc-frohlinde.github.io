@@ -43,3 +43,33 @@ self.addEventListener('fetch',e=>{
     return Promise.race([net.catch(()=>hit),late]).finally(()=>clearTimeout(t));
   }));
 });
+
+// ── Erinnerungen (Web Push) ──────────────────────────────────
+// The job on GitHub (tools/erinnerungen) sends {title, body, url, tag}. A tap
+// opens the player's own link on the screen the reminder is about — in the
+// open app window if there is one, otherwise in a new one.
+self.addEventListener('push',e=>{
+  let d={};
+  try{d=e.data?e.data.json():{};}catch(x){d={body:e.data?e.data.text():''};}
+  e.waitUntil(self.registration.showNotification(d.title||'Flutlicht',{
+    body:d.body||'',
+    icon:'icons/flutlicht-192.png?v=2',
+    badge:'icons/flutlicht-badge-96.png',
+    tag:d.tag||undefined,
+    lang:'de',
+    data:{url:d.url||'./'}
+  }));
+});
+self.addEventListener('notificationclick',e=>{
+  e.notification.close();
+  const url=new URL((e.notification.data&&e.notification.data.url)||'./',self.registration.scope).href;
+  e.waitUntil((async()=>{
+    const wins=await self.clients.matchAll({type:'window',includeUncontrolled:true});
+    for(const w of wins){
+      if(new URL(w.url).origin!==new URL(url).origin)continue;
+      try{await w.focus();}catch(x){}
+      try{if('navigate' in w){await w.navigate(url);return;}}catch(x){}
+    }
+    if(self.clients.openWindow)await self.clients.openWindow(url);
+  })());
+});

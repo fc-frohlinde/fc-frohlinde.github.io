@@ -1,0 +1,48 @@
+# Flutlicht · Erinnerungen an die Spieler (Web Push)
+# Every 15 minutes from about 7 to 23 Uhr: works out what is due (rating after a
+# session, vote the day after a match, answer the evening before) and sends it
+# to the players who switched reminders on. Code: tools/erinnerungen.
+# Needs the repository secret FIREBASE_SERVICE_ACCOUNT; without it the run
+# ends at once without error.
+name: Erinnerungen
+
+on:
+  schedule:
+    # UTC. Odd minutes: at full hours GitHub starts many jobs and delays them.
+    - cron: '7,22,37,52 5-21 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: erinnerungen
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  runde:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      EINGERICHTET: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
+    steps:
+      - if: env.EINGERICHTET != 'true'
+        run: echo "FIREBASE_SERVICE_ACCOUNT fehlt – Erinnerungen sind noch nicht eingerichtet."
+      - if: env.EINGERICHTET == 'true'
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: tools/erinnerungen
+      - if: env.EINGERICHTET == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: tools/erinnerungen/package-lock.json
+      - if: env.EINGERICHTET == 'true'
+        run: npm ci --omit=dev --no-audit --no-fund
+        working-directory: tools/erinnerungen
+      - if: env.EINGERICHTET == 'true'
+        run: node send.mjs
+        working-directory: tools/erinnerungen
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
