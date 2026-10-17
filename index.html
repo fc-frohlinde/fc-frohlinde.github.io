@@ -6561,7 +6561,7 @@ const APP_VERSION_LABEL='1.2.0';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792262222018; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792275218106; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.2.0',date:'17.10.2026',title:'Erinnerungen',items:[
     {icon:'🔔',title:'Erinnerungen aufs Handy',desc:'Spieler können in ihrer Übersicht Erinnerungen einschalten. Dann kommt eine Benachrichtigung, wenn die Belastung nach einer Einheit noch fehlt (etwa 20–45 Minuten nach dem Ende), am Tag nach dem Spiel ab 17 Uhr, wenn die Stimme für den Spieler des Spiels fehlt, und am Vorabend ab 18 Uhr, wenn er für morgen noch nicht zu- oder abgesagt hat. Jede nur einmal, nie zwischen 22:30 und 8 Uhr. Auf dem iPhone nur in der installierten App.'},
@@ -16677,7 +16677,7 @@ async function pushAdminLoad(){
 }
 function pushKindOn(cfg,k){return !(cfg&&cfg[k]===false);}
 function pushAdminSet(k,on){
-  if(!canEdit()||!CU||CU.role!=='admin'||!fbDb)return;
+  if(!canEdit()||!fbDb)return;
   const tk=_fbPathKey(UI.currentTeam||'');
   fbDb.ref('fcf_push/config/'+tk+'/'+k).set(!!on).then(()=>{
     if(_pushAdm){_pushAdm.config[k]=!!on;}
@@ -16687,7 +16687,7 @@ function pushAdminSet(k,on){
 }
 // A trainer's own phone: one test notification at the next run
 async function pushAdminTest(){
-  if(!CU||CU.role!=='admin')return;
+  if(!canEdit())return;
   if(!pushCan()){alert('Dieser Browser kann keine Benachrichtigungen empfangen.'+(_a2hsIOS()&&!_a2hsStandalone()?' Auf dem iPhone nur in der installierten App.':''));return;}
   let perm='default';try{perm=await Notification.requestPermission();}catch(e){}
   if(perm!=='granted'){pushDeniedHelp();return;}
@@ -16714,11 +16714,12 @@ function pushAdminHtml(pl){
   const a=_pushAdm||{config:{},status:null};
   const st=a.status;
   const stale=st&&st.t&&Date.now()-st.t>6*3600e3;
-  const isAdm=CU&&CU.role==='admin';
+  const isAdm=canEdit();
   return `<div class="push-adm">
     <div class="push-adm-h">Automatische Erinnerungen <span>${on} von ${pl.length} Spielern haben sie an</span></div>
     ${PUSH_KINDS.map(([k,t,d])=>`<label class="push-adm-row"><input type="checkbox" ${pushKindOn(a.config,k)?'checked':''} ${isAdm?'':'disabled'} onchange="pushAdminSet('${k}',this.checked)"><span><b>${t}</b><small>${d}</small></span></label>`).join('')}
-    <div class="push-adm-st${!st||stale||st.fail?' warn':''}">${!st?'Noch nicht eingerichtet: die Runde auf GitHub ist noch nicht gelaufen.'
+    <div class="push-adm-st${a.err||!st||stale||st.fail?' warn':''}">${a.err?'⚠ Kein Zugriff auf die Erinnerungen in der Datenbank: die neuen Firebase-Regeln (Block fcf_push) sind noch nicht veröffentlicht.'
+      :!st?'Noch nicht eingerichtet: die Runde auf GitHub ist noch nicht gelaufen.'
       :st.fail?'⚠ Letzte Runde '+_pushAgo(st.t)+' abgebrochen: '+escapeHtml(st.fail)
       :(stale?'⚠ Letzte Runde '+_pushAgo(st.t)+' — die Erinnerungen laufen gerade nicht.':'Letzte Runde '+_pushAgo(st.t)+' · heute verschickt: '+(st.day===_pushDayKey()?(st.sent||0):0))}</div>
     ${isAdm?'<button class="btn bs push-adm-test" onclick="pushAdminTest()">Test an dieses Handy</button>':''}
