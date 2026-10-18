@@ -6584,10 +6584,10 @@ const APP_VERSION_LABEL='1.2.1';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792281602176; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792283938867; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.2.1',date:'18.10.2026',title:'Bewegung',items:[
-    {icon:'↔️',title:'Aufstellung',desc:'Beim Tauschen sieht man, wer wohin geht: der gezogene Spieler setzt sich auf seinen Platz, der verdrängte wandert auf den frei gewordenen.'},
+    {icon:'↔️',title:'Aufstellung',desc:'Beim Tauschen sieht man, wer wohin geht: der gezogene Spieler setzt sich auf seinen Platz, der verdrängte wandert auf den frei gewordenen. In der Saisonplanung pulsiert die Position, auf die ein Spieler gezogen wird, und sein Name leuchtet kurz auf.'},
     {icon:'🪟',title:'Fenster und Tasten',desc:'Fenster in der Mitte öffnen sich mit einem kurzen Übergang wie die Seitenleisten. Jede Taste reagiert sichtbar auf das Antippen. Wer im Gerät „Bewegung reduzieren“ eingeschaltet hat, sieht keine Animationen mehr.'},
   ]},
   {version:'1.2.0',date:'17.10.2026',title:'Erinnerungen',items:[
@@ -34029,9 +34029,9 @@ function slpRender(){
       // When conf mode disabled - center align; when enabled - left align with reserved check space
       let nameTxt;
       if(confEnabled){
-        nameTxt=`<text x="${nameStartX}" y="${yPos}" text-anchor="start" font-family="'Barlow',sans-serif" font-size="${fs}" font-weight="${fw}" fill="${textColor}">${nm}</text>`;
+        nameTxt=`<text data-pi="${pi}" x="${nameStartX}" y="${yPos}" text-anchor="start" font-family="'Barlow',sans-serif" font-size="${fs}" font-weight="${fw}" fill="${textColor}">${nm}</text>`;
       } else {
-        nameTxt=`<text x="0" y="${yPos}" text-anchor="middle" font-family="'Barlow',sans-serif" font-size="${fs}" font-weight="${fw}" fill="${textColor}">${nm}</text>`;
+        nameTxt=`<text data-pi="${pi}" x="0" y="${yPos}" text-anchor="middle" font-family="'Barlow',sans-serif" font-size="${fs}" font-weight="${fw}" fill="${textColor}">${nm}</text>`;
       }
       // Check mark - placed in the reserved space to the LEFT of name
       let checkTxt='';
@@ -34272,6 +34272,7 @@ function slpAddToSlot(slotId,pi){
   if(!slpState.slots[slotId].includes(pi)){
     slpState.slots[slotId].push(pi);
     slpRender();slpRenderPopup(slotId);
+    _slpAnimateDrop(slotId,pi);
   }
 }
 
@@ -34444,7 +34445,27 @@ function slpAssignViaDrop(slotId,pi){
   slpState.slots[slotId].push(pi);
   saveG();
   slpRender();
+  _slpAnimateDrop(slotId,pi);
   if(typeof showSaveFlash==='function')showSaveFlash('✓ Zugewiesen');
+}
+// The pitch is drawn anew after a drop, so nothing would show where the player
+// went: the position's circle pulses once and his name lights up briefly.
+function _slpAnimateDrop(slotId,pi){
+  try{
+    if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+    const g=document.querySelector('.slp-slot-group[data-slot-id="'+slotId+'"]');
+    if(!g||typeof g.animate!=='function')return;
+    const c=g.querySelector('circle');
+    if(c){
+      c.style.transformBox='fill-box';c.style.transformOrigin='center';
+      c.animate([{transform:'scale(1.18)'},{transform:'scale(1)'}],{duration:260,easing:'cubic-bezier(.22,1,.36,1)'});
+    }
+    const t=g.querySelector('text[data-pi="'+pi+'"]');
+    if(t){
+      const f=t.getAttribute('fill')||'#fff';
+      t.animate([{opacity:0,fill:'#FFE48F'},{opacity:1,fill:'#FFE48F',offset:.3},{opacity:1,fill:f}],{duration:1100,easing:'ease-out'});
+    }
+  }catch(e){}
 }
 
 function slpRemoveFromSlot(slotId,idx){
