@@ -2914,6 +2914,9 @@ body.design-heute.hxk-dk .ss-comm-act[title="L\00f6schen"]{color:#FF9C90 !import
 .app-sh-warn{margin-top:12px;padding:10px 12px;border-radius:10px;background:rgba(243,156,18,.12);border:1px solid rgba(243,156,18,.35);font-size:.78rem;line-height:1.45;color:var(--hx-ink,var(--gd));}
 .app-sh-stat{margin-top:12px;font-size:.78rem;line-height:1.45;color:var(--hx-muted,var(--gm));}
 .app-sh-stat b{color:var(--hx-ink,var(--gd));}
+.bk-safe{margin:0 0 10px;padding:8px 10px;border-radius:8px;font-size:.74rem;line-height:1.45;
+  background:color-mix(in srgb,#1F8F4E 9%,transparent);border:1px solid color-mix(in srgb,#1F8F4E 30%,transparent);color:var(--hx-ink,var(--gd));}
+.bk-safe.warn{background:rgba(243,156,18,.12);border-color:rgba(243,156,18,.35);}
 .push-adm{margin-top:16px;padding-top:14px;border-top:1px solid var(--hx-line,var(--gl));}
 .push-adm-h{font-size:.86rem;font-weight:700;color:var(--hx-ink,var(--gd));margin-bottom:8px;}
 .push-adm-h span{display:block;font-size:.74rem;font-weight:500;color:var(--hx-muted,var(--gm));margin-top:2px;}
@@ -6584,7 +6587,7 @@ const APP_VERSION_LABEL='1.2.1';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792283938867; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792285988491; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.2.1',date:'18.10.2026',title:'Bewegung',items:[
     {icon:'↔️',title:'Aufstellung',desc:'Beim Tauschen sieht man, wer wohin geht: der gezogene Spieler setzt sich auf seinen Platz, der verdrängte wandert auf den frei gewordenen. In der Saisonplanung pulsiert die Position, auf die ein Spieler gezogen wird, und sein Name leuchtet kurz auf.'},
@@ -29295,8 +29298,29 @@ function deleteBackup(i){
   const targetTs=bks[i].ts;
   modifyBackups(currentBks=>currentBks.filter(b=>b&&b.ts!==targetTs));
 }
+// The protected copy: made once a day by the job on GitHub (tools/sicherung)
+// in a part of the database the app cannot reach — so nobody can delete it
+// along with the data. The app only reads its status.
+function bkSafeStatus(){
+  const el=document.getElementById('bk-safe');
+  if(!el||!fbDb)return;
+  fbDb.ref('__backups_meta/safe').once('value').then(x=>{
+    const v=x.val();
+    if(!v||!v.t){el.hidden=true;return;}
+    const age=Date.now()-v.t,d=new Date(v.t);
+    const hm=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+    const days=Math.floor(age/864e5);
+    const when=days<1&&d.getDate()===new Date().getDate()?'heute '+hm:days<2?'gestern '+hm:d.getDate()+'.'+(d.getMonth()+1)+'.';
+    el.className='bk-safe'+(age>2*864e5?' warn':'');
+    el.innerHTML=age>2*864e5
+      ?'⚠ Geschützte Tageskopie: zuletzt '+when+' — die tägliche Sicherung auf GitHub läuft gerade nicht.'
+      :'🛡 Geschützte Tageskopie: zuletzt '+when+' · '+(v.days||1)+(v.days===1?' Tag':' Tage')+' zurück. Sie liegt außerhalb der Reichweite der App, niemand kann sie hier löschen. Abrufen über GitHub (Actions → Sicherung).';
+    el.hidden=false;
+  }).catch(()=>{el.hidden=true;});
+}
 function openBackupModal(){
   if(!_hxSettingsSub('backup'))openM('moBackup');
+  bkSafeStatus();
   // Show local data immediately (no flicker)
   renderBackupList();
   // Then fetch fresh from Firebase and re-render with the full list
@@ -34687,6 +34711,7 @@ _pubCleanupSchedule();
     <input type="file" id="bk-import-input" accept=".json,application/json" style="display:none;" onchange="importBackupFromFile(event)"/>
   </div>
   <p class="note" style="margin:0 0 10px;font-size:.7rem;">Backups werden im Browser & in der Cloud gespeichert. Maximal 15 Stück (älteste werden automatisch entfernt, „Vor Operation" werden bevorzugt behalten).</p>
+  <div id="bk-safe" class="bk-safe" hidden></div>
   <div id="backup-list" style="border:1px solid var(--gl);border-radius:8px;min-height:60px;flex:1;overflow-y:auto;"></div>
 </div></div>
 

@@ -1,0 +1,77 @@
+# Flutlicht · Sicherung
+# Once a day a copy of all data goes to a part of the database that neither the
+# app nor anyone else can read or delete (fcf_safe, 30 days). With the secret
+# SICHERUNG_PASSWORT the same copy is also kept here as an encrypted file for
+# 90 days (Actions → Sicherung → run → Artifacts), in case the whole Firebase
+# project were lost. Run it by hand with a date (JJJJMMTT) to get the copy of
+# that day as a file. Code: tools/sicherung.
+name: Sicherung
+
+on:
+  schedule:
+    - cron: '23 1 * * *'
+  workflow_dispatch:
+    inputs:
+      datum:
+        description: 'Tageskopie als Datei holen (JJJJMMTT, z. B. 20261018). Leer lassen: normale Sicherung.'
+        required: false
+        default: ''
+
+concurrency:
+  group: sicherung
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  sichern:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      EINGERICHTET: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
+      MIT_DATEI: ${{ secrets.SICHERUNG_PASSWORT != '' }}
+    steps:
+      - if: env.EINGERICHTET != 'true'
+        run: echo "FIREBASE_SERVICE_ACCOUNT fehlt – keine Sicherung."
+      - if: env.EINGERICHTET == 'true'
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: tools/sicherung
+      - if: env.EINGERICHTET == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: tools/sicherung/package-lock.json
+      - if: env.EINGERICHTET == 'true'
+        run: npm ci --omit=dev --no-audit --no-fund
+        working-directory: tools/sicherung
+      - if: env.EINGERICHTET == 'true'
+        run: node run.mjs
+        working-directory: tools/sicherung
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          DATUM: ${{ inputs.datum }}
+      # Never leaves the runner unencrypted: without a password the files are
+      # simply dropped with the machine.
+      - if: env.EINGERICHTET == 'true' && env.MIT_DATEI == 'true'
+        name: Verschlüsseln
+        working-directory: tools/sicherung
+        env:
+          PW: ${{ secrets.SICHERUNG_PASSWORT }}
+        run: |
+          shopt -s nullglob
+          files=(out/*)
+          [ ${#files[@]} -gt 0 ] || exit 0
+          command -v 7z >/dev/null || sudo apt-get install -y -qq p7zip-full >/dev/null
+          7z a -tzip -mem=AES256 -p"$PW" -bso0 -bsp0 "sicherung-${TAG}.zip" out/*
+          rm -rf out
+      - if: env.EINGERICHTET == 'true' && env.MIT_DATEI == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: sicherung-${{ env.TAG }}
+          path: tools/sicherung/sicherung-*.zip
+          retention-days: 90
+          compression-level: 0
+          if-no-files-found: ignore
