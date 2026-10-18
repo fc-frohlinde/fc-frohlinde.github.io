@@ -6597,13 +6597,18 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.1'; // v1.2.1: Bewegung
-const APP_VERSION_LABEL='1.2.1';
+const APP_VERSION='1.2.2'; // v1.2.2: Entschuldigt ohne Abzug
+const APP_VERSION_LABEL='1.2.2';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792289357511; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792291568963; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.2',date:'18.10.2026',title:'Entschuldigt ohne Abzug',items:[
+    {icon:'🤒',title:'Krank? Kostet nichts',desc:'Auf der Karte zählen Termine, die ihr als entschuldigt eingetragen habt, nicht gegen den Spieler – bis zu einer pro angefangene 10 Termine. Was darüber hinausgeht, zählt wie Fehlen. Die Karte sagt es offen, z. B. „18 von 20 dabei · 2× entschuldigt ohne Abzug“. So muss niemand krank zum Training kommen, um seine Stufe zu halten.'},
+    {icon:'🔥',title:'Serie',desc:'Ein entschuldigter Termin im selben Rahmen hält die Serie nur an, statt sie auf null zu setzen. Gilt überall, wo eine Serie steht: Karte, Spieler-App, Spielerprofil, Wochenbericht.'},
+    {icon:'👀',title:'Für Trainer',desc:'Entschuldigt tragt weiterhin nur ihr ein: „Kann nicht“ des Spielers bleibt Fehlen, bis ihr es entschuldigt. Sprecht ab, was als entschuldigt gilt (Krankheit, Prüfung, Familie – ja; keine Lust, späte Absage – nein). Anwesenheit in Tabelle und Statistik bleibt unverändert.'},
+  ]},
   {version:'1.2.1',date:'18.10.2026',title:'Bewegung',items:[
     {icon:'↔️',title:'Aufstellung',desc:'Beim Tauschen sieht man, wer wohin geht: der gezogene Spieler setzt sich auf seinen Platz, der verdrängte wandert auf den frei gewordenen. In der Saisonplanung pulsiert die Position, auf die ein Spieler gezogen wird, und sein Name leuchtet kurz auf.'},
     {icon:'🪟',title:'Fenster und Tasten',desc:'Fenster in der Mitte öffnen sich mit einem kurzen Übergang wie die Seitenleisten. Jede Taste reagiert sichtbar auf das Antippen. Wer im Gerät „Bewegung reduzieren“ eingeschaltet hat, sieht keine Animationen mehr.'},
@@ -16166,6 +16171,32 @@ const CARD_TIERS=[
   {k:'gold',name:'Gold',min:80,lamps:5,m:['#B07D0C','#FFE48F','#D9A21B'],ink:'#F2C230',hi:'#FFE897',lo:'#E0A51C'},
   {k:'flutlicht',name:'Flutlicht',min:95,lamps:6,m:['#F2C230','#FFFFFF','#FFE9A0'],ink:'#FFF3C4',hi:'#FFFFFF',lo:'#FFDD7A'}
 ];
+// Excused without penalty: of t recorded sessions, up to one per started ten
+// that the trainers marked Entschuldigt are left out — a cold must not cost a
+// lamp, or players come to training ill to keep it. More than that counts as
+// absence, so someone excused every other week is not at 100 %. At least one
+// session always counts. Only trainers can mark Entschuldigt (pmSetStatus).
+function _cardScore(a,t,e){
+  const nz=Math.max(0,Math.min(e,Math.ceil(t/10),t-1));
+  const c=t-nz;
+  return {nz,c,pct:c?Math.round(a/c*100):0};
+}
+// Current streak over session indices in date order, newest last. Present
+// adds one; an excused session within the same allowance only pauses it;
+// absent (or excused beyond it) ends it; not yet recorded is skipped.
+function _streakOf(p,idxs){
+  const st=si=>(p&&Array.isArray(p.s)&&si<p.s.length)?p.s[si]:null;
+  let a=0,t=0,e=0;
+  idxs.forEach(si=>{const v=st(si);if(v===1||v===0||v===2){t++;if(v===1)a++;else if(v===2)e++;}});
+  let pause=_cardScore(a,t,e).nz,streak=0;
+  for(let i=idxs.length-1;i>=0;i--){
+    const v=st(idxs[i]);
+    if(v===1)streak++;
+    else if(v===2&&pause>0)pause--;
+    else if(v===0||v===2)break;
+  }
+  return streak;
+}
 const CARD_FL_MIN=8;            // Flutlicht needs a real sample, not 2 of 2
 const CARD_FL_RATED=80;         // … and the load rated after (nearly) every session
 const CARD_RATED_FROM=20261017; // ratings count from the day the app asked every player for them
@@ -16201,14 +16232,15 @@ function cardData(p,D,season){
       }else if(num){rq++;ra++;}
     }
   });
-  const pct=ov.overall,t=ov.marked,a=ov.cA;
+  const t=ov.marked,a=ov.cA,e=ov.cE;
+  const sc=_cardScore(a,t,e),pct=sc.pct,nz=sc.nz;
   const rated=rq?Math.round(ra/rq*100):null;
   // Too few sessions to judge the rating yet: it does not hold anyone back
   const rateOk=rq<3||rated>=CARD_FL_RATED;
   let ti=pct>=80?2:pct>=60?1:0;
   if(pct>=95&&t>=CARD_FL_MIN&&rateOk)ti=3;
   const name=String(p.name||'').trim();
-  return {ti,pct,a,t,rated,rq,rateOk,apps,goals,assists,mvp,
+  return {ti,pct,a,t,e,nz,rated,rq,rateOk,apps,goals,assists,mvp,
     streak:_playerStreak(p,D,season),
     name,ini:name.split(/\s+/).map(x=>x[0]||'').join('').slice(0,2).toUpperCase()||'?',
     nr:(p.nr!=null&&p.nr!=='')?String(p.nr):'',pos:typeof p.pos==='string'?p.pos:'',
@@ -16219,7 +16251,7 @@ function _cardNext(d){
   if(d.ti===3)return {done:true};
   const nx=CARD_TIERS[d.ti+1];
   const fl=(d.ti+1===3);
-  const reached=(a,t)=>Math.round(a/t*100)>=nx.min&&(!fl||t>=CARD_FL_MIN);
+  const reached=(a,t)=>_cardScore(a,t,d.e||0).pct>=nx.min&&(!fl||t>=CARD_FL_MIN);
   let n=0;
   if(!reached(d.a,d.t)){for(n=1;n<=99;n++)if(reached(d.a+n,d.t+n))break;}
   return {tier:nx,n,needRate:fl&&!d.rateOk};
@@ -16337,8 +16369,11 @@ function cardDraw(cv,d,o){
   x.fillStyle=g;x.textAlign='left';
   x.font='800 78px '+BS;x.fillText(num,sx,347);
   x.font='700 32px '+BS;x.fillText('%',sx+wn+3,347);
-  x.textAlign='center';x.font='600 11.5px '+BA;x.fillStyle='rgba(255,255,255,.6)';
-  x.fillText('Anwesenheit · '+d.a+' von '+d.t,180,365);
+  x.textAlign='center';x.fillStyle='rgba(255,255,255,.6)';
+  const how=d.nz?d.a+' von '+d.t+' dabei · '+d.nz+'× entschuldigt ohne Abzug':'Anwesenheit · '+d.a+' von '+d.t;
+  let hs=11.5;
+  for(;hs>9;hs-=.5){x.font='600 '+hs+'px '+BA;if(x.measureText(how).width<=304)break;}
+  x.fillText(how,180,365);
   x.fillStyle='rgba(255,255,255,.12)';x.fillRect(28,379,304,1);
   // Six numbers he controls himself
   const cells=[[d.streak,'Serie'],[d.apps,'Spiele'],[d.goals,'Tore'],
@@ -16482,7 +16517,7 @@ function renderPlayerCard(){
     return `<span class="mk-chip ${w.st}" title="${tip}">${escapeHtml(w.day)}${w.match?' ⚽':''}${w.st==='ok'?' ✓':''}</span>`;}).join('')}</div>`:'';
   let canShare=false;
   try{canShare=!!(navigator.share&&navigator.canShare&&navigator.canShare({files:[new File([new Uint8Array(1)],'x.jpg',{type:'image/jpeg'})]}));}catch(e){}
-  const aria=`Karte ${T.name}. Anwesenheit ${d.pct} Prozent, ${d.a} von ${d.t}. Serie ${d.streak}, Spiele ${d.apps}, Tore ${d.goals}, Vorlagen ${d.assists}, Bewertet ${d.rated==null?'noch nichts':d.rated+' Prozent'}, Spieler des Spiels ${d.mvp}.`;
+  const aria=`Karte ${T.name}. Anwesenheit ${d.pct} Prozent, ${d.a} von ${d.t}${d.nz?`, ${d.nz} Mal entschuldigt ohne Abzug`:''}. Serie ${d.streak}, Spiele ${d.apps}, Tore ${d.goals}, Vorlagen ${d.assists}, Bewertet ${d.rated==null?'noch nichts':d.rated+' Prozent'}, Spieler des Spiels ${d.mvp}.`;
   wrap.innerHTML=`<div class="mk mk-t-${T.k}">${back}${prev}
     <div class="mk-stage"><canvas id="mk-cv" class="mk-cv" width="1080" height="1512" role="img" aria-label="${escapeHtml(aria)}"></canvas></div>
     <div class="mk-next">
@@ -16495,7 +16530,7 @@ function renderPlayerCard(){
       ${canShare?'<button class="mk-share" onclick="cardShare()">Karte teilen</button><button class="mk-save" onclick="cardSave()">Als Bild speichern</button>'
         :'<button class="mk-share" onclick="cardSave()">Als Bild speichern</button>'}
     </div>
-    <div class="mk-foot">Zählt die ganze Saison: wie oft du bei Training und Spiel dabei warst. Silber ab 60 %, Gold ab 80 %, Flutlicht ab 95 % bei mindestens ${CARD_FL_MIN} Terminen – und wenn du die Belastung fast immer bewertest.</div>
+    <div class="mk-foot">Zählt die ganze Saison: wie oft du bei Training und Spiel dabei warst. Bist du krank, bleib zu Hause: Termine, die die Trainer als entschuldigt eintragen, kosten dich nichts – bis zu 1 von 10. Silber ab 60 %, Gold ab 80 %, Flutlicht ab 95 % bei mindestens ${CARD_FL_MIN} Terminen – und wenn du die Belastung fast immer bewertest.</div>
   </div>`;
   _mkShow();
 }
@@ -17640,17 +17675,10 @@ function _pmCalcStats(p,D){
     if(sk<today&&_sessAfterJoin(p,s))pastIdxs.push({si,sk});
   });
   pastIdxs.sort((a,b)=>a.sk-b.sk);
-  // STREAK: count only CONSECUTIVE Anwesend sessions from most recent backwards.
-  // Anything that's not Anwesend (Fehlend, Entschuldigt, Angemeldet, Ausstehend) breaks the streak.
-  // This matches user intuition: streak = "how many trainings in a row did I attend".
-  let streak=0;
-  for(let i=pastIdxs.length-1;i>=0;i--){
-    const si=pastIdxs[i].si;
-    const v=(p.s&&si<p.s.length)?p.s[si]:3;
-    if(v===1)streak++;
-    else if(v===3||v===4)continue; // Ausstehend / Angemeldet (trainer didn't roll-call yet) — skip without breaking
-    else break; // Fehlend (0) OR Entschuldigt (2) breaks streak
-  }
+  // STREAK: consecutive Anwesend from the most recent backwards; not yet
+  // recorded is skipped, Fehlend ends it, Entschuldigt within the allowance
+  // only pauses it (same rule as the card, _streakOf).
+  const streak=_streakOf(p,pastIdxs.map(x=>x.si));
   // Rank: cached from CU (computed before sanitization in player mode).
   // In player mode the rest of D.players is sanitized to null — direct recomputation impossible.
   let rank=null;
@@ -19406,22 +19434,14 @@ function _psWeekSeries(p,block,season,weeks){
     .slice(-(weeks||10))
     .map(([k,v])=>({kw:parseInt(k.split('-W')[1],10),pct:Math.round(v.a/v.t*100),a:v.a,t:v.t}));
 }
-// Current streak, most recent backwards. Not yet recorded (3/4/empty) neither
-// counts nor breaks it.
+// Current streak, most recent backwards (rule in _streakOf).
 function _playerStreak(p,block,season){
   const held=[];
   (block.sessions||[]).forEach((s,si)=>{
     if(s&&sessTookPlace(s,season)&&_sessAfterJoin(p,s,season))held.push({si,sk:_dbSortKey(s.date,season)});
   });
   held.sort((a,b)=>a.sk-b.sk);
-  let streak=0;
-  for(let i=held.length-1;i>=0;i--){
-    const v=p.s&&p.s[held[i].si];
-    if(v===1)streak++;
-    else if(v===3||v===4||v==null)continue;
-    else break;
-  }
-  return streak;
+  return _streakOf(p,held.map(h=>h.si));
 }
 function dbBuildPlayerStatsSnapshot(data,pi,offset,includePhoto){
   const {block,season,team}=data;
@@ -21460,13 +21480,8 @@ function openPlayerStats(pi,opts){
     // Current streak, counted backwards through the sessions that took place.
     // tIdx/mIdx are the past trainings and matches available here; merged and
     // ordered by date they give the real sequence.
-    let streak=0;
     const pastAll=[...tIdx,...mIdx].sort((a,b)=>dispToSortKey(ss[a].date)-dispToSortKey(ss[b].date));
-    for(let k=pastAll.length-1;k>=0;k--){
-      const v=p.s?p.s[pastAll[k]]:null;
-      if(v===1)streak++;
-      else if(v===0||v===2)break;
-    }
+    const streak=_streakOf(p,pastAll);
     const tile=(v,l,s,c)=>`<div class="ps-tile"><div class="ps-tile-v"${c?` style="color:${c};"`:''}>${v}</div>`
       +`<div class="ps-tile-l">${l}</div>${s?`<div class="ps-tile-s">${s}</div>`:''}</div>`;
     document.getElementById('ps-cards').innerHTML=
