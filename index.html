@@ -2663,6 +2663,29 @@ html:has(body.hub-mode){background:#080f22;}
   font-family:'Barlow',sans-serif;font-size:.98rem;font-weight:700;cursor:pointer;}
 .mvp-go:disabled{background:#E6EBF2;color:#8A97B0;cursor:default;}
 .hub-mvp{cursor:default;}
+/* ── Bewegung ────────────────────────────────────────────────
+   Movement says what happened, nothing else. Sections switch without any —
+   they are tabs, not layers. Windows open with one short step: side panels
+   slide in, sheets rise from the bottom, dialogs settle in the middle.
+   Closing is immediate. The backdrop fades so a dialog does not slam in. */
+@keyframes moFadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes moDlgIn{from{opacity:0;transform:translateY(8px) scale(.985);}to{opacity:1;transform:none;}}
+@media (min-width:768px){
+  .mo.open:not(.hx-page){animation:moFadeIn .16s ease-out;}
+  .mo.open:not(.hx-page):not(.hx-panel)>.mob{animation:moDlgIn .18s cubic-bezier(.22,1,.36,1);}
+}
+@media (max-width:767px){
+  .mo.open:not(.hx-page){animation:moFadeIn .16s ease-out;}
+}
+/* Every button answers a tap — on the pitch you need to see it registered */
+.btn:not(:disabled):active,.seg-btn:active,.rpe-tile:active,.rpe-open-b:active,.rpe-nd-btn:active,
+.mvp-opt:active,.mvp-go:not(:disabled):active,.hub-push-on:active,.hub-push-later:active,.rpe-remind:active{transform:scale(.97);}
+/* "Bewegung reduzieren" on the phone or computer: no movement anywhere */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;scroll-behavior:auto !important;}
+}
+
 /* The reminder offer: an offer with two answers, not a link */
 .hub-push{cursor:default;align-items:flex-start;}
 .hub-push:hover{transform:none;border-color:var(--hbr);}
@@ -6556,13 +6579,17 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.0'; // v1.2.0: Erinnerungen (Web Push)
-const APP_VERSION_LABEL='1.2.0';
+const APP_VERSION='1.2.1'; // v1.2.1: Bewegung
+const APP_VERSION_LABEL='1.2.1';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792275218106; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792281602176; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.1',date:'18.10.2026',title:'Bewegung',items:[
+    {icon:'↔️',title:'Aufstellung',desc:'Beim Tauschen sieht man, wer wohin geht: der gezogene Spieler setzt sich auf seinen Platz, der verdrängte wandert auf den frei gewordenen.'},
+    {icon:'🪟',title:'Fenster und Tasten',desc:'Fenster in der Mitte öffnen sich mit einem kurzen Übergang wie die Seitenleisten. Jede Taste reagiert sichtbar auf das Antippen. Wer im Gerät „Bewegung reduzieren“ eingeschaltet hat, sieht keine Animationen mehr.'},
+  ]},
   {version:'1.2.0',date:'17.10.2026',title:'Erinnerungen',items:[
     {icon:'🔔',title:'Erinnerungen aufs Handy',desc:'Spieler können in ihrer Übersicht Erinnerungen einschalten. Dann kommt eine Benachrichtigung, wenn die Belastung nach einer Einheit noch fehlt (etwa 20–45 Minuten nach dem Ende), am Tag nach dem Spiel ab 17 Uhr, wenn die Stimme für den Spieler des Spiels fehlt, und am Vorabend ab 18 Uhr, wenn er für morgen noch nicht zu- oder abgesagt hat. Jede nur einmal, nie zwischen 22:30 und 8 Uhr. Auf dem iPhone nur in der installierten App.'},
     {icon:'👀',title:'Für Trainer',desc:'Unter „Link an die Mannschaft“: wer Erinnerungen an hat, welche Arten laufen (Admin schaltet sie an und aus), wann die letzte Runde war und „Test an dieses Handy“. In der Liste „Noch offen“ und im Kader zeigt 🔔, wer automatisch erinnert wird.'},
@@ -32948,15 +32975,35 @@ document.addEventListener('pointerup',(e)=>{
       const toOK=toVal!==null&&toVal!==-1;
       _lpSetSlotPlayer(_lpDragHover,fromOK?fromVal:null);
       _lpSetSlotPlayer(_lpDragSlot,toOK?toVal:null);
+      _lpSwapAnim={from:_lpDragSlot,to:_lpDragHover,had:toOK};
     }
     _lpDragCleanup();
     lpRender();
+    if(_lpSwapAnim){const a=_lpSwapAnim;_lpSwapAnim=null;_lpAnimateSwap(a.from,a.to,a.had);}
   } else {
     _lpDragSlot=null;_lpDragHover=null;
   }
 });
 
 function lpPointerEnter(e,targetSlot){/* legacy - no-op now, drag handled in move */}
+// After a drop the pitch is drawn anew, so the players would simply jump. The
+// dropped one settles on his new spot; the one he displaced travels to the
+// spot that was freed — so the trainer sees who went where. CSS transforms on
+// an SVG group replace its transform attribute while they run, so each
+// keyframe carries the group's own position (px = user units here).
+let _lpSwapAnim=null;
+function _lpAnimateSwap(fromSlot,toSlot,had){
+  try{
+    if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+    const g=id=>document.querySelector('#lp-slots [data-slot="'+id+'"]');
+    const xy=el=>{const m=el&&/translate\(\s*([-\d.]+)[\s,]+([-\d.]+)\s*\)/.exec(el.getAttribute('transform')||'');return m?[+m[1],+m[2]]:null;};
+    const gTo=g(toSlot),gFrom=g(fromSlot),pTo=xy(gTo),pFrom=xy(gFrom);
+    if(!gTo||!pTo||typeof gTo.animate!=='function')return;
+    const T=(p,s)=>'translate('+p[0]+'px,'+p[1]+'px)'+(s!=null?' scale('+s+')':'');
+    gTo.animate([{transform:T(pTo,1.14)},{transform:T(pTo,1)}],{duration:220,easing:'cubic-bezier(.22,1,.36,1)'});
+    if(had&&gFrom&&pFrom)gFrom.animate([{transform:T(pTo)},{transform:T(pFrom)}],{duration:280,easing:'cubic-bezier(.22,1,.36,1)'});
+  }catch(e){}
+}
 
 function lpClosePopup(){
   // No drag cleanup here: the drag START calls this to dismiss the picker,
