@@ -4571,6 +4571,20 @@ body.design-heute #hxHome.hx-has-hero .hx-date{text-shadow:0 1px 8px rgba(0,0,0,
 .hx-btn.primary:hover{filter:brightness(.97);}
 .hx-btn.dark{background:#fff;color:var(--hx-ink);border-color:#fff;font-weight:700;}
 .hx-counts{display:flex;flex-wrap:wrap;gap:24px;align-items:center;}
+.hx-card.hx-tp{flex-direction:row;align-items:center;gap:16px;padding:16px 20px;}
+.hx-tp-ic{flex:none;width:44px;height:44px;border-radius:12px;background:var(--hx-yellow);color:var(--hx-on-acc,var(--hx-ink));display:grid;place-items:center;}
+.hx-tp-ic svg{width:22px;height:22px;}
+.hx-tp-x{flex:1 1 auto;min-width:0;}
+.hx-tp-x b{display:block;font-size:1rem;font-weight:700;}
+.hx-tp-x span{display:block;margin-top:2px;font-size:.88rem;line-height:1.35;color:var(--hx-muted);}
+.hx-tp .hx-btns{flex:none;flex-wrap:nowrap;}
+.hx-tp .hx-btn{height:42px;}
+@media (max-width:767px){
+  .hx-card.hx-tp{flex-wrap:wrap;gap:12px;padding:14px 16px;}
+  .hx-tp-x{flex:1 1 200px;}
+  .hx-tp .hx-btns{width:100%;}
+  .hx-tp .hx-btns .hx-btn,.hx-tp .hx-btns .hx-btn.primary{flex:1;justify-content:center;height:46px;font-size:.98rem;}
+}
 .hx-tiles{flex:1 1 300px;display:grid;grid-template-columns:repeat(var(--hxn,3),minmax(0,1fr));gap:10px;}
 button.hx-tile{cursor:pointer;transition:transform .12s,box-shadow .12s;}
 button.hx-tile:hover{box-shadow:0 0 0 2px rgba(14,35,80,.12) inset;}
@@ -6611,11 +6625,12 @@ const APP_VERSION_LABEL='1.2.3';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792608431024; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792617346357; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.2.3',date:'21.10.2026',title:'Benachrichtigungen aufs Handy',items:[
     {icon:'📲',title:'Auch wenn Flutlicht zu ist',desc:'Einstellungen → Benachrichtigungen → „Aufs Handy“ auf jedem Gerät einmal einschalten. Dann kommen die Hinweise als echte Benachrichtigung, auch bei geschlossener App. Der alte Schalter funktionierte nur, solange die App offen war, und ist ersetzt. Auf dem iPhone nur in der installierten App.'},
     {icon:'🔔',title:'Was kommt',desc:'Geburtstage (am Vorabend und morgens am Tag), Nachrichten anderer Trainer, „Anwesenheit fehlt“ am Morgen nach einer Einheit mit offenen Einträgen und Technik (Sicherung oder Erinnerungen laufen nicht). Auf Wunsch: kurzfristige Absagen in den 24 Std. vor Beginn und der Stand 3 Std. vor Beginn (dabei, abgesagt, offen). Jede Art einzeln abschaltbar, die Auswahl gilt für alle deine Geräte. Nie zwischen 22:30 und 8 Uhr.'},
+    {icon:'🏠',title:'Hinweis auf der Übersicht',desc:'Wer sie auf einem Gerät noch nicht eingeschaltet hat, sieht auf der Übersicht einmal „Benachrichtigungen aufs Handy“ mit „Einschalten“. „Später“ blendet den Hinweis für zwei Wochen aus, nach dem zweiten Mal bleibt er weg; der Schalter in den Einstellungen bleibt immer.'},
     {icon:'👆',title:'Tippen führt hin',desc:'Ein Tippen öffnet die passende Stelle: das Profil des Geburtstagskinds, das Erfassen der Anwesenheit, den Termin oder die Nachricht. Spieler bekommen von alldem nichts.'},
   ]},
   {version:'1.2.2',date:'18.10.2026',title:'Entschuldigt ohne Abzug',items:[
@@ -16915,6 +16930,39 @@ function tpushRender(){
     <div class="tp-kinds">${TPUSH_KINDS.map(([k,ic,t,d])=>`<label class="tp-kind"><input type="checkbox" ${p[k]?'checked':''} onchange="tpushSetKind('${k}',this.checked)"><span><b>${ic} ${t}</b><small>${d}</small></span></label>`).join('')}</div>
     <p class="tp-note">Die Auswahl gilt für alle deine Geräte. Nie zwischen 22:30 und 8 Uhr. Spieler bekommen davon nichts.</p>`;
 }
+// The offer on the start page: only where this device could have them and
+// does not. "Später" hides it for two weeks; after the second time it stays
+// away (the switch in the settings is always there).
+function _tpOfferLs(v){
+  const k='offer_'+((CU&&CU.name)||'');
+  if(v===undefined){try{return JSON.parse(_pushLs(k)||'{}')||{};}catch(e){return {};}}
+  _pushLs(k,JSON.stringify(v));
+}
+function _tpOfferHtml(){
+  try{
+    if(!CU||!canEdit()||(typeof isPlayerMode==='function'&&isPlayerMode()))return '';
+    const st=tpushState();
+    if(st!=='off'&&st!=='ios')return '';
+    const o=_tpOfferLs();
+    if((o.n||0)>=2||(o.next&&Date.now()<o.next))return '';
+    const ios=st==='ios';
+    return `<section class="hx-card hx-tp" aria-label="Benachrichtigungen aufs Handy"><span class="hx-tp-ic" aria-hidden="true">${hxIcon('bell')}</span>
+      <span class="hx-tp-x"><b>Benachrichtigungen aufs Handy</b><span>${ios
+        ?'Geburtstage, fehlende Anwesenheit, Nachrichten. Auf dem iPhone nur in der installierten App.'
+        :'Geburtstage, fehlende Anwesenheit, Nachrichten – auch wenn Flutlicht geschlossen ist. Was genau, wählst du in den Einstellungen.'}</span></span>
+      <span class="hx-btns"><button type="button" class="hx-btn primary" onclick="${ios?'pushIosHelp()':'tpOfferOn()'}">${ios?'So geht’s':'Einschalten'}</button><button type="button" class="hx-btn" onclick="tpOfferLater()">Später</button></span>
+    </section>`;
+  }catch(e){return '';}
+}
+async function tpOfferOn(){
+  await tpushEnable();
+  try{hxRender();}catch(e){}
+}
+function tpOfferLater(){
+  const o=_tpOfferLs();
+  _tpOfferLs({n:(o.n||0)+1,next:Date.now()+14*864e5});
+  try{hxRender();}catch(e){}
+}
 // A tap on a trainer notification opens ?go=…&gt=team&gs=season&gi=index:
 // carried out once, as soon as the data of that team is there.
 let _tgo=null;
@@ -25132,7 +25180,7 @@ function hxRender(){
   const mi=findNextMatchIdx();
   let html=`<div class="hx-heroimg" aria-hidden="true"></div><div class="hx-wrap">${mtop}
     <div class="hx-top"><div class="hx-hello"><span class="hx-date">${esc(dateTxt)}</span><h1 class="hx-h1">${esc(_hxGreeting())}</h1></div>
-    </div>
+    </div>${_tpOfferHtml()}
     <div class="hx-grid">`;
   // ── Focus: the next session ──
   if(fi<0){
