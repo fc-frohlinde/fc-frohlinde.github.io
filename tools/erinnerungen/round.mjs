@@ -1,19 +1,27 @@
 // Flutlicht · Erinnerungen — one round: read, decide, send, record.
 //
-//   fcf_push/subs/<owner>/<device>  subscriptions (owner: p<hash of token>,
-//                                   or t<hash> for a trainer's test device)
-//   fcf_push/sent/<YYYYMMDD>/<kind>-<session>/<owner>   what went out that day
+//   fcf_push/subs/<owner>/<device>  subscriptions (owner: p<hash of token> for
+//                                   a player, t<hash of "trainer:"+name> for a
+//                                   trainer: test device and/or tp:1 = his own
+//                                   notifications, see trainer.mjs)
+//   fcf_push/sent/<YYYYMMDD>/<kind>-<key>/<owner>   what went out that day
+//                                   (owner "_": a team was looked at, see chk-)
+//   fcf_push/tsnap/<team__season>   answers as of the last round, for
+//                                   cancellations shortly before the start
 //   fcf_push/status                 last round, for the trainers' panel
 //   fcf_push/pub                    public VAPID key, read by the app
 //   fcf_push_keys/vapid             key pair — no rule grants clients access
 //
 // db: {get(path), set(path,v), remove(path)}; push: web-push or a stand-in.
 import { decode, pathKey, berlin, plan, anyDue, quiet, addDays } from './lib.mjs';
+import { trainerOwner, allowed, kindsOf, needsPlayers, birthdays, rollCall, cancellations, lineup,
+  messages, machinery, BDAY_DAY, BDAY_EVE, ATT_FROM } from './trainer.mjs';
 
 export async function round({ db, push, ts = Date.now(), log = console.log, dry = false }) {
   const now = berlin(ts);
   let sent = 0, errors = 0, gone = 0, nDev = 0;
   try {
+    const prev = (await db.get('fcf_push/status')) || {};
     // Keys: made once, kept where only this job can read them
     let keys = await db.get('fcf_push_keys/vapid');
     if (!keys || !keys.publicKey || !keys.privateKey) {
@@ -26,6 +34,16 @@ export async function round({ db, push, ts = Date.now(), log = console.log, dry 
 
     const subs = (await db.get('fcf_push/subs')) || {};
     nDev = Object.values(subs).reduce((a, o) => a + Object.keys(o || {}).length, 0);
+
+    // One read per team and kind of data, whoever needs it
+    const cache = new Map();
+    const load = async (bk, what) => {
+      const id = bk + '/' + what;
+      if (!cache.has(id)) cache.set(id, decode(await db.get(`fcf_data/db/${pathKey(bk)}/${what}`)) || []);
+      return cache.get(id);
+    };
+    let sentToday = null;
+    const today = async () => (sentToday = sentToday || (await db.get(`fcf_push/sent/${now.day}`)) || {});
 
     // To every device of an owner (or one of them); dead devices are removed
     async function deliver(owner, payload, ttl, only) {
@@ -59,19 +77,22 @@ export async function round({ db, push, ts = Date.now(), log = console.log, dry 
 
     // Player reminders, block by block (team + season of the subscriptions)
     const blocks = new Map();
-    for (const devs of Object.values(subs)) for (const d of Object.values(devs || {}))
-      if (d && d.team && d.season) blocks.set(d.team + '__' + d.season, { team: d.team, season: d.season });
+    for (const [owner, devs] of Object.entries(subs)) {
+      if (!owner.startsWith('p')) continue;
+      for (const d of Object.values(devs || {}))
+        if (d && d.team && d.season) blocks.set(d.team + '__' + d.season, { team: d.team, season: d.season });
+    }
     const owners = new Set(Object.keys(subs).filter(o => o.startsWith('p')));
     if (!quiet(now) && owners.size) {
       const configs = (await db.get('fcf_push/config')) || {};
-      const sentToday = (await db.get(`fcf_push/sent/${now.day}`)) || {};
       for (const [bk, { team, season }] of blocks) {
         const base = `fcf_data/db/${pathKey(bk)}`;
         const cfg = configs[pathKey(team)] || {};
-        const sessions = decode(await db.get(base + '/sessions')) || [];
+        const sessions = await load(bk, 'sessions');
         if (!anyDue(sessions, season, now, cfg)) continue;          // most rounds end here
-        const players = decode(await db.get(base + '/players')) || [];
-        for (const t of plan({ sessions, players, season, team, now, cfg, owners, sent: sentToday })) {
+        const players = await load(bk, 'players');
+        const sentT = await today();
+        for (const t of plan({ sessions, players, season, team, now, cfg, owners, sent: sentT })) {
           const n = await deliver(t.owner, t.payload, t.ttl);
           if (n) {
             sent += n;
@@ -87,11 +108,83 @@ export async function round({ db, push, ts = Date.now(), log = console.log, dry 
       }
     }
 
+    // Trainers' own notifications (trainer.mjs)
+    const recips = [];
+    for (const [owner, devs] of Object.entries(subs)) {
+      if (!owner.startsWith('t')) continue;
+      const d = Object.values(devs || {}).filter(x => x && x.tp && x.trainer && x.team && x.season).sort((a, z) => (z.t || 0) - (a.t || 0))[0];
+      if (d && trainerOwner(d.trainer) === owner) recips.push({ owner, name: d.trainer, team: d.team, season: d.season });
+    }
+    if (!quiet(now) && recips.length) {
+      const trainers = decode(await db.get('fcf_data/trainers')) || [];
+      const rs = [];
+      for (const r of recips) {
+        if (!allowed(r.name, r.team, trainers)) { log('Kein Trainer der Mannschaft', r.team + ':', r.name); continue; }
+        r.kinds = kindsOf(decode(await db.get(`fcf_data/userAutomation/${pathKey(r.name)}/push`)));
+        rs.push(r);
+      }
+      const sentT = await today();
+      let sentY = null;
+      const was = (log2, kind, key, owner) => !!(log2 && log2[kind + '-' + key] && log2[kind + '-' + key][owner]);
+      const note = async (kind, key, owner) => {
+        (sentT[kind + '-' + key] = sentT[kind + '-' + key] || {})[owner] = ts;
+        if (!dry) await db.set(`fcf_push/sent/${now.day}/${kind}-${key}/${owner}`, ts);
+      };
+      const send = async (r, kind, it) => {
+        if (was(sentT, kind, it.key, r.owner) || (kind === 'msg' && was(sentY, kind, it.key, r.owner))) return;
+        const n = await deliver(r.owner, { title: it.title, body: it.body, url: it.url, tag: kind + '-' + it.key }, it.ttl);
+        if (n) { sent += n; await note(kind, it.key, r.owner); log('Trainer', kind, it.key, r.name, n + ' Gerät(e)'); }
+      };
+      // per team
+      const byBlock = new Map();
+      for (const r of rs) { const bk = r.team + '__' + r.season; if (!byBlock.has(bk)) byBlock.set(bk, []); byBlock.get(bk).push(r); }
+      for (const [bk, group] of byBlock) {
+        const b = { team: group[0].team, season: group[0].season, sessions: await load(bk, 'sessions') };
+        const any = {}; for (const r of group) for (const k of Object.keys(r.kinds)) any[k] = any[k] || r.kinds[k];
+        const chk = k => k + '-' + pathKey(bk);
+        const done = k => was(sentT, 'chk', chk(k), '_');
+        if (!needsPlayers(b, now, any, done)) continue;
+        b.players = await load(bk, 'players');
+        const to = async (kind, it) => { for (const r of group) if (r.kinds[kind]) await send(r, kind, it); };
+        if (any.bday) for (const eve of [false, true]) {
+          const mk = eve ? 'bdaychk-e' : 'bdaychk-d';
+          if (now.min < (eve ? BDAY_EVE : BDAY_DAY) || done(mk)) continue;
+          const it = birthdays(b, now, eve);
+          if (it) await to('bday', it);
+          await note('chk', chk(mk), '_');
+        }
+        if (any.att && now.min >= ATT_FROM && !done('attchk')) {
+          for (const it of rollCall(b, now)) await to('att', it);
+          await note('chk', chk('attchk'), '_');
+        }
+        if (any.late) {
+          const path = `fcf_push/tsnap/${pathKey(bk)}`;
+          const { items, snap } = cancellations(b, now, (await db.get(path)) || {});
+          for (const it of items) await to('late', it);
+          if (!dry) await db.set(path, Object.keys(snap).length ? snap : null);
+        }
+        if (any.lineup) for (const it of lineup(b, now)) {
+          if (done('lineup-' + it.key)) continue;
+          await to('lineup', it);
+          await note('chk', chk('lineup-' + it.key), '_');
+        }
+      }
+      // for everyone: messages between trainers, the machinery
+      if (rs.some(r => r.kinds.msg)) {
+        const list = decode(await db.get('fcf_data/messages')) || [];
+        sentY = (await db.get(`fcf_push/sent/${addDays(now.day, -1)}`)) || {};
+        for (const r of rs) if (r.kinds.msg) for (const it of messages(list, now, r.name)) await send(r, 'msg', it);
+      }
+      if (rs.some(r => r.kinds.tech)) {
+        const items = machinery({ safe: await db.get('__backups_meta/safe'), prev, now });
+        for (const r of rs) if (r.kinds.tech) for (const it of items) await send(r, 'tech', it);
+      }
+    }
+
     // Housekeeping: the sent log keeps a week
     const days = Object.keys((await db.get('fcf_push/sent')) || {});
     for (const d of days) if (+d < addDays(now.day, -7) && !dry) await db.remove('fcf_push/sent/' + d);
 
-    const prev = (await db.get('fcf_push/status')) || {};
     if (!dry) await db.set('fcf_push/status', {
       t: ts, day: now.day, sent: (prev.day === now.day ? (prev.sent || 0) : 0) + sent,
       err: errors, gone, devices: nDev, v: 1 });

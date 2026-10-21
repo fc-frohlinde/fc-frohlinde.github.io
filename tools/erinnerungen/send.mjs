@@ -1,4 +1,4 @@
-// Flutlicht · Erinnerungen — entry point of the scheduled GitHub workflow
+// Flutlicht · Erinnerungen — entry point of the scheduled GitHub workflow (players, and the trainers' own notifications, trainer.mjs)
 // (.github/workflows/erinnerungen.yml): every 15 minutes, one round (round.mjs).
 // Needs the secret FIREBASE_SERVICE_ACCOUNT (the project's service account
 // key as JSON). Without it nothing happens. `node send.mjs --dry` sends

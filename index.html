@@ -2943,6 +2943,15 @@ body.design-heute.hxk-dk .ss-comm-act[title="L\00f6schen"]{color:#FF9C90 !import
 .push-adm-st{margin-top:8px;font-size:.76rem;line-height:1.45;color:var(--hx-muted,var(--gm));}
 .push-adm-st.warn{color:#B9770E;}
 .push-adm-test{margin-top:10px;}
+.tp-kinds{margin:2px 0 6px;padding:2px 12px;border-radius:10px;background:rgba(127,127,127,.06);}
+label.tp-kind{display:flex;align-items:flex-start;gap:10px;padding:9px 0;margin:0;cursor:pointer;
+  font-size:inherit;font-weight:400;text-transform:none;letter-spacing:normal;line-height:1.3;}
+label.tp-kind+label.tp-kind{border-top:1px solid var(--hx-line,var(--gl));}
+label.tp-kind input[type=checkbox]{margin:2px 0 0;padding:0;width:17px;height:17px;accent-color:var(--hx-nav,#0E2350);flex-shrink:0;}
+.tp-kind b{display:block;font-size:.84rem;font-weight:600;color:var(--hx-ink,var(--gd));}
+.tp-kind small{display:block;font-size:.74rem;color:var(--hx-muted,var(--gm));margin-top:2px;}
+.tp-note{font-size:.74rem;line-height:1.45;color:var(--hx-muted,var(--gm));margin:6px 0 16px;}
+.tp-help{border:0;background:none;padding:0;font:inherit;color:inherit;text-decoration:underline;cursor:pointer;}
 .push-bell{margin-left:4px;vertical-align:-1px;color:var(--hx-muted,var(--gm));}
 /* ── Editor ──────────────────────────────────────────────── */
 .rpe-ed-sec{font-size:.64rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
@@ -6597,13 +6606,18 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.2'; // v1.2.2: Entschuldigt ohne Abzug
-const APP_VERSION_LABEL='1.2.2';
+const APP_VERSION='1.2.3'; // v1.2.3: Benachrichtigungen aufs Handy
+const APP_VERSION_LABEL='1.2.3';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792291568963; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792608431024; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.3',date:'21.10.2026',title:'Benachrichtigungen aufs Handy',items:[
+    {icon:'📲',title:'Auch wenn Flutlicht zu ist',desc:'Einstellungen → Benachrichtigungen → „Aufs Handy“ auf jedem Gerät einmal einschalten. Dann kommen die Hinweise als echte Benachrichtigung, auch bei geschlossener App. Der alte Schalter funktionierte nur, solange die App offen war, und ist ersetzt. Auf dem iPhone nur in der installierten App.'},
+    {icon:'🔔',title:'Was kommt',desc:'Geburtstage (am Vorabend und morgens am Tag), Nachrichten anderer Trainer, „Anwesenheit fehlt“ am Morgen nach einer Einheit mit offenen Einträgen und Technik (Sicherung oder Erinnerungen laufen nicht). Auf Wunsch: kurzfristige Absagen in den 24 Std. vor Beginn und der Stand 3 Std. vor Beginn (dabei, abgesagt, offen). Jede Art einzeln abschaltbar, die Auswahl gilt für alle deine Geräte. Nie zwischen 22:30 und 8 Uhr.'},
+    {icon:'👆',title:'Tippen führt hin',desc:'Ein Tippen öffnet die passende Stelle: das Profil des Geburtstagskinds, das Erfassen der Anwesenheit, den Termin oder die Nachricht. Spieler bekommen von alldem nichts.'},
+  ]},
   {version:'1.2.2',date:'18.10.2026',title:'Entschuldigt ohne Abzug',items:[
     {icon:'🤒',title:'Krank? Kostet nichts',desc:'Auf der Karte zählen Termine, die ihr als entschuldigt eingetragen habt, nicht gegen den Spieler – bis zu einer pro angefangene 10 Termine. Was darüber hinausgeht, zählt wie Fehlen. Die Karte sagt es offen, z. B. „18 von 20 dabei · 2× entschuldigt ohne Abzug“. So muss niemand krank zum Training kommen, um seine Stufe zu halten.'},
     {icon:'🔥',title:'Serie',desc:'Ein entschuldigter Termin im selben Rahmen hält die Serie nur an, statt sie auf null zu setzen. Gilt überall, wo eine Serie steht: Karte, Spieler-App, Spielerprofil, Wochenbericht.'},
@@ -10654,6 +10668,8 @@ function showApp(){
   // and caused the visible "Online" pill to appear 1.5s late.
   if(typeof startPresence==='function')startPresence();
   if(typeof _automationStart==='function')_automationStart();
+  setTimeout(()=>{try{_tgoRun();}catch(e){}},600);
+  setTimeout(()=>{try{tpushCheck();}catch(e){}},4000);
   if(!(typeof isPlayerMode==='function'&&isPlayerMode()))_a2hsArm('trainer');
   // Startseite: trainer-facing entry screen. Players go straight to their
   // usual flow. Data may still be syncing from Firebase at this point —
@@ -13383,34 +13399,9 @@ function updateAppearanceUI(){
   document.getElementById('fs-l')?.classList.toggle('active',s.fontScale>1.05);
   const a=document.getElementById('setAnim');if(a)a.checked=s.animations;
   // Saisonkader-Button & Vergangene ausblenden — mirror current colState
-  // Push notifications: reflect both setting and OS-level permission
-  const pe=document.getElementById('setPushEnabled');
-  const psub=document.getElementById('pushSubLabel');
-  if(pe&&psub){
-    if(!pushSupported()){
-      pe.checked=false;pe.disabled=true;
-      psub.textContent='⚠️ Wird in diesem Browser nicht unterstützt';
-    } else {
-      const perm=pushPermission();
-      pe.disabled=false;
-      // The switch reflects BOTH the stored preference and the browser
-      // permission. When a browser drops the permission (Edge does this when
-      // "Cookies und Websitedaten beim Schließen löschen" includes
-      // permissions, and always in InPrivate windows) the switch went back to
-      // off with no explanation — it looked like the app had forgotten it.
-      pe.checked=s.pushEnabled===true&&perm==='granted';
-      if(perm==='denied'){
-        psub.textContent='⚠️ In Browser-Einstellungen blockiert';
-      } else if(perm==='granted'&&s.pushEnabled){
-        psub.textContent='✓ Aktiv für Nachrichten und Geburtstage';
-      } else if(s.pushEnabled&&perm!=='granted'){
-        psub.textContent='⚠️ Hier eingeschaltet, aber der Browser meldet „'+perm+'" — bitte erneut aktivieren und im Dialog „Zulassen" wählen.';
-      } else {
-        psub.textContent='System-Benachrichtigungen für Nachrichten und Geburtstage'
-          +(perm!=='default'?' · Browser: '+perm:'');
-      }
-    }
-  }
+  // Aufs Handy (Trainer): its own block, see tpushRender
+  if(typeof tpushRender==='function')tpushRender();
+
 
 }
 
@@ -13804,9 +13795,9 @@ else maInitPullToRefresh();
 function pushSupported(){return 'Notification' in window;}
 function pushPermission(){return pushSupported()?Notification.permission:'unsupported';}
 function pushIsEnabled(){
-  // Combined: user toggle ON in appearance + browser permission GRANTED
-  const s=getAppearance();
-  return s.pushEnabled===true && pushPermission()==='granted';
+  // Replaced in 1.2.3 by real push for trainers (tpush…, sent by the job on
+  // GitHub). These came only while the app was open and would now arrive twice.
+  return false;
 }
 async function requestPushPermission(){
   if(!pushSupported())return 'unsupported';
@@ -13934,6 +13925,7 @@ function checkAndPushNew(opts){
 
 // Hook: run check after each Firebase data sync
 function pushAfterSync(){
+  if(_tgo)setTimeout(()=>{try{_tgoRun();}catch(e){}},300);
   // Small delay to let G stabilize
   setTimeout(()=>{
     try{checkAndPushNew();}catch(e){console.warn(e);}
@@ -16778,7 +16770,7 @@ async function pushAdminTest(){
     let sub=await reg.pushManager.getSubscription();
     if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:_pushKey(pub)});
     const owner='t'+(await _pushSha('trainer:'+(CU.name||''))).slice(0,24);
-    await _pushStore(sub,owner,{test:Date.now(),trainer:CU.name||''});
+    await _pushStore(sub,owner,Object.assign({test:Date.now(),trainer:CU.name||''},tpushState()==='on'?{tp:1}:{}));
     alert('Angemeldet. Die Test-Benachrichtigung kommt mit der nächsten Runde, spätestens in etwa 15–30 Minuten.');
   }catch(e){alert('Hat nicht geklappt: '+(e&&e.message));}
 }
@@ -16804,6 +16796,154 @@ function pushAdminHtml(pl){
       :(stale?'⚠ Letzte Runde '+_pushAgo(st.t)+' — die Erinnerungen laufen gerade nicht.':'Letzte Runde '+_pushAgo(st.t)+' · heute verschickt: '+(st.day===_pushDayKey()?(st.sent||0):0))}</div>
     ${isAdm?'<button class="btn bs push-adm-test" onclick="pushAdminTest()">Test an dieses Handy</button>':''}
   </div>`;
+}
+// ── Benachrichtigungen für Trainer: aufs Handy ───────────────
+// Real push, also when Flutlicht is closed; the job on GitHub decides and
+// sends (tools/erinnerungen/trainer.mjs). This device is stored like a
+// player's, under t<sha256("trainer:"+name)> with tp:1 and the team/season
+// open here. Which kinds he wants is a personal setting next to the others
+// (G.userAutomation[name].push), the same on all his devices. Players never
+// get any of these. Never between 22:30 and 8:00.
+const TPUSH_KINDS=[
+  ['bday','🎂','Geburtstage','am Vorabend ab 18 Uhr und morgens am Tag selbst',true],
+  ['msg','💬','Nachrichten','von anderen Trainern hier in der App',true],
+  ['att','✍️','Anwesenheit fehlt','am Morgen nach Training oder Spiel, wenn noch Spieler ohne Eintrag sind',true],
+  ['late','⚠️','Kurzfristige Absagen','wenn ein Spieler in den 24 Std. vor Beginn absagt',false],
+  ['lineup','📋','Stand vor dem Termin','3 Std. vor Beginn: wie viele dabei, abgesagt, offen',false],
+  ['tech','🛠','Technik','wenn die tägliche Sicherung oder die Erinnerungen nicht laufen',true]];
+let _tpOn=null;      // this device: null = not checked yet
+async function _tpOwner(){return 't'+(await _pushSha('trainer:'+((CU&&CU.name)||''))).slice(0,24);}
+function tpushPrefs(){
+  const u=G&&G.userAutomation&&CU&&G.userAutomation[CU.name];
+  const p=(u&&u.push)||{},o={};
+  TPUSH_KINDS.forEach(k=>{o[k[0]]=typeof p[k[0]]==='boolean'?p[k[0]]:k[4];});
+  return o;
+}
+function tpushSetKind(k,on){
+  if(!canEdit())return;
+  const p=_automationGetPrefs();
+  p.push=Object.assign({},p.push||{},{[k]:!!on});
+  _automationSavePrefs(p);
+  if(typeof showSaveFlash==='function')showSaveFlash((on?'🔔 ':'🔕 ')+TPUSH_KINDS.find(x=>x[0]===k)[2]+(on?' an':' aus'));
+}
+// on | off | denied | ios (iPhone in the browser) | none (no push here)
+function tpushState(){
+  if(typeof _a2hsIOS==='function'&&_a2hsIOS()&&!_a2hsStandalone())return 'ios';
+  if(!pushCan())return 'none';
+  if(Notification.permission==='denied')return 'denied';
+  const nm=(CU&&CU.name)||'';
+  if(_tpOn===true||(_tpOn===null&&Notification.permission==='granted'&&_pushLs('ton_'+nm)==='1'))return 'on';
+  return 'off';
+}
+// The job's public key: asked for when switching on (pushLoadPub keeps a
+// failed early answer, so not that one)
+async function _tpPub(){
+  if(_pushPub)return _pushPub;
+  if(!fbDb)return null;
+  try{const x=await fbDb.ref('fcf_push/pub').once('value');_pushPub=x.val()||null;}catch(e){}
+  return _pushPub;
+}
+async function tpushEnable(){
+  if(!canEdit()||!pushCan())return;
+  let perm='default';try{perm=await Notification.requestPermission();}catch(e){perm='denied';}
+  if(perm!=='granted'){_tpOn=false;if(perm==='denied')pushDeniedHelp();tpushRender();return;}
+  try{
+    const pub=await _tpPub();
+    if(!pub)throw new Error('keine Verbindung zur Datenbank oder noch nicht eingerichtet');
+    const reg=await _pushReg();
+    let sub=await reg.pushManager.getSubscription();
+    if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:_pushKey(pub)});
+    if(!await _pushStore(sub,await _tpOwner(),{trainer:CU.name,tp:1}))throw new Error('nicht gespeichert');
+    _tpOn=true;_pushLs('ton_'+CU.name,1);_pushLs('trec_'+CU.name,JSON.stringify({ep:sub.endpoint,t:Date.now()}));
+    if(typeof showSaveFlash==='function')showSaveFlash('📲 Benachrichtigungen an');
+  }catch(e){
+    console.warn('[TPush] enable',e);
+    _tpOn=false;
+    alert('Hat nicht geklappt ('+((e&&e.message)||e)+'). Bitte später noch einmal versuchen.');
+  }
+  tpushRender();
+}
+// Only his record goes: the browser's subscription may also serve a player
+// link opened on the same phone.
+async function tpushDisable(){
+  try{
+    const reg=await navigator.serviceWorker.getRegistration();
+    const sub=reg?await reg.pushManager.getSubscription():null;
+    if(sub&&fbDb){
+      const eh=(await _pushSha(sub.endpoint)).slice(0,16);
+      await fbDb.ref('fcf_push/subs/'+(await _tpOwner())+'/'+eh).remove();
+    }
+  }catch(e){console.warn('[TPush] disable',e&&e.message);}
+  _tpOn=false;_pushLs('ton_'+((CU&&CU.name)||''),null);_pushLs('trec_'+((CU&&CU.name)||''),null);
+  if(typeof showSaveFlash==='function')showSaveFlash('🔕 Benachrichtigungen aus');
+  tpushRender();
+}
+// On every start of the trainer app: still subscribed? The record is renewed
+// once a week (team and season as open now) and at once with a new address.
+async function tpushCheck(){
+  if(!CU||!canEdit()||(typeof isPlayerMode==='function'&&isPlayerMode())||!pushCan())return;
+  const nm=CU.name||'';
+  if(_pushLs('ton_'+nm)!=='1')return;
+  try{
+    const reg=await navigator.serviceWorker.getRegistration();
+    const sub=reg?await reg.pushManager.getSubscription():null;
+    if(!sub||Notification.permission!=='granted'){_tpOn=false;_pushLs('ton_'+nm,null);return;}
+    _tpOn=true;
+    const last=JSON.parse(_pushLs('trec_'+nm)||'{}');
+    if(fbDb&&(last.ep!==sub.endpoint||Date.now()-(last.t||0)>7*864e5)){
+      if(await _pushStore(sub,await _tpOwner(),{trainer:nm,tp:1}))_pushLs('trec_'+nm,JSON.stringify({ep:sub.endpoint,t:Date.now()}));
+    }
+  }catch(e){console.warn('[TPush] check',e&&e.message);}
+}
+function tpushRender(){
+  const box=document.getElementById('tpushBox');if(!box)return;
+  if(!CU||!canEdit()){
+    box.innerHTML='<div class="setting-row"><div><div class="setting-label">📲 Aufs Handy</div><div class="setting-sub">Gibt es für die Trainer der Mannschaft.</div></div></div>';
+    return;
+  }
+  const st=tpushState(),p=tpushPrefs();
+  const sub={
+    on:'An auf diesem Gerät, auch wenn Flutlicht geschlossen ist.',
+    off:'Auch wenn Flutlicht geschlossen ist. Auf jedem Gerät einmal einschalten.',
+    denied:'Im Browser blockiert. <button type="button" class="tp-help" onclick="pushDeniedHelp()">So änderst du das</button>',
+    ios:'Auf dem iPhone nur in der installierten App: in Safari „Teilen“ → „Zum Home-Bildschirm“, dann dort einschalten.',
+    none:'In diesem Browser nicht möglich.'}[st];
+  box.innerHTML=`<div class="setting-row">
+      <div><div class="setting-label">📲 Aufs Handy</div><div class="setting-sub">${sub}</div></div>
+      <div class="setting-control"><label class="setting-switch"><input type="checkbox" id="tpushOn" ${st==='on'?'checked':''} ${st==='on'||st==='off'?'':'disabled'} onchange="this.checked?tpushEnable():tpushDisable()"><span class="setting-slider"></span></label></div>
+    </div>
+    <div class="tp-kinds">${TPUSH_KINDS.map(([k,ic,t,d])=>`<label class="tp-kind"><input type="checkbox" ${p[k]?'checked':''} onchange="tpushSetKind('${k}',this.checked)"><span><b>${ic} ${t}</b><small>${d}</small></span></label>`).join('')}</div>
+    <p class="tp-note">Die Auswahl gilt für alle deine Geräte. Nie zwischen 22:30 und 8 Uhr. Spieler bekommen davon nichts.</p>`;
+}
+// A tap on a trainer notification opens ?go=…&gt=team&gs=season&gi=index:
+// carried out once, as soon as the data of that team is there.
+let _tgo=null;
+try{const q=new URLSearchParams(location.search);if(q.get('go'))_tgo={go:q.get('go'),t:q.get('gt'),s:q.get('gs'),i:q.get('gi'),id:q.get('gid')};}catch(e){}
+function _tgoDone(){
+  _tgo=null;
+  try{const u=new URL(location.href);['go','gt','gs','gi','gid'].forEach(k=>u.searchParams.delete(k));history.replaceState(history.state,'',u.pathname+u.search+u.hash);}catch(e){}
+}
+function _tgoRun(){
+  if(!_tgo||!CU||CU.role==='player'||(typeof isPlayerMode==='function'&&isPlayerMode()))return;
+  const x=_tgo;
+  if(x.t&&x.s){
+    if(!G||!G.db||!G.db[x.t+'__'+x.s])return;                 // not loaded yet: next sync
+    if(!(CU.role==='admin'||(Array.isArray(CU.teams)&&CU.teams.includes(x.t)))){_tgoDone();return;}
+    if(UI.currentTeam!==x.t||UI.currentSeason!==x.s){
+      UI.currentTeam=x.t;UI.currentSeason=x.s;
+      try{localStorage.setItem('fcf_currentTeam',x.t);localStorage.setItem('fcf_currentSeason',x.s);}catch(e){}
+      render();
+    }
+  }
+  _tgoDone();
+  const i=parseInt(x.i,10);
+  setTimeout(()=>{try{
+    if(x.go==='rc'&&!isNaN(i))rcOpen(i);
+    else if(x.go==='sess'&&!isNaN(i))openSessStats(i);
+    else if(x.go==='player'&&!isNaN(i))openPlayerStats(i);
+    else if(x.go==='msg'&&x.id)viewMessage(x.id);
+    else if(x.go==='backup'&&isAdmin())openBackupModal();
+  }catch(e){console.warn('[go]',e);}},350);
 }
 function _pushDayKey(){const d=new Date();return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();}
 function renderMvpVote(){
@@ -34887,15 +35027,7 @@ _pubCleanupSchedule();
     <section class="set-sec" data-sec="benach">
       <h4 class="set-sec-h">🔔 Benachrichtigungen</h4>
       <p class="set-sec-sub">Gilt nur für dich.</p>
-  <div class="setting-row">
-    <div>
-      <div class="setting-label">📲 Push-Benachrichtigungen</div>
-      <div class="setting-sub" id="pushSubLabel">System-Benachrichtigungen für Nachrichten und Geburtstage</div>
-    </div>
-    <div class="setting-control">
-      <label class="setting-switch"><input type="checkbox" id="setPushEnabled" onchange="onPushToggle(this)"/><span class="setting-slider"></span></label>
-    </div>
-  </div>
+  <div id="tpushBox" class="tp-box"></div>
 
   <!-- AUTOMATION (canEdit only) -->
   <div id="setAutomationSection" style="display:none;margin-top:16px;">
