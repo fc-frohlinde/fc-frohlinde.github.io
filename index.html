@@ -2943,6 +2943,9 @@ body.design-heute.hxk-dk .ss-comm-act[title="L\00f6schen"]{color:#FF9C90 !import
 .push-adm-st{margin-top:8px;font-size:.76rem;line-height:1.45;color:var(--hx-muted,var(--gm));}
 .push-adm-st.warn{color:#B9770E;}
 .push-adm-test{margin-top:10px;}
+.ay-box{margin:14px 0 6px;}
+.ay-h span{font-weight:500;color:var(--hx-muted,var(--gm));margin-left:4px;}
+.ay-note{font-size:.76rem;line-height:1.45;color:var(--hx-muted,var(--gm));margin:4px 0 2px;}
 .tp-kinds{margin:2px 0 6px;padding:2px 12px;border-radius:10px;background:rgba(127,127,127,.06);}
 label.tp-kind{display:flex;align-items:flex-start;gap:10px;padding:9px 0;margin:0;cursor:pointer;
   font-size:inherit;font-weight:400;text-transform:none;letter-spacing:normal;line-height:1.3;}
@@ -6620,13 +6623,18 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.3'; // v1.2.3: Benachrichtigungen aufs Handy
-const APP_VERSION_LABEL='1.2.3';
+const APP_VERSION='1.2.4'; // v1.2.4: Antwort-Regel der Mannschaft
+const APP_VERSION_LABEL='1.2.4';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792617346357; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792662121972; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.4',date:'22.10.2026',title:'Wer gilt als dabei?',items:[
+    {icon:'✅',title:'Antwort-Regel der Mannschaft',desc:'Einstellungen → Mannschaft: „Alle gelten als dabei“, getrennt für Trainings und Spiele. Dann steht jeder Spieler ohne Antwort bei allen künftigen Terminen automatisch auf „M“ – auch bei neuen Terminen und neuen Spielern. Wer nicht kann, sagt in der App ab. Niemand muss mehr von Hand auf „M“ gesetzt werden.'},
+    {icon:'↩️',title:'Jederzeit zurück',desc:'Wird die Regel ausgeschaltet, werden nur die automatisch gesetzten „M“ wieder „?“. Was Spieler selbst geantwortet oder ihr von Hand eingetragen habt, bleibt.'},
+    {icon:'📱',title:'Beim Spieler',desc:'Er sieht „Du bist dabei – wenn du nicht kannst, sag ab“. Die Erinnerung „Sag kurz zu oder ab“ entfällt dann von selbst; kurzfristige Absagen meldet die App euch weiter.'},
+  ]},
   {version:'1.2.3',date:'21.10.2026',title:'Benachrichtigungen aufs Handy',items:[
     {icon:'📲',title:'Auch wenn Flutlicht zu ist',desc:'Einstellungen → Benachrichtigungen → „Aufs Handy“ auf jedem Gerät einmal einschalten. Dann kommen die Hinweise als echte Benachrichtigung, auch bei geschlossener App. Der alte Schalter funktionierte nur, solange die App offen war, und ist ersetzt. Auf dem iPhone nur in der installierten App.'},
     {icon:'🔔',title:'Was kommt',desc:'Geburtstage (am Vorabend und morgens am Tag), Nachrichten anderer Trainer, „Anwesenheit fehlt“ am Morgen nach einer Einheit mit offenen Einträgen und Technik (Sicherung oder Erinnerungen laufen nicht). Auf Wunsch: kurzfristige Absagen in den 24 Std. vor Beginn und der Stand 3 Std. vor Beginn (dabei, abgesagt, offen). Jede Art einzeln abschaltbar, die Auswahl gilt für alle deine Geräte. Nie zwischen 22:30 und 8 Uhr.'},
@@ -6984,7 +6992,7 @@ function dispToISO(s){
 // session must shift all of them together: shifting only s and perf left
 // ratings, match minutes, physio bookings, excuses, goals and assists on the
 // neighbouring session.
-const SESS_PLAYER_FIELDS=['s','perf','rpe','rpeMin','physio','excOK','preconfReason','goals','assists'];
+const SESS_PLAYER_FIELDS=['s','perf','rpe','rpeMin','physio','excOK','preconfReason','goals','assists','ay'];
 function _sessFieldBlank(f){return f==='s'?3:(f==='preconfReason'?'':null);}
 // Opens a slot at `at` in each array; vals gives values for it (e.g. restore)
 function _sessInsertAt(p,at,vals){
@@ -8430,7 +8438,7 @@ function _padPlayerArrays(g){
       const need=blk.sessions.length;
       blk.players.forEach(p=>{
         if(!p)return;
-        ['rpe','rpeMin','perf','physio','excOK','preconfReason','goals','assists'].forEach(f=>{
+        ['rpe','rpeMin','perf','physio','excOK','preconfReason','goals','assists','ay'].forEach(f=>{
           if(!Array.isArray(p[f]))return;
           while(p[f].length<need)p[f].push(null);
         });
@@ -8514,7 +8522,7 @@ function sanitizeG(data){
         keys.forEach(k=>{out[k]=inner[k];});
         return out;
       };
-      ['rpe','rpeMin','perf','physio','excOK','goals','assists'].forEach(f=>{
+      ['rpe','rpeMin','perf','physio','excOK','goals','assists','ay'].forEach(f=>{
         if(p[f]!=null&&!Array.isArray(p[f]))p[f]=_byIndex(p[f]);
       });
       // Validate preconfReason: must be array of strings if present
@@ -9106,6 +9114,7 @@ function saveG(badge=true){
   // Also guards localStorage: a sanitised copy cached there would corrupt the
   // next trainer session on this device.
   if(_writeBlocked('saveG'))return;
+  try{_ayApplyAll();}catch(e){console.warn('[Antwort-Regel]',e);}
   _sessionEditAt=Date.now();
   _persistLocal();
   if(badge){const b=document.getElementById('savedBadge');b.classList.add('show');clearTimeout(b._t);b._t=setTimeout(()=>b.classList.remove('show'),1600);}
@@ -12246,8 +12255,122 @@ document.addEventListener('click',()=>document.querySelectorAll('[id^="pm_"]').f
 // dropping him to Fehlend and making the trainer grant it a second time.
 // Set on every trainer-side write, cleared as soon as a trainer picks
 // something else — so a later Fehlend really means Fehlend.
+// ── Antwort-Regel der Mannschaft ─────────────────────────────
+// G.db[team+'__rules'].autoYes = {t: bool, m: bool}: trainings / matches.
+// On: every player without an answer (3) at a session still to come stands
+// on "M" (4). p.ay[si] remembers who set it: 1 = the rule, 0 = an answer by
+// the player or an entry by a trainer (the rule never touches it again),
+// null = untouched. Switching off turns only the rule's "M" back into "?".
+// Applied on every save of a trainer (new sessions, new players, restored
+// sessions, a new season — whatever path made them) and once after loading.
+function teamRules(t){
+  t=t||UI.currentTeam;
+  const r=G&&G.db&&G.db[t+'__rules'];
+  return (r&&typeof r==='object')?r:{};
+}
+function ruleAutoYes(t,type){
+  const a=teamRules(t).autoYes||{};
+  return type==='match'?a.m===true:(type==='training'?a.t===true:false);
+}
+function _ayTouch(p,si){
+  if(!p||typeof si!=='number')return;
+  if(!Array.isArray(p.ay))p.ay=[];
+  while(p.ay.length<=si)p.ay.push(null);
+  p.ay[si]=0;
+}
+// Blocks of a team: "Team__2026/27"; team-wide keys (…__rules, __schedule,
+// __focuses) have no players and drop out by themselves
+function _ayBlocks(t){
+  return Object.keys((G&&G.db)||{}).filter(k=>k.startsWith(t+'__')).map(k=>({k,season:k.slice(t.length+2),D:G.db[k]}))
+    .filter(b=>b.D&&Array.isArray(b.D.players)&&Array.isArray(b.D.sessions));
+}
+// The sessions still to come of one kind, with the players the rule may set
+// (fn: 'apply' → open and untouched; 'revert' → set by the rule)
+function _ayWalk(t,type,fn,dry){
+  let n=0;
+  _ayBlocks(t).forEach(({season,D})=>{
+    D.sessions.forEach((s,si)=>{
+      if(!s||!s.date||s.type!==type)return;
+      if(typeof sessTookPlace==='function'&&sessTookPlace(s,season))return;
+      D.players.forEach(p=>{
+        if(!p)return;
+        if(typeof _sessAfterJoin==='function'&&!_sessAfterJoin(p,s,season))return;
+        const v=(Array.isArray(p.s)&&si<p.s.length&&p.s[si]!=null)?p.s[si]:3;
+        const a=(Array.isArray(p.ay)&&si<p.ay.length)?p.ay[si]:null;
+        if(fn==='apply'&&v===3&&a!==0){
+          n++;if(dry)return;
+          if(!Array.isArray(p.s))p.s=[];
+          while(p.s.length<=si)p.s.push(3);
+          p.s[si]=4;
+          if(!Array.isArray(p.ay))p.ay=[];
+          while(p.ay.length<=si)p.ay.push(null);
+          p.ay[si]=1;
+        }else if(fn==='revert'&&a===1){
+          if(v===4){n++;if(!dry)p.s[si]=3;}
+          if(!dry)p.ay[si]=null;
+        }
+      });
+    });
+  });
+  return n;
+}
+// Every team with the rule on: fill in what is open. Returns the count.
+function _ayApplyAll(){
+  if(!G||!G.db||(typeof isPlayerMode==='function'&&isPlayerMode())||G.__sanitized)return 0;
+  let n=0;
+  (Array.isArray(G.teamList)?G.teamList:[]).forEach(t=>{
+    ['training','match'].forEach(type=>{if(ruleAutoYes(t,type))n+=_ayWalk(t,type,'apply',false);});
+  });
+  return n;
+}
+// Once after loading, for whoever opens the trainer app first
+let _ayStarted=false;
+function _ayStart(){
+  if(_ayStarted||!CU||!canEdit()||(typeof isPlayerMode==='function'&&isPlayerMode()))return;
+  _ayStarted=true;
+  try{if(_ayApplyAll()>0)saveG(false);}catch(e){console.warn('[Antwort-Regel]',e);}
+}
+// The switch in Einstellungen → Mannschaft
+function aySet(type,on){
+  if(!canEdit())return;
+  const t=UI.currentTeam,kind=type==='match'?'Spiele':'Trainings',kindD=type==='match'?'Spielen':'Trainings';
+  const n=_ayWalk(t,type,on?'apply':'revert',true);
+  const msg=on
+    ?'Künftig gelten bei allen '+kindD+' von '+t+' alle Spieler als dabei, bis sie absagen.\n\n'
+      +(n?n+' offene Antwort'+(n===1?'':'en')+' („?“) bei künftigen '+kindD+(n===1?' wird':' werden')+' jetzt auf „M“ gesetzt.':'Offene Antworten gibt es gerade keine.')
+      +' Wer schon geantwortet hat, bleibt, wie er ist.'
+    :'Bei '+kindD+' von '+t+' sagt dann wieder jeder selbst zu oder ab.\n\n'
+      +(n?n+' automatisch gesetzte „M“ bei künftigen '+kindD+(n===1?' wird':' werden')+' wieder „?“.':'Automatisch gesetzte „M“ gibt es gerade keine.')
+      +' Eigene Antworten der Spieler und eure Einträge bleiben.';
+  if(!confirm(msg)){ayRender();return;}
+  snap();
+  if(!G.db[t+'__rules']||typeof G.db[t+'__rules']!=='object')G.db[t+'__rules']={};
+  const r=G.db[t+'__rules'];
+  r.autoYes=Object.assign({t:false,m:false},r.autoYes||{},{[type==='match'?'m':'t']:!!on});
+  r.updatedAt=Date.now();
+  if(!on)_ayWalk(t,type,'revert',false);
+  saveG();                        // applies the rule on the way (_ayApplyAll)
+  logAudit('Antwort-Regel',t,kind+': '+(on?'alle gelten als dabei':'jeder sagt selbst zu oder ab')+(n?' ('+n+'×)':''));
+  if(typeof showSaveFlash==='function')showSaveFlash(on?'✅ '+kind+': alle dabei':'↩️ '+kind+': jeder antwortet selbst');
+  ayRender();
+  try{render();}catch(e){}
+}
+function ayRender(){
+  const box=document.getElementById('ayBox');if(!box)return;
+  if(!CU||!canEdit()){box.innerHTML='';return;}
+  const t=UI.currentTeam||'';
+  const row=(type,label)=>`<div class="setting-row">
+      <div><div class="setting-label">${label}</div><div class="setting-sub">${ruleAutoYes(t,type)?'Alle gelten als dabei – wer nicht kann, sagt ab.':'Jeder sagt selbst zu oder ab.'}</div></div>
+      <div class="setting-control"><label class="setting-switch"><input type="checkbox" id="ay-${type}" ${ruleAutoYes(t,type)?'checked':''} onchange="aySet('${type}',this.checked)"><span class="setting-slider"></span></label></div>
+    </div>`;
+  box.innerHTML=`<div class="setting-label ay-h">✅ Wer gilt als dabei? <span>${escapeHtml(t)}</span></div>
+    <p class="ay-note">Eingeschaltet: Ohne Absage steht jeder Spieler bei künftigen Terminen auf „M“. Spieler sehen „Du bist dabei“ und sagen ab, wenn sie nicht können.</p>
+    ${row('training','🏃 Trainings: alle gelten als dabei')}
+    ${row('match','⚽ Spiele: alle gelten als dabei')}`;
+}
 function _noteExcuse(p,si){
   if(!p||!Array.isArray(p.s))return;
+  _ayTouch(p,si);
   if(!Array.isArray(p.excOK))p.excOK=[];
   while(p.excOK.length<=si)p.excOK.push(null);
   p.excOK[si]=(p.s[si]===2)?true:null;
@@ -13441,6 +13564,7 @@ function _setFill(){
   const regSwitch=document.getElementById('setRegStatus');
   if(regSwitch)regSwitch.checked=isRegStatusShown();
   if(typeof _automationSyncSettingsUI==='function')_automationSyncSettingsUI();
+  if(typeof ayRender==='function')ayRender();
   _setLogoSync();
   const tc=document.getElementById('set-trash-count');
   if(tc)tc.textContent=Array.isArray(G.trash)&&G.trash.length?`(${G.trash.length})`:'';
@@ -13940,6 +14064,7 @@ function checkAndPushNew(opts){
 
 // Hook: run check after each Firebase data sync
 function pushAfterSync(){
+  if(!_ayStarted)setTimeout(()=>{try{_ayStart();}catch(e){}},500);
   if(_tgo)setTimeout(()=>{try{_tgoRun();}catch(e){}},300);
   // Small delay to let G stabilize
   setTimeout(()=>{
@@ -17152,6 +17277,7 @@ function _pmSaveTargeted(si){
   one('physio',p.physio);
   one('excOK',p.excOK);
   one('rpeMin',p.rpeMin);
+  one('ay',p.ay);
   if(Object.keys(updates).length===0)return;
   _fbSaving=true;
   fbDb.ref().update(updates).then(()=>{
@@ -18773,6 +18899,7 @@ function renderPlayerMode(){
         +'</div>';
     }
     else if(status===2)feedback='<div class="pm-feedback pm-fb-exc">\ud83d\udccb Entschuldigt</div>';
+    else if(status===4&&Array.isArray(p.ay)&&p.ay[si]===1)feedback='<div class="pm-feedback pm-fb-yes">\u2713 Du bist dabei – wenn du nicht kannst, sag ab.</div>';
     else if(status===4)feedback='<div class="pm-feedback pm-fb-yes">\u2713 Du bist angemeldet</div>';
     // Reason textarea: show only when Entschuldigt (status===2). Player can edit own reason.
 
@@ -19019,7 +19146,14 @@ function pmSetStatus(si,val){
   // only values this function ever writes are Angemeldet and Fehlend.
   // The deadline check above (_amRsvpLocked) already closes the window, so a
   // roll-call result cannot be touched afterwards either.
-  if(current===targetStatus)return; // no-op
+  if(!Array.isArray(p.ay))p.ay=[];
+  while(p.ay.length<=si)p.ay.push(null);
+  if(current===targetStatus){
+    // "Komme" on the rule's "M": now it is his own answer
+    if(p.ay[si]===1&&!RPE_IS_PREVIEW){p.ay[si]=0;_pmSaveTargeted(si);renderPlayerMode();if(typeof showSaveFlash==='function')showSaveFlash('✓ Bestätigt');}
+    return;
+  }
+  p.ay[si]=0;
   const oldVal=current;
   p.s[si]=targetStatus;
   // Only a booking is cleared, and only when he stops attending: it would
@@ -35143,6 +35277,7 @@ _pubCleanupSchedule();
       <label class="setting-switch"><input type="checkbox" id="setRegStatus" onchange="toggleRegStatus()"/><span class="setting-slider"></span></label>
     </div>
   </div>
+      <div id="ayBox" class="ay-box"></div>
 
       <div class="set-hx-only" id="set-foc-host" style="margin:16px 0 4px;"><div class="setting-label" style="margin-bottom:6px;">🎯 Schwerpunkte</div>
         <p class="note">Schwerpunkte für <strong id="foc-team-lbl">–</strong></p>
