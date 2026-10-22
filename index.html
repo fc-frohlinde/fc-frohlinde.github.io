@@ -884,6 +884,8 @@ input[type="date"]{cursor:pointer;}
 .pl-btns{display:flex;gap:3px;}
 .pl-btn{padding:3px 7px;border-radius:5px;border:none;cursor:pointer;font-size:.66rem;font-weight:600;}
 .full-table td.st-pc{white-space:nowrap;}
+.full-table td.st-gv{white-space:nowrap;font-variant-numeric:tabular-nums;}
+.full-table td.st-gv small{margin:0 5px;color:var(--hx-muted,var(--gm));}
 .full-table td.st-pc b{font-weight:700;}
 .full-table td.st-pc small{margin-left:6px;font-size:.74em;font-weight:500;color:var(--hx-muted,var(--gm));font-variant-numeric:tabular-nums;}
 .pl-btn-e{background:rgba(22,89,184,.1);color:var(--bm);}.pl-btn-e:hover{background:rgba(22,89,184,.2);}
@@ -6582,13 +6584,16 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.22'; // v1.2.22: Alle Spieler kompakter
-const APP_VERSION_LABEL='1.2.22';
+const APP_VERSION='1.2.23'; // v1.2.23: Alle Spieler mit Toren
+const APP_VERSION_LABEL='1.2.23';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792696925695; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792697619147; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.23',date:'22.10.2026',title:'Statistik: Tore',items:[
+    {icon:'⚽',title:'Tore, Vorlagen, Spieler des Spiels',desc:'„Alle Spieler“ zeigt die Tore und Vorlagen aus den Spielen („3 · 2“) und wie oft jemand Spieler des Spiels war (🏅) – sortierbar. Die Spalten erscheinen, sobald in der Saison etwas davon eingetragen ist; Tore und Vorlagen trägt man im Spiel unter „Tore und Vorlagen eintragen“ ein.'},
+  ]},
   {version:'1.2.22',date:'22.10.2026',title:'Statistik: Alle Spieler',items:[
     {icon:'🏆',title:'Eine Spalte je Art',desc:'Statt T%, T-A, T-∑ (und dasselbe für Spiele) steht je eine Spalte „Training“ und „Spiele“: die Quote und daneben, wie oft er da war von wie vielen gezählten, z. B. „94 % 17/18“. Auf dem Handy passen damit auch die Spiele auf den Schirm. Sortiert wird nach der Quote, bei Gleichstand nach der Zahl.'},
   ]},
@@ -26704,6 +26709,12 @@ function _statsPlayerTable(D,opts){
   const ss=D.sessions||[];
   const mS=ss.filter(s=>s.type==='match').length;
   const _isPast=si=>{const s=ss[si];return s&&sessTookPlace(s);};
+  // Spieler des Spiels per match: the stored winners, else the closed vote
+  const mvpW=ss.map(s=>{
+    if(!s||s.type!=='match')return null;
+    if(Array.isArray(s.mvpWin))return s.mvpWin;
+    try{const r=mvpResult(s);return r?r.winners:null;}catch(e){return null;}
+  });
   // Per player — same: only past sessions, factual statuses for denominator
   const rows=(D.players||[]).map(p=>{
     const ownIdx=i=>_isPast(i)&&_sessAfterJoin(p,ss[i]); // before he was on the team → out
@@ -26716,8 +26727,16 @@ function _statsPlayerTable(D,opts){
     // Leistungsnote average across all graded past sessions (trainings + matches)
     const perfVals=[...tIdx,...mIdx].map(i=>(p.perf&&(p.perf[i]===1||p.perf[i]===2||p.perf[i]===3))?p.perf[i]:null).filter(v=>v!=null);
     const perfAvg=perfVals.length?(perfVals.reduce((s,v)=>s+v,0)/perfVals.length):null;
-    return{pi:D.players.indexOf(p),nr:p.nr,name:p.name,shortname:p.shortname,pos:p.pos,pos2:p.pos2||'',tA,tPl,tPct,mA,mPl,mPct,pct:tPct,perfAvg,perfAvgSort:perfAvg!=null?perfAvg:99,perfCount:perfVals.length};
+    // Goals and assists from the matches he played, Spieler des Spiels
+    const num=(arr,i)=>(Array.isArray(arr)&&+arr[i]>0)?+arr[i]:0;
+    const goals=mIdx.reduce((t,i)=>t+num(p.goals,i),0),assists=mIdx.reduce((t,i)=>t+num(p.assists,i),0);
+    const mvp=mIdx.filter(i=>mvpW[i]&&mvpW[i].includes(p.name)).length;
+    return{pi:D.players.indexOf(p),nr:p.nr,name:p.name,shortname:p.shortname,pos:p.pos,pos2:p.pos2||'',tA,tPl,tPct,mA,mPl,mPct,pct:tPct,perfAvg,perfAvgSort:perfAvg!=null?perfAvg:99,perfCount:perfVals.length,
+      goals,assists,gSort:goals*1000+assists,mvp};
   });
+  // The columns appear once the season has any of it — empty columns of
+  // dashes would only push the rest off a phone screen
+  const hasG=rows.some(r=>r.goals||r.assists),hasM=rows.some(r=>r.mvp);
   // Equal shares: the one who was there more often first (18/18 before 2/2)
   rows.sort((a,b)=>{const v=statsSort.col;let r=typeof a[v]==='string'?a[v].localeCompare(b[v]):a[v]-b[v];
     if(!r&&v==='tPct')r=a.tA-b.tA;if(!r&&v==='mPct')r=a.mA-b.mA;return statsSort.asc?r:-r;});
@@ -26728,7 +26747,7 @@ function _statsPlayerTable(D,opts){
   return `${opts.noHead?'':`    <div class="sec" style="margin-top:12px;margin-bottom:8px;">🏆 Alle Spieler</div>
 `}    <div style="${wrap}">
     <table class="full-table"><thead><tr>
-      ${th('nr','#')}${th('name','Spieler')}${th('pos','Pos.')}${th('tPct','Training')}${mS?th('mPct','Spiele'):''}${th('perfAvgSort','⭐ Einsatz')}
+      ${th('nr','#')}${th('name','Spieler')}${th('pos','Pos.')}${th('tPct','Training')}${mS?th('mPct','Spiele'):''}${hasG?th('gSort','Tore · Vorl.'):''}${hasM?`<th onclick="sortStats('mvp')" title="Spieler des Spiels">🏅 ${sa('mvp')}</th>`:''}${th('perfAvgSort','⭐ Einsatz')}
     </tr></thead><tbody>
     ${rows.map(r=>{const bc=pctColor(r.tPct);
       const openHandler=open(r.pi);
@@ -26739,6 +26758,8 @@ function _statsPlayerTable(D,opts){
       <td class="pos-td"><div class="pos-wrap">${pbHtml(r)}</div></td>
       ${_stPc(r.tA,r.tPl,r.tPct,'Trainings')}
       ${mS?_stPc(r.mA,r.mPl,r.mPct,'Spielen'):''}
+      ${hasG?`<td class="st-gv" title="${r.goals} ${r.goals===1?'Tor':'Tore'}, ${r.assists} ${r.assists===1?'Vorlage':'Vorlagen'}">${r.goals||r.assists?`<b>${r.goals}</b><small>·</small>${r.assists}`:'–'}</td>`:''}
+      ${hasM?`<td title="${r.mvp}× Spieler des Spiels">${r.mvp||'–'}</td>`:''}
       <td style="font-weight:700;color:${perfColor};" title="${r.perfCount} bewertete Termine">${r.perfAvg!=null?r.perfAvg.toFixed(1).replace('.',','):'–'}</td>
     </tr>`;}).join('')}
     </tbody></table></div>`;
