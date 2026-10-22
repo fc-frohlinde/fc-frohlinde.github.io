@@ -1123,6 +1123,7 @@ body.no-photos .nm-av,body.no-photos .ma-card-av,body.no-photos .tr-av{display:n
 .tp-sec-h{font-size:.66rem;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--gm);margin-bottom:7px;}
 /* Shared by both profile modals — view rows, edit rows and contact rows. */
 .tp-row{display:flex;align-items:center;gap:9px;margin-bottom:6px;max-width:100%;}
+.tp-row[hidden]{display:none;}
 .tp-note{font-size:.72rem;color:var(--gm);}
 .tp-l{flex:0 0 118px;font-size:.74rem;color:var(--gm);}
 .tp-v{flex:1;min-width:0;font-size:.8rem;color:var(--gd);word-break:break-word;}
@@ -1283,16 +1284,10 @@ select.lp-fmt-btn option:checked{background:var(--bm);color:#fff;}
 .mcd-row-val{font-weight:700;color:var(--bd);min-width:36px;text-align:right;font-variant-numeric:tabular-nums;}
 
 /* Multi-select rows */
-/* Registration status — temporary feature.
-   Activated globally when <body class="show-reg-status">.
-   Player names with class .player-unregistered turn amber/yellow to signal
-   "Postkarte noch nicht versendet / nicht angemeldet". */
-body.show-reg-status .player-unregistered,
-body.show-reg-status .player-unregistered .nm,
-body.show-reg-status .player-unregistered .name {
-  color: #d4a017 !important;
-  text-shadow: 0 0 1px rgba(0,0,0,.04);
-}
+/* Spielberechtigung (1.2.16). Saisonkader with "Status" on: who may not play
+   yet is yellow. Elsewhere a small flag where it matters (squad, lineup). */
+.slp-nsb{color:#d4a017 !important;}
+.sb-flag{margin-left:5px;font-size:.85em;cursor:help;}
 
 /* Recycle bin items */
 .trash-item{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--ow);border:1px solid var(--gl);border-radius:8px;margin-bottom:7px;flex-wrap:wrap;}
@@ -2614,6 +2609,8 @@ body.design-heute .dow-btn.sel-m{background:var(--mc1);border-color:var(--mc1);c
 .mob label.sqd-row input[type=checkbox]{width:18px;height:18px;margin:0;padding:0;accent-color:var(--hx-blue,var(--bm));}
 .sqd-nr{font-family:var(--hx-num,'Barlow');font-weight:800;color:var(--hx-muted,var(--gm));text-align:right;}
 .sqd-nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sqd-nm .sqd-sb{display:block;font-size:.7rem;font-weight:600;color:#9A5B00;overflow:hidden;text-overflow:ellipsis;}
+.sqd-warn>div+div{margin-top:5px;}
 .sqd-pos{font-size:.7rem;font-weight:700;color:var(--hx-muted,var(--gm));}
 .sqd-no{padding:9px 12px;border-top:1px solid var(--hx-line,var(--gl));font-size:.76rem;line-height:1.45;color:var(--hx-muted,var(--gm));}
 .sqd-g+.sqd-no{border-top:1px solid var(--hx-line,var(--gl));}
@@ -6077,6 +6074,8 @@ if(window._fbBlocked){
         <div class="tp-row"><span class="tp-l">Position 2</span><div class="tp-in-wrap" id="pe-pos2-sel"></div></div>
         <div class="tp-row"><span class="tp-l">Starker Fuß</span><div class="tp-in-wrap" id="pe-foot-sel"></div></div>
         <div class="tp-row"><span class="tp-l">Pass-Nr.</span><input class="tp-in" type="text" id="pe-passnr" placeholder="z.B. 12345678"/></div>
+        <div class="tp-row" title="Z. B. solange die Abmeldung beim alten Verein fehlt"><span class="tp-l">Spielberechtigt</span><select class="tp-in" id="pe-sb" aria-label="Spielberechtigt" onchange="_peSbSync()"><option value="ja">Ja</option><option value="nein">Noch nicht</option></select></div>
+        <div class="tp-row" id="pe-sbab-row" hidden><span class="tp-l">Spielberechtigt ab</span><input class="tp-in" type="date" id="pe-sbab" aria-label="Spielberechtigt ab" title="Leer lassen, solange es nicht feststeht"/></div>
         <div class="tp-row" title="Einheiten vor diesem Datum zählen nicht in seine Statistik. Leer = von Saisonbeginn an."><span class="tp-l">Dabei seit</span><input class="tp-in" type="date" id="pe-joinDate"/></div>
       </div>
       <div class="tp-sec">
@@ -6529,13 +6528,18 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.15'; // v1.2.15: Treffpunkt als Standard merken
-const APP_VERSION_LABEL='1.2.15';
+const APP_VERSION='1.2.16'; // v1.2.16: Spielberechtigung statt Anmeldungs-Status
+const APP_VERSION_LABEL='1.2.16';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792688131310; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792690055556; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.16',date:'22.10.2026',title:'Spielberechtigung',items:[
+    {icon:'🪪',title:'Spielberechtigt – im Profil',desc:'Im Spielerprofil unter Bearbeiten → Sportlich lässt sich festhalten, dass ein Spieler noch nicht spielen darf, z. B. weil die Abmeldung beim alten Verein noch fehlt – auf Wunsch mit Datum „ab …“. Standard ist „Ja“. Das sehen nur Trainer.'},
+    {icon:'⚠',title:'Hinweis bei Kader und Aufstellung',desc:'Wer am Spieltag noch nicht spielberechtigt ist, ist in „Kader und Treffpunkt“ und bei der Aufstellung markiert. Auswählen lässt er sich trotzdem, die Entscheidung bleibt beim Trainer – bei Freundschaftsspielen können andere Fristen gelten.'},
+    {icon:'📋',title:'Saisonkader: ein Schalter „Status“',desc:'Der Schalter heißt jetzt „Status“: grün mit ✓ = für die Saison bestätigt, gelb = noch nicht spielberechtigt. Die gelben Namen in der ganzen App und die Einstellung „Anmeldungs-Status anzeigen“ entfallen.'},
+  ]},
   {version:'1.2.14',date:'22.10.2026',title:'Treffpunkt einstellbar',items:[
     {icon:'⏱',title:'Wann sich die Mannschaft trifft',desc:'Einstellungen → Mannschaft → „Treffpunkt bei Spielen“: wie viele Minuten vor Anpfiff bei Heim- und bei Auswärtsspielen, dazu der übliche Treffpunkt für Auswärtsspiele. Das Fenster „Kader und Treffpunkt“ schlägt das vor und zeigt, was der Standard ist. Weicht ein Spiel ab, ändert man es dort; mit „Als Standard merken“ gilt es auch für die nächsten Spiele, sonst nur für dieses.'},
   ]},
@@ -8241,6 +8245,8 @@ function sanitizeG(data){
   _migrateMatchLineupsIn(data);
   // One-time migration: invert registration model (V2)
   _migrateRegModelIn(data);
+  // One-time migration: Spielberechtigung replaces the registration tick (1.2.16)
+  _migrateSbIn(data);
   // Migration: preconf field → status 4 (Angemeldet) in p.s[]
   _migratePreconfToS(data);
   // Defensive: clean stale player indices in seasonLineups (refs to deleted players)
@@ -8359,6 +8365,19 @@ function _migrateRegModelIn(data){
     });
   }
   data._regModelV2=true;
+}
+// Spielberechtigung (1.2.16) replaces the registration tick: everyone may play
+// unless marked otherwise (p.noSb). When it came in no player was marked
+// unregistered, so the old flag is simply dropped.
+function _migrateSbIn(data){
+  if(!data||data._sbV3)return;
+  if(data.db&&typeof data.db==='object'){
+    Object.values(data.db).forEach(block=>{
+      if(!block||!Array.isArray(block.players))return;
+      block.players.forEach(p=>{if(p&&typeof p==='object')delete p.registered;});
+    });
+  }
+  data._sbV3=true;
 }
 // Migration that works on a data object (not the global G). Conservative: never drops
 // data — unresolvable entries stay in legacy format so Wartung can show them for manual fix.
@@ -10920,7 +10939,6 @@ function showApp(){
   updateViewChecks();
   applyZoom();
   applyRoleUI();
-  if(typeof applyRegStatusBodyClass==='function')applyRegStatusBodyClass();
   if(typeof _updateAppTitle==='function')_updateAppTitle();
   initTabDrag();
   render();
@@ -11673,39 +11691,26 @@ function _sessVisible(s,today,nextRealIdx,currentIdx){
   return true;
 }
 // ── REGISTRATION STATUS (temporary feature) ───────────────────
-// Toggles yellow highlight for players where p.registered !== true (V2: default unregistered).
-// User-preference only; applies to current viewer.
-function isRegStatusShown(){return getUserPref('showRegStatus',true)===true;}
-function toggleRegStatus(){
-  setUserPref('showRegStatus',!isRegStatusShown());
-  applyRegStatusBodyClass();
-  updateRegStatusCheck();
-  // Show/hide "Status verwalten" button (unified — visible if conf OR reg mode active)
-  if(typeof _updateSlpStatusBtn==='function')_updateSlpStatusBtn();
-  // Re-render so name-class helper picks up the change
-  if(typeof render==='function')render();
+// Spielberechtigung (1.2.16). A player may play unless marked otherwise:
+// p.noSb = true — not yet (e.g. the Abmeldung at his old club is missing);
+// p.sbAb = 'YYYY-MM-DD' — from that day on, if known. Trainers' record only:
+// player mode strips both from his own entry.
+function playerSb(p,key){
+  if(!p||!p.noSb)return true;
+  const ab=/^\d{4}-\d{2}-\d{2}$/.test(p.sbAb||'')?isoToSortKey(p.sbAb):null;
+  return ab!=null&&(key||todaySK())>=ab;
 }
-function applyRegStatusBodyClass(){
-  // Yellow color only when pref ON AND we are in pre-season window for selected season.
-  // (Once season has started, status feature is conceptually gone — no color.)
-  const seasonActive=typeof slpSeasonStarted==='function'?!slpSeasonStarted():true;
-  document.body.classList.toggle('show-reg-status',isRegStatusShown()&&seasonActive);
+function _sbAbDisp(p,withYear){
+  const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec((p&&p.sbAb)||'');
+  return m?m[3]+'.'+m[2]+'.'+(withYear?m[1]:''):'';
 }
-function updateRegStatusCheck(){
-  const el=document.getElementById('vd2-regstatus');
-  if(!el)return;
-  const on=isRegStatusShown();
-  el.textContent=on?'✓':'–';
-  el.classList.toggle('on',on);
-  el.style.fontWeight=on?'700':'600';
-  el.style.color=on?'var(--ac)':'rgba(255,255,255,.65)';
-  const item=el.closest('.vd-item');
-  if(item)item.classList.toggle('vd-active',on);
-}
-// Returns CSS class for a player's name span based on registration state.
-// Returns 'player-unregistered' unless p.registered===true (V2 model: default = unregistered).
-function plNameClass(p){
-  return (p&&p.registered!==true)?'player-unregistered':'';
+function _sbShort(p){const d=_sbAbDisp(p);return d?'spielberechtigt ab '+d:'noch nicht spielberechtigt';}
+// Lineup of a match: a small flag at a player who may not play that day
+function _lpSbFlag(p){
+  if(!(typeof canEdit==='function'&&canEdit())||!p||!p.noSb)return '';
+  const D=cd(),si=lpState&&lpState.sessIdx,s=(si!=null&&D&&D.sessions)?D.sessions[si]:null;
+  if(!s||playerSb(p,_dbSortKey(s.date,UI.currentSeason)))return '';
+  return `<span class="sb-flag" title="${escapeHtml(_sbShort(p))}">⚠</span>`;
 }
 function toggleViewMenu2(e){e.stopPropagation();document.getElementById('viewDropdown2').classList.toggle('open');_syncCompactCheck();}
 function _syncCompactCheck(){
@@ -11727,8 +11732,6 @@ function updateViewChecks(){
   });
   // Vergangene / Zukünftige ausblenden — consistent visual feedback
   _syncSessVisToggles();
-  // Registration-Status (temporary feature)
-  if(typeof updateRegStatusCheck==='function')updateRegStatusCheck();
 }
 // Close dropdown on outside click
 document.addEventListener('click',()=>document.getElementById('viewDropdown')?.classList.remove('open'));
@@ -11974,7 +11977,7 @@ function renderBody(){
     rows.push(`<tr>
       <td class="tdl c0">${!ro?`<input class="nri" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="${p.nr||''}" onclick="event.stopPropagation();this.select();" onchange="updNr(${origPi},this.value)" onblur="updNr(${origPi},this.value)" onkeydown="if(event.key==='Enter'){this.blur();event.preventDefault();}" title="Trikotnummer bearbeiten"/>`:`<span style="font-weight:700;color:var(--bm);">${p.nr||''}</span>`}</td>
       <td class="tdl c1" onclick="openPlayerFromMain(${origPi})" style="cursor:pointer;">
-        <div class="ncell">${p.photo?`<img class="nm-av" src="${p.photo}" alt="" loading="lazy">`:`<span class="nm-av nm-av-ph" aria-hidden="true">${_avIni(p)}</span>`}<span class="nm ${plNameClass(p)}">${getDisplayName(p)||''}</span><span class="ni">›</span></div>
+        <div class="ncell">${p.photo?`<img class="nm-av" src="${p.photo}" alt="" loading="lazy">`:`<span class="nm-av nm-av-ph" aria-hidden="true">${_avIni(p)}</span>`}<span class="nm">${getDisplayName(p)||''}</span><span class="ni">›</span></div>
       </td>
       <td class="c2" style="padding:4px;cursor:pointer;" onclick="openPlayerFromMain(${origPi})" title="Profil öffnen">${pcHtml(p)}</td>
       ${cells}
@@ -12285,7 +12288,7 @@ function mxBody(){
     rows.push(`<tr>
       <td class="tdl c0">${!ro?`<input class="nri" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="${p.nr||''}" onclick="event.stopPropagation();this.select();" onchange="updNr(${origPi},this.value)" onblur="updNr(${origPi},this.value)" onkeydown="if(event.key==='Enter'){this.blur();event.preventDefault();}" title="Trikotnummer bearbeiten"/>`:`<span style="font-weight:700;color:var(--bm);">${p.nr||''}</span>`}</td>
       <td class="tdl c1" onclick="openPlayerFromMain(${origPi})" style="cursor:pointer;">
-        <div class="ncell">${p.photo?`<img class="nm-av" src="${p.photo}" alt="" loading="lazy">`:`<span class="nm-av nm-av-ph" aria-hidden="true">${_avIni(p)}</span>`}<span class="nm ${plNameClass(p)}">${getDisplayName(p)||''}</span><span class="ni">›</span></div>
+        <div class="ncell">${p.photo?`<img class="nm-av" src="${p.photo}" alt="" loading="lazy">`:`<span class="nm-av nm-av-ph" aria-hidden="true">${_avIni(p)}</span>`}<span class="nm">${getDisplayName(p)||''}</span><span class="ni">›</span></div>
       </td>
       <td class="c2" style="padding:4px;cursor:pointer;" onclick="openPlayerFromMain(${origPi})" title="Profil öffnen">${pcHtml(p)}</td>
       <td class="c3 mx-pct" data-mxp="${origPi}" style="color:${_mxPctCol(r)};">${r==null?'–':r+'%'}</td>
@@ -13746,8 +13749,6 @@ function _setVisible(sec){
 function _setFill(){
   if(_setVisible('konto'))_kontoFill();
   if(typeof updateAppearanceUI==='function')updateAppearanceUI();
-  const regSwitch=document.getElementById('setRegStatus');
-  if(regSwitch)regSwitch.checked=isRegStatusShown();
   if(typeof ayRender==='function')ayRender();
   if(typeof meetRender==='function')meetRender();
   _setLogoSync();
@@ -14949,7 +14950,11 @@ function _pmSanitizeG(){
   const D=G.db[myKey];
   if(D){
     if(Array.isArray(D.players)){
-      D.players=D.players.map((p,idx)=>idx===myPi?p:null);
+      D.players=D.players.map((p,idx)=>{
+        if(idx!==myPi)return null;
+        if(p&&typeof p==='object'){delete p.noSb;delete p.sbAb;}
+        return p;
+      });
     }
     if(Array.isArray(D.sessions)){
       D.sessions=D.sessions.map(s=>{
@@ -15153,8 +15158,10 @@ function _sqRenderList(){
   const all=(D.players||[]).map((p,pi)=>({p,pi})).filter(x=>x.p&&join(x.p))
     .sort((a,b)=>(pIdx(a.p.pos)-pIdx(b.p.pos))||((+a.p.nr||999)-(+b.p.nr||999)));
   const nm=p=>(getDisplayName?getDisplayName(p):p.name)||'';
+  const sbk=_dbSortKey(s.date,season);
+  const sbF=x=>playerSb(x.p,sbk)?'':`<span class="sqd-sb">⚠ ${e(_sbShort(x.p))}</span>`;
   const row=x=>`<label class="sqd-row"><input type="checkbox" data-pi="${x.pi}"${_SQ.sel.has(x.pi)?' checked':''} onchange="sqToggle(${x.pi},this.checked)">`
-    +`<span class="sqd-nr">${e(String(x.p.nr||'–'))}</span><span class="sqd-nm">${e(nm(x.p))}</span><span class="sqd-pos">${e(x.p.pos||'')}</span></label>`;
+    +`<span class="sqd-nr">${e(String(x.p.nr||'–'))}</span><span class="sqd-nm">${e(nm(x.p))}${sbF(x)}</span><span class="sqd-pos">${e(x.p.pos||'')}</span></label>`;
   const grp=(title,list,sub)=>list.length?`<div class="sqd-g"><div class="sqd-gh">${title} <b>${list.length}</b>${sub?`<span>${sub}</span>`:''}</div>${list.map(row).join('')}</div>`:'';
   const yes=all.filter(x=>_sqSt(x.p,si)===4||_sqSt(x.p,si)===1),open=all.filter(x=>_sqSt(x.p,si)===3),no=all.filter(x=>[0,2].includes(_sqSt(x.p,si)));
   // Declined or excused players are not offered: they said they cannot come.
@@ -15211,9 +15218,15 @@ function _sqRenderSum(){
   // Second time in a row confirmed and left out: worth a word in person
   const prev=_sqPrevOut(D,si,season);
   const twice=outs.filter(p=>prev.has(p.name)).map(nm);
+  // Picked although the profile says he may not play that day
+  const sbk=_dbSortKey(s.date,season);
+  const nsb=ins.filter(p=>!playerSb(p,sbk)).map(nm);
+  const warn=[];
+  if(nsb.length)warn.push(`<b>${e(nsb.join(', '))}</b> ${nsb.length===1?'ist':'sind'} laut Profil am Spieltag noch nicht spielberechtigt.`);
+  if(twice.length)warn.push(`<b>${e(twice.join(', '))}</b> ${twice.length===1?'ist':'sind'} zum 2. Mal in Folge trotz Zusage nicht im Kader – besser persönlich sprechen.`);
   const w=document.getElementById('sqWarn');
-  w.hidden=!twice.length;
-  w.innerHTML=twice.length?`<b>${e(twice.join(', '))}</b> ${twice.length===1?'ist':'sind'} zum 2. Mal in Folge trotz Zusage nicht im Kader – besser persönlich sprechen.`:'';
+  w.hidden=!warn.length;
+  w.innerHTML=warn.map(x=>`<div>${x}</div>`).join('');
   const r=_sqRead(),q={meet:r.meet||'…',where:r.where};
   // What the standard is — and, when this match differs, the offer to keep it
   const st=_sqStd(s),kw=_sqKeepWhat(s,r);
@@ -21684,7 +21697,6 @@ function openPlayerStats(pi,opts){
   const psNameEl=document.getElementById('ps-name');
   if(psNameEl){
     psNameEl.textContent=p.name||'–';
-    psNameEl.classList.toggle('player-unregistered',p.registered!==true);
   }
   document.getElementById('ps-nr').textContent='#'+(p.nr||'?');
   document.getElementById('ps-pos-badge').innerHTML=pbHtml(p);
@@ -21713,6 +21725,7 @@ function openPlayerStats(pi,opts){
     }
     if(p.foot)info.push(_row('Starker Fu\u00df',p.foot==='right'?'Rechts':p.foot==='left'?'Links':'Beidf\u00fc\u00dfig'));
     if(p.passnr)info.push(_row('Pass-Nr.',escapeHtml(p.passnr)));
+    if(canEdit()&&!playerSb(p))info.push(_row('Spielberechtigt',_sbAbDisp(p,true)?'ab '+_sbAbDisp(p,true):'noch nicht'));
     const personSec=document.getElementById('ps-sec-person');
     noteEl.innerHTML=info.join('');
     if(personSec)personSec.style.display=info.length?'':'none';
@@ -21732,6 +21745,8 @@ function openPlayerStats(pi,opts){
     document.getElementById('pe-note').value=p.note||'';
     document.getElementById('pe-shortname').value=p.shortname||'';
     document.getElementById('pe-passnr').value=p.passnr||'';
+    {const sb=document.getElementById('pe-sb'),ab=document.getElementById('pe-sbab');
+     if(sb){const no=!playerSb(p);sb.value=no?'nein':'ja';if(ab)ab.value=(no&&p.sbAb)?p.sbAb:'';_peSbSync();}}
     document.getElementById('pe-birthdate').value=p.birthdate||'';
     {const jd=document.getElementById('pe-joinDate');if(jd)jd.value=p.joinDate||'';}
     document.getElementById('pe-phone').value=p.phone||'';
@@ -22034,7 +22049,12 @@ function _psShowCard(){
 // Edits are held in the form until "Fertig". _psSnapshot records the state on
 // entering edit mode so we can tell whether anything actually changed — that
 // is what decides if closing has to ask.
-const _PS_FIELDS=['pe-name','pe-nr','pe-shortname','pe-passnr','pe-birthdate','pe-joinDate','pe-phone','pe-email','pe-note'];
+const _PS_FIELDS=['pe-name','pe-nr','pe-shortname','pe-passnr','pe-sb','pe-sbab','pe-birthdate','pe-joinDate','pe-phone','pe-email','pe-note'];
+// Spielberechtigt: the date only matters while he may not play yet
+function _peSbSync(){
+  const s=document.getElementById('pe-sb'),r=document.getElementById('pe-sbab-row');
+  if(s&&r)r.hidden=s.value!=='nein';
+}
 let _psSnapshot=null;
 function _psReadForm(){
   const o={};
@@ -22056,7 +22076,7 @@ function _psCommitEdit(){
   if(!p)return;
   const val=id=>{const e=document.getElementById(id);return e?String(e.value||'').trim():null;};
   const before=JSON.stringify([p.name,p.nr,p.shortname,p.passnr,p.birthdate,p.joinDate,p.phone,p.email,p.note,
-    p.pos,p.pos2,p.foot]);
+    p.pos,p.pos2,p.foot,p.noSb,p.sbAb]);
   const nm=val('pe-name');
   if(nm)p.name=nm;                      // never allow an empty name
   const nr=val('pe-nr');
@@ -22066,13 +22086,16 @@ function _psCommitEdit(){
     if(v===null)return;
     if(v)p[f]=v;else delete p[f];
   });
+  {const sb=val('pe-sb');
+   if(sb==='nein'){p.noSb=true;const ab=val('pe-sbab');if(/^\d{4}-\d{2}-\d{2}$/.test(ab||''))p.sbAb=ab;else delete p.sbAb;}
+   else if(sb==='ja'){delete p.noSb;delete p.sbAb;}}
   // Positions live in editP1/editP2, not in an input, which is why a
   // field-by-field commit missed them.
   if(typeof editP1!=='undefined'&&editP1)p.pos=editP1;
   if(typeof editP2!=='undefined'){if(editP2)p.pos2=editP2;else delete p.pos2;}
   if(typeof _currentFoot!=='undefined')p.foot=_currentFoot;
   if(JSON.stringify([p.name,p.nr,p.shortname,p.passnr,p.birthdate,p.joinDate,p.phone,p.email,p.note,
-    p.pos,p.pos2,p.foot])===before)return;
+    p.pos,p.pos2,p.foot,p.noSb,p.sbAb])===before)return;
   saveG();
   if(typeof renderBody==='function')renderBody();
   if(typeof renderTfoot==='function')renderTfoot();
@@ -22082,7 +22105,6 @@ function _psCommitEdit(){
   const psName=document.getElementById('ps-name');
   if(psName){
     psName.textContent=p.name||'\u2013';
-    psName.classList.toggle('player-unregistered',p.registered!==true);
   }
   const psNr=document.getElementById('ps-nr');
   if(psNr)psNr.textContent='#'+(p.nr||'?');
@@ -26550,7 +26572,7 @@ function sortStats(col){if(statsSort.col===col)statsSort.asc=!statsSort.asc;else
 //  TEAM / SEASON
 // ══════════════════════════════
 function switchTeam(t){UI.currentTeam=t;saveUI();slpState.currentId=null;slpState.slots={};render();if(typeof _updateAppTitle==='function')_updateAppTitle();if(typeof writePresenceEntry==='function')writePresenceEntry();}
-function switchSeason(s){UI.currentSeason=s;saveUI();slpState.currentId=null;slpState.slots={};render();if(typeof applyRegStatusBodyClass==='function')applyRegStatusBodyClass();if(typeof writePresenceEntry==='function')writePresenceEntry();}
+function switchSeason(s){UI.currentSeason=s;saveUI();slpState.currentId=null;slpState.slots={};render();if(typeof writePresenceEntry==='function')writePresenceEntry();}
 
 async function addSeason(){
   if(!isAdmin())return;
@@ -33296,7 +33318,7 @@ function lpRenderPopup(slotId){
   pickerEl.innerHTML=rows.map(({i,p,isAssigned,isBest,isFit,bcol})=>`
     <div class="slp-pick-item${isBest?' best':''}${isAssigned?' assigned-already':''}" onclick="lpAssignToSlot('${slotId}',${i})">
       <span class="nr">${p.nr||'–'}</span>
-      <span class="name ${plNameClass(p)}">${getDisplayName(p)}</span>
+      <span class="name">${getDisplayName(p)}${_lpSbFlag(p)}</span>
       ${_lpLastWeekAttendance(i)}
       <span class="pos-b" style="background:${bcol.split(';')[0]};${bcol.split(';')[1]}">${p.pos}</span>
       ${isBest?'<span style="color:var(--ac);font-size:.7rem;">★</span>':''}
@@ -33685,7 +33707,7 @@ function lpRenderSubPopup(subIdx){
   pickerEl.innerHTML=rows.map(({i,p,isAssigned,bcol})=>`
     <div class="slp-pick-item${isAssigned?' assigned-already':''}" onclick="lpAssignToSub(${subIdx},${i})">
       <span class="nr">${p.nr||'–'}</span>
-      <span class="name ${plNameClass(p)}">${getDisplayName(p)}</span>
+      <span class="name">${getDisplayName(p)}${_lpSbFlag(p)}</span>
       ${_lpLastWeekAttendance(i)}
       <span class="pos-b" style="background:${bcol.split(';')[0]};${bcol.split(';')[1]}">${p.pos}</span>
     </div>`).join('');
@@ -33874,6 +33896,17 @@ function slpIsConfEnabled(){
   // Per-user setting, stored in user prefs (localStorage), not in G
   return getUserPref('slpConfEnabled_'+slpConfKey(),false)===true;
 }
+// Saisonkader, "Status" on: may this player play now? Reads the open draft.
+function _slpSbMap(D){
+  const m={};
+  ((D&&D.players)||[]).forEach((p,i)=>{if(p&&playerSb(p))m[i]=true;});
+  return m;
+}
+function _slpSbNow(pi){
+  if(_slpStatusDraft&&_slpStatusDraft.sb)return _slpStatusDraft.sb[pi]===true;
+  const D=cd();return playerSb(D&&D.players?D.players[pi]:null);
+}
+function _slpSbCls(pi){return (slpIsConfEnabled()&&!slpSeasonStarted()&&!_slpSbNow(pi))?'slp-nsb':'';}
 function slpIsPlayerConfirmed(pi){
   // Read from draft if Saisonkader is open (live preview of unsaved toggles),
   // else from committed state in G.
@@ -33916,11 +33949,11 @@ function _slpInitDraft(){
   const confKey=slpConfKey();
   const confEntry=G.slpConfirmations&&G.slpConfirmations[confKey];
   const regMap={};
-  (D.players||[]).forEach((p,i)=>{if(p&&p.registered===true)regMap[i]=true;});
+  Object.assign(regMap,_slpSbMap(D));
   _slpStatusDraft={
     confKey,
     confirmed:confEntry&&confEntry.confirmed?JSON.parse(JSON.stringify(confEntry.confirmed)):{},
-    registered:regMap
+    sb:regMap
   };
 }
 // Accessor used by render functions: returns the live draft state if Saisonkader
@@ -33932,11 +33965,11 @@ function _slpGetEffectiveStatus(){
   const confKey=slpConfKey();
   const confEntry=G.slpConfirmations&&G.slpConfirmations[confKey];
   const regMap={};
-  (D?D.players:[]||[]).forEach((p,i)=>{if(p&&p.registered===true)regMap[i]=true;});
+  Object.assign(regMap,_slpSbMap(D));
   return {
     confKey,
     confirmed:confEntry&&confEntry.confirmed?confEntry.confirmed:{},
-    registered:regMap
+    sb:regMap
   };
 }
 function _slpCaptureStatusSnapshot(){
@@ -33947,11 +33980,11 @@ function _slpCaptureStatusSnapshot(){
   const confKey=slpConfKey();
   const confEntry=G.slpConfirmations&&G.slpConfirmations[confKey];
   const regMap={};
-  (D.players||[]).forEach((p,i)=>{if(p&&p.registered===true)regMap[i]=true;});
+  Object.assign(regMap,_slpSbMap(D));
   return {
     confKey,
     confirmed:confEntry&&confEntry.confirmed?JSON.parse(JSON.stringify(confEntry.confirmed)):{},
-    registered:regMap
+    sb:regMap
   };
 }
 function _slpRestoreStatusSnapshot(){
@@ -33977,7 +34010,7 @@ function _slpRefreshStatusSnapshot(){
 function _slpStatusEffectivelyDirty(){
   if(!_slpStatusSnapshot||!_slpStatusDraft)return false;
   return JSON.stringify(_slpStatusDraft.confirmed)!==JSON.stringify(_slpStatusSnapshot.confirmed)
-      || JSON.stringify(_slpStatusDraft.registered)!==JSON.stringify(_slpStatusSnapshot.registered);
+      || JSON.stringify(_slpStatusDraft.sb)!==JSON.stringify(_slpStatusSnapshot.sb);
 }
 // Snapshot the field layout (slots + formation + customSlots) at open-time
 function _slpCaptureSlotSnapshot(){
@@ -34004,11 +34037,14 @@ function _slpCommitDraft(){
   if(!G.slpConfirmations)G.slpConfirmations={};
   if(!G.slpConfirmations[_slpStatusDraft.confKey])G.slpConfirmations[_slpStatusDraft.confKey]={};
   G.slpConfirmations[_slpStatusDraft.confKey].confirmed=JSON.parse(JSON.stringify(_slpStatusDraft.confirmed));
-  // Apply registration flags to players
+  // Spielberechtigung: only players whose state the trainer changed here
+  // (a date set in the profile stays while he still may not play)
   (D.players||[]).forEach((p,i)=>{
     if(!p)return;
-    if(_slpStatusDraft.registered[i]===true)p.registered=true;
-    else delete p.registered;
+    const want=_slpStatusDraft.sb[i]===true;
+    if(want===playerSb(p))return;
+    if(want){delete p.noSb;delete p.sbAb;}
+    else{p.noSb=true;delete p.sbAb;}
   });
   saveG();
 }
@@ -34022,8 +34058,6 @@ function slpToggleConf(pi){
   _slpMarkStatusDirty();
   slpRenderStatusList();
   slpRender();
-  // Update main app too (player names in attendance table reflect color)
-  if(typeof render==='function')render();
 }
  // backward-compat shim
      // backward-compat shim
@@ -34031,20 +34065,17 @@ function slpOpenStatusList(){
   slpRenderStatusList();
   openM('moSlpStatus');
 }
-// Anmeldungs-Status: temporary feature for managing pre-season registration.
-// V2 model: player is UNregistered by default — explicit p.registered === true flags them as registered.
+// Spielberechtigt (1.2.16): ticked = may play. Same draft as the confirmations.
 function slpToggleReg(pi){
   if(!canEdit())return;
   if(!_slpStatusDraft)_slpInitDraft();
-  if(_slpStatusDraft.registered[pi]===true)delete _slpStatusDraft.registered[pi];
-  else _slpStatusDraft.registered[pi]=true;
+  if(_slpStatusDraft.sb[pi]===true)delete _slpStatusDraft.sb[pi];
+  else _slpStatusDraft.sb[pi]=true;
   _slpMarkStatusDirty();
   slpRenderStatusList();
   if(typeof slpRender==='function')slpRender();
-  // Update main app too — name colors update everywhere immediately
-  if(typeof render==='function')render();
 }
-// Unified renderer — both columns (Bestätigung + Anmeldung) are always available when
+// Unified renderer — both columns (Bestätigt + Spielberechtigt) are always available when
 // season is not yet started. Display toggles only affect visual rendering elsewhere.
 function slpRenderStatusList(){
   const D=cd();
@@ -34053,8 +34084,8 @@ function slpRenderStatusList(){
   // Falls back to committed G state otherwise.
   const status=(typeof _slpGetEffectiveStatus==='function')?_slpGetEffectiveStatus():null;
   const conf=status?status.confirmed:slpGetConf().confirmed;
-  const reg=status?status.registered:null;
-  const isRegistered=(pi)=>reg?reg[pi]===true:(players[pi]&&players[pi].registered===true);
+  const reg=status?status.sb:null;
+  const isRegistered=(pi)=>reg?reg[pi]===true:playerSb(players[pi]);
   const seasonStarted=typeof slpSeasonStarted==='function'?slpSeasonStarted():false;
   // Both modes are available equally when season has not started yet
   const confActive=!seasonStarted;
@@ -34064,13 +34095,13 @@ function slpRenderStatusList(){
   const noteEl=document.getElementById('slp-status-note');
   if(titleEl){
     if(seasonStarted)titleEl.textContent='Status verwalten (Saison läuft bereits)';
-    else titleEl.textContent='📋 Bestätigungen + Anmeldungs-Status';
+    else titleEl.textContent='📋 Bestätigt und spielberechtigt';
   }
   if(noteEl){
     if(seasonStarted){
       noteEl.innerHTML='Die Saison hat bereits begonnen — Status-Verwaltung steht für die Vor-Saison-Phase zur Verfügung.';
     } else {
-      noteEl.innerHTML='<b>Bestätigung</b>: Spieler hat Teilnahme bestätigt.<br><b>Anmeldung</b>: Häkchen setzen, sobald sich der Spieler angemeldet hat. <b>Ohne Häkchen</b> = gelb markiert.';
+      noteEl.innerHTML='<b>Bestätigt</b>: hat für die Saison zugesagt – mit „Status“ grün und ✓.<br><b>Spielberechtigt</b>: darf spielen. Ohne Häkchen gelb, z. B. solange die Abmeldung beim alten Verein fehlt. Ein Datum „ab …“ lässt sich im Spielerprofil eintragen.';
     }
   }
   const el=document.getElementById('slp-status-list');
@@ -34093,7 +34124,7 @@ function slpRenderStatusList(){
     <span style="flex:1;">Spieler</span>
     <span style="width:48px;text-align:center;" title="Position">Pos</span>
     <span style="width:60px;text-align:center;" title="Bestätigt">✓ Best.</span>
-    <span style="width:60px;text-align:center;" title="Angemeldet">✓ Angemeldet</span>
+    <span style="width:76px;text-align:center;line-height:1.15;" title="Spielberechtigt">✓ Spiel&shy;berechtigt</span>
   </div>`;
   html+=sortedPis.map(pi=>{
     const p=players[pi];
@@ -34114,8 +34145,8 @@ function slpRenderStatusList(){
         <span class="lp-card-pos1" style="background:${bcol1[0]};${bcol1[1]};font-size:.6rem;">${escapeHtml(p.pos||'')}</span>
         ${bcol2?`<span class="lp-card-pos1" style="background:${bcol2[0]};${bcol2[1]};font-size:.6rem;">${escapeHtml(p.pos2)}</span>`:''}
       </span>
-      <span style="width:60px;text-align:center;"><input type="checkbox" ${isConf?'checked':''} onchange="slpToggleConf(${pi})" style="width:18px;height:18px;cursor:pointer;accent-color:var(--cp);" title="Bestätigt"/></span>
-      <span style="width:60px;text-align:center;"><input type="checkbox" ${isReg?'checked':''} onchange="slpToggleReg(${pi})" style="width:18px;height:18px;cursor:pointer;accent-color:var(--bm);" title="Angemeldet"/></span>
+      <span style="width:60px;text-align:center;"><input type="checkbox" ${isConf?'checked':''} onchange="slpToggleConf(${pi})" style="width:18px;height:18px;cursor:pointer;accent-color:var(--cp);" title="Bestätigt" aria-label="${escapeHtml(getDisplayName(p))} bestätigt"/></span>
+      <span style="width:76px;text-align:center;"><input type="checkbox" ${isReg?'checked':''} onchange="slpToggleReg(${pi})" style="width:18px;height:18px;cursor:pointer;accent-color:var(--bm);" title="Spielberechtigt" aria-label="${escapeHtml(getDisplayName(p))} spielberechtigt"/></span>
     </div>`;
   }).join('');
   el.innerHTML=html;
@@ -34125,7 +34156,7 @@ function slpRenderStatusList(){
   const regCount=players.filter((_,i)=>isRegistered(i)).length;
   const dirtyMark=(typeof _slpStatusEffectivelyDirty==='function'&&_slpStatusEffectivelyDirty())?' · <span style="color:#a02525;font-weight:700;">● Ungespeicherte Änderungen</span>':'';
   const stEl=document.getElementById('slp-status-stats');
-  if(stEl)stEl.innerHTML=`${confCount} / ${total} bestätigt · ${regCount} / ${total} angemeldet${dirtyMark}`;
+  if(stEl)stEl.innerHTML=`${confCount} / ${total} bestätigt · ${regCount} / ${total} spielberechtigt${dirtyMark}`;
 }
 
 // ══ SEASON LINEUP PLANNER ════════════════════════════════════
@@ -34261,7 +34292,7 @@ async function closeSeasonLineup(){
     const D=cd();
     const players=D?D.players:[];
     const draftConf=_slpStatusDraft?_slpStatusDraft.confirmed:{};
-    const draftReg=_slpStatusDraft?_slpStatusDraft.registered:{};
+    const draftReg=_slpStatusDraft?_slpStatusDraft.sb:{};
     const confCount=players.filter((_,i)=>draftConf[i]).length;
     const regCount=players.filter((_,i)=>draftReg[i]===true).length;
     const slotPlayerCount=Object.values(slpState.slots||{}).reduce((s,arr)=>s+(Array.isArray(arr)?arr.length:0),0);
@@ -34269,7 +34300,7 @@ async function closeSeasonLineup(){
     const changes=[];
     if(statusDirty){
       changes.push({label:'Bestätigt',value:confCount+' Spieler',icon:'✓'});
-      changes.push({label:'Angemeldet',value:regCount+' Spieler',icon:'✓'});
+      changes.push({label:'Spielberechtigt',value:regCount+' Spieler',icon:'✓'});
     }
     if(slotsDirty){
       changes.push({label:'Kaderplan (Positionen)',value:slotPlayerCount+' Zuordnungen · '+(slpState.formation||'?'),icon:'⚽'});
@@ -34285,7 +34316,7 @@ async function closeSeasonLineup(){
       if(statusDirty)_slpCommitDraft();
       if(slotsDirty)slpSave(); // persist field layout to G.seasonLineups
       logAudit('Saisonkader gespeichert',UI.currentTeam+' · '+UI.currentSeason,
-        (statusDirty?(confCount+' bestätigt · '+regCount+' angemeldet'):'')
+        (statusDirty?(confCount+' bestätigt · '+regCount+' spielberechtigt'):'')
         +(statusDirty&&slotsDirty?' · ':'')
         +(slotsDirty?(slotPlayerCount+' Slots'):''));
       _slpRefreshStatusSnapshot();
@@ -34478,10 +34509,8 @@ function slpRender(){
       const fs=fontFor(i);
       const yPos=R+18+i*LINE_H;
       const confirmed=confEnabled?slpIsPlayerConfirmed(pi):false;
-      // Reg-status: read from draft if Saisonkader is open (live preview)
-      const draftReg=(typeof _slpStatusDraft!=='undefined'&&_slpStatusDraft)?_slpStatusDraft.registered:null;
-      const isPlayerReg=draftReg?(draftReg[pi]===true):(p&&p.registered===true);
-      const isUnreg=isRegStatusShown()&&p&&!isPlayerReg;
+      // "Status" on: who may not play yet is yellow (draft-aware)
+      const isUnreg=confEnabled&&p&&!_slpSbNow(pi);
       const textColor=isUnreg?'#ffd34d':(confirmed?'#7dffa0':col);
       // When conf mode disabled - center align; when enabled - left align with reserved check space
       let nameTxt;
@@ -34680,7 +34709,7 @@ function slpRenderPopup(slotId){
         const p=players[pi];if(!p)return'';
         return `<div class="slp-assigned-row">
           <span class="nr">${p.nr||'–'}</span>
-          <span class="name ${plNameClass(p)}">${getDisplayName(p)}</span>
+          <span class="name ${_slpSbCls(pi)}">${getDisplayName(p)}</span>
           <span class="prio">#${i+1}</span>
           ${i>0?`<span class="up-btn" onclick="slpMovePrio('${slotId}',${i},-1)" title="Priorität erhöhen">▲</span>`:'<span style="width:18px"></span>'}
           ${i<assigned.length-1?`<span class="up-btn" onclick="slpMovePrio('${slotId}',${i},1)" title="Priorität senken">▼</span>`:'<span style="width:18px"></span>'}
@@ -34716,7 +34745,7 @@ function slpRenderPopup(slotId){
       const cls=`slp-pick-item${isBest?' best':''}${isAssignedElsewhere?' assigned-already':''}`;
       return `<div class="${cls}" onclick="slpAddToSlot('${slotId}',${i})">
         <span class="nr">${p.nr||'–'}</span>
-        <span class="name ${plNameClass(p)}">${getDisplayName(p)}</span>
+        <span class="name ${_slpSbCls(i)}">${getDisplayName(p)}</span>
         <span class="pos-b" style="background:${bcol.split(';')[0]};${bcol.split(';')[1]}">${p.pos}</span>
         ${isBest?'<span style="color:var(--ac);font-size:.7rem;">★</span>':''}
       </div>`;
@@ -35316,15 +35345,6 @@ _pubCleanupSchedule();
           <button type="button" class="btn" id="setHeroDel" onclick="homeRemoveHeroPhoto()" style="background:rgba(231,76,60,.1);color:#c0392b;border:1px solid rgba(231,76,60,.3);">Entfernen</button>
         </div>
       </div>
-  <div class="setting-row">
-    <div>
-      <div class="setting-label">🟡 Anmeldungs-Status anzeigen</div>
-      <div class="setting-sub">Nicht angemeldete Spieler werden gelb dargestellt (Vor-Saison)</div>
-    </div>
-    <div class="setting-control">
-      <label class="setting-switch"><input type="checkbox" id="setRegStatus" onchange="toggleRegStatus()"/><span class="setting-slider"></span></label>
-    </div>
-  </div>
       <div id="ayBox" class="ay-box"></div>
       <div id="meetBox" class="ay-box"></div>
 
@@ -35595,7 +35615,7 @@ _pubCleanupSchedule();
     <div style="flex:1;"></div>
     <div id="slp-hint" style="display:none;"></div>
     <input type="checkbox" id="slp-conf-toggle" onchange="slpToggleConfirmations(this.checked)" style="cursor:pointer;margin:0 4px 0 0;width:14px;height:14px;vertical-align:middle;"/>
-    <span id="slp-conf-toggle-lbl" style="font-size:.75rem;color:rgba(255,255,255,.95);font-weight:600;margin-right:6px;user-select:none;cursor:pointer;" onclick="const _t=document.getElementById('slp-conf-toggle');_t.checked=!_t.checked;slpToggleConfirmations(_t.checked);">Bestätigungen</span>
+    <span id="slp-conf-toggle-lbl" style="font-size:.75rem;color:rgba(255,255,255,.95);font-weight:600;margin-right:6px;user-select:none;cursor:pointer;" onclick="const _t=document.getElementById('slp-conf-toggle');_t.checked=!_t.checked;slpToggleConfirmations(_t.checked);" title="Grün mit ✓ = für die Saison bestätigt, gelb = noch nicht spielberechtigt">Status</span>
     <button class="slp-close-btn" id="slp-status-btn" onclick="slpOpenStatusList()" style="display:none;background:rgba(232,200,64,0.15);border-color:rgba(232,200,64,0.4);color:#e8c840;"><span class="fb-long">📋 Status verwalten</span><span class="fb-short">📋</span></button>
     <button class="slp-close-btn" id="slp-close-btn" onclick="closeSeasonLineup()" aria-label="Schließen"><span class="fb-long">✕ Schließen</span><span class="fb-short">✕</span></button>
   </div>
