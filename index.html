@@ -2585,6 +2585,18 @@ body.design-heute .dow-btn.sel-m{background:var(--mc1);border-color:var(--mc1);c
 .sqd-meet{margin-top:6px;font-size:.88rem;color:var(--hx-ink,var(--gd));}
 .sqd-meet b{font-family:var(--hx-num,'Barlow');font-weight:800;font-size:1.08rem;}
 .sqd-out{margin-top:6px;font-size:.78rem;line-height:1.4;color:var(--hx-muted,var(--gm));}
+.sqd-lu{margin-top:8px;padding:7px 10px;border-radius:9px;background:#FFF4E0;border-left:3px solid #E0912F;font-size:.78rem;line-height:1.4;color:#5A3A00;}
+.lp-sq-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:7px 12px;flex-shrink:0;font-size:.76rem;line-height:1.35;color:#fff;
+  background:rgba(22,89,184,.28);border-bottom:1px solid rgba(255,255,255,.14);}
+.lp-sq-bar.warn{background:rgba(232,200,64,.18);border-bottom-color:rgba(232,200,64,.4);}
+.lp-sq-t{flex:1 1 220px;min-width:0;}
+.lp-sq-btn{flex-shrink:0;border:0;border-radius:999px;padding:5px 14px;min-height:32px;font-family:'Barlow',sans-serif;font-size:.76rem;font-weight:700;cursor:pointer;background:#e8c840;color:#0e2350;}
+body.design-heute .lp-sq-bar{background:#EAF1FB;border-bottom-color:#CFDDF2;color:var(--hx-ink);}
+body.design-heute .lp-sq-bar.warn{background:#FFF4E5;border-bottom-color:#F3D9B1;color:#5A3A00;}
+body.design-heute .lp-sq-btn{background:var(--hx-blue);color:#fff;}
+.slp-pick-item.lp-nik,#lp-kader-list>div.lp-nik{opacity:.62;}
+.lp-nik-t{margin-left:6px;font-size:.6rem;font-weight:600;color:rgba(255,255,255,.6);white-space:nowrap;}
+body.design-heute .lp-nik-t{color:var(--hx-muted);}
 .sqd-acts{display:flex;align-items:center;gap:16px;margin-top:10px;}
 .sqd-go{height:34px;padding:0 14px;border-radius:999px;border:none;background:var(--hx-yellow,#F2C230);color:var(--hx-on-acc,#0E2350);font:700 .84rem 'Barlow',sans-serif;cursor:pointer;}
 .sqd-go.alt{background:var(--hx-field,#fff);color:var(--hx-ink,var(--gd));border:1px solid var(--hx-line,var(--gl));}
@@ -6528,13 +6540,18 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.16'; // v1.2.16: Spielberechtigung statt Anmeldungs-Status
-const APP_VERSION_LABEL='1.2.16';
+const APP_VERSION='1.2.17'; // v1.2.17: Kader und Aufstellung kennen sich
+const APP_VERSION_LABEL='1.2.17';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792690055556; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792691940386; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.17',date:'22.10.2026',title:'Kader und Aufstellung',items:[
+    {icon:'🔗',title:'Die Aufstellung kennt den Kader',desc:'Ist der Kader veröffentlicht, stehen seine Spieler in der Aufstellung oben in der Auswahl. Wer nicht im Kader ist, steht darunter mit „nicht im Kader“ und lässt sich trotzdem wählen.'},
+    {icon:'⚠',title:'Wenn beide auseinanderlaufen',desc:'Steht jemand in der Aufstellung, aber nicht im Kader, sagen es die Aufstellung und die Kader-Karte im Spiel – er bekäme keinen Treffpunkt. „Kader anpassen“ öffnet das Kader-Fenster mit ihm schon angehakt; geändert wird erst mit „Änderungen veröffentlichen“.'},
+    {icon:'📣',title:'Aus der Aufstellung zum Kader',desc:'Ist noch kein Kader veröffentlicht, bietet die Aufstellung „Kader festlegen“ an – mit ihren Spielern vorausgewählt, auch wenn sie noch nicht gespeichert ist.'},
+  ]},
   {version:'1.2.16',date:'22.10.2026',title:'Spielberechtigung',items:[
     {icon:'🪪',title:'Spielberechtigt – im Profil',desc:'Im Spielerprofil unter Bearbeiten → Sportlich lässt sich festhalten, dass ein Spieler noch nicht spielen darf, z. B. weil die Abmeldung beim alten Verein noch fehlt – auf Wunsch mit Datum „ab …“. Standard ist „Ja“. Das sehen nur Trainer.'},
     {icon:'⚠',title:'Hinweis bei Kader und Aufstellung',desc:'Wer am Spieltag noch nicht spielberechtigt ist, ist in „Kader und Treffpunkt“ und bei der Aufstellung markiert. Auswählen lässt er sich trotzdem, die Entscheidung bleibt beim Trainer – bei Freundschaftsspielen können andere Fristen gelten.'},
@@ -15089,10 +15106,13 @@ function _sqPanelHtml(si){
   const when=Date.now()<due?'geht frühestens '+hm(due)+' aufs Handy':'veröffentlicht '+new Date(q.t).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})+' '+hm(q.t);
   // Confirmed but not picked, as of now (answers may have changed since)
   const outNow=(D.players||[]).filter(p=>p&&!q.p.includes(p.name)&&_sqSt(p,si)===4).map(p=>(getDisplayName?getDisplayName(p):p.name));
+  // In the lineup but not in the squad: he would not know when to come
+  const df=ed?_sqLuDiff(D,si):null,ni=df?df.notIn:[];
   return `<div class="sqd-card on"><div class="sqd-h"><b>Kader · ${q.p.length} Spieler</b><span>${e(when)}</span></div>
     <div class="sqd-meet">Treffpunkt <b>${e(q.meet)}</b>${q.where?' · '+e(q.where):''}</div>
     ${outNow.length?`<div class="sqd-out">Zugesagt, nicht im Kader: ${e(outNow.join(', '))}</div>`:''}
-    ${ed?`<div class="sqd-acts"><button type="button" class="sqd-go alt" onclick="squadOpen(${si})">Ändern</button><button type="button" class="sqd-link" onclick="squadWithdraw(${si})">Zurücknehmen</button></div>`:''}</div>`;
+    ${ni.length?`<div class="sqd-lu">In der Aufstellung, aber nicht im Kader: <b>${e(_sqNames(D,ni))}</b> – ${ni.length===1?'bekommt':'bekommen'} keinen Treffpunkt.</div>`:''}
+    ${ed?`<div class="sqd-acts"><button type="button" class="sqd-go alt" onclick="squadOpen(${si}${ni.length?',true':''})">${ni.length?'Kader anpassen':'Ändern'}</button><button type="button" class="sqd-link" onclick="squadWithdraw(${si})">Zurücknehmen</button></div>`:''}</div>`;
 }
 // ── the window ──
 let _SQ=null;
@@ -15115,12 +15135,66 @@ function _sqEnsure(){
   const m=w.firstElementChild;document.body.appendChild(m);
   ['sqMeet','sqWhere'].forEach(id=>{const el=document.getElementById(id);el.addEventListener('input',_sqRenderSum);el.addEventListener('change',_sqRenderSum);});
 }
-function _sqLineup(D,si){
-  const lu=G.matchLineups&&G.matchLineups[_mlKey(UI.currentTeam,UI.currentSeason,si)];
-  const s=D.sessions[si];
-  if(!lu||(lu.sessDate&&s&&lu.sessDate!==s.date))return null;   // saved for another date: sessions moved since
-  const a=[...Object.values(lu.slots||{}),...(lu.subs||[])].filter(v=>typeof v==='number'&&D.players[v]&&![0,2].includes(_sqSt(D.players[v],si)));
-  return a.length?[...new Set(a)]:null;
+// Kader and Aufstellung (1.2.17): the squad says who comes, the lineup who
+// plays where — one list of "who is in". The lineup offers the squad first,
+// and where the two differ both windows say so. Nothing changes the squad
+// silently: every change is a message to the players.
+// The lineup of a match: the open planner if it shows this match (saved or
+// not), else the saved one unless it was saved for another date. idx = players
+// in it who have not declined; full = every place on the pitch taken.
+function _lpOpenOn(si){const el=document.getElementById('moLineup');return !!(el&&el.classList.contains('open')&&typeof lpState!=='undefined'&&lpState.sessIdx===si);}
+function _sqLuInfo(D,si){
+  const s=D&&D.sessions&&D.sessions[si];if(!s)return null;
+  let lu;
+  if(_lpOpenOn(si))lu=lpState;
+  else{
+    lu=G.matchLineups&&G.matchLineups[_mlKey(UI.currentTeam,UI.currentSeason,si)];
+    if(!lu||(lu.sessDate&&lu.sessDate!==s.date))return null;   // saved for another date: sessions moved since
+  }
+  const vals=Object.values(lu.slots||{}).filter(v=>v!=null);
+  const idx=[...new Set([...vals,...(lu.subs||[])].filter(v=>typeof v==='number'&&D.players[v]&&![0,2].includes(_sqSt(D.players[v],si))))];
+  let n=11;try{n=fmtSlots(lu.formation||'4-2-3-1',lu.customSlots||null).length||11;}catch(e){}
+  return {idx,full:vals.length>=n};
+}
+function _sqLineup(D,si){const i=_sqLuInfo(D,si);return (i&&i.idx.length)?i.idx:null;}
+// Lineup against the published squad: in the lineup but not in the squad (he
+// gets no meeting time), and, once the pitch is full, in the squad without a
+// place in the lineup
+function _sqLuDiff(D,si){
+  const s=D&&D.sessions&&D.sessions[si],q=_sqOf(s);if(!q)return null;
+  const li=_sqLuInfo(D,si);if(!li||!li.idx.length)return null;
+  const inQ=new Set(q.p),inL=new Set(li.idx);
+  const notIn=li.idx.filter(pi=>!inQ.has(D.players[pi].name));
+  const spare=li.full?(D.players||[]).map((p,pi)=>(p&&inQ.has(p.name)&&!inL.has(pi)&&![0,2].includes(_sqSt(p,si)))?pi:-1).filter(pi=>pi>=0):[];
+  return {notIn,spare};
+}
+function _sqNames(D,list){return list.map(pi=>{const p=D.players[pi];return (getDisplayName?getDisplayName(p):p.name)||'';}).join(', ');}
+// Published squad of the match the planner shows, as player indices
+function _lpSqSet(){
+  const D=cd(),si=lpState.sessIdx,s=(si!=null&&D&&D.sessions)?D.sessions[si]:null,q=(s&&s.type==='match')?_sqOf(s):null;
+  if(!q)return null;
+  return new Set((D.players||[]).map((p,pi)=>(p&&q.p.includes(p.name))?pi:-1).filter(pi=>pi>=0));
+}
+// The strip in the planner: no squad yet → offer it; a player in the lineup
+// but not in the squad → say so and offer to add him; else, with the pitch
+// full, who comes without a place
+function _lpSqBar(){
+  const el=document.getElementById('lp-sq-bar');if(!el)return;
+  const D=cd(),si=lpState.sessIdx,s=(si!=null&&D&&D.sessions)?D.sessions[si]:null,e=escapeHtml;
+  let h='',cls='';
+  if(s&&s.type==='match'&&typeof canEdit==='function'&&canEdit()&&!_sqStarted(s,UI.currentSeason)){
+    if(!_sqOf(s)){
+      const li=_sqLuInfo(D,si);
+      if(li&&li.idx.length){cls='info';h=`<span class="lp-sq-t">Kader noch nicht veröffentlicht – die Spieler kennen Treffpunkt und Uhrzeit noch nicht.</span><button type="button" class="lp-sq-btn" onclick="squadOpen(${si})">Kader festlegen</button>`;}
+    } else {
+      const df=_sqLuDiff(D,si);
+      if(df&&df.notIn.length){cls='warn';h=`<span class="lp-sq-t">⚠ Nicht im Kader: <b>${e(_sqNames(D,df.notIn))}</b> – ${df.notIn.length===1?'bekommt':'bekommen'} keinen Treffpunkt.</span><button type="button" class="lp-sq-btn" onclick="squadOpen(${si},true)">Kader anpassen</button>`;}
+      else if(df&&df.spare.length){cls='info';h=`<span class="lp-sq-t">Im Kader, ohne Platz in der Aufstellung: ${e(_sqNames(D,df.spare))}</span>`;}
+    }
+  }
+  el.className='lp-sq-bar'+(cls?' '+cls:'');
+  el.style.display=h?'flex':'none';
+  el.innerHTML=h;
 }
 function _sqMeetDefault(s){
   const r=(G.db[UI.currentTeam+'__rules']&&G.db[UI.currentTeam+'__rules'].meet)||{};
@@ -15128,7 +15202,7 @@ function _sqMeetDefault(s){
   const off=_meetMin(away?'a':'h');
   return {meet:ko==null?'':_sqHM(ko-off),where:away?(r.aw||''):String(s.location||'').trim()};
 }
-function squadOpen(si){
+function squadOpen(si,addLu){
   if(!(typeof canEdit==='function'&&canEdit()))return;
   const D=cd(),s=D&&D.sessions&&D.sessions[si],season=UI.currentSeason;
   if(!s||s.type!=='match')return;
@@ -15136,7 +15210,10 @@ function squadOpen(si){
   _sqEnsure();
   const q=_sqOf(s),sel=new Set();
   const join=p=>typeof _sessAfterJoin!=='function'||_sessAfterJoin(p,s,season);
-  if(q)(D.players||[]).forEach((p,pi)=>{if(p&&q.p.includes(p.name))sel.add(pi);});
+  if(q){
+    (D.players||[]).forEach((p,pi)=>{if(p&&q.p.includes(p.name))sel.add(pi);});
+    if(addLu)(_sqLineup(D,si)||[]).forEach(pi=>sel.add(pi));   // "Kader anpassen": add, never drop
+  }
   else (_sqLineup(D,si)||(D.players||[]).map((p,pi)=>(p&&join(p)&&_sqSt(p,si)===4)?pi:-1).filter(pi=>pi>=0)).forEach(pi=>sel.add(pi));
   _SQ={si,sel,date:s.date,was:!!q};
   document.getElementById('sqKeep').checked=false;
@@ -15296,6 +15373,7 @@ function squadWithdraw(si){
   if(typeof showSaveFlash==='function')showSaveFlash('✓ Kader zurückgenommen');
 }
 function _sqRefresh(si){
+  try{if(_lpOpenOn(si))lpRender();}catch(e){}
   try{if(typeof _currentSessIdx!=='undefined'&&_currentSessIdx===si)_ssHxAttRender(si);}catch(e){}
   try{if(typeof hxRender==='function')hxRender();}catch(e){}
 }
@@ -33225,6 +33303,7 @@ function lpRender(){
              ${escapeHtml(nameOf(u.ref))} <b>${u.d.miss?u.d.miss+'\u00d7U':u.d.exc+'\u00d7E'}</b> \u2715</button>`).join('');
     }
   }
+  _lpSqBar();
   const warnEl=document.getElementById('lp-unavail-bar');
   if(warnEl){
     const un=lpUnavailInLineup();
@@ -33298,6 +33377,8 @@ function lpRenderPopup(slotId){
     const st=p2.s[sessIdx];
     return st===0||st===2; // Fehlend or Entschuldigt
   };
+  // Published squad: its players first, the others below and marked
+  const sqSet=_lpSqSet();
   const rows=[...players.keys()].map(i=>{
     const p=players[i];if(!p)return null;
     if(isUnavailable(i)&&i!==currentPid)return null;
@@ -33305,20 +33386,22 @@ function lpRenderPopup(slotId){
     const isBest=suitablePos[0]===p.pos;
     const isFit=suitablePos.includes(p.pos)||suitablePos.includes(p.pos2);
     const bcol=PB_COLORS[p.pos]||'#ddd;color:#333';
-    return {i,p,isAssigned,isBest,isFit,bcol};
+    const nik=!!sqSet&&!sqSet.has(i);
+    return {i,p,isAssigned,isBest,isFit,bcol,nik};
   }).filter(Boolean).sort((a,b)=>{
     // Available (not yet assigned) ALWAYS comes first
     if(!a.isAssigned&&b.isAssigned)return -1;
     if(a.isAssigned&&!b.isAssigned)return 1;
+    if(a.nik!==b.nik)return a.nik?1:-1;
     if(a.isBest&&!b.isBest)return -1;if(!a.isBest&&b.isBest)return 1;
     if(a.isFit&&!b.isFit)return -1;if(!a.isFit&&b.isFit)return 1;
     return (+a.p.nr||99)-(+b.p.nr||99);
   });
 
-  pickerEl.innerHTML=rows.map(({i,p,isAssigned,isBest,isFit,bcol})=>`
-    <div class="slp-pick-item${isBest?' best':''}${isAssigned?' assigned-already':''}" onclick="lpAssignToSlot('${slotId}',${i})">
+  pickerEl.innerHTML=rows.map(({i,p,isAssigned,isBest,isFit,bcol,nik})=>`
+    <div class="slp-pick-item${isBest&&!nik?' best':''}${isAssigned?' assigned-already':''}${nik?' lp-nik':''}" onclick="lpAssignToSlot('${slotId}',${i})">
       <span class="nr">${p.nr||'–'}</span>
-      <span class="name">${getDisplayName(p)}${_lpSbFlag(p)}</span>
+      <span class="name">${getDisplayName(p)}${_lpSbFlag(p)}${nik?'<span class="lp-nik-t">nicht im Kader</span>':''}</span>
       ${_lpLastWeekAttendance(i)}
       <span class="pos-b" style="background:${bcol.split(';')[0]};${bcol.split(';')[1]}">${p.pos}</span>
       ${isBest?'<span style="color:var(--ac);font-size:.7rem;">★</span>':''}
@@ -33576,6 +33659,7 @@ function lpRenderSubs(){
   const kaderEl=document.getElementById('lp-kader-list');
   if(kaderEl){
     const sessIdx=lpState.sessIdx;
+    const sqSet=_lpSqSet();
     const isUnavail=(pi)=>{
       if(sessIdx===null||sessIdx===undefined)return false;
       const pp=players[pi];if(!pp||!pp.s)return false;
@@ -33599,7 +33683,7 @@ function lpRenderSubs(){
       if(slotEntry){const si=slotIndexById[slotEntry[0]];return [0, si!==undefined?si:99];}
       const subIdx=lpState.subs.indexOf(id);
       if(subIdx>=0){return [1, subIdx];}
-      return [2, posRank(entry.p)];
+      return [(!entry.isGuest&&sqSet&&!sqSet.has(id))?3:2, posRank(entry.p)];
     };
     const sorted=entries.sort((a,b)=>{
       const ka=getEntrySortKey(a);
@@ -33629,10 +33713,11 @@ function lpRenderSubs(){
         ? `<span class="lp-disc-badge" title="Trainingsregel: ${escapeHtml(_disc.reason)} \u2014 ${escapeHtml(_disc.details.join(', '))}">\u26a0 ${_disc.miss?_disc.miss+'\u00d7U':_disc.exc+'\u00d7E'}</span>`
         : '';
       if(_disc)bg='rgba(192,57,43,.12)';
-      return `<div style="display:flex;align-items:center;gap:6px;padding:5px 8px;background:${bg};border:1px solid ${_disc?'rgba(192,57,43,.45)':'rgba(255,255,255,.07)'};border-radius:7px;margin-bottom:3px;">
+      const nik=!isGuest&&!!sqSet&&!sqSet.has(id);
+      return `<div${nik?' class="lp-nik"':''} style="display:flex;align-items:center;gap:6px;padding:5px 8px;background:${bg};border:1px solid ${_disc?'rgba(192,57,43,.45)':'rgba(255,255,255,.07)'};border-radius:7px;margin-bottom:3px;">
         <span style="font-family:'Bebas Neue';color:var(--ac);font-size:.85rem;width:18px;text-align:center;">${p.nr||'–'}</span>
         <span style="font-size:.72rem;font-weight:600;color:#fff;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${getDisplayName(p)}</span>
-        ${guestBadge}${discBadge}
+        ${nik?'<span class="lp-nik-t">nicht im Kader</span>':''}${guestBadge}${discBadge}
         <span class="lp-card-pos1" style="background:${bcol.split(';')[0]};${bcol.split(';')[1]};font-size:.55rem;font-weight:700;padding:1px 5px;border-radius:7px;">${p.pos}</span>
         ${status}
       </div>`;
@@ -33693,21 +33778,24 @@ function lpRenderSubPopup(subIdx){
     const st=p2.s[sessIdx2];
     return st===0||st===2;
   };
+  const sqSet=_lpSqSet();
   const rows=[...players.keys()].map(i=>{
     const p=players[i];if(!p)return null;
     if(isUnavail(i)&&i!==currentPid)return null;
     const isAssigned=usedIds.has(i)&&i!==currentPid;
     const bcol=PB_COLORS[p.pos]||'#ddd;color:#333';
-    return {i,p,isAssigned,bcol};
+    const nik=!!sqSet&&!sqSet.has(i);
+    return {i,p,isAssigned,bcol,nik};
   }).filter(Boolean).sort((a,b)=>{
     if(!a.isAssigned&&b.isAssigned)return -1;
     if(a.isAssigned&&!b.isAssigned)return 1;
+    if(a.nik!==b.nik)return a.nik?1:-1;
     return (+a.p.nr||99)-(+b.p.nr||99);
   });
-  pickerEl.innerHTML=rows.map(({i,p,isAssigned,bcol})=>`
-    <div class="slp-pick-item${isAssigned?' assigned-already':''}" onclick="lpAssignToSub(${subIdx},${i})">
+  pickerEl.innerHTML=rows.map(({i,p,isAssigned,bcol,nik})=>`
+    <div class="slp-pick-item${isAssigned?' assigned-already':''}${nik?' lp-nik':''}" onclick="lpAssignToSub(${subIdx},${i})">
       <span class="nr">${p.nr||'–'}</span>
-      <span class="name">${getDisplayName(p)}${_lpSbFlag(p)}</span>
+      <span class="name">${getDisplayName(p)}${_lpSbFlag(p)}${nik?'<span class="lp-nik-t">nicht im Kader</span>':''}</span>
       ${_lpLastWeekAttendance(i)}
       <span class="pos-b" style="background:${bcol.split(';')[0]};${bcol.split(';')[1]}">${p.pos}</span>
     </div>`).join('');
@@ -33837,6 +33925,7 @@ function lpSave(){
       season:UI.currentSeason
     };
     saveG();lpRenderSaves();_lpOpenSnap=_lpSnapshot();showSaveFlash('✓ Aufstellung gespeichert');
+    try{_sqRefresh(lpState.sessIdx);}catch(e){}
   } else {
     const name='Aufstellung '+new Date().toLocaleDateString('de-DE');
     const lus=lpGetLineups();
@@ -35067,6 +35156,7 @@ _pubCleanupSchedule();
   <!-- Separate strip: "cannot play today" and "not eligible this week" are
        different facts, and one line for both would hide which is which. -->
   <div id="lp-disc-bar" class="lp-disc-bar" style="display:none;"></div>
+  <div id="lp-sq-bar" class="lp-sq-bar" style="display:none;"></div>
   <!-- Body -->
   <!-- Match planner popup -->
   <div class="slp-popup" id="lp-popup" style="display:none;z-index:900;" onclick="event.stopPropagation()">
@@ -35141,7 +35231,7 @@ _pubCleanupSchedule();
         <button class="lp-save-btn" style="width:100%;margin-bottom:8px;padding:7px;" onclick="lpSave()">💾 Aufstellung speichern</button>
         <div id="lp-saves-list" style="font-size:.65rem;color:rgba(255,255,255,.7);text-align:center;padding:4px 0;"></div>
       </div>
-      <div class="lp-sb-label2">🧑‍🤝‍🧑 Kader-Übersicht</div>
+      <div class="lp-sb-label2">🧑‍🤝‍🧑 Spieler</div>
       <div id="lp-kader-list" style="padding:0 8px 6px;flex:1;overflow-y:auto;"></div>
       <div id="lp-subs-area" style="padding:0 8px 4px;max-height:100px;overflow-y:auto;"></div>
       <div style="padding:6px 10px;border-top:1px solid rgba(255,255,255,.07);">
