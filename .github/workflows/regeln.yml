@@ -43,5 +43,10 @@ jobs:
         working-directory: tools/regeln
         run: |
           [ -f out.txt ] || exit 0
-          msg=$(tail -n 60 out.txt | grep -v '^::' | sed 's/%/%25/g' | sed ':a;N;$!ba;s/\n/%0A/g')
+          msg=$(grep -E '^(FAIL|[0-9]+ FAILED|Error)' out.txt | head -n 40 | sed 's/%/%25/g' | sed ':a;N;$!ba;s/\n/%0A/g')
           echo "::warning title=Regeln Ausgabe::$msg"
+          # The emulator logs why a rule said no
+          if [ -f database-debug.log ]; then
+            dbg=$(grep -iE 'denied|error|fail' database-debug.log | tail -n 25 | cut -c1-300 | sed 's/%/%25/g' | sed ':a;N;$!ba;s/\n/%0A/g')
+            echo "::warning title=Emulator::$dbg"
+          fi

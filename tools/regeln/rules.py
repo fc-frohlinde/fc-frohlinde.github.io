@@ -8,7 +8,11 @@ import json
 # that code — it must have been redeemed by this uid and not be revoked.
 CODE = "root.child('fcf_members/'+auth.uid+'/code').val()"
 INV = "root.child('fcf_invites/'+" + CODE + ")"
-IS_MEMBER = ("(auth != null && " + INV + ".child('used').val() === auth.uid && !"
+# The isString() check comes first: without a member entry the code is null,
+# and 'fcf_invites/'+null is an error that fails the whole expression,
+# including an "|| redeem" behind it (found by the emulator test).
+IS_MEMBER = ("(auth != null && root.child('fcf_members/'+auth.uid+'/code').isString() && "
+             + INV + ".child('used').val() === auth.uid && !"
              + INV + ".child('revoked').exists())")
 IS_ADMIN = "(" + IS_MEMBER + " && " + INV + ".child('role').val() === 'admin')"
 

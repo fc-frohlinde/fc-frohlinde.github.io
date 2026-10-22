@@ -175,10 +175,10 @@
       }
     },
     "fcf_invites": {
-      ".read": "((auth != null && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists()) && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('role').val() === 'admin')",
+      ".read": "((auth != null && root.child('fcf_members/'+auth.uid+'/code').isString() && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists()) && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('role').val() === 'admin')",
       "$code": {
         ".read": true,
-        ".write": "((auth != null && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists()) && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('role').val() === 'admin')",
+        ".write": "((auth != null && root.child('fcf_members/'+auth.uid+'/code').isString() && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists()) && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('role').val() === 'admin')",
         ".validate": "newData.hasChildren(['role','name','t','exp'])",
         "role": {
           ".validate": "newData.val() === 'admin' || newData.val() === 'trainer'"
@@ -218,10 +218,10 @@
       }
     },
     "fcf_members": {
-      ".read": "((auth != null && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists()) && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('role').val() === 'admin')",
+      ".read": "((auth != null && root.child('fcf_members/'+auth.uid+'/code').isString() && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists()) && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('role').val() === 'admin')",
       "$uid": {
         ".read": "auth != null && auth.uid === $uid",
-        ".write": "((auth != null && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists()) && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('role').val() === 'admin') || (auth != null && auth.uid === $uid && !data.exists() && newData.child('code').isString() && root.child('fcf_invites/'+newData.child('code').val()).child('role').exists() && !root.child('fcf_invites/'+newData.child('code').val()).child('used').exists() && !root.child('fcf_invites/'+newData.child('code').val()).child('revoked').exists() && root.child('fcf_invites/'+newData.child('code').val()).child('exp').val() > now && newData.parent().parent().child('fcf_invites/'+newData.child('code').val()+'/used').val() === auth.uid)",
+        ".write": "((auth != null && root.child('fcf_members/'+auth.uid+'/code').isString() && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists()) && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('role').val() === 'admin') || (auth != null && auth.uid === $uid && !data.exists() && newData.child('code').isString() && root.child('fcf_invites/'+newData.child('code').val()).child('role').exists() && !root.child('fcf_invites/'+newData.child('code').val()).child('used').exists() && !root.child('fcf_invites/'+newData.child('code').val()).child('revoked').exists() && root.child('fcf_invites/'+newData.child('code').val()).child('exp').val() > now && newData.parent().parent().child('fcf_invites/'+newData.child('code').val()+'/used').val() === auth.uid)",
         ".validate": "newData.hasChildren(['code','t'])",
         "code": {
           ".validate": "newData.isString() && newData.val().length >= 16 && newData.val().length <= 40"

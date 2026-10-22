@@ -15,7 +15,7 @@ async function req(method, path, body, uid) {
 }
 let fails = 0, n = 0;
 const ok = (c, m) => { n++; if (c) console.log('ok   ' + m); else { fails++; console.log('FAIL ' + m); console.log('::error title=Regeln::' + m); } };
-const can = async (m, p) => ok((await p).ok, 'darf: ' + m);
+const can = async (m, p) => { const r = await p; ok(r.ok, 'darf: ' + m + (r.ok ? '' : ' (' + r.status + ' ' + r.body.slice(0, 200) + ')')); };
 const cannot = async (m, p) => { const r = await p; ok(!r.ok, 'darf nicht: ' + m + (r.ok ? '' : '')); };
 
 // rules into the emulator
