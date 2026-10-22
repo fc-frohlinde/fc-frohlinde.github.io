@@ -6679,13 +6679,16 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.9'; // v1.2.9: Benachrichtigungen überleben Updates
-const APP_VERSION_LABEL='1.2.9';
+const APP_VERSION='1.2.10'; // v1.2.10: kein Handy-Hinweis am Computer
+const APP_VERSION_LABEL='1.2.10';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792670008425; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792671187040; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.10',date:'22.10.2026',title:'Am Computer kein Hinweis „aufs Handy“',items:[
+    {icon:'🖥',title:'Hinweis nur auf Handy und Tablet',desc:'Die Karte „Benachrichtigungen aufs Handy“ erscheint auf der Übersicht nur noch auf Handy und Tablet. Am Computer heißt der Schalter in den Einstellungen „Auf diesem Computer“ – Benachrichtigungen kommen dort nur, solange der Browser läuft.'},
+  ]},
   {version:'1.2.9',date:'22.10.2026',title:'Benachrichtigungen bleiben an',items:[
     {icon:'🔔',title:'Updates schalten Benachrichtigungen nicht mehr ab',desc:'Beim Laden einer neuen Version hat die App bisher ihren Hintergrunddienst neu angemeldet – damit hat der Browser das Abo für Benachrichtigungen beendet, bei Trainern wie bei Spielern. Jetzt bleibt er angemeldet. Geräte, die ihr Abo so verloren haben, melden sich beim nächsten Öffnen von selbst wieder an, solange die Erlaubnis noch besteht; nur wo der Browser dafür ein Tippen verlangt, erscheint noch einmal „Einschalten“.'},
   ]},
@@ -16813,6 +16816,10 @@ function _pushDev(){
   const ua=navigator.userAgent||'';
   return /iPhone|iPad|iPod/.test(ua)?'ios':/Android/.test(ua)?'android':'other';
 }
+// A computer: not a phone or tablet (an iPad reports itself as a Mac, but with touch)
+function _isComputer(){
+  try{const ua=navigator.userAgent||'';return _pushDev()==='other'&&!(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1);}catch(e){return false;}
+}
 async function _pushReg(){
   if(!pushCan())return null;
   return navigator.serviceWorker.ready;
@@ -17181,15 +17188,15 @@ function tpushRender(){
     box.innerHTML='<div class="setting-row"><div><div class="setting-label">📲 Aufs Handy</div><div class="setting-sub">Gibt es für die Trainer der Mannschaft.</div></div></div>';
     return;
   }
-  const st=tpushState(),p=tpushPrefs();
+  const st=tpushState(),p=tpushPrefs(),pc=_isComputer();
   const sub={
-    on:'An auf diesem Gerät, auch wenn Flutlicht geschlossen ist.',
-    off:'Auch wenn Flutlicht geschlossen ist. Auf jedem Gerät einmal einschalten.',
+    on:pc?'An auf diesem Computer – solange der Browser läuft. Fürs Handy dort in Flutlicht einschalten.':'An auf diesem Gerät, auch wenn Flutlicht geschlossen ist.',
+    off:pc?'Kommen am Computer nur, solange der Browser läuft. Fürs Handy dort in Flutlicht einschalten.':'Auch wenn Flutlicht geschlossen ist. Auf jedem Gerät einmal einschalten.',
     denied:'Im Browser blockiert. <button type="button" class="tp-help" onclick="pushDeniedHelp()">So änderst du das</button>',
     ios:'Auf dem iPhone nur in der installierten App: in Safari „Teilen“ → „Zum Home-Bildschirm“, dann dort einschalten.',
     none:'In diesem Browser nicht möglich.'}[st];
   box.innerHTML=`<div class="setting-row">
-      <div><div class="setting-label">📲 Aufs Handy</div><div class="setting-sub">${sub}</div></div>
+      <div><div class="setting-label">${pc?'🖥 Auf diesem Computer':'📲 Aufs Handy'}</div><div class="setting-sub">${sub}</div></div>
       <div class="setting-control"><label class="setting-switch"><input type="checkbox" id="tpushOn" ${st==='on'?'checked':''} ${st==='on'||st==='off'?'':'disabled'} onchange="this.checked?tpushEnable():tpushDisable()"><span class="setting-slider"></span></label></div>
     </div>
     <div class="tp-kinds">${TPUSH_KINDS.map(([k,ic,t,d])=>`<label class="tp-kind"><input type="checkbox" ${p[k]?'checked':''} onchange="tpushSetKind('${k}',this.checked)"><span><b>${ic} ${t}</b><small>${d}</small></span></label>`).join('')}</div>
@@ -17206,6 +17213,8 @@ function _tpOfferLs(v){
 function _tpOfferHtml(){
   try{
     if(!CU||!canEdit()||(typeof isPlayerMode==='function'&&isPlayerMode()))return '';
+    // The offer is for the phone; on a computer the switch in the settings is enough
+    if(_isComputer())return '';
     const st=tpushState();
     if(st!=='off'&&st!=='ios')return '';
     const o=_tpOfferLs();
