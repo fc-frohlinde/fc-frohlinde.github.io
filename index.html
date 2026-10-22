@@ -2696,6 +2696,18 @@ body.design-heute .dow-btn{background:var(--hx-field,#fff);color:var(--hx-ink,va
 body.design-heute .dow-btn.sel{background:var(--hx-blue,var(--bm));border-color:var(--hx-blue,var(--bm));color:var(--hx-field,#fff);}
 body.design-heute .dow-btn.sel-m{background:var(--mc1);border-color:var(--mc1);color:#fff;}
 .rs-mob select{width:100%;}
+.rs-rows{display:flex;flex-direction:column;gap:6px;margin:2px 0 6px;}
+.rs-row{display:grid;grid-template-columns:2.2em 6.9em 4.6em minmax(0,1fr);gap:6px;align-items:center;}
+.rs-row-h{font-size:.68rem;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--hx-muted,var(--gm));margin-bottom:-3px;}
+.rs-row-d{font-size:.86rem;color:var(--hx-ink,var(--gd));}
+.mob .rs-row input:not([type=range]),.mob .rs-row select{margin:0;min-width:0;width:100%;}
+.mob .rs-row input.rs-m{padding-left:8px;padding-right:4px;}
+@media (max-width:440px){
+  .rs-row{grid-template-columns:2.2em minmax(0,1fr) 4.8em;}
+  .rs-row .rs-l{grid-column:2/4;}
+  .rs-row-hl{display:none;}
+  .rs-row[data-d]+.rs-row[data-d]{margin-top:4px;}
+}
 .rs-prev{margin:14px 0 4px;border:1px solid var(--hx-line,var(--gl));border-radius:12px;overflow:hidden;}
 .rs-g{padding:10px 12px;border-top:1px solid var(--hx-line,var(--gl));}
 .rs-g:first-child{border-top:none;}
@@ -6494,7 +6506,7 @@ if(window._fbBlocked){
     <div class="dow-btn" data-d="5">Fr</div><div class="dow-btn" data-d="6">Sa</div>
     <div class="dow-btn sel-m" data-d="0">So</div>
   </div>
-  <label>Uhrzeit Training</label><input type="time" id="genTimeT" value="18:30"/>
+  <label>Training je Tag: Uhrzeit, Dauer, Ort</label><div class="rs-rows" id="genSlots"></div><input type="hidden" id="genTimeT" value="18:30"/>
   <label>Uhrzeit Spiel</label><input type="time" id="genTimeM" value="15:00"/>
   <label>Startdatum</label><input type="date" id="genS"/>
   <label>Enddatum</label><input type="date" id="genE"/>
@@ -6663,13 +6675,16 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.6'; // v1.2.6: Trainingszeiten ändern und Pausen
-const APP_VERSION_LABEL='1.2.6';
+const APP_VERSION='1.2.7'; // v1.2.7: Zeit und Ort je Trainingstag
+const APP_VERSION_LABEL='1.2.7';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792664571527; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792666285666; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.7',date:'22.10.2026',title:'Zeit und Ort je Trainingstag',items:[
+    {icon:'🕖',title:'Jeder Trainingstag mit eigener Uhrzeit, Dauer und Ort',desc:'„Trainingszeiten ändern“ und „Saisonplan erstellen“ haben je gewähltem Tag eine eigene Zeile – etwa Mo 19:00 auf dem Kunstrasen und Mi 18:00 in der Halle. Das Fenster öffnet mit dem, was heute je Wochentag gilt. Die Nachricht an die Spieler nennt die Tage mit ihren Zeiten und Orten, und das Muster gilt auch für den Plan der nächsten Saison.'},
+  ]},
   {version:'1.2.6',date:'22.10.2026',title:'Trainingszeiten ändern und Pausen',items:[
     {icon:'🕖',title:'Trainingszeiten ändern',desc:'Kalender → „⋯“ → „Trainingszeiten ändern“: neue Tage, Uhrzeit, Dauer oder Ort ab einem Datum – für alle Trainings, die noch kommen. Die Vorschau zeigt vorher, was passiert: Bleibt der Tag, bleiben die Zu- und Absagen. Wird ein Training auf einen anderen Tag verlegt, beginnen sie neu (Entschuldigungen bleiben). Was wegfällt, kommt in den Papierkorb. Spiele bleiben unberührt.'},
     {icon:'⏸️',title:'Trainingspause',desc:'Kalender → „⋯“ → „Trainingspause“: alle Trainings in einem Zeitraum absagen, etwa in den Ferien. Spiele bleiben.'},
@@ -26972,7 +26987,7 @@ async function _promptApplySchedulePatterns(season){
       {label:'Mannschaft',value:t,icon:'🏆'},
       {label:'Training-Tage',value:trDays,icon:'🏃'},
       {label:'Spiel-Tage',value:maDays,icon:'⚽'},
-      {label:'Uhrzeit Training',value:pat.timeT||'18:30',icon:'⏰'},
+      {label:'Uhrzeit Training',value:_slotsSummary(pat)||pat.timeT||'18:30',icon:'⏰'},
       {label:'Uhrzeit Spiel',value:pat.timeM||'15:00',icon:'⏰'}
     ].map(r=>({...r,value:String(r.value)})));
     const ok=await confirmDestructive({
@@ -26994,6 +27009,7 @@ function _applySchedulePattern(team,season,pat){
   const y1=parseInt(m[1]),y2=y1+1;
   const startISO=`${y1}-07-01`,endISO=`${y2}-06-30`;
   const ns=genRange(new Date(startISO),new Date(endISO),pat.dowTr,pat.dowMa,pat.timeT||'18:30',pat.timeM||'15:00');
+  _applySlotsTo(ns,pat.slots);
   // Ensure block exists
   const key=team+'__'+season;
   if(!G.db[key])G.db[key]={sessions:[],players:[]};
@@ -27913,7 +27929,26 @@ async function delSess(si){
 }
 
 function openGenSch(){
-  autoSetGenDates();openM('moGenSch');
+  autoSetGenDates();_genSlotsInit();openM('moGenSch');
+}
+// Per day as saved for the team, else the old single time
+let _genSlots={};
+function _genSlotsInit(){
+  const pat=G.db&&G.db[UI.currentTeam+'__schedule'];
+  const t0=(document.getElementById('genTimeT')||{}).value||'18:30';
+  _genSlots={};
+  [0,1,2,3,4,5,6].forEach(d=>{const v=_slotOf(pat&&pat.slots,d);
+    _genSlots[d]=v?{time:v.time,dur:+v.dur||90,loc:v.loc||''}:{time:(pat&&pat.timeT)||t0,dur:(pat&&+pat.durT)||90,loc:''};});
+  const box=document.getElementById('genSlots');
+  if(box&&!box._wired){
+    box._wired=true;
+    // after the buttons' own handlers (bubbling): a match day can switch a training day off
+    ['dowTr','dowMa'].forEach(id=>{const g=document.getElementById(id);if(g)g.addEventListener('click',()=>_genSlotsRender());});
+  }
+  _genSlotsRender();
+}
+function _genSlotsRender(){
+  _slotRows('genSlots',[...document.querySelectorAll('#dowTr .dow-btn.sel')].map(b=>+b.dataset.d),_genSlots,false);
 }
 function getSeasonBounds(){
   const m=UI.currentSeason.match(/^(\d{4})\/(\d{2})$/);
@@ -27980,7 +28015,9 @@ function doGen(){
   if(typeof autoBackupBeforeOp==='function')autoBackupBeforeOp('Trainingsplan generiert: '+UI.currentTeam+' '+sIso+'–'+eIso);
   const tD=[...document.querySelectorAll('#dowTr .dow-btn.sel')].map(b=>+b.dataset.d);
   const mD=[...document.querySelectorAll('#dowMa .dow-btn.sel-m')].map(b=>+b.dataset.d);
-  const tTime=document.getElementById('genTimeT').value,mTime=document.getElementById('genTimeM').value;
+  const mTime=document.getElementById('genTimeM').value;
+  if(tD.some(d=>!_genSlots[d]||_rsMin(_genSlots[d].time)==null))return alert('Bitte für jeden Trainingstag eine Uhrzeit eingeben.');
+  const tTime=tD.length?_genSlots[_RS_ORDER.find(d=>tD.includes(d))].time:(document.getElementById('genTimeT').value||'18:30');
   const D=cd();
   // Remove sessions within the date window
   const startKey=isoToSortKey(sIso),endKey=isoToSortKey(eIso);
@@ -28002,9 +28039,12 @@ function doGen(){
   // Don't generate on dates already occupied by named matches
   const namedMatchDates=new Set(D.sessions.filter(s=>s.type==='match'&&s.label&&s.label.trim()).map(s=>s.date));
   const ns=genRange(new Date(sIso),new Date(eIso),tD,mD,tTime,mTime).filter(x=>!(x.type==='match'&&namedMatchDates.has(x.date)));
+  _applySlotsTo(ns,_genSlots);
+  if(typeof rememberLocation==='function')tD.forEach(d=>{if(_genSlots[d]&&_genSlots[d].loc)rememberLocation(_genSlots[d].loc);});
   snap();ns.forEach(x=>insertSorted(D,x));
   // Persist the pattern so we can re-apply automatically next season
   _saveSchedulePattern(tD,mD,tTime,mTime);
+  {const p=G.db[UI.currentTeam+'__schedule'];p.slots=_slotsStore(tD,_genSlots);const v0=_slotOf(p.slots,_RS_ORDER.find(d=>tD.includes(d)));if(v0)p.durT=v0.dur;}
   saveG();render();closeM('moGenSch');
   alert(`${ns.length} Einheit(en) generiert (${toRemove.length} alte ersetzt).`);
 }
@@ -28048,11 +28088,76 @@ function _rsAnswers(D,si){
   });
   return n;
 }
+// ── Per training day: time, duration, place ──
+// slots: {dow: {time, dur, loc}} in memory; stored in __schedule.slots as
+// {d1: …} — numeric keys would come back from Firebase as an array.
+const _RS_ORDER=[1,2,3,4,5,6,0];
+const _RS_WD=['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+function _slotOf(slots,d){const v=slots&&(slots[d]||slots['d'+d]);return (v&&typeof v==='object')?v:null;}
+function _slotsStore(days,slots){
+  const o={};days.forEach(d=>{const v=_slotOf(slots,d);if(v)o['d'+d]={time:v.time,dur:+v.dur>0?+v.dur:90,loc:v.loc||''};});return o;
+}
+// One row per chosen day. keepLabel: '' in the place list means "unchanged"
+// (changing times) instead of "no place" (a new plan).
+function _slotRows(boxId,days,slots,keepLabel){
+  const box=document.getElementById(boxId);if(!box)return;
+  const locs=getLocations().slice();
+  Object.values(slots).forEach(v=>{if(v&&v.loc&&!locs.includes(v.loc))locs.push(v.loc);});
+  const ds=_RS_ORDER.filter(d=>days.includes(d));
+  box.innerHTML=ds.length?`<div class="rs-row rs-row-h" aria-hidden="true"><span></span><span>Uhrzeit</span><span>Min.</span><span class="rs-row-hl">Ort</span></div>`+ds.map(d=>{
+    const v=slots[d]||(slots[d]={time:'18:30',dur:90,loc:''});
+    const opts=`<option value="">${keepLabel?'Ort unverändert':'Kein Ort'}</option>`
+      +locs.map(l=>`<option value="${escapeHtml(l)}"${l===v.loc?' selected':''}>${escapeHtml(l)}</option>`).join('')
+      +'<option value="__new__">➕ Neuer Ort…</option>';
+    return `<div class="rs-row" data-d="${d}"><b class="rs-row-d">${DOW[d]}</b>`
+      +`<input type="time" class="rs-t" value="${escapeHtml(v.time||'')}" aria-label="Uhrzeit ${_RS_WD[d]}">`
+      +`<input type="number" class="rs-m" min="15" max="240" step="5" inputmode="numeric" value="${+v.dur>0?+v.dur:90}" aria-label="Dauer in Minuten ${_RS_WD[d]}">`
+      +`<select class="rs-l" aria-label="Ort ${_RS_WD[d]}">${opts}</select></div>`;
+  }).join(''):'';
+  box.querySelectorAll('.rs-row[data-d]').forEach(r=>{
+    const d=+r.dataset.d,v=slots[d];
+    const t=r.querySelector('.rs-t'),m=r.querySelector('.rs-m'),l=r.querySelector('.rs-l');
+    const upd=()=>{v.time=t.value;v.dur=Math.max(15,Math.min(240,parseInt(m.value,10)||90));box.dispatchEvent(new Event('slotchange'));};
+    [t,m].forEach(x=>{x.addEventListener('input',upd);x.addEventListener('change',upd);});
+    l.addEventListener('change',()=>{
+      if(l.value==='__new__'){
+        const nv=String(prompt('Neuen Ort eingeben:')||'').trim().slice(0,80);
+        if(nv)v.loc=nv;
+        _slotRows(boxId,days,slots,keepLabel);
+      }else v.loc=l.value;
+      box.dispatchEvent(new Event('slotchange'));
+    });
+  });
+}
+// A day switched on gets the values of the day before it in the list
+function _slotFill(slots,days,d){
+  if(slots[d])return;
+  const prev=_RS_ORDER.filter(x=>days.includes(x)&&x!==d&&slots[x]);
+  const before=prev.filter(x=>_RS_ORDER.indexOf(x)<_RS_ORDER.indexOf(d));
+  const src=slots[before.length?before[before.length-1]:prev[0]];
+  slots[d]=src?{time:src.time,dur:src.dur,loc:src.loc}:{time:'18:30',dur:90,loc:''};
+}
+// Generated trainings ("Mo 2.11" → Monday) take their day's values
+function _applySlotsTo(list,slots){
+  if(!slots||typeof slots!=='object')return;
+  list.forEach(x=>{
+    if(!x||x.type!=='training')return;
+    const v=_slotOf(slots,DOW.indexOf(String(x.date||'').slice(0,2)));
+    if(!v||_rsMin(v.time)==null)return;
+    x.time=v.time;x.duration=+v.dur>0?+v.dur:90;if(v.loc)x.location=v.loc;
+  });
+}
+// "Di 18:30, Do 17:00 (Halle)"
+function _slotsSummary(pat){
+  if(!pat||!pat.slots||!Array.isArray(pat.dowTr))return '';
+  return _RS_ORDER.filter(d=>pat.dowTr.includes(d)).map(d=>{const v=_slotOf(pat.slots,d);return v?DOW[d]+' '+v.time+(v.loc?' ('+v.loc+')':''):'';}).filter(Boolean).join(', ');
+}
 const _rsTop=a=>{const c=new Map();a.forEach(x=>{if(x!=null&&x!=='')c.set(x,(c.get(x)||0)+1);});let b=null,n=0;c.forEach((v,k)=>{if(v>n){b=k;n=v;}});return b;};
 
-// What a new pattern would do. o: {from, to: ISO; days: [0..6]; time; dur;
-// loc: '' = place unchanged}. Week by week: a training already on one of the
-// new days stays there (time, duration, place updated), the others move to the
+// What a new pattern would do. o: {from, to: ISO; days: [0..6]; slots:
+// {dow: {time, dur, loc}}, loc '' = place unchanged}. Week by week: a training
+// already on one of the new days stays there (that day's time, duration and
+// place), the others move to the
 // remaining new days in order, what is left over falls away, missing days are
 // added. How many a week gets: as many as it had, plus the difference between
 // the new number of days and the usual number per week — so a week cut short
@@ -28064,8 +28169,9 @@ function _reschedPlan(D,season,o){
   const res={change:[],move:[],add:[],drop:[],same:0,free:0,skipped:[],loc0:''};
   const today=todaySK();
   const fromK=Math.max(isoToSortKey(o.from),today),toK=isoToSortKey(o.to);
-  const days=new Set(o.days||[]),tMin=_rsMin(o.time);
-  if(!(fromK<=toK)||!days.size||tMin==null)return res;
+  const days=new Set(o.days||[]);
+  const slot=k=>o.slots[_rsDate(k).getDay()];
+  if(!(fromK<=toK)||!days.size||[...days].some(d=>!o.slots[d]||_rsMin(o.slots[d].time)==null))return res;
   const old=[],busy=new Set(),games=new Set();
   ((D&&D.sessions)||[]).forEach((s,si)=>{
     if(!s||!s.date)return;
@@ -28082,12 +28188,11 @@ function _reschedPlan(D,season,o){
   old.forEach(x=>wk(x.k).o.push(x));
   for(const d=_rsDate(fromK);_rsK(d)<=toK;d.setDate(d.getDate()+1)){
     const k=_rsK(d);
-    if(!days.has(d.getDay())||busy.has(k)||(k===today&&tMin<=nowMin))continue;
+    if(!days.has(d.getDay())||busy.has(k)||(k===today&&_rsMin(slot(k).time)<=nowMin))continue;
     if(games.has(k)){wk(k).g.push(k);continue;}
     wk(k).n.push(k);
   }
-  const dur=o.dur||90;
-  const same=s=>s.time===o.time&&(+s.duration>0?+s.duration:90)===dur&&(!o.loc||String(s.location||'')===o.loc);
+  const same=(s,v)=>s.time===v.time&&(+s.duration>0?+s.duration:90)===(+v.dur||90)&&(!v.loc||String(s.location||'')===v.loc);
   // A week without any training still to come is a break (holidays) or lies
   // past the end of the plan: it stays empty.
   const lastW=old.length?Math.max(...old.map(x=>_rsWeek(x.k))):0;
@@ -28107,7 +28212,7 @@ function _reschedPlan(D,season,o){
     let n=0;
     g.o.sort((a,b)=>a.k-b.k||(_rsMin(a.s.time)||0)-(_rsMin(b.s.time)||0));
     g.o.forEach(x=>{
-      if(n<want&&g.n.includes(x.k)&&!taken.has(x.k)){taken.add(x.k);n++;if(same(x.s))res.same++;else res.change.push(x);}
+      if(n<want&&g.n.includes(x.k)&&!taken.has(x.k)){taken.add(x.k);n++;if(same(x.s,slot(x.k)))res.same++;else res.change.push(x);}
       else rest.push(x);
     });
     const free=g.n.filter(k=>!taken.has(k));
@@ -28141,6 +28246,7 @@ function _rsDrop(D,s,team,season){
 // To another day. A yes or no was given for the old day, so answers start
 // again; an excuse from the trainers stays (holidays, an injury), and so do the
 // plan, notes and a physio booking.
+function _rsSetSlot(s,v){s.time=v.time;s.duration=+v.dur>0?+v.dur:90;if(v.loc)s.location=v.loc;}
 function _rsMove(D,s,k,o,team,season){
   const si=D.sessions.indexOf(s);if(si<0)return;
   const lk=_mlKey(team,season,si);
@@ -28150,7 +28256,7 @@ function _rsMove(D,s,k,o,team,season){
   const was=D.players.map(p=>_sessRemoveAt(p,si));
   shiftMatchLineupsIndices(team,si,-1,season);
   s.date=_rsDisp(k);s.month=moFromDisp(s.date);
-  s.time=o.time;s.duration=o.dur||90;if(o.loc)s.location=o.loc;
+  _rsSetSlot(s,o.slots[_rsDate(k).getDay()]);
   delete s.remind;
   _sessShiftDeadline(s,start0,season);
   const at=insertSorted(D,s);
@@ -28175,20 +28281,23 @@ function rsApply(){
   snap();
   pl.change.forEach(x=>{
     const k0=rpeMetaKey(x.s),start0=_sessStartMs(x.s,season);
-    x.s.time=o.time;x.s.duration=o.dur||90;if(o.loc)x.s.location=o.loc;
+    _rsSetSlot(x.s,o.slots[_rsDate(x.k).getDay()]);
     _sessShiftDeadline(x.s,start0,season);
     rpeMetaRekey(D,k0,rpeMetaKey(x.s));
   });
   pl.drop.forEach(x=>_rsDrop(D,x.s,team,season));
   pl.move.forEach(x=>_rsMove(D,x.s,x.to,o,team,season));
-  const loc=o.loc||pl.loc0;
-  pl.add.forEach(k=>{const date=_rsDisp(k);insertSorted(D,{date,month:moFromDisp(date),type:'training',focus:'',time:o.time,duration:o.dur||90,location:loc||undefined});});
-  if(o.loc&&typeof rememberLocation==='function')rememberLocation(o.loc);
+  pl.add.forEach(k=>{
+    const date=_rsDisp(k),v=o.slots[_rsDate(k).getDay()];
+    insertSorted(D,{date,month:moFromDisp(date),type:'training',focus:'',time:v.time,duration:+v.dur>0?+v.dur:90,location:(v.loc||pl.loc0)||undefined});
+  });
+  if(typeof rememberLocation==='function')o.days.forEach(d=>{if(o.slots[d].loc)rememberLocation(o.slots[d].loc);});
   // Running to the season's end: the pattern for next season's plan too
   if(o.to>=getSeasonBounds().max){
     const p0=G.db[team+'__schedule'];
     const p=Object.assign({dowMa:[0],timeM:'15:00'},(p0&&typeof p0==='object')?p0:{});
-    G.db[team+'__schedule']=Object.assign(p,{dowTr:o.days.slice(),timeT:o.time,durT:o.dur||90,updatedAt:Date.now()});
+    const v0=o.slots[_RS_ORDER.find(d=>o.days.includes(d))];
+    G.db[team+'__schedule']=Object.assign(p,{dowTr:o.days.slice(),timeT:v0.time,durT:+v0.dur||90,slots:_slotsStore(o.days,o.slots),updatedAt:Date.now()});
   }
   const news=_rsChecked('rsNotify')?_newsPost('Neue Trainingszeiten',_rsNewsText(o)):null;
   saveG();render();_rsCalRefresh();closeM('moResched');
@@ -28262,7 +28371,16 @@ function _rsDaysTxt(days){
 function _rsNewsText(o){
   const a=_rsDisp(Math.max(isoToSortKey(o.from),todaySK()))+'.';
   const when=(o.to>=getSeasonBounds().max)?'Ab '+a:'Vom '+a+' bis '+_rsDisp(isoToSortKey(o.to))+'.';
-  return when+' trainieren wir '+_rsDaysTxt(o.days)+' um '+o.time+' Uhr'+(o.loc?' – '+o.loc:'')+'.';
+  // Days with the same time and place together: "Mo und Mi um 19:00 Uhr"
+  const groups=[];
+  _RS_ORDER.filter(d=>o.days.includes(d)).forEach(d=>{
+    const v=o.slots[d],key=v.time+'|'+(v.loc||'');
+    const g=groups.find(x=>x.key===key);
+    if(g)g.days.push(d);else groups.push({key,days:[d],time:v.time,loc:v.loc||''});
+  });
+  const parts=groups.map(g=>_rsDaysTxt(g.days)+' um '+g.time+' Uhr'+(g.loc?' ('+g.loc+')':''));
+  const joined=(parts.length>1&&groups.every(g=>g.days.length===1))?parts.slice(0,-1).join(', ')+' und '+parts[parts.length-1]:parts.join(', ');
+  return when+' trainieren wir '+joined+'.';
 }
 function _psNewsText(o,pl){
   const a=_rsDisp(Math.max(isoToSortKey(o.from),todaySK())),b=_rsDisp(isoToSortKey(o.to));
@@ -28282,8 +28400,7 @@ function _rsEnsure(id){
     <div class="rs-two"><div><label for="rsFrom">Ab</label><input type="date" id="rsFrom"></div><div><label for="rsTo">Bis</label><input type="date" id="rsTo"></div></div>
     <label id="rsDaysL">Trainingstage</label>
     <div class="dow-grid rs-days" id="rsDays" role="group" aria-labelledby="rsDaysL">${days}</div>
-    <div class="rs-two"><div><label for="rsTime">Uhrzeit</label><input type="time" id="rsTime"></div><div><label for="rsDur">Dauer (Min.)</label><input type="number" id="rsDur" min="15" max="240" step="5" inputmode="numeric"></div></div>
-    <label for="rsLoc">Ort</label><select id="rsLoc"></select>
+    <div class="rs-rows" id="rsRows"></div>
     <div class="rs-prev" id="rsPrev" aria-live="polite"></div>
     ${notify('rs')}
     <div class="mob-btns"><button type="button" class="btn bp" id="rsGo" onclick="rsApply()">Übernehmen</button><button type="button" class="btn bs" onclick="closeM('moResched')">Abbrechen</button></div>
@@ -28306,41 +28423,41 @@ function _rsEnsure(id){
     el.addEventListener('input',upd);el.addEventListener('change',upd);
   });
   m.querySelectorAll('.rs-days .dow-btn').forEach(b=>b.addEventListener('click',()=>{
-    const on=!b.classList.contains('sel');b.classList.toggle('sel',on);b.setAttribute('aria-pressed',on?'true':'false');_rsRender(id);
+    const on=!b.classList.contains('sel');b.classList.toggle('sel',on);b.setAttribute('aria-pressed',on?'true':'false');
+    const days=_rsDaysSel();if(on)_slotFill(_rsSlots,days,+b.dataset.d);
+    _slotRows('rsRows',days,_rsSlots,true);_rsRender(id);
   }));
-  const loc=m.querySelector('#rsLoc');
-  if(loc)loc.addEventListener('change',()=>{
-    if(loc.value!=='__new__')return;
-    _rsLocFill(String(prompt('Neuen Ort eingeben:')||'').trim().slice(0,80));_rsRender(id);
-  });
+  const rows=m.querySelector('#rsRows');
+  if(rows)rows.addEventListener('slotchange',()=>_rsRender(id));
 }
-function _rsLocFill(cur){
-  const el=document.getElementById('rsLoc');if(!el)return;
-  const list=getLocations().slice();
-  if(cur&&!list.includes(cur))list.push(cur);
-  el.innerHTML='<option value="">Unverändert</option>'+list.map(l=>`<option value="${escapeHtml(l)}">${escapeHtml(l)}</option>`).join('')
-    +'<option value="__new__">➕ Neuer Ort…</option>';
-  el.value=cur||'';
-}
+let _rsSlots={};
+function _rsDaysSel(){return [...document.querySelectorAll('#rsDays .dow-btn.sel')].map(b=>+b.dataset.d);}
 function _rsRead(id){
   const v=x=>{const e=document.getElementById(x);return e?String(e.value||''):'';};
   if(id==='moPause')return {from:v('psFrom'),to:v('psTo'),why:v('psWhy').trim().slice(0,60)};
-  const loc=v('rsLoc');
-  return {from:v('rsFrom'),to:v('rsTo'),days:[...document.querySelectorAll('#rsDays .dow-btn.sel')].map(b=>+b.dataset.d),
-    time:v('rsTime'),dur:Math.max(15,Math.min(240,parseInt(v('rsDur'),10)||90)),loc:loc==='__new__'?'':loc.trim()};
+  const days=_rsDaysSel(),slots={};
+  days.forEach(d=>{const x=_rsSlots[d]||{};slots[d]={time:String(x.time||''),dur:+x.dur>0?+x.dur:90,loc:String(x.loc||'').trim()};});
+  return {from:v('rsFrom'),to:v('rsTo'),days,slots};
 }
 // What the next four weeks look like now — the window opens on "no change"
 function _rsDefaults(D,season,fromK){
   const until=_rsK((d=>{d.setDate(d.getDate()+27);return d;})(_rsDate(fromK)));
   const near=((D&&D.sessions)||[]).filter(s=>s&&s.type==='training'&&s.date&&!sessTookPlace(s,season))
-    .map(s=>({s,k:_rsSk(s,season)})).filter(x=>x.k>=fromK&&x.k<=until);
+    .map(s=>({s,k:_rsSk(s,season),d:_rsDate(_rsSk(s,season)).getDay()})).filter(x=>x.k>=fromK&&x.k<=until);
+  const slots={};
   if(near.length){
-    const cnt=new Map();near.forEach(x=>{const d=_rsDate(x.k).getDay();cnt.set(d,(cnt.get(d)||0)+1);});
+    const cnt=new Map();near.forEach(x=>cnt.set(x.d,(cnt.get(x.d)||0)+1));
     const reg=[...cnt.keys()].filter(d=>cnt.get(d)>1);
-    return {days:reg.length?reg:[...cnt.keys()],time:_rsTop(near.map(x=>x.s.time))||'18:30',dur:+_rsTop(near.map(x=>+x.s.duration>0?+x.s.duration:90))||90};
+    const days=reg.length?reg:[...cnt.keys()];
+    // Each weekday as it is now: its most common time, length and place
+    days.forEach(d=>{const xs=near.filter(x=>x.d===d);
+      slots[d]={time:_rsTop(xs.map(x=>x.s.time))||'18:30',dur:+_rsTop(xs.map(x=>+x.s.duration>0?+x.s.duration:90))||90,loc:_rsTop(xs.map(x=>x.s.location))||''};});
+    return {days,slots};
   }
   const pat=G.db&&G.db[UI.currentTeam+'__schedule'];
-  return {days:(pat&&Array.isArray(pat.dowTr))?pat.dowTr.slice():[2,4],time:(pat&&pat.timeT)||'18:30',dur:(pat&&+pat.durT)||90};
+  const days=(pat&&Array.isArray(pat.dowTr))?pat.dowTr.slice():[2,4];
+  days.forEach(d=>{const v=_slotOf(pat&&pat.slots,d);slots[d]=v?{time:v.time,dur:+v.dur||90,loc:v.loc||''}:{time:(pat&&pat.timeT)||'18:30',dur:(pat&&+pat.durT)||90,loc:''};});
+  return {days,slots};
 }
 function _rsNextMonday(){const t=new Date();return new Date(t.getFullYear(),t.getMonth(),t.getDate()+((8-t.getDay())%7||7));}
 function _rsBounds(ids){
@@ -28357,8 +28474,8 @@ function openResched(){
   document.getElementById('rsFrom').value=f;document.getElementById('rsTo').value=bd.hi;
   const df=_rsDefaults(cd(),UI.currentSeason,isoToSortKey(f));
   document.querySelectorAll('#rsDays .dow-btn').forEach(x=>{const on=df.days.includes(+x.dataset.d);x.classList.toggle('sel',on);x.setAttribute('aria-pressed',on?'true':'false');});
-  document.getElementById('rsTime').value=df.time;document.getElementById('rsDur').value=df.dur;
-  _rsLocFill('');
+  _rsSlots=df.slots;
+  _slotRows('rsRows',df.days,_rsSlots,true);
   document.getElementById('rsNotify').checked=true;
   _rsRender('moResched');
   openM('moResched');
@@ -28414,15 +28531,16 @@ function _rsRender(id){
     go.textContent=n===1?'1 Training absagen':n?n+' Trainings absagen':'Trainings absagen';
   }else if(!o.days.length){
     html=msg('Mindestens einen Trainingstag wählen. Fällt das Training aus, nimm „Trainingspause“.');
-  }else if(_rsMin(o.time)==null){
-    html=msg('Bitte eine Uhrzeit eingeben.');
+  }else if(o.days.some(d=>_rsMin(o.slots[d].time)==null)){
+    html=msg('Bitte für jeden Tag eine Uhrzeit eingeben.');
   }else{
     const pl=_reschedPlan(D,season,o);
     n=pl.change.length+pl.move.length+pl.add.length+pl.drop.length;
     if(!n)html=msg('Keine Änderung – die Trainings im Zeitraum passen schon.');
+    const sl=x=>o.slots[_rsDate(x.k).getDay()];
     html+=_rsGroup('change','Gleicher Tag, neu: '+[
-        pl.change.some(x=>x.s.time!==o.time)&&'Uhrzeit',pl.change.some(x=>(+x.s.duration>0?+x.s.duration:90)!==o.dur)&&'Dauer',
-        o.loc&&pl.change.some(x=>String(x.s.location||'')!==o.loc)&&'Ort'].filter(Boolean).join(', '),
+        pl.change.some(x=>x.s.time!==sl(x).time)&&'Uhrzeit',pl.change.some(x=>(+x.s.duration>0?+x.s.duration:90)!==sl(x).dur)&&'Dauer',
+        pl.change.some(x=>sl(x).loc&&String(x.s.location||'')!==sl(x).loc)&&'Ort'].filter(Boolean).join(', '),
       'Zu- und Absagen bleiben',pl.change.map(x=>_rsItem(D,x,x.s.date)));
     html+=_rsGroup('move','Auf einen anderen Tag','Zu- und Absagen beginnen neu',pl.move.map(x=>_rsItem(D,x,x.s.date+' → '+_rsDisp(x.to),'answers')));
     html+=_rsGroup('add','Neu','',pl.add.map(k=>escapeHtml(_rsDisp(k))));
