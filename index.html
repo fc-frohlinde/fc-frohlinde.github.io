@@ -883,6 +883,9 @@ input[type="date"]{cursor:pointer;}
 .pl-pos{min-width:82px;max-width:82px;display:flex;gap:2px;padding-right:10px;}
 .pl-btns{display:flex;gap:3px;}
 .pl-btn{padding:3px 7px;border-radius:5px;border:none;cursor:pointer;font-size:.66rem;font-weight:600;}
+.full-table td.st-pc{white-space:nowrap;}
+.full-table td.st-pc b{font-weight:700;}
+.full-table td.st-pc small{margin-left:6px;font-size:.74em;font-weight:500;color:var(--hx-muted,var(--gm));font-variant-numeric:tabular-nums;}
 .pl-btn-e{background:rgba(22,89,184,.1);color:var(--bm);}.pl-btn-e:hover{background:rgba(22,89,184,.2);}
 .pl-btn-d{background:rgba(231,76,60,.1);color:var(--ca);}.pl-btn-d:hover{background:rgba(231,76,60,.2);}
 .tr-row{display:flex;align-items:center;gap:7px;padding:7px 10px;background:var(--ow);border-radius:7px;margin-bottom:5px;}
@@ -6579,13 +6582,16 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.21'; // v1.2.21: Statistik zählt nur A/F/E
-const APP_VERSION_LABEL='1.2.21';
+const APP_VERSION='1.2.22'; // v1.2.22: Alle Spieler kompakter
+const APP_VERSION_LABEL='1.2.22';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792696074758; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792696925695; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.22',date:'22.10.2026',title:'Statistik: Alle Spieler',items:[
+    {icon:'🏆',title:'Eine Spalte je Art',desc:'Statt T%, T-A, T-∑ (und dasselbe für Spiele) steht je eine Spalte „Training“ und „Spiele“: die Quote und daneben, wie oft er da war von wie vielen gezählten, z. B. „94 % 17/18“. Auf dem Handy passen damit auch die Spiele auf den Schirm. Sortiert wird nach der Quote, bei Gleichstand nach der Zahl.'},
+  ]},
   {version:'1.2.21',date:'22.10.2026',title:'Statistik',items:[
     {icon:'📈',title:'Gleiche Zahlen überall',desc:'Die Seite Statistik zählte „Nicht im Kader“ als Fehlen, und an einigen Stellen (Wochentage, Verlauf pro Monat) auch noch nicht erfasste Zusagen. Jetzt zählen dort wie in Tabelle, Profil und Karte nur A, F und E; M, ? und N zählen nicht.'},
   ]},
@@ -26687,6 +26693,12 @@ function populateFocSel(){
 let statsSort={col:'pct',asc:false};
 // Per-player table ("Alle Spieler") on the Statistik page; opts.open(pi)
 // builds the click handler, opts.wrap the scroll box style.
+// Share and "present / counted" in one cell: the share alone hides whether
+// it rests on 2 sessions or 20, and the counts alone need doing the sum
+function _stPc(a,n,pct,what){
+  if(!n)return '<td class="st-pc">–</td>';
+  return `<td class="st-pc" title="${a} von ${n} ${what} da"><b style="color:${pctColor(pct)};">${pct}%</b><small>${a}/${n}</small></td>`;
+}
 function _statsPlayerTable(D,opts){
   opts=opts||{};
   const ss=D.sessions||[];
@@ -26706,7 +26718,9 @@ function _statsPlayerTable(D,opts){
     const perfAvg=perfVals.length?(perfVals.reduce((s,v)=>s+v,0)/perfVals.length):null;
     return{pi:D.players.indexOf(p),nr:p.nr,name:p.name,shortname:p.shortname,pos:p.pos,pos2:p.pos2||'',tA,tPl,tPct,mA,mPl,mPct,pct:tPct,perfAvg,perfAvgSort:perfAvg!=null?perfAvg:99,perfCount:perfVals.length};
   });
-  rows.sort((a,b)=>{const v=statsSort.col;const r=typeof a[v]==='string'?a[v].localeCompare(b[v]):a[v]-b[v];return statsSort.asc?r:-r;});
+  // Equal shares: the one who was there more often first (18/18 before 2/2)
+  rows.sort((a,b)=>{const v=statsSort.col;let r=typeof a[v]==='string'?a[v].localeCompare(b[v]):a[v]-b[v];
+    if(!r&&v==='tPct')r=a.tA-b.tA;if(!r&&v==='mPct')r=a.mA-b.mA;return statsSort.asc?r:-r;});
   const sa=c=>statsSort.col===c?(statsSort.asc?'↑':'↓'):'';
   const th=(c,l)=>`<th onclick="sortStats('${c}')">${l} ${sa(c)}</th>`;
   const wrap=opts.wrap||'max-height:240px;overflow-y:auto;border:1px solid var(--gl);border-radius:8px;';
@@ -26714,8 +26728,7 @@ function _statsPlayerTable(D,opts){
   return `${opts.noHead?'':`    <div class="sec" style="margin-top:12px;margin-bottom:8px;">🏆 Alle Spieler</div>
 `}    <div style="${wrap}">
     <table class="full-table"><thead><tr>
-      ${th('nr','#')}${th('name','Spieler')}${th('pos','Pos.')}${th('tPct','T%')}${th('tA','T-A')}${th('tPl','T-∑')}${th('perfAvgSort','⭐ Einsatz')}
-      ${mS?th('mPct','S%')+th('mA','S-A')+th('mPl','S-∑'):''}
+      ${th('nr','#')}${th('name','Spieler')}${th('pos','Pos.')}${th('tPct','Training')}${mS?th('mPct','Spiele'):''}${th('perfAvgSort','⭐ Einsatz')}
     </tr></thead><tbody>
     ${rows.map(r=>{const bc=pctColor(r.tPct);
       const openHandler=open(r.pi);
@@ -26724,10 +26737,9 @@ function _statsPlayerTable(D,opts){
       <td>${r.nr}</td>
       <td style="text-align:left;">${getDisplayName(r)}</td>
       <td class="pos-td"><div class="pos-wrap">${pbHtml(r)}</div></td>
-      <td style="font-weight:700;color:${bc};">${r.tPl?r.tPct+'%':'–'}</td>
-      <td>${r.tA}</td><td>${r.tPl}</td>
-      <td style="font-weight:700;color:${perfColor};" title="${r.perfCount} bewertete Trainings">${r.perfAvg!=null?r.perfAvg.toFixed(1).replace('.',','):'–'}</td>
-      ${mS?`<td style="font-weight:700;color:${pctColor(r.mPct)};">${r.mPl?r.mPct+'%':'–'}</td><td>${r.mA}</td><td>${r.mPl}</td>`:''}
+      ${_stPc(r.tA,r.tPl,r.tPct,'Trainings')}
+      ${mS?_stPc(r.mA,r.mPl,r.mPct,'Spielen'):''}
+      <td style="font-weight:700;color:${perfColor};" title="${r.perfCount} bewertete Termine">${r.perfAvg!=null?r.perfAvg.toFixed(1).replace('.',','):'–'}</td>
     </tr>`;}).join('')}
     </tbody></table></div>`;
 }
