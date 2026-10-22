@@ -2580,6 +2580,48 @@ body.design-heute .dow-btn.sel-m{background:var(--mc1);border-color:var(--mc1);c
 .rs-msg-l{font-size:.7rem;color:var(--hx-muted,var(--gm));}
 .rs-chk small{display:block;font-weight:500;font-size:.74rem;line-height:1.4;color:var(--hx-muted,var(--gm));margin-top:2px;}
 .rs-opt{font-weight:400;}
+/* Spieltag: Kader und Treffpunkt (1.2.13) — card in the match panel, the window, players */
+.sqd-card{margin:4px 0 18px;padding:12px 14px;border-radius:14px;border:1px solid var(--hx-line,var(--gl));background:var(--hx-card2,#F4F7FB);}
+.sqd-card.on{border-left:4px solid #2E8B5E;}
+.sqd-h{display:flex;align-items:baseline;flex-wrap:wrap;gap:3px 10px;}
+.sqd-h b{font-size:.98rem;color:var(--hx-ink,var(--gd));}
+.sqd-h span{font-size:.76rem;color:var(--hx-muted,var(--gm));}
+.sqd-txt{margin:6px 0 10px;font-size:.82rem;line-height:1.45;color:var(--hx-ink2,var(--gd));}
+.sqd-meet{margin-top:6px;font-size:.88rem;color:var(--hx-ink,var(--gd));}
+.sqd-meet b{font-family:var(--hx-num,'Barlow');font-weight:800;font-size:1.08rem;}
+.sqd-out{margin-top:6px;font-size:.78rem;line-height:1.4;color:var(--hx-muted,var(--gm));}
+.sqd-acts{display:flex;align-items:center;gap:16px;margin-top:10px;}
+.sqd-go{height:34px;padding:0 14px;border-radius:999px;border:none;background:var(--hx-yellow,#F2C230);color:var(--hx-on-acc,#0E2350);font:700 .84rem 'Barlow',sans-serif;cursor:pointer;}
+.sqd-go.alt{background:var(--hx-field,#fff);color:var(--hx-ink,var(--gd));border:1px solid var(--hx-line,var(--gl));}
+.sqd-link{background:none;border:none;padding:4px 0;color:var(--hx-blue,var(--bm));font:700 .84rem 'Barlow',sans-serif;cursor:pointer;}
+.sqd-go:focus-visible,.sqd-link:focus-visible{outline:2px solid var(--hx-blue,var(--bm));outline-offset:2px;}
+.sqd-mob>*{flex-shrink:0;}
+.sqd-two{display:grid;grid-template-columns:7.2em minmax(0,1fr);gap:10px;}
+.sqd-two input{width:100%;box-sizing:border-box;}
+.sqd-lh{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:14px 0 6px;font-size:.86rem;color:var(--hx-ink,var(--gd));}
+.sqd-lh b{font-family:var(--hx-num,'Barlow');font-weight:800;font-size:1.3rem;margin-right:3px;}
+.sqd-lh .sqd-link[hidden]{display:none;}
+.sqd-list{border:1px solid var(--hx-line,var(--gl));border-radius:12px;overflow:hidden;}
+.sqd-g+.sqd-g{border-top:1px solid var(--hx-line,var(--gl));}
+.sqd-gh{display:flex;align-items:baseline;gap:6px;padding:9px 12px 3px;font-size:.78rem;font-weight:700;color:var(--hx-ink2,var(--gd));}
+.sqd-gh span{font-weight:500;color:var(--hx-muted,var(--gm));}
+.mob label.sqd-row{display:grid;grid-template-columns:20px 2.1em minmax(0,1fr) auto;align-items:center;gap:8px;margin:0;padding:7px 12px;cursor:pointer;
+  font-size:.88rem;font-weight:600;text-transform:none;letter-spacing:normal;line-height:1.25;color:var(--hx-ink,var(--gd));width:auto;}
+.mob label.sqd-row:hover{background:var(--hx-card2,#F4F7FB);}
+.mob label.sqd-row input[type=checkbox]{width:18px;height:18px;margin:0;padding:0;accent-color:var(--hx-blue,var(--bm));}
+.sqd-nr{font-family:var(--hx-num,'Barlow');font-weight:800;color:var(--hx-muted,var(--gm));text-align:right;}
+.sqd-nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sqd-pos{font-size:.7rem;font-weight:700;color:var(--hx-muted,var(--gm));}
+.sqd-no{padding:9px 12px;border-top:1px solid var(--hx-line,var(--gl));font-size:.76rem;line-height:1.45;color:var(--hx-muted,var(--gm));}
+.sqd-g+.sqd-no{border-top:1px solid var(--hx-line,var(--gl));}
+.sqd-warn{margin:10px 0 0;padding:9px 11px;border-radius:10px;background:#FFF4E0;border-left:3px solid #E0912F;font-size:.8rem;line-height:1.45;color:#5A3A00;}
+.sqd-warn[hidden]{display:none;}
+.sqd-msg{margin-top:7px;padding:8px 10px;border-radius:9px;background:var(--hx-card2,#EEF2F8);border-left:3px solid #2E8B5E;
+  display:flex;flex-direction:column;gap:2px;font-size:.8rem;line-height:1.4;color:var(--hx-ink,var(--gd));}
+.sqd-msg.out{border-left-color:#9AA7BF;}
+.pm-squad{font-size:.76rem;font-weight:700;color:#5B6B88;margin:0 0 8px;}
+.pm-squad.in{color:#1E7A4C;}
+.hub-sq.in{border-color:#2E8B5E;}
 /* ── Bewegung ────────────────────────────────────────────────
    Movement says what happened, nothing else. Sections switch without any —
    they are tabs, not layers. Windows open with one short step: side panels
@@ -6477,13 +6519,19 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.12'; // v1.2.12: eigene Konten und Einladungen
-const APP_VERSION_LABEL='1.2.12';
+const APP_VERSION='1.2.13'; // v1.2.13: Spieltag — Kader und Treffpunkt
+const APP_VERSION_LABEL='1.2.13';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792681000985; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792685904014; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.13',date:'22.10.2026',title:'Spieltag: Kader und Treffpunkt',items:[
+    {icon:'⚽',title:'Kader veröffentlichen',desc:'Im Spiel unter „Kader und Treffpunkt“: Spieler auswählen (vorbelegt mit den Zusagen bzw. der Aufstellung), Uhrzeit und Ort des Treffpunkts angeben, veröffentlichen. Wer im Kader ist, bekommt Treffpunkt und Anstoß aufs Handy. Wer zugesagt hat und nicht dabei ist, erfährt es sachlich, mit dem nächsten Training – damit niemand umsonst zum Treffpunkt kommt. Wer abgesagt oder nicht geantwortet hat, bekommt nichts.'},
+    {icon:'✏️',title:'Ändern und zurücknehmen',desc:'Nach einer Änderung bekommt nur eine Nachricht, wen sie betrifft (neu dabei, doch nicht dabei, neuer Treffpunkt). Aufs Handy geht es frühestens 10 Minuten nach dem Veröffentlichen, nie nachts. Alle Spieler sehen ihren Stand in der App.'},
+    {icon:'💬',title:'Zum zweiten Mal nicht dabei',desc:'Hat ein Spieler zum zweiten Mal in Folge zugesagt und ist nicht im Kader, sagt es das Fenster vor dem Veröffentlichen – das bespricht man besser persönlich.'},
+    {icon:'👀',title:'Erinnerung für die Trainer',desc:'Steht ein Spiel in den nächsten zwei Tagen ohne veröffentlichten Kader an, erscheint es unter „Im Blick behalten“. Treffpunkt-Zeit und Ort für Auswärtsspiele merkt sich die App für das nächste Mal.'},
+  ]},
   {version:'1.2.12',date:'22.10.2026',title:'Eigenes Konto für Trainer',items:[
     {icon:'🔐',title:'Anmelden mit eigenem Konto',desc:'Unter der bisherigen Anmeldung gibt es jetzt „Mit Google anmelden“ und „Mit E-Mail anmelden“. Ein Konto allein öffnet die App nicht: Zugang gibt eine Einladung vom Admin. Wer eingeladen ist, legt sein Konto über den Link selbst an, niemand muss E-Mail-Adressen sammeln. Name und Passwort funktionieren vorerst weiter.'},
     {icon:'✉️',admin:true,title:'Trainer einladen',desc:'Kader → Trainer → Profil → Zugang → „Einladen“: Die App erstellt einen Link (7 Tage gültig, einmal nutzbar), den du per WhatsApp schickst. Dort steht auch, wer schon ein Konto hat; offene Links lassen sich zurückziehen und Zugänge entziehen. Einladen geht, sobald du selbst mit deinem Konto angemeldet bist.'},
@@ -14874,6 +14922,8 @@ function _pmSanitizeG(){
   if(Array.isArray(G.exerciseLibrary))G.exerciseLibrary=[];
   delete G._lastSaveBy;
   delete G._lastSaveTs;
+  // Squad of a match: whether he is in it, and where to meet — not the list
+  const _meName=(()=>{try{const pp=G.db[myKey]&&G.db[myKey].players;return (pp&&myPi!=null&&pp[myPi])?pp[myPi].name:null;}catch(e){return null;}})();
   const keepDb={};
   if(G.db[myKey])keepDb[myKey]=G.db[myKey];
   // The team's notice (new training times, a break): title and text only
@@ -14903,6 +14953,7 @@ function _pmSanitizeG(){
           physio:(typeof sessPhysioOn==='function'&&sessPhysioOn(s))?true:undefined,
           // Spieler des Spiels: the winner(s) once the vote has closed — never the counts
           mvpWin:(()=>{try{const r=mvpResult(s);return (r&&r.winners.length)?r.winners.slice():undefined;}catch(e){return undefined;}})(),
+          squad:(()=>{const q=_sqOf(s);return (q&&_meName)?{in:q.p.includes(_meName),meet:q.meet||'',where:q.where||'',t:q.t}:undefined;})(),
           // Player-visible session info — explicitly whitelisted
           location:s.location||''
           // note deliberately omitted — trainers' own record
@@ -14914,6 +14965,289 @@ function _pmSanitizeG(){
     delete D.notes;
   }
 }
+// ══ Spieltag: Kader und Treffpunkt (1.2.13) ══════════════════════
+// The trainers pick the squad for a match, say when and where to meet and
+// publish. The job on GitHub tells every player with reminders on: in the
+// squad → meeting time and place; confirmed but not picked → a plain "not
+// this time" (he must know not to come to the meeting point); declined or no
+// answer → nothing. A change after publishing reaches only those it concerns.
+// Everyone sees it in the app. The job has its own copy of the wording
+// (tools/erinnerungen/lib.mjs, planSquad) — keep both the same.
+//   s.squad = {p:[names], out:[names confirmed but not picked, at publishing],
+//              meet:'HH:MM', where, t, by, off?, offBy?}
+// The team remembers how long before kick-off it meets, home and away, and
+// where it meets for away games: G.db[team+'__rules'].meet = {h, a, hw, aw}.
+const SQUAD_WD=['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+const SQUAD_MEET_DEF={h:60,a:90};
+function _sqOf(s){
+  const q=s&&s.squad;
+  return (q&&typeof q==='object'&&Array.isArray(q.p)&&typeof q.t==='number'&&!q.off)?q:null;
+}
+function _sqMin(hm){const m=String(hm||'').match(/^(\d{1,2}):(\d{2})/);return m?(+m[1])*60+(+m[2]):null;}
+function _sqHM(min){min=((min%1440)+1440)%1440;return String(Math.floor(min/60)).padStart(2,'0')+':'+String(min%60).padStart(2,'0');}
+// Kick-off has passed: nothing about the squad is shown or changed any more
+function _sqStarted(s,season){
+  const k=_dbSortKey(s.date,season),t=todaySK();
+  if(k!==t)return k<t;
+  const m=_sqMin(s.time);if(m==null)return false;
+  const n=new Date();return n.getHours()*60+n.getMinutes()>=m;
+}
+function _sqDays(s,season){return Math.round((_hxDate(_dbSortKey(s.date,season))-_hxDate(todaySK()))/864e5);}
+// "für heute", "für morgen", "für Sonntag", further ahead "für So 25.10."
+function _sqFor(s,season){
+  const d=_sqDays(s,season);
+  if(d===0)return 'für heute';
+  if(d===1)return 'für morgen';
+  if(d>1&&d<7)return 'für '+SQUAD_WD[_hxDate(_dbSortKey(s.date,season)).getDay()];
+  return 'für '+String(s.date||'').replace(/\.?$/,'.');
+}
+// The first training after the match (within two weeks): "Di 20.10, 18:30"
+function _sqNextTraining(D,si,season){
+  const s=D.sessions[si],k=_dbSortKey(s.date,season);let best=null;
+  (D.sessions||[]).forEach(x=>{
+    if(!x||!x.date||x.type==='match')return;
+    const kk=_dbSortKey(x.date,season);
+    if(kk<=k||(_hxDate(kk)-_hxDate(k))/864e5>14)return;
+    if(!best||kk<best.k||(kk===best.k&&String(x.time||'')<String(best.s.time||'')))best={k:kk,s:x};
+  });
+  return best?String(best.s.date).replace(/\.$/,'')+(best.s.time?', '+best.s.time:''):'';
+}
+function _sqMsg(D,si,season,q){
+  const s=D.sessions[si],f=_sqFor(s,season),next=_sqNextTraining(D,si,season);
+  const ko=s.time?' Anstoß '+s.time+(s.label?' gegen '+s.label:'')+'.':(s.label?' Gegen '+s.label+'.':'');
+  return {inT:'Du bist im Kader '+f,inB:'Treffpunkt '+q.meet+(q.where?', '+q.where:'')+'.'+ko,
+    outT:'Kader '+f+' steht',outB:'Diesmal bist du nicht dabei.'+(next?' Nächstes Training '+next+'.':'')};
+}
+const _sqSt=(p,si)=>(p&&Array.isArray(p.s)&&si<p.s.length&&p.s[si]!=null)?p.s[si]:3;
+// The window in the match panel, above "Wer kommt?"
+function _sqPanelHtml(si){
+  const D=cd(),s=D&&D.sessions&&D.sessions[si],season=UI.currentSeason;
+  if(!s||s.type!=='match'||!s.date||_sqStarted(s,season))return '';
+  const ed=typeof canEdit==='function'&&canEdit(),q=_sqOf(s),e=escapeHtml;
+  if(!q){
+    if(!ed)return '';
+    return `<div class="sqd-card"><div class="sqd-h"><b>Kader und Treffpunkt</b></div>
+      <p class="sqd-txt">Noch nicht veröffentlicht. Wer dabei ist, bekommt Treffpunkt und Uhrzeit aufs Handy – wer zugesagt hat und nicht dabei ist, erfährt es auch.</p>
+      <button type="button" class="sqd-go" onclick="squadOpen(${si})">Kader festlegen</button></div>`;
+  }
+  const due=_newsDue(q.t),hm=x=>{const d=new Date(x);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');};
+  const when=Date.now()<due?'geht frühestens '+hm(due)+' aufs Handy':'veröffentlicht '+new Date(q.t).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})+' '+hm(q.t);
+  // Confirmed but not picked, as of now (answers may have changed since)
+  const outNow=(D.players||[]).filter(p=>p&&!q.p.includes(p.name)&&_sqSt(p,si)===4).map(p=>(getDisplayName?getDisplayName(p):p.name));
+  return `<div class="sqd-card on"><div class="sqd-h"><b>Kader · ${q.p.length} Spieler</b><span>${e(when)}</span></div>
+    <div class="sqd-meet">Treffpunkt <b>${e(q.meet)}</b>${q.where?' · '+e(q.where):''}</div>
+    ${outNow.length?`<div class="sqd-out">Zugesagt, nicht im Kader: ${e(outNow.join(', '))}</div>`:''}
+    ${ed?`<div class="sqd-acts"><button type="button" class="sqd-go alt" onclick="squadOpen(${si})">Ändern</button><button type="button" class="sqd-link" onclick="squadWithdraw(${si})">Zurücknehmen</button></div>`:''}</div>`;
+}
+// ── the window ──
+let _SQ=null;
+function _sqEnsure(){
+  if(document.getElementById('moKader'))return;
+  const w=document.createElement('div');
+  w.innerHTML=`<div class="mo hx-full" id="moKader" style="z-index:860;"><div class="mob sqd-mob" style="width:460px;">
+    <h3 id="sqTitle">Kader</h3>
+    <p class="rs-lead" id="sqSub"></p>
+    <div class="sqd-two"><div><label for="sqMeet">Treffpunkt um</label><input type="time" id="sqMeet"></div>
+      <div><label for="sqWhere">Wo <span class="rs-opt">(optional)</span></label><input type="text" id="sqWhere" maxlength="80" list="sqWhereList" placeholder="z. B. Parkplatz am Sportplatz"><datalist id="sqWhereList"></datalist></div></div>
+    <div class="sqd-lh"><span id="sqCount"></span><button type="button" class="sqd-link" id="sqFromLu" onclick="sqFromLineup()" hidden>Wie in der Aufstellung</button></div>
+    <div class="sqd-list" id="sqList"></div>
+    <div class="sqd-warn" id="sqWarn" hidden></div>
+    <div class="rs-prev" id="sqPrev" aria-live="polite"></div>
+    <div class="mob-btns"><button type="button" class="btn bp" id="sqGo" onclick="sqPublish()">Kader veröffentlichen</button><button type="button" class="btn bs" onclick="closeM('moKader')">Abbrechen</button></div>
+  </div></div>`;
+  const m=w.firstElementChild;document.body.appendChild(m);
+  ['sqMeet','sqWhere'].forEach(id=>{const el=document.getElementById(id);el.addEventListener('input',_sqRenderSum);el.addEventListener('change',_sqRenderSum);});
+}
+function _sqLineup(D,si){
+  const lu=G.matchLineups&&G.matchLineups[_mlKey(UI.currentTeam,UI.currentSeason,si)];
+  const s=D.sessions[si];
+  if(!lu||(lu.sessDate&&s&&lu.sessDate!==s.date))return null;   // saved for another date: sessions moved since
+  const a=[...Object.values(lu.slots||{}),...(lu.subs||[])].filter(v=>typeof v==='number'&&D.players[v]&&![0,2].includes(_sqSt(D.players[v],si)));
+  return a.length?[...new Set(a)]:null;
+}
+function _sqMeetDefault(s){
+  const r=(G.db[UI.currentTeam+'__rules']&&G.db[UI.currentTeam+'__rules'].meet)||{};
+  const away=s.homeAway!=='home',ko=_sqMin(s.time);
+  const off=away?(r.a||SQUAD_MEET_DEF.a):(r.h||SQUAD_MEET_DEF.h);
+  return {meet:ko==null?'':_sqHM(ko-off),where:away?(r.aw||''):(r.hw||String(s.location||'').trim())};
+}
+function squadOpen(si){
+  if(!(typeof canEdit==='function'&&canEdit()))return;
+  const D=cd(),s=D&&D.sessions&&D.sessions[si],season=UI.currentSeason;
+  if(!s||s.type!=='match')return;
+  if(_sqStarted(s,season)){alert('Das Spiel hat schon begonnen.');return;}
+  _sqEnsure();
+  const q=_sqOf(s),sel=new Set();
+  const join=p=>typeof _sessAfterJoin!=='function'||_sessAfterJoin(p,s,season);
+  if(q)(D.players||[]).forEach((p,pi)=>{if(p&&q.p.includes(p.name))sel.add(pi);});
+  else (_sqLineup(D,si)||(D.players||[]).map((p,pi)=>(p&&join(p)&&_sqSt(p,si)===4)?pi:-1).filter(pi=>pi>=0)).forEach(pi=>sel.add(pi));
+  _SQ={si,sel,date:s.date,was:!!q};
+  const def=_sqMeetDefault(s);
+  document.getElementById('sqMeet').value=q?q.meet:def.meet;
+  document.getElementById('sqWhere').value=q?(q.where||''):def.where;
+  const places=new Set([...(typeof getLocations==='function'?getLocations():[]),...['hw','aw'].map(k=>((G.db[UI.currentTeam+'__rules']||{}).meet||{})[k]).filter(Boolean)]);
+  document.getElementById('sqWhereList').innerHTML=[...places].map(x=>`<option value="${escapeHtml(x)}">`).join('');
+  document.getElementById('sqTitle').textContent='Kader '+_sqFor(s,season);
+  document.getElementById('sqSub').textContent=[s.date+(s.label?' gegen '+s.label:''),s.time?'Anstoß '+s.time:'',s.homeAway==='home'?'Heimspiel':s.homeAway==='away'?'Auswärtsspiel':''].filter(Boolean).join(' · ');
+  _sqRenderList();
+  openM('moKader');
+}
+// Sorted like "Wer kommt?": by position, goalkeepers first
+function _sqRenderList(){
+  const D=cd(),si=_SQ.si,s=D.sessions[si],season=UI.currentSeason,e=escapeHtml;
+  const join=p=>typeof _sessAfterJoin!=='function'||_sessAfterJoin(p,s,season);
+  const pIdx=x=>{const i=POS.indexOf(x);return i<0?99:i;};
+  const all=(D.players||[]).map((p,pi)=>({p,pi})).filter(x=>x.p&&join(x.p))
+    .sort((a,b)=>(pIdx(a.p.pos)-pIdx(b.p.pos))||((+a.p.nr||999)-(+b.p.nr||999)));
+  const nm=p=>(getDisplayName?getDisplayName(p):p.name)||'';
+  const row=x=>`<label class="sqd-row"><input type="checkbox" data-pi="${x.pi}"${_SQ.sel.has(x.pi)?' checked':''} onchange="sqToggle(${x.pi},this.checked)">`
+    +`<span class="sqd-nr">${e(String(x.p.nr||'–'))}</span><span class="sqd-nm">${e(nm(x.p))}</span><span class="sqd-pos">${e(x.p.pos||'')}</span></label>`;
+  const grp=(title,list,sub)=>list.length?`<div class="sqd-g"><div class="sqd-gh">${title} <b>${list.length}</b>${sub?`<span>${sub}</span>`:''}</div>${list.map(row).join('')}</div>`:'';
+  const yes=all.filter(x=>_sqSt(x.p,si)===4||_sqSt(x.p,si)===1),open=all.filter(x=>_sqSt(x.p,si)===3),no=all.filter(x=>[0,2].includes(_sqSt(x.p,si)));
+  // Declined or excused players are not offered: they said they cannot come.
+  // Selected earlier and declined since: still listed so the trainer sees it.
+  const noSel=no.filter(x=>_SQ.sel.has(x.pi));
+  let h=grp('Zugesagt',yes)+grp('Ohne Antwort',open,'nur wenn sicher')+grp('Abgesagt, aber im Kader',noSel,'abwählen?');
+  const rest=no.filter(x=>!_SQ.sel.has(x.pi));
+  if(rest.length)h+=`<div class="sqd-no">Abgesagt oder entschuldigt: ${e(rest.map(x=>nm(x.p)).join(', '))}</div>`;
+  document.getElementById('sqList').innerHTML=h||'<div class="rs-empty">Noch keine Spieler.</div>';
+  _sqRenderSum();
+}
+function sqToggle(pi,on){if(!_SQ)return;if(on)_SQ.sel.add(pi);else _SQ.sel.delete(pi);_sqRenderSum();}
+function sqFromLineup(){
+  const D=cd(),lu=_sqLineup(D,_SQ.si);if(!lu)return;
+  _SQ.sel=new Set(lu);_sqRenderList();
+}
+// Names of those confirmed but not picked at the previous published match
+function _sqPrevOut(D,si,season){
+  const k=_dbSortKey(D.sessions[si].date,season);let best=null;
+  (D.sessions||[]).forEach((x,i)=>{
+    if(i===si||!x||x.type!=='match'||!x.date)return;
+    const q=_sqOf(x);if(!q)return;
+    const kk=_dbSortKey(x.date,season);
+    if(kk<k&&(!best||kk>best.k))best={k:kk,q};
+  });
+  return new Set(best?(best.q.out||[]):[]);
+}
+function _sqRead(){
+  return {meet:String(document.getElementById('sqMeet').value||'').trim(),where:String(document.getElementById('sqWhere').value||'').trim().slice(0,80)};
+}
+function _sqRenderSum(){
+  if(!_SQ)return;
+  const D=cd(),si=_SQ.si,s=D.sessions[si],season=UI.currentSeason,e=escapeHtml;
+  const join=p=>typeof _sessAfterJoin!=='function'||_sessAfterJoin(p,s,season);
+  const nm=p=>(getDisplayName?getDisplayName(p):p.name)||'';
+  const n=_SQ.sel.size;
+  document.getElementById('sqCount').innerHTML=`<b>${n}</b> im Kader`;
+  const lu=_sqLineup(D,si),fl=document.getElementById('sqFromLu');
+  fl.hidden=!lu||(lu.length===n&&lu.every(pi=>_SQ.sel.has(pi)));
+  const ins=[..._SQ.sel].map(pi=>D.players[pi]).filter(Boolean);
+  const outs=(D.players||[]).filter((p,pi)=>p&&join(p)&&!_SQ.sel.has(pi)&&_sqSt(p,si)===4);
+  // Second time in a row confirmed and left out: worth a word in person
+  const prev=_sqPrevOut(D,si,season);
+  const twice=outs.filter(p=>prev.has(p.name)).map(nm);
+  const w=document.getElementById('sqWarn');
+  w.hidden=!twice.length;
+  w.innerHTML=twice.length?`<b>${e(twice.join(', '))}</b> ${twice.length===1?'ist':'sind'} zum 2. Mal in Folge trotz Zusage nicht im Kader – besser persönlich sprechen.`:'';
+  const r=_sqRead(),q={meet:r.meet||'…',where:r.where};
+  const m=_sqMsg(D,si,season,q);
+  const push=ins.concat(outs).filter(p=>p.push&&p.push.t).length,tot=ins.length+outs.length;
+  const box=(cls,t,b)=>`<div class="sqd-msg ${cls}"><b>${e(t)}</b><span>${e(b)}</span></div>`;
+  let h=`<div class="rs-g"><div class="rs-gh"><span class="rs-n">${ins.length}</span><span>im Kader</span></div>${box('in',m.inT,m.inB)}</div>`;
+  if(outs.length)h+=`<div class="rs-g"><div class="rs-gh"><span class="rs-n">${outs.length}</span><span>zugesagt, nicht im Kader</span></div>${box('out',m.outT,m.outB)}</div>`;
+  h+=`<div class="rs-foot">${push?push+' von '+tot+' bekommen es aufs Handy (frühestens in 10 Minuten), alle sehen es in der App.':'Alle sehen es in der App; Erinnerungen aufs Handy hat von ihnen noch niemand an.'}`
+    +` Wer abgesagt oder nicht geantwortet hat, bekommt nichts.${_SQ.was?' Nach einer Änderung bekommt nur eine Nachricht, wen sie betrifft.':''}</div>`;
+  document.getElementById('sqPrev').innerHTML=h;
+  const go=document.getElementById('sqGo');
+  go.textContent=_SQ.was?'Änderungen veröffentlichen':'Kader veröffentlichen';
+  go.disabled=!n;
+}
+function sqPublish(){
+  if(!_SQ||!(typeof canEdit==='function'&&canEdit()))return;
+  const D=cd(),si=_SQ.si,s=D.sessions[si],season=UI.currentSeason;
+  if(!s||s.date!==_SQ.date||s.type!=='match'){alert('Das Spiel wurde inzwischen verschoben oder gelöscht. Bitte neu öffnen.');closeM('moKader');return;}
+  if(_sqStarted(s,season)){alert('Das Spiel hat schon begonnen.');return;}
+  const r=_sqRead(),ko=_sqMin(s.time),mm=_sqMin(r.meet);
+  if(mm==null){alert('Bitte die Uhrzeit für den Treffpunkt angeben.');document.getElementById('sqMeet').focus();return;}
+  if(ko!=null&&mm>ko){alert('Der Treffpunkt liegt nach dem Anstoß ('+s.time+').');return;}
+  if(!_SQ.sel.size)return;
+  const join=p=>typeof _sessAfterJoin!=='function'||_sessAfterJoin(p,s,season);
+  const names=[..._SQ.sel].map(pi=>D.players[pi]).filter(Boolean).map(p=>p.name);
+  const out=(D.players||[]).filter((p,pi)=>p&&join(p)&&!_SQ.sel.has(pi)&&_sqSt(p,si)===4).map(p=>p.name);
+  const was=_sqOf(s);
+  snap();
+  s.squad={p:names,out,meet:_sqHM(mm),where:r.where,t:Date.now(),by:(CU&&CU.name)||''};
+  // Next time the window suggests the same: minutes before kick-off, and the
+  // meeting place of away games (home games default to the ground)
+  const t=UI.currentTeam;
+  if(!G.db[t+'__rules']||typeof G.db[t+'__rules']!=='object')G.db[t+'__rules']={};
+  const rm=Object.assign({},G.db[t+'__rules'].meet||{}),away=s.homeAway!=='home';
+  if(ko!=null&&ko-mm>=0&&ko-mm<=300)rm[away?'a':'h']=ko-mm;
+  if(r.where)rm[away?'aw':'hw']=r.where;
+  G.db[t+'__rules'].meet=rm;
+  saveG();
+  logAudit(was?'Kader geändert':'Kader veröffentlicht',s.date+(s.label?' '+s.label:''),names.length+' Spieler, Treffpunkt '+_sqHM(mm));
+  closeM('moKader');
+  _sqRefresh(si);
+  if(typeof showSaveFlash==='function')showSaveFlash(was?'✓ Kader geändert':'✓ Kader veröffentlicht');
+}
+function squadWithdraw(si){
+  if(!(typeof canEdit==='function'&&canEdit()))return;
+  const D=cd(),s=D&&D.sessions&&D.sessions[si],q=_sqOf(s);if(!q)return;
+  const pend=Date.now()<_newsDue(q.t);
+  if(!confirm('Kader für '+s.date+(s.label?' gegen '+s.label:'')+' zurücknehmen?\n\nDie Spieler sehen ihn dann nicht mehr in der App'
+    +(pend?' und bekommen nichts aufs Handy.':'. Aufs Handy ist er schon gegangen – das lässt sich nicht zurückholen.')))return;
+  snap();
+  q.off=Date.now();q.offBy=(CU&&CU.name)||'';
+  saveG();
+  logAudit('Kader zurückgenommen',s.date+(s.label?' '+s.label:''),pend?'vor dem Versand':'nach dem Versand');
+  _sqRefresh(si);
+  if(typeof showSaveFlash==='function')showSaveFlash('✓ Kader zurückgenommen');
+}
+function _sqRefresh(si){
+  try{if(typeof _currentSessIdx!=='undefined'&&_currentSessIdx===si)_ssHxAttRender(si);}catch(e){}
+  try{if(typeof hxRender==='function')hxRender();}catch(e){}
+}
+// "Im Blick behalten": a match in the next two days without a published squad
+function _sqFlags(D,season){
+  if(!(typeof canEdit==='function'&&canEdit()))return [];
+  const out=[];
+  (D.sessions||[]).forEach((s,si)=>{
+    if(!s||s.type!=='match'||!s.date||_sqOf(s)||_sqStarted(s,season))return;
+    const d=_sqDays(s,season);if(d<0||d>2)return;
+    out.push({dot:'#1659B8',who:'Spiel '+_hxWhen(_dbSortKey(s.date,season))+(s.label?' · '+s.label:''),what:'Kader und Treffpunkt noch nicht veröffentlicht',on:`squadOpen(${si})`});
+  });
+  return out;
+}
+// ── players ──
+// In player mode s.squad is reduced to {in, meet, where, t} (_pmSanitizeG)
+function _sqPm(s){const q=s&&s.squad;return (q&&typeof q.in==='boolean')?q:null;}
+// The next match with a squad that concerns him: picked, or confirmed and not picked
+function _sqPmNext(D,p){
+  const season=UI.currentSeason;let best=null;
+  (D.sessions||[]).forEach((s,si)=>{
+    const q=_sqPm(s);if(!q||s.type!=='match'||_sqStarted(s,season))return;
+    const v=_sqSt(p,si);if(v===0||v===2||(!q.in&&v!==4))return;
+    const k=_dbSortKey(s.date,season);
+    if(!best||k<best.k)best={s,si,k,q};
+  });
+  return best;
+}
+function _squadHubHtml(D,p){
+  const b=_sqPmNext(D,p);if(!b)return '';
+  const f=_sqFor(b.s,UI.currentSeason),e=escapeHtml;
+  const t=b.q.in?'Im Kader '+f:'Kader '+f+' steht';
+  const sub=b.q.in?'Treffpunkt '+b.q.meet+(b.q.where?' · '+b.q.where:''):'Diesmal bist du nicht dabei';
+  return `<div class="hub-card hub-mvp hub-news hub-sq${b.q.in?' in':''}"><span class="hub-ic" aria-hidden="true">${b.q.in?'⚽':'📋'}</span><span class="hub-txt"><b>${e(t)}</b><span>${e(sub)}</span></span></div>`;
+}
+// One line on the match in "Meine Woche"
+function _squadCardLine(s,si,p){
+  const q=_sqPm(s);if(!q)return '';
+  const v=_sqSt(p,si);if(v===0||v===2)return '';
+  if(q.in)return `<div class="pm-squad in">✓ Im Kader · Treffpunkt ${_amEscapeText(q.meet)}${q.where?', '+_amEscapeText(q.where):''}</div>`;
+  return v===4?'<div class="pm-squad">Diesmal nicht im Kader</div>':'';
+}
+
 // ══ sRPE (session RPE) ═══════════════════════════════════════
 // Standard method in football: the player rates the session's exertion 0–10
 // afterwards; multiplied by the minutes it gives the session LOAD. The value
@@ -17999,7 +18333,7 @@ function renderHub(){
     return `<a class="hub-card" href="${href}">${inner}</a>`;
   };
   const tok=p.confirmToken||'';
-  let cards=_newsHtml('hub');
+  let cards=_newsHtml('hub')+_squadHubHtml(D,p);
   if(weekTotal){
     cards+=card('\ud83d\udcc5','Meine Woche',
       weekOpen?(weekOpen+' von '+weekTotal+' offen'):('alle '+weekTotal+' beantwortet'),
@@ -18518,7 +18852,7 @@ function renderPlayerMode(){
     // Trainer's note for this session — surfaced for the player (e.g. "Bring 2 pairs of cleats")
     const noteInfo='';   // trainers' note, not player-facing
     // Lineup position — only for matches where trainer has named player in the starting XI/bank
-    const lineupInfo=f.isMatch?_pmLookupLineupRole(si,p):'';
+    const lineupInfo=f.isMatch?_squadCardLine(s,si,p):'';
     const cls=`pm-card pm-${f.isMatch?'match':'train'}${locked?' pm-locked':''}${isHero?' pm-hero-card':''}${status!==3?' pm-answered':''}`;
     return `<div class="${cls}" data-si="${si}">
       <div class="pm-card-date">
@@ -22578,7 +22912,7 @@ function _ssHxAttRender(si){
     frist=dl?(_amRsvpLocked(si)?'Antworten gesperrt seit '+_amFmtDeadline(dl):'Antwort bis '+_amFmtDeadline(dl)):'Keine Antwortfrist';
   }
   const sb=(k,l)=>`<button type="button" class="${sortBy===k?'on':''}" aria-pressed="${sortBy===k}" onclick="_ssxSetSort('${k}',${si})">${l}</button>`;
-  let h=`<div class="ssx-head"><h4>${roll?'Wer war da?':'Wer kommt?'}</h4>${frist?`<span class="ssx-frist">${e(frist)}</span>`:''}</div>
+  let h=(roll?'':_sqPanelHtml(si))+`<div class="ssx-head"><h4>${roll?'Wer war da?':'Wer kommt?'}</h4>${frist?`<span class="ssx-frist">${e(frist)}</span>`:''}</div>
     <div class="ssx-sum"><b>${roll?c.present:c.yes}</b><span>von ${c.total} ${roll?'anwesend':'zugesagt'}</span></div>${_hxSeg(parts,c.total)}
     <div class="ssx-sort" role="group" aria-label="Sortieren"><span>Sortieren</span>${sb('pos','Position')}${sb('name','Name')}${sb('nr','Nr.')}</div>`;
   const chip=({p,pi},noPos)=>{
@@ -24726,6 +25060,7 @@ function hxRender(){
   // ── Im Blick behalten ──
   const flags=[];
   try{const nf=_newsFlag();if(nf)flags.push(nf);}catch(e){}
+  try{_sqFlags(D,season).forEach(f=>flags.push(f));}catch(e){}
   try{
     _rcMissing(D,season).forEach(x=>flags.push({dot:'#C9373E',who:'Anwesenheit fehlt',
       what:(x.s.type==='match'?'Spiel':'Training')+' vom '+x.s.date+(x.there?': '+x.open+' Spieler ohne Eintrag':' ist noch nicht erfasst'),on:`rcOpen(${x.si})`}));

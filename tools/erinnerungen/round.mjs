@@ -12,10 +12,13 @@
 //   fcf_push/pub                    public VAPID key, read by the app
 //   fcf_data/db/<team>__news        a notice from the trainers to the team
 //                                   ({t, title, body}), sent once to everyone
+//   fcf_push/sq/<block>/<match>/<owner>  what a player was last told about the
+//                                   squad of a match ('in|HH:MM|where', 'out');
+//                                   _d = day of the match, gone two days after
 //   fcf_push_keys/vapid             key pair — no rule grants clients access
 //
 // db: {get(path), set(path,v), remove(path)}; push: web-push or a stand-in.
-import { decode, pathKey, berlin, plan, anyDue, quiet, addDays, newsFresh, planNews } from './lib.mjs';
+import { decode, pathKey, berlin, plan, anyDue, quiet, addDays, newsFresh, planNews, squadPending, planSquad } from './lib.mjs';
 import { trainerOwner, allowed, kindsOf, needsPlayers, birthdays, rollCall, cancellations, lineup,
   messages, machinery, BDAY_DAY, BDAY_EVE, ATT_FROM } from './trainer.mjs';
 
@@ -100,17 +103,21 @@ export async function round({ db, push, ts = Date.now(), log = console.log, dry 
         const sessions = await load(bk, 'sessions');
         const news = await teamNews(team);
         const hasNews = newsFresh(news, now);
-        if (!hasNews && !anyDue(sessions, season, now, cfg)) continue;          // most rounds end here
+        const hasSquad = squadPending(sessions, season, now);
+        if (!hasNews && !hasSquad && !anyDue(sessions, season, now, cfg)) continue;          // most rounds end here
         const players = await load(bk, 'players');
         const sentT = await today();
         const todo = plan({ sessions, players, season, team, now, cfg, owners, sent: sentT });
         if (hasNews) todo.push(...planNews({ news, players, now, owners, log: sentT, logY: await yesterday() }));
+        const sqPath = `fcf_push/sq/${pathKey(bk)}`;
+        if (hasSquad) todo.push(...planSquad({ sessions, players, season, now, owners, told: (await db.get(sqPath)) || {} }));
         for (const t of todo) {
           const n = await deliver(t.owner, t.payload, t.ttl);
           if (n) {
             sent += n;
             (sentT[t.kind + '-' + t.key] = sentT[t.kind + '-' + t.key] || {})[t.owner] = ts;
             if (!dry) await db.set(`fcf_push/sent/${now.day}/${t.kind}-${t.key}/${t.owner}`, ts);
+            if (t.kind === 'squad' && !dry) { await db.set(`${sqPath}/${t.key}/${t.owner}`, t.state); await db.set(`${sqPath}/${t.key}/_d`, t.day); }
             log(t.kind, t.key, t.owner.slice(0, 9), n + ' Gerät(e)');
           }
           // No device left: the bell in his record goes too
@@ -195,9 +202,15 @@ export async function round({ db, push, ts = Date.now(), log = console.log, dry 
       }
     }
 
-    // Housekeeping: the sent log keeps a week
+    // Housekeeping: the sent log keeps a week; what players were told about a
+    // squad goes two days after the match (once a day is enough)
     const days = Object.keys((await db.get('fcf_push/sent')) || {});
     for (const d of days) if (+d < addDays(now.day, -7) && !dry) await db.remove('fcf_push/sent/' + d);
+    if (prev.day !== now.day && !dry) {
+      const sq = (await db.get('fcf_push/sq')) || {};
+      for (const [b, ms] of Object.entries(sq)) for (const [m, o] of Object.entries(ms || {}))
+        if (!o || !o._d || o._d < addDays(now.day, -2)) await db.remove(`fcf_push/sq/${b}/${m}`);
+    }
 
     if (!dry) await db.set('fcf_push/status', {
       t: ts, day: now.day, sent: (prev.day === now.day ? (prev.sent || 0) : 0) + sent,

@@ -237,4 +237,74 @@ function world() {
   await round({ db: db5, push, ts: at + 22 * 60e3, log: q });
   ok(push.calls.length === 0, 'notice taken back: nothing');
 }
+// ── Spieltag: Kader und Treffpunkt ──
+{
+  const { sess, players } = data();
+  const si = sess.findIndex(s => s.date === 'So 25.10');
+  // Max 4 in · Ali 4 out · Tom 3 not picked · Jonas 0 declined (still listed) · Luca 3 picked · Finn 2 · Noah 4 out
+  [4, 4, 3, 0, 3, 2, 4].forEach((v, i) => { players[i].s[si] = v; });
+  const sq = { p: ['Max Müller', 'Jonas Weber', 'Luca Rossi'], out: ['Ali Kaya', 'Noah Becker'], meet: '11:45', where: 'Parkplatz Sportplatz', t: Date.UTC(2026, 9, 23, 18, 0), by: 'Artem' };
+  sess[si].squad = sq;
+  const subs = {};
+  ['tok0', 'tok1', 'tok2', 'tok3', 'tok4', 'tok6'].forEach(t => { subs[ownerOf(t)] = { a: dev(t) }; });
+  const mk = () => makeDb({ fcf_data: { db: { 'U19__2026__SL__27': { sessions: enc(sess), players: enc(players) } } },
+    fcf_push: { subs, config: { U19: { rsvp: false, rpe: false, vote: false } } } });
+  const db = mk();
+  const by = c => c.ep.replace('https://push.example/', '');
+  let push = makePush();
+  await round({ db, push, ts: Date.UTC(2026, 9, 23, 18, 5), log: q });           // Fr 20:05, 5 minutes after
+  ok(push.calls.length === 0, 'squad: not in the first 10 minutes');
+  push = makePush();
+  await round({ db, push, ts: Date.UTC(2026, 9, 23, 18, 12), log: q });          // Fr 20:12
+  const got = Object.fromEntries(push.calls.map(c => [by(c), c.p]));
+  ok(Object.keys(got).sort().join() === 'tok0,tok1,tok4,tok6', 'squad: in (Max, Luca) and confirmed-out (Ali, Noah); not Tom (no answer), not Jonas (declined): ' + Object.keys(got).sort().join());
+  ok(got.tok0 && got.tok0.title === 'Du bist im Kader für Sonntag' && got.tok0.body === 'Treffpunkt 11:45, Parkplatz Sportplatz. Anstoß 13:00 gegen SV Brackel.', 'squad: in text: ' + JSON.stringify(got.tok0));
+  ok(got.tok1 && got.tok1.title === 'Kader für Sonntag steht' && got.tok1.body === 'Diesmal bist du nicht dabei. Nächstes Training Di 27.10, 18:30.', 'squad: out text: ' + JSON.stringify(got.tok1));
+  ok(got.tok0 && got.tok0.url === 'https://fc-frohlinde.github.io/?p=tok0&do=week' && got.tok0.tag === 'squad-k1025-1300m', 'squad: link and tag');
+  const ttl0 = push.calls.find(c => by(c) === 'tok0').opt.TTL;
+  ok(ttl0 === ((2 * 1440 + 13 * 60) - (20 * 60 + 12)) * 60, 'squad: valid until kick-off: ' + ttl0);
+  const told = await db.get('fcf_push/sq/U19__2026__SL__27/k1025-1300m');
+  ok(told && told[ownerOf('tok0')] === 'in|11:45|Parkplatz Sportplatz' && told[ownerOf('tok1')] === 'out' && told._d === 20261025, 'squad: what each was told is kept: ' + JSON.stringify(told));
+  push = makePush();
+  await round({ db, push, ts: Date.UTC(2026, 9, 23, 18, 27), log: q });
+  ok(push.calls.length === 0, 'squad: once');
+  // Changed on Saturday morning: Ali in, Luca out, meeting 11:30
+  const sess2 = await db.get('fcf_data/db/U19__2026__SL__27/sessions');
+  const s2 = decode(sess2);
+  s2[si].squad = Object.assign({}, sq, { p: ['Max Müller', 'Ali Kaya'], out: ['Noah Becker'], meet: '11:30', t: Date.UTC(2026, 9, 24, 7, 0) });
+  await db.set('fcf_data/db/U19__2026__SL__27/sessions', enc(s2));
+  push = makePush();
+  await round({ db, push, ts: Date.UTC(2026, 9, 24, 7, 12), log: q });           // Sa 9:12
+  const ch = Object.fromEntries(push.calls.map(c => [by(c), c.p]));
+  ok(Object.keys(ch).sort().join() === 'tok0,tok1,tok4', 'squad changed: only those concerned (Noah unchanged): ' + Object.keys(ch).sort().join());
+  ok(ch.tok0 && ch.tok0.title === 'Neuer Treffpunkt für morgen' && /^Treffpunkt 11:30,/.test(ch.tok0.body), 'squad changed: new meeting time: ' + JSON.stringify(ch.tok0));
+  ok(ch.tok1 && ch.tok1.title === 'Du bist jetzt im Kader für morgen', 'squad changed: now in: ' + JSON.stringify(ch.tok1));
+  ok(ch.tok4 && ch.tok4.title === 'Änderung im Kader für morgen' && /^Diesmal bist du doch nicht dabei\./.test(ch.tok4.body), 'squad changed: taken out (no answer, but he had been told he is in): ' + JSON.stringify(ch.tok4));
+  // On match day after kick-off: nothing more, whatever changes
+  s2[si].squad = Object.assign({}, s2[si].squad, { p: ['Max Müller'], t: Date.UTC(2026, 9, 25, 10, 0) });
+  await db.set('fcf_data/db/U19__2026__SL__27/sessions', enc(s2));
+  push = makePush();
+  await round({ db, push, ts: Date.UTC(2026, 9, 25, 12, 30), log: q });          // So 13:30 (winter time since 3:00)
+  ok(push.calls.length === 0, 'squad: after kick-off nothing');
+  // Two days later the record is cleared (first round of a new day)
+  await db.set('fcf_push/status', { day: 20261027 });
+  await round({ db, push, ts: Date.UTC(2026, 9, 28, 6, 7), log: q });            // Mi 8:07
+  ok(!(await db.get('fcf_push/sq/U19__2026__SL__27/k1025-1300m')), 'squad record cleared two days after the match');
+  // Withdrawn before it went out: nothing; published at night: in the morning
+  const sess3 = JSON.parse(JSON.stringify(sess));
+  sess3[si].squad = Object.assign({}, sq, { off: Date.UTC(2026, 9, 23, 18, 3) });
+  const db3 = makeDb({ fcf_data: { db: { 'U19__2026__SL__27': { sessions: enc(sess3), players: enc(players) } } }, fcf_push: { subs, config: { U19: { rsvp: false, rpe: false, vote: false } } } });
+  push = makePush();
+  await round({ db: db3, push, ts: Date.UTC(2026, 9, 23, 18, 20), log: q });
+  ok(push.calls.length === 0, 'squad withdrawn: nothing');
+  const sess4 = JSON.parse(JSON.stringify(sess));
+  sess4[si].squad = Object.assign({}, sq, { t: Date.UTC(2026, 9, 23, 20, 50) });   // Fr 22:50
+  const db4 = makeDb({ fcf_data: { db: { 'U19__2026__SL__27': { sessions: enc(sess4), players: enc(players) } } }, fcf_push: { subs, config: { U19: { rsvp: false, rpe: false, vote: false } } } });
+  push = makePush();
+  await round({ db: db4, push, ts: Date.UTC(2026, 9, 23, 21, 7), log: q });
+  ok(push.calls.length === 0, 'squad at night: not at night');
+  push = makePush();
+  await round({ db: db4, push, ts: Date.UTC(2026, 9, 24, 6, 7), log: q });       // Sa 8:07
+  ok(push.calls.length === 4 && push.calls.some(c => c.p.title === 'Du bist im Kader für morgen'), 'squad at night: the next morning, "für morgen" (' + push.calls.length + ')');
+}
 console.log(fails ? fails + ' FAILED' : 'all passed');

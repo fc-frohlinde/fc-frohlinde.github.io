@@ -191,3 +191,84 @@ export function planNews({ news, players, now, owners, log, logY }) {
   });
   return out;
 }
+
+// ── Spieltag: Kader und Treffpunkt (1.2.13) ──
+// s.squad = {p:[names], meet:'HH:MM', where, t, off?} on a match. Each player
+// with reminders on is told what concerns him, once per state: in the squad
+// (with meeting time and place), or confirmed and not picked ("not this time",
+// with the next training). Declined, excused or no answer: nothing. After a
+// change only those whose state changed hear again. What a player was last
+// told: told[key][owner] = 'in|HH:MM|where' or 'out' (fcf_push/sq/<block>).
+// The wording is the same as in the app (_sqMsg) — keep both the same.
+export const SQUAD_DELAY = NEWS_DELAY;
+const WD = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
+const dayDiff = (a, b) => Math.round((Date.UTC(Math.floor(a / 10000), Math.floor(a / 100) % 100 - 1, a % 100)
+  - Date.UTC(Math.floor(b / 10000), Math.floor(b / 100) % 100 - 1, b % 100)) / 864e5);
+const wdOf = k => new Date(Date.UTC(Math.floor(k / 10000), Math.floor(k / 100) % 100 - 1, k % 100)).getUTCDay();
+export const squadOf = s => {
+  const q = s && s.type === 'match' && s.squad;
+  return (q && typeof q === 'object' && Array.isArray(q.p) && typeof q.t === 'number' && !q.off && q.meet) ? q : null;
+};
+// Published, old enough, kick-off still ahead
+function squadLive(s, season, now) {
+  const q = squadOf(s);
+  if (!q || now.ts - q.t < SQUAD_DELAY) return null;
+  const k = sortKey(s.date, season), sm = startMin(s);
+  if (k < now.day || (k === now.day && sm != null && now.min >= sm)) return null;
+  return q;
+}
+export const squadPending = (sessions, season, now) => !quiet(now) && (sessions || []).some(s => !!squadLive(s, season, now));
+function forWord(k, today, date) {
+  const d = dayDiff(k, today);
+  if (d === 0) return 'für heute';
+  if (d === 1) return 'für morgen';
+  if (d > 1 && d < 7) return 'für ' + WD[wdOf(k)];
+  return 'für ' + String(date || '').replace(/\.?$/, '.');
+}
+function nextTraining(sessions, season, k) {
+  let best = null;
+  (sessions || []).forEach(x => {
+    if (!x || !x.date || x.type === 'match') return;
+    const kk = sortKey(x.date, season);
+    if (kk <= k || dayDiff(kk, k) > 14) return;
+    if (!best || kk < best.k || (kk === best.k && String(x.time || '') < String(best.s.time || ''))) best = { k: kk, s: x };
+  });
+  return best ? String(best.s.date).replace(/\.$/, '') + (best.s.time ? ', ' + best.s.time : '') : '';
+}
+export function planSquad({ sessions, players, season, now, owners, told }) {
+  const out = [];
+  if (quiet(now)) return out;
+  (sessions || []).forEach((s, si) => {
+    const q = squadLive(s, season, now);
+    if (!q) return;
+    const key = metaKey(s);
+    if (!key) return;
+    const k = sortKey(s.date, season), f = forWord(k, now.day, s.date), next = nextTraining(sessions, season, k);
+    const inB = 'Treffpunkt ' + q.meet + (q.where ? ', ' + q.where : '') + '.'
+      + (s.time ? ' Anstoß ' + s.time + (s.label ? ' gegen ' + s.label : '') + '.' : (s.label ? ' Gegen ' + s.label + '.' : ''));
+    const outB = (pre) => pre + (next ? ' Nächstes Training ' + next + '.' : '');
+    const sm = startMin(s);
+    const ttl = Math.max(600, (dayDiff(k, now.day) * 1440 + (sm != null ? sm : 24 * 60) - now.min) * 60);
+    const inSet = new Set(q.p), was = (told && told[key]) || {};
+    (players || []).forEach((p, pi) => {
+      if (!p || !p.confirmToken || !afterJoin(p, s, season)) return;
+      const owner = ownerOf(p.confirmToken);
+      if (!owners.has(owner)) return;
+      const v = st(p, si);
+      if (v === 0 || v === 2) return;
+      const isIn = inSet.has(p.name), had = was[owner];
+      // Out: he confirmed — or he had been told he is in (taken out again)
+      const want = isIn ? 'in|' + q.meet + '|' + (q.where || '') : ((v === 4 || String(had || '').startsWith('in|')) ? 'out' : null);
+      if (!want || had === want) return;
+      let title, body;
+      if (isIn && !had) { title = 'Du bist im Kader ' + f; body = inB; }
+      else if (isIn && had === 'out') { title = 'Du bist jetzt im Kader ' + f; body = inB; }
+      else if (isIn) { title = 'Neuer Treffpunkt ' + f; body = inB; }
+      else if (!had) { title = 'Kader ' + f + ' steht'; body = outB('Diesmal bist du nicht dabei.'); }
+      else { title = 'Änderung im Kader ' + f; body = outB('Diesmal bist du doch nicht dabei.'); }
+      out.push({ owner, pi, kind: 'squad', key, state: want, day: k, ttl, payload: {
+        title, body, url: SITE + '?p=' + encodeURIComponent(p.confirmToken) + '&do=week', tag: 'squad-' + key } });
+    });
+  });
+  return out;
+}
