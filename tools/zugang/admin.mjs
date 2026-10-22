@@ -15,22 +15,22 @@ const name = String(process.env.NAME_IN || '').trim().slice(0, 60) || 'Admin';
 const fail = m => { console.log('::error title=Zugang::' + m); process.exitCode = 1; };
 
 if (!sa) { console.log('FIREBASE_SERVICE_ACCOUNT fehlt.'); process.exit(0); }
-if (!/^[A-Za-z0-9]{10,128}$/.test(uid)) { fail('Die Konto-ID sieht nicht richtig aus (nur Buchstaben und Ziffern).'); process.exit(); }
+if (!/^[A-Za-z0-9]{10,128}$/.test(uid)) { fail('ID аккаунта выглядит неправильно (только буквы и цифры).'); process.exit(); }
 
 admin.initializeApp({ credential: admin.credential.cert(JSON.parse(sa)), databaseURL: DB_URL });
 const db = admin.database();
 const short = uid.slice(0, 6) + '…';
 try {
   try { await admin.auth().getUser(uid); }
-  catch (e) { fail('Kein Konto mit der ID ' + short + ' – zuerst in der App mit Google oder E-Mail anmelden.'); throw null; }
+  catch (e) { fail('Нет аккаунта с ID ' + short + ' – сначала войти в приложении через Google или почту.'); throw null; }
 
   const m = (await db.ref('fcf_members/' + uid).get()).val();
   if (m && m.code) {
     const inv = (await db.ref('fcf_invites/' + m.code).get()).val();
     if (inv && inv.used === uid && !inv.revoked) {
-      if (inv.role === 'admin') { console.log('::notice title=Zugang::Konto ' + short + ' ist schon Admin.'); throw null; }
+      if (inv.role === 'admin') { console.log('::notice title=Zugang::Аккаунт ' + short + ' уже админ.'); throw null; }
       await db.ref('fcf_invites/' + m.code + '/role').set('admin');
-      console.log('::notice title=Zugang::Konto ' + short + ' hatte Zugang als Trainer, ist jetzt Admin.');
+      console.log('::notice title=Zugang::У аккаунта ' + short + ' был доступ тренера, теперь он админ.');
       throw null;
     }
   }
@@ -40,9 +40,9 @@ try {
     ['fcf_invites/' + code]: { role: 'admin', name, trainerId: '', t: now, exp: now, by: 'github', byName: 'Einrichtung', used: uid, usedAt: now },
     ['fcf_members/' + uid]: { code, t: now, name },
   });
-  console.log('::notice title=Zugang::Admin-Zugang für ' + name + ' (Konto ' + short + ') angelegt. In der App „Weiter“ tippen oder neu laden.');
+  console.log('::notice title=Zugang::Доступ админа для ' + name + ' (аккаунт ' + short + ') создан. В приложении обновить страницу и нажать „Weiter“.');
 } catch (e) {
-  if (e) fail('Fehler: ' + (e.message || e));
+  if (e) fail('Ошибка: ' + (e.message || e));
 } finally {
   await admin.app().delete();
 }
