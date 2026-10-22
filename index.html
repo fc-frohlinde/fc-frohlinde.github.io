@@ -3820,6 +3820,7 @@ body.design-heute .hx-att.dark .hx-seg{background:rgba(255,255,255,.14);}
 body.design-heute .hx-att.dark .s-open{background:rgba(255,255,255,.32);}
 body.design-heute .hx-att.dark .hx-lg{color:#DCE5F5;}
 body.design-heute .hx-att.dark .hx-lg b{color:#fff;}
+body.design-heute .hx-att.dark :is(button.hx-lg,button.hx-att-n):hover{background:rgba(255,255,255,.1);}
 body.design-heute .hx-a-match .hx-btns{margin-top:auto;flex-wrap:nowrap;}
 body.design-heute .hx-a-match .hx-btn{flex:1 1 auto;justify-content:center;padding:0 12px;}
 /* last week: bars on a 0–100 scale, value above each */
@@ -6578,13 +6579,16 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.19'; // v1.2.19: Legende geordnet
-const APP_VERSION_LABEL='1.2.19';
+const APP_VERSION='1.2.20'; // v1.2.20: Übersicht — Spielkarte wie Terminkarte
+const APP_VERSION_LABEL='1.2.20';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792694606810; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792695372715; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.20',date:'22.10.2026',title:'Übersicht',items:[
+    {icon:'📊',title:'Spielkarte zählt wie die Terminkarte',desc:'Die Karte „Nächstes Spiel“ fasste Absagen und Entschuldigungen als „fehlen“ zusammen – vor dem Spiel fehlt aber noch niemand. Jetzt steht dort wie beim nächsten Termin „abgesagt · entschuldigt · offen“, in denselben Farben, und ein Tipp öffnet die Gruppe im Spiel. Gruppen mit 0 (außer „offen“) werden weggelassen.'},
+  ]},
   {version:'1.2.19',date:'22.10.2026',title:'Legende',items:[
     {icon:'ⓘ',title:'Geordnet nach dem, was zählt',desc:'Die Legende der Anwesenheit (ⓘ) zeigt die Buchstaben so wie in der Tabelle und ordnet sie: was für die Anwesenheit zählt (A, F, E), was nicht (M, ?, N) und was die Tabelle sonst markiert. Mit „Nicht im Kader“.'},
   ]},
@@ -25165,6 +25169,22 @@ function _hxTag(isM,title,skv){
   return title===kind?when.charAt(0).toUpperCase()+when.slice(1):kind+' · '+when;
 }
 // Segmented attendance bar: parts [[cls,n,…],…] of a squad of `total`
+// Attendance as one bar: the parts add up to the squad, the legend opens each
+// group. The same for both cards on the Übersicht (1.2.20) — the match card
+// used to lump "abgesagt" and "entschuldigt" together as "fehlen", which
+// before a match is the wrong word and hid who had excused himself. Empty
+// groups are left out, except "offen": 0 offen is news (everyone answered).
+function _hxAttHtml(c,roll,si,cls){
+  const parts=roll
+    ?[['ok',c.present,'anwesend',1],['bad',c.no,'fehlend',0],['warn',c.exc,'entschuldigt',2],['open',c.open,'offen',4]]
+    :[['ok',c.yes,'zugesagt',4],['bad',c.no,'abgesagt',0],['warn',c.exc,'entschuldigt',2],['open',c.open,'offen',3]];
+  const lead=roll?c.present:c.yes;
+  return `<div class="hx-att${cls?' '+cls:''}">
+        <button type="button" class="hx-att-n" onclick="openSessFromMain(${si});_ssxFocus(${parts[0][3]})"><b>${lead}</b><span>von ${c.total} ${roll?'anwesend':'zugesagt'}</span></button>
+        ${_hxSeg(parts,c.total)}
+        <div class="hx-legend">${parts.slice(1).filter(x=>x[1]||x[0]==='open').map(x=>`<button type="button" class="hx-lg" onclick="openSessFromMain(${si});_ssxFocus(${x[3]})"><i class="s-${x[0]}"></i><b>${x[1]}</b>${x[2]}</button>`).join('')}</div>
+      </div>`;
+}
 function _hxSeg(parts,total){
   const t=Math.max(1,total);
   return `<div class="hx-seg" role="img" aria-label="${parts.map(x=>x[1]+' '+(x[2]||'')).join(', ')}">${parts.filter(x=>x[1]>0).map(x=>`<i class="s-${x[0]}" style="flex:${x[1]/t}"></i>`).join('')}</div>`;
@@ -25254,16 +25274,7 @@ function hxRender(){
     if(s.location)meta.push(s.location);
     // The time range already says how long it is
     if(s.duration&&!s.time)meta.push(s.duration+' Minuten');
-    // Attendance as one bar: the parts add up to the squad, the legend opens each group
-    const parts=roll
-      ?[['ok',c.present,'anwesend',1],['bad',c.no,'fehlend',0],['warn',c.exc,'entschuldigt',2],['open',c.open,'offen',4]]
-      :[['ok',c.yes,'zugesagt',4],['bad',c.no,'abgesagt',0],['warn',c.exc,'entschuldigt',2],['open',c.open,'offen',3]];
-    const lead=roll?c.present:c.yes;
-    const att=`<div class="hx-att">
-        <button type="button" class="hx-att-n" onclick="openSessFromMain(${fi});_ssxFocus(${parts[0][3]})"><b>${lead}</b><span>von ${c.total} ${roll?'anwesend':'zugesagt'}</span></button>
-        ${_hxSeg(parts,c.total)}
-        <div class="hx-legend">${parts.slice(1).filter(x=>x[1]||x[0]!=='bad').map(x=>`<button type="button" class="hx-lg" onclick="openSessFromMain(${fi});_ssxFocus(${x[3]})"><i class="s-${x[0]}"></i><b>${x[1]}</b>${x[2]}</button>`).join('')}</div>
-      </div>`;
+    const att=_hxAttHtml(c,roll,fi,'');
     let btns='';
     if(roll)btns+=`<button type="button" class="hx-btn primary" onclick="rcOpen(${fi})">${hxIcon('check')}Anwesenheit erfassen</button>`;
     else btns+=`<button type="button" class="hx-btn primary" onclick="openSessFromMain(${fi})">Wer kommt?</button>`;
@@ -25297,8 +25308,7 @@ function hxRender(){
     html+=`<section class="hx-card${isM?' hx-dark':' hx-next'} hx-a-match" aria-label="${isM?'Nächstes Spiel':'Danach'}">
       <span class="hx-meta"><span class="hx-mpre">${isM?'Nächstes Spiel':'Danach'} · </span>${esc(w.charAt(0).toUpperCase()+w.slice(1))}${s.time?', '+esc(s.time):''}${isM&&s.homeAway?' · '+(s.homeAway==='home'?'Heimspiel':'auswärts'):''}</span>
       <h3 class="hx-h2 hx-match-t">${esc(isM?(s.label||'Spiel'):(s.focus||'Training'))}</h3>
-      <div class="hx-att${isM?' dark':''}"><div class="hx-att-n"><b>${c.yes}</b><span>von ${c.total} zugesagt</span></div>${_hxSeg([['ok',c.yes,'zugesagt'],['bad',c.no+c.exc,'fehlen'],['open',c.open,'offen']],c.total)}
-        <div class="hx-legend"><span class="hx-lg static"><i class="s-bad"></i><b>${c.no+c.exc}</b>fehlen</span><span class="hx-lg static"><i class="s-open"></i><b>${c.open}</b>offen</span></div></div>
+      ${_hxAttHtml(c,_isSessRollCallTime(si2),si2,isM?'dark':'')}
       ${isM?(()=>{let has=false;try{const k=_mlKey(UI.currentTeam,season,si2);const lu=G.matchLineups&&G.matchLineups[k];has=!!(lu&&lu.slots&&Object.values(lu.slots).some(v=>v!=null&&v!==''));}catch(e){}
         return `<div class="hx-lu${has?' on':''}">${has?'Aufstellung steht':'Noch keine Aufstellung'}</div>`;})():''}
       <div class="hx-btns">${isM?`<button type="button" class="hx-btn primary" onclick="openSessFromMain(${si2})">Wer kommt?</button><button type="button" class="hx-btn dark ghost" onclick="openLineupPlanner(${si2})" title="Aufstellung planen">Aufstellung</button>`:`<button type="button" class="hx-btn" onclick="openSessFromMain(${si2})">Wer kommt?</button>${typeof _tplHomeBtn==='function'?_tplHomeBtn(si2):''}`}</div>
