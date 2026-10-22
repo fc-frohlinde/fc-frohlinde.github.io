@@ -893,6 +893,17 @@ input[type="date"]{cursor:pointer;}
 .pl-btns{display:flex;gap:3px;}
 .pl-btn{padding:3px 7px;border-radius:5px;border:none;cursor:pointer;font-size:.66rem;font-weight:600;}
 .full-table td.st-pc{white-space:nowrap;}
+.ics-sub{background:var(--hx-card2,#EEF4FC);border:1px solid var(--hx-line,#D6E2F2);border-radius:12px;padding:12px 14px;margin:0 0 16px;}
+.ics-sub[hidden]{display:none;}
+.ics-sub-h{font-weight:700;font-size:.95rem;color:var(--hx-ink,var(--bd));display:flex;align-items:center;gap:8px;}
+.ics-sub-h span{font-size:.68rem;font-weight:700;color:#1E6B46;background:#D9F0E3;border-radius:999px;padding:2px 8px;}
+.ics-sub-p{margin:6px 0 10px;font-size:.8rem;line-height:1.45;color:var(--hx-muted,var(--gm));}
+.ics-sub-btns{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;}
+.ics-sub-btns .btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;min-height:38px;}
+.ics-sub-url{width:100%;box-sizing:border-box;font-size:.72rem;padding:6px 8px;margin:0 0 6px;color:var(--hx-muted,var(--gm));}
+.ics-sub-note{margin:4px 0 0;font-size:.74rem;line-height:1.45;color:var(--hx-muted,var(--gm));}
+.ics-sub-note.warn{color:#8A4B00;}
+.ics-once-h{font-weight:700;font-size:.85rem;color:var(--hx-ink,var(--bd));margin:0 0 4px;}
 .full-table td.st-gv{white-space:nowrap;font-variant-numeric:tabular-nums;}
 .full-table td.st-gv small{margin:0 5px;color:var(--hx-muted,var(--gm));}
 .full-table td.st-pc b{font-weight:700;}
@@ -6593,13 +6604,17 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.25'; // v1.2.25: Eingewechselt erfassen
-const APP_VERSION_LABEL='1.2.25';
+const APP_VERSION='1.2.26'; // v1.2.26: Kalender abonnieren
+const APP_VERSION_LABEL='1.2.26';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792699459125; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792703076632; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.26',date:'22.10.2026',title:'Kalender abonnieren',items:[
+    {icon:'📅',title:'Termine im eigenen Kalender',desc:'Kalender → „⋯“ → „Kalender abonnieren“: Trainings, Spiele (mit Treffpunkt, sobald der Kader steht) und Termine der Mannschaft erscheinen in Google, Apple oder Outlook und ändern sich dort mit – verschobene Trainings rücken, abgesagte verschwinden. Ohne Namen von Spielern. Für Trainer mit eigenem Konto.'},
+    {icon:'🛠',title:'Export repariert',desc:'„Einmal herunterladen“ (.ics) enthielt keine Trainings und Spiele mehr – nur sonstige Termine. Jetzt wieder alle, mit Ort.'},
+  ]},
   {version:'1.2.25',date:'22.10.2026',title:'Eingewechselt',items:[
     {icon:'🔁',title:'Wer reinkam',desc:'Nach dem Spiel unter „Anwesenheit erfassen → Einsatz“: oben stehen alle Anwesenden, die nicht in der Startelf waren – antippen, wer eingewechselt wurde. Geht, wenn die Aufstellung des Spiels gespeichert ist. Bei jedem steht dann „Startelf“, „eingewechselt“ oder „nicht eingesetzt“.'},
     {icon:'📊',title:'In der Statistik und im Profil',desc:'„Alle Spieler“ zeigt neben „Startelf“ die Spalte „Eingew.“, das Spielerprofil „7× Startelf · 2× eingewechselt“.'},
@@ -14240,12 +14255,16 @@ function _icsPad(n){return String(n).padStart(2,'0');}
 function _icsFmtDate(d){return d.getFullYear()+_icsPad(d.getMonth()+1)+_icsPad(d.getDate());}
 function _icsFmtDT(d){return _icsFmtDate(d)+'T'+_icsPad(d.getHours())+_icsPad(d.getMinutes())+'00';}
 function _icsEsc(s){return String(s||'').replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\n/g,'\\n');}
+// "Di 27.10" (sessions, team dates: the year comes from the season) or "27.10.2026"
 function _icsParseDispDate(disp){
   const p=String(disp||'').split('.');
-  if(p.length!==3)return null;
-  const d=parseInt(p[0]),m=parseInt(p[1]),y=parseInt(p[2]);
-  if(!d||!m||!y)return null;
-  return {d,m,y};
+  if(p.length===3&&/^\d{4}$/.test(p[2].trim())){
+    const d=parseInt(p[0].replace(/\D/g,'')),m=parseInt(p[1]),y=parseInt(p[2]);
+    return (d&&m&&y)?{d,m,y}:null;
+  }
+  const k=(typeof _dbSortKey==='function')?_dbSortKey(String(disp||''),UI.currentSeason):99999999;
+  if(!k||k===99999999)return null;
+  return {y:Math.floor(k/10000),m:Math.floor(k/100)%100,d:k%100};
 }
 function _icsFold(line){
   if(line.length<=75)return line;
@@ -14258,7 +14277,63 @@ function _icsFold(line){
   if(rest)out+='\r\n '+rest;
   return out;
 }
-function openExportIcs(){openM('moExportIcs');}
+function openExportIcs(){openM('moExportIcs');try{icsSubRender();}catch(e){}}
+// Kalender-Abo (1.2.26): the team's dates as a feed the trainers' calendars
+// subscribe to. The reminders job builds it and publishes it to a secret
+// address (tools/erinnerungen/kalender.mjs); the address is in fcf_cal, which
+// only members (trainers with an account) may read. Not for players.
+function _calSlug(t){return String(t||'').normalize('NFKD').replace(/[^A-Za-z0-9]+/g,'_').replace(/^_+|_+$/g,'')||'team';}
+let _icsSubSeq=0,_icsSubUrl='';
+async function icsSubRender(){
+  const box=document.getElementById('icsSub');if(!box)return;
+  const ed=typeof canEdit==='function'&&canEdit()&&!(typeof isPlayerMode==='function'&&isPlayerMode());
+  box.hidden=!ed;if(!ed)return;
+  const e=escapeHtml,my=++_icsSubSeq;
+  const head='<div class="ics-sub-h">Abonnieren<span>empfohlen</span></div>'
+    +'<p class="ics-sub-p">Trainings, Spiele mit Treffpunkt und Termine der Mannschaft erscheinen in deinem Kalender und ändern sich dort mit. Ohne Namen von Spielern.</p>';
+  const say=t=>{box.innerHTML=head+'<p class="ics-sub-note">'+t+'</p>';};
+  if(!CU||!CU.acct){say('Das geht mit deinem eigenen Konto (Google oder E-Mail): Einstellungen → Konto.');return;}
+  say('Wird geladen …');
+  let url=null,why='';
+  try{
+    if(typeof _acctReady==='function')await _acctReady();
+    const user=typeof _acctCurrent==='function'?await _acctCurrent(10000):null;
+    if(!user)why='login';
+    else{
+      const v=(await fbDb.ref('fcf_cal/'+_calSlug(UI.currentTeam)).once('value')).val();
+      url=(v&&typeof v.url==='string'&&/^https:\/\/gist\.githubusercontent\.com\/[\w.-]+\/\w+\/raw\/[\w.-]+$/.test(v.url))?v.url:null;
+      if(!url)why='none';
+    }
+  }catch(err){why=/permission|denied/i.test(String((err&&(err.code||err.message))||err))?'rules':'net';}
+  if(my!==_icsSubSeq)return;
+  let st=null;
+  try{st=(await fbDb.ref('fcf_push/status/cal').once('value')).val();}catch(err){}
+  if(my!==_icsSubSeq)return;
+  if(why==='login'){say('Bitte melde dich mit deinem Konto neu an.');return;}
+  if(why==='rules'){say('Noch nicht freigeschaltet: Die Firebase-Regeln für das Abo müssen einmal veröffentlicht werden (Admin).');return;}
+  if(why==='net'){say('Gerade keine Verbindung. Bitte später noch einmal.');return;}
+  if(why==='none'){
+    if(st&&st.off)say('Noch nicht eingerichtet: Der Admin legt einmal den Schlüssel KALENDER_TOKEN an (GitHub).');
+    else if(st&&st.err)say('Konnte noch nicht angelegt werden (GitHub antwortet '+e(String(st.err))+'). Der Schlüssel KALENDER_TOKEN ist vermutlich falsch.');
+    else say('Wird gerade angelegt – in spätestens 15 Minuten hier.');
+    return;
+  }
+  _icsSubUrl=url;
+  const wc=url.replace(/^https:/,'webcal:');
+  box.innerHTML=head
+    +'<div class="ics-sub-btns">'
+    +'<a class="btn bp" href="https://calendar.google.com/calendar/r?cid='+encodeURIComponent(wc)+'" target="_blank" rel="noopener">In Google Kalender</a>'
+    +'<a class="btn bs" href="'+e(wc)+'">Apple Kalender / iPhone</a>'
+    +'<button type="button" class="btn bs" onclick="icsSubCopy()">Link kopieren</button></div>'
+    +'<input class="ics-sub-url" id="icsSubUrl" readonly value="'+e(url)+'" aria-label="Adresse des Kalenders" onfocus="this.select()">'
+    +(st&&st.err?'<p class="ics-sub-note warn">Zuletzt nicht aktualisiert (GitHub antwortet '+e(String(st.err))+') – Schlüssel KALENDER_TOKEN prüfen.</p>':'')
+    +'<p class="ics-sub-note">Google holt Änderungen alle paar Stunden, das iPhone meist schneller – für Kurzfristiges bleibt die App maßgeblich. Den Link nicht weitergeben: wer ihn hat, sieht alle Termine.</p>';
+}
+async function icsSubCopy(){
+  if(!_icsSubUrl)return;
+  try{await navigator.clipboard.writeText(_icsSubUrl);if(typeof showSaveFlash==='function')showSaveFlash('✓ Link kopiert');}
+  catch(err){const i=document.getElementById('icsSubUrl');if(i){i.focus();i.select();}}
+}
 function generateICS(opts){
   const D=cd();
   if(!D)return null;
@@ -14301,7 +14376,8 @@ function generateICS(opts){
       if(isMatch&&s.homeAway)desc.push(s.homeAway==='home'?'Heimspiel':'Auswärtsspiel');
       if(s.note)desc.push(s.note);
       if(desc.length)lines.push(_icsFold('DESCRIPTION:'+_icsEsc(desc.join('\n'))));
-      if(isMatch&&s.homeAway==='home')lines.push('LOCATION:'+_icsEsc('Heim'));
+      if(s.location)lines.push(_icsFold('LOCATION:'+_icsEsc(s.location)));
+      else if(isMatch&&s.homeAway==='home')lines.push('LOCATION:'+_icsEsc('Heim'));
       else if(isMatch&&s.homeAway==='away')lines.push('LOCATION:'+_icsEsc('Auswärts'));
       lines.push('CATEGORIES:'+(isMatch?'Spiel,Fußball':'Training,Fußball'));
       lines.push('END:VEVENT');
@@ -24551,7 +24627,7 @@ function calMoreMenu(btn,e){
     ed?{ic:'plan',label:'Saisonplan erstellen',sub:'Trainings und Spiele auf einmal',fn:()=>openGenSch()}:null,
     ed?{ic:'clock',label:'Trainingszeiten ändern',sub:'Ab einem Datum: Tage, Uhrzeit, Ort',fn:()=>openResched()}:null,
     ed?{ic:'pause',label:'Trainingspause',sub:'Trainings in einem Zeitraum absagen',fn:()=>openPause()}:null,
-    {ic:'exp',label:'Exportieren',sub:'In Google- oder Apple-Kalender',fn:()=>openExportIcs()},
+    {ic:'exp',label:ed?'Kalender abonnieren':'Exportieren',sub:ed?'Google, Apple, Outlook – ändert sich mit':'In Google- oder Apple-Kalender',fn:()=>openExportIcs()},
   ].filter(Boolean));
 }
 
@@ -36159,10 +36235,12 @@ _pubCleanupSchedule();
 <!-- ICS Export Options --><div class="mo" id="moExportIcs" style="z-index:855;"><div class="mob" style="width:440px;max-width:95vw;position:relative;">
   <button class="mob-close-x" onclick="closeM('moExportIcs')" aria-label="Schließen">✕</button>
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-right:32px;">
-    <h3 style="flex:1;margin:0;color:var(--bd);">📥 Kalender exportieren</h3>
+    <h3 style="flex:1;margin:0;color:var(--bd);">📅 Kalender</h3>
   </div>
+  <div class="ics-sub" id="icsSub" hidden></div>
+  <div class="ics-once-h">Einmal herunterladen</div>
   <p class="note" style="margin:0 0 14px;font-size:.78rem;line-height:1.5;color:var(--gm);">
-    Exportiert die Saison-Termine als <b>.ics-Datei</b>, die du in Google Calendar, Apple Kalender oder Outlook importieren kannst.
+    Die Saison-Termine als <b>.ics-Datei</b> zum Importieren. Spätere Änderungen kommen dort nicht an.
   </p>
   <div style="background:#f7f9fc;border-radius:8px;padding:10px 12px;margin-bottom:14px;">
     <label style="display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer;font-size:.85rem;color:var(--gd);">

@@ -240,6 +240,10 @@
         }
       }
     },
+    "fcf_cal": {
+      ".read": "(auth != null && root.child('fcf_members/'+auth.uid+'/code').isString() && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists())",
+      ".write": false
+    },
     "$other": {
       ".read": false,
       ".write": false

@@ -4,6 +4,9 @@
 # to the players who switched reminders on. Code: tools/erinnerungen.
 # Needs the repository secret FIREBASE_SERVICE_ACCOUNT; without it the run
 # ends at once without error.
+# Необязательный секрет KALENDER_TOKEN (токен GitHub только с правом «gist»):
+# подписка тренеров на календарь (tools/erinnerungen/kalender.mjs). Без него
+# календарь просто не публикуется.
 name: Erinnerungen
 
 on:
@@ -46,3 +49,4 @@ jobs:
         working-directory: tools/erinnerungen
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          KALENDER_TOKEN: ${{ secrets.KALENDER_TOKEN }}

@@ -155,6 +155,12 @@ rules = {
         "$other": {".validate": False}
       }
     },
+    # Kalender-Abo (1.2.26): the address of each team's calendar feed. Only
+    # members (trainers with an account) read it; only the job writes it.
+    "fcf_cal": {
+      ".read": IS_MEMBER,
+      ".write": False
+    },
     "$other": {".read": False, ".write": False}
   }
 }

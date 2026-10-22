@@ -98,6 +98,15 @@ await cannot('отозванному отменить отзыв', req('DELETE',
 await can('админу удалить запись участника', req('DELETE', 'fcf_members/uRole', undefined, 'uAdmin'));
 await cannot('админу записать мусор в приглашение', req('PUT', 'fcf_invites/OPENCODE000000000001/foo', 1, 'uAdmin'));
 
+// ── Kalender-Abo: the feed address, members only ──
+await req('PUT', 'fcf_cal', { U19: { url: 'https://gist.githubusercontent.com/x/y/raw/f.ics', team: 'U19', t: now } }, 'owner');
+await can('тренеру с аккаунтом читать адрес календаря', req('GET', 'fcf_cal/U19', undefined, 'uTrainer'));
+await can('админу читать адрес календаря', req('GET', 'fcf_cal', undefined, 'uAdmin'));
+await cannot('без входа читать адрес календаря', req('GET', 'fcf_cal/U19'));
+await cannot('чужому аккаунту (не участник) читать адрес календаря', req('GET', 'fcf_cal/U19', undefined, 'uStranger'));
+await cannot('отозванному читать адрес календаря', req('GET', 'fcf_cal/U19', undefined, 'uGone'));
+await cannot('админу записать адрес календаря (только джоб)', req('PUT', 'fcf_cal/U19/url', 'https://evil', 'uAdmin'));
+
 // ── what stays as it is until the lock (Teil 3) ──
 await can('без входа читать fcf_data (пока открыто)', req('GET', 'fcf_data/version'));
 await can('читать push-ключ', req('GET', 'fcf_push/pub'));

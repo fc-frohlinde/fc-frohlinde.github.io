@@ -16,13 +16,16 @@
 //                                   squad of a match ('in|HH:MM|where', 'out');
 //                                   _d = day of the match, gone two days after
 //   fcf_push_keys/vapid             key pair — no rule grants clients access
+//   fcf_push/cal/<team>, fcf_cal/<team>  the calendar feed (kalender.mjs)
 //
 // db: {get(path), set(path,v), remove(path)}; push: web-push or a stand-in.
 import { decode, pathKey, berlin, plan, anyDue, quiet, addDays, newsFresh, planNews, squadPending, planSquad } from './lib.mjs';
 import { trainerOwner, allowed, kindsOf, needsPlayers, birthdays, rollCall, cancellations, lineup,
   messages, machinery, BDAY_DAY, BDAY_EVE, ATT_FROM } from './trainer.mjs';
+import { publishCalendars } from './kalender.mjs';
 
-export async function round({ db, push, ts = Date.now(), log = console.log, dry = false }) {
+// cal: {token, fetch} for the calendar feed (no token: no feed)
+export async function round({ db, push, ts = Date.now(), log = console.log, dry = false, cal = {} }) {
   const now = berlin(ts);
   let sent = 0, errors = 0, gone = 0, nDev = 0;
   try {
@@ -202,6 +205,12 @@ export async function round({ db, push, ts = Date.now(), log = console.log, dry 
       }
     }
 
+    // Calendar feed: at any time of day; only what changed is written
+    let calSt = prev.cal || null;
+    try {
+      calSt = await publishCalendars({ db, now, token: cal.token, fetchFn: cal.fetch || globalThis.fetch, load, log, dry, prev: prev.cal || {} });
+    } catch (e) { errors++; log('Kalender:', String((e && e.message) || e).slice(0, 200)); calSt = Object.assign({}, prev.cal || {}, { err: 1 }); }
+
     // Housekeeping: the sent log keeps a week; what players were told about a
     // squad goes two days after the match (once a day is enough)
     const days = Object.keys((await db.get('fcf_push/sent')) || {});
@@ -214,7 +223,7 @@ export async function round({ db, push, ts = Date.now(), log = console.log, dry 
 
     if (!dry) await db.set('fcf_push/status', {
       t: ts, day: now.day, sent: (prev.day === now.day ? (prev.sent || 0) : 0) + sent,
-      err: errors, gone, devices: nDev, v: 1 });
+      err: errors, gone, devices: nDev, v: 1, cal: calSt });
     log(`Runde fertig: ${sent} gesendet, ${errors} Fehler, ${gone} abgemeldet, ${nDev} Geräte`);
     return { sent, errors, gone, devices: nDev };
   } catch (e) {

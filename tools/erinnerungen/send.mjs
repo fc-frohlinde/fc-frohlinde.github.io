@@ -21,7 +21,8 @@ const db = {
   remove: p => ref(p).remove(),
 };
 try {
-  await round({ db, push: webpush, dry: process.argv.includes('--dry') });
+  // KALENDER_TOKEN: GitHub token with only the "gist" scope, for the calendar feed
+  await round({ db, push: webpush, dry: process.argv.includes('--dry'), cal: { token: process.env.KALENDER_TOKEN || '', fetch: globalThis.fetch } });
 } catch (e) {
   process.exitCode = 1;
 } finally {

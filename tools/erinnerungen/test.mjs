@@ -1,6 +1,7 @@
 // Erinnerungen job: rounds against an in-memory database. node test_round.mjs
 import { round } from './round.mjs';
 import { decode, berlin, ownerOf, plan, sortKey } from './lib.mjs';
+import { buildIcs, icsHash, publishCalendars, seasonOf, slug } from './kalender.mjs';
 
 let fails = 0;
 const ok = (c, m) => { console.log((c ? 'ok  ' : 'FAIL') + ' ' + m); if (!c) fails++; };
@@ -326,5 +327,76 @@ function world() {
   push = makePush();
   await round({ db: db4, push, ts: Date.UTC(2026, 9, 24, 6, 7), log: q });       // Sa 8:07
   ok(push.calls.length === 4 && push.calls.some(c => c.p.title === 'Du bist im Kader für morgen'), 'squad at night: the next morning, "für morgen" (' + push.calls.length + ')');
+}
+// ── calendar feed (kalender.mjs) ──
+{
+  ok(seasonOf(20261022) === '2026/27' && seasonOf(20270630) === '2026/27' && seasonOf(20270701) === '2027/28', 'calendar: season of a day');
+  ok(slug('U19') === 'U19' && slug('U 17/2') === 'U_17_2', 'calendar: team key');
+  const now = berlin(Date.UTC(2026, 9, 22, 18, 0));
+  const sess = [
+    { date: 'So 16.08', type: 'match', time: '13:00', label: 'Alt' },                       // older than 30 days: not in the feed
+    { date: 'Di 20.10', type: 'training', time: '18:30', duration: 90, focus: 'Umschalten', location: 'Kunstrasen' },
+    { date: 'So 25.10', type: 'match', time: '13:00', label: 'SV Brackel', homeAway: 'away', location: 'Sportpark Brackel',
+      squad: { p: ['Max Müller'], out: [], meet: '11:30', where: 'Parkplatz, Frohlinde', t: 1, by: 'Artem' } },
+    { date: 'Do 29.10', type: 'training' },                                                   // no time: all day
+  ];
+  const evs = [{ id: 'cev_1', date: 'Fr 30.10', time: '19:00', name: 'Mannschaftsabend', note: 'Pizzeria', players: [1, 2] }];
+  const ics = buildIcs({ team: 'U19', season: '2026/27', sessions: sess, events: evs, now });
+  const lines = ics.split('\r\n');
+  ok(ics.startsWith('BEGIN:VCALENDAR\r\n') && ics.endsWith('END:VCALENDAR\r\n') && !/[^\r]\n/.test(ics), 'calendar: CRLF lines, begin and end');
+  ok(lines.every(l => Buffer.byteLength(l, 'utf8') <= 75), 'calendar: no line over 75 octets');
+  ok(ics.includes('X-WR-CALNAME:FC Frohlinde U19') && ics.includes('TZID:Europe/Berlin') && ics.includes('REFRESH-INTERVAL;VALUE=DURATION:PT1H'), 'calendar: name, time zone, refresh');
+  ok(!ics.includes('Alt'), 'calendar: older than 30 days left out');
+  const unf = ics.replace(/\r\n /g, '');
+  ok(unf.includes('SUMMARY:Training · Umschalten') && unf.includes('DTSTART;TZID=Europe/Berlin:20261020T183000') && unf.includes('DTEND;TZID=Europe/Berlin:20261020T200000') && unf.includes('LOCATION:Kunstrasen'), 'calendar: a training');
+  ok(unf.includes('SUMMARY:Spiel gegen SV Brackel') && unf.includes('DTSTART;TZID=Europe/Berlin:20261025T130000') && unf.includes('DTEND;TZID=Europe/Berlin:20261025T144500')
+    && unf.includes('DESCRIPTION:Auswärtsspiel\\nAnstoß 13:00\\nTreffpunkt 11:30\\, Parkplatz\\, Frohlinde\\nFlutlicht: https://fc-frohlinde.github.io/'), 'calendar: a match with the meeting point, escaped: ' + (unf.match(/DESCRIPTION:Auswärts[^\r]*/) || [''])[0]);
+  ok(unf.includes('DTSTART;VALUE=DATE:20261029') && unf.includes('DTEND;VALUE=DATE:20261030'), 'calendar: no time → all day');
+  ok(unf.includes('SUMMARY:Mannschaftsabend') && unf.includes('DTSTART;TZID=Europe/Berlin:20261030T190000') && unf.includes('UID:ev-cev_1-U19@fc-frohlinde.github.io'), 'calendar: the team\'s other dates');
+  ok(!/Max Müller/.test(ics), 'calendar: no player names');
+  const later = buildIcs({ team: 'U19', season: '2026/27', sessions: sess, events: evs, now: berlin(Date.UTC(2026, 9, 22, 19, 0)) });
+  ok(icsHash(later) === icsHash(ics) && later !== ics, 'calendar: same dates, same hash (only the time stamp differs)');
+  // publishing
+  const fx = (responses) => { const calls = []; const f = async (url, o) => { calls.push({ url, method: o.method, body: o.body ? JSON.parse(o.body) : null, auth: o.headers.Authorization });
+    const r = responses.shift() || { status: 200, j: {} }; return { status: r.status, ok: r.status >= 200 && r.status < 300, json: async () => r.j }; }; f.calls = calls; return f; };
+  const mk = () => makeDb({ fcf_data: { teamList: ['U19'], db: { 'U19__2026__SL__27': { sessions: enc(sess) } }, calEvents: { 'U19__2026__SL__27': enc(evs) } } });
+  const ld = db => { const c = new Map(); return async (bk, what) => { if (!c.has(bk + what)) c.set(bk + what, decode(await db.get(`fcf_data/db/${bk.replace(/\//g, '__SL__')}/${what}`)) || []); return c.get(bk + what); }; };
+  const logs = [], lg = (...a) => logs.push(a.join(' '));
+  let db = mk(), f = fx([]);
+  let st = await publishCalendars({ db, now, token: '', fetchFn: f, load: ld(db), log: lg });
+  ok(st.off === 1 && f.calls.length === 0 && !(await db.get('fcf_cal/U19')), 'calendar: without a token nothing is published');
+  f = fx([{ status: 201, j: { id: 'g123secret', owner: { login: 'artem' } } }]);
+  st = await publishCalendars({ db, now, token: 'tok', fetchFn: f, load: ld(db), log: lg });
+  ok(f.calls.length === 1 && f.calls[0].method === 'POST' && f.calls[0].url === 'https://api.github.com/gists' && f.calls[0].body.public === false && f.calls[0].auth === 'Bearer tok'
+    && f.calls[0].body.files['fc-frohlinde-u19.ics'].content.includes('SUMMARY:Spiel gegen SV Brackel'), 'calendar: first time a secret gist is made');
+  const pub = await db.get('fcf_cal/U19');
+  ok(pub && pub.url === 'https://gist.githubusercontent.com/artem/g123secret/raw/fc-frohlinde-u19.ics' && pub.team === 'U19', 'calendar: the address for the members: ' + JSON.stringify(pub));
+  ok((await db.get('fcf_push/cal/U19')).gist === 'g123secret' && st.t === now.ts && st.n === 1, 'calendar: state kept for the job');
+  ok(!logs.join('\n').includes('g123secret') && !logs.join('\n').includes('gist.githubusercontent'), 'calendar: the log never shows the address');
+  f = fx([]);
+  await publishCalendars({ db, now: berlin(Date.UTC(2026, 9, 22, 18, 15)), token: 'tok', fetchFn: f, load: ld(db), log: lg });
+  ok(f.calls.length === 0, 'calendar: nothing changed → no call to GitHub');
+  const s2 = JSON.parse(JSON.stringify(sess)); s2[1].time = '19:00';
+  await db.set('fcf_data/db/U19__2026__SL__27/sessions', enc(s2));
+  f = fx([{ status: 200, j: { id: 'g123secret', owner: { login: 'artem' } } }]);
+  await publishCalendars({ db, now, token: 'tok', fetchFn: f, load: ld(db), log: lg });
+  ok(f.calls.length === 1 && f.calls[0].method === 'PATCH' && f.calls[0].url === 'https://api.github.com/gists/g123secret'
+    && f.calls[0].body.files['fc-frohlinde-u19.ics'].content.includes('20261020T190000'), 'calendar: a moved training updates the same gist');
+  s2[1].time = '18:00'; await db.set('fcf_data/db/U19__2026__SL__27/sessions', enc(s2));
+  f = fx([{ status: 404, j: {} }, { status: 201, j: { id: 'gNEW', owner: { login: 'artem' } } }]);
+  await publishCalendars({ db, now, token: 'tok', fetchFn: f, load: ld(db), log: lg });
+  ok(f.calls.map(c => c.method).join() === 'PATCH,POST' && (await db.get('fcf_cal/U19')).url.includes('/gNEW/'), 'calendar: gist deleted → a new one, new address');
+  s2[1].time = '17:00'; await db.set('fcf_data/db/U19__2026__SL__27/sessions', enc(s2));
+  f = fx([{ status: 401, j: { message: 'Bad credentials' } }, { status: 401, j: {} }]);
+  st = await publishCalendars({ db, now, token: 'bad', fetchFn: f, load: ld(db), log: lg });
+  ok(st.err === 401 && (await db.get('fcf_cal/U19')).url.includes('/gNEW/'), 'calendar: bad token → error noted, the old address stays');
+  // inside a round: status.cal
+  db = mk(); await db.set('fcf_push/subs', {});
+  f = fx([{ status: 201, j: { id: 'gR', owner: { login: 'artem' } } }]);
+  await round({ db, push: makePush(), ts: Date.UTC(2026, 9, 22, 18, 0), log: q, cal: { token: 'tok', fetch: f } });
+  const rs = await db.get('fcf_push/status');
+  ok(rs.cal && rs.cal.n === 1 && rs.cal.t > 0 && !rs.cal.err && (await db.get('fcf_cal/U19')).url.includes('/gR/'), 'calendar: in a round, status.cal: ' + JSON.stringify(rs.cal));
+  await round({ db, push: makePush(), ts: Date.UTC(2026, 9, 22, 18, 15), log: q });
+  ok((await db.get('fcf_push/status')).cal.off === 1, 'calendar: a round without a token says so');
 }
 console.log(fails ? fails + ' FAILED' : 'all passed');
