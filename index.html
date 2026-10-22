@@ -893,6 +893,19 @@ input[type="date"]{cursor:pointer;}
   color:var(--gm);margin-bottom:8px;}
 .legend-pop .li{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--gd);
   padding:3px 0;}
+.legend-pop{width:292px;max-width:calc(100vw - 16px);box-sizing:border-box;}
+.lg-sec+.lg-sec{margin-top:8px;padding-top:8px;border-top:1px solid var(--gl);}
+.lg-sh{font-size:.7rem;font-weight:700;color:var(--gm);margin:0 0 3px;}
+.legend-pop .li.lg-row,.lg-sec .li{align-items:flex-start;}
+.lg-t{display:flex;flex-direction:column;line-height:1.3;min-width:0;padding-top:1px;}
+.lg-t small{font-size:.68rem;font-weight:500;color:var(--gm);}
+.lg-c{flex-shrink:0;width:28px;height:20px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;
+  font:700 .72rem 'Barlow',sans-serif;box-sizing:border-box;}
+.lg-c.csq{border:1.5px dashed #AEBBD1;background:transparent !important;}
+.legend-pop .lg-c.csn{background:#DCE2EC !important;color:#4A5870 !important;}   /* the cell's tint is see-through: solid on a dark popover */
+.lg-c.lg-wk{background:#CDEBD9;color:#1E6B46;font-size:.66rem;}
+.lg-c.lg-ball{font-size:.78rem;}
+body.design-heute.hxk-dk .lg-c.lg-wk{background:color-mix(in srgb,#2FA36B 46%,var(--hk-card));color:#C9F2DA;}
 .legend-pop-hint{font-size:.68rem;color:var(--gm);line-height:1.5;margin-top:9px;
   padding-top:8px;border-top:1px solid var(--gl);}
 .toolbar #btn-legend{background:none;border:none;box-shadow:none;
@@ -5957,13 +5970,28 @@ if(window._fbBlocked){
 <div class="legend-bar" id="legendEl" style="display:none;"></div>
 <div class="legend-pop" id="legendPop">
   <div class="legend-pop-h">Legende</div>
-  <div class="li"><span class="ldot lda"></span>Anwesend (A)</div>
-  <div class="li"><span class="ldot ldf"></span>Fehlend (F)</div>
-  <div class="li"><span class="ldot lde"></span>Entschuldigt (E)</div>
-  <div class="li"><span class="ldot ldm"></span>Angemeldet (M)</div>
-  <div class="li"><span class="ldot ldq"></span>Ausstehend (?)</div>
-  <div class="li lg-mx"><span class="ldot ldwk"></span>Diese Woche</div>
-  <div class="li lg-mx"><span class="ldot ldnm"></span>Nächstes Spiel</div>
+  <!-- Grouped by what a letter does to the attendance figure — the question
+       a trainer actually has. Chips use the table's own classes, so letter
+       and colour are the same as in the cell. -->
+  <div class="lg-sec">
+    <div class="lg-sh">Zählt für die Anwesenheit</div>
+    <div class="li"><span class="lg-c csa">A</span><span class="lg-t">Anwesend</span></div>
+    <div class="li"><span class="lg-c csf">F</span><span class="lg-t">Fehlend<small>auch „Kann nicht“, bis ihr es entschuldigt</small></span></div>
+    <div class="li"><span class="lg-c cse">E</span><span class="lg-t">Entschuldigt<small>auf der Karte 1 je 10 Termine ohne Abzug</small></span></div>
+  </div>
+  <div class="lg-sec">
+    <div class="lg-sh">Zählt nicht</div>
+    <div class="li"><span class="lg-c csm">M</span><span class="lg-t">Zugesagt<small>nach dem Termin noch zu erfassen</small></span></div>
+    <div class="li"><span class="lg-c csq">?</span><span class="lg-t">Keine Antwort<small>nach dem Termin: nicht erfasst</small></span></div>
+    <div class="li"><span class="lg-c csn">N</span><span class="lg-t">Nicht im Kader<small>nur Spiele, setzt sich nach dem Anpfiff selbst</small></span></div>
+  </div>
+  <div class="lg-sec lg-mx">
+    <div class="lg-sh">In der Tabelle</div>
+    <div class="li"><span class="lg-c lg-x ldwk"></span><span class="lg-t">Diese Woche</span></div>
+    <div class="li"><span class="lg-c lg-x ldnm"></span><span class="lg-t">Nächstes Spiel</span></div>
+    <div class="li"><span class="lg-c lg-wk">3/3</span><span class="lg-t">Zugeklappte Woche<small>anwesend von erfasst</small></span></div>
+    <div class="li"><span class="lg-c lg-x lg-ball">⚽</span><span class="lg-t">Spiel</span></div>
+  </div>
   <div class="legend-pop-hint">Name oder Datum antippen → Details<br>Zelle antippen → Status ändern</div>
 </div>
 
@@ -6550,13 +6578,16 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.18'; // v1.2.18: Status Nicht im Kader
-const APP_VERSION_LABEL='1.2.18';
+const APP_VERSION='1.2.19'; // v1.2.19: Legende geordnet
+const APP_VERSION_LABEL='1.2.19';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792693686619; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792694606810; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.19',date:'22.10.2026',title:'Legende',items:[
+    {icon:'ⓘ',title:'Geordnet nach dem, was zählt',desc:'Die Legende der Anwesenheit (ⓘ) zeigt die Buchstaben so wie in der Tabelle und ordnet sie: was für die Anwesenheit zählt (A, F, E), was nicht (M, ?, N) und was die Tabelle sonst markiert. Mit „Nicht im Kader“.'},
+  ]},
   {version:'1.2.18',date:'22.10.2026',title:'Nicht im Kader',items:[
     {icon:'➖',title:'Eigener Status statt „Entschuldigt“',desc:'Wer zugesagt hat, aber nicht im Kader steht, bekommt nach dem Anpfiff von selbst „Nicht im Kader“ (N). Das zählt weder für noch gegen ihn: nicht in der Anwesenheit, nicht auf der Karte, die Serie läuft weiter. Bisher stand dort meist E – das verbrauchte sein „entschuldigt ohne Abzug“ und drückte die Quote, obwohl er bereit war.'},
     {icon:'✍',title:'Von Hand',desc:'Bei Spielen ohne veröffentlichten Kader und für frühere Spiele lässt sich N in der Tabelle, beim Erfassen und im Spiel-Fenster wählen. Wer nicht im Kader war und trotzdem mitgefahren ist, bekommt wie immer A.'},
