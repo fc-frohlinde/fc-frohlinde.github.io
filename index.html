@@ -2728,6 +2728,10 @@ body.design-heute .dow-btn.sel-m{background:var(--mc1);border-color:var(--mc1);c
   font-size:inherit;font-weight:400;text-transform:none;letter-spacing:normal;line-height:1.3;}
 .mob label.rs-chk input[type=checkbox]{width:18px;height:18px;margin:1px 0 0;padding:0;flex-shrink:0;accent-color:var(--hx-blue,var(--bm));}
 .rs-chk>span{font-size:.86rem;font-weight:600;color:var(--hx-ink,var(--gd));}
+.rs-msg{margin:6px 0 2px 28px;padding:9px 11px;border-radius:10px;background:var(--hx-card2,#EEF2F8);border-left:3px solid #F2C230;
+  display:flex;flex-direction:column;gap:2px;font-size:.8rem;line-height:1.4;color:var(--hx-ink,var(--gd));}
+.rs-msg[hidden]{display:none;}
+.rs-msg-l{font-size:.7rem;color:var(--hx-muted,var(--gm));}
 .rs-chk small{display:block;font-weight:500;font-size:.74rem;line-height:1.4;color:var(--hx-muted,var(--gm));margin-top:2px;}
 .rs-opt{font-weight:400;}
 /* ── Bewegung ────────────────────────────────────────────────
@@ -6675,13 +6679,18 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.7'; // v1.2.7: Zeit und Ort je Trainingstag
-const APP_VERSION_LABEL='1.2.7';
+const APP_VERSION='1.2.8'; // v1.2.8: Mitteilung zurücknehmen
+const APP_VERSION_LABEL='1.2.8';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792666285666; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792668616740; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.8',date:'22.10.2026',title:'Mitteilung an die Mannschaft: bewusst und zurücknehmbar',items:[
+    {icon:'☑️',title:'„Spieler benachrichtigen“ ist aus, bis du es einschaltest',desc:'Bei „Trainingszeiten ändern“ und „Trainingspause“. Eingeschaltet zeigt das Fenster genau die Nachricht, die die Spieler bekommen. Die Vorschau nennt bei jedem Training die neue Uhrzeit.'},
+    {icon:'↩️',title:'Zurücknehmen',desc:'Solange eine Mitteilung läuft, steht sie unter „Im Blick behalten“. Ein Tippen nimmt sie zurück: Die Spieler sehen sie nicht mehr in ihrer Übersicht. Aufs Handy geht sie frühestens 10 Minuten nach dem Speichern – bis dahin kommt sie dort gar nicht erst an.'},
+    {icon:'✏️',title:'Korrektur',desc:'Ersetzt eine neue Mitteilung innerhalb eines Tages eine, die schon aufs Handy gegangen ist, heißt sie „Korrektur: …“. In der Übersicht steht immer nur die neueste.'},
+  ]},
   {version:'1.2.7',date:'22.10.2026',title:'Zeit und Ort je Trainingstag',items:[
     {icon:'🕖',title:'Jeder Trainingstag mit eigener Uhrzeit, Dauer und Ort',desc:'„Trainingszeiten ändern“ und „Saisonplan erstellen“ haben je gewähltem Tag eine eigene Zeile – etwa Mo 19:00 auf dem Kunstrasen und Mi 18:00 in der Halle. Das Fenster öffnet mit dem, was heute je Wochentag gilt. Die Nachricht an die Spieler nennt die Tage mit ihren Zeiten und Orten, und das Muster gilt auch für den Plan der nächsten Saison.'},
   ]},
@@ -25528,6 +25537,7 @@ function hxRender(){
   html+=`</section>`;
   // ── Im Blick behalten ──
   const flags=[];
+  try{const nf=_newsFlag();if(nf)flags.push(nf);}catch(e){}
   try{
     _rcMissing(D,season).forEach(x=>flags.push({dot:'#C9373E',who:'Anwesenheit fehlt',
       what:(x.s.type==='match'?'Spiel':'Training')+' vom '+x.s.date+(x.there?': '+x.open+' Spieler ohne Eintrag':' ist noch nicht erfasst'),on:`rcOpen(${x.si})`}));
@@ -28335,7 +28345,7 @@ function _rsDone(msg,news){
   const all=(cd().players||[]).filter(Boolean);
   const push=all.filter(p=>p.push&&p.push.t).length,rest=all.length-push;
   if(!rest)return;
-  const head=push?push+(push===1?' Spieler bekommt':' Spieler bekommen')+' die Nachricht aufs Handy'+(_rsNight()?' – morgen ab 8 Uhr.':' – in den nächsten 15 Minuten.')+'\n\n':'';
+  const head=push?push+(push===1?' Spieler bekommt':' Spieler bekommen')+' die Nachricht aufs Handy'+(_rsNight()?' – morgen ab 8 Uhr.':' – frühestens in 10 Minuten. Bis dahin kannst du sie unter „Im Blick behalten“ zurücknehmen.')+'\n\n':'';
   if(!confirm(head+rest+(rest===1?' Spieler hat':' Spieler haben')+' keine Erinnerungen aufs Handy. Text für die WhatsApp-Gruppe öffnen?'))return;
   const txt='📣 '+news.title+'\n'+news.body;
   if(typeof _dbCopyText==='function')_dbCopyText(txt);
@@ -28347,15 +28357,30 @@ function _rsDone(msg,news){
 // see it for a week at the top of their overview; the job on GitHub sends it
 // once to everyone with reminders on (tools/erinnerungen, kind "news").
 const NEWS_DAYS=7;
+// The job sends a notice no earlier than 10 minutes after it was saved (and
+// never 22:30–8:00) — time to notice a mistake and take it back.
+const NEWS_DELAY=10*60e3;
+function _newsDue(t){
+  const d=new Date(t+NEWS_DELAY),m=d.getHours()*60+d.getMinutes();
+  if(m>=22*60+30)return new Date(d.getFullYear(),d.getMonth(),d.getDate()+1,8,0).getTime();
+  if(m<8*60)return new Date(d.getFullYear(),d.getMonth(),d.getDate(),8,0).getTime();
+  return d.getTime();
+}
+// "Korrektur:" when it replaces, within a day, one that has probably reached phones
+function _newsTitle(base){
+  const p=G&&G.db&&G.db[UI.currentTeam+'__news'];
+  if(!p||typeof p!=='object'||typeof p.t!=='number'||Date.now()-p.t>=864e5)return base;
+  return ((p.off||Date.now())>=_newsDue(p.t))?'Korrektur: '+base:base;
+}
 function _newsPost(title,body){
   const t=UI.currentTeam;if(!t||!G.db)return null;
-  const n={t:Date.now(),title:String(title).slice(0,80),body:String(body).slice(0,240),by:(CU&&CU.name)||''};
+  const n={t:Date.now(),title:_newsTitle(String(title)).slice(0,80),body:String(body).slice(0,240),by:(CU&&CU.name)||''};
   G.db[t+'__news']=n;
   return n;
 }
 function teamNews(t){
   const n=G&&G.db&&G.db[(t||UI.currentTeam)+'__news'];
-  if(!n||typeof n!=='object'||typeof n.t!=='number'||!n.title)return null;
+  if(!n||typeof n!=='object'||typeof n.t!=='number'||!n.title||n.off)return null;
   const age=Date.now()-n.t;
   return (age<NEWS_DAYS*864e5&&age>-864e5)?n:null;
 }
@@ -28363,6 +28388,28 @@ function _newsHtml(kind){
   const n=teamNews();if(!n)return '';
   if(kind==='hub')return `<div class="hub-card hub-mvp hub-news"><span class="hub-ic" aria-hidden="true">📣</span><span class="hub-txt"><b>${escapeHtml(n.title)}</b><span>${escapeHtml(n.body||'')}</span></span></div>`;
   return `<div class="pm-news"><span class="pm-news-ic" aria-hidden="true">📣</span><div class="pm-news-txt"><b>${escapeHtml(n.title)}</b><span>${escapeHtml(n.body||'')}</span></div></div>`;
+}
+// "Im Blick behalten": the running notice; a tap takes it back
+function _newsFlag(){
+  const nw=G&&G.db&&G.db[UI.currentTeam+'__news'];
+  if(!teamNews()||!(typeof canEdit==='function'&&canEdit()))return null;
+  const due=_newsDue(nw.t),hm=x=>{const d=new Date(x);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');};
+  const until=_rsDisp(_rsK(new Date(nw.t+NEWS_DAYS*864e5)));
+  return {dot:'#1659B8',who:'Mitteilung: '+nw.title,
+    what:(Date.now()<due?'geht frühestens '+hm(due)+' aufs Handy · zurücknehmen?':'sichtbar bis '+until+' · zurücknehmen?'),on:'newsManage()'};
+}
+function newsManage(){
+  if(!(typeof canEdit==='function'&&canEdit()))return;
+  const nw=G.db&&G.db[UI.currentTeam+'__news'];if(!nw||nw.off)return;
+  const pend=Date.now()<_newsDue(nw.t);
+  if(!confirm('„'+nw.title+'“\n'+(nw.body||'')+'\n\nZurücknehmen? Die Spieler sehen die Mitteilung dann nicht mehr in ihrer Übersicht'
+    +(pend?' und bekommen sie nicht aufs Handy.':'. Aufs Handy ist sie schon gegangen – das lässt sich nicht zurückholen.')))return;
+  snap();
+  nw.off=Date.now();nw.offBy=(CU&&CU.name)||'';
+  saveG();
+  logAudit('Mitteilung zurückgenommen',nw.title,pend?'vor dem Versand':'nach dem Versand');
+  if(typeof hxRender==='function')hxRender();
+  if(typeof showSaveFlash==='function')showSaveFlash('\u2713 Mitteilung zurückgenommen');
 }
 function _rsDaysTxt(days){
   const a=[1,2,3,4,5,6,0].filter(d=>days.includes(d)).map(d=>DOW[d]);
@@ -28392,7 +28439,7 @@ function _psNewsText(o,pl){
 function _rsEnsure(id){
   if(document.getElementById(id))return;
   const days=[1,2,3,4,5,6,0].map(d=>`<button type="button" class="dow-btn" data-d="${d}" aria-pressed="false">${DOW[d]}</button>`).join('');
-  const notify=x=>`<label class="rs-chk"><input type="checkbox" id="${x}Notify" checked><span>Spieler benachrichtigen<small id="${x}NotifyHint"></small></span></label>`;
+  const notify=x=>`<label class="rs-chk"><input type="checkbox" id="${x}Notify"><span>Spieler benachrichtigen<small id="${x}NotifyHint"></small></span></label><div class="rs-msg" id="${x}Msg" hidden></div>`;
   const w=document.createElement('div');
   w.innerHTML=(id==='moResched')?`<div class="mo hx-full" id="moResched" style="z-index:860;"><div class="mob rs-mob" style="width:440px;">
     <h3>Trainingszeiten ändern</h3>
@@ -28476,7 +28523,7 @@ function openResched(){
   document.querySelectorAll('#rsDays .dow-btn').forEach(x=>{const on=df.days.includes(+x.dataset.d);x.classList.toggle('sel',on);x.setAttribute('aria-pressed',on?'true':'false');});
   _rsSlots=df.slots;
   _slotRows('rsRows',df.days,_rsSlots,true);
-  document.getElementById('rsNotify').checked=true;
+  document.getElementById('rsNotify').checked=false;
   _rsRender('moResched');
   openM('moResched');
 }
@@ -28490,13 +28537,13 @@ function openPause(){
   if(t>bd.hi)t=bd.hi;
   document.getElementById('psFrom').value=f;document.getElementById('psTo').value=t;
   document.getElementById('psWhy').value='';
-  document.getElementById('psNotify').checked=true;
+  document.getElementById('psNotify').checked=false;
   _rsRender('moPause');
   openM('moPause');
 }
 function _rsReach(){
   const all=(cd().players||[]).filter(Boolean),push=all.filter(p=>p.push&&p.push.t).length;
-  return (push?push+' von '+all.length+' bekommen es aufs Handy, alle':'Alle')+' sehen es eine Woche lang in ihrer Übersicht.';
+  return (push?push+' von '+all.length+' bekommen es aufs Handy (frühestens in 10 Minuten), alle':'Alle')+' sehen es eine Woche lang in ihrer Übersicht. Zurücknehmen unter „Im Blick behalten“.';
 }
 function _rsItem(D,x,label,warn){
   const w=[];
@@ -28519,12 +28566,12 @@ function _rsRender(id){
   const box=document.getElementById(pause?'psPrev':'rsPrev'),go=document.getElementById(pause?'psGo':'rsGo');
   const hint=document.getElementById(pause?'psNotifyHint':'rsNotifyHint');
   if(!box||!go)return;
-  if(hint)hint.textContent=_rsReach();
-  let n=0,html='';
+  let n=0,html='',note=null;
   const msg=t=>`<div class="rs-empty">${t}</div>`;
   if(!o.from||!o.to||o.from>o.to)html=msg('Bitte einen Zeitraum wählen: „'+(pause?'Von':'Ab')+'“ vor „Bis“.');
   else if(pause){
     const pl=_pausePlan(D,season,o);n=pl.drop.length;
+    if(n)note={title:_newsTitle('Trainingspause'),body:_psNewsText(o,pl)};
     html=n?_rsGroup('drop','Fallen aus','kommen in den Papierkorb',pl.drop.map(x=>_rsItem(D,x,x.s.date,'all')))
       :msg('In diesem Zeitraum ist kein Training mehr geplant.');
     if(pl.games)html+=`<div class="rs-foot">${pl.games===1?'Das Spiel in diesem Zeitraum bleibt.':'Die '+pl.games+' Spiele in diesem Zeitraum bleiben.'}</div>`;
@@ -28537,13 +28584,14 @@ function _rsRender(id){
     const pl=_reschedPlan(D,season,o);
     n=pl.change.length+pl.move.length+pl.add.length+pl.drop.length;
     if(!n)html=msg('Keine Änderung – die Trainings im Zeitraum passen schon.');
-    const sl=x=>o.slots[_rsDate(x.k).getDay()];
+    else note={title:_newsTitle('Neue Trainingszeiten'),body:_rsNewsText(o)};
+    const sl=x=>o.slots[_rsDate(x.k).getDay()],at=k=>', '+o.slots[_rsDate(k).getDay()].time;
     html+=_rsGroup('change','Gleicher Tag, neu: '+[
         pl.change.some(x=>x.s.time!==sl(x).time)&&'Uhrzeit',pl.change.some(x=>(+x.s.duration>0?+x.s.duration:90)!==sl(x).dur)&&'Dauer',
         pl.change.some(x=>sl(x).loc&&String(x.s.location||'')!==sl(x).loc)&&'Ort'].filter(Boolean).join(', '),
-      'Zu- und Absagen bleiben',pl.change.map(x=>_rsItem(D,x,x.s.date)));
-    html+=_rsGroup('move','Auf einen anderen Tag','Zu- und Absagen beginnen neu',pl.move.map(x=>_rsItem(D,x,x.s.date+' → '+_rsDisp(x.to),'answers')));
-    html+=_rsGroup('add','Neu','',pl.add.map(k=>escapeHtml(_rsDisp(k))));
+      'Zu- und Absagen bleiben',pl.change.map(x=>_rsItem(D,x,x.s.date+at(x.k))));
+    html+=_rsGroup('move','Auf einen anderen Tag','Zu- und Absagen beginnen neu',pl.move.map(x=>_rsItem(D,x,x.s.date+' → '+_rsDisp(x.to)+at(x.to),'answers')));
+    html+=_rsGroup('add','Neu','',pl.add.map(k=>escapeHtml(_rsDisp(k)+at(k))));
     html+=_rsGroup('drop','Fallen weg','kommen in den Papierkorb',pl.drop.map(x=>_rsItem(D,x,x.s.date,'all')));
     const foot=[];
     if(n&&pl.same)foot.push(pl.same===1?'Ein Training passt schon.':pl.same+' Trainings passen schon.');
@@ -28554,6 +28602,13 @@ function _rsRender(id){
   }
   box.innerHTML=html;
   go.disabled=!n;
+  // What the players would get — shown only when it is switched on
+  const on=_rsChecked(pause?'psNotify':'rsNotify'),mb=document.getElementById(pause?'psMsg':'rsMsg');
+  if(hint)hint.textContent=on?_rsReach():'Aus – die Spieler erfahren davon nichts.';
+  if(mb){
+    mb.hidden=!(on&&note);
+    mb.innerHTML=(on&&note)?`<span class="rs-msg-l">Die Spieler bekommen:</span><b>${escapeHtml(note.title)}</b><span>${escapeHtml(note.body)}</span>`:'';
+  }
 }
 
 // ══════════════════════════════

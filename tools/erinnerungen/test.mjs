@@ -200,11 +200,14 @@ function world() {
   const db = makeDb({ fcf_data: { db: { 'U19__2026__SL__27': { sessions: enc(sess), players: enc(players) }, U19__news: news } }, fcf_push: { subs, config: { U19: { rsvp: false, rpe: false, vote: false } } } });
   let push = makePush();
   await round({ db, push, ts: at + 7 * 60e3, log: q });
+  ok(push.calls.length === 0, 'notice: not before it is 10 minutes old');
+  push = makePush();
+  await round({ db, push, ts: at + 22 * 60e3, log: q });
   const to = push.calls.map(c => c.ep.replace('https://push.example/', '')).sort().join(',');
   ok(to === 'ali,finn,max,max2' && push.calls[0].p.title === 'Neue Trainingszeiten' && /Mo und Mi um 19:00/.test(push.calls[0].p.body)
     && /\?p=tok\d$/.test(push.calls[0].p.url), 'notice: to every subscribed player and device, whatever the reminders are set to: ' + to + ' ' + (push.calls[0] || { p: {} }).p.url);
   push = makePush();
-  await round({ db, push, ts: at + 22 * 60e3, log: q });
+  await round({ db, push, ts: at + 37 * 60e3, log: q });
   ok(push.calls.length === 0, 'notice: once');
   push = makePush();
   await round({ db, push, ts: at + 23 * 3600e3, log: q });                               // next morning 9:00
@@ -226,7 +229,12 @@ function world() {
   // another team's notice: not to these players
   const db4 = makeDb({ fcf_data: { db: { 'U19__2026__SL__27': { sessions: enc(sess), players: enc(players) }, U17__news: news } }, fcf_push: { subs } });
   push = makePush();
-  await round({ db: db4, push, ts: at + 7 * 60e3, log: q });
+  await round({ db: db4, push, ts: at + 22 * 60e3, log: q });
   ok(push.calls.length === 0, 'another team\'s notice: nothing');
+  // taken back before it went out
+  const db5 = makeDb({ fcf_data: { db: { 'U19__2026__SL__27': { sessions: enc(sess), players: enc(players) }, U19__news: Object.assign({}, news, { off: at + 5 * 60e3 }) } }, fcf_push: { subs } });
+  push = makePush();
+  await round({ db: db5, push, ts: at + 22 * 60e3, log: q });
+  ok(push.calls.length === 0, 'notice taken back: nothing');
 }
 console.log(fails ? fails + ' FAILED' : 'all passed');

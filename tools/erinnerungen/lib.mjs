@@ -11,6 +11,7 @@ export const VOTE_FROM = 17 * 60;         // the day after a match
 export const RSVP_FROM = 18 * 60;         // the evening before
 export const ASK_VALID = 12 * 3600e3;     // "Erinnern" by a trainer counts for 12 h
 export const NEWS_VALID = 24 * 3600e3;    // a notice from the trainers goes out within a day
+export const NEWS_DELAY = 10 * 60e3;      // … but not before it is 10 minutes old (time to take it back)
 
 // ── the app's storage format (fbEncodeValue) ──
 export function decode(val) {
@@ -167,11 +168,12 @@ export function plan({ sessions, players, season, team, now, cfg, owners, sent }
 }
 
 // A notice from the trainers to the whole team (new training times, a break):
-// G.db[team + '__news'] = {t, title, body, by}. Fresh for a day — a notice
-// written at night goes out in the morning. log: today's sent log, logY:
+// G.db[team + '__news'] = {t, title, body, by, off}. Goes out once it is 10
+// minutes old (the trainer can take it back until then: off = when) and for a
+// day after — a notice written at night goes out in the morning. log: today's sent log, logY:
 // yesterday's, so a notice sent last evening is not sent again this morning.
-export const newsFresh = (n, now) => !!(n && typeof n.t === 'number' && n.title
-  && now.ts - n.t < NEWS_VALID && now.ts >= n.t - 60e3);
+export const newsFresh = (n, now) => !!(n && typeof n.t === 'number' && n.title && !n.off
+  && now.ts - n.t < NEWS_VALID && now.ts - n.t >= NEWS_DELAY);
 export function planNews({ news, players, now, owners, log, logY }) {
   const out = [];
   if (quiet(now) || !newsFresh(news, now)) return out;
