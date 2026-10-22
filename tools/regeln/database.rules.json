@@ -1,0 +1,248 @@
+{
+  "rules": {
+    "fcf_data": {
+      ".read": true,
+      ".write": "newData.exists() && newData.hasChild('version') && newData.child('version').val() >= 14",
+      "version": {
+        ".validate": "newData.isNumber() && newData.val() >= 14 && newData.val() <= 999"
+      },
+      "teamList": {
+        ".validate": "newData.exists()"
+      },
+      "seasonList": {
+        ".validate": "newData.exists()"
+      },
+      "db": {
+        ".validate": "newData.exists()"
+      },
+      "_lastSaveTs": {
+        ".validate": "newData.isNumber() && newData.val() <= (now + 3600000)"
+      },
+      "_lastSaveBy": {
+        ".validate": "newData.isString() && newData.val().length <= 100"
+      },
+      "auditLogP": {
+        "$id": {
+          ".validate": "newData.hasChildren(['ts','action']) && newData.child('ts').isNumber()"
+        }
+      },
+      "auditLogT": {
+        "$id": {
+          ".validate": "newData.hasChildren(['ts','action']) && newData.child('ts').isNumber()"
+        }
+      },
+      "$other": {
+        ".validate": true
+      }
+    },
+    "fcf_media": {
+      ".read": true,
+      ".write": true,
+      "photos": {
+        "$id": {
+          ".validate": "newData.isString() && newData.val().beginsWith('data:image') && newData.val().length <= 500000"
+        }
+      },
+      "rev": {
+        "$id": {
+          ".validate": "newData.isNumber() && newData.val() <= (now + 3600000)"
+        }
+      },
+      "$other": {
+        ".validate": false
+      }
+    },
+    "__backups": {
+      ".read": true,
+      ".write": true,
+      "$index": {
+        ".validate": "newData.hasChildren(['ts','data'])"
+      }
+    },
+    "__backups_meta": {
+      ".read": true,
+      ".write": true,
+      "lastAutoDay": {
+        ".validate": "newData.isString() && newData.val().length <= 40"
+      },
+      "$other": {
+        ".validate": false
+      }
+    },
+    "__presence": {
+      ".read": true,
+      ".write": true,
+      "$sessionId": {
+        ".validate": "newData.exists()",
+        "lastSeen": {
+          ".validate": "newData.isNumber() && newData.val() <= (now + 3600000)"
+        },
+        "$other": {
+          ".validate": true
+        }
+      }
+    },
+    "__trainerActivity": {
+      ".read": true,
+      ".write": true,
+      "$trainerKey": {
+        ".validate": "newData.hasChildren(['name','lastSeen'])",
+        "name": {
+          ".validate": "newData.isString() && newData.val().length <= 100"
+        },
+        "role": {
+          ".validate": "newData.isString() && newData.val().length <= 20"
+        },
+        "lastSeen": {
+          ".validate": "newData.isNumber() && newData.val() <= (now + 3600000)"
+        },
+        "team": {
+          ".validate": "newData.isString() && newData.val().length <= 60"
+        },
+        "season": {
+          ".validate": "newData.isString() && newData.val().length <= 20"
+        },
+        "viewing": {
+          ".validate": "newData.isString() && newData.val().length <= 100"
+        },
+        "appVersion": {
+          ".validate": "newData.isString() && newData.val().length <= 20"
+        },
+        "appTs": {
+          ".validate": "newData.isNumber()"
+        },
+        "$other": {
+          ".validate": true
+        }
+      }
+    },
+    "fcf_plans": {
+      ".read": true,
+      ".write": true,
+      "$team": {
+        "plans": {
+          "$pid": {
+            ".validate": "newData.hasChild('upd')"
+          }
+        },
+        "idx": {
+          "$pid": {
+            ".validate": "newData.hasChild('upd')"
+          }
+        },
+        "lib": {
+          "$id": {
+            ".validate": "newData.hasChildren(['title','upd'])"
+          }
+        },
+        "tpl": {
+          "$id": {
+            ".validate": "newData.hasChildren(['name','upd'])"
+          }
+        },
+        "meta": {
+          ".validate": "newData.hasChild('seeded')"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "fcf_push": {
+      "pub": {
+        ".read": true
+      },
+      "status": {
+        ".read": true
+      },
+      "config": {
+        ".read": true,
+        "$team": {
+          ".write": true,
+          "$kind": {
+            ".validate": "($kind === 'rpe' || $kind === 'vote' || $kind === 'rsvp') && newData.isBoolean()"
+          }
+        }
+      },
+      "subs": {
+        "$owner": {
+          ".read": true,
+          "$device": {
+            ".write": true,
+            ".validate": "newData.hasChildren(['e','k','t']) && newData.child('e').isString() && newData.child('e').val().beginsWith('https://') && newData.child('e').val().length <= 1000 && newData.child('k/p256dh').isString() && newData.child('k/auth').isString() && newData.child('t').isNumber()"
+          }
+        }
+      }
+    },
+    "fcf_invites": {
+      ".read": "((auth != null && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists()) && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('role').val() === 'admin')",
+      "$code": {
+        ".read": true,
+        ".write": "((auth != null && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists()) && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('role').val() === 'admin')",
+        ".validate": "newData.hasChildren(['role','name','t','exp'])",
+        "role": {
+          ".validate": "newData.val() === 'admin' || newData.val() === 'trainer'"
+        },
+        "name": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 60"
+        },
+        "trainerId": {
+          ".validate": "newData.isString() && newData.val().length <= 40"
+        },
+        "t": {
+          ".validate": "newData.isNumber()"
+        },
+        "exp": {
+          ".validate": "newData.isNumber()"
+        },
+        "by": {
+          ".validate": "newData.isString() && newData.val().length <= 128"
+        },
+        "byName": {
+          ".validate": "newData.isString() && newData.val().length <= 60"
+        },
+        "used": {
+          ".write": "(auth != null && !data.exists() && newData.val() === auth.uid && data.parent().child('role').exists() && data.parent().child('exp').val() > now && !data.parent().child('revoked').exists() && newData.parent().parent().parent().child('fcf_members/'+auth.uid+'/code').val() === $code)",
+          ".validate": "newData.isString() && newData.val().length <= 128"
+        },
+        "usedAt": {
+          ".write": "auth != null && !data.exists() && newData.parent().child('used').val() === auth.uid && !data.parent().child('used').exists()",
+          ".validate": "newData.isNumber() && newData.val() <= now + 60000"
+        },
+        "revoked": {
+          ".validate": "newData.isNumber()"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "fcf_members": {
+      ".read": "((auth != null && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists()) && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('role').val() === 'admin')",
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "((auth != null && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists()) && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('role').val() === 'admin') || (auth != null && auth.uid === $uid && !data.exists() && newData.child('code').isString() && root.child('fcf_invites/'+newData.child('code').val()).child('role').exists() && !root.child('fcf_invites/'+newData.child('code').val()).child('used').exists() && !root.child('fcf_invites/'+newData.child('code').val()).child('revoked').exists() && root.child('fcf_invites/'+newData.child('code').val()).child('exp').val() > now && newData.parent().parent().child('fcf_invites/'+newData.child('code').val()+'/used').val() === auth.uid)",
+        ".validate": "newData.hasChildren(['code','t'])",
+        "code": {
+          ".validate": "newData.isString() && newData.val().length >= 16 && newData.val().length <= 40"
+        },
+        "t": {
+          ".validate": "newData.isNumber() && newData.val() <= now + 60000"
+        },
+        "email": {
+          ".validate": "newData.isString() && newData.val().length <= 120"
+        },
+        "name": {
+          ".validate": "newData.isString() && newData.val().length <= 120"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "$other": {
+      ".read": false,
+      ".write": false
+    }
+  }
+}
