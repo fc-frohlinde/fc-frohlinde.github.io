@@ -283,6 +283,53 @@ html:has(body.player-mode){background:#080f22;}
 .auth-pk{height:44px;background:#0E2350;color:#fff;font-size:.94rem;}
 .auth-err{color:#A52F35;font-size:.88rem;font-weight:500;margin-top:10px;text-align:center;}
 .auth-err:empty{min-height:0;margin:0;}
+/* Konten (1.2.12): the second way in, under the old form; the invite page */
+.auth-or{display:flex;align-items:center;gap:12px;margin:22px 0 14px;font-size:.86rem;color:#5E6E8E;}
+.auth-or::before,.auth-or::after{content:'';flex:1;height:1px;background:#E1E7F0;}
+.auth-alt{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:48px;margin:0 0 10px;padding:0 14px;box-sizing:border-box;
+  border:1.5px solid #D5DEEC;border-radius:12px;background:#fff;color:#0E2350;font:600 .98rem 'Barlow',sans-serif;cursor:pointer;transition:border-color .15s,background .15s;}
+.auth-alt:hover{border-color:#A9B9D3;background:#F7F9FC;}
+.auth-alt:focus-visible,.auth-link:focus-visible{outline:3px solid #1659B8;outline-offset:2px;}
+.auth-alt[aria-expanded="true"]{border-color:#0E2350;}
+.auth-alt svg{flex:none;}
+.auth-mail{padding:8px 0 0;}
+.auth-mail[hidden]{display:none;}
+.auth-navy{background:#0E2350;color:#fff;}
+.auth-links{display:flex;flex-wrap:wrap;justify-content:center;gap:2px 16px;margin-top:8px;}
+.auth-link{background:none;border:none;padding:6px 4px;color:#1659B8;font:600 .9rem 'Barlow',sans-serif;cursor:pointer;border-radius:6px;}
+.auth-link:hover{text-decoration:underline;}
+.auth-who{display:flex;flex-direction:column;gap:4px;padding:12px 14px;margin:0 0 12px;border-radius:12px;background:#F1F4F9;color:#0E2350;
+  font-size:.92rem;line-height:1.4;text-align:left;overflow-wrap:anywhere;}
+.auth-who small{font-size:.85rem;color:#4A5A7A;}
+.auth-who small.auth-uid{font-size:.76rem;color:#6B7A99;user-select:all;}
+.auth-note{color:#1F6B45;font-size:.88rem;margin-top:10px;text-align:center;line-height:1.4;}
+.auth-note:empty{display:none;}
+.auth-hint{font-weight:500;color:#6B7A99;margin-left:6px;}
+.inv-box{text-align:left;color:#0E2350;}
+.inv-h{margin:0 0 8px;font:700 1.5rem/1.15 'Barlow',sans-serif;color:#0E2350;}
+.inv-p{margin:0 0 20px;font-size:.96rem;line-height:1.5;color:#3A4A6B;}
+.inv-foot{margin:18px 0 0;padding-top:14px;border-top:1px solid #E6EBF2;font-size:.82rem;color:#6B7A99;text-align:center;}
+/* Zugang in the trainer profile, the list and Einstellungen → Konto */
+.acc-row{display:flex;align-items:flex-start;gap:10px;}
+.acc-dot{flex:none;display:inline-block;width:9px;height:9px;border-radius:50%;margin-top:6px;background:var(--hx-track,#C6D0DF);}
+.acc-dot.ok{background:#2E9B5F;}
+.acc-dot.wait{background:#E3AC1A;}
+.acc-txt{display:flex;flex-direction:column;gap:2px;min-width:0;font-size:.88rem;color:var(--hx-ink,var(--gd));}
+.acc-txt small{font-size:.8rem;line-height:1.45;color:var(--hx-muted,var(--gm));overflow-wrap:anywhere;}
+.acc-acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;padding-left:19px;}
+.acc-b{font-size:.8rem;padding:6px 12px;}
+.acc-chip{display:inline-flex;align-items:center;gap:4px;margin-left:8px;font-size:.7rem;font-weight:600;color:var(--hx-muted,var(--gm));vertical-align:1px;}
+.acc-chip .acc-dot{width:7px;height:7px;margin:0;}
+.acc-box{border:1px solid var(--hx-line,var(--gl));border-radius:8px;padding:11px 13px;margin-bottom:10px;}
+.acc-box:empty{display:none;}
+.acc-msg{font-size:.78rem;margin-top:6px;color:#A52F35;}
+.acc-msg.ok{color:#1F6B45;}
+.acc-msg:empty{display:none;}
+.inv-sh-p{font-size:.88rem;line-height:1.5;margin:4px 0 12px;color:var(--hx-ink,var(--gd));}
+.inv-sh-link{display:block;width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid var(--hx-line,var(--gl));border-radius:10px;
+  background:var(--hx-field,#fff);color:var(--hx-ink,var(--bd));font:500 .84rem 'Barlow',sans-serif;}
+.inv-sh-acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+.inv-sh-warn{font-size:.78rem;color:var(--hx-muted,var(--gm));margin:12px 0 0;}
 /* lights on: the lamps strike one after another, then the glow comes up */
 @keyframes flLampOn{0%,35%{opacity:.18}42%{opacity:.95}48%{opacity:.45}58%,100%{opacity:1}}
 @keyframes flGlowOn{from{opacity:0}to{opacity:1}}
@@ -5753,6 +5800,12 @@ if(window._fbBlocked){
   <button class="auth-btn" id="authSubmitBtn" onclick="doAuth()">Anmelden</button>
   <button class="auth-btn auth-back" id="authBackBtn" onclick="_resetAuthStage()" type="button" style="display:none;">Zurück</button>
   <div class="auth-err" id="authErr" role="alert"></div>
+  <div class="auth-acct" id="authAcct">
+    <div class="auth-or"><span>oder mit eigenem Konto</span></div>
+    <div id="authAcctIn"></div>
+    <div class="auth-err" id="acctErr" role="alert"></div>
+    <div class="auth-note" id="acctNote" role="status"></div>
+  </div>
   <details id="authAdvanced" class="auth-adv">
     <summary>Mit Passkey anmelden</summary>
     <div class="auth-adv-in"><button class="auth-btn auth-pk" id="authPasskeyBtn" type="button" onclick="doAuthPasskey()" style="display:none;">Passkey verwenden</button></div>
@@ -6424,13 +6477,17 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.11'; // v1.2.11: aufgeräumt
-const APP_VERSION_LABEL='1.2.11';
+const APP_VERSION='1.2.12'; // v1.2.12: eigene Konten und Einladungen
+const APP_VERSION_LABEL='1.2.12';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792676726102; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792681000985; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.12',date:'22.10.2026',title:'Eigenes Konto für Trainer',items:[
+    {icon:'🔐',title:'Anmelden mit eigenem Konto',desc:'Unter der bisherigen Anmeldung gibt es jetzt „Mit Google anmelden“ und „Mit E-Mail anmelden“. Ein Konto allein öffnet die App nicht: Zugang gibt eine Einladung vom Admin. Wer eingeladen ist, legt sein Konto über den Link selbst an, niemand muss E-Mail-Adressen sammeln. Name und Passwort funktionieren vorerst weiter.'},
+    {icon:'✉️',admin:true,title:'Trainer einladen',desc:'Kader → Trainer → Profil → Zugang → „Einladen“: Die App erstellt einen Link (7 Tage gültig, einmal nutzbar), den du per WhatsApp schickst. Dort steht auch, wer schon ein Konto hat; offene Links lassen sich zurückziehen und Zugänge entziehen. Einladen geht, sobald du selbst mit deinem Konto angemeldet bist.'},
+  ]},
   {version:'1.2.11',date:'22.10.2026',title:'Aufgeräumt',items:[
     {icon:'🧹',title:'Alter Code entfernt',desc:'Funktionen ohne Knopf, die alten Benachrichtigungen (nur bei offener App, seit 1.2.3 aus), die alten Erinnerungskarten (seit 1.2.5 ersetzt), ein Konfliktfenster, das nie erschien, und Gestaltung für Elemente, die es nicht mehr gibt. Am Bildschirm ändert sich nichts; die App lädt etwas weniger.'},
     {icon:'💾',title:'App-Backups: Tageskopien bleiben',desc:'Beim Aufräumen gefunden: Die Regel, dass mehrere Backups vor Änderungen nicht alle täglichen Backups verdrängen dürfen, war durch eine ältere Fassung derselben Funktion außer Kraft gesetzt. Jetzt gilt sie.'},
@@ -7599,7 +7656,7 @@ const DEFAULT_FB_CONFIG={
   authDomain:'fc-frohlinde-ea23f.firebaseapp.com'
 };
 function loadFbConfig(){
-  try{const lc=JSON.parse(localStorage.getItem(FB_CFG_KEY));if(lc&&lc.apiKey)return lc;}catch(e){}
+  try{const lc=JSON.parse(localStorage.getItem(FB_CFG_KEY));if(lc&&lc.apiKey){if(!lc.authDomain&&lc.projectId)lc.authDomain=lc.projectId+'.firebaseapp.com';return lc;}}catch(e){}
   return DEFAULT_FB_CONFIG;
 }
 
@@ -8787,6 +8844,9 @@ function initAuth(){
   if(new URLSearchParams(location.search).has('guest')){
     try{const u=new URL(location.href);u.searchParams.delete('guest');history.replaceState(history.state,'',u.pathname+u.search+u.hash);}catch(e){}
   }
+  // Invite link (?invite=<code>): the landing page to create the account
+  const _invCode=new URLSearchParams(location.search).get('invite');
+  if(_invCode!==null){_invLanding(_invCode);return;}
   // Session-expiry check: returns true if session should be discarded.
   // Reads sessionExpiryDays from the user's per-device prefs (key fcf_prefs_<name>).
   const _sessionExpired=(u)=>{
@@ -8850,7 +8910,8 @@ function initAuth(){
       if(u&&u.role){
         if(_sessionExpired(u)){
           localStorage.removeItem(AUTH_SK);
-        } else if(u.role==='trainer'){const t=G.trainers.find(x=>x.name.toLowerCase()===u.name.toLowerCase());if(!t){localStorage.removeItem(AUTH_SK);}else{u.teams=[...t.teams];CU=u;sessionStorage.setItem('fcf_reloaded','1');showApp();return;}}
+          if(u.acct)_acctSignOutQuiet();
+        } else if(u.role==='trainer'){const t=G.trainers.find(x=>x.name.toLowerCase()===u.name.toLowerCase());if(!t&&!u.acct){localStorage.removeItem(AUTH_SK);}else{if(t)u.teams=[...t.teams];CU=u;sessionStorage.setItem('fcf_reloaded','1');showApp();return;}}
         else if(u.role==='player'&&!u.playerToken){localStorage.removeItem(AUTH_SK);}
         else{CU=u;sessionStorage.setItem('fcf_reloaded','1');showApp();return;}
       }
@@ -8875,6 +8936,590 @@ function initAuth(){
   if(typeof _initAuthUI==='function')_initAuthUI();
   document.getElementById('authOverlay').classList.add('open');
   if(typeof _bootVeilHide==='function')_bootVeilHide();
+  _acctLoginOpen();
+}
+
+// ══════════════════════════════
+//  KONTEN (Schritt B, Teil 1 — 1.2.12)
+// ══════════════════════════════
+// A trainer signs in with his own Firebase account (Google or e-mail). An
+// account alone opens nothing: access comes from an invite the admin makes in
+// the app (fcf_invites/<code>), redeemed once by that account
+// (fcf_members/<uid>). The database rules check the same chain, so nobody can
+// write himself a role. Until Teil 3 the old login keeps working beside it.
+// Players never sign in: the SDK is loaded only on trainer pages.
+const FB_AUTH_SDK='https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js';
+const INVITE_DAYS=7;
+let fbAuth=null,_acctSdkP=null,_acctUser=null,_acctKnown=false,_acctWait=[],_acctBusy=false;
+const _acctMem={};   // uid → member (or null), checked on the login screen
+function _acctSdk(){
+  if(_acctSdkP)return _acctSdkP;
+  const p=new Promise((res,rej)=>{
+    if(typeof firebase==='undefined'||!firebase.initializeApp){rej(new Error('blocked'));return;}
+    if(firebase.auth){res();return;}
+    const s=document.createElement('script');
+    s.src=FB_AUTH_SDK;s.async=true;
+    s.onload=()=>firebase.auth?res():rej(new Error('blocked'));
+    s.onerror=()=>rej(new Error('blocked'));
+    document.head.appendChild(s);
+  });
+  _acctSdkP=p;
+  p.catch(()=>{if(_acctSdkP===p)_acctSdkP=null;});
+  return p;
+}
+async function _acctReady(){
+  await _acctSdk();
+  if(!fbApp)throw new Error('offline');
+  if(!fbAuth){
+    fbAuth=fbApp.auth();
+    try{fbAuth.languageCode='de';}catch(e){}
+    fbAuth.onAuthStateChanged(u=>{
+      _acctUser=u||null;_acctKnown=true;
+      const w=_acctWait;_acctWait=[];w.forEach(f=>f(_acctUser));
+      try{_acctOnState();}catch(e){}
+    });
+  }
+  return fbAuth;
+}
+// The signed-in account once Firebase knows it; undefined = no answer in time
+function _acctCurrent(ms){
+  return new Promise(res=>{
+    if(_acctKnown){res(_acctUser);return;}
+    _acctWait.push(res);
+    setTimeout(()=>res(undefined),ms||10000);
+  });
+}
+// The trainer list must be there before an account can be matched to a trainer
+function _acctData(ms){
+  return new Promise(res=>{
+    const t0=Date.now();
+    (function poll(){
+      if(_fbInitialLoaded||Date.now()-t0>(ms||8000)){res();return;}
+      setTimeout(poll,100);
+    })();
+  });
+}
+async function _acctMember(uid){
+  const m=(await fbDb.ref('fcf_members/'+uid).once('value')).val();
+  if(!m||typeof m.code!=='string')return null;
+  const inv=(await fbDb.ref('fcf_invites/'+m.code).once('value')).val();
+  if(!inv||inv.used!==uid||inv.revoked)return null;
+  return {code:m.code,role:inv.role,name:inv.name||'',trainerId:inv.trainerId||''};
+}
+// The trainer an invite was made for: by id (survives a rename), the
+// first admin (made by the setup job) by name
+function _acctTrainer(mem){
+  const ts=(G&&Array.isArray(G.trainers))?G.trainers:[];
+  const lc=s=>String(s||'').toLowerCase();
+  if(mem.trainerId)return ts.find(t=>t&&t.id===mem.trainerId)||null;
+  return ts.find(t=>t&&lc(t.name)===lc(mem.name))||null;
+}
+function _acctVia(u){
+  return ((u&&u.providerData)||[]).some(p=>p&&p.providerId==='google.com')?'google':'mail';
+}
+// Admins stay "Admin" as with the old login (hidden from presence, the
+// trainers' notifications and the job key off that name)
+function _acctCU(mem,user){
+  const acct={uid:user.uid,email:String(user.email||''),via:_acctVia(user)};
+  if(mem.role==='admin')return {name:'Admin',role:'admin',teams:[],acct,loginAt:Date.now()};
+  const t=_acctTrainer(mem);
+  if(!t)return null;
+  return {name:t.name,role:'trainer',teams:[...(t.teams||[])],acct,loginAt:Date.now()};
+}
+function _acctEnter(cu,how){
+  CU=cu;
+  try{sessionStorage.removeItem(AUTH_SK);localStorage.setItem(AUTH_SK,JSON.stringify(CU));}catch(e){}
+  _invClose();
+  document.getElementById('authOverlay').classList.remove('open');
+  showApp();
+  setTimeout(()=>{try{logAudit(how==='invite'?'Konto verbunden':'Anmeldung (Konto)','',CU.acct.via==='google'?'Google':'E-Mail');if(typeof saveG==='function')saveG();}catch(e){}},2000);
+  setTimeout(()=>{try{_maybeShowChangelogOnLogin();}catch(e){}},1200);
+}
+// The stored session belongs to an account without access now (or another
+// account is signed in): back to the login, with the reason
+function _acctEnd(msg){
+  try{localStorage.removeItem(AUTH_SK);sessionStorage.removeItem(AUTH_SK);}catch(e){}
+  try{sessionStorage.setItem('fcf_acct_msg',msg||'');}catch(e){}
+  location.reload();
+}
+function _acctSignOutQuiet(){_acctReady().then(a=>a.signOut()).catch(()=>{});}
+// A session from storage opens the app at once; the account is checked as
+// soon as Firebase answers. Offline or no answer: the session stays.
+async function _acctVerify(){
+  const u0=CU;
+  if(!u0||!u0.acct)return;
+  let user;
+  try{await _acctReady();user=await _acctCurrent(15000);}catch(e){return;}
+  if(user===undefined||CU!==u0)return;
+  if(!user||user.uid!==u0.acct.uid){_acctEnd('Bitte melde dich neu an.');return;}
+  let mem;
+  try{mem=await _acctMember(user.uid);}catch(e){return;}
+  if(CU!==u0)return;
+  if(!mem){_acctEnd('Dein Zugang wurde beendet. Bei Fragen wende dich an den Admin.');return;}
+  await _acctData();
+  const cu=_acctCU(mem,user);
+  if(!cu){_acctEnd('Dein Zugang passt zu keinem Trainer mehr. Bitte wende dich an den Admin.');return;}
+  // Role, name or teams changed meanwhile: carry them over
+  if(cu.role!==u0.role||cu.name!==u0.name||(cu.teams||[]).join()!==(u0.teams||[]).join()||cu.acct.email!==u0.acct.email||cu.acct.via!==u0.acct.via){
+    CU.role=cu.role;CU.name=cu.name;CU.teams=cu.teams;CU.acct=cu.acct;
+    try{localStorage.setItem(AUTH_SK,JSON.stringify(CU));}catch(e){}
+    try{applyRoleUI();renderUserPill();render();}catch(e){}
+  }
+}
+function _acctErrText(e){
+  const c=(e&&e.code)||'',m=String((e&&e.message)||e||'');
+  if(m==='blocked')return 'Der Anmeldedienst wird von diesem Browser blockiert (Tracking-Schutz?). Bitte einen anderen Browser versuchen.';
+  if(m==='offline'||c==='auth/network-request-failed')return 'Keine Verbindung. Bitte später noch einmal.';
+  if(/auth\/(invalid-credential|wrong-password|user-not-found|invalid-login-credentials)/.test(c))return 'E-Mail oder Passwort stimmt nicht.';
+  if(c==='auth/too-many-requests')return 'Zu viele Versuche. Bitte in ein paar Minuten noch einmal.';
+  if(c==='auth/popup-closed-by-user'||c==='auth/cancelled-popup-request'||c==='auth/user-cancelled')return '';
+  if(c==='auth/popup-blocked')return 'Der Browser hat das Google-Fenster blockiert. Pop-ups für diese Seite erlauben oder mit E-Mail anmelden.';
+  if(c==='auth/operation-not-supported-in-this-environment'||c==='auth/web-storage-unsupported')return 'Google geht in dieser Ansicht nicht. Bitte im Browser öffnen oder mit E-Mail anmelden.';
+  if(c==='auth/unauthorized-domain')return 'Diese Adresse ist für die Anmeldung nicht freigegeben (Firebase → Authentication → Settings → Authorized domains).';
+  if(c==='auth/operation-not-allowed')return 'Diese Anmeldeart ist in Firebase nicht eingeschaltet.';
+  if(c==='auth/email-already-in-use')return 'Für diese E-Mail gibt es schon ein Konto. Melde dich mit seinem Passwort an.';
+  if(c==='auth/weak-password')return 'Das Passwort ist zu kurz (mindestens 6 Zeichen).';
+  if(c==='auth/invalid-email'||c==='auth/missing-email')return 'Diese E-Mail-Adresse stimmt nicht.';
+  if(c==='auth/missing-password')return 'Bitte ein Passwort eingeben.';
+  if(c==='auth/user-disabled')return 'Dieses Konto ist gesperrt.';
+  if(/permission[_ ]denied/i.test(m))return 'Der Zugang ließ sich nicht prüfen (Datenbank-Regeln noch nicht aktiv?).';
+  return 'Das hat nicht geklappt'+(c?' ('+c.replace('auth/','')+')':'')+'.';
+}
+const _GOOGLE_G='<svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.6-.4-3.9z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.6-.4-3.9z"/></svg>';
+const _MAIL_IC='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>';
+function _acctSet(id,txt){const el=document.getElementById(id);if(el)el.textContent=txt||'';}
+function _acctVal(id){const el=document.getElementById(id);return el?String(el.value||'').trim():'';}
+
+// ── Login screen: "oder mit eigenem Konto" ──
+function _acctLoginOpen(){
+  let msg='';
+  try{msg=sessionStorage.getItem('fcf_acct_msg')||'';sessionStorage.removeItem('fcf_acct_msg');}catch(e){}
+  _acctRenderLogin();
+  if(msg)_acctSet('acctErr',msg);
+  _acctReady().catch(()=>{});
+}
+function _acctOnState(){
+  const ov=document.getElementById('authOverlay');
+  if(_acctBusy||_inv||CU||!ov||!ov.classList.contains('open'))return;
+  _acctRenderLogin();
+}
+function _acctRenderLogin(){
+  const box=document.getElementById('authAcctIn');
+  if(!box)return;
+  const esc=escapeHtml,u=_acctUser;
+  if(!u){
+    if(box.dataset.st==='out')return;   // keeps typed e-mail and an open form
+    box.dataset.st='out';
+    box.innerHTML=`<button type="button" class="auth-alt" onclick="acctGoogle('login')">${_GOOGLE_G}<span>Mit Google anmelden</span></button>
+      <button type="button" class="auth-alt" id="acctMailBtn" aria-expanded="false" aria-controls="acctMailBox" onclick="acctMailToggle()">${_MAIL_IC}<span>Mit E-Mail anmelden</span></button>
+      <div class="auth-mail" id="acctMailBox" hidden>
+        <label class="auth-label" for="acctMail">E-Mail</label>
+        <input class="auth-input" id="acctMail" type="email" autocomplete="email" autocapitalize="off" spellcheck="false" onkeydown="if(event.key==='Enter')document.getElementById('acctPw').focus()"/>
+        <label class="auth-label" for="acctPw">Passwort</label>
+        <input class="auth-input" id="acctPw" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')acctMailLogin()"/>
+        <button type="button" class="auth-btn auth-navy" onclick="acctMailLogin()">Anmelden</button>
+        <div class="auth-links"><button type="button" class="auth-link" onclick="acctMailReset('acctMail','acctErr','acctNote')">Passwort vergessen?</button></div>
+      </div>`;
+    return;
+  }
+  box.dataset.st='in';
+  const who=`<div class="auth-who"><span>Angemeldet als <b>${esc(u.email||'Konto ohne E-Mail')}</b></span>`;
+  const out=`<div class="auth-links"><button type="button" class="auth-link" onclick="acctSignOut()">Abmelden</button></div>`;
+  const c=_acctMem[u.uid];
+  if(c===undefined){
+    box.innerHTML=who+'<small>Zugang wird geprüft …</small></div>';
+    _acctMember(u.uid).then(m=>{_acctMem[u.uid]=m;},e=>{_acctMem[u.uid]={err:_acctErrText(e)};}).then(()=>{if(_acctUser===u)_acctRenderLogin();});
+    return;
+  }
+  if(c&&c.err){box.innerHTML=who+`<small>${esc(c.err)}</small></div>`+out;return;}
+  if(c){box.innerHTML=who+'</div><button type="button" class="auth-btn auth-navy" onclick="acctContinue()">Weiter</button>'+out;return;}
+  box.innerHTML=who+`<small>Dieses Konto hat noch keinen Zugang. Den bekommst du mit einem Einladungslink vom Admin.</small><small class="auth-uid">Konto-ID: ${esc(u.uid)}</small></div>`+out;
+}
+function acctMailToggle(){
+  const b=document.getElementById('acctMailBox'),btn=document.getElementById('acctMailBtn');
+  if(!b)return;
+  b.hidden=!b.hidden;
+  if(btn)btn.setAttribute('aria-expanded',String(!b.hidden));
+  if(!b.hidden){const i=document.getElementById('acctMail');if(i)i.focus();}
+}
+async function _acctLoginWith(user){
+  // The account just signed in is the current one, even before the state callback
+  _acctUser=user;_acctKnown=true;
+  let mem;
+  try{mem=await _acctMember(user.uid);}catch(e){_acctMem[user.uid]={err:_acctErrText(e)};_acctRenderLogin();return;}
+  _acctMem[user.uid]=mem;
+  if(!mem){_acctRenderLogin();return;}
+  await _acctData();
+  const cu=_acctCU(mem,user);
+  if(!cu){_acctSet('acctErr','Dein Zugang passt zu keinem Trainer mehr. Bitte wende dich an den Admin.');_acctRenderLogin();return;}
+  _acctEnter(cu,'login');
+}
+async function acctGoogle(where){
+  const errId=where==='inv'?'invErr':'acctErr';
+  _acctSet(errId,'');
+  _acctBusy=true;
+  try{
+    const a=await _acctReady();
+    const p=new firebase.auth.GoogleAuthProvider();
+    p.setCustomParameters({prompt:'select_account'});
+    const r=await a.signInWithPopup(p);
+    if(where==='inv')await invAccept(r.user);
+    else await _acctLoginWith(r.user);
+  }catch(e){_acctSet(errId,_acctErrText(e));}
+  finally{_acctBusy=false;if(!CU)_acctOnState();}
+}
+async function acctMailLogin(){
+  const em=_acctVal('acctMail'),pw=(document.getElementById('acctPw')||{}).value||'';
+  _acctSet('acctErr','');_acctSet('acctNote','');
+  if(!em||!pw){_acctSet('acctErr','Bitte E-Mail und Passwort eingeben.');return;}
+  _acctBusy=true;
+  try{
+    const a=await _acctReady();
+    const r=await a.signInWithEmailAndPassword(em,pw);
+    const p=document.getElementById('acctPw');if(p)p.value='';
+    await _acctLoginWith(r.user);
+  }catch(e){_acctSet('acctErr',_acctErrText(e));}
+  finally{_acctBusy=false;if(!CU)_acctOnState();}
+}
+async function acctMailReset(inputId,errId,noteId){
+  const em=inputId?_acctVal(inputId):String((CU&&CU.acct&&CU.acct.email)||'');
+  _acctSet(errId,'');_acctSet(noteId,'');
+  if(!em){_acctSet(errId,'Gib zuerst deine E-Mail-Adresse ein.');return;}
+  try{
+    const a=await _acctReady();
+    await a.sendPasswordResetEmail(em);
+    _acctSet(noteId,'Wenn es zu '+em+' ein Konto gibt, kommt gleich eine E-Mail mit einem Link für ein neues Passwort.');
+  }catch(e){_acctSet(errId,_acctErrText(e));}
+}
+function acctContinue(){if(_acctUser)_acctLoginWith(_acctUser);}
+function acctSignOut(){
+  if(!fbAuth)return;
+  const box=document.getElementById('authAcctIn');if(box)box.dataset.st='';
+  fbAuth.signOut().catch(()=>{});
+}
+
+// ── Invite link: ?invite=<code> ──
+let _inv=null;
+function _invDropParam(){
+  try{const u=new URL(location.href);if(u.searchParams.has('invite')){u.searchParams.delete('invite');history.replaceState(history.state,'',u.pathname+u.search+u.hash);}}catch(e){}
+}
+function _invClose(){
+  const b=document.getElementById('invBox');if(b)b.remove();
+  const f=document.querySelector('#authOverlay .auth-form');if(f)f.hidden=false;
+  _inv=null;
+}
+async function _invLanding(code){
+  const ov=document.getElementById('authOverlay');
+  const form=ov.querySelector('.auth-form');
+  if(form)form.hidden=true;
+  let box=document.getElementById('invBox');
+  if(!box){box=document.createElement('div');box.id='invBox';box.className='auth-box inv-box';ov.appendChild(box);}
+  ov.classList.add('open');
+  if(typeof _bootVeilHide==='function')_bootVeilHide();
+  _inv={code:String(code||''),v:null,state:'load',mode:'new',mail:''};
+  _invRender();
+  await _invLoad();
+  _invRender();
+}
+async function _invLoad(){
+  const I=_inv;if(!I)return;
+  if(!/^[A-Za-z0-9_-]{16,40}$/.test(I.code)){I.state='none';return;}
+  if(!fbDb){I.state='error';return;}
+  let v;
+  try{v=(await fbDb.ref('fcf_invites/'+I.code).once('value')).val();}catch(e){I.state='error';return;}
+  I.v=v;
+  if(!v||!v.role){I.state='none';return;}
+  let user;
+  try{await _acctReady();user=await _acctCurrent(6000);}catch(e){user=undefined;}
+  I.user=user||null;
+  if(v.revoked){I.state='revoked';return;}
+  if(v.used){I.state=(user&&v.used===user.uid)?'mine':'used';return;}
+  if(!(v.exp>Date.now())){I.state='expired';return;}
+  if(user){
+    let mem=null;
+    try{mem=await _acctMember(user.uid);}catch(e){}
+    if(mem){I.state='member';return;}
+  }
+  I.state='open';
+}
+function _invDate(t){
+  const d=new Date(t);
+  return ['So','Mo','Di','Mi','Do','Fr','Sa'][d.getDay()]+', '+String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.';
+}
+function _invRender(){
+  const box=document.getElementById('invBox'),I=_inv;
+  if(!box||!I)return;
+  const esc=escapeHtml,v=I.v||{};
+  const first=String(v.name||'').split(' ')[0];
+  const club=(G&&G.clubName)||'FC Frohlinde';
+  const toLogin='<button type="button" class="auth-btn auth-navy" onclick="invToLogin()">Zur Anmeldung</button>';
+  const page=(h,p,rest)=>`<h2 class="inv-h">${h}</h2>${p?`<p class="inv-p">${p}</p>`:''}${rest||''}<div class="auth-err" id="invErr" role="alert"></div><div class="auth-note" id="invNote"></div>`;
+  let html;
+  if(I.state==='load')html=page('Einladung','Wird geladen …');
+  else if(I.state==='error')html=page('Einladung','Die Einladung ließ sich nicht laden. Bitte prüfe die Verbindung.','<button type="button" class="auth-btn" onclick="invRetry()">Nochmal</button>');
+  else if(I.state==='none')html=page('Einladung nicht gefunden','Der Link ist unvollständig oder gehört zu keiner Einladung. Bitte frag nach einem neuen Link.',toLogin);
+  else if(I.state==='revoked')html=page('Einladung zurückgezogen','Dieser Link gilt nicht mehr. Bitte frag '+esc(v.byName||'den Admin')+' nach einem neuen.',toLogin);
+  else if(I.state==='expired')html=page('Einladung abgelaufen','Der Link galt bis '+esc(_invDate(v.exp))+'. Bitte frag '+esc(v.byName||'den Admin')+' nach einem neuen.',toLogin);
+  else if(I.state==='used')html=page('Einladung schon benutzt','Mit diesem Link wurde schon ein Konto verbunden. Warst du das, melde dich einfach mit deinem Konto an.',toLogin);
+  else if(I.state==='mine'||I.state==='member')html=page('Du bist schon dabei',
+    'Angemeldet als <b>'+esc((I.user&&I.user.email)||'dein Konto')+'</b>'+(I.state==='member'?' – dieses Konto hat schon Zugang.':'.'),
+    '<button type="button" class="auth-btn" onclick="invGo()">Weiter zur App</button><div class="auth-links"><button type="button" class="auth-link" onclick="invOther()">Anderes Konto verwenden</button></div>');
+  else{
+    const role=v.role==='admin'?'als Admin':'als Trainer';
+    const intro=`<b>${esc(v.byName||'Der Admin')}</b> lädt dich zu Flutlicht ein – ${role} beim ${esc(club)}.`;
+    const foot=`<p class="inv-foot">Gültig bis ${esc(_invDate(v.exp))} · nur einmal nutzbar</p>`;
+    if(I.user){
+      html=page('Willkommen'+(first?', '+esc(first):''),intro,
+        `<div class="auth-who"><span>Angemeldet als <b>${esc(I.user.email||'Konto ohne E-Mail')}</b></span></div>
+        <button type="button" class="auth-btn" onclick="invAccept()">Einladung annehmen</button>
+        <div class="auth-links"><button type="button" class="auth-link" onclick="invOther()">Anderes Konto verwenden</button></div>`)+foot;
+    }else{
+      const neu=I.mode==='new';
+      html=page('Willkommen'+(first?', '+esc(first):''),intro+' Leg dafür dein Konto an – es gehört nur dir.',
+        `<button type="button" class="auth-alt" onclick="acctGoogle('inv')">${_GOOGLE_G}<span>Mit Google fortfahren</span></button>
+        <div class="auth-or"><span>oder mit E-Mail</span></div>
+        <label class="auth-label" for="invMail">E-Mail</label>
+        <input class="auth-input" id="invMail" type="email" autocomplete="email" autocapitalize="off" spellcheck="false" value="${esc(I.mail||'')}" oninput="if(_inv)_inv.mail=this.value" onkeydown="if(event.key==='Enter')document.getElementById('invPw').focus()"/>
+        <label class="auth-label" for="invPw">${neu?'Neues Passwort <span class="auth-hint">mindestens 6 Zeichen</span>':'Passwort'}</label>
+        <input class="auth-input" id="invPw" type="password" autocomplete="${neu?'new-password':'current-password'}" onkeydown="if(event.key==='Enter')invMail()"/>
+        <button type="button" class="auth-btn" onclick="invMail()">${neu?'Konto anlegen':'Anmelden und annehmen'}</button>
+        <div class="auth-links">${neu
+          ?'<button type="button" class="auth-link" onclick="invMode(\'old\')">Ich habe schon ein Konto</button>'
+          :'<button type="button" class="auth-link" onclick="invMode(\'new\')">Neues Konto anlegen</button><button type="button" class="auth-link" onclick="acctMailReset(\'invMail\',\'invErr\',\'invNote\')">Passwort vergessen?</button>'}</div>`)+foot;
+    }
+  }
+  box.innerHTML=html;
+}
+function invMode(m){if(!_inv)return;_inv.mode=m;_invRender();setTimeout(()=>{const i=document.getElementById(_inv&&_inv.mail?'invPw':'invMail');if(i)i.focus();},30);}
+function invRetry(){if(!_inv)return;_inv.state='load';_invRender();_invLoad().then(_invRender);}
+function invToLogin(){
+  _invDropParam();_invClose();
+  if(typeof _initAuthUI==='function')_initAuthUI();
+  _acctLoginOpen();
+}
+async function invOther(){
+  try{if(fbAuth)await fbAuth.signOut();}catch(e){}
+  _acctUser=(fbAuth&&fbAuth.currentUser)||null;   // the state callback may come later
+  if(!_inv)return;
+  _inv.user=null;_inv.state='load';_invRender();
+  await _invLoad();_invRender();
+}
+async function invGo(){
+  const u=_inv&&_inv.user;if(!u)return;
+  _invDropParam();
+  _acctBusy=true;
+  try{await _acctLoginWith(u);}finally{_acctBusy=false;}
+  // No access after all (or no matching trainer): show the login with the reason
+  if(!CU){_invClose();_acctLoginOpen();}
+}
+async function invMail(){
+  const I=_inv;if(!I)return;
+  const em=_acctVal('invMail'),pw=(document.getElementById('invPw')||{}).value||'';
+  I.mail=em;
+  _acctSet('invErr','');_acctSet('invNote','');
+  if(!em||!pw){_acctSet('invErr','Bitte E-Mail und Passwort eingeben.');return;}
+  if(I.mode==='new'&&pw.length<6){_acctSet('invErr','Das Passwort ist zu kurz (mindestens 6 Zeichen).');return;}
+  _acctBusy=true;
+  try{
+    const a=await _acctReady();
+    let r;
+    if(I.mode==='new'){
+      try{r=await a.createUserWithEmailAndPassword(em,pw);}
+      catch(e){
+        if(e&&e.code==='auth/email-already-in-use'){I.mode='old';_invRender();_acctSet('invErr',_acctErrText(e));const p=document.getElementById('invPw');if(p)p.focus();return;}
+        throw e;
+      }
+    }else r=await a.signInWithEmailAndPassword(em,pw);
+    await invAccept(r.user);
+  }catch(e){_acctSet('invErr',_acctErrText(e));}
+  finally{_acctBusy=false;}
+}
+// Redeem: member entry and "used" in one write; the rules check each against the other
+async function invAccept(user){
+  const I=_inv;
+  user=user||(I&&I.user);
+  if(!I||!user||!I.v)return;
+  I.user=user;
+  let mem=null;
+  try{mem=await _acctMember(user.uid);}catch(e){}
+  if(mem){I.state='member';_invRender();return;}
+  const v=I.v,TS=firebase.database.ServerValue.TIMESTAMP;
+  const me={code:I.code,t:TS};
+  if(user.email)me.email=String(user.email).slice(0,120);
+  if(user.displayName)me.name=String(user.displayName).slice(0,120);
+  try{
+    await fbDb.ref().update({['fcf_members/'+user.uid]:me,['fcf_invites/'+I.code+'/used']:user.uid,['fcf_invites/'+I.code+'/usedAt']:TS});
+  }catch(e){
+    // Taken, expired or withdrawn in the meantime: show why
+    await _invLoad();_invRender();
+    if(_inv&&_inv.state==='open')_acctSet('invErr',_acctErrText(e));
+    return;
+  }
+  await _acctData();
+  const cu=_acctCU({code:I.code,role:v.role,name:v.name,trainerId:v.trainerId||''},user);
+  if(!cu){_acctSet('invErr','Dein Konto ist verbunden, aber der Trainer dazu fehlt in der App. Bitte melde dich beim Admin.');return;}
+  _invDropParam();
+  const first=String(v.role==='admin'?((G&&G.adminAuth&&G.adminAuth.firstName)||v.name):cu.name).split(' ')[0];
+  _acctEnter(cu,'invite');
+  setTimeout(()=>{try{showSaveFlash('👋 Willkommen, '+first);}catch(e){}},900);
+}
+
+// ── Admin: access per trainer (Kader → Trainer → Profil → Zugang) ──
+let _acctAdm={t:0,inv:null,mem:null,err:'',busy:false};
+function _acctAdmOn(){return !!(typeof isAdmin==='function'&&isAdmin()&&CU&&CU.acct&&fbDb);}
+async function _acctAdmLoad(force){
+  if(!_acctAdmOn()||_acctAdm.busy)return _acctAdm;
+  if(!force&&_acctAdm.t&&Date.now()-_acctAdm.t<60000)return _acctAdm;
+  _acctAdm.busy=true;
+  try{
+    const [i,m]=await Promise.all([fbDb.ref('fcf_invites').once('value'),fbDb.ref('fcf_members').once('value')]);
+    Object.assign(_acctAdm,{t:Date.now(),inv:i.val()||{},mem:m.val()||{},err:''});
+  }catch(e){Object.assign(_acctAdm,{t:Date.now(),inv:null,mem:null,err:_acctErrText(e)});}
+  finally{_acctAdm.busy=false;}
+  return _acctAdm;
+}
+// Load once in the background, then draw again whatever shows access
+function _acctAdmKick(){
+  if(!_acctAdmOn()||_acctAdm.busy||(_acctAdm.t&&Date.now()-_acctAdm.t<60000))return;
+  _acctAdmLoad().then(_acctAdmRedraw);
+}
+function _acctAdmRedraw(){
+  try{const m=document.getElementById('moTrainerProfile');if(m&&m.classList.contains('open')&&!_tpEditing)renderTrainerProfile();}catch(e){}
+  try{const l=document.getElementById('mgr-tr-list');if(l&&l.offsetParent)renderMgrTrainers();}catch(e){}
+}
+// linked: an account has access · open: a link waits · none
+function _acctStateOf(t){
+  const lc=s=>String(s||'').toLowerCase(),now=Date.now();
+  const mine=Object.entries(_acctAdm.inv||{})
+    .filter(([c,v])=>v&&(v.trainerId?(!!t.id&&v.trainerId===t.id):lc(v.name)===lc(t.name)))
+    .map(([code,v])=>({code,v})).sort((a,b)=>(b.v.t||0)-(a.v.t||0));
+  const mem=_acctAdm.mem||{};
+  const linked=mine.find(x=>x.v.used&&!x.v.revoked&&mem[x.v.used]&&mem[x.v.used].code===x.code);
+  if(linked)return Object.assign({st:'linked',m:mem[linked.v.used]},linked);
+  const open=mine.find(x=>!x.v.used&&!x.v.revoked&&x.v.exp>now);
+  if(open)return Object.assign({st:'open'},open);
+  // Only when the newest link ran out unused (not when it was withdrawn)
+  const last=mine[0];
+  return {st:'none',lastExp:(last&&!last.v.used&&!last.v.revoked&&last.v.exp<=now)?last.v.exp:0};
+}
+function _acctChip(t){
+  if(!_acctAdmOn()||!_acctAdm.inv)return '';
+  const s=_acctStateOf(t);
+  if(s.st==='linked')return '<span class="acc-chip" title="Meldet sich mit eigenem Konto an"><i class="acc-dot ok"></i>Konto</span>';
+  if(s.st==='open')return '<span class="acc-chip" title="Einladungslink wartet"><i class="acc-dot wait"></i>eingeladen</span>';
+  return '';
+}
+function _acctSecHtml(gi){
+  if(!(typeof isAdmin==='function'&&isAdmin()))return '';
+  const t=G.trainers&&G.trainers[gi];if(!t)return '';
+  const esc=escapeHtml,first=String(t.name||'').split(' ')[0];
+  const row=(dot,b,small)=>`<div class="acc-row"><span class="acc-dot${dot?' '+dot:''}"></span><div class="acc-txt"><b>${b}</b>${small?`<small>${small}</small>`:''}</div></div>`;
+  let body;
+  if(!(CU&&CU.acct)){
+    body=row('','Einladen mit eigenem Konto','Melde dich mit deinem Konto an (Google oder E-Mail), dann schickst du '+esc(first)+' hier einen Einladungslink.');
+  }else if(!_acctAdm.t){
+    _acctAdmKick();
+    body=row('','Wird geladen …','');
+  }else if(_acctAdm.err){
+    body=row('','Zugänge nicht geladen',esc(_acctAdm.err))+`<div class="acc-acts"><button type="button" class="btn bs acc-b" onclick="_acctAdmLoad(true).then(_acctAdmRedraw)">Nochmal</button></div>`;
+  }else{
+    _acctAdmKick();
+    const s=_acctStateOf(t);
+    if(s.st==='linked'){
+      const self=s.v.used===CU.acct.uid;
+      body=row('ok',self?'Dein Konto':'Hat ein eigenes Konto',esc((s.m&&s.m.email)||'ohne E-Mail')+' · seit '+esc(_invDate(s.v.usedAt||s.m.t||s.v.t))+(s.v.role==='admin'?' · Admin':''))
+        +(self?'':`<div class="acc-acts"><button type="button" class="btn bs acc-b" onclick="acctRevoke(${gi},'${esc(s.code)}')">Zugang entziehen</button></div>`);
+    }else if(s.st==='open'){
+      body=row('wait','Eingeladen','Link gültig bis '+esc(_invDate(s.v.exp))+' · noch nicht angenommen')
+        +`<div class="acc-acts"><button type="button" class="btn bp acc-b" onclick="acctShare(${gi},'${esc(s.code)}')">Link teilen</button><button type="button" class="btn bs acc-b" onclick="acctRevoke(${gi},'${esc(s.code)}')">Zurückziehen</button></div>`;
+    }else{
+      body=row('','Noch kein eigenes Konto',(s.lastExp?'Der letzte Link ist am '+esc(_invDate(s.lastExp))+' abgelaufen. ':'')+'Mit einem Einladungslink legt '+esc(first)+(t.gender==='w'?' ihr':' sein')+' Konto selbst an – mit Google oder E-Mail.')
+        +`<div class="acc-acts"><button type="button" class="btn bp acc-b" onclick="acctInvite(${gi})">Einladen</button></div>`;
+    }
+  }
+  return `<div class="tp-sec tp-acc"><div class="tp-sec-h">Zugang</div>${body}</div>`;
+}
+function _acctCode(){
+  const a='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_',b=new Uint8Array(20);
+  crypto.getRandomValues(b);
+  return Array.from(b,x=>a[x&63]).join('');
+}
+async function acctInvite(gi){
+  const t=G.trainers&&G.trainers[gi];
+  if(!t||!_acctAdmOn())return;
+  await _acctAdmLoad(true);
+  if(_acctAdm.err){alert(_acctAdm.err);return;}
+  const s=_acctStateOf(t);
+  if(s.st==='linked'){_acctAdmRedraw();return;}
+  if(s.st==='open'){acctShare(gi,s.code);return;}
+  // The id ties the account to this profile, also after a rename
+  if(!t.id){snap();t.id='t'+Date.now();saveG();}
+  const now=Date.now(),code=_acctCode();
+  const by=String((typeof _hxFirstName==='function'&&_hxFirstName())||'Admin').slice(0,60);
+  const v={role:'trainer',name:String(t.name).slice(0,60),trainerId:t.id,t:now,exp:now+INVITE_DAYS*864e5,by:CU.acct.uid,byName:by};
+  try{await fbDb.ref('fcf_invites/'+code).set(v);}
+  catch(e){alert('Die Einladung ließ sich nicht anlegen: '+_acctErrText(e));return;}
+  _acctAdm.inv[code]=v;
+  logAudit('Einladung erstellt',t.name,'gültig '+INVITE_DAYS+' Tage');
+  _acctAdmRedraw();
+  acctShare(gi,code);
+}
+function _inviteLink(code){
+  const base=location.protocol==='file:'?_SHARE_FALLBACK_HOST+'/':location.origin+location.pathname;
+  return base+'?invite='+code;
+}
+let _invShare=null;
+function acctShare(gi,code){
+  const t=G.trainers&&G.trainers[gi],v=_acctAdm.inv&&_acctAdm.inv[code];
+  if(!t||!v)return;
+  const esc=escapeHtml,first=String(t.name||'').split(' ')[0],link=_inviteLink(code),club=(G&&G.clubName)||'FC Frohlinde';
+  _invShare={link,first,text:'Hallo '+first+', hier ist dein Zugang zu Flutlicht ('+club+'): '+link+'\nDamit legst du dein eigenes Konto an – mit Google oder E-Mail. Gültig bis '+_invDate(v.exp)+', nur einmal nutzbar.'};
+  document.getElementById('inv-sh-title').textContent='Einladung für '+t.name;
+  document.getElementById('inv-sh-body').innerHTML=`<p class="inv-sh-p">Schick ${esc(first)} diesen Link. Damit legt ${t.gender==='w'?'sie':'er'} ${t.gender==='w'?'ihr':'sein'} eigenes Konto an und ist dabei. Gültig bis ${esc(_invDate(v.exp))}, nur einmal nutzbar.</p>
+    <input class="inv-sh-link" id="inv-sh-link" readonly value="${esc(link)}" onclick="this.select()" aria-label="Einladungslink">
+    <div class="inv-sh-acts">
+      <button type="button" class="btn bp" onclick="acctShareWa()">WhatsApp</button>
+      <button type="button" class="btn bs" onclick="acctShareCopy(this)">Link kopieren</button>
+      ${navigator.share?'<button type="button" class="btn bs" onclick="acctShareNative()">Teilen …</button>':''}
+    </div>
+    <p class="inv-sh-warn">Wer den Link hat, kann ihn einlösen – also nur an ${esc(first)} schicken.</p>`;
+  openM('moInvite');
+}
+function acctShareWa(){if(_invShare)window.open('https://wa.me/?text='+encodeURIComponent(_invShare.text),'_blank','noopener');}
+function acctShareNative(){if(_invShare&&navigator.share)navigator.share({title:'Flutlicht',text:_invShare.text}).catch(()=>{});}
+function acctShareCopy(btn){
+  if(!_invShare)return;
+  const done=()=>{if(btn){btn.textContent='✓ Kopiert';setTimeout(()=>{btn.textContent='Link kopieren';},2000);}};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(_invShare.link).then(done,()=>{prompt('Link kopieren:',_invShare.link);});
+  else prompt('Link kopieren:',_invShare.link);
+}
+async function acctRevoke(gi,code){
+  const t=G.trainers&&G.trainers[gi],v=_acctAdm.inv&&_acctAdm.inv[code];
+  if(!t||!v||!_acctAdmOn())return;
+  const linked=!!v.used;
+  if(linked&&v.used===CU.acct.uid)return;
+  if(!confirm(linked
+    ?'Zugang von „'+t.name+'“ entziehen?\n\nSein Konto öffnet die App dann nicht mehr. Mit einem neuen Einladungslink geht es später wieder.'
+    :'Einladung für „'+t.name+'“ zurückziehen?\n\nDer Link funktioniert dann nicht mehr.'))return;
+  const upd={['fcf_invites/'+code+'/revoked']:Date.now()};
+  if(linked)upd['fcf_members/'+v.used]=null;
+  try{await fbDb.ref().update(upd);}
+  catch(e){alert('Das hat nicht geklappt: '+_acctErrText(e));return;}
+  logAudit(linked?'Zugang entzogen':'Einladung zurückgezogen',t.name,'');
+  await _acctAdmLoad(true);
+  _acctAdmRedraw();
+}
+// Einstellungen → Konto: how this person signs in
+function _acctKontoHtml(){
+  if(!CU)return '';
+  const esc=escapeHtml;
+  if(CU.acct){
+    return `<div class="acc-row"><span class="acc-dot ok"></span><div class="acc-txt"><b>Eigenes Konto</b><small>Angemeldet als ${esc(CU.acct.email||'Konto ohne E-Mail')} (${CU.acct.via==='google'?'Google':'E-Mail und Passwort'}).</small></div></div>`
+      +(CU.acct.via==='mail'?`<div class="acc-acts"><button type="button" class="btn bs acc-b" onclick="acctMailReset('','kontoAcctErr','kontoAcctNote')">Passwort ändern</button></div><div class="acc-msg" id="kontoAcctErr"></div><div class="acc-msg ok" id="kontoAcctNote"></div>`:'');
+  }
+  return `<div class="acc-row"><span class="acc-dot"></span><div class="acc-txt"><b>Noch mit Name und Passwort</b><small>${isAdmin()
+    ?'Melde dich einmal mit Google oder E-Mail an (Abmelden → „oder mit eigenem Konto“). Mit der Konto-ID, die dann erscheint, wird dein Admin-Zugang eingerichtet (GitHub → Actions → Zugang). Danach lädst du die anderen Trainer per Link ein.'
+    :'Bald meldest du dich mit deinem eigenen Konto an (Google oder E-Mail). Den Link dafür schickt dir der Admin.'}</small></div></div>`;
 }
 
 // Open password+PIN management modal for current user
@@ -8893,6 +9538,7 @@ function saveAdminFirstName(){
 }
 function _kontoFill(){
   if(!CU)return false;
+  {const ab=document.getElementById('konto-acct-box');if(ab)ab.innerHTML=_acctKontoHtml();}
   const auth=_findAuthRecord(CU.name);
   if(!auth)return false;
   const nb=document.getElementById('konto-name-box');
@@ -10146,6 +10792,9 @@ function confirmLogout(){
   if(typeof saveG==='function')saveG();
   localStorage.removeItem(AUTH_SK);sessionStorage.removeItem(AUTH_SK);
   CU=null;
+  // The account too, or the login would offer "Weiter" right away
+  if(fbAuth)fbAuth.signOut().catch(()=>{});
+  {const ab=document.getElementById('authAcctIn');if(ab)ab.dataset.st='';}
   if(typeof _updateAppTitle==='function')_updateAppTitle();
   document.getElementById('authInput').value='';
   document.getElementById('authErr').textContent='';
@@ -10163,6 +10812,7 @@ function confirmLogout(){
   if(typeof _initAuthUI==='function')_initAuthUI();
   document.getElementById('authOverlay').classList.add('open');
   if(typeof _bootVeilHide==='function')_bootVeilHide();
+  _acctLoginOpen();
 }
 function manualSyncSave(){
   if(!fbRef)return alert('Keine Firebase-Verbindung.');
@@ -10220,6 +10870,8 @@ function showApp(){
   if(typeof _automationStart==='function')_automationStart();
   setTimeout(()=>{try{_tgoRun();}catch(e){}},600);
   setTimeout(()=>{try{tpushCheck();}catch(e){}},4000);
+  // Signed in with an account: check it is still valid (removed, revoked, other account)
+  if(CU&&CU.acct)setTimeout(()=>{try{_acctVerify();}catch(e){}},1500);
   if(!(typeof isPlayerMode==='function'&&isPlayerMode()))_a2hsArm('trainer');
   // Startseite: trainer-facing entry screen. Players go straight to their
   // usual flow. Data may still be syncing from Firebase at this point —
@@ -25003,6 +25655,7 @@ function renderTrainerProfile(){
       else if(days<90)html+='<div class="tp-warn">\u23f3 Lizenz l\u00e4uft in '+days+' Tagen ab</div>';
     }
   }
+  if(!ed)html+=_acctSecHtml(_tpIdx);
   box.innerHTML=html;
 }
 // Same rule as the player card: nothing is written until "Fertig". The draft
@@ -25172,6 +25825,7 @@ function renderMgrTrainers(){
   const staff=all.filter(t=>!isCoachRole(t));
   const myT=coaches.concat(staff);
   const showLock=isAdmin();
+  if(showLock)_acctAdmKick();
   const _headBefore=t=>{
     if(!coaches.length||!staff.length)return '';
     if(t===coaches[0])return '<div class="tr-group">Trainerteam</div>';
@@ -25190,7 +25844,7 @@ function renderMgrTrainers(){
         :`<div class="tr-av tr-av-ph">${escapeHtml((t.name||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase())}</div>`;
       const sub=[t.role?trainerRoleLabel(t):'',t.teams.join(', ')].filter(Boolean).join(' \u00b7 ');
       const handle=isAdmin()?`<span class="tr-grip" title="Ziehen zum Sortieren" onpointerdown="trDragStart(event,${gi})">\u283f</span>`:'';
-      return _headBefore(t)+`<div class="tr-row" data-gi="${gi}">${handle}<div class="tr-main" onclick="openTrainerProfile(${gi})" title="Profil öffnen">${av}<div><div class="tr-nm">${escapeHtml(t.name)}${lockIcon}</div><div class="tr-teams">${escapeHtml(sub)}</div></div></div>${resetBtn}${isAdmin()?`<button class="tr-del" onclick="delTrainer(${gi})">✕</button>`:''}</div>`;
+      return _headBefore(t)+`<div class="tr-row" data-gi="${gi}">${handle}<div class="tr-main" onclick="openTrainerProfile(${gi})" title="Profil öffnen">${av}<div><div class="tr-nm">${escapeHtml(t.name)}${lockIcon}${_acctChip(t)}</div><div class="tr-teams">${escapeHtml(sub)}</div></div></div>${resetBtn}${isAdmin()?`<button class="tr-del" onclick="delTrainer(${gi})">✕</button>`:''}</div>`;
     }).join('')
     :'<p style="font-size:.76rem;color:var(--gm);">Kein Trainer für dieses Team.</p>';
 }
@@ -34098,6 +34752,8 @@ _pubCleanupSchedule();
     <section class="set-sec" data-sec="konto">
       <h4 class="set-sec-h">👤 Konto</h4>
       <p class="set-sec-sub">Persönliche Sicherheits- und Sitzungseinstellungen.</p>
+  <!-- ─ Anmeldung: eigenes Konto oder noch Name und Passwort ─ -->
+  <div class="acc-box" id="konto-acct-box"></div>
   <!-- ─ Vorname (nur Admin-Konto: es hat keinen Personennamen) ─ -->
   <div id="konto-name-box" style="display:none;border:1px solid var(--gl);border-radius:8px;padding:11px 13px;margin-bottom:10px;">
     <div style="font-weight:700;color:var(--bd);margin-bottom:8px;font-size:.86rem;">👋 Vorname</div>
@@ -34415,6 +35071,14 @@ _pubCleanupSchedule();
     <button class="ms-row ms-out" onclick="mobSheetClose();confirmLogout()"><span class="ms-row-ic" id="ms-ic-out">⎋</span>Abmelden</button>
   </div>
 </div>
+
+<div class="mo" id="moInvite" style="z-index:890;"><div class="mob" style="width:420px;max-width:94vw;">
+  <div class="tp-title-row">
+    <h3 style="margin:0;flex:1;" id="inv-sh-title">Einladung</h3>
+    <button class="btn bs" onclick="closeM('moInvite')" aria-label="Schließen">✕</button>
+  </div>
+  <div id="inv-sh-body"></div>
+</div></div>
 
 <div class="mo hx-panel" id="moTrainerProfile"><div class="mob" style="width:440px;max-width:96vw;">
   <div class="tp-title-row">
