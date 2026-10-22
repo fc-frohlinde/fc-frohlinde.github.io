@@ -2871,6 +2871,13 @@ body.design-heute.hxk-dk .ss-comm-act[title="L\00f6schen"]{color:#FF9C90 !import
 .ay-box{margin:14px 0 6px;}
 .ay-h span{font-weight:500;color:var(--hx-muted,var(--gm));margin-left:4px;}
 .ay-note{font-size:.76rem;line-height:1.45;color:var(--hx-muted,var(--gm));margin:4px 0 2px;}
+.meet-min{align-items:center;gap:8px;margin-left:auto;}
+.meet-min input{width:5em;margin:0;text-align:right;}
+.meet-min span{font-size:.78rem;color:var(--hx-muted,var(--gm));white-space:nowrap;}
+.meet-where .setting-control{flex:1 1 55%;margin-left:auto;}
+.meet-where input{width:100%;margin:0;box-sizing:border-box;}
+@media (max-width:560px){.meet-where{flex-wrap:wrap;}.meet-where>div:first-child{flex:1 1 100%;}.meet-where .setting-control{flex:1 1 100%;margin-left:0;}}
+#meetBox .setting-label label{font:inherit;text-transform:none;letter-spacing:normal;margin:0;color:inherit;}
 .tp-kinds{margin:2px 0 6px;padding:2px 12px;border-radius:10px;background:rgba(127,127,127,.06);}
 label.tp-kind{display:flex;align-items:flex-start;gap:10px;padding:9px 0;margin:0;cursor:pointer;
   font-size:inherit;font-weight:400;text-transform:none;letter-spacing:normal;line-height:1.3;}
@@ -6519,18 +6526,21 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.13'; // v1.2.13: Spieltag — Kader und Treffpunkt
-const APP_VERSION_LABEL='1.2.13';
+const APP_VERSION='1.2.14'; // v1.2.14: Treffpunkt-Zeiten einstellbar
+const APP_VERSION_LABEL='1.2.14';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792685904014; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792687621318; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.14',date:'22.10.2026',title:'Treffpunkt einstellbar',items:[
+    {icon:'⏱',title:'Wann sich die Mannschaft trifft',desc:'Einstellungen → Mannschaft → „Treffpunkt bei Spielen“: wie viele Minuten vor Anpfiff bei Heim- und bei Auswärtsspielen, dazu der übliche Treffpunkt für Auswärtsspiele. Das Fenster „Kader und Treffpunkt“ schlägt das vor; für ein einzelnes Spiel lässt es sich dort ändern, ohne die Einstellung zu verstellen.'},
+  ]},
   {version:'1.2.13',date:'22.10.2026',title:'Spieltag: Kader und Treffpunkt',items:[
     {icon:'⚽',title:'Kader veröffentlichen',desc:'Im Spiel unter „Kader und Treffpunkt“: Spieler auswählen (vorbelegt mit den Zusagen bzw. der Aufstellung), Uhrzeit und Ort des Treffpunkts angeben, veröffentlichen. Wer im Kader ist, bekommt Treffpunkt und Anstoß aufs Handy. Wer zugesagt hat und nicht dabei ist, erfährt es sachlich, mit dem nächsten Training – damit niemand umsonst zum Treffpunkt kommt. Wer abgesagt oder nicht geantwortet hat, bekommt nichts.'},
     {icon:'✏️',title:'Ändern und zurücknehmen',desc:'Nach einer Änderung bekommt nur eine Nachricht, wen sie betrifft (neu dabei, doch nicht dabei, neuer Treffpunkt). Aufs Handy geht es frühestens 10 Minuten nach dem Veröffentlichen, nie nachts. Alle Spieler sehen ihren Stand in der App.'},
     {icon:'💬',title:'Zum zweiten Mal nicht dabei',desc:'Hat ein Spieler zum zweiten Mal in Folge zugesagt und ist nicht im Kader, sagt es das Fenster vor dem Veröffentlichen – das bespricht man besser persönlich.'},
-    {icon:'👀',title:'Erinnerung für die Trainer',desc:'Steht ein Spiel in den nächsten zwei Tagen ohne veröffentlichten Kader an, erscheint es unter „Im Blick behalten“. Treffpunkt-Zeit und Ort für Auswärtsspiele merkt sich die App für das nächste Mal.'},
+    {icon:'👀',title:'Erinnerung für die Trainer',desc:'Steht ein Spiel in den nächsten zwei Tagen ohne veröffentlichten Kader an, erscheint es unter „Im Blick behalten“.'},
   ]},
   {version:'1.2.12',date:'22.10.2026',title:'Eigenes Konto für Trainer',items:[
     {icon:'🔐',title:'Anmelden mit eigenem Konto',desc:'Unter der bisherigen Anmeldung gibt es jetzt „Mit Google anmelden“ und „Mit E-Mail anmelden“. Ein Konto allein öffnet die App nicht: Zugang gibt eine Einladung vom Admin. Wer eingeladen ist, legt sein Konto über den Link selbst an, niemand muss E-Mail-Adressen sammeln. Name und Passwort funktionieren vorerst weiter.'},
@@ -13736,6 +13746,7 @@ function _setFill(){
   const regSwitch=document.getElementById('setRegStatus');
   if(regSwitch)regSwitch.checked=isRegStatusShown();
   if(typeof ayRender==='function')ayRender();
+  if(typeof meetRender==='function')meetRender();
   _setLogoSync();
   const tc=document.getElementById('set-trash-count');
   if(tc)tc.textContent=Array.isArray(G.trash)&&G.trash.length?`(${G.trash.length})`:'';
@@ -14975,10 +14986,46 @@ function _pmSanitizeG(){
 // (tools/erinnerungen/lib.mjs, planSquad) — keep both the same.
 //   s.squad = {p:[names], out:[names confirmed but not picked, at publishing],
 //              meet:'HH:MM', where, t, by, off?, offBy?}
-// The team remembers how long before kick-off it meets, home and away, and
-// where it meets for away games: G.db[team+'__rules'].meet = {h, a, hw, aw}.
+// How long before kick-off the team meets, home and away, and where it meets
+// for away games, is a setting of the team (Einstellungen → Mannschaft):
+// G.db[team+'__rules'].meet = {h, a, aw} (minutes; place). Home games meet at
+// the ground (the match's location).
 const SQUAD_WD=['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
 const SQUAD_MEET_DEF={h:60,a:90};
+// Minutes before kick-off: the team's setting, else 60 at home and 90 away
+function _meetMin(k){
+  const v=((G&&G.db&&G.db[UI.currentTeam+'__rules'])||{}).meet;
+  const n=v&&typeof v[k]==='number'?v[k]:null;
+  return (n!=null&&n>=0&&n<=240)?n:SQUAD_MEET_DEF[k];
+}
+function meetRender(){
+  const box=document.getElementById('meetBox');if(!box)return;
+  if(!CU||!(typeof canEdit==='function'&&canEdit())){box.innerHTML='';return;}
+  const t=UI.currentTeam||'',e=escapeHtml,aw=((G.db[t+'__rules']||{}).meet||{}).aw||'';
+  const row=(k,label)=>`<div class="setting-row"><div><div class="setting-label"><label for="meet-${k}">${label}</label></div></div>
+    <div class="setting-control meet-min"><input type="number" id="meet-${k}" min="0" max="240" step="5" inputmode="numeric" value="${_meetMin(k)}" onchange="meetSet('${k}',this.value)"><span>Min. vor Anpfiff</span></div></div>`;
+  box.innerHTML=`<div class="setting-label ay-h">⏱ Treffpunkt bei Spielen <span>${e(t)}</span></div>
+    <p class="ay-note">Das schlägt „Kader und Treffpunkt“ vor. Für ein einzelnes Spiel lässt es sich dort ändern.</p>
+    ${row('h','Heimspiele')}${row('a','Auswärtsspiele')}
+    <div class="setting-row meet-where"><div><div class="setting-label"><label for="meet-aw">Treffpunkt auswärts</label></div><div class="setting-sub">Heimspiele: am Spielort</div></div>
+      <div class="setting-control"><input type="text" id="meet-aw" maxlength="80" placeholder="z. B. Parkplatz am Sportplatz" value="${e(aw)}" onchange="meetSet('aw',this.value)"></div></div>`;
+}
+function meetSet(k,val){
+  if(!(typeof canEdit==='function'&&canEdit()))return;
+  const t=UI.currentTeam;
+  let v;
+  if(k==='aw')v=String(val||'').trim().slice(0,80);
+  else{v=Math.round(+val);if(!isFinite(v)||v<0||v>240){alert('Bitte eine Zahl zwischen 0 und 240 Minuten.');meetRender();return;}}
+  snap();
+  if(!G.db[t+'__rules']||typeof G.db[t+'__rules']!=='object')G.db[t+'__rules']={};
+  const m=Object.assign({},G.db[t+'__rules'].meet||{});
+  if(k==='aw'&&!v)delete m.aw;else m[k]=v;
+  G.db[t+'__rules'].meet=m;
+  saveG();
+  logAudit('Treffpunkt-Regel',t,k==='aw'?'auswärts: '+(v||'–'):(k==='h'?'Heimspiele':'Auswärtsspiele')+': '+v+' Min.');
+  if(typeof showSaveFlash==='function')showSaveFlash('\u2713 Gespeichert');
+  meetRender();
+}
 function _sqOf(s){
   const q=s&&s.squad;
   return (q&&typeof q==='object'&&Array.isArray(q.p)&&typeof q.t==='number'&&!q.off)?q:null;
@@ -15068,8 +15115,8 @@ function _sqLineup(D,si){
 function _sqMeetDefault(s){
   const r=(G.db[UI.currentTeam+'__rules']&&G.db[UI.currentTeam+'__rules'].meet)||{};
   const away=s.homeAway!=='home',ko=_sqMin(s.time);
-  const off=away?(r.a||SQUAD_MEET_DEF.a):(r.h||SQUAD_MEET_DEF.h);
-  return {meet:ko==null?'':_sqHM(ko-off),where:away?(r.aw||''):(r.hw||String(s.location||'').trim())};
+  const off=_meetMin(away?'a':'h');
+  return {meet:ko==null?'':_sqHM(ko-off),where:away?(r.aw||''):String(s.location||'').trim()};
 }
 function squadOpen(si){
   if(!(typeof canEdit==='function'&&canEdit()))return;
@@ -15085,7 +15132,7 @@ function squadOpen(si){
   const def=_sqMeetDefault(s);
   document.getElementById('sqMeet').value=q?q.meet:def.meet;
   document.getElementById('sqWhere').value=q?(q.where||''):def.where;
-  const places=new Set([...(typeof getLocations==='function'?getLocations():[]),...['hw','aw'].map(k=>((G.db[UI.currentTeam+'__rules']||{}).meet||{})[k]).filter(Boolean)]);
+  const places=new Set([...(typeof getLocations==='function'?getLocations():[]),((G.db[UI.currentTeam+'__rules']||{}).meet||{}).aw].filter(Boolean));
   document.getElementById('sqWhereList').innerHTML=[...places].map(x=>`<option value="${escapeHtml(x)}">`).join('');
   document.getElementById('sqTitle').textContent='Kader '+_sqFor(s,season);
   document.getElementById('sqSub').textContent=[s.date+(s.label?' gegen '+s.label:''),s.time?'Anstoß '+s.time:'',s.homeAway==='home'?'Heimspiel':s.homeAway==='away'?'Auswärtsspiel':''].filter(Boolean).join(' · ');
@@ -15177,14 +15224,13 @@ function sqPublish(){
   const was=_sqOf(s);
   snap();
   s.squad={p:names,out,meet:_sqHM(mm),where:r.where,t:Date.now(),by:(CU&&CU.name)||''};
-  // Next time the window suggests the same: minutes before kick-off, and the
-  // meeting place of away games (home games default to the ground)
+  // The first away meeting place becomes the team's (visible and changeable
+  // in Einstellungen → Mannschaft); times stay as set there
   const t=UI.currentTeam;
-  if(!G.db[t+'__rules']||typeof G.db[t+'__rules']!=='object')G.db[t+'__rules']={};
-  const rm=Object.assign({},G.db[t+'__rules'].meet||{}),away=s.homeAway!=='home';
-  if(ko!=null&&ko-mm>=0&&ko-mm<=300)rm[away?'a':'h']=ko-mm;
-  if(r.where)rm[away?'aw':'hw']=r.where;
-  G.db[t+'__rules'].meet=rm;
+  if(s.homeAway!=='home'&&r.where&&!((G.db[t+'__rules']||{}).meet||{}).aw){
+    if(!G.db[t+'__rules']||typeof G.db[t+'__rules']!=='object')G.db[t+'__rules']={};
+    G.db[t+'__rules'].meet=Object.assign({},G.db[t+'__rules'].meet||{},{aw:r.where});
+  }
   saveG();
   logAudit(was?'Kader geändert':'Kader veröffentlicht',s.date+(s.label?' '+s.label:''),names.length+' Spieler, Treffpunkt '+_sqHM(mm));
   closeM('moKader');
@@ -35248,6 +35294,7 @@ _pubCleanupSchedule();
     </div>
   </div>
       <div id="ayBox" class="ay-box"></div>
+      <div id="meetBox" class="ay-box"></div>
 
       <div class="set-hx-only" id="set-foc-host" style="margin:16px 0 4px;"><div class="setting-label" style="margin-bottom:6px;">🎯 Schwerpunkte</div>
         <p class="note">Schwerpunkte für <strong id="foc-team-lbl">–</strong></p>
