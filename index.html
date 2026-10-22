@@ -6584,13 +6584,16 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.23'; // v1.2.23: Alle Spieler mit Toren
-const APP_VERSION_LABEL='1.2.23';
+const APP_VERSION='1.2.24'; // v1.2.24: Alle Spieler mit Startelf
+const APP_VERSION_LABEL='1.2.24';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792697619147; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792698904853; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.24',date:'22.10.2026',title:'Statistik: Startelf',items:[
+    {icon:'🟢',title:'Wie oft von Anfang an',desc:'„Alle Spieler“ zeigt, wie oft jemand in der Startelf stand – von den gespielten Spielen mit gespeicherter Aufstellung, bei denen er dabei war („7/10“). Die Bank zählt hier nicht: wer dort sitzt, wird nicht immer eingewechselt.'},
+  ]},
   {version:'1.2.23',date:'22.10.2026',title:'Statistik: Tore',items:[
     {icon:'⚽',title:'Tore, Vorlagen, Spieler des Spiels',desc:'„Alle Spieler“ zeigt die Tore und Vorlagen aus den Spielen („3 · 2“) und wie oft jemand Spieler des Spiels war (🏅) – sortierbar. Die Spalten erscheinen, sobald in der Saison etwas davon eingetragen ist; Tore und Vorlagen trägt man im Spiel unter „Tore und Vorlagen eintragen“ ein.'},
   ]},
@@ -26715,6 +26718,18 @@ function _statsPlayerTable(D,opts){
     if(Array.isArray(s.mvpWin))return s.mvpWin;
     try{const r=mvpResult(s);return r?r.winners:null;}catch(e){return null;}
   });
+  // Saved lineups of the matches played — the starting eleven is a fact once
+  // the match took place (a plan before). The bench is not: not everyone on it
+  // comes on, so it is not counted here.
+  const _bk=Object.keys((G&&G.db)||{}).find(k=>G.db[k]===D)||'';
+  const _bm=/^(.+)__(\d{4}\/\d{2})$/.exec(_bk);
+  const luAt=ss.map((s,i)=>{
+    if(!_bm||!s||s.type!=='match'||!_isPast(i))return null;
+    const lu=G.matchLineups&&G.matchLineups[_mlKey(_bm[1],_bm[2],i)];
+    if(!lu||(lu.sessDate&&lu.sessDate!==s.date))return null;
+    const st=Object.values(lu.slots||{}).filter(v=>typeof v==='number');
+    return st.length?new Set(st):null;
+  });
   // Per player — same: only past sessions, factual statuses for denominator
   const rows=(D.players||[]).map(p=>{
     const ownIdx=i=>_isPast(i)&&_sessAfterJoin(p,ss[i]); // before he was on the team → out
@@ -26731,12 +26746,15 @@ function _statsPlayerTable(D,opts){
     const num=(arr,i)=>(Array.isArray(arr)&&+arr[i]>0)?+arr[i]:0;
     const goals=mIdx.reduce((t,i)=>t+num(p.goals,i),0),assists=mIdx.reduce((t,i)=>t+num(p.assists,i),0);
     const mvp=mIdx.filter(i=>mvpW[i]&&mvpW[i].includes(p.name)).length;
+    const _pi=D.players.indexOf(p);
+    const stIn=mIdx.filter(i=>luAt[i]&&luAt[i].has(_pi)).length;
+    const stOf=mIdx.filter(i=>luAt[i]&&(luAt[i].has(_pi)||(p.s&&p.s[i]===1))).length;
     return{pi:D.players.indexOf(p),nr:p.nr,name:p.name,shortname:p.shortname,pos:p.pos,pos2:p.pos2||'',tA,tPl,tPct,mA,mPl,mPct,pct:tPct,perfAvg,perfAvgSort:perfAvg!=null?perfAvg:99,perfCount:perfVals.length,
-      goals,assists,gSort:goals*1000+assists,mvp};
+      goals,assists,gSort:goals*1000+assists,mvp,stIn,stOf,stSort:stIn*1000+stOf};
   });
   // The columns appear once the season has any of it — empty columns of
   // dashes would only push the rest off a phone screen
-  const hasG=rows.some(r=>r.goals||r.assists),hasM=rows.some(r=>r.mvp);
+  const hasG=rows.some(r=>r.goals||r.assists),hasM=rows.some(r=>r.mvp),hasL=luAt.some(Boolean);
   // Equal shares: the one who was there more often first (18/18 before 2/2)
   rows.sort((a,b)=>{const v=statsSort.col;let r=typeof a[v]==='string'?a[v].localeCompare(b[v]):a[v]-b[v];
     if(!r&&v==='tPct')r=a.tA-b.tA;if(!r&&v==='mPct')r=a.mA-b.mA;return statsSort.asc?r:-r;});
@@ -26747,7 +26765,7 @@ function _statsPlayerTable(D,opts){
   return `${opts.noHead?'':`    <div class="sec" style="margin-top:12px;margin-bottom:8px;">🏆 Alle Spieler</div>
 `}    <div style="${wrap}">
     <table class="full-table"><thead><tr>
-      ${th('nr','#')}${th('name','Spieler')}${th('pos','Pos.')}${th('tPct','Training')}${mS?th('mPct','Spiele'):''}${hasG?th('gSort','Tore · Vorl.'):''}${hasM?`<th onclick="sortStats('mvp')" title="Spieler des Spiels">🏅 ${sa('mvp')}</th>`:''}${th('perfAvgSort','⭐ Einsatz')}
+      ${th('nr','#')}${th('name','Spieler')}${th('pos','Pos.')}${th('tPct','Training')}${mS?th('mPct','Spiele'):''}${hasL?th('stSort','Startelf'):''}${hasG?th('gSort','Tore · Vorl.'):''}${hasM?`<th onclick="sortStats('mvp')" title="Spieler des Spiels">🏅 ${sa('mvp')}</th>`:''}${th('perfAvgSort','⭐ Einsatz')}
     </tr></thead><tbody>
     ${rows.map(r=>{const bc=pctColor(r.tPct);
       const openHandler=open(r.pi);
@@ -26758,6 +26776,7 @@ function _statsPlayerTable(D,opts){
       <td class="pos-td"><div class="pos-wrap">${pbHtml(r)}</div></td>
       ${_stPc(r.tA,r.tPl,r.tPct,'Trainings')}
       ${mS?_stPc(r.mA,r.mPl,r.mPct,'Spielen'):''}
+      ${hasL?`<td class="st-gv" title="${r.stIn} von ${r.stOf} Spielen mit Aufstellung, bei denen er dabei war">${r.stOf?`<b>${r.stIn}</b><small>/</small>${r.stOf}`:'–'}</td>`:''}
       ${hasG?`<td class="st-gv" title="${r.goals} ${r.goals===1?'Tor':'Tore'}, ${r.assists} ${r.assists===1?'Vorlage':'Vorlagen'}">${r.goals||r.assists?`<b>${r.goals}</b><small>·</small>${r.assists}`:'–'}</td>`:''}
       ${hasM?`<td title="${r.mvp}× Spieler des Spiels">${r.mvp||'–'}</td>`:''}
       <td style="font-weight:700;color:${perfColor};" title="${r.perfCount} bewertete Termine">${r.perfAvg!=null?r.perfAvg.toFixed(1).replace('.',','):'–'}</td>
