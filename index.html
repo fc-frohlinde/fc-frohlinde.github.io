@@ -6679,13 +6679,16 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.8'; // v1.2.8: Mitteilung zurücknehmen
-const APP_VERSION_LABEL='1.2.8';
+const APP_VERSION='1.2.9'; // v1.2.9: Benachrichtigungen überleben Updates
+const APP_VERSION_LABEL='1.2.9';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792668616740; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792670008425; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.9',date:'22.10.2026',title:'Benachrichtigungen bleiben an',items:[
+    {icon:'🔔',title:'Updates schalten Benachrichtigungen nicht mehr ab',desc:'Beim Laden einer neuen Version hat die App bisher ihren Hintergrunddienst neu angemeldet – damit hat der Browser das Abo für Benachrichtigungen beendet, bei Trainern wie bei Spielern. Jetzt bleibt er angemeldet. Geräte, die ihr Abo so verloren haben, melden sich beim nächsten Öffnen von selbst wieder an, solange die Erlaubnis noch besteht; nur wo der Browser dafür ein Tippen verlangt, erscheint noch einmal „Einschalten“.'},
+  ]},
   {version:'1.2.8',date:'22.10.2026',title:'Mitteilung an die Mannschaft: bewusst und zurücknehmbar',items:[
     {icon:'☑️',title:'„Spieler benachrichtigen“ ist aus, bis du es einschaltest',desc:'Bei „Trainingszeiten ändern“ und „Trainingspause“. Eingeschaltet zeigt das Fenster genau die Nachricht, die die Spieler bekommen. Die Vorschau nennt bei jedem Training die neue Uhrzeit.'},
     {icon:'↩️',title:'Zurücknehmen',desc:'Solange eine Mitteilung läuft, steht sie unter „Im Blick behalten“. Ein Tippen nimmt sie zurück: Die Spieler sehen sie nicht mehr in ihrer Übersicht. Aufs Handy geht sie frühestens 10 Minuten nach dem Speichern – bis dahin kommt sie dort gar nicht erst an.'},
@@ -10253,12 +10256,16 @@ async function _hardReload(){
       await Promise.all(keys.map(k=>caches.delete(k)));
     }
   }catch(e){console.warn('[hardReload] cache purge failed',e);}
+  // The service worker stays registered: unregistering it ends its push
+  // subscription, and until 1.2.9 every update switched off reminders and
+  // notifications on the device. sw.js asks the network first for every page,
+  // so the new version loads anyway; update() fetches a newer sw.js, if any.
   try{
     if('serviceWorker' in navigator){
       const regs=await navigator.serviceWorker.getRegistrations();
-      await Promise.all(regs.map(r=>r.unregister()));
+      await Promise.race([Promise.all(regs.map(r=>r.update().catch(()=>{}))),new Promise(r=>setTimeout(r,1500))]);
     }
-  }catch(e){console.warn('[hardReload] SW unregister failed',e);}
+  }catch(e){console.warn('[hardReload] SW update failed',e);}
   // Cache-busting query string forces network re-fetch on Safari that ignores reload(true)
   const u=new URL(location.href);
   u.searchParams.set('_v',Date.now().toString(36));
@@ -16782,13 +16789,13 @@ function _pushLs(k,v){
 // off | on | denied | ios (iPhone in the browser: push only in the installed app) | none
 function pushPlayerState(){
   const tok0=(CU&&CU.playerToken)||'';
-  const onHere=_pushOn===true||(_pushOn===null&&pushCan()&&Notification.permission==='granted'&&_pushLs('on_'+tok0)==='1');
+  const onHere=_pushOn===true||(_pushOn===null&&pushCan()&&Notification.permission==='granted'&&(_pushLs('on_'+tok0)==='1'||!!_pushLs('rec_'+tok0)));
   if(!_pushPub&&!onHere)return 'none';     // not set up yet
   if(typeof _a2hsIOS==='function'&&_a2hsIOS()&&!_a2hsStandalone())return 'ios';
   if(!pushCan())return 'none';
   if(Notification.permission==='denied')return 'denied';
   const tok=(CU&&CU.playerToken)||'';
-  if(_pushOn===true||(_pushOn===null&&Notification.permission==='granted'&&_pushLs('on_'+tok)==='1'))return 'on';
+  if(_pushOn===true||(_pushOn===null&&Notification.permission==='granted'&&(_pushLs('on_'+tok)==='1'||!!_pushLs('rec_'+tok))))return 'on';
   return 'off';
 }
 // "Später" on the offer: ask again in two weeks
@@ -16809,6 +16816,31 @@ function _pushDev(){
 async function _pushReg(){
   if(!pushCan())return null;
   return navigator.serviceWorker.ready;
+}
+// The registration; right after a start sw.js may still be registering
+// (on load), so wait for it a little. null = unknown: then nothing is
+// switched off on the strength of it.
+async function _pushRegNow(ms){
+  try{
+    const r=await navigator.serviceWorker.getRegistration();
+    if(r)return r;
+    return await Promise.race([navigator.serviceWorker.ready,new Promise(res=>setTimeout(()=>res(null),ms||8000))]);
+  }catch(e){return null;}
+}
+// The browser lost the subscription although nobody switched it off (until
+// 1.2.9 every app update did that). With the permission still granted,
+// subscribe again quietly; where the browser wants a tap for it, this fails
+// and the offer shows instead.
+async function _pushResub(reg,pub){
+  try{
+    if(!reg||!pub||Notification.permission!=='granted')return null;
+    return await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:_pushKey(pub)});
+  }catch(e){console.warn('[Push] resubscribe',e&&e.message);return null;}
+}
+// The record of an address that no longer exists: away, so the job does not try it
+async function _pushDropOld(owner,oldEp,newEp){
+  if(!fbDb||!owner||!oldEp||oldEp===newEp)return;
+  try{await fbDb.ref('fcf_push/subs/'+owner+'/'+(await _pushSha(oldEp)).slice(0,16)).remove();}catch(e){}
 }
 // owner: 'p' + token hash (player) or 't' + name hash (trainer test device)
 async function _pushStore(sub,owner,extra){
@@ -16845,16 +16877,25 @@ async function pushCheck(){
     return;
   }
   try{
-    const reg=await navigator.serviceWorker.getRegistration();
-    const sub=reg?await reg.pushManager.getSubscription():null;
-    const on=!!(sub&&Notification.permission==='granted');
+    const reg=await _pushRegNow();
     const tok=CU.playerToken||'';
-    _pushOn=on;_pushLs('on_'+tok,on?1:null);
-    if(on){
-      const ep=sub.endpoint,last=JSON.parse(_pushLs('rec_'+tok)||'{}');
-      if(last.ep!==ep||Date.now()-(last.t||0)>7*864e5){
-        const owner=await _pushOwner();
-        if(owner&&await _pushStore(sub,owner)){_pushLs('rec_'+tok,JSON.stringify({ep,t:Date.now()}));_pmSavePush(true);}
+    const last=JSON.parse(_pushLs('rec_'+tok)||'{}');
+    if(reg){
+      let sub=await reg.pushManager.getSubscription();
+      // rec_ stays until he switches off himself: an update took the
+      // subscription, so subscribe again quietly
+      if(!sub&&last.ep&&Notification.permission==='granted')sub=await _pushResub(reg,_pushPub||await pushLoadPub());
+      const on=!!(sub&&Notification.permission==='granted');
+      _pushOn=on;_pushLs('on_'+tok,on?1:null);
+      if(on){
+        const ep=sub.endpoint;
+        if(last.ep!==ep||Date.now()-(last.t||0)>7*864e5){
+          const owner=await _pushOwner();
+          if(owner&&await _pushStore(sub,owner)){
+            await _pushDropOld(owner,last.ep,ep);
+            _pushLs('rec_'+tok,JSON.stringify({ep,t:Date.now()}));_pmSavePush(true);
+          }
+        }
       }
     }
   }catch(e){console.warn('[Push] check',e&&e.message);}
@@ -17054,7 +17095,8 @@ function tpushState(){
   if(!pushCan())return 'none';
   if(Notification.permission==='denied')return 'denied';
   const nm=(CU&&CU.name)||'';
-  if(_tpOn===true||(_tpOn===null&&Notification.permission==='granted'&&_pushLs('ton_'+nm)==='1'))return 'on';
+  // trec_ stays until he switches off himself: on, also when an update took the subscription
+  if(_tpOn===true||(_tpOn===null&&Notification.permission==='granted'&&(_pushLs('ton_'+nm)==='1'||!!_pushLs('trec_'+nm))))return 'on';
   return 'off';
 }
 // The job's public key: asked for when switching on (pushLoadPub keeps a
@@ -17105,17 +17147,33 @@ async function tpushDisable(){
 async function tpushCheck(){
   if(!CU||!canEdit()||(typeof isPlayerMode==='function'&&isPlayerMode())||!pushCan())return;
   const nm=CU.name||'';
-  if(_pushLs('ton_'+nm)!=='1')return;
+  const last=JSON.parse(_pushLs('trec_'+nm)||'{}');
+  if(_pushLs('ton_'+nm)!=='1'&&!last.ep)return;      // never on here, or switched off
+  const before=tpushState();
   try{
-    const reg=await navigator.serviceWorker.getRegistration();
-    const sub=reg?await reg.pushManager.getSubscription():null;
-    if(!sub||Notification.permission!=='granted'){_tpOn=false;_pushLs('ton_'+nm,null);return;}
-    _tpOn=true;
-    const last=JSON.parse(_pushLs('trec_'+nm)||'{}');
-    if(fbDb&&(last.ep!==sub.endpoint||Date.now()-(last.t||0)>7*864e5)){
-      if(await _pushStore(sub,await _tpOwner(),{trainer:nm,tp:1}))_pushLs('trec_'+nm,JSON.stringify({ep:sub.endpoint,t:Date.now()}));
+    const reg=await _pushRegNow();
+    if(!reg)return;
+    let sub=await reg.pushManager.getSubscription();
+    if(Notification.permission!=='granted'){_tpOn=false;_pushLs('ton_'+nm,null);}
+    else{
+      if(!sub)sub=await _pushResub(reg,await _tpPub());
+      if(!sub){_tpOn=false;_pushLs('ton_'+nm,null);}
+      else{
+        _tpOn=true;_pushLs('ton_'+nm,1);
+        if(fbDb&&(last.ep!==sub.endpoint||Date.now()-(last.t||0)>7*864e5)){
+          const owner=await _tpOwner();
+          if(await _pushStore(sub,owner,{trainer:nm,tp:1})){
+            await _pushDropOld(owner,last.ep,sub.endpoint);
+            _pushLs('trec_'+nm,JSON.stringify({ep:sub.endpoint,t:Date.now()}));
+          }
+        }
+      }
     }
   }catch(e){console.warn('[TPush] check',e&&e.message);}
+  if(before!==tpushState()){
+    try{tpushRender();}catch(e){}
+    try{if(typeof hxRender==='function')hxRender();}catch(e){}
+  }
 }
 function tpushRender(){
   const box=document.getElementById('tpushBox');if(!box)return;
