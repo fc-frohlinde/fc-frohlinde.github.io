@@ -6579,13 +6579,16 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.20'; // v1.2.20: Übersicht — Spielkarte wie Terminkarte
-const APP_VERSION_LABEL='1.2.20';
+const APP_VERSION='1.2.21'; // v1.2.21: Statistik zählt nur A/F/E
+const APP_VERSION_LABEL='1.2.21';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792695372715; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792696074758; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.21',date:'22.10.2026',title:'Statistik',items:[
+    {icon:'📈',title:'Gleiche Zahlen überall',desc:'Die Seite Statistik zählte „Nicht im Kader“ als Fehlen, und an einigen Stellen (Wochentage, Verlauf pro Monat) auch noch nicht erfasste Zusagen. Jetzt zählen dort wie in Tabelle, Profil und Karte nur A, F und E; M, ? und N zählen nicht.'},
+  ]},
   {version:'1.2.20',date:'22.10.2026',title:'Übersicht',items:[
     {icon:'📊',title:'Spielkarte zählt wie die Terminkarte',desc:'Die Karte „Nächstes Spiel“ fasste Absagen und Entschuldigungen als „fehlen“ zusammen – vor dem Spiel fehlt aber noch niemand. Jetzt steht dort wie beim nächsten Termin „abgesagt · entschuldigt · offen“, in denselben Farben, und ein Tipp öffnet die Gruppe im Spiel. Gruppen mit 0 (außer „offen“) werden weggelassen.'},
   ]},
@@ -6879,6 +6882,8 @@ const POS_LBL={TW:'Torwart',RV:'Rechter Verteidiger',IV:'Innenverteidiger',LV:'L
  // trainer cycle: ?→A→F→E (status 4 not in cycle — set by player only)
 // 5 = Nicht im Kader (1.2.18): confirmed for a match but not picked. Neutral —
 // every count of attendance takes 1/0/2 only, so it is left out everywhere.
+// A fact about attendance: only these count in any percentage
+const _stFact=v=>v===1||v===0||v===2;
 const SYM={1:'A',0:'F',2:'E',3:'?',4:'M',5:'N'}; // M for "aMgemeldet" (Angemeldet)
 const CLS={1:'csa',0:'csf',2:'cse',3:'csq',4:'csm',5:'csn'};
 const STLBL={1:'Anwesend',0:'Fehlend',2:'Entschuldigt',3:'Ausstehend',4:'Angemeldet',5:'Nicht im Kader'};
@@ -19447,8 +19452,8 @@ function dbComputeMetrics(data){
   let tA=0,tT=0,mA=0,mT=0,oA=0,oT=0;
   players.forEach(p=>{
     if(!p)return;
-    tPastIdx.forEach(i=>{if(!_sessAfterJoin(p,sessions[i],season))return;const v=p.s&&p.s[i];if(v===3||v==null||v===4)return;tT++;oT++;if(v===1){tA++;oA++;}});
-    mPastIdx.forEach(i=>{if(!_sessAfterJoin(p,sessions[i],season))return;const v=p.s&&p.s[i];if(v===3||v==null||v===4)return;mT++;oT++;if(v===1){mA++;oA++;}});
+    tPastIdx.forEach(i=>{if(!_sessAfterJoin(p,sessions[i],season))return;const v=p.s&&p.s[i];if(!_stFact(v))return;tT++;oT++;if(v===1){tA++;oA++;}});
+    mPastIdx.forEach(i=>{if(!_sessAfterJoin(p,sessions[i],season))return;const v=p.s&&p.s[i];if(!_stFact(v))return;mT++;oT++;if(v===1){mA++;oA++;}});
   });
   // Avg group size — ONLY past sessions (otherwise future "0 anwesend" drags it down)
   const sessionPresent=sessions.map((s,i)=>{
@@ -19487,7 +19492,7 @@ function dbRankPlayers(data){
       if(!sessTookPlace(s,season))return; // future sessions are not facts
       if(!_sessAfterJoin(p,s,season))return; // before he was on the team
       const v=p.s&&p.s[i];
-      if(v===3||v==null||v===4)return; // 4 = Angemeldet = pre-state
+      if(!_stFact(v))return; // only A/F/E are facts: ? and M not yet, N never
       taken++;
       if(v===1)att++;
     });
@@ -19583,7 +19588,7 @@ function dbComputeWeekday(data){
       if(!p)return;
       if(!_sessAfterJoin(p,s,season))return; // before he was on the team
       const v=p.s&&p.s[si];
-      if(v===3||v==null)return;
+      if(!_stFact(v))return;
       wd[dow].t++;
       if(v===1)wd[dow].a++;
     });
@@ -19647,7 +19652,7 @@ function dbComputeMonthlyTrend(data){
       if(!p)return;
       if(!_sessAfterJoin(p,s,season))return; // before he was on the team
       const v=p.s&&p.s[si];
-      if(v===3||v==null)return;
+      if(!_stFact(v))return;
       monthly[key].taken++;
       if(v===1)monthly[key].att++;
     });
@@ -19843,7 +19848,7 @@ function dbComputeWeekReport(data,offsetWeeks){
       if(!p)return;
       if(!_sessAfterJoin(p,s,season))return; // before he was on the team
       const v=p.s&&p.s[i];
-      if(v==null||v===3||v===4||v===4)return; // 4 = Angemeldet = pre-state, not yet marked
+      if(!_stFact(v))return; // only A/F/E are facts: ? and M not yet, N never
       if(isMatch){mT++;if(v===1)mA++;}else{tT++;if(v===1)tA++;}
     });
   });
@@ -19875,7 +19880,7 @@ function _dbComputeSeasonStats(data){
       if(!sessTookPlace(s,season))return; // future sessions are not facts
       if(!_sessAfterJoin(p,s,season))return; // before he was on the team
       const v=p.s&&p.s[si];
-      if(v==null||v===3||v===4||v===4)return; // 4 = Angemeldet = pre-state, not yet marked
+      if(!_stFact(v))return; // only A/F/E are facts: ? and M not yet, N never
       tot++;teamT++;
       if(v===1){pres++;teamA++;}
     });
@@ -19906,7 +19911,7 @@ function _psWeekSeries(p,block,season,weeks){
     const y=Math.floor(sk/10000),m=Math.floor(sk/100)%100,d=sk%100;
     const key=isoWeekKey(new Date(y,m-1,d));
     const v=p.s&&p.s[si];
-    if(v==null||v===3||v===4)return;
+    if(!_stFact(v))return;
     if(!buckets[key])buckets[key]={a:0,t:0,sk};
     buckets[key].t++;
     if(v===1)buckets[key].a++;
@@ -21096,7 +21101,7 @@ function computePlayerWeekday(occurrences){
       if(!wd[dow])return;
       if(!_sessAfterJoin(p,s,season))return; // before he was on the team
       const v=p.s&&p.s[si];
-      if(v===3||v==null||v===4||v===4)return; // 4 = Angemeldet — pre-state, not a fact
+      if(!_stFact(v))return; // only A/F/E are facts
       wd[dow].t++;
       if(v===1)wd[dow].a++;
     });
