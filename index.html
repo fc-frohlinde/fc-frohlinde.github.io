@@ -2596,6 +2596,9 @@ body.design-heute .dow-btn.sel-m{background:var(--mc1);border-color:var(--mc1);c
 .sqd-link{background:none;border:none;padding:4px 0;color:var(--hx-blue,var(--bm));font:700 .84rem 'Barlow',sans-serif;cursor:pointer;}
 .sqd-go:focus-visible,.sqd-link:focus-visible{outline:2px solid var(--hx-blue,var(--bm));outline-offset:2px;}
 .sqd-mob>*{flex-shrink:0;}
+.sqd-std{margin:6px 0 0;font-size:.76rem;color:var(--hx-muted,var(--gm));}
+.mob label.rs-chk.sqd-keep{margin:8px 0 0;}
+.mob label.rs-chk.sqd-keep[hidden]{display:none;}
 .sqd-two{display:grid;grid-template-columns:7.2em minmax(0,1fr);gap:10px;}
 .sqd-two input{width:100%;box-sizing:border-box;}
 .sqd-lh{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:14px 0 6px;font-size:.86rem;color:var(--hx-ink,var(--gd));}
@@ -6526,15 +6529,15 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.14'; // v1.2.14: Treffpunkt-Zeiten einstellbar
-const APP_VERSION_LABEL='1.2.14';
+const APP_VERSION='1.2.15'; // v1.2.15: Treffpunkt als Standard merken
+const APP_VERSION_LABEL='1.2.15';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792687621318; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792688131310; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
   {version:'1.2.14',date:'22.10.2026',title:'Treffpunkt einstellbar',items:[
-    {icon:'⏱',title:'Wann sich die Mannschaft trifft',desc:'Einstellungen → Mannschaft → „Treffpunkt bei Spielen“: wie viele Minuten vor Anpfiff bei Heim- und bei Auswärtsspielen, dazu der übliche Treffpunkt für Auswärtsspiele. Das Fenster „Kader und Treffpunkt“ schlägt das vor; für ein einzelnes Spiel lässt es sich dort ändern, ohne die Einstellung zu verstellen.'},
+    {icon:'⏱',title:'Wann sich die Mannschaft trifft',desc:'Einstellungen → Mannschaft → „Treffpunkt bei Spielen“: wie viele Minuten vor Anpfiff bei Heim- und bei Auswärtsspielen, dazu der übliche Treffpunkt für Auswärtsspiele. Das Fenster „Kader und Treffpunkt“ schlägt das vor und zeigt, was der Standard ist. Weicht ein Spiel ab, ändert man es dort; mit „Als Standard merken“ gilt es auch für die nächsten Spiele, sonst nur für dieses.'},
   ]},
   {version:'1.2.13',date:'22.10.2026',title:'Spieltag: Kader und Treffpunkt',items:[
     {icon:'⚽',title:'Kader veröffentlichen',desc:'Im Spiel unter „Kader und Treffpunkt“: Spieler auswählen (vorbelegt mit den Zusagen bzw. der Aufstellung), Uhrzeit und Ort des Treffpunkts angeben, veröffentlichen. Wer im Kader ist, bekommt Treffpunkt und Anstoß aufs Handy. Wer zugesagt hat und nicht dabei ist, erfährt es sachlich, mit dem nächsten Training – damit niemand umsonst zum Treffpunkt kommt. Wer abgesagt oder nicht geantwortet hat, bekommt nichts.'},
@@ -15096,6 +15099,8 @@ function _sqEnsure(){
     <p class="rs-lead" id="sqSub"></p>
     <div class="sqd-two"><div><label for="sqMeet">Treffpunkt um</label><input type="time" id="sqMeet"></div>
       <div><label for="sqWhere">Wo <span class="rs-opt">(optional)</span></label><input type="text" id="sqWhere" maxlength="80" list="sqWhereList" placeholder="z. B. Parkplatz am Sportplatz"><datalist id="sqWhereList"></datalist></div></div>
+    <div class="sqd-std" id="sqStd"></div>
+    <label class="rs-chk sqd-keep" id="sqKeepL" hidden><input type="checkbox" id="sqKeep"><span id="sqKeepT"></span></label>
     <div class="sqd-lh"><span id="sqCount"></span><button type="button" class="sqd-link" id="sqFromLu" onclick="sqFromLineup()" hidden>Wie in der Aufstellung</button></div>
     <div class="sqd-list" id="sqList"></div>
     <div class="sqd-warn" id="sqWarn" hidden></div>
@@ -15129,6 +15134,7 @@ function squadOpen(si){
   if(q)(D.players||[]).forEach((p,pi)=>{if(p&&q.p.includes(p.name))sel.add(pi);});
   else (_sqLineup(D,si)||(D.players||[]).map((p,pi)=>(p&&join(p)&&_sqSt(p,si)===4)?pi:-1).filter(pi=>pi>=0)).forEach(pi=>sel.add(pi));
   _SQ={si,sel,date:s.date,was:!!q};
+  document.getElementById('sqKeep').checked=false;
   const def=_sqMeetDefault(s);
   document.getElementById('sqMeet').value=q?q.meet:def.meet;
   document.getElementById('sqWhere').value=q?(q.where||''):def.where;
@@ -15176,6 +15182,18 @@ function _sqPrevOut(D,si,season){
   });
   return new Set(best?(best.q.out||[]):[]);
 }
+// The team's standard for this match, and what would change if kept
+function _sqStd(s){
+  const away=s.homeAway!=='home',k=away?'a':'h';
+  const r=((G.db[UI.currentTeam+'__rules']||{}).meet)||{};
+  return {away,k,min:_meetMin(k),aw:away?(r.aw||''):null};
+}
+function _sqKeepWhat(s,r){
+  const st=_sqStd(s),ko=_sqMin(s.time),mm=_sqMin(r.meet),out={};
+  if(ko!=null&&mm!=null&&mm<=ko&&ko-mm<=240&&ko-mm!==st.min)out.min=ko-mm;
+  if(st.away&&r.where&&r.where!==st.aw)out.aw=r.where;
+  return out;
+}
 function _sqRead(){
   return {meet:String(document.getElementById('sqMeet').value||'').trim(),where:String(document.getElementById('sqWhere').value||'').trim().slice(0,80)};
 }
@@ -15197,6 +15215,16 @@ function _sqRenderSum(){
   w.hidden=!twice.length;
   w.innerHTML=twice.length?`<b>${e(twice.join(', '))}</b> ${twice.length===1?'ist':'sind'} zum 2. Mal in Folge trotz Zusage nicht im Kader – besser persönlich sprechen.`:'';
   const r=_sqRead(),q={meet:r.meet||'…',where:r.where};
+  // What the standard is — and, when this match differs, the offer to keep it
+  const st=_sqStd(s),kw=_sqKeepWhat(s,r);
+  document.getElementById('sqStd').textContent='Standard für '+(st.away?'Auswärtsspiele':'Heimspiele')+': '+st.min+' Min. vor Anpfiff'
+    +(st.away?(st.aw?' · '+st.aw:''):' · am Spielort');
+  const kl=document.getElementById('sqKeepL'),diff=('min' in kw)||('aw' in kw);
+  kl.hidden=!diff;
+  if(!diff)document.getElementById('sqKeep').checked=false;
+  else document.getElementById('sqKeepT').innerHTML='Als Standard für '+(st.away?'Auswärtsspiele':'Heimspiele')+' merken<small>'
+    +e([('min' in kw)?st.min+' → '+kw.min+' Min. vor Anpfiff':'',('aw' in kw)?'Treffpunkt: '+kw.aw:''].filter(Boolean).join(' · '))
+    +'. Sonst gilt es nur für dieses Spiel.</small>';
   const m=_sqMsg(D,si,season,q);
   const push=ins.concat(outs).filter(p=>p.push&&p.push.t).length,tot=ins.length+outs.length;
   const box=(cls,t,b)=>`<div class="sqd-msg ${cls}"><b>${e(t)}</b><span>${e(b)}</span></div>`;
@@ -15224,12 +15252,16 @@ function sqPublish(){
   const was=_sqOf(s);
   snap();
   s.squad={p:names,out,meet:_sqHM(mm),where:r.where,t:Date.now(),by:(CU&&CU.name)||''};
-  // The first away meeting place becomes the team's (visible and changeable
-  // in Einstellungen → Mannschaft); times stay as set there
-  const t=UI.currentTeam;
-  if(s.homeAway!=='home'&&r.where&&!((G.db[t+'__rules']||{}).meet||{}).aw){
+  // "Als Standard merken": the team's setting follows this match; otherwise
+  // the setting stays as it is
+  const t=UI.currentTeam,kw=_sqKeepWhat(s,r);
+  if(document.getElementById('sqKeep').checked&&(('min' in kw)||('aw' in kw))){
     if(!G.db[t+'__rules']||typeof G.db[t+'__rules']!=='object')G.db[t+'__rules']={};
-    G.db[t+'__rules'].meet=Object.assign({},G.db[t+'__rules'].meet||{},{aw:r.where});
+    const k=s.homeAway!=='home'?'a':'h',mt=Object.assign({},G.db[t+'__rules'].meet||{});
+    if('min' in kw)mt[k]=kw.min;
+    if('aw' in kw)mt.aw=kw.aw;
+    G.db[t+'__rules'].meet=mt;
+    logAudit('Treffpunkt-Regel',t,(k==='a'?'Auswärtsspiele':'Heimspiele')+': '+[('min' in kw)?kw.min+' Min.':'',('aw' in kw)?kw.aw:''].filter(Boolean).join(', ')+' (aus dem Kader-Fenster)');
   }
   saveG();
   logAudit(was?'Kader geändert':'Kader veröffentlicht',s.date+(s.label?' '+s.label:''),names.length+' Spieler, Treffpunkt '+_sqHM(mm));
