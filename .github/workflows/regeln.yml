@@ -31,4 +31,17 @@ jobs:
           java-version: 21
       - name: Emulator und Tests
         working-directory: tools/regeln
-        run: npx --yes firebase-tools@15.34.1 emulators:exec --only database --project demo-flutlicht "node test.mjs"
+        # The rules are loaded by test.mjs itself, so a mistake in them shows
+        # up as a failed check with the emulator's message, not as a start error.
+        run: |
+          set -o pipefail
+          npx --yes firebase-tools@15.34.1 emulators:exec --only database --project demo-flutlicht "node test.mjs" 2>&1 | tee out.txt
+      # Logs of this public repo are not readable from everywhere; the last
+      # lines of a failed run as one annotation make the cause visible.
+      - name: Ausgabe bei Fehler
+        if: failure()
+        working-directory: tools/regeln
+        run: |
+          [ -f out.txt ] || exit 0
+          msg=$(tail -n 60 out.txt | grep -v '^::' | sed 's/%/%25/g' | sed ':a;N;$!ba;s/\n/%0A/g')
+          echo "::warning title=Regeln Ausgabe::$msg"

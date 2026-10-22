@@ -21,7 +21,9 @@ const cannot = async (m, p) => { const r = await p; ok(!r.ok, 'darf nicht: ' + m
 // rules into the emulator
 const rules = fs.readFileSync(new URL('./database.rules.json', import.meta.url), 'utf8');
 const rr = await fetch(HOST + '/.settings/rules.json?ns=' + NS, { method: 'PUT', headers: { Authorization: 'Bearer owner' }, body: rules });
-ok(rr.ok, 'Regeln geladen (' + rr.status + ')');
+const rrBody = await rr.text();
+ok(rr.ok, 'Regeln geladen (' + rr.status + ')' + (rr.ok ? '' : ': ' + rrBody.slice(0, 600).replace(/\n/g, ' ')));
+if (!rr.ok) process.exit(1);
 
 const now = Date.now(), DAY = 864e5;
 const inv = (o) => Object.assign({ role: 'trainer', name: 'Jimmy', trainerId: 't2', t: now, exp: now + 7 * DAY, by: 'uAdmin', byName: 'Artem' }, o);
