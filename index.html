@@ -6623,13 +6623,19 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.4'; // v1.2.4: Antwort-Regel der Mannschaft
-const APP_VERSION_LABEL='1.2.4';
+const APP_VERSION='1.2.5'; // v1.2.5: weniger Handarbeit
+const APP_VERSION_LABEL='1.2.5';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792662121972; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792662879326; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.5',date:'22.10.2026',title:'Weniger Handarbeit',items:[
+    {icon:'✍️',title:'„Anwesenheit fehlt“ immer im Blick',desc:'Die Übersicht zeigt unter „Im Blick behalten“ jede Einheit der letzten 14 Tage, bei der noch Spieler ohne Eintrag sind – „?“ oder „M“. Ein Tippen öffnet das Erfassen. Die alte Einstellung „Roll-Call-Erinnerung“ ist dafür nicht mehr nötig und entfällt.'},
+    {icon:'🔔',title:'„Erinnern“ aufs Handy',desc:'Im Terminfenster schickt „Erinnern“ allen, die noch nicht geantwortet und Erinnerungen an haben, eine persönliche Nachricht (mit der nächsten Runde, nie nachts). Für die übrigen gibt es den Text für die WhatsApp-Gruppe – ohne Namensliste.'},
+    {icon:'📋',title:'Wochenbericht ohne Rangliste',desc:'Spieler sehen die Zahlen der Mannschaft, ihre eigene Woche und, wer bei allen Terminen dabei war. Die Rangliste und die Tabelle mit „gefehlt“ und „entschuldigt“ aller Mitspieler entfallen, ebenso der Platz in „Meine Statistik“. Euer Wochenbericht bleibt, wie er ist.'},
+    {icon:'💡',title:'Karte',desc:'Die höchste Stufe heißt auf der Karte „Volles Flutlicht“ – damit sie nicht wie das App-Logo darunter aussieht.'},
+  ]},
   {version:'1.2.4',date:'22.10.2026',title:'Wer gilt als dabei?',items:[
     {icon:'✅',title:'Antwort-Regel der Mannschaft',desc:'Einstellungen → Mannschaft: „Alle gelten als dabei“, getrennt für Trainings und Spiele. Dann steht jeder Spieler ohne Antwort bei allen künftigen Terminen automatisch auf „M“ – auch bei neuen Terminen und neuen Spielern. Wer nicht kann, sagt in der App ab. Niemand muss mehr von Hand auf „M“ gesetzt werden.'},
     {icon:'↩️',title:'Jederzeit zurück',desc:'Wird die Regel ausgeschaltet, werden nur die automatisch gesetzten „M“ wieder „?“. Was Spieler selbst geantwortet oder ihr von Hand eingetragen habt, bleibt.'},
@@ -14957,6 +14963,8 @@ function _automationListRollCallCards(){
 function _automationRenderCards(){
   const wrap=document.getElementById('automationCards');
   if(!wrap)return;
+  // Replaced in 1.2.5 by "Anwesenheit fehlt" in "Im Blick behalten"
+  wrap.innerHTML='';wrap.style.display='none';return;
   if(!canEdit()){wrap.innerHTML='';wrap.style.display='none';return;}
   let html='';
   // Week-report and RSVP-reminder cards removed: players use the hub
@@ -15015,7 +15023,7 @@ function onAutoRollCallChange(){
 function _automationSyncSettingsUI(){
   const editable=canEdit&&canEdit();
   const section=document.getElementById('setAutomationSection');
-  if(section)section.style.display=editable?'block':'none';
+  if(section)section.style.display='none';   // replaced by "Im Blick behalten" (1.2.5)
   if(!editable)return;
   const s=_automationGetPrefs();
   const rcEnabled=document.getElementById('autoRollCallEnabled');
@@ -16301,7 +16309,7 @@ const CARD_TIERS=[
   {k:'bronze',name:'Bronze',min:0,lamps:3,m:['#7A4A28','#E8B386','#9A6238'],ink:'#E9B78C',hi:'#F6D2B0',lo:'#C07A47'},
   {k:'silber',name:'Silber',min:60,lamps:4,m:['#7D8AA0','#F3F6FB','#98A4B8'],ink:'#DDE4EF',hi:'#FFFFFF',lo:'#A9B5C8'},
   {k:'gold',name:'Gold',min:80,lamps:5,m:['#B07D0C','#FFE48F','#D9A21B'],ink:'#F2C230',hi:'#FFE897',lo:'#E0A51C'},
-  {k:'flutlicht',name:'Flutlicht',min:95,lamps:6,m:['#F2C230','#FFFFFF','#FFE9A0'],ink:'#FFF3C4',hi:'#FFFFFF',lo:'#FFDD7A'}
+  {k:'flutlicht',name:'Flutlicht',label:'Volles Flutlicht',min:95,lamps:6,m:['#F2C230','#FFFFFF','#FFE9A0'],ink:'#FFF3C4',hi:'#FFFFFF',lo:'#FFDD7A'}
 ];
 // Excused without penalty: of t recorded sessions, up to one per started ten
 // that the trainers marked Entschuldigt are left out — a cold must not cost a
@@ -16482,7 +16490,7 @@ function cardDraw(cv,d,o){
   x.strokeStyle=metal(126,106,234,214);x.lineWidth=3;
   x.beginPath();x.arc(180,160,55.5,0,Math.PI*2);x.stroke();
   // Colour and season
-  x.font='800 15px '+BS;x.fillStyle=T.ink;_mkSpaced(x,T.name.toUpperCase(),22,32,2.2,'left');
+  x.font='800 15px '+BS;x.fillStyle=T.ink;_mkSpaced(x,(T.label||T.name).toUpperCase(),22,32,2.2,'left');
   x.font='600 11px '+BA;x.fillStyle='rgba(255,255,255,.55)';x.textAlign='right';x.fillText(d.season,338,31);
   // Name, fitted to the width
   x.textAlign='center';x.fillStyle='#FFFFFF';
@@ -16603,7 +16611,7 @@ function cardShare(){
   if(!can)return cardSave();
   const T=CARD_TIERS[_mkData.ti];
   navigator.share({files:[f],title:'Meine Flutlicht-Karte',
-    text:'Meine Flutlicht-Karte: '+T.name+', '+_mkData.pct+' % Anwesenheit'})
+    text:'Meine Flutlicht-Karte: '+(T.label||T.name)+', '+_mkData.pct+' % Anwesenheit'})
     .catch(e=>{if(!e||e.name!=='AbortError')cardSave();});
 }
 function cardSave(){
@@ -17484,7 +17492,7 @@ function _hubBuildLive(found){
   const data={team:found.team,season:found.season,block,sessions:block.sessions,players:block.players};
   const off=(typeof _dbCompletedWeekOffset==='function')?_dbCompletedWeekOffset():-1;
   let report=null,stats=null;
-  try{report=dbBuildReportSnapshot(data,off,false);}catch(e){console.error('[HubLive report]',e);}
+  try{report=_reportForPlayers(dbBuildReportSnapshot(data,off,false),found.pi);}catch(e){console.error('[HubLive report]',e);}
   try{stats=dbBuildPlayerStatsSnapshot(data,found.pi,off,true);}catch(e){console.error('[HubLive stats]',e);}
   _hubLive={report,stats,data,off,pi:found.pi};
 }
@@ -18804,19 +18812,7 @@ function renderPlayerMode(){
     if(stats.streak>0){
       html+=`<div class="pm-stat"><div class="pm-stat-val">\ud83d\udd25 ${stats.streak}</div><div class="pm-stat-lbl">Streak</div></div>`;
     }
-    // Rank: top 3 always shown as medal; otherwise show "#X" only if player is in
-    // the upper half of the team (median split — scales to teams of any size,
-    // avoids demotivating players in the bottom half).
-    if(stats.rank!=null){
-      const teamSize=(typeof CU!=='undefined'&&CU&&typeof CU._pmTeamSize==='number')?CU._pmTeamSize:0;
-      const median=teamSize>0?Math.ceil(teamSize/2):0;
-      const medal=stats.rank===1?'\ud83e\udd47':stats.rank===2?'\ud83e\udd48':stats.rank===3?'\ud83e\udd49':'';
-      if(medal){
-        html+=`<div class="pm-stat"><div class="pm-stat-val">${medal}</div><div class="pm-stat-lbl">Rang</div></div>`;
-      } else if(median>0&&stats.rank<=median){
-        html+=`<div class="pm-stat"><div class="pm-stat-val">#${stats.rank}</div><div class="pm-stat-lbl">von ${teamSize}</div></div>`;
-      }
-    }
+    // No place in the team (1.2.5): the card and this page are about him alone.
     html+='</div>';
   }
   html+='</div></div>';
@@ -19849,6 +19845,17 @@ function dbBuildPlayerStatsSnapshot(data,pi,offset,includePhoto){
     }
   };
 }
+// What players get of the weekly report (decided 21.10.2026): the team's
+// numbers, their own line and the names of those at every session of the
+// week — no ranking, no one else's absences. me: the player's index, or null
+// for the trainers' preview.
+function _reportForPlayers(r,me){
+  if(!r||!Array.isArray(r.players))return r;
+  const full=r.players.filter(p=>p&&p.wTotal>0&&p.wPct===100).map(p=>p.name);
+  const mine=(me!=null)?r.players.find(p=>p&&p._pi===me):null;
+  const strip=p=>{const o=Object.assign({},p);delete o._pi;return o;};
+  return Object.assign({},r,{aud:'players',full,me:mine?mine.name:null,players:mine?[strip(mine)]:[]});
+}
 function dbBuildReportSnapshot(data,offset,includePhotos){
   const r=dbComputeWeekReport(data,offset);
   const seasonStats=_dbComputeSeasonStats(data);
@@ -19859,6 +19866,7 @@ function dbBuildReportSnapshot(data,offset,includePhotos){
     const wPct=pr.marked>0?Math.round(pr.present/pr.total*100):null;
     const sPct=ss.total>0?Math.round(ss.present/ss.total*100):null;
     return {
+      _pi:pr.pi,
       name:pr.name,
       nr:(p.nr!=null&&p.nr!=='')?p.nr:null,
       pos:p.pos||'',
@@ -20167,7 +20175,7 @@ async function dbOpenPlayerReport(){
   // Open the tab inside the click (popup blockers), fill it once the photos are ready
   const w=standalone?null:window.open('about:blank','_blank');
   const data={team,season,block,sessions:block.sessions,players:block.players};
-  const snap=dbBuildReportSnapshot(data,_dbState.weekReportOffset||0,true);
+  const snap=_reportForPlayers(dbBuildReportSnapshot(data,_dbState.weekReportOffset||0,true),null);
   if(Array.isArray(snap.players))await Promise.all(snap.players.map(async p=>{if(p&&p.photo)p.photo=await _hubThumb(p.photo,96);}));
   // localStorage, not sessionStorage: the tab is already open and would not see later writes
   try{localStorage.setItem('fcf_live_report',JSON.stringify(snap));}catch(e){if(w)w.close();alert('Vorschau nicht möglich.');return;}
@@ -23192,21 +23200,37 @@ function _ssxSet(si,pi,v){
   try{if(typeof _kbVisible==='function'&&_kbVisible())kbRender();}catch(e){}
 }
 // One message for the group chat with the names that have not answered yet
+// "Erinnern" in the session window. Players with reminders on get a
+// personal push: the request is stored on the session (s.remind) and the job
+// on GitHub sends it with its next round, never at night. For the others a
+// text for the team group — without listing who has not answered.
 function ssRemindOpen(si){
   if(!canEdit())return;
   const D=cd();const s=D&&D.sessions&&D.sessions[si];if(!s)return;
   const season=UI.currentSeason;
-  const names=(D.players||[]).filter(p=>p&&(typeof _sessAfterJoin!=='function'||_sessAfterJoin(p,s,season))&&(((p.s&&si<p.s.length)?p.s[si]:3)===3))
-    .map(p=>(getDisplayName?getDisplayName(p):p.name)||'').filter(Boolean);
-  if(!names.length){alert('Alle haben geantwortet.');return;}
+  const open=(D.players||[]).filter(p=>p&&(typeof _sessAfterJoin!=='function'||_sessAfterJoin(p,s,season))&&(((p.s&&si<p.s.length)?p.s[si]:3)===3));
+  if(!open.length){alert('Alle haben geantwortet.');return;}
+  const push=open.filter(p=>p.push&&p.push.t).length,rest=open.length-push;
   const what=s.type==='match'?('das Spiel'+(s.label?' gegen '+s.label:'')):'das Training';
   const dl=typeof _amSessionDeadline==='function'?_amSessionDeadline(si):null;
-  const txt='\u23f3 Für '+what+' am '+s.date+(s.time?' um '+s.time:'')+' fehlt noch die Antwort von:\n'
-    +names.join(', ')+'\n\nBitte kurz zu- oder absagen'+(dl?' (bis '+_amFmtDeadline(dl)+')':'')+'. Danke!';
+  let head='';
+  if(push){
+    snap();
+    s.remind={t:Date.now(),by:(CU&&CU.name)||''};
+    saveG();
+    const h=new Date(),m=h.getHours()*60+h.getMinutes();
+    head=push+(push===1?' Spieler bekommt':' Spieler bekommen')+' eine Erinnerung aufs Handy'+((m>=22*60+30||m<8*60)?' – morgen ab 8 Uhr.':' – in den nächsten 15 Minuten.');
+    logAudit('Erinnerung',s.date||'?',push+' per Push'+(rest?', '+rest+' ohne':''));
+  }
+  if(!rest){alert(head);return;}
+  const q=(head?head+'\n\n':'')+rest+(rest===1?' Spieler hat':' Spieler haben')+' keine Erinnerungen aufs Handy. Text für die WhatsApp-Gruppe öffnen? (ohne Namen)';
+  if(!confirm(q))return;
+  const txt='\u23f3 Für '+what+' am '+s.date+(s.time?' um '+s.time:'')+' fehlen noch Antworten.\n'
+    +'Bitte kurz in der App zu- oder absagen'+(dl?' (bis '+_amFmtDeadline(dl)+')':'')+'. Danke!';
   _dbCopyText(txt);
   if(typeof showSaveFlash==='function')showSaveFlash('\ud83d\udccb Nachricht kopiert');
   window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank','noopener');
-  logAudit('Erinnerung',s.date||'?',names.length+' offen');
+  if(!push)logAudit('Erinnerung',s.date||'?',rest+' offen (WhatsApp)');
 }
 
 // ── SESSION COMMENTS / NOTIZEN ───────────────────────────────
@@ -25432,8 +25456,8 @@ function hxRender(){
   // ── Im Blick behalten ──
   const flags=[];
   try{
-    const rc=(typeof _automationListRollCallCards==='function')?_automationListRollCallCards():[];
-    rc.forEach(x=>flags.push({dot:'#C9373E',who:'Anwesenheit fehlt',what:(x.sess.type==='match'?'Spiel':'Training')+' vom '+x.sess.date+' ist noch nicht erfasst',on:`rcOpen(${x.si})`}));
+    _rcMissing(D,season).forEach(x=>flags.push({dot:'#C9373E',who:'Anwesenheit fehlt',
+      what:(x.s.type==='match'?'Spiel':'Training')+' vom '+x.s.date+(x.there?': '+x.open+' Spieler ohne Eintrag':' ist noch nicht erfasst'),on:`rcOpen(${x.si})`}));
   }catch(e){}
   const t0=_hxDate(today);
   const inDays=(s,a,bb)=>{const d=Math.round((_hxDate(sk(s))-t0)/86400000);return d>=a&&d<=bb;};
@@ -25487,6 +25511,30 @@ function hxRender(){
   el.innerHTML=html;
 }
 
+// Sessions over in the last 14 days with players still without an entry
+// ("?" or "M"), newest first, at most three. No setting: the same rule as the
+// trainers' push "Anwesenheit fehlt". Players who said "nicht dabei" stay open
+// after "Rest anwesend" on purpose — so they keep the session on this list.
+function _rcMissing(D,season){
+  const out=[];const now=Date.now();
+  (D&&D.sessions||[]).forEach((s,si)=>{
+    if(!s||!s.date||(s.type!=='training'&&s.type!=='match'))return;
+    if(!sessTookPlace(s,season))return;
+    const sk=(typeof _dbSortKey==='function')?_dbSortKey(s.date,season):dispToSortKey(s.date);
+    const tp=String(s.time||'').split(':').map(Number);
+    const start=_hxDate(sk).getTime()+((tp.length===2&&!isNaN(tp[0]))?tp[0]*60+(tp[1]||0):0)*60000;
+    const end=start+((typeof s.duration==='number'&&s.duration>0)?s.duration:90)*60000;
+    if(end>now||now-start>14*864e5)return;
+    let open=0,there=0;
+    (D.players||[]).forEach(p=>{
+      if(!p||(typeof _sessAfterJoin==='function'&&!_sessAfterJoin(p,s,season)))return;
+      const v=(Array.isArray(p.s)&&si<p.s.length&&p.s[si]!=null)?p.s[si]:3;
+      if(v===1)there++;else if(v===3||v===4)open++;
+    });
+    if(open)out.push({si,s,open,there,start});
+  });
+  return out.sort((a,b)=>b.start-a.start).slice(0,3);
+}
 // "Im Blick": three rows on tablets and short windows, four otherwise
 function _hxFlagCap(){return (innerWidth>=768&&(innerWidth<=1180||innerHeight<=820))?3:4;}
 window.addEventListener('resize',()=>{

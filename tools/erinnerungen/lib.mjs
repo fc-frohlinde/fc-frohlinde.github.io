@@ -9,6 +9,7 @@ export const RPE_AFTER = 20;              // minutes after the planned end
 export const RPE_DEFAULT_MIN = 90;        // as in the app
 export const VOTE_FROM = 17 * 60;         // the day after a match
 export const RSVP_FROM = 18 * 60;         // the evening before
+export const ASK_VALID = 12 * 3600e3;     // "Erinnern" by a trainer counts for 12 h
 
 // ── the app's storage format (fbEncodeValue) ──
 export function decode(val) {
@@ -97,10 +98,14 @@ export function anyDue(sessions, season, now, cfg) {
     if (on(cfg, 'rpe') && k === today && sm != null && now.min >= sm + (s.duration > 0 ? s.duration : RPE_DEFAULT_MIN) + RPE_AFTER - 30) return true;
     if (on(cfg, 'vote') && s.type === 'match' && k === yest && now.min >= VOTE_FROM) return true;
     if (on(cfg, 'rsvp') && k === tom && now.min >= RSVP_FROM) return true;
+    if (asked(s, now)) return true;
     return false;
   });
 }
 const on = (cfg, k) => !(cfg && cfg[k] === false);
+// A trainer pressed "Erinnern" in the session window (s.remind = {t, by}):
+// fresh, and the session has not begun
+const asked = (s, now) => !!(s && s.remind && typeof s.remind.t === 'number' && now.ts - s.remind.t < ASK_VALID && now.ts >= s.remind.t - 60e3);
 
 // What to send now: [{owner, pi, kind, key, payload, ttl}]. owners: Set of
 // subscribed owner ids; sent: {"<kind>-<key>": {owner: ts}} for today.
@@ -135,6 +140,17 @@ export function plan({ sessions, players, season, team, now, cfg, owners, sent }
           title: 'Spieler des Spiels',
           body: (s.label ? 'Gegen ' + s.label + ' fehlt' : 'Für das Spiel gestern fehlt') + ' noch deine Stimme – bis heute 24 Uhr.',
           url: link('&do=vote&s=' + si), tag: 'vote-' + key } });
+      }
+      // "Erinnern" by a trainer: everyone still without an answer, once per press,
+      // whatever the automatic reminders are set to
+      if (asked(s, now) && v === 3 && k >= today && !(k === today && sm != null && now.min >= sm)
+        && !(typeof s.rsvpUntil === 'number' && now.ts > s.rsvpUntil)) {
+        const rk = key + '-' + s.remind.t;
+        if (!was('ask', rk, owner)) out.push({ owner, pi, kind: 'ask', key: rk, ttl: ttlToMidnight(now) + 12 * 3600, payload: {
+          title: (s.type === 'match' ? 'Spiel' + (s.label ? ' ' + against(s) : '') : 'Training') + ' '
+            + (k === today ? 'heute' : k === tom ? 'morgen' : 'am ' + s.date) + (hhmm(s) ? ', ' + hhmm(s) : ''),
+          body: 'Kommst du? Sag kurz zu oder ab.',
+          url: link('&do=week'), tag: 'ask-' + key } });
       }
       // Zu- oder Absage: tomorrow's session, no answer yet, deadline not passed
       if (on(cfg, 'rsvp') && k === tom && now.min >= RSVP_FROM && v === 3

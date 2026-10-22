@@ -142,6 +142,10 @@
 
   /* ── Ranking ── */
   .rank-list{display:flex;flex-direction:column;gap:8px;}
+  .full-card{background:var(--card);border:1px solid var(--card-br);border-radius:14px;padding:13px 15px;}
+  .full-lbl{font-size:.74rem;color:var(--txt-faint);margin-bottom:4px;}
+  .full-names{font-weight:700;font-size:.95rem;line-height:1.45;color:var(--txt);}
+  .preview-note{font-size:.78rem;color:var(--txt-faint);text-align:center;}
   /* ── Personal statistics page ── */
   .ps-wrap{max-width:560px;margin:0 auto;padding:18px 14px 40px;}
   .ps-hero{display:flex;align-items:center;gap:14px;margin-bottom:6px;}
@@ -547,15 +551,41 @@ function renderReport(r){
         <div class="empty-week-ico">${up.length?'\u23f3':'\u2615'}</div>
         <div class="empty-week-txt">${up.length
           ?`In dieser Woche hat noch <b>kein Termin stattgefunden</b>. Als N\u00e4chstes:<br>${upTxt}`
-          :`In dieser Woche gab es <b>keine Termine</b>.<br>Die Saison-Wertung l\u00e4uft aber weiter \u2014 schau dir deinen Platz an!`}</div>
+          :`In dieser Woche gab es <b>keine Termine</b>.`}</div>
       </div>
     </div>`;
   }
 
-  // Combined Rangliste — Saison (default) ↔ Diese Woche toggle.
-  // Cache state + rows for the toggle handler to re-render in place.
-  _rankState={weekRanked,seasonRanked,hasWeekSessions,rankRow};
-  html+=`<div class="sec fade-seq" id="ranking-sec" style="animation-delay:.1s"></div>`;
+  // No ranking and no one else's absences any more (1.2.5): the player sees
+  // his own week and who was at every session. Old snapshots without "aud"
+  // (an app not yet updated) get the same treatment.
+  _rankState=null;
+  const me=(r.aud==='players'&&r.me)?(r.players||[]).find(p=>p&&p.name===r.me):null;
+  const full=Array.isArray(r.full)?r.full:(r.players||[]).filter(p=>p&&p.wTotal>0&&p.wPct===100).map(p=>p.name);
+  if(me){
+    const cells=me.wCells&&me.wCells.length?`<div class="rank-cells">${me.wCells.map(cellEmoji).join('')}</div>`:'';
+    html+=`<div class="sec fade-seq" style="animation-delay:.1s">
+      <div class="sec-head"><h2>\ud83d\ude4b Deine Woche</h2><div class="sec-line"></div></div>
+      <div class="rank-list"><div class="rank-row me-row">
+        ${av(me)}
+        <div class="rank-info"><div class="rank-name">${esc(me.name)}</div>${cells}</div>
+        <div class="rank-pct">
+          <div class="rank-pct-main"><div class="num ${pctClass(me.wPct)}">${me.wPct==null?'\u2013':me.wPct+'%'}</div><div class="sub">${me.wTotal?esc(me.wPresent+'/'+me.wTotal):'\u2013'}</div></div>
+          <div class="rank-pct-alt"><span class="alt-lbl">Saison</span><span class="alt-val ${pctClass(me.sPct)}">${me.sPct==null?'\u2013':me.sPct+'%'}</span></div>
+        </div>
+      </div></div>
+      ${cells?`<div class="legend"><span>\u2705 da</span><span>\ud83d\udfe1 entschuldigt</span><span>\u274c gefehlt</span><span>\u2796 offen</span></div>`:''}
+    </div>`;
+  }
+  if(hasWeekSessions&&full.length){
+    html+=`<div class="sec fade-seq" style="animation-delay:.15s">
+      <div class="sec-head"><h2>\ud83d\udcaa Immer dabei</h2><div class="sec-line"></div></div>
+      <div class="full-card"><div class="full-lbl">Bei allen Terminen dieser Woche dabei:</div><div class="full-names">${full.map(esc).join(', ')}</div></div>
+    </div>`;
+  }
+  if(r.aud==='players'&&!r.me){
+    html+=`<div class="sec fade-seq preview-note" style="animation-delay:.18s">Vorschau: So sehen es die Spieler – jeder zusätzlich mit seiner eigenen Woche.</div>`;
+  }
 
   // Mannschaft
   html+=`<div class="sec fade-seq" style="animation-delay:.2s">
@@ -591,10 +621,7 @@ function renderReport(r){
   </div>`;
 
   html+=`</div>`; // .wrap
-  // Reset to default sort on each fresh report load
-  _rankSort='season';
   app.innerHTML=html;
-  renderRankingSection();
 }
 
 // ── PERSONAL STATISTICS PAGE ──────────────────────────────

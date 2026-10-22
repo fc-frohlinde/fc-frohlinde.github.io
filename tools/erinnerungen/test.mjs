@@ -157,4 +157,38 @@ function world() {
   await round({ db, push: makePush(), ts: Date.UTC(2026, 9, 20, 9, 0), log: q });      // 11:00, nothing due
   ok(reads.some(p => p.endsWith('/sessions')) && !reads.some(p => p.endsWith('/players')), 'nothing due: players not read');
 }
+// ── "Erinnern" by a trainer ──
+{
+  const { sess, players } = data();
+  const ti = sess.findIndex(s => s.date === 'Do 22.10');
+  players[1].s[ti] = 4; players[2].s[ti] = 0;
+  const subs = { [ownerOf('tok0')]: { a: dev('max') }, [ownerOf('tok1')]: { a: dev('ali') }, [ownerOf('tok2')]: { a: dev('tom') }, [ownerOf('tok3')]: { a: dev('jonas') } };
+  const press = Date.UTC(2026, 9, 21, 9, 0);                                         // Wed 11:00
+  sess[ti].remind = { t: press, by: 'Artem' };
+  const db = makeDb({ fcf_data: { db: { 'U19__2026__SL__27': { sessions: enc(sess), players: enc(players) } } }, fcf_push: { subs, config: { U19: { rsvp: false } } } });
+  let push = makePush();
+  await round({ db, push, ts: press + 7 * 60e3, log: q });
+  const to = push.calls.map(c => c.ep.replace('https://push.example/', '')).sort().join(',');
+  ok(to === 'jonas,max' && push.calls[0].p.title === 'Training morgen, 18:30' && push.calls[0].p.body === 'Kommst du? Sag kurz zu oder ab.' && push.calls[0].p.url.endsWith('&do=week'),
+    'Erinnern: only who has not answered, even with the automatic reminder off: ' + to + ' ' + (push.calls[0] || { p: {} }).p.title);
+  push = makePush();
+  await round({ db, push, ts: press + 22 * 60e3, log: q });
+  ok(push.calls.length === 0, 'Erinnern: once per press');
+  const s2 = JSON.parse(JSON.stringify(sess)); s2[ti].remind = { t: press + 3600e3, by: 'Artem' };
+  await db.set('fcf_data/db/U19__2026__SL__27/sessions', enc(s2));
+  push = makePush();
+  await round({ db, push, ts: press + 3600e3 + 7 * 60e3, log: q });
+  ok(push.calls.length === 2, 'pressed again later: again (' + push.calls.length + ')');
+  push = makePush();
+  await round({ db, push, ts: press + 13 * 3600e3, log: q });
+  ok(push.calls.length === 0, 'old press (13 h): nothing');
+  const s3 = JSON.parse(JSON.stringify(sess)); s3[ti].remind = { t: Date.UTC(2026, 9, 21, 20, 50), by: 'Artem' };   // 22:50
+  const db3 = makeDb({ fcf_data: { db: { 'U19__2026__SL__27': { sessions: enc(s3), players: enc(players) } } }, fcf_push: { subs } });
+  push = makePush();
+  await round({ db: db3, push, ts: Date.UTC(2026, 9, 21, 21, 7), log: q });
+  ok(push.calls.length === 0, 'pressed at night: not at night');
+  push = makePush();
+  await round({ db: db3, push, ts: Date.UTC(2026, 9, 22, 6, 7), log: q });
+  ok(push.calls.length === 2 && push.calls[0].p.title === 'Training heute, 18:30', 'pressed at night: the next morning, "heute": ' + push.calls.map(c => c.p.title).join());
+}
 console.log(fails ? fails + ' FAILED' : 'all passed');
