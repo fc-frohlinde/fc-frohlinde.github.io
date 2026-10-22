@@ -174,6 +174,15 @@ if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostnam
 .rc-tabs button.on{background:#fff;color:#0E2350;}
 .rc-tabs button:focus-visible,.rc-b:focus-visible,.rc-g:focus-visible,.rc-fb:focus-visible{outline:3px solid #F2C230;outline-offset:2px;}
 .rc-gbtns{display:flex;gap:4px;flex-shrink:0;}
+.rc-sub{margin:0 0 12px;padding:10px 12px 6px;border-radius:12px;background:rgba(255,255,255,.06);}
+.rc-sub-h{font-weight:700;font-size:.86rem;color:#fff;margin-bottom:8px;}
+.rc-sub-h span{font-weight:500;font-size:.76rem;color:rgba(255,255,255,.6);margin-left:8px;}
+.rc-sub-c{display:flex;flex-wrap:wrap;gap:6px;}
+.rc-sc{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:6px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.24);
+  background:transparent;color:#fff;font:600 .86rem 'Barlow',sans-serif;cursor:pointer;margin-bottom:6px;}
+.rc-sc i{font-style:normal;opacity:.65;}
+.rc-sc.on{background:#2E8B5E;border-color:#2E8B5E;}
+.rc-sc:focus-visible{outline:2px solid #fff;outline-offset:2px;}
 .rc-legend{font-size:.76rem;color:rgba(255,255,255,.6);text-align:center;margin:2px 0 10px;}
 .rc-grading .rc-fb-all{display:none;}
 .rc-btns{display:flex;gap:var(--sp-1);flex-shrink:0;}
@@ -6584,13 +6593,17 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.24'; // v1.2.24: Alle Spieler mit Startelf
-const APP_VERSION_LABEL='1.2.24';
+const APP_VERSION='1.2.25'; // v1.2.25: Eingewechselt erfassen
+const APP_VERSION_LABEL='1.2.25';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792698904853; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792699459125; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.25',date:'22.10.2026',title:'Eingewechselt',items:[
+    {icon:'🔁',title:'Wer reinkam',desc:'Nach dem Spiel unter „Anwesenheit erfassen → Einsatz“: oben stehen alle Anwesenden, die nicht in der Startelf waren – antippen, wer eingewechselt wurde. Geht, wenn die Aufstellung des Spiels gespeichert ist. Bei jedem steht dann „Startelf“, „eingewechselt“ oder „nicht eingesetzt“.'},
+    {icon:'📊',title:'In der Statistik und im Profil',desc:'„Alle Spieler“ zeigt neben „Startelf“ die Spalte „Eingew.“, das Spielerprofil „7× Startelf · 2× eingewechselt“.'},
+  ]},
   {version:'1.2.24',date:'22.10.2026',title:'Statistik: Startelf',items:[
     {icon:'🟢',title:'Wie oft von Anfang an',desc:'„Alle Spieler“ zeigt, wie oft jemand in der Startelf stand – von den gespielten Spielen mit gespeicherter Aufstellung, bei denen er dabei war („7/10“). Die Bank zählt hier nicht: wer dort sitzt, wird nicht immer eingewechselt.'},
   ]},
@@ -21048,10 +21061,10 @@ function computePlayerOverallStats(occurrences){
   };
 }
 function computePlayerLineupStats(targetName,targetBday){
-  let totalLineups=0,starts=0,subOnly=0;
+  let totalLineups=0,starts=0,subOnly=0,subIn=0;
   const posCount={};
   const bySeason={}; // 'team__season' => {posCount:{},starts:0,subOnly:0,total:0}
-  if(!G||!G.matchLineups)return{totalLineups,starts,subOnly,posCount,bySeason};
+  if(!G||!G.matchLineups)return{totalLineups,starts,subOnly,subIn,posCount,bySeason};
   Object.keys(G.matchLineups).forEach(key=>{
     const lineup=G.matchLineups[key];
     if(!lineup)return;
@@ -21060,6 +21073,7 @@ function computePlayerLineupStats(targetName,targetBday){
     // it as "23× aufgestellt, meist Linksverteidiger" turns intentions into
     // history — and the plan still changes right up to kick-off. Only matches
     // that actually took place may enter any statistic.
+    let _kSess=null;
     {
       const parts=key.split('__');
       const kSeason=parts[1]||'';
@@ -21067,6 +21081,7 @@ function computePlayerLineupStats(targetName,targetBday){
       const kBlock=G.db&&G.db[team+'__'+kSeason];
       const kSess=(kBlock&&Array.isArray(kBlock.sessions))?kBlock.sessions[kIdx]:null;
       if(!kSess)return;                       // orphaned lineup → not a fact
+      _kSess=kSess;
       if(typeof sessTookPlace==='function'&&!sessTookPlace(kSess,kSeason))return;
     }
     // Best season identifier: from lineup.season or parse from key (team__season__idx)
@@ -21085,6 +21100,8 @@ function computePlayerLineupStats(targetName,targetBday){
     if(!bySeason[seasonKey])bySeason[seasonKey]={team,season:seasonOfLineup,posCount:{},starts:0,subOnly:0,total:0};
     const slotPis=Object.values(lineup.slots||{}).filter(v=>typeof v==='number');
     const subsPis=Array.isArray(lineup.subs)?lineup.subs:[];
+    // Came on from the bench (recorded after the match, 1.2.25)
+    if(!slotPis.includes(targetPi)&&_kSess&&Array.isArray(_kSess.subIn)&&_kSess.subIn.includes(targetName))subIn++;
     if(slotPis.includes(targetPi)){
       totalLineups++;starts++;
       bySeason[seasonKey].starts++;bySeason[seasonKey].total++;
@@ -21102,7 +21119,7 @@ function computePlayerLineupStats(targetName,targetBday){
       bySeason[seasonKey].subOnly++;bySeason[seasonKey].total++;
     }
   });
-  return{totalLineups,starts,subOnly,posCount,bySeason};
+  return{totalLineups,starts,subOnly,subIn,posCount,bySeason};
 }
 function computePlayerWeekday(occurrences){
   const wd={Mo:{a:0,t:0},Di:{a:0,t:0},Mi:{a:0,t:0},Do:{a:0,t:0},Fr:{a:0,t:0},Sa:{a:0,t:0},So:{a:0,t:0}};
@@ -21242,7 +21259,7 @@ function openPlayerStatsExt(){
   html+=psKpi('Gesamt',stats.overall!==null?stats.overall+'%':'–',`${stats.cA} von ${stats.marked} markiert`);
   html+=psKpi('Trainings',stats.tPct!==null?stats.tPct+'%':'–','Anwesenheit');
   html+=psKpi('Spiele',stats.mPct!==null?stats.mPct+'%':'–','Anwesenheit');
-  html+=psKpi('Aufstellungen',lineupStats.totalLineups||'–',lineupStats.starts?`${lineupStats.starts}× Startelf`:(lineupStats.subOnly?'nur Bank':''));
+  html+=psKpi('Aufstellungen',lineupStats.totalLineups||'–',[lineupStats.starts?`${lineupStats.starts}× Startelf`:'',lineupStats.subIn?`${lineupStats.subIn}× eingewechselt`:''].filter(Boolean).join(' · ')||(lineupStats.subOnly?'nur Bank':''));
   html+='</div></div>';
   
   // ── 2. STATUS BREAKDOWN ──
@@ -22783,10 +22800,11 @@ function rcRender(){
     const open=here.filter(x=>getPerf(x.pi,si)==null).length;
     if(bar)bar.style.width=(here.length?Math.round((here.length-open)/here.length*100):0)+'%';
     if(prog)prog.textContent=up+' stark \u00b7 '+down+' schwach'+(open?' \u00b7 '+open+' noch ohne':'');
+    html+=_rcSubHtml(si,s,here,name);
     if(here.length)html+='<div class="rc-legend">Nur wer auff\u00e4llt: \u25b2 stark, \u25bc schwach. Bei \u201eFertig\u201c z\u00e4hlen alle anderen als normal.</div>';
     here.forEach(({p,pi})=>{
       const g=getPerf(pi,si);
-      html+='<div class="rc-row rc-row-g'+(g!=null?' done':'')+'">'+avatar(p)+who(p,g===2?{t:'normal',c:''}:null)
+      html+='<div class="rc-row rc-row-g'+(g!=null?' done':'')+'">'+avatar(p)+who(p,g===2?{t:'normal',c:''}:_rcSubHint(si,s,p,pi))
         +'<div class="rc-gbtns">'
           +'<button class="rc-g rc-up'+(g===1?' on':'')+'" onclick="rcGrade('+pi+',1)" aria-pressed="'+(g===1)+'" title="Stark">\u25b2<span>Stark</span></button>'
           +'<button class="rc-g rc-down'+(g===3?' on':'')+'" onclick="rcGrade('+pi+',3)" aria-pressed="'+(g===3)+'" title="Schwach">\u25bc<span>Schwach</span></button>'
@@ -22813,6 +22831,48 @@ function rcRender(){
     if(!html)html='<div class="rc-empty">✅ Alle Spieler erfasst.</div>';
   }
   listEl.innerHTML=html;
+}
+// Eingewechselt (1.2.25): who came on from the bench. Only with a saved lineup
+// of the match — its starting eleven is known, and anyone else who was there
+// can have come on. Stored on the match by name (s.subIn), like the squad, so
+// it moves with the session and survives a change of the player order.
+function _luStarters(si){
+  const D=cd(),s=D&&D.sessions&&D.sessions[si];if(!s)return null;
+  const lu=G.matchLineups&&G.matchLineups[_mlKey(UI.currentTeam,UI.currentSeason,si)];
+  if(!lu||(lu.sessDate&&lu.sessDate!==s.date))return null;
+  const st=Object.values(lu.slots||{}).filter(v=>typeof v==='number');
+  return st.length?new Set(st):null;
+}
+function _rcSubHtml(si,s,here,name){
+  if(!s||s.type!=='match')return '';
+  const st=_luStarters(si);
+  if(!st)return '<div class="rc-legend">Ohne gespeicherte Aufstellung lässt sich nicht erfassen, wer eingewechselt wurde.</div>';
+  const bench=here.filter(x=>!st.has(x.pi));
+  if(!bench.length)return '';
+  const sin=Array.isArray(s.subIn)?s.subIn:[],e=escapeHtml;
+  return '<div class="rc-sub"><div class="rc-sub-h">Eingewechselt<span>antippen, wer reinkam</span></div><div class="rc-sub-c">'
+    +bench.map(({p,pi})=>{const on=sin.includes(p.name);
+      return '<button type="button" class="rc-sc'+(on?' on':'')+'" aria-pressed="'+on+'" onclick="rcSub('+pi+')">'+(p.nr?'<i>'+e(String(p.nr))+'</i>':'')+e(name(p))+'</button>';}).join('')
+    +'</div></div>';
+}
+function _rcSubHint(si,s,p,pi){
+  if(!s||s.type!=='match')return null;
+  const st=_luStarters(si);if(!st)return null;
+  if(st.has(pi))return {t:'Startelf',c:''};
+  return (Array.isArray(s.subIn)&&s.subIn.includes(p.name))?{t:'eingewechselt',c:'ok'}:{t:'nicht eingesetzt',c:''};
+}
+function rcSub(pi){
+  if(_rcSi==null||!(typeof canEdit==='function'&&canEdit()))return;
+  const D=cd(),s=D.sessions[_rcSi],p=D.players[pi];
+  if(!s||s.type!=='match'||!p||!_luStarters(_rcSi))return;
+  snap();
+  const a=Array.isArray(s.subIn)?s.subIn.slice():[];
+  const i=a.indexOf(p.name),on=i<0;
+  if(on)a.push(p.name);else a.splice(i,1);
+  if(a.length)s.subIn=a;else delete s.subIn;
+  saveG();
+  logAudit(on?'Einwechslung erfasst':'Einwechslung entfernt',s.date+(s.label?' '+s.label:''),(getDisplayName?getDisplayName(p):p.name));
+  rcRender();
 }
 function rcSet(pi,val){
   if(_rcSi==null)return;
@@ -26749,12 +26809,13 @@ function _statsPlayerTable(D,opts){
     const _pi=D.players.indexOf(p);
     const stIn=mIdx.filter(i=>luAt[i]&&luAt[i].has(_pi)).length;
     const stOf=mIdx.filter(i=>luAt[i]&&(luAt[i].has(_pi)||(p.s&&p.s[i]===1))).length;
+    const subN=mIdx.filter(i=>luAt[i]&&!luAt[i].has(_pi)&&Array.isArray(ss[i].subIn)&&ss[i].subIn.includes(p.name)).length;
     return{pi:D.players.indexOf(p),nr:p.nr,name:p.name,shortname:p.shortname,pos:p.pos,pos2:p.pos2||'',tA,tPl,tPct,mA,mPl,mPct,pct:tPct,perfAvg,perfAvgSort:perfAvg!=null?perfAvg:99,perfCount:perfVals.length,
-      goals,assists,gSort:goals*1000+assists,mvp,stIn,stOf,stSort:stIn*1000+stOf};
+      goals,assists,gSort:goals*1000+assists,mvp,stIn,stOf,stSort:stIn*1000+stOf,subN};
   });
   // The columns appear once the season has any of it — empty columns of
   // dashes would only push the rest off a phone screen
-  const hasG=rows.some(r=>r.goals||r.assists),hasM=rows.some(r=>r.mvp),hasL=luAt.some(Boolean);
+  const hasG=rows.some(r=>r.goals||r.assists),hasM=rows.some(r=>r.mvp),hasL=luAt.some(Boolean),hasS=rows.some(r=>r.subN);
   // Equal shares: the one who was there more often first (18/18 before 2/2)
   rows.sort((a,b)=>{const v=statsSort.col;let r=typeof a[v]==='string'?a[v].localeCompare(b[v]):a[v]-b[v];
     if(!r&&v==='tPct')r=a.tA-b.tA;if(!r&&v==='mPct')r=a.mA-b.mA;return statsSort.asc?r:-r;});
@@ -26765,7 +26826,7 @@ function _statsPlayerTable(D,opts){
   return `${opts.noHead?'':`    <div class="sec" style="margin-top:12px;margin-bottom:8px;">🏆 Alle Spieler</div>
 `}    <div style="${wrap}">
     <table class="full-table"><thead><tr>
-      ${th('nr','#')}${th('name','Spieler')}${th('pos','Pos.')}${th('tPct','Training')}${mS?th('mPct','Spiele'):''}${hasL?th('stSort','Startelf'):''}${hasG?th('gSort','Tore · Vorl.'):''}${hasM?`<th onclick="sortStats('mvp')" title="Spieler des Spiels">🏅 ${sa('mvp')}</th>`:''}${th('perfAvgSort','⭐ Einsatz')}
+      ${th('nr','#')}${th('name','Spieler')}${th('pos','Pos.')}${th('tPct','Training')}${mS?th('mPct','Spiele'):''}${hasL?th('stSort','Startelf'):''}${hasS?th('subN','Eingew.'):''}${hasG?th('gSort','Tore · Vorl.'):''}${hasM?`<th onclick="sortStats('mvp')" title="Spieler des Spiels">🏅 ${sa('mvp')}</th>`:''}${th('perfAvgSort','⭐ Einsatz')}
     </tr></thead><tbody>
     ${rows.map(r=>{const bc=pctColor(r.tPct);
       const openHandler=open(r.pi);
@@ -26777,6 +26838,7 @@ function _statsPlayerTable(D,opts){
       ${_stPc(r.tA,r.tPl,r.tPct,'Trainings')}
       ${mS?_stPc(r.mA,r.mPl,r.mPct,'Spielen'):''}
       ${hasL?`<td class="st-gv" title="${r.stIn} von ${r.stOf} Spielen mit Aufstellung, bei denen er dabei war">${r.stOf?`<b>${r.stIn}</b><small>/</small>${r.stOf}`:'–'}</td>`:''}
+      ${hasS?`<td title="${r.subN}× eingewechselt">${r.subN||'–'}</td>`:''}
       ${hasG?`<td class="st-gv" title="${r.goals} ${r.goals===1?'Tor':'Tore'}, ${r.assists} ${r.assists===1?'Vorlage':'Vorlagen'}">${r.goals||r.assists?`<b>${r.goals}</b><small>·</small>${r.assists}`:'–'}</td>`:''}
       ${hasM?`<td title="${r.mvp}× Spieler des Spiels">${r.mvp||'–'}</td>`:''}
       <td style="font-weight:700;color:${perfColor};" title="${r.perfCount} bewertete Termine">${r.perfAvg!=null?r.perfAvg.toFixed(1).replace('.',','):'–'}</td>
