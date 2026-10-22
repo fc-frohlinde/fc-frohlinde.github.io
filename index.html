@@ -317,15 +317,8 @@ html:has(body.player-mode){background:#080f22;}
 .ud-item{display:flex;align-items:center;gap:9px;padding:9px 14px;font-family:'Barlow',sans-serif;font-size:.82rem;font-weight:600;color:rgba(255,255,255,.8);cursor:pointer;transition:background .1s;white-space:nowrap;}
 .ud-item:hover{background:rgba(255,255,255,.09);color:#fff;}
 .ud-sep{height:1px;background:rgba(255,255,255,.1);margin:3px 0;}
-.ud-group{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.35);padding:8px 14px 4px;}
 .ud-meta{padding:6px 14px 8px;font-size:.62rem;color:rgba(255,255,255,.32);font-weight:500;cursor:pointer;}
 .ud-meta:hover{color:rgba(255,255,255,.55);}
-.ud-toggle{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;font-family:'Barlow',sans-serif;font-size:.82rem;font-weight:600;color:rgba(255,255,255,.8);cursor:pointer;transition:background .1s;}
-.ud-toggle:hover{background:rgba(255,255,255,.09);color:#fff;}
-.ud-switch{width:34px;height:18px;border-radius:9px;background:rgba(255,255,255,.2);position:relative;transition:background .2s;flex-shrink:0;}
-.ud-switch.on{background:var(--cp);}
-.ud-switch::after{content:'';position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;top:2px;left:2px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.3);}
-.ud-switch.on::after{left:18px;}
 
 /* Presence indicator */
 
@@ -511,9 +504,7 @@ body.compact .toolbar{padding:3px 14px !important;}
 /* Toolbar has dark bg - .bs there needs light-on-dark style */
 .toolbar .bs{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);}
 .toolbar .bs:hover{background:rgba(255,255,255,.18);}
-/* dark variant for use on dark backgrounds */
-.bs-dark{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);}
-.bs-dark:hover{background:rgba(255,255,255,.18);}.bs:hover{background:rgba(255,255,255,.2);}
+.bs:hover{background:rgba(255,255,255,.2);}
 .bd{background:rgba(231,76,60,.13);color:#ff9080;border:1px solid rgba(231,76,60,.27);}.bd:hover{background:rgba(231,76,60,.27);}
 .bm{background:rgba(176,48,0,.15);color:#ffc0a0;border:1px solid rgba(176,48,0,.3);}.bm:hover{background:rgba(176,48,0,.3);}
 
@@ -531,7 +522,6 @@ body.compact .toolbar{padding:3px 14px !important;}
 body:not(:has(#mainTable.mx)) .lg-mx{display:none;}
 body.design-kabine .legend-pop .ldq{background:transparent;border:1.5px dashed #AEBBD1;}
 .lda{background:var(--cp);}.ldf{background:var(--ca);}.lde{background:var(--ce);}.ldq{background:#ccc;border:1px solid var(--gm);}.ldm{background:#3b82c4;}
-.lhint{margin-left:auto;font-size:.66rem;color:var(--gm);font-style:italic;}
 
 /* ══════ TABLE ══════ */
 .table-wrap{flex:1;overflow:auto;min-height:0;}
@@ -675,10 +665,6 @@ tr:hover .drb{color:var(--gm);}
 .si .v{font-family:'Bebas Neue',sans-serif;font-size:1.25rem;color:var(--bd);line-height:1;}
 .si .k{font-size:.64rem;font-weight:600;letter-spacing:1px;color:var(--gd);text-transform:uppercase;}
 
-.zoom-grp{display:none;}
-.zb{background:none;border:none;color:rgba(255,255,255,.75);cursor:pointer;font-size:.85rem;font-weight:700;padding:1px 5px;border-radius:4px;transition:all .12s;}
-.zb:hover{background:rgba(255,255,255,.15);color:#fff;}
-.zlbl{font-size:.72rem;font-weight:700;color:rgba(255,255,255,.85);min-width:34px;text-align:center;}
 
 /* MODALS */
 .mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(2px);}
@@ -829,13 +815,6 @@ input[type="date"]{cursor:pointer;}
 .evt-mi-clear:hover{background:var(--ow);color:var(--gd);}
 .evt-sep{height:1px;background:var(--gl);margin:4px 2px;}
 
-/* match lineup */
-.lineup-section{background:var(--ow);border-radius:8px;padding:10px 12px;border:1px solid var(--gl);margin-bottom:10px;}
-.lineup-hdr{font-size:.68rem;font-weight:700;color:var(--bd);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
-.lineup-player{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--gl);font-size:.76rem;}
-.lineup-player:last-child{border-bottom:none;}
-.lineup-nr{width:24px;font-weight:700;color:var(--bm);}
-.lineup-nm{flex:1;font-weight:600;color:var(--bd);}
 
 /* team manager rows */
 .pl-row{display:flex;align-items:center;gap:7px;padding:6px 10px;border-bottom:1px solid var(--gl);font-size:.76rem;}
@@ -1128,14 +1107,6 @@ html.hx-dark .tr-reset{background:rgba(242,194,48,.16)!important;color:#F2C230!i
 .fi-del{background:none;border:none;cursor:pointer;color:var(--gm);font-size:.85rem;padding:2px 4px;border-radius:3px;}
 .fi-del:hover{background:rgba(231,76,60,.1);color:var(--ca);}
 .sec{font-size:.66rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--gd);margin-bottom:7px;}
-.rkrow{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--gl);font-size:.76rem;}
-.rkrow:last-child{border-bottom:none;}
-.rk-i{width:15px;font-family:'Bebas Neue',sans-serif;font-size:.84rem;color:var(--gm);}
-.rk-n{flex:1;font-weight:600;color:var(--bd);cursor:pointer;}
-.rk-n:hover{color:var(--bm);}
-.rk-bw{width:66px;background:var(--gl);border-radius:3px;height:5px;}
-.rk-bar{height:5px;border-radius:3px;}
-.rk-pct{width:32px;text-align:right;font-weight:700;}
 .full-table{width:100%;font-size:.76rem;border-collapse:separate;border-spacing:0;}
 .full-table th{background:var(--bd);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:.77rem;padding:6px 8px;text-align:center;cursor:pointer;white-space:nowrap;}
 .full-table th:hover{background:var(--bm);}
@@ -1193,29 +1164,9 @@ select.lp-fmt-btn option:checked{background:var(--bm);color:#fff;}
 .lp-sidebar{width:230px;flex-shrink:0;display:flex;flex-direction:column;background:rgba(0,0,0,.35);border-left:1px solid rgba(255,255,255,.07);overflow:hidden;}
 .lp-sb-top{padding:12px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;}
 .lp-sb-label{font-size:.58rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.75);margin-bottom:7px;}
-.lp-name-row{display:flex;gap:5px;margin-bottom:8px;}
-.lp-name-inp{flex:1;min-width:0;padding:5px 9px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.13);border-radius:7px;font-family:'Barlow',sans-serif;font-size:.76rem;color:#fff;outline:none;}
-.lp-name-inp::placeholder{color:rgba(255,255,255,.25);}
-.lp-name-inp:focus{border-color:rgba(232,200,64,0.4);}
 .lp-save-btn{padding:5px 10px;background:#e8c840;color:#071e48;border:none;border-radius:7px;font-family:'Barlow',sans-serif;font-size:.74rem;font-weight:700;cursor:pointer;}
 .lp-save-btn:hover{background:#f0d050;}
-.lp-chips{display:flex;flex-wrap:wrap;gap:4px;max-height:68px;overflow-y:auto;}
-.lp-chip{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:11px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.11);font-size:.67rem;font-weight:600;color:rgba(255,255,255,.85);cursor:pointer;transition:all .12s;}
-.lp-chip.active{background:rgba(232,200,64,0.18);border-color:rgba(232,200,64,0.5);color:#e8c840;}
-.lp-chip:hover:not(.active){color:#fff;border-color:rgba(255,255,255,.25);}
-.lp-chip-x{color:rgba(255,255,255,.5);margin-left:1px;font-size:.65rem;}
-.lp-chip-x:hover{color:var(--ca);}
 .lp-sb-label2{font-size:.58rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.75);padding:10px 12px 5px;flex-shrink:0;}
-.lp-players-list{flex:1;overflow-y:auto;padding:0 8px 8px;}
-.lp-player-card{display:flex;align-items:center;gap:7px;padding:6px 8px;margin-bottom:3px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:8px;cursor:pointer;transition:all .15s;}
-.lp-player-card:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.18);}
-.lp-player-card.suitable{border-color:rgba(39,174,96,.25);background:rgba(39,174,96,.05);}
-.lp-player-card.suitable:hover{background:rgba(39,174,96,.12);}
-.lp-player-card.selected{border-color:#e8c840;background:rgba(232,200,64,0.1);}
-.lp-player-card.assigned{opacity:.3;pointer-events:none;}
-.lp-card-nr{width:20px;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:.95rem;color:#e8c840;flex-shrink:0;line-height:1;}
-.lp-card-name{flex:1;font-size:.76rem;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.lp-card-badges{display:flex;gap:2px;}
 .lp-card-pos1{font-size:.55rem;font-weight:700;padding:1px 4px;border-radius:7px;min-width:30px;text-align:center;display:inline-block;}
 .lp-statsbar{display:flex;align-items:center;gap:8px;padding:9px 12px;background:rgba(0,0,0,.25);border-top:1px solid rgba(255,255,255,.06);flex-shrink:0;}
 .lp-stat{display:flex;flex-direction:column;align-items:center;padding:6px 14px;background:color-mix(in srgb,var(--bl) 18%,transparent);border:1px solid color-mix(in srgb,var(--bl) 38%,transparent);border-radius:8px;min-width:60px;transition:background .15s;}
@@ -1369,17 +1320,7 @@ body.show-reg-status .player-unregistered .name {
 .slp-sidebar{width:220px;flex-shrink:0;display:flex;flex-direction:column;background:rgba(0,0,0,.3);border-left:1px solid rgba(255,255,255,.07);overflow:hidden;}
 .slp-sb-top{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;}
 .slp-sb-label{font-size:.58rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.75);margin-bottom:7px;}
-.slp-name-row{display:flex;gap:5px;margin-bottom:8px;}
-.slp-name-inp{flex:1;min-width:0;padding:5px 9px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:7px;font-family:'Barlow',sans-serif;font-size:.76rem;color:#fff;outline:none;}
-.slp-name-inp::placeholder{color:rgba(255,255,255,.25);}
-.slp-name-inp:focus{border-color:rgba(232,200,64,0.4);}
 .slp-save-btn{padding:5px 10px;background:#e8c840;color:#071e48;border:none;border-radius:7px;font-family:'Barlow',sans-serif;font-size:.73rem;font-weight:700;cursor:pointer;white-space:nowrap;}
-.slp-chips{display:flex;flex-wrap:wrap;gap:4px;max-height:72px;overflow-y:auto;}
-.slp-chip{display:inline-flex;align-items:center;gap:3px;padding:2px 9px;border-radius:11px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);font-size:.66rem;font-weight:600;color:rgba(255,255,255,.85);cursor:pointer;transition:all .12s;}
-.slp-chip.active{background:rgba(232,200,64,0.18);border-color:rgba(232,200,64,0.4);color:#e8c840;}
-.slp-chip:hover:not(.active){color:#fff;border-color:rgba(255,255,255,.25);}
-.slp-chip-x{color:rgba(255,255,255,.5);font-size:.65rem;margin-left:2px;}
-.slp-chip-x:hover{color:var(--ca);}
 .slp-legend{flex:1;overflow-y:auto;padding:10px 12px;}
 /* Drag preview (floating clone of card) */
 .slp-drag-preview{position:fixed;pointer-events:none;z-index:99999;background:rgba(7,15,35,0.95);border:2px solid #e8c840;color:#fff;border-radius:7px;padding:5px 10px;font-size:.78rem;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.5);transform:translate(-50%,-50%);}
@@ -1693,16 +1634,7 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   #moSession2 .ss-btn-ico{display:inline;}
   #ss-head-btns .btn{padding:6px 11px;font-size:.8rem;min-height:36px;flex-shrink:0;}
   #ss-edit-toggle{font-size:.74rem !important;padding:7px 10px !important;min-height:38px;}
-  /* Weekly invite block: on a phone the select and both buttons cannot share
-     a row — the select shrinks to unreadable. Stack them full width. */
-  .am-week-row{flex-direction:column;align-items:stretch;gap:6px;}
-  .am-week-lbl{font-size:.7rem;}
-  /* Must match the desktop rule's specificity, otherwise the auto width set
-     there would win here too and the dropdown would shrink on a phone. */
-  .mob select.am-week-sel{width:100%;max-width:none;min-height:44px;font-size:.82rem;}
-  .am-week-row .am-bc-btn{width:100%;min-height:44px;justify-content:center;}
-  .am-broadcast-actions .am-bc-btn{width:100%;min-height:44px;justify-content:center;}
-  
+            
   /* A per-pane button row sits wherever that pane's content ends, so
      "Schließen" jumped around between tabs. One footer, always at the same
      place; pane-specific actions (＋ Spieler, CSV-Export) stay in the pane,
@@ -1720,9 +1652,7 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
   #cal-content{padding:0 !important;}
   /* Lineup planner — adapt overlay padding */
   .lp-overlay,.slp-overlay{padding:8px !important;}
-  /* Lineup planner: stack vertically, compress sub panel */
-  .lp-content,.slp-content{flex-direction:column !important;}
-  .lp-pitch-col,.slp-pitch-col{padding:8px 4px !important;width:100% !important;flex:0 1 auto !important;}
+    .lp-pitch-col,.slp-pitch-col{padding:8px 4px !important;width:100% !important;flex:0 1 auto !important;}
   .lp-pitch-svg,.slp-pitch-svg{max-height:50vh !important;width:100% !important;height:auto !important;}
   #lp-subs-col,.lp-subs-col,.slp-subs-col{
     flex:0 0 auto !important;width:100% !important;max-width:100% !important;
@@ -1848,7 +1778,6 @@ select.slp-fmt-btn option:checked{background:var(--bm);color:#fff;}
 .sr-icon{font-size:1.1rem;text-align:center;}
 .sr-label{font-size:.84rem;color:var(--bd);font-weight:600;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .sr-meta{font-size:.7rem;color:var(--gm);margin-top:2px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.sr-badge{font-size:.62rem;color:var(--gm);background:rgba(0,0,0,.05);padding:2px 7px;border-radius:3px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;}
 .sr-arrow{font-size:.82rem;color:var(--gm);opacity:.4;transition:opacity .15s,transform .15s;}
 .sr-item.sel .sr-arrow,.sr-item:hover .sr-arrow{opacity:1;transform:translateX(2px);color:var(--bm);}
 .sr-empty{padding:36px 20px;text-align:center;color:var(--gm);font-size:.84rem;}
@@ -1929,132 +1858,11 @@ mark.sr-hl{background:rgba(243,156,18,.35);color:inherit;border-radius:2px;paddi
 .db-wr-teampct span{font-size:.62rem;color:var(--gm);text-transform:uppercase;letter-spacing:.5px;}
 /* Photo toggle — keeps uppercase look (matches other modal labels) but explicit flex/gap */
 .mob label.db-wr-photo-toggle{display:flex;align-items:center;gap:10px;margin:0;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;line-height:1.3;color:var(--gd);cursor:pointer;user-select:none;}
-/* Anmeldungen modal */
-.am-head{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-shrink:0;padding-right:36px;flex-wrap:wrap;}
-.mob h3.am-head-title{margin:0;color:var(--bd);font-size:1.28rem;line-height:1;letter-spacing:2px;font-family:'Bebas Neue',sans-serif;flex-shrink:0;}
-.am-tabs{display:inline-flex;background:var(--ow);border:1px solid var(--gl);border-radius:8px;padding:2px;margin-left:auto;}
-.am-tab{background:transparent;border:none;padding:5px 12px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--gd);border-radius:6px;cursor:pointer;transition:background .15s,color .15s;font-family:'Barlow',sans-serif;}
-.am-tab:hover{color:var(--bd);}
-.am-tab.active{background:var(--bm);color:#fff;}
-.am-head-meta{font-size:.78rem;color:var(--gm);font-weight:600;flex-shrink:0;line-height:1;}
 /* The counts moved into the tiles above; what is left here is the deadline
    and the reminder, which the tiles cannot show. */
 .ss-rsvp{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;}
 .ss-rsvp-none{font-size:.7rem;color:var(--gm);}
-.ss-rsvp-btn{margin-left:auto;font-size:.72rem;padding:4px 12px;background:var(--bm);color:#fff;font-weight:600;}
-/* Reads like the message itself: same shape as a chat bubble, not a form. */
-.am-week-preview{margin-top:8px;background:var(--ow);border:1px solid var(--gl);
-  border-radius:10px;padding:10px 12px;}
-.am-week-prev-h{font-size:.68rem;color:var(--gm);margin-bottom:7px;}
-.am-week-prev-body{white-space:pre-wrap;word-break:break-word;font-size:.8rem;
-  line-height:1.5;color:var(--gd);background:#fff;border:1px solid var(--gl);
-  border-radius:8px;padding:9px 11px;}
-.am-players{border-top:1px solid var(--gl);margin-top:12px;}
-.am-players .ps-more-body{padding-top:4px;}
-.am-stat-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
-.am-stat{flex:1;min-width:120px;padding:9px 12px;background:color-mix(in srgb,var(--bd) 5%,#fff);border:1px solid color-mix(in srgb,var(--bd) 18%,#fff);border-radius:8px;}
-.am-stat-label{font-size:.66rem;text-transform:uppercase;letter-spacing:.4px;color:var(--gm);font-weight:700;margin-bottom:3px;}
-.am-stat-value{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;line-height:1;color:var(--bd);letter-spacing:1px;}
-.am-bulk-actions{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;padding:10px 12px;background:rgba(22,89,184,.04);border:1px solid rgba(22,89,184,.15);border-radius:8px;}
-.am-bulk-btn{font-size:.78rem;padding:6px 12px;border-radius:6px;border:1px solid var(--bm);background:#fff;color:var(--bm);font-weight:600;cursor:pointer;font-family:'Barlow',sans-serif;display:inline-flex;align-items:center;gap:5px;transition:all .15s;}
-.am-bulk-btn:hover{background:var(--bm);color:#fff;}
-.am-broadcast-section{margin-bottom:14px;padding:12px 14px;background:linear-gradient(135deg,rgba(22,89,184,.06),rgba(76,175,80,.05));border:1px solid rgba(22,89,184,.2);border-radius:10px;}
-.am-broadcast-title{font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:1.5px;color:var(--bd);margin-bottom:3px;}
-.am-broadcast-sub{font-size:.7rem;color:var(--gm);margin-bottom:10px;}
-.am-broadcast-actions{display:flex;flex-wrap:wrap;gap:8px;}
-.am-bc-btn{flex:1;min-width:180px;font-size:.78rem;padding:8px 12px;border-radius:7px;border:1px solid var(--bm);background:#fff;color:var(--bm);font-weight:600;cursor:pointer;font-family:'Barlow',sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:5px;transition:all .15s;}
-.am-bc-btn:hover{background:var(--bm);color:#fff;}
-/* Wochenbericht mini-preview inside the broadcast section */
-.am-bc-week{margin-top:10px;padding-top:10px;border-top:1px solid rgba(22,89,184,.15);}
-.am-bc-week-head{font-size:.82rem;color:var(--gd);font-weight:700;margin-bottom:4px;}
-.am-bc-week-meta{color:var(--bm);font-weight:600;}
-.am-bc-week-empty{color:var(--gm);font-weight:400;font-style:italic;}
-.am-bc-week-status{font-size:.72rem;font-weight:600;margin-bottom:8px;}
-.am-bc-published{color:#2d7d3a;}
-.am-bc-unpublished{color:#9a4500;}
-.am-bulk-btn.primary{background:var(--bm);color:#fff;}
-.am-bulk-btn.primary:hover{background:var(--bd);}
-.am-bulk-btn:disabled{opacity:.5;cursor:not-allowed;background:#fff;color:var(--gm);border-color:var(--gl);}
-.am-list{display:flex;flex-direction:column;gap:6px;}
-.am-row{display:flex;align-items:center;gap:10px;padding:9px 12px;background:#fff;border:1px solid var(--gl);border-radius:8px;}
-.am-row.no-link{background:rgba(243,156,18,.05);border-color:rgba(243,156,18,.25);}
-.am-row.no-phone{opacity:.7;}
-.am-row-name{font-weight:600;color:var(--bd);font-size:.86rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.am-hist-toggle{background:rgba(22,89,184,.08);border:1px solid rgba(22,89,184,.2);color:var(--bm);font-size:.62rem;padding:1px 6px;border-radius:10px;margin-left:7px;cursor:pointer;font-weight:700;font-family:'Barlow',sans-serif;letter-spacing:.3px;transition:all .12s;vertical-align:middle;}
-.am-hist-toggle:hover{background:rgba(22,89,184,.18);border-color:var(--bm);}
-.am-row-history{margin-top:7px;padding:7px 9px;background:rgba(0,0,0,.02);border-left:2px solid var(--bm);border-radius:4px;}
-.am-hist-list{list-style:none;margin:0;padding:0;}
-.am-hist-item{display:flex;align-items:center;gap:7px;padding:3px 0;font-size:.7rem;color:var(--gd);}
-.am-hist-icon{flex-shrink:0;font-size:.85rem;width:18px;text-align:center;}
-.am-hist-when{flex-shrink:0;font-family:monospace;font-size:.65rem;color:var(--gm);min-width:78px;}
-.am-hist-det{flex:1;font-size:.7rem;color:var(--bd);}
-.am-hist-empty{font-size:.7rem;color:var(--gm);font-style:italic;}
-.am-row-name-wrap{flex:1;min-width:0;}
-.am-row-reason{font-size:.7rem;color:var(--gd);font-style:italic;margin-top:2px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
-.am-row-nr{display:inline-block;font-family:'Bebas Neue',sans-serif;background:color-mix(in srgb,var(--bd) 12%,#fff);color:var(--bd);padding:2px 6px;border-radius:4px;font-size:.74rem;line-height:1;letter-spacing:.5px;margin-right:6px;flex-shrink:0;}
-/* Anmeldungen — pill-style sort bar above player lists */
-.am-sortbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:8px;padding:6px 10px;background:rgba(0,0,0,.025);border-radius:7px;}
-/* Automation reminder cards on the main page */
-.auto-card{background:linear-gradient(135deg,#fff,rgba(22,89,184,.04));border:1px solid rgba(22,89,184,.25);border-radius:10px;padding:12px 14px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.04);}
-.auto-card-head{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
-.auto-card-icon{font-size:1.1rem;}
-.auto-card-title{flex:1;font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:1px;color:var(--bd);}
-.auto-card-x{background:none;border:none;color:var(--gm);font-size:1rem;cursor:pointer;padding:2px 6px;border-radius:4px;line-height:1;}
-.auto-card-x:hover{background:rgba(0,0,0,.06);color:var(--bd);}
-.auto-card-meta{font-size:.78rem;color:var(--gd);font-weight:600;margin-bottom:6px;}
-.auto-card-note{font-size:.72rem;color:#9a4500;background:rgba(255,200,100,.12);padding:6px 9px;border-radius:5px;margin-bottom:8px;}
-.auto-card-actions{display:flex;flex-wrap:wrap;gap:6px;}
-.auto-card-btn{font-size:.76rem;font-weight:600;padding:6px 12px;border-radius:6px;border:1px solid var(--bm);background:#fff;color:var(--bm);cursor:pointer;font-family:'Barlow',sans-serif;transition:all .12s;}
-.auto-card-btn:hover{background:var(--bm);color:#fff;}
-.auto-card-btn.primary{background:var(--bm);color:#fff;}
-.auto-card-btn.primary:hover{background:var(--bd);}
-.auto-card-btn.ghost{border-color:var(--gl);color:var(--gm);}
-.auto-card-btn.ghost:hover{background:var(--gl);color:var(--bd);}
-.am-sortbar-lbl{font-size:.7rem;color:var(--gm);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-right:4px;}
-.am-sortpill{font-size:.74rem;font-weight:600;padding:4px 11px;border-radius:14px;border:1px solid var(--gl);background:#fff;color:var(--gd);cursor:pointer;font-family:'Barlow',sans-serif;transition:all .12s;letter-spacing:.2px;}
-.am-sortpill:hover{border-color:var(--bm);color:var(--bm);}
-.am-sortpill.active{background:var(--bm);border-color:var(--bm);color:#fff;}
-.am-sortpill.active:hover{background:var(--bd);}
-/* Anmeldungen Overview — player row avatar + clickable info block */
-.am-row-avatar{width:36px;height:36px;flex-shrink:0;cursor:pointer;border-radius:50%;overflow:hidden;background:var(--gl);display:flex;align-items:center;justify-content:center;transition:transform .12s;}
-.am-row-avatar:hover{transform:scale(1.06);}
-.am-row-avatar-img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
-.am-row-avatar-ini{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--bm),var(--bd));color:#fff;font-family:'Bebas Neue',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:.5px;}
-.am-row-info{flex:1;min-width:0;cursor:pointer;}
-.am-row-name-line{display:flex;align-items:center;gap:2px;}
-.am-row-name-clickable{font-weight:600;color:var(--bd);font-size:.86rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:color .12s;}
-.am-row-info:hover .am-row-name-clickable{color:var(--bm);text-decoration:underline;}
-.am-row-meta{font-size:.7rem;color:var(--gm);margin-top:1px;font-weight:500;}
-.am-row-status{font-size:.7rem;color:var(--gd);display:flex;align-items:center;gap:6px;flex-shrink:0;}
-.am-status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-.am-status-link-yes{background:#27ae60;}
-.am-status-link-no{background:#e74c3c;}
-.am-status-phone-yes{background:#27ae60;}
-.am-status-phone-no{background:#bbb;}
-.am-row-actions{display:flex;gap:5px;flex-shrink:0;}
-.am-row-actions .btn-mini{font-size:.7rem;padding:4px 9px;border-radius:5px;border:1px solid var(--gl);background:var(--ow);color:var(--bd);cursor:pointer;font-weight:600;font-family:'Barlow',sans-serif;transition:all .12s;}
-.am-row-actions .btn-mini:hover{background:#fff;border-color:var(--bm);}
-.am-row-actions .btn-wa{background:#25d366;border-color:#1eb955;color:#fff;}
-.am-row-actions .btn-wa:hover{background:#1eb955;}
-.am-row-actions .btn-wa.disabled{background:#ccc;border-color:#bbb;color:#fff;cursor:not-allowed;}
-.am-row-resp{display:inline-block;width:24px;font-size:1rem;text-align:center;flex-shrink:0;}
-.am-empty{padding:32px 16px;text-align:center;color:var(--gm);font-size:.84rem;background:var(--ow);border-radius:8px;}
-.am-sess-info{margin-bottom:14px;padding:12px 14px;background:linear-gradient(135deg,color-mix(in srgb,var(--bd) 8%,#fff),color-mix(in srgb,var(--bm) 5%,#fff));border:1px solid color-mix(in srgb,var(--bd) 22%,#fff);border-radius:10px;}
-.am-sess-when{font-family:'Bebas Neue',sans-serif;font-size:1.18rem;color:var(--bd);letter-spacing:1.5px;line-height:1;margin-bottom:4px;}
-.am-sess-what{font-size:.82rem;color:var(--gd);font-weight:500;}
-.am-resp-summary{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
-.am-resp-chip{padding:6px 10px;border-radius:18px;font-size:.74rem;font-weight:700;display:inline-flex;align-items:center;gap:5px;}
-.am-resp-chip.komme{background:rgba(39,174,96,.12);color:#0a5c30;}
-.am-resp-chip.kann-nicht{background:rgba(231,76,60,.12);color:#a3231b;}
-.am-resp-chip.entsch{background:rgba(243,156,18,.12);color:#7a4d04;}
-.am-resp-chip.offen{background:rgba(150,150,150,.15);color:var(--gd);}
-@media(max-width:540px){
-  .am-head{gap:8px;}
-  .am-tabs{margin-left:0;}
-  .am-row{flex-wrap:wrap;}
-  .am-row-actions{margin-left:auto;}
-}
 .db-wr-photo-toggle{display:flex;align-items:center;gap:10px;margin:0;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;line-height:1.3;color:var(--gd);cursor:pointer;user-select:none;}
 .mob label.db-wr-photo-toggle input[type="checkbox"]{width:16px;height:16px;margin:0;padding:0;flex-shrink:0;cursor:pointer;accent-color:var(--bm);}
 .mob label.db-wr-photo-toggle .db-wr-photo-txt{white-space:nowrap;font-size:inherit;font-weight:inherit;text-transform:inherit;letter-spacing:inherit;margin:0;display:inline;}
@@ -2459,15 +2267,11 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 .u-empty-icon .ico-loc{width:1.8rem;height:1.8rem;}
 .loc-field{display:flex;align-items:center;gap:6px;}
 .loc-field input{flex:1;min-width:0;}
-.loc-ic{font-size:.9rem;}
 .loc-mgr-btn{flex-shrink:0;padding:6px 10px;font-size:.8rem;}
 .loc-row{display:flex;align-items:center;gap:8px;padding:8px 2px;border-bottom:1px solid var(--gl);}
 .loc-main{flex:1;min-width:0;}
 .loc-addr{width:100%;margin:4px 0 0;padding:5px 8px;border:1.5px solid var(--gl);border-radius:6px;
   font-family:'Barlow',sans-serif;font-size:.74rem;color:var(--gd);}
-.loc-route{display:inline-flex;align-items:center;gap:4px;color:var(--bl);text-decoration:none;
-  font-size:.72rem;font-weight:700;white-space:nowrap;}
-.loc-route:hover{text-decoration:underline;}
 /* Underlined so it is visibly tappable, but in the surrounding colour — the
    place name should not turn into a bright link inside a dark card. */
 .loc-link{color:inherit;text-decoration:underline;text-decoration-style:dotted;
@@ -2483,11 +2287,6 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 .rpe-ov-vals{display:flex;flex-wrap:wrap;gap:5px;}
 .rpe-ov-chip{background:var(--muted-bg);border-radius:999px;padding:3px 9px;font-size:.72rem;color:var(--gd);}
 .rpe-ov-chip b{color:var(--bd);font-size:.8rem;margin-left:2px;}
-.rpe-dur{display:flex;align-items:center;gap:6px;font-size:.74rem;color:var(--gm);margin-bottom:7px;}
-.rpe-dur input{width:66px;padding:4px 7px;border:1.5px solid var(--gl);border-radius:6px;
-  font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:600;color:var(--gd);}
-.rpe-dur-hint{font-size:.68rem;opacity:.8;}
-.rpe-list{display:flex;flex-direction:column;gap:4px;margin-top:6px;}
 /* Rows inside the attendance window: avatar, number, name, status chip. */
 /* Tight rows: a full squad has to fit one phone screenshot, so the avatar is
    dropped and the status shrinks to its icon — the colour already says which. */
@@ -2814,21 +2613,8 @@ body.design-heute .dow-btn.sel-m{background:var(--mc1);border-color:var(--mc1);c
 .mvp-card{cursor:default;margin-top:8px;}
 .mvp-card:hover{transform:none;box-shadow:none;}
 @media (max-height:700px){.rpo-opt{min-height:36px;}.rpo-num{height:29px;font-size:1.2rem;}.rpo-list{gap:2px;}.rpo-q{margin:12px 0 10px;}}
-.rpo-scale{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;}
-.rpo-n{height:52px;border-radius:11px;border:1px solid transparent;cursor:pointer;
-  font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:1px;transition:all .1s;}
-.rpo-n:active{transform:scale(.95);}
-.rpo-n.on{outline:3px solid var(--bd);outline-offset:1px;}
-.rpo-legend{display:flex;justify-content:space-between;font-size:.66rem;color:var(--gm);margin-top:5px;}
-.rpo-echo{font-size:.8rem;font-weight:700;color:var(--cp);margin-top:12px;min-height:1.2em;}
-.rpo-min-h{font-size:.8rem;font-weight:700;color:var(--gd);margin:18px 0 8px;
-  padding-top:16px;border-top:1px solid var(--gl);}
-.rpo-min{display:flex;align-items:center;justify-content:center;gap:8px;}
 .rpo-mbtn{width:44px;height:44px;border-radius:11px;border:1.5px solid var(--gl);
   background:var(--ow);color:var(--gd);font-size:1.2rem;cursor:pointer;}
-.mob input#rpo-min-in,#rpo-min-in{width:88px;height:44px;text-align:center;margin:0;
-  font-family:'Bebas Neue',sans-serif;font-size:1.3rem;border:1.5px solid var(--gl);
-  border-radius:11px;color:var(--bd);}
 .rpo-full{margin-top:9px;font-size:.74rem;padding:8px 14px;border-radius:10px;
   border:1px solid var(--gl);background:var(--ow);color:var(--gd);cursor:pointer;}
 .rpo-prev{background:var(--ac);color:var(--bd);font-size:.76rem;font-weight:700;
@@ -2905,12 +2691,6 @@ body.design-heute .dow-btn.sel-m{background:var(--mc1);border-color:var(--mc1);c
 .rpe-card-v{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;line-height:1;letter-spacing:1px;flex-shrink:0;}
 .rpe-card-chev{font-size:1.2rem;opacity:.5;flex-shrink:0;}
 .rpe-all-sub{font-size:.72rem;color:var(--gm);margin:-4px 0 12px;}
-/* ── Load tiles ──────────────────────────────────────────── */
-.rpe-sum{display:flex;align-items:baseline;justify-content:space-between;gap:10px;
-  flex-wrap:wrap;margin-bottom:9px;}
-.rpe-sum-main b{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;color:var(--bd);letter-spacing:1px;}
-.rpe-sum-main span{font-size:.7rem;color:var(--gm);margin-left:5px;}
-.rpe-sum-side{font-size:.7rem;color:var(--gm);}
 .rpe-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:6px;}
 .rpe-tile{display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 4px 6px;
   border-radius:10px;border:1px solid transparent;cursor:pointer;font-family:'Barlow',sans-serif;
@@ -3043,7 +2823,6 @@ label.tp-kind input[type=checkbox]{margin:2px 0 0;padding:0;width:17px;height:17
 .rpe-row:has(.rpe-min:focus){background:color-mix(in srgb,var(--bm) 10%,transparent);}
 .rpe-row:has(.rpe-min:focus) .rpe-nm{color:var(--bd);font-weight:700;}
 .rpe-nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--gd);}
-.rpe-val{font-family:'Bebas Neue',sans-serif;font-size:1rem;color:var(--bd);min-width:20px;text-align:center;}
 .rpe-ov-chip{display:inline-flex;align-items:center;gap:5px;}
 .rpe-ov-in{width:42px;padding:2px 3px;border:1.5px solid var(--gl);border-radius:5px;background:#fff;
   font-family:'Bebas Neue',sans-serif;font-size:.9rem;text-align:center;color:var(--bd);}
@@ -3053,30 +2832,7 @@ label.tp-kind input[type=checkbox]{margin:2px 0 0;padding:0;width:17px;height:17
 .mob input.rpe-min,.rpe-min{width:58px;flex:0 0 58px;padding:3px 6px;border:1.5px solid var(--gl);border-radius:6px;
   font-family:'Barlow',sans-serif;font-size:.74rem;text-align:center;color:var(--gd);margin:0;}
 .rpe-load{min-width:46px;text-align:right;font-weight:700;color:var(--gm);}
-/* Compact layout: this panel is a set of controls, not a page. */
-.am-bc-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
-.am-bc-head .am-broadcast-title{flex:1;min-width:0;}
-.am-bc-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
-.am-week-block{margin-top:8px;padding-top:8px;border-top:1px solid var(--gl);}
-.am-week-title{font-size:.76rem;font-weight:700;color:var(--gd);margin-bottom:6px;}
-.am-week-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;width:100%;}
-.am-week-hint{font-size:.66rem;color:var(--gm);margin-top:6px;line-height:1.3;}
-.am-week-edit{margin-top:9px;}
-.am-week-edit textarea{width:100%;font-family:'Barlow',sans-serif;font-size:.8rem;line-height:1.45;
-  padding:9px 11px;border:1.5px solid var(--gl);border-radius:8px;resize:vertical;margin-bottom:0;}
-.am-week-edit-hint{font-size:.66rem;color:var(--gm);margin-top:5px;}
-.am-week-edit-hint code{background:var(--muted-bg);padding:1px 4px;border-radius:3px;font-size:.64rem;}
-.am-week-edit-btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px;}
-/* Own line under the buttons, label first and the box at the right edge. */
-.am-week-toggle{display:flex;align-items:center;gap:6px;margin-left:auto;font-size:.72rem;white-space:nowrap;
-  color:var(--gd);cursor:pointer;flex-wrap:wrap;}
 
-.am-week-toggle input{width:17px;height:17px;cursor:pointer;flex-shrink:0;margin:0;}
-.am-week-toggle-hint{font-size:.66rem;color:var(--gm);}
-.am-week-lbl{font-size:.72rem;font-weight:700;color:var(--gm);}
-.mob select.am-week-sel{width:auto;min-width:120px;max-width:170px;margin-bottom:0;
-  padding:5px 9px;border:1.5px solid var(--gl);border-radius:7px;background:#fff;
-  font-family:'Barlow',sans-serif;font-size:.76rem;font-weight:600;color:var(--gd);cursor:pointer;}
 .pm-count-open{background:var(--warn-bg) !important;color:var(--warn-fg) !important;}
 .pm-focus-hint{margin:18px 16px 0;text-align:center;font-size:.74rem;color:rgba(255,255,255,.5);line-height:1.4;}
 /* Focus mode: only the question. Season stats and streak would invite
@@ -3761,11 +3517,6 @@ body.design-heute .slp-roster-col-filter button.active{background:var(--hx-solid
 body.design-heute .slp-roster-col-filter button:hover:not(.active){background:var(--hx-ground);}
 body.design-heute .slp-sort-label{color:var(--hx-muted);}
 body.design-heute :is(.lp-save-btn,.slp-save-btn){background:var(--hx-yellow);color:var(--hx-on-acc,var(--hx-ink));border-radius:999px;}
-body.design-heute :is(.lp-name-inp,.slp-name-inp){background:var(--hx-field);border:1px solid var(--hx-line);color:var(--hx-ink);border-radius:10px;}
-body.design-heute :is(.lp-name-inp,.slp-name-inp)::placeholder{color:#9AA7BF;}
-body.design-heute :is(.lp-chip,.slp-chip){background:var(--hx-ground);border-color:var(--hx-line);color:var(--hx-ink2);}
-body.design-heute :is(.lp-chip,.slp-chip).active{background:var(--hx-solid,var(--hx-ink));border-color:var(--hx-solid,var(--hx-ink));color:var(--hx-on-solid,#fff);}
-body.design-heute :is(.lp-chip-x,.slp-chip-x){color:var(--hx-muted);}
 body.design-heute #lp-saves-list{color:var(--hx-muted) !important;}
 /* Kader list (Aufstellung) — rows are rendered with inline styles */
 body.design-heute #lp-kader-list > div{background:var(--hx-field) !important;border:1px solid var(--hx-line) !important;border-radius:10px !important;}
@@ -3773,9 +3524,6 @@ body.design-heute #lp-kader-list > div > span:nth-child(1){color:var(--hx-ink2) 
 body.design-heute #lp-kader-list > div > span:nth-child(2){color:var(--hx-ink) !important;}
 body.design-heute #lp-kader-list > div[style*="192,57,43"]{background:#FFF4F2 !important;border-color:#F3C6BF !important;}
 body.design-heute .lp-disc-badge{background:#F8DEDF;color:var(--hx-bad);}
-body.design-heute :is(.lp-player-card){background:var(--hx-field);border-color:var(--hx-line);}
-body.design-heute .lp-card-name{color:var(--hx-ink);}
-body.design-heute .lp-card-nr{color:var(--hx-ink2);font-family:var(--hx-num);font-weight:800;}
 /* Roster (Saisonkader) */
 body.design-heute .slp-roster-col-card{background:var(--hx-field);border:1px solid var(--hx-line);color:var(--hx-ink);border-radius:12px;}
 body.design-heute .slp-roster-col-card:hover{background:var(--hx-ground);}
@@ -4848,7 +4596,6 @@ body.design-heute .team-tabs .ttab-add i{width:34px;flex-shrink:0;text-align:cen
 body.design-heute .team-tabs .ttab-add:hover{color:var(--hx-blue);background:var(--hx-ground);}
 body.design-heute .user-dropdown{padding:6px;min-width:250px;overflow:visible;}
 body.design-heute .user-dropdown .ud-sep{background:var(--hx-line);margin:5px 4px;}
-body.design-heute .user-dropdown .ud-group{font:700 .74rem 'Barlow',sans-serif;text-transform:none;letter-spacing:0;color:var(--hx-muted);padding:8px 10px 4px;}
 body.design-heute .user-dropdown .ud-item{gap:10px;padding:7px 10px;min-height:38px;border-radius:9px;color:var(--hx-ink);font:600 .9rem 'Barlow',sans-serif;box-sizing:border-box;}
 body.design-heute .user-dropdown .ud-item:hover{background:var(--hx-ground);color:var(--hx-ink);}
 body.design-heute .user-dropdown .ud-item svg{color:var(--hx-muted);flex-shrink:0;}
@@ -6096,8 +5843,6 @@ if(window._fbBlocked){
   <div class="legend-pop-hint">Name oder Datum antippen → Details<br>Zelle antippen → Status ändern</div>
 </div>
 
-<!-- AUTOMATION reminder cards (trainer-only) — populated by _automationRenderCards() -->
-<div id="automationCards" style="display:none;padding:0 20px;margin-top:10px;"></div>
 
 <div class="mx-bar" id="mxBar" role="search" aria-label="Anwesenheit filtern" style="display:none;">
   <label class="mx-q"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input type="search" id="mxQ" placeholder="Spieler suchen" aria-label="Spieler suchen" autocomplete="off" oninput="mxSearch(this.value)" onkeydown="if(event.key==='Escape'){this.value='';mxSearch('');}"></label>
@@ -6679,13 +6424,17 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.10'; // v1.2.10: kein Handy-Hinweis am Computer
-const APP_VERSION_LABEL='1.2.10';
+const APP_VERSION='1.2.11'; // v1.2.11: aufgeräumt
+const APP_VERSION_LABEL='1.2.11';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792671187040; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792676726102; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.11',date:'22.10.2026',title:'Aufgeräumt',items:[
+    {icon:'🧹',title:'Alter Code entfernt',desc:'Funktionen ohne Knopf, die alten Benachrichtigungen (nur bei offener App, seit 1.2.3 aus), die alten Erinnerungskarten (seit 1.2.5 ersetzt), ein Konfliktfenster, das nie erschien, und Gestaltung für Elemente, die es nicht mehr gibt. Am Bildschirm ändert sich nichts; die App lädt etwas weniger.'},
+    {icon:'💾',title:'App-Backups: Tageskopien bleiben',desc:'Beim Aufräumen gefunden: Die Regel, dass mehrere Backups vor Änderungen nicht alle täglichen Backups verdrängen dürfen, war durch eine ältere Fassung derselben Funktion außer Kraft gesetzt. Jetzt gilt sie.'},
+  ]},
   {version:'1.2.10',date:'22.10.2026',title:'Am Computer kein Hinweis „aufs Handy“',items:[
     {icon:'🖥',title:'Hinweis nur auf Handy und Tablet',desc:'Die Karte „Benachrichtigungen aufs Handy“ erscheint auf der Übersicht nur noch auf Handy und Tablet. Am Computer heißt der Schalter in den Einstellungen „Auf diesem Computer“ – Benachrichtigungen kommen dort nur, solange der Browser läuft.'},
   ]},
@@ -6938,7 +6687,7 @@ const POS=['TW','RV','IV','LV','6er','8er','10er','RF','LF','ST'];
 const POS_ORDER=POS; // sorted goalkeeper→forward
 const POS_LBL={TW:'Torwart',RV:'Rechter Verteidiger',IV:'Innenverteidiger',LV:'Linker Verteidiger',
   '6er':'Def. MF','8er':'Zentr. MF','10er':'Off. MF',RF:'Rechter Flügel',LF:'Linker Flügel',ST:'Stürmer'};
-const SC=[3,1,0,2]; // trainer cycle: ?→A→F→E (status 4 not in cycle — set by player only)
+ // trainer cycle: ?→A→F→E (status 4 not in cycle — set by player only)
 const SYM={1:'A',0:'F',2:'E',3:'?',4:'M'}; // M for "aMgemeldet" (Angemeldet)
 const CLS={1:'csa',0:'csf',2:'cse',3:'csq',4:'csm'};
 const STLBL={1:'Anwesend',0:'Fehlend',2:'Entschuldigt',3:'Ausstehend',4:'Angemeldet'};
@@ -6946,7 +6695,6 @@ const STCLS={1:'ss-a',0:'ss-f',2:'ss-e',3:'ss-q',4:'ss-m'};
 const DOW=['So','Mo','Di','Mi','Do','Fr','Sa'];
 const DEM={1:'Januar',2:'Februar',3:'März',4:'April',5:'Mai',6:'Juni',
   7:'Juli',8:'August',9:'September',10:'Oktober',11:'November',12:'Dezember'};
-const DEF_TEAMS=['U14','U15','U16','U17','U19'];
 const DEF_FOCUSES=['Zone 1','Zone 2','Zone 3','Umschalten','Standards'];
 
 let G=null, CU=null;
@@ -7162,52 +6910,6 @@ function _parseMlKey(key){
   if(!team||!season)return null;
   return{team,season,idx};
 }
-// One-time migration from legacy "team__idx" keys to new "team__season__idx" keys.
-// Idempotent — already-new-format keys are skipped.
-function _migrateMatchLineups(){
-  if(!G||!G.matchLineups||typeof G.matchLineups!=='object')return;
-  const keys=Object.keys(G.matchLineups);
-  let migrated=0,dropped=0;
-  keys.forEach(oldKey=>{
-    const lineup=G.matchLineups[oldKey];
-    if(!lineup||typeof lineup!=='object')return;
-    const parts=oldKey.split('__');
-    // Already in new format: 3+ parts and last is numeric
-    if(parts.length>=3&&!isNaN(parseInt(parts[parts.length-1],10)))return;
-    if(parts.length!==2){delete G.matchLineups[oldKey];dropped++;return;}
-    const team=parts[0];
-    const idx=parseInt(parts[1],10);
-    if(isNaN(idx)){delete G.matchLineups[oldKey];dropped++;return;}
-    // Prefer .season metadata
-    let season=lineup.season;
-    // Fallback: match by sessDate within seasons
-    if(!season&&lineup.sessDate){
-      for(const s of(G.seasonList||[])){
-        const block=G.db&&G.db[team+'__'+s];
-        if(block&&Array.isArray(block.sessions)&&block.sessions[idx]&&block.sessions[idx].date===lineup.sessDate){
-          season=s;break;
-        }
-      }
-    }
-    // Last resort: any season with a match at this index
-    if(!season){
-      for(const s of(G.seasonList||[])){
-        const block=G.db&&G.db[team+'__'+s];
-        if(block&&Array.isArray(block.sessions)&&block.sessions[idx]&&block.sessions[idx].type==='match'){
-          season=s;break;
-        }
-      }
-    }
-    if(!season){delete G.matchLineups[oldKey];dropped++;return;}
-    const newKey=_mlKey(team,season,idx);
-    if(newKey===oldKey)return;
-    if(G.matchLineups[newKey]){delete G.matchLineups[oldKey];dropped++;return;}
-    G.matchLineups[newKey]={...lineup,season};
-    delete G.matchLineups[oldKey];
-    migrated++;
-  });
-  if(migrated>0||dropped>0)console.info('[matchLineups] Migrated '+migrated+', dropped '+dropped+' orphan(s)');
-}
 
 // When a session is removed at index `removedIdx`, the lineup at that index is dropped
 // and all higher-indexed lineups shift down by 1. When a session is inserted at `at`,
@@ -7272,42 +6974,10 @@ function genRange(s1,s2,tDays,mDays,tTime,mTime){
   }
   return res;
 }
-function defSessions(){
-  return genRange(new Date('2026-03-24'),new Date('2026-06-30'),[2,4],[0],'18:30','15:00')
-    .sort((a,b)=>dispToSortKey(a.date)-dispToSortKey(b.date));
-}
 
 // ══════════════════════════════
 //  DEFAULT PLAYERS
 // ══════════════════════════════
-const DEF_PL={
-  U19:[{nr:1,name:'Luca Hoffmann',pos:'TW',pos2:''},{nr:2,name:'Tim Schreiber',pos:'RV',pos2:''},
-    {nr:3,name:'Jonas Weber',pos:'IV',pos2:''},{nr:4,name:'Ben Krämer',pos:'IV',pos2:'LV'},
-    {nr:5,name:'Niklas Schulz',pos:'LV',pos2:''},{nr:6,name:'Felix Brandt',pos:'6er',pos2:'8er'},
-    {nr:7,name:'Paul Zimmermann',pos:'8er',pos2:''},{nr:8,name:'Max Fischer',pos:'8er',pos2:'10er'},
-    {nr:9,name:'Elias Koch',pos:'10er',pos2:''},{nr:10,name:'Finn Neumann',pos:'RF',pos2:''},
-    {nr:11,name:'Leon Bauer',pos:'LF',pos2:''},{nr:12,name:'Tobias Braun',pos:'TW',pos2:''},
-    {nr:13,name:'Moritz Klein',pos:'IV',pos2:''},{nr:14,name:'Simon Wolf',pos:'6er',pos2:''},
-    {nr:15,name:'David Richter',pos:'ST',pos2:'RF'}],
-  U17:[{nr:1,name:'Karl Berger',pos:'TW',pos2:''},{nr:2,name:'Noah Müller',pos:'RV',pos2:''},
-    {nr:3,name:'Fabian Lenz',pos:'IV',pos2:''},{nr:4,name:'Oscar Roth',pos:'IV',pos2:''},
-    {nr:5,name:'Luis Engel',pos:'LV',pos2:''},{nr:6,name:'Erik Haas',pos:'6er',pos2:''},
-    {nr:7,name:'Tom Becker',pos:'8er',pos2:''},{nr:8,name:'Kai Wagner',pos:'10er',pos2:'RF'},
-    {nr:9,name:'Sven Groß',pos:'RF',pos2:''},{nr:10,name:'Mats Schulte',pos:'ST',pos2:''}],
-  U16:[{nr:1,name:'Ben Müller',pos:'TW',pos2:''},{nr:2,name:'Finn Wagner',pos:'RV',pos2:''},
-    {nr:3,name:'Leo Braun',pos:'IV',pos2:''},{nr:4,name:'Max Koch',pos:'IV',pos2:''},
-    {nr:5,name:'Jan Bauer',pos:'LV',pos2:''},{nr:6,name:'Tim Roth',pos:'8er',pos2:''},
-    {nr:7,name:'Nico Lange',pos:'10er',pos2:''},{nr:8,name:'Simon Wolf',pos:'ST',pos2:''}],
-  U15:[{nr:1,name:'Felix Arndt',pos:'TW',pos2:''},{nr:2,name:'Lukas Dorn',pos:'RV',pos2:''},
-    {nr:3,name:'Ben Fuchs',pos:'IV',pos2:''},{nr:4,name:'Finn Gerber',pos:'IV',pos2:''},
-    {nr:5,name:'Tim Hahn',pos:'LV',pos2:''},{nr:6,name:'Emil Jung',pos:'8er',pos2:''},
-    {nr:7,name:'Paul Kaiser',pos:'10er',pos2:''},{nr:8,name:'Max Ott',pos:'ST',pos2:''}],
-  U14:[{nr:1,name:'Arne Berg',pos:'TW',pos2:''},{nr:2,name:'Sven Holt',pos:'RV',pos2:''},
-    {nr:3,name:'Kai Lenz',pos:'IV',pos2:''},{nr:4,name:'Tom Merz',pos:'IV',pos2:''},
-    {nr:5,name:'Luca Feld',pos:'LV',pos2:''},{nr:6,name:'Jonas Rau',pos:'8er',pos2:''},
-    {nr:7,name:'Felix Stern',pos:'10er',pos2:''},{nr:8,name:'Marc Hase',pos:'ST',pos2:''}],
-};
-function mkPl(team,n){return(DEF_PL[team]||[]).map(p=>({...p,s:new Array(n).fill(3),perf:new Array(n).fill(null)}));}
 
 // ══════════════════════════════
 //  DATA / STORAGE
@@ -7338,14 +7008,6 @@ function buildDef(){
   G={version:14,teamList:['U19'],seasonList:[season],trainers:[],db:{}};
   const sess=genAutoSessions(season);
   G.db['U19__'+season]={sessions:sess,players:[]};
-  G.db['U19__focuses']=[...DEF_FOCUSES];
-}
-function buildTestDef(){
-  // Test data: full default with teams, players, sessions, trainers
-  const season='2025/26';
-  const sess=genAutoSessions(season);
-  G={version:14,teamList:['U19'],seasonList:[season],trainers:[{id:'t1',name:'Thomas Hoffmann',teams:['U19']},{id:'t2',name:'Artem Horbachov',teams:['U19']}],db:{}};
-  G.db['U19__'+season]={sessions:JSON.parse(JSON.stringify(sess)),players:mkPl('U19',sess.length)};
   G.db['U19__focuses']=[...DEF_FOCUSES];
 }
 // ══════════════════════════════════════════════════════════════
@@ -7482,10 +7144,6 @@ function _writeBlocked(what){
 // Set for the duration of a housekeeping write, so it does not masquerade as
 // an edit. Not a parameter: the call chain runs through saveG in places.
 let _systemWrite=false;
-function _sysSave(fn){
-  _systemWrite=true;
-  try{fn();}finally{setTimeout(()=>{_systemWrite=false;},0);}
-}
 // Adopt a snapshot as the working state. In player mode the shared object is
 // never reduced — a private copy is, so no code path can write the reduced
 // version back, and no trainer session can inherit it from this device.
@@ -8157,144 +7815,6 @@ function fbDecode(d){
   if(_mediaNeedsRefetch){_mediaNeedsRefetch=false;_mediaRefetchAll();}
   return out;
 }
-// ── REMOTE VERSION STAMP RESET ────────────────────────────────
-// If a never-deployed build (e.g. a local test) published a future
-// APP_RELEASE_TS, online clients keep seeing "update available" for a version
-// that does not exist on the server. Admin, console: resetRemoteVersion()
-function resetRemoteVersion(){
-  if(!isAdmin()){console.warn('Nur Admin');return;}
-  G._appVersion=APP_VERSION;
-  G._appReleaseTs=APP_RELEASE_TS;
-  saveG();
-  try{Object.keys(sessionStorage).forEach(k=>{if(k.indexOf('_updRld_')===0)sessionStorage.removeItem(k);});}catch(e){}
-  console.info('\u2705 Remote-Versionsstempel auf '+APP_VERSION+' ('+APP_RELEASE_TS+') zur\u00fcckgesetzt.');
-}
-// ── BACKUP NODE REPAIR (one-time) ─────────────────────────────
-// Strips photos from EXISTING __backups entries so the node fits back
-// under the RTDB 16MB single-write limit. Works PER ENTRY (child reads +
-// child writes), never transferring the whole node at once. Downloads
-// ~2-4MB per photo-bearing entry — run after quota reset if tight.
-// Admin, console: await repairBackupsStripPhotos()
-async function repairBackupsStripPhotos(){
-  if(!isAdmin()){console.warn('Nur Admin');return;}
-  if(!fbRef){console.warn('Keine Firebase-Verbindung');return;}
-  const root=fbRef.parent.child('__backups');
-  let before=0,after=0,fixed=0;
-  for(let i=0;i<20;i++){
-    const ts=(await root.child(i+'/ts').once('value')).val();
-    if(ts==null)continue;
-    const raw=(await root.child(i+'/data').once('value')).val();
-    if(typeof raw!=='string'){continue;}
-    before+=raw.length;
-    if(raw.indexOf('data:image')===-1){after+=raw.length;continue;} // already clean
-    let parsed;
-    try{parsed=JSON.parse(raw);}catch(e){console.warn('Eintrag '+i+' nicht lesbar — \u00fcbersprungen');after+=raw.length;continue;}
-    const slim=JSON.stringify(parsed,(k,v)=>{
-      if((k==='photo'||k==='clubLogo'||k==='heroPhoto')
-         &&typeof v==='string'&&v.length>1500&&v.indexOf('data:image')===0)return undefined;
-      return v;
-    });
-    await root.child(i+'/data').set(slim);
-    after+=slim.length;fixed++;
-    console.info('Eintrag '+i+' ('+new Date(ts).toLocaleDateString('de-DE')+'): '
-      +Math.round(raw.length/1024)+' KB \u2192 '+Math.round(slim.length/1024)+' KB');
-  }
-  console.info('\u2705 Fertig: '+fixed+' Eintr\u00e4ge verschlankt \u00b7 Knoten '
-    +Math.round(before/1024/1024*10)/10+' MB \u2192 '+Math.round(after/1024/1024*10)/10+' MB');
-  console.info('Danach ein Test-Backup erstellen \u2014 es sollte jetzt in der Liste erscheinen.');
-}
-// ── PHOTO RECOVERY UTILITY (quota-frugal) ─────────────────────
-// Restores photos from Firebase __backups. Designed to run ON A NEARLY
-// EXHAUSTED Spark download quota: the list step reads only tiny metadata
-// fields (ts/label/kind — a few KB total); the FULL backup data (~MBs) is
-// downloaded exactly ONCE, for the single backup you pick, and cached
-// in-memory for the apply step. Admin, from DevTools console:
-//   restorePhotosFromBackup()        — cheap list (no photo counts — counting would require downloading each backup)
-//   restorePhotosFromBackup(ts)      — downloads THAT ONE backup, dry-run match report
-//   restorePhotosFromBackup(ts,true) — apply (reuses the dry-run download)
-let _phRestoreCache=null; // {ts, harvest, logo, hero}
-async function restorePhotosFromBackup(ts,apply){
-  if(!isAdmin()){console.warn('Nur Admin');return;}
-  if(!fbRef){console.warn('Keine Firebase-Verbindung');return;}
-  const root=fbRef.parent.child('__backups');
-  // ── Cheap metadata scan: individual tiny reads, never the data blobs ──
-  const metas=[];
-  for(let i=0;i<20;i++){
-    const t=(await root.child(i+'/ts').once('value')).val();
-    if(t==null)continue;
-    const label=(await root.child(i+'/label').once('value')).val();
-    const kind=(await root.child(i+'/kind').once('value')).val();
-    metas.push({idx:i,ts:t,label:label||'?',kind:kind||'?',datum:new Date(t).toLocaleString('de-DE')});
-  }
-  if(!metas.length){console.warn('Keine Backups gefunden');return;}
-  metas.sort((a,b)=>b.ts-a.ts);
-  if(ts===undefined){
-    console.table(metas.map(m=>({ts:m.ts,datum:m.datum,label:m.label,kind:m.kind})));
-    console.info('W\u00e4hle das NEUESTE Backup von VOR dem Foto-Verlust (vor dem v1.0.9.1-Deploy).');
-    console.info('Dann: restorePhotosFromBackup(<ts>) \u2014 l\u00e4dt genau dieses eine Backup (~wenige MB).');
-    return;
-  }
-  const meta=metas.find(m=>m.ts===ts);
-  if(!meta){console.warn('Backup mit ts='+ts+' nicht gefunden');return;}
-  // ── Download exactly one data blob (or reuse dry-run cache) ──
-  let harvest,logo,hero;
-  if(_phRestoreCache&&_phRestoreCache.ts===ts){
-    ({harvest,logo,hero}=_phRestoreCache);
-    console.info('(Daten aus Dry-Run-Cache \u2014 kein erneuter Download)');
-  } else {
-    console.info('Lade Backup "'+meta.label+'" \u2026');
-    const raw=(await root.child(meta.idx+'/data').once('value')).val();
-    if(!raw){console.warn('Backup-Daten leer');return;}
-    let data;
-    try{data=typeof raw==='string'?JSON.parse(raw):raw;}catch(e){console.warn('Backup nicht lesbar:',e);return;}
-    harvest={};logo=null;hero=null;
-    const walk=(node)=>{
-      if(!node||typeof node!=='object')return;
-      if(Array.isArray(node)){node.forEach(walk);return;}
-      if(typeof node.photo==='string'&&node.photo.indexOf('data:image')===0&&node.name){
-        harvest[node.name+'|'+(node.birthdate||'')]=node.photo;
-      }
-      Object.values(node).forEach(v=>{if(v&&typeof v==='object')walk(v);});
-    };
-    walk(data.db||data);
-    if(typeof data.clubLogo==='string'&&data.clubLogo.indexOf('data:image')===0)logo=data.clubLogo;
-    if(typeof data.heroPhoto==='string'&&data.heroPhoto.indexOf('data:image')===0)hero=data.heroPhoto;
-    _phRestoreCache={ts,harvest,logo,hero};
-  }
-  const nPhotos=Object.keys(harvest).length;
-  if(!nPhotos&&!logo&&!hero){console.warn('Dieses Backup enth\u00e4lt keine Fotos \u2014 \u00e4lteres w\u00e4hlen (vor dem Verlust).');return;}
-  // ── Match against current G ──
-  let hit=0;const plan=[];
-  Object.keys(G.db||{}).forEach(blockKey=>{
-    (G.db[blockKey].players||[]).forEach(p=>{
-      if(!p||!p.name)return;
-      if(typeof p.photo==='string'&&p.photo.indexOf('data:image')===0)return;
-      const key=p.name+'|'+(p.birthdate||'');
-      if(harvest[key]){plan.push({blockKey,name:p.name});hit++;}
-    });
-  });
-  const wantLogo=logo&&!(typeof G.clubLogo==='string'&&G.clubLogo.indexOf('data:image')===0);
-  const wantHero=hero&&!(typeof G.heroPhoto==='string'&&G.heroPhoto.indexOf('data:image')===0);
-  console.info('Backup enth\u00e4lt '+nPhotos+' Spielerfotos \u00b7 wiederherstellbar: '+hit
-    +(wantLogo?' + Vereinslogo':'')+(wantHero?' + Startseiten-Foto':''));
-  console.table(plan);
-  if(!apply){console.info('restorePhotosFromBackup('+ts+', true) zum Anwenden (nutzt diesen Download wieder)');return;}
-  if(typeof snap==='function')snap(); // undo point
-  Object.keys(G.db||{}).forEach(blockKey=>{
-    (G.db[blockKey].players||[]).forEach(p=>{
-      if(!p||!p.name)return;
-      if(typeof p.photo==='string'&&p.photo.indexOf('data:image')===0)return;
-      const key=p.name+'|'+(p.birthdate||'');
-      if(harvest[key])p.photo=harvest[key];
-    });
-  });
-  if(wantLogo)G.clubLogo=logo;
-  if(wantHero)G.heroPhoto=hero;
-  saveG(); // re-encode splits photos into fcf_media (rules now allow it)
-  render();
-  logAudit('Fotos aus Backup wiederhergestellt','',hit+' Spielerfotos');
-  console.info('\u2705 '+hit+' Fotos wiederhergestellt und gespeichert');
-}
 // ── FORENSIC RECOVERY UTILITY ─────────────────────────────────
 // Recover index-based references (slpConfirmations, seasonLineups, matchLineups)
 // by matching player NAMES (not indices) from a backup — fixes cases where
@@ -8461,52 +7981,6 @@ async function forensicRecover(backupLabel,apply){
 }
 if(typeof window!=='undefined')window.forensicRecover=forensicRecover;
 
-// ──────────────────────────────────────────────────────────────
-// CLEANUP UTILITY: removes orphan Firebase keys from past bugs
-// Call from console: fbCleanupOrphans()
-// Lists what would be deleted first, then prompts to confirm.
-// ──────────────────────────────────────────────────────────────
-async function fbCleanupOrphans(dryRun){
-  if(dryRun===undefined)dryRun=true;
-  if(!fbDb||!fbRef){console.error('Firebase not connected');return;}
-  const snap=await fbDb.ref('fcf_data/db').once('value');
-  const raw=snap.val();
-  if(!raw){console.info('fcf_data/db is empty');return;}
-  // Decode keys to identify what's what
-  const keys=Object.keys(raw);
-  const realTeams=[],orphans=[];
-  keys.forEach(k=>{
-    const decoded=k.replace(/__SL__/g,'/').replace(/__DOT__/g,'.');
-    // Real team key: encoded__season form, where encoded is a string with __SL__ ⟹ has '/' after decode
-    // OR exact match like U19__2025__SL__26
-    const wide=k.endsWith('__focuses')||TEAM_WIDE_KEYS.some(x=>k.endsWith('__'+x));
-    const isReal=k.includes('__SL__')||wide;
-    const startsBad=k.startsWith('undefined__');
-    const endsBad=k.endsWith('__undefined');
-    const looksOrphan=startsBad||endsBad||!isReal;
-    if(looksOrphan)orphans.push(k);
-    else realTeams.push(k);
-  });
-  console.info('=== Firebase fcf_data/db keys ===');
-  console.info('Real (keep):',realTeams);
-  console.info('Orphan (would delete):',orphans);
-  if(dryRun){
-    console.info('');
-    console.info('THIS WAS A DRY RUN. To actually delete: fbCleanupOrphans(false)');
-    return;
-  }
-  if(orphans.length===0){console.info('Nothing to clean up.');return;}
-  if(!confirm('Delete '+orphans.length+' orphan keys from Firebase?\n\n'+orphans.join('\n')+'\n\nThis cannot be undone.'))return;
-  let deleted=0;
-  for(const k of orphans){
-    try{
-      await fbDb.ref('fcf_data/db/'+k).remove();
-      deleted++;
-      console.info('Deleted:',k);
-    }catch(e){console.error('Failed to delete',k,e);}
-  }
-  console.info('=== Done. Deleted '+deleted+'/'+orphans.length+' orphan keys ===');
-}
 
 // Per-session arrays are stored sparsely: Firebase keeps only the indices that
 // carry a value, so a player who last rated session 7 comes back with an
@@ -9064,12 +8538,6 @@ function _markSynced(){
 function _dataAgeMs(){
   if(!_lastSyncAt)return Infinity;
   return Date.now()-_lastSyncAt;
-}
-function _isDataStale(thresholdMs){
-  // No Firebase configured = always "stale" in the sense that we can't verify
-  if(!fbRef)return false; // local-only mode, no remote to compare with
-  if(_fbConnState!=='connected')return true;
-  return _dataAgeMs()>(thresholdMs||60000); // default: 60s
 }
 // Format age as a short human label
 function _fmtAge(ms){
@@ -9889,11 +9357,6 @@ function _clearPasskey(rec){
   delete rec.passkeyId;
   delete rec.passkeyCreatedAt;
 }
-// React to name input changes — show/hide password & PIN fields based on user record
-// _authNameChanged is kept as a legacy no-op so any external callers don't break.
-// The login UI is now fully STATIC — reacting to name input would reveal whether the name
-// exists in the system (user enumeration). All fields stay in the same state regardless.
-function _authNameChanged(){}
 // Initialize static auth UI: show Passkey button only based on browser capability
 // (this leaks NO user-specific info). PIN field stays in collapsed "Weitere Optionen".
 function _initAuthUI(){
@@ -10673,33 +10136,10 @@ function setUserPref(key,val){
   prefs[key]=val;
   localStorage.setItem(k,JSON.stringify(prefs));
 }
-function toggleAutoSync(){
-  const cur=getUserPref('autoSync',true);
-  const newVal=!cur;
-  // Switching ON when we have unsynced local edits could pull remote and overwrite them.
-  // Give the user a chance to push first.
-  if(newVal&&cur===false&&_localDirty&&fbRef){
-    const ok=confirm('Du hast lokale Änderungen, die noch nicht in der Cloud sind.\n\n'+
-      'Wenn du Auto-Sync jetzt einschaltest, könnten andere Änderungen aus der Cloud deine überschreiben.\n\n'+
-      'Vorher “☁️ Jetzt speichern” wählen?\n\n'+
-      'OK = Trotzdem einschalten   |   Abbrechen = Erst manuell speichern');
-    if(!ok){updateUserMenuState();return;}
-  }
-  setUserPref('autoSync',newVal);
-  if(newVal){
-    // Turning ON: start listener
-    if(fbRef&&!fbListening)startFbListener();
-  } else {
-    // Turning OFF: stop listener so remote changes don't overwrite local edits
-    stopFbListener();
-  }
-  updateUserMenuState();
-}
 function confirmLogout(){
   closeUserMenu();
   if(!confirm('Wirklich abmelden?'))return;
   // Stop background timers
-  if(typeof stopPushInterval==='function')stopPushInterval();
   if(typeof stopPresence==='function')stopPresence();
   // Log before clearing CU
   if(CU&&CU.role!=='player')logAudit('Abmeldung','','');
@@ -10751,7 +10191,6 @@ function manualSyncLoad(){
     saveG(false);render();alert('✅ Daten geladen.');
   }).catch(e=>alert('Fehler: '+e.message));
 }
-function switchUser(){confirmLogout();}
 
 function showApp(){
   // Save initial currentTeam/currentSeason to localStorage if not already set
@@ -11651,7 +11090,6 @@ function render(){
     if(typeof renderMobileAtt==='function')renderMobileAtt();
     applyRoleUI();
     updateUndoBtns();
-    if(typeof _automationRenderCards==='function')_automationRenderCards();
     if(typeof hxRenderNav==='function')hxRenderNav();
     if(typeof _kbVisible==='function'&&_kbVisible())try{kbRender();}catch(e){console.error('kbRender',e);}
     // Keep Startseite in sync: Firebase sync, undo/redo, team/season switch
@@ -12462,17 +11900,6 @@ function _noteExcuse(p,si){
   while(p.excOK.length<=si)p.excOK.push(null);
   p.excOK[si]=(p.s[si]===2)?true:null;
 }
-function cycStPlayer(pi,si){
-  if(!canEdit())return;
-  const D=cd(),p=D.players[pi];if(!p||!p.s)return;
-  const past=isSessPast(si);
-  let cycle=past?SC.filter(v=>v!==3):SC;
-  let cur=cycle.indexOf(p.s[si]);if(cur<0)cur=0;
-  p.s[si]=cycle[(cur+1)%cycle.length];_noteExcuse(p,si);
-  snap();saveG();
-  // Refresh the player stats modal
-  openPlayerStats(pi);
-}
 function setSessPlayerStatus(pi,si,val){
   if(!canEdit())return;
   const D=cd();if(!D.players[pi]||!D.players[pi].s)return;
@@ -12528,28 +11955,6 @@ function setPerf(pi,si,val){
   const sess=D.sessions[si];
   const sessLabel=sess?sess.date:'?';
   logAudit('Einsatz geändert',p.name||'?',sessLabel+': '+(oldVal?PERF_LABEL[oldVal]:'–')+' → '+(newVal?PERF_LABEL[newVal]:'–'));
-}
-function cycStForce(pi,si){
-  // Bypass past lock - allowed in session detail modal
-  if(!canEdit())return;
-  const D=cd();if(!D.players[pi]||!D.players[pi].s)return;
-  snap();
-  const p=D.players[pi];
-  const oldVal=p.s[si];
-  p.s[si]=SC[(SC.indexOf(p.s[si])+1)%SC.length];_noteExcuse(p,si);
-  const newVal=p.s[si];
-  const cell=document.querySelector(`[data-pi="${pi}"][data-si="${si}"]`);
-  if(cell){
-    const isNext=si===nextIdx;const isPast=isSessPast(si);
-    cell.className=`cs ${CLS[p.s[si]]}${isNext?' next-col':''}${isPast?' past-locked':''}`;
-    cell.textContent=SYM[p.s[si]];
-  }
-  renderTfoot();saveG();
-  if(oldVal!==newVal){
-    const sess=D.sessions[si];
-    const sessLabel=sess?(sess.date+(sess.type==='match'?' (Spiel)':' (Training)')):'?';
-    logAudit('Status geändert',p.name||'?',sessLabel+': '+_statusName(oldVal)+' → '+_statusName(newVal));
-  }
 }
 function isSessPast(si){
   const D=cd();if(!D.sessions[si])return false;
@@ -13453,18 +12858,6 @@ function deleteUserMessage(){
   refreshNotifBadge();
   if(document.getElementById('notifPanel')?.classList.contains('open'))renderNotifPanel();
 }
-function toggleNotifPanel(e){
-  if(e)e.stopPropagation();
-  const panel=ensureNotifPanel();
-  if(!panel)return;
-  const isOpen=panel.classList.contains('open');
-  if(isOpen){
-    panel.classList.remove('open');
-  } else {
-    renderNotifPanel();
-    panel.classList.add('open');
-  }
-}
 function closeNotifPanel(){
   const panel=document.getElementById('notifPanel');
   if(panel)panel.classList.remove('open');
@@ -13589,12 +12982,6 @@ function _hxSchemeCur(s){
 function setAppFontScale(v){const s=getAppearance();s.fontScale=v;saveAppearance(s);applyAppearance();updateAppearanceUI();}
 function setAppAnimations(v){const s=getAppearance();s.animations=v;saveAppearance(s);applyAppearance();}
 function setAppCompact(v){const s=getAppearance();s.compact=v;saveAppearance(s);applyAppearance();}
-async function onPushToggle(el){
-  const checked=el.checked;
-  await setAppPushEnabled(checked);
-  // Re-sync UI in case permission was denied
-  updateAppearanceUI();
-}
 function resetAppearance(){
   if(!confirm('Alle Anzeigeeinstellungen zurücksetzen?'))return;
   saveAppearance(Object.assign({},APPEARANCE_DEFAULTS));
@@ -13630,11 +13017,9 @@ function updateAppearanceUI(){
 
 }
 
-function openAppearanceSettings(){openSettings('darstellung');}
 // ── EINSTELLUNGEN — one window with categories ─────────────────
 // Konto / Darstellung / Benachrichtigungen / Mannschaft / Daten. The old
-// entry points (openPasswordModal, openAppearanceSettings, openPreferences)
-// open it on their section. Phone: without a section the category list is
+// entry points (e.g. openPasswordModal) open it on their section. Phone: without a section the category list is
 // shown; a section is a page of its own with a back arrow.
 var _setLast='konto';
 function _setPhone(){return window.matchMedia('(max-width:767px)').matches;}
@@ -13650,7 +13035,6 @@ function _setFill(){
   if(typeof updateAppearanceUI==='function')updateAppearanceUI();
   const regSwitch=document.getElementById('setRegStatus');
   if(regSwitch)regSwitch.checked=isRegStatusShown();
-  if(typeof _automationSyncSettingsUI==='function')_automationSyncSettingsUI();
   if(typeof ayRender==='function')ayRender();
   _setLogoSync();
   const tc=document.getElementById('set-trash-count');
@@ -13736,15 +13120,11 @@ function settingsBack(){
   else if(mob&&mob.classList.contains('sec-open'))settingsShow('');
   else closeM('moSettings');   // Heute phone: ‹ on the category list leaves the page
 }
-// Kept for old callers (search, shortcuts)
-function openPreferences(){openSettings();}
 function setUserSessionExpiry(val){
   // Per-user pref — each trainer has their own session duration on this device
   setUserPref('sessionExpiryDays',parseInt(val,10));
   if(typeof showSaveFlash==='function')showSaveFlash('✓ Sitzungsdauer aktualisiert');
 }
-// Legacy alias removed — old global setter is gone; this is per-user now.
-function setSessionExpiry(val){setUserSessionExpiry(val);}
 
 // ── MOBILE ATTENDANCE VIEW ──────────────────────────────────
 let _maSelectedSi=null; // currently displayed session index in mobile view
@@ -14014,174 +13394,17 @@ function maInitPullToRefresh(){
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',maInitPullToRefresh);
 else maInitPullToRefresh();
 
-// ── PUSH NOTIFICATIONS (System-level) ────────────────────────
-// Uses Notification API. Works while app is open or PWA installed.
-// Tracks shown IDs separately from "seen" to avoid re-notifying for old items.
 
-function pushSupported(){return 'Notification' in window;}
-function pushPermission(){return pushSupported()?Notification.permission:'unsupported';}
-function pushIsEnabled(){
-  // Replaced in 1.2.3 by real push for trainers (tpush…, sent by the job on
-  // GitHub). These came only while the app was open and would now arrive twice.
-  return false;
-}
-async function requestPushPermission(){
-  if(!pushSupported())return 'unsupported';
-  if(Notification.permission==='granted')return 'granted';
-  if(Notification.permission==='denied')return 'denied';
-  try{
-    const result=await Notification.requestPermission();
-    return result;
-  }catch(e){return 'denied';}
-}
-// Diagnostics: pushDiag() in the console prints everything that decides
-// whether notifications can work, so the cause can be read instead of guessed.
-window.pushDiag=function(){
-  const s=getAppearance();
-  const out={
-    'Notification API': ('Notification' in window),
-    'Berechtigung': ('Notification' in window)?Notification.permission:'—',
-    'Im Profil gespeichert': s.pushEnabled===true,
-    'Sicherer Kontext (https)': window.isSecureContext,
-    'Service Worker aktiv': !!(navigator.serviceWorker&&navigator.serviceWorker.controller),
-    'Als App installiert': window.matchMedia('(display-mode: standalone)').matches,
-    'Herkunft': location.origin
-  };
-  console.table(out);
-  return out;
-};
-async function setAppPushEnabled(checked){
-  const s=getAppearance();
-  if(checked){
-    const perm=await requestPushPermission();
-    if(perm!=='granted'){
-      s.pushEnabled=false;
-      saveAppearance(s);
-      updateAppearanceUI();
-      if(perm==='denied')alert('Benachrichtigungen sind in deinem Browser blockiert. Bitte erlaube sie in den Browsereinstellungen.');
-      else if(perm==='unsupported')alert('Dein Browser unterstützt keine System-Benachrichtigungen.');
-      // "default" = the dialog was dismissed, or the browser suppressed it
-      // (Edge: "Benachrichtigungsanfragen werden stummgeschaltet"). Without a
-      // word here the switch simply flipped back and looked broken.
-      else alert('Der Browser hat keine Erlaubnis erteilt (Status: '+perm+').\n\nIn Edge: auf das Schloss-Symbol links in der Adressleiste klicken \u2192 Berechtigungen \u2192 Benachrichtigungen auf \u201eZulassen\u201c stellen. Falls dort nichts erscheint, ist unter Einstellungen \u2192 Cookies und Websiteberechtigungen \u2192 Benachrichtigungen die Option \u201eStummschalten\u201c aktiv.');
-      return;
-    }
-  }
-  s.pushEnabled=checked;
-  saveAppearance(s);
-  // When enabling, run an initial check so user sees something soon
-  if(checked&&typeof checkAndPushNew==='function'){
-    setTimeout(()=>checkAndPushNew({skipExisting:true}),300);
-  }
-}
 
-// Track which IDs have been pushed already (per device)
-function getPushedIds(){
-  try{
-    const raw=localStorage.getItem('pushedIds');
-    if(raw)return new Set(JSON.parse(raw));
-  }catch(e){}
-  return new Set();
-}
-function setPushedIds(set){
-  try{
-    // Cap at 200 most recent to prevent unbounded growth
-    const arr=Array.from(set).slice(-200);
-    localStorage.setItem('pushedIds',JSON.stringify(arr));
-  }catch(e){}
-}
 
-function showSystemNotif(title,body,opts){
-  if(!pushIsEnabled())return null;
-  if(document.visibilityState==='visible'&&!opts?.alsoWhenVisible)return null; // Don't disturb when actively viewing
-  try{
-    const n=new Notification(title,{
-      body:body||'',
-      icon:opts?.icon,
-      tag:opts?.tag||'fcf-'+Date.now(),
-      badge:opts?.icon,
-      silent:false,
-      requireInteraction:false
-    });
-    n.onclick=()=>{
-      window.focus();
-      if(opts?.onClick)try{opts.onClick();}catch(e){}
-      n.close();
-    };
-    // Auto-close after 8 seconds (some platforms ignore this)
-    setTimeout(()=>{try{n.close();}catch(e){}},8000);
-    return n;
-  }catch(e){console.warn('Notification failed:',e);return null;}
-}
 
-// Compute unseen-and-not-yet-pushed notifications and trigger system push
-function checkAndPushNew(opts){
-  if(!pushIsEnabled())return;
-  if(typeof computeNotifications!=='function')return;
-  const list=computeNotifications();
-  const pushed=getPushedIds();
-  const seen=getSeenNotifs();
-  const dismissed=getDismissedNotifs();
-  let newPushedIds=null;
-  list.forEach(n=>{
-    if(pushed.has(n.id))return;
-    if(seen.has(n.id))return; // already seen in-app
-    if(dismissed.has(n.id))return;
-    // First-time setup: don't blast user with backlog
-    if(opts?.skipExisting){
-      if(!newPushedIds)newPushedIds=pushed;
-      newPushedIds.add(n.id);
-      return;
-    }
-    // Show system notification
-    const title=n.title||'Benachrichtigung';
-    const body=n.sub||'';
-    showSystemNotif(title,body,{
-      tag:n.id,
-      icon:'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgcng9IjMyIiBmaWxsPSIjMGQzYjdjIi8+PHRleHQgeD0iOTYiIHk9IjEyMCIgZm9udC1zaXplPSI3NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2U4Yzg0MCIgZm9udC1mYW1pbHk9IkFyaWFsIEJsYWNrLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtd2VpZ2h0PSI5MDAiPkZDPC90ZXh0Pjwvc3ZnPg==',
-      onClick:()=>{
-        if(typeof onNotifClick==='function')onNotifClick(n.id,n.action||'');
-      }
-    });
-    if(!newPushedIds)newPushedIds=pushed;
-    newPushedIds.add(n.id);
-  });
-  if(newPushedIds)setPushedIds(newPushedIds);
-}
 
 // Hook: run check after each Firebase data sync
 function pushAfterSync(){
   if(!_ayStarted)setTimeout(()=>{try{_ayStart();}catch(e){}},500);
   if(_tgo)setTimeout(()=>{try{_tgoRun();}catch(e){}},300);
-  // Small delay to let G stabilize
-  setTimeout(()=>{
-    try{checkAndPushNew();}catch(e){console.warn(e);}
-  },400);
 }
 
-// Periodic check while app is open (safety net for time-based items like weekly schedule on Monday)
-let _pushIntervalId=null;
-function startPushInterval(){
-  if(_pushIntervalId)return;
-  _pushIntervalId=setInterval(()=>{
-    if(pushIsEnabled())checkAndPushNew();
-  },5*60*1000); // every 5 minutes
-}
-function stopPushInterval(){
-  if(_pushIntervalId){
-    clearInterval(_pushIntervalId);
-    _pushIntervalId=null;
-  }
-}
-// Don't start in player mode (players don't need push)
-if(!new URLSearchParams(location.search).has('player')){
-  startPushInterval();
-}
-// Stop when page becomes hidden, restart when visible (saves battery on mobile)
-document.addEventListener('visibilitychange',()=>{
-  if(document.visibilityState==='hidden')stopPushInterval();
-  else if(CU&&CU.role!=='player')startPushInterval();
-});
 
 
 // ── ICS CALENDAR EXPORT ─────────────────────────────────────
@@ -14372,18 +13595,6 @@ function generatePlayerToken(){
   else for(let i=0;i<arr.length;i++)arr[i]=Math.floor(Math.random()*256);
   return 'p_'+Array.from(arr).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
-// Open a player's own screen in a new tab, exactly as the player sees it —
-// the rating question included: it appears only in the player's own window
-// (end of the session until midnight). &preview=1 only keeps taps from being
-// saved under the player's name.
-function pmExitPreview(){
-  let back='';
-  try{back=sessionStorage.getItem('fcf_preview_back')||'';}catch(e){}
-  try{sessionStorage.removeItem('fcf_preview_back');}catch(e){}
-  if(back){location.href=back;return;}
-  // No stored origin (link opened directly): fall back to the plain app URL
-  location.href=location.origin+location.pathname;
-}
 function previewPlayer(token){
   if(!isAdmin())return;
   if(!token){alert('Dieser Spieler hat noch keinen Link.');return;}
@@ -14472,113 +13683,6 @@ function _amCountSessionResponses(si){
 }
 // ── WhatsApp text templates for player invitations ──
 // ══ WEEKLY INVITE TEXTS ══════════════════════════════════════
-// One link covers the whole week, so the message lists the week's dates
-// instead of a single session. Five variants: the same request lands
-// differently depending on the week, and a message that never changes stops
-// being read after a month.
-const AM_WEEK_TEMPLATES={
-  // The link already shows every date of the week with its buttons, so listing
-  // them here says the same thing twice — and a long message is scrolled past.
-  // These give the reason to tap and how much is waiting: a count, not a list.
-  kompakt:{
-    label:'Kompakt',
-    build:c=>{
-      if(!c.list.length)return `Hi ${c.nm}! \uD83D\uDC4B\n\nDiese Woche stehen keine Termine an.`;
-      const l=[`Hi ${c.nm}! \uD83D\uDC4B`,'',`Diese Woche: ${c.summary}.`,
-        'Bitte kurz zu- oder absagen:',c.url];
-      l.push('','Danke! \uD83D\uDE4F');
-      return l.join('\n');
-    }
-  },
-  freundlich:{
-    label:'Freundlich',
-    build:c=>{
-      if(!c.list.length)return `Hi ${c.nm}! \uD83D\uDC4B\n\nDiese Woche ist frei \u2014 geniess die Pause! \uD83D\uDE0A`;
-      const l=[`Hallo ${c.nm}! \uD83D\uDC4B`,'',
-        `${c.summary} stehen an. Sag uns bitte kurz Bescheid, wann du dabei bist \u2014 dann k\u00f6nnen wir richtig planen:`,
-        c.url];
-      l.push('','Bis bald! \u26BD');
-      return l.join('\n');
-    }
-  },
-  motivierend:{
-    label:'Motivierend',
-    build:c=>{
-      if(!c.list.length)return `\uD83D\uDCAA ${c.nm}, diese Woche Pause \u2014 danach greifen wir wieder an!`;
-      const head=c.matchCount>0?'\uD83D\uDD25 Spieltag-Woche!':'\uD83D\uDCAA Neue Woche, neue Einheiten!';
-      const l=[head,'',`Hi ${c.nm}, ${c.summary} \u2014 wir z\u00e4hlen auf dich.`,
-        'Trag kurz ein, wann du da bist:',c.url];
-      l.push('','\uD83D\uDE80');
-      return l.join('\n');
-    }
-  },
-  sachlich:{
-    label:'Sachlich',
-    build:c=>{
-      if(!c.list.length)return `${c.nm}: diese Woche keine Termine.`;
-      const l=[`Terminplanung${c.kw?' KW '+c.kw:''}`,'',`${c.summary}.`,
-        'R\u00fcckmeldung bitte \u00fcber diesen Link:',c.url];
-      return l.join('\n');
-    }
-  },
-  kurz:{
-    label:'Sehr kurz',
-    build:c=>{
-      if(!c.list.length)return 'Diese Woche frei.';
-      return `Hi ${c.nm}! ${c.summary} diese Woche \u2014 kurz eintragen bitte \uD83D\uDC47\n${c.url}`
-    }
-  },
-  checkliste:{
-    label:'Nachfassend',
-    build:c=>{
-      if(!c.list.length)return `Hi ${c.nm}! Diese Woche keine Termine \u2713`;
-      const l=[`Hi ${c.nm}! \uD83D\uDC4B`,'',
-        `${c.summary} \u2014 im Link siehst du alles auf einen Blick und hakst es in zwei Klicks ab:`,
-        c.url];
-      return l.join('\n');
-    }
-  },
-  teamgeist:{
-    label:'Teamgeist',
-    build:c=>{
-      if(!c.list.length)return `${c.nm}, diese Woche Pause \u2014 erhol dich gut! \u26BD`;
-      const l=[`\u26BD Hi ${c.nm}!`,'',
-        'Je fr\u00fcher wir wissen, wer dabei ist, desto besser wird das Training f\u00fcr alle.',
-        '',`${c.summary} \u2014 zwei Klicks, mehr nicht:`,c.url];
-      l.push('','Danke dir! \uD83D\uDE4F');
-      return l.join('\n');
-    }
-  },
-  countdown:{
-    label:'N\u00e4chster Termin',
-    build:c=>{
-      if(!c.list.length)return `Keine Termine diese Woche. \u26BD`;
-      const f=c.list[0];
-      const l=[`Hi ${c.nm}!`,'',
-        `Als N\u00e4chstes: ${f.dow} ${f.dnum}, ${f.time} Uhr.`,
-        `Diese Woche ${c.summary} \u2014 bitte f\u00fcr alle eintragen:`,c.url];
-      return l.join('\n');
-    }
-  },
-  fokus:{
-    label:'Mit Hinweis',
-    build:c=>{
-      if(!c.list.length)return `Hi ${c.nm}! Diese Woche keine Einheiten.`;
-      const l=[`Hi ${c.nm}! \uD83D\uDC4B`,'',`${c.summary} diese Woche.`,'',
-        'Wichtig: Absagen bitte immer \u00fcber den Link \u2014 so sieht das ganze Trainerteam Bescheid.',
-        c.url];
-      return l.join('\n');
-    }
-  },
-  statsfokus:{
-    label:'Statistik im Fokus',
-    build:c=>{
-      const l=[`Hi ${c.nm}! \uD83D\uDCCA`,''];
-      l.push(`Und diese Woche: ${c.summary}. Bitte eintragen:`,c.url);
-      return l.join('\n');
-    }
-  }
-};
 // The text is built per player (name, own links), so an edited version cannot
 // simply be sent as-is to everyone. What CAN be personalised is the wording
 // around the placeholders: the edit is stored as an override with {name},
@@ -14755,81 +13859,6 @@ function buildTeamLink(team){
   }
   return location.origin+location.pathname+'?team='+encodeURIComponent(t);
 }
-function copyTeamLink(){
-  if(!canEdit())return;
-  const team=UI.currentTeam||'';
-  if(!team){alert('Keine Mannschaft ausgewählt.');return;}
-  const url=buildTeamLink(team);
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(url).then(
-      ()=>{if(typeof showSaveFlash==='function')showSaveFlash('🔗 Mannschafts-Link kopiert · zur WhatsApp-Gruppe einfügen');},
-      ()=>{prompt('Link kopieren:',url);}
-    );
-  } else {prompt('Link kopieren:',url);}
-}
-// Compose the standard "team broadcast" message body for a given session.
-// Same format used by sendRsvpWhatsApp (from user-menu) and amBroadcastSession
-// (from Anmeldungen modal), so trainer sees consistent wording either way.
-// Emoji as \u-escapes so the bytes survive editor round-trips and code-page changes.
-function _buildSessionBroadcastText(sess,sk){
-  const teamLink=buildTeamLink(UI.currentTeam);
-  const y=Math.floor(sk/10000),mo=Math.floor(sk/100)%100,day=sk%100;
-  const dt=new Date(y,mo-1,day);
-  const dows=['So','Mo','Di','Mi','Do','Fr','Sa'];
-  const dow=dows[dt.getDay()];
-  const dateStr=dow+' '+String(day).padStart(2,'0')+'.'+String(mo).padStart(2,'0')+'.';
-  const timeStr=sess.time?(' \u00b7 '+sess.time):'';
-  // Plain text — no emoji. Some WhatsApp/Edge combinations corrupt emoji bytes
-  // in the wa.me redirect chain even when JS encodes them correctly. Keeping
-  // text ASCII-safe (+ German umlauts via \u escape) is the only reliable
-  // approach across all clients.
-  const titleLine=sess.type==='match'
-    ? 'Spiel '+(sess.label?'gegen '+sess.label:'')
-    : 'Training';
-  return titleLine+'\n'
-    +dateStr+timeStr+'\n'
-    +'\n'
-    +'Bitte zu/absagen \u00fcber euren pers\u00f6nlichen Link:\n'
-    +teamLink;
-}
-// Trigger broadcast from Anmeldungen → "Für diese Sitzung" → "In Gruppe broadcast"
-function amBroadcastSession(sessIdx){
-  if(!canEdit())return;
-  const D=cd();
-  if(!D||!Array.isArray(D.sessions))return;
-  const sess=D.sessions[sessIdx];
-  if(!sess){alert('Sitzung nicht gefunden.');return;}
-  const sk=dispToSortKey(sess.date);
-  if(!sk||sk===99999999){alert('Sitzung hat kein gültiges Datum.');return;}
-  _openWhatsAppGroupCompose(_buildSessionBroadcastText(sess,sk));
-}
-// Compose a WhatsApp broadcast text for the next upcoming training/match
-// with the team-link as the single shared registration URL.
-function sendRsvpWhatsApp(){
-  if(!canEdit())return;
-  const D=cd();
-  if(!D||!Array.isArray(D.sessions)){alert('Keine Sitzungen verfügbar.');return;}
-  const today=todaySK();
-  // Find next upcoming session within 14 days
-  const horizonD=new Date();horizonD.setDate(horizonD.getDate()+14);
-  const horizon=horizonD.getFullYear()*10000+(horizonD.getMonth()+1)*100+horizonD.getDate();
-  const upcoming=D.sessions
-    .map((s,si)=>({s,si,sk:s?dispToSortKey(s.date):99999999}))
-    .filter(x=>x.s&&x.sk>=today&&x.sk<=horizon)
-    .sort((a,b)=>a.sk-b.sk);
-  if(!upcoming.length){alert('Keine Sitzungen in den nächsten 14 Tagen.');return;}
-  // If multiple, ask trainer which one (simple prompt)
-  let target=upcoming[0];
-  if(upcoming.length>1){
-    const opts=upcoming.slice(0,5).map((x,i)=>(i+1)+'. '+x.s.date+' '+(x.s.type==='match'?'(Spiel · '+(x.s.label||'')+')':'(Training)')).join('\n');
-    const choice=prompt('Welche Sitzung?\n\n'+opts+'\n\nBitte Nummer eingeben (1):','1');
-    if(!choice)return;
-    const idx=parseInt(choice,10)-1;
-    if(isNaN(idx)||idx<0||idx>=upcoming.length){alert('Ungültige Auswahl.');return;}
-    target=upcoming[idx];
-  }
-  _openWhatsAppGroupCompose(_buildSessionBroadcastText(target.s,target.sk));
-}
 // Open WhatsApp with pre-filled text — no specific recipient, trainer picks
 // the group after the share sheet opens. This is the only WhatsApp pattern that
 // supports group-broadcast from a web link.
@@ -14986,202 +14015,9 @@ function _automationMigrate(){
   if(typeof snap==='function')snap();
   if(typeof saveG==='function')saveG();
 }
-// ISO week number — week starts Monday per German convention. Used both for
-// "lastSentKw" tracking and matching the Wochenbericht KW shown elsewhere.
-// Compute the most-recent trigger time for the week-report based on settings.
-// Returns Date (or null if not enabled). Trigger time is the LAST occurrence
-// of (weekday, hour:minute) that is <= now — i.e., we only fire after the
-// scheduled moment has passed in the current week.
-// Should we show the week-report card right now?
-// For each upcoming session, decide whether the RSVP reminder card applies.
-// Sessions that ended at least (duration + 60min buffer) ago and still have
-// players with status=3 (Ausstehend). Returns the most recent only — we don't
-// want to spam the trainer with 5 cards if they were on holiday.
-function _automationListRollCallCards(){
-  const s=_automationGetPrefs().rollCall;
-  const st=_automationGetStatus().rollCall;
-  if(!s.enabled)return [];
-  if(!canEdit())return [];
-  const D=cd();
-  if(!D||!Array.isArray(D.sessions))return [];
-  const players=D.players||[];
-  const now=Date.now();
-  const lookbackDays=14;
-  const lookbackTs=now-lookbackDays*24*3600000;
-  const result=[];
-  D.sessions.forEach((sess,si)=>{
-    if(!sess||!sess.date)return;
-    const sk=dispToSortKey(sess.date);
-    if(!sk||sk===99999999)return;
-    const y=Math.floor(sk/10000),mo=Math.floor(sk/100)%100,day=sk%100;
-    const time=sess.time||(sess.type==='match'?'15:00':'18:30');
-    const [h,m]=time.split(':').map(x=>parseInt(x,10)||0);
-    const startTs=new Date(y,mo-1,day,h||0,m||0).getTime();
-    // Clean session durations: 90min training, 120min match. Buffer minutesAfter
-    // is configurable in user prefs (Sofort / 15 / 30 / 60 / ... Min nach Ende).
-    const durMin=sess.type==='match'?120:90;
-    const bufferMin=Math.max(0,s.minutesAfter|0);
-    const triggerTs=startTs+(durMin+bufferMin)*60000;
-    if(triggerTs>now)return;
-    if(startTs<lookbackTs)return;
-    const key=String(si)+':'+sess.date;
-    if(st.lastSentSi&&st.lastSentSi[key])return;
-    // Count missing roll-call entries (status=3 = Ausstehend, treated as "not entered")
-    let missing=0;
-    players.forEach(p=>{
-      if(!p)return;
-      const v=(p.s&&si<p.s.length)?p.s[si]:3;
-      if(v===3||v==null)missing++;
-    });
-    if(missing===0)return; // already fully entered
-    result.push({si,sess,key,missing,startTs});
-  });
-  // Sort by date desc — most recent first
-  result.sort((a,b)=>b.startTs-a.startTs);
-  // Show only the single most recent — avoid card spam
-  return result.slice(0,1);
-}
-function _automationRenderCards(){
-  const wrap=document.getElementById('automationCards');
-  if(!wrap)return;
-  // Replaced in 1.2.5 by "Anwesenheit fehlt" in "Im Blick behalten"
-  wrap.innerHTML='';wrap.style.display='none';return;
-  if(!canEdit()){wrap.innerHTML='';wrap.style.display='none';return;}
-  let html='';
-  // Week-report and RSVP-reminder cards removed: players use the hub
-  // themselves, nothing is sent from here any more.
-  // Roll-call reminder cards (post-session attendance entry)
-  const rcCards=_automationListRollCallCards();
-  rcCards.forEach(c=>{
-    const isMatch=c.sess.type==='match';
-    const tt=isMatch?(c.sess.label?'Spiel gegen '+c.sess.label:'Spiel'):'Training';
-    html+='<div class="auto-card">';
-    html+='<div class="auto-card-head"><span class="auto-card-icon">\ud83d\udccb</span>'
-      +'<div class="auto-card-title">'+_dbEscapeHtml(tt)+' vom '+_dbEscapeHtml(c.sess.date)+'</div>'
-      +'<button class="auto-card-x" onclick="_automationDismissRollCall(\''+c.key+'\')" title="Diese Erinnerung schlie\u00dfen">\u2715</button>'
-      +'</div>';
-    html+='<div class="auto-card-meta">'+c.missing+' Spieler ohne Status-Eintrag \u2014 schnell ausf\u00fcllen, bevor du es vergisst</div>';
-    html+='<div class="auto-card-actions">';
-    html+='<button class="auto-card-btn primary" onclick="_automationOpenRollCall('+c.si+',\''+c.key+'\')">\ud83d\udccb Anwesenheit eintragen</button>';
-    html+='<button class="auto-card-btn ghost" onclick="_automationDismissRollCall(\''+c.key+'\')">Schon erledigt</button>';
-    html+='</div>';
-    html+='</div>';
-  });
-  wrap.innerHTML=html;
-  wrap.style.display=html?'block':'none';
-}
-// Action handlers
-function _automationOpenRollCall(si,key){
-  if(!canEdit())return;
-  _automationDismissRollCall(key,/*silent*/true);
-  if(typeof openSessStats==='function')openSessStats(si);
-}
-function _automationDismissRollCall(key,silent){
-  if(!canEdit())return;
-  const st=_automationGetStatus().rollCall;
-  if(!st.lastSentSi)st.lastSentSi={};
-  st.lastSentSi[key]=Date.now();
-  snap();saveG();
-  if(!silent)_automationRenderCards();
-}
-// Settings UI handlers
-function onAutoRollCallToggle(el){
-  if(!canEdit())return;
-  const p=_automationGetPrefs();
-  p.rollCall.enabled=!!el.checked;
-  _automationSavePrefs(p);
-  _automationSyncSettingsUI();
-  _automationRenderCards();
-}
-function onAutoRollCallChange(){
-  if(!canEdit())return;
-  const p=_automationGetPrefs();
-  const minEl=document.getElementById('autoRollCallMinutes');
-  if(minEl)p.rollCall.minutesAfter=parseInt(minEl.value,10)||60;
-  _automationSavePrefs(p);
-  _automationRenderCards();
-}
-function _automationSyncSettingsUI(){
-  const editable=canEdit&&canEdit();
-  const section=document.getElementById('setAutomationSection');
-  if(section)section.style.display='none';   // replaced by "Im Blick behalten" (1.2.5)
-  if(!editable)return;
-  const s=_automationGetPrefs();
-  const rcEnabled=document.getElementById('autoRollCallEnabled');
-  if(rcEnabled)rcEnabled.checked=!!s.rollCall.enabled;
-  const rcCfg=document.getElementById('autoRollCallConfig');
-  if(rcCfg)rcCfg.style.display=s.rollCall.enabled?'block':'none';
-  const rcMin=document.getElementById('autoRollCallMinutes');
-  if(rcMin)rcMin.value=String(s.rollCall.minutesAfter!=null?s.rollCall.minutesAfter:60);
-}
-// Periodic check — every 5 minutes + on visibility change
-let _automationInterval=null;
 function _automationStart(){
   // Migrate from legacy fully-shared format if present (one-time per device)
   try{_automationMigrate();}catch(e){console.error('[automation] migrate failed',e);}
-  if(_automationInterval)clearInterval(_automationInterval);
-  _automationInterval=setInterval(_automationRenderCards,5*60*1000);
-  document.addEventListener('visibilitychange',()=>{
-    if(!document.hidden)_automationRenderCards();
-  });
-}
-// Setup wizard for trainers: bulk-generate confirmTokens, list players missing
-// birthdates so trainer can complete them. Run once before sharing team link.
-function setupPlayerLinks(){
-  if(!canEdit())return;
-  const D=cd();
-  if(!D||!Array.isArray(D.players)){alert('Keine Spielerdaten verfügbar.');return;}
-  const all=D.players.filter(p=>p);
-  const noToken=all.filter(p=>!p.confirmToken);
-  const noBday=all.filter(p=>!p.birthdate);
-  let msg='Setup für Mannschafts-Link in „'+UI.currentTeam+' · '+UI.currentSeason+'":\n\n';
-  msg+='✓ '+all.length+' Spieler insgesamt\n';
-  if(noToken.length===0){
-    msg+='✓ Alle haben einen persönlichen Link\n';
-  } else {
-    msg+='⚠ '+noToken.length+' ohne Link — werden jetzt erstellt\n';
-  }
-  if(noBday.length===0){
-    msg+='✓ Alle haben ein Geburtsdatum\n\n';
-    msg+='Fortfahren?';
-  } else {
-    msg+='⚠ '+noBday.length+' ohne Geburtsdatum — diese können den Mannschafts-Link NICHT nutzen:\n';
-    msg+=noBday.slice(0,10).map(p=>'  • '+(p.name||'?')).join('\n');
-    if(noBday.length>10)msg+='\n  • ... +'+(noBday.length-10)+' weitere';
-    msg+='\n\nTrotzdem Tokens erstellen?\n(Geburtstage später nachtragen in Spielerprofil)';
-  }
-  if(!confirm(msg))return;
-  // Bulk-generate tokens
-  if(noToken.length>0){
-    snap();
-    let created=0;
-    D.players.forEach(p=>{
-      if(p&&!p.confirmToken){
-        p.confirmToken=generatePlayerToken();
-        created++;
-      }
-    });
-    saveG();
-    logAudit('Spieler-Tokens erstellt',UI.currentTeam,created+' neue Tokens');
-  }
-  // Show result + copy link offer
-  const teamLink=buildTeamLink(UI.currentTeam);
-  let result='✅ Setup abgeschlossen\n\n';
-  result+='Mannschafts-Link:\n'+teamLink+'\n\n';
-  if(noBday.length>0){
-    result+='Hinweis: '+noBday.length+' Spieler ohne Geburtsdatum können sich noch nicht anmelden. Bitte in der Mannschaft → Spielerprofil → ✎ Bearbeiten ergänzen.';
-  } else {
-    result+='Alle Spieler können den Link nutzen.';
-  }
-  alert(result);
-  // Auto-copy link to clipboard
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(teamLink).catch(()=>{
-      // Clipboard is blocked in some mobile browsers / insecure contexts —
-      // tell the trainer instead of pretending it worked.
-      if(typeof showSaveFlash==='function')showSaveFlash('\u2139\ufe0f Link konnte nicht kopiert werden \u2014 bitte manuell kopieren');
-    });
-  }
 }
 function renderPeConfirmLink(pi){
   const display=document.getElementById('pe-confirm-link-display');
@@ -15206,7 +14042,7 @@ function renderPeConfirmLink(pi){
 // Before Sunday 16:00 → Sunday of this week. From then on → Sunday of next
 // week, matching when the weekly invitation is sent.
 const PM_SURVEY_DOW=0;      // 0 = Sunday (JS getDay)
-const PM_SURVEY_HOUR=16;    // switch to the coming week from this hour
+    // switch to the coming week from this hour
 // First day of the week the invitation is about. On a Sunday that is tomorrow;
 // on any other day it is that day itself — sessions already past are of no use
 // to answer.
@@ -15451,7 +14287,7 @@ const RPE_SCALE=[
 ];
 function rpeLabel(n){const r=RPE_SCALE[n];return r?r[1]:'';}
 const RPE_DEFAULT_MIN=90;      // used when the trainer set no duration
-const RPE_WINDOW_H=72;         // entry stays open this long after the session
+         // entry stays open this long after the session
 const RPE_EARLY_MIN=15;        // rating opens this many minutes before the planned end
 // Trainer preview (&preview=1): the screen is identical to the player's, the
 // rating window too; preview only stops answers from being saved.
@@ -15869,9 +14705,6 @@ function dbRenderLoadCard(data){
     +'Rahmen = Anstieg \u00fcber '+LOAD_SPIKE_PCT+'% zur Vorwoche.</div></div>';
   return html;
 }
-// Remembers whether the individual-values fold is open, so a redraw does not
-// collapse it under the cursor.
-let _ssRpeOpen=false;
 // Everyone a session's rating concerns, in three groups: rated, says he was
 // not there, not answered. Absent and excused players are not asked; a value
 // one of them has anyway still counts as rated.
@@ -18468,21 +17301,6 @@ function rpoNotThere(si){
   try{_hubCheckDone('rpe');}catch(e){}
   window._rpeThanksNd=false;
 }
-function rpoMin(si,delta,abs){
-  const D=cd();const pi=_pmValidateIdx();
-  if(pi==null)return;
-  const p=D.players[pi];
-  const cur=(Array.isArray(p.rpeMin)?p.rpeMin[si]:null);
-  const base=(abs!==undefined&&abs!=='')?parseInt(abs,10)
-    :(cur==null?rpeSessionMinutes(D.sessions[si],null,si):cur);
-  const next=Math.max(0,Math.min(240,(isNaN(base)?0:base)+(delta||0)));
-  if(!Array.isArray(p.rpeMin))p.rpeMin=[];
-  while(p.rpeMin.length<D.sessions.length)p.rpeMin.push(null);
-  p.rpeMin[si]=next;
-  if(!RPE_IS_PREVIEW)_pmSaveTargeted(si);
-  const inp=document.getElementById('rpo-min-in');
-  if(inp)inp.value=next;
-}
 // The hub: what is waiting, and what can be looked at. Cards disappear when
 // they have nothing to offer, so the screen is only ever as long as it needs
 // to be.
@@ -19195,57 +18013,6 @@ function _amEscapeText(s){
   if(s==null)return '';
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-function pmSaveReason(si,text){
-  if(!isPlayerMode())return;
-  // Re-validate — guarantees we write to OUR record, not someone else's after roster shift
-  const pi=_pmValidateIdx();
-  if(pi==null)return;
-  const D=cd();const p=D&&D.players&&D.players[pi];
-  if(!p)return;
-  if(_amRsvpLocked(si))return; // silent ignore — UI is read-only after deadline
-  if(!Array.isArray(p.preconfReason))p.preconfReason=[];
-  while(p.preconfReason.length<=si)p.preconfReason.push('');
-  const trimmed=String(text||'').trim().slice(0,200);
-  if((p.preconfReason[si]||'')===trimmed)return; // no change
-  p.preconfReason[si]=trimmed;
-  // VARIANT B: targeted write + Firebase-transaction audit
-  _pmSaveTargeted(si);
-  const sess=D.sessions[si];
-  const sessLabel=sess?(sess.date+(sess.type==='match'?' (Spiel)':' (Training)')):'?';
-  _pmAppendAudit({
-    ts:Date.now(),user:p.name||'Spieler',role:'player',
-    team:UI.currentTeam||'',season:UI.currentSeason||'',
-    action:'Grund (Spieler-App)',target:p.name||'?',
-    details:sessLabel+(trimmed?': "'+trimmed.slice(0,60)+(trimmed.length>60?'…':'')+'"':': (entfernt)')
-  });
-}
-function pmTogglePhysio(si){
-  if(!isPlayerMode())return;
-  const D=cd();const myPi=_pmValidateIdx();
-  if(myPi==null||!D||!D.players||!D.players[myPi])return;
-  const p=D.players[myPi];
-  const s=D.sessions&&D.sessions[si];
-  if(!s||!sessPhysioOn(s))return;
-  if(_amRsvpLocked(si))return;
-  const st=(p.s&&si<p.s.length)?p.s[si]:3;
-  if(st!==4&&st!==1)return;
-  if(!Array.isArray(p.physio))p.physio=[];
-  while(p.physio.length<D.sessions.length)p.physio.push(null);
-  const now=p.physio[si]===true;
-  p.physio[si]=now?null:true;
-  if(RPE_IS_PREVIEW){
-    if(typeof showSaveFlash==='function')showSaveFlash('\ud83d\udc41 Vorschau \u2014 nicht gespeichert');
-    renderPlayerMode();
-    return;
-  }
-  _pmSaveTargeted(si);
-  try{
-    _pmAppendAudit({ts:Date.now(),user:p.name||'Spieler',role:'player',
-      action:'Physio-Termin',target:(s&&s.date)||'?',
-      detail:p.physio[si]?'gebucht':'abgesagt'});
-  }catch(e){}
-  renderPlayerMode();
-}
 function pmSetStatus(si,val){
   // val from UI: 1 = Komme, 0 = Kann nicht. Maps to p.s[si] status.
   if(!isPlayerMode())return;
@@ -19860,18 +18627,6 @@ function buildHubLink(token,action,sessIdx){
   return base+'?p='+encodeURIComponent(token||'')
     +(action?('&do='+action):'')
     +(sessIdx!=null?('&s='+sessIdx):'');
-}
-function buildRpeLink(token,sessIdx){
-  const base=location.origin+location.pathname;
-  return base+'?rpe='+encodeURIComponent(token||'')+(sessIdx!=null?('&s='+sessIdx):'');
-}
-// Group link: no token, so the screen has to ask who is answering.
-function buildRpeTeamLink(sessIdx,preview){
-  const base=location.origin+location.pathname;
-  return base+'?rpeteam='+encodeURIComponent(UI.currentTeam||'')
-    +'&season='+encodeURIComponent(UI.currentSeason||'')
-    +(sessIdx!=null?('&s='+sessIdx):'')
-    +(preview?'&preview=1':'');
 }
 // Weekly attendance series for the trend chart (last N weeks, held sessions)
 function _psWeekSeries(p,block,season,weeks){
@@ -20755,10 +19510,6 @@ function dbExportPng(){
   img.src=url;
 }
 
-function pmLogout(){
-  if(!confirm('Wirklich abmelden?'))return;
-  location.href=location.pathname;
-}
 
 // ── EXTENDED PLAYER STATISTICS (across all seasons) ──────────
 // Chronological Leistungsnote series across ALL seasons for one player.
@@ -20888,10 +19639,6 @@ function findPlayerOccurrences(name,birthdate){
   // Sort: by season ascending (chronological)
   out.sort((a,b)=>a.season.localeCompare(b.season));
   return out;
-}
-function _seasonStartSK(season){
-  const m=String(season||'').match(/^(\d{4})\//);
-  return m?(parseInt(m[1])*10000+701):0;
 }
 // Computes monthly attendance for a player across all seasons
 function computeMonthlyAttendance(occurrences){
@@ -22323,44 +21070,6 @@ function togglePlayerEdit(){
     _psSnapshot=null;
   }
 }
-function savePlayerEdit(){
-  // Re-resolve before write — Anna's edits should land on Anna's record, even if
-  // another trainer's deletion shifted indices while this edit modal was open.
-  const pi=_resolveCurrentPI();
-  if(pi<0){alert('Dieser Spieler ist nicht mehr verfügbar.');closeM('moPlayer');return;}
-  const D=cd(),p=D.players[pi];if(!p)return;
-  snap();
-  p.nr=parseInt(document.getElementById('pe-nr').value)||p.nr;
-  p.name=document.getElementById('pe-name').value.trim()||p.name;
-  p.pos=editP1;p.pos2=editP2||'';
-  p.note=document.getElementById('pe-note').value.trim();
-  p.shortname=document.getElementById('pe-shortname').value.trim();
-  p.passnr=document.getElementById('pe-passnr').value.trim();
-  p.birthdate=document.getElementById('pe-birthdate').value;
-  {const jd=document.getElementById('pe-joinDate');if(jd){if(jd.value)p.joinDate=jd.value;else delete p.joinDate;}}
-  p.phone=document.getElementById('pe-phone').value.trim();
-  p.email=document.getElementById('pe-email').value.trim();
-  // "Position verbergen" control removed; keep any existing value untouched
-  p.foot=_currentFoot;
-  saveG();renderBody();renderTfoot();
-  // Back to card view after saving — including the blocks the form hid
-  _psShowCard();
-  // Refresh the modal content
-  openPlayerStats(pi);
-}
-function savePlayerAndClose(){savePlayerEdit();}
-async function delCurrentPlayer(){
-  // Re-resolve currentPI against latest G — protects against index drift if
-  // another trainer deleted someone while this modal was open.
-  const pi=_resolveCurrentPI();
-  if(pi<0){
-    alert('Dieser Spieler ist nicht mehr verfügbar (wurde inzwischen gelöscht oder verschoben).');
-    closeM('moPlayer');
-    return;
-  }
-  closeM('moPlayer');
-  await delPlayer(pi);
-}
 
 // ══════════════════════════════
 //  SESSION STATS
@@ -22384,45 +21093,6 @@ const SS_ATT_META={
   4:{n:'Angemeldet',  i:'M',cls:'csm'},
   3:{n:'Ausstehend',  i:'?',cls:'csq'}
 };
-// One message for the group chat. Copied to the clipboard and opened in
-// WhatsApp — the trainer picks the team chat there.
-function ssSendRpe(si){
-  if(!canEdit())return;
-  const D=cd();const s=D&&D.sessions&&D.sessions[si];
-  if(!s)return;
-  const isMatch=s.type==='match';
-  const txt='\ud83d\udcaa Wie anstrengend war '
-    +(isMatch?('das Spiel'+(s.label?' gegen '+s.label:'')):'das Training')
-    +' heute f\u00fcr euch?\n\nKurz antippen \u2014 dauert 10 Sekunden:\n'
-    +buildRpeTeamLink(si);
-  _dbCopyText(txt);
-  if(typeof showSaveFlash==='function')showSaveFlash('\ud83d\udccb Nachricht kopiert');
-  window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank','noopener');
-  logAudit('Belastungs-Abfrage',s.date||'?','Gruppen-Link');
-}
-function ssSendRpeIndividual(si){
-  if(!canEdit())return;
-  const D=cd();const s=D&&D.sessions&&D.sessions[si];
-  if(!s)return;
-  // Those who took part: sRPE from someone who was not there means nothing.
-  const targets=(D.players||[]).map((p,pi)=>({p,pi}))
-    .filter(x=>x.p&&x.p.phone&&String(x.p.phone).trim()
-      &&![0,2].includes((x.p.s&&si<x.p.s.length)?x.p.s[si]:3));
-  if(!targets.length){alert('Keine Spieler mit Telefonnummer.');return;}
-  if(!confirm(targets.length+' Spieler nach der Belastung fragen?\n\nAm besten ca. 30 Minuten nach Schluss \u2014 dann bewertet man die ganze Einheit und nicht nur das Ende.'))return;
-  targets.forEach((x,i)=>{
-    if(!x.p.confirmToken)ensurePlayerToken(x.pi);
-    setTimeout(()=>{
-      const nm=(getDisplayName?getDisplayName(x.p):x.p.name)||'';
-      const isMatch=s.type==='match';
-      const txt=`Hi ${nm}! \ud83d\udcaa\n\nWie anstrengend war ${isMatch?('das Spiel'+(s.label?' gegen '+s.label:'')):'das Training'} heute f\u00fcr dich?\n`
-        +`Kurz antippen \u2014 dauert 10 Sekunden:\n${buildRpeLink(x.p.confirmToken,si)}`;
-      const link=_amWhatsAppLink(x.p.phone,txt);
-      if(link)window.open(link,'_blank','noopener');
-    },i*350);
-  });
-  logAudit('Belastungs-Abfrage',s.date||'?',targets.length+' Spieler');
-}
 // Sort order of the attendance window — remembered per device.
 let _ssAttSort=(()=>{try{return localStorage.getItem('fcf_ssa_sort')||'pos';}catch(e){return 'pos';}})();
 function ssAttSetSort(k){
@@ -23042,9 +21712,8 @@ function openSessStats(si){
         <button class="btn bd" id="ss-del" onclick="delCurrSess()" style="font-size:.76rem;">\ud83d\uddd1 ${isMat?'Spiel':'Training'} l\u00f6schen</button>
       </div>`;
   }else{if(ssDelBtn)ssDelBtn.style.display='none';if(document.getElementById('ss-edit-toggle'))document.getElementById('ss-edit-toggle').style.display='none';}
-  // Template and Duplicate buttons removed from this modal (unused). Their
-  // functions saveSessionAsTemplate/duplicateCurrentSession stay in place —
-  // templates are still applied when creating a session.
+  // Template and Duplicate buttons removed from this modal (unused); templates
+  // are still applied when creating a session.
   buildSessAtt(si);
   openM('moSession2');
 }
@@ -23540,118 +22209,6 @@ function deleteComment(si,id){
 }
 
 // ── BULK ACTIONS ─────────────────────────────────────────────
-// Set status for ALL players in current team for a given session.
-function bulkSetStatus(si,status){
-  if(!canEdit())return;
-  const D=cd();
-  if(!D||!Array.isArray(D.players)||!D.players.length)return;
-  const sess=D.sessions[si];
-  if(!sess)return;
-  // Build summary of changes
-  const changed=[];
-  D.players.forEach((p,pi)=>{
-    if(!p)return;
-    if(!Array.isArray(p.s))p.s=[];
-    const old=p.s[si];
-    if(old===status)return;
-    changed.push({pi,old,new:status,name:p.name});
-  });
-  if(!changed.length){
-    if(typeof showSaveFlash==='function')showSaveFlash('ℹ Bereits alle gesetzt');
-    return;
-  }
-  const labels={0:'Fehlend',1:'Anwesend',2:'Entschuldigt',3:'Ausstehend',4:'Angemeldet'};
-  const sessLabel=sess.date+(sess.type==='match'?' (Spiel)':' (Training)');
-  if(!confirm(`Alle ${D.players.length} Spieler für „${sessLabel}" auf „${labels[status]}" setzen?\n\n${changed.length} Änderung${changed.length!==1?'en':''} werden vorgenommen.`))return;
-  snap();
-  D.players.forEach(p=>{
-    if(!p)return;
-    if(!Array.isArray(p.s))p.s=[];
-    p.s[si]=status;
-  });
-  saveG();
-  buildSessAtt(si);
-  if(typeof renderBody==='function')renderBody();
-  if(typeof renderTfoot==='function')renderTfoot();
-  
-  logAudit('Bulk-Status',sessLabel,'Alle → '+labels[status]+' ('+changed.length+'×)');
-  if(typeof showSaveFlash==='function')showSaveFlash('✓ '+changed.length+' Spieler aktualisiert');
-}
-// Invert attendance: Anwesend(1) → Fehlend(0) and vice versa. Excused/pending stay.
-function bulkInvert(si){
-  if(!canEdit())return;
-  const D=cd();
-  if(!D||!Array.isArray(D.players)||!D.players.length)return;
-  const sess=D.sessions[si];
-  if(!sess)return;
-  const targets=D.players.filter(p=>p&&Array.isArray(p.s)&&(p.s[si]===0||p.s[si]===1));
-  if(!targets.length){
-    if(typeof showSaveFlash==='function')showSaveFlash('ℹ Keine Anw./Fehl.-Status zum Tauschen');
-    return;
-  }
-  if(!confirm(`Anwesenheit für ${targets.length} Spieler umkehren?\n\n• Anwesend → Fehlend\n• Fehlend → Anwesend\n\n(Entschuldigte und Ausstehende bleiben unverändert.)`))return;
-  snap();
-  D.players.forEach(p=>{
-    if(!p||!Array.isArray(p.s))return;
-    if(p.s[si]===1)p.s[si]=0;
-    else if(p.s[si]===0)p.s[si]=1;
-  });
-  saveG();
-  buildSessAtt(si);
-  if(typeof renderBody==='function')renderBody();
-  if(typeof renderTfoot==='function')renderTfoot();
-  
-  const sessLabel=sess.date+(sess.type==='match'?' (Spiel)':' (Training)');
-  logAudit('Bulk-Status invertiert',sessLabel,targets.length+'× Anwesend ↔ Fehlend');
-  if(typeof showSaveFlash==='function')showSaveFlash('🔄 '+targets.length+' Spieler invertiert');
-}
-// Copy attendance from the most recent prior session of the same type (training/match).
-function bulkCopyFromPrevious(si){
-  if(!canEdit())return;
-  const D=cd();
-  if(!D||!Array.isArray(D.players)||!D.players.length)return;
-  const sess=D.sessions[si];
-  if(!sess)return;
-  // Find previous session of same type
-  let prevIdx=-1;
-  for(let i=si-1;i>=0;i--){
-    const s=D.sessions[i];
-    if(s&&s.type===sess.type){prevIdx=i;break;}
-  }
-  if(prevIdx<0){
-    alert('Keine vorherige '+(sess.type==='match'?'Spiel':'Trainings')+'-Sitzung gefunden, von der kopiert werden könnte.');
-    return;
-  }
-  const prevSess=D.sessions[prevIdx];
-  // Count what would change
-  let changes=0;
-  D.players.forEach(p=>{
-    if(!p||!Array.isArray(p.s))return;
-    const old=p.s[si];
-    const src=p.s[prevIdx];
-    if(src!==undefined&&src!==null&&src!==3&&old!==src)changes++;
-  });
-  if(!changes){
-    if(typeof showSaveFlash==='function')showSaveFlash('ℹ Keine Änderungen nötig');
-    return;
-  }
-  if(!confirm(`Anwesenheit von „${prevSess.date}" übernehmen?\n\n${changes} Status-Änderung${changes!==1?'en':''} werden vorgenommen.\n(Ausstehende Werte aus der Quelle werden ignoriert.)`))return;
-  snap();
-  D.players.forEach(p=>{
-    if(!p)return;
-    if(!Array.isArray(p.s))p.s=[];
-    const src=p.s[prevIdx];
-    if(src!==undefined&&src!==null&&src!==3){p.s[si]=src;}
-  });
-  saveG();
-  buildSessAtt(si);
-  if(typeof renderBody==='function')renderBody();
-  if(typeof renderTfoot==='function')renderTfoot();
-  
-  const sessLabel=sess.date+(sess.type==='match'?' (Spiel)':' (Training)');
-  logAudit('Bulk-Status kopiert',sessLabel,'aus '+prevSess.date+' ('+changes+' Änderungen)');
-  if(typeof showSaveFlash==='function')showSaveFlash('📋 '+changes+' Änderungen aus '+prevSess.date);
-}
 
 function updSessDate(si,iso){
   if(!canEdit())return;
@@ -23785,26 +22342,6 @@ function updSessRsvp(si,v){
   saveG();
   if(typeof showSaveFlash==='function')showSaveFlash(v?'\u2705 Anmeldungs-Deadline gesetzt':'\u2705 Deadline entfernt');
 }
-function updSessRsvpDefault(si){
-  if(!canEdit())return;
-  const D=cd();const s=D&&D.sessions&&D.sessions[si];
-  if(!s)return;
-  // Compute session start timestamp from date + time, then subtract 2h
-  const sk=dispToSortKey(s.date);
-  if(!sk||sk===99999999)return;
-  const y=Math.floor(sk/10000),mo=Math.floor(sk/100)%100,day=sk%100;
-  const t=s.time||(s.type==='match'?'15:00':'18:30');
-  const [hh,mm]=t.split(':').map(n=>parseInt(n)||0);
-  const sessStart=new Date(y,mo-1,day,hh,mm,0).getTime();
-  const deadline=sessStart-2*60*60*1000; // -2h
-  snap();
-  s.rsvpUntil=deadline;
-  saveG();
-  // Refresh field in DOM
-  const inp=document.getElementById('ss-e-rsvp');
-  if(inp)inp.value=_amTsToDatetimeLocal(deadline);
-  if(typeof showSaveFlash==='function')showSaveFlash('\u2705 Deadline: 2h vor Beginn');
-}
 // ── SESSION TEMPLATES (Vorlagen) ─────────────────────────────
 // Stored globally in G.sessionTemplates as [{id, type, name, focus?, time, label?, homeAway?, note?}]
 function getTemplates(type){
@@ -23865,38 +22402,6 @@ function applyTemplate(type,tplId){
     setLoc('newMatchLoc',tpl.location);
   }
   if(typeof showSaveFlash==='function')showSaveFlash('📋 Vorlage angewendet');
-}
-function saveSessionAsTemplate(){
-  if(!canEdit())return;
-  const D=cd();
-  const sess=D&&D.sessions&&D.sessions[currentSI];
-  if(!sess)return;
-  if(sess.type!=='training'){
-    alert('Vorlagen sind nur für Trainings verfügbar.');
-    return;
-  }
-  const defaultName=sess.focus||'Trainings-Vorlage';
-  const name=prompt('Name für die Vorlage:',defaultName);
-  if(!name||!name.trim())return;
-  if(!Array.isArray(G.sessionTemplates))G.sessionTemplates=[];
-  const tpl={
-    id:'tpl_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
-    type:'training',
-    name:name.trim().slice(0,80),
-    time:sess.time||'',
-    focus:sess.focus||'',
-    note:sess.note||'',
-    location:sess.location||'',
-    duration:(typeof sess.duration==='number')?sess.duration:undefined,
-    createdBy:(CU&&CU.name)||'?',
-    createdAt:Date.now(),
-    useCount:0
-  };
-  snap();
-  G.sessionTemplates.push(tpl);
-  saveG();
-  if(typeof showSaveFlash==='function')showSaveFlash('💾 Vorlage gespeichert');
-  logAudit('Vorlage erstellt',name,'training'+(tpl.focus?' · '+tpl.focus:''));
 }
 function manageTemplates(){
   // Open modal showing all templates with delete option
@@ -23982,42 +22487,6 @@ function deleteTemplate(id){
 }
 
 // ── DUPLICATE SESSION ────────────────────────────────────────
-function duplicateCurrentSession(){
-  if(!canEdit())return;
-  const D=cd();
-  const sess=D&&D.sessions&&D.sessions[currentSI];
-  if(!sess)return;
-  const iso=prompt('Datum für die neue Sitzung (TT.MM.JJJJ):',sess.date);
-  if(!iso||!iso.trim())return;
-  const v=iso.trim();
-  // Accept either DD.MM.YYYY or YYYY-MM-DD
-  let disp=null;
-  if(/^\d{2}\.\d{2}\.\d{4}$/.test(v))disp=v;
-  else if(/^\d{4}-\d{2}-\d{2}$/.test(v))disp=isoToDisp(v);
-  if(!disp){alert('Ungültiges Datumsformat. Erwartet: TT.MM.JJJJ');return;}
-  snap();
-  const newSess={
-    type:sess.type,
-    date:disp,
-    month:moFromDisp(disp),
-    time:sess.time||'',
-    focus:sess.focus||'',
-    label:sess.label||'',
-    homeAway:sess.homeAway||'home',
-    note:sess.note||'',
-    planLink:sess.planLink||''
-    // Note: comments are NOT duplicated (they're tied to specific session events)
-  };
-  const newPos=insertSorted(D,newSess);
-  // insertSorted already handles p.s arrays (inserts 3=Ausstehend at the new position)
-  saveG();
-  render();
-  closeM('moSession2');
-  logAudit('Sitzung dupliziert',sess.date+'→'+disp,sess.type==='match'?'Spiel':'Training');
-  if(typeof showSaveFlash==='function')showSaveFlash('📑 Sitzung dupliziert');
-  // Open the new session
-  setTimeout(()=>{if(typeof openSessStats==='function')openSessStats(newPos);},150);
-}
 
 async function delCurrSess(){
   if(!canEdit())return;
@@ -26645,22 +25114,6 @@ function tpRemovePhoto(){
   logAudit('Trainerfoto entfernt',t.name,'');
   renderTrainerProfile();
 }
-// Order in G.trainers drives every list in the app, including the home page.
-// The manager shows only the current team's trainers, so a move inside that
-// filtered view has to be translated back into the global array.
-function tpMove(fromGi,toGi){
-  if(!isAdmin())return;
-  if(fromGi===toGi||fromGi==null||toGi==null)return;
-  const arr=G.trainers;
-  if(!arr[fromGi]||!arr[toGi])return;
-  snap();
-  const [item]=arr.splice(fromGi,1);
-  arr.splice(toGi,0,item);
-  saveG();
-  logAudit('Trainer-Reihenfolge ge\u00e4ndert',item.name,'');
-  renderMgrTrainers();
-  if(typeof homeRender==='function')try{homeRender();}catch(e){}
-}
 let _trDrag=null;
 function trDragStart(e,gi){
   if(!isAdmin())return;
@@ -27796,11 +26249,6 @@ function locMapsUrl(name){
 }
 function locRouteNeeded(s){
   return !!(s&&s.type==='match'&&s.homeAway==='away');
-}
-function locRouteLink(name,label){
-  const url=locMapsUrl(name);
-  if(!url)return '';
-  return `<a class="loc-route" href="${url}" target="_blank" rel="noopener" title="Route öffnen">${label||'\ud83d\uddfa Route'}</a>`;
 }
 // Icon + name, linked to the map when directions are actually needed.
 function locNameHtml(s,esc){
@@ -29313,27 +27761,6 @@ async function hardReset(){
   localStorage.removeItem(SK);undoStack.length=0;redoStack.length=0;buildDef();saveG(false);render();closeM('moAdmin');
   logAudit('Daten zurückgesetzt','','');
 }
-async function hardResetTest(){
-  if(!isAdmin())return;
-  const stats=typeof computeBackupStats==='function'?computeBackupStats(G):null;
-  const itemsHtml=stats?_impactRowsHtml([
-    {label:'Mannschaften',value:stats.teams,icon:'🏆'},
-    {label:'Spieler-Einträge',value:stats.players,icon:'👥'},
-    {label:'Sitzungen',value:stats.sessions,icon:'📅'},
-    {label:'Notizen',value:stats.notes,icon:'💬'},
-    {label:'Aufstellungen',value:stats.lineups,icon:'⚽'}
-  ]):'';
-  const ok=await confirmDestructive({
-    title:'Testdaten laden?',
-    subtitle:'Aktuelle Daten werden überschrieben. Vorher wird automatisch ein Backup erstellt.',
-    itemsHtml:`<div class="mcd-list-title">Folgende Daten werden überschrieben:</div>${itemsHtml}`,
-    confirmLabel:'⚠ Testdaten laden'
-  });
-  if(!ok)return;
-  if(typeof autoBackupBeforeOp==='function')autoBackupBeforeOp('Testdaten geladen');
-  localStorage.removeItem(SK);undoStack.length=0;redoStack.length=0;buildTestDef();saveG(false);render();closeM('moAdmin');
-}
-function exportData(){const b=new Blob([JSON.stringify(G,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`FCF_Data_${Date.now()}.json`;a.click();}
 
 // ══════════════════════════════
 //  MODALS
@@ -29606,19 +28033,8 @@ function openSessFromMain(si){
 }
 function playerGoBack(){navBack('moPlayer');}
 function sessGoBack(){navBack('moSession2');}
-function clearNav(){_navStack.length=0;}
 
-// Store player data at edit start for cancel
-let _playerEditSnap=null;
-function openPlayerStats_orig(pi){openPlayerStats(pi);}
 
-// Cancel player edit: restore original values to inputs only (no data change)
-function cancelPlayerEdit(){
-  const p=cd().players[currentPI];if(!p)return;
-  document.getElementById('pe-nr').value=p.nr||'';
-  document.getElementById('pe-name').value=p.name||'';
-  initEditPos(p.pos||'8er',p.pos2||'');
-}
 
 
 
@@ -29727,11 +28143,14 @@ function loadBackups(){
 // Keeps the newest entries but guarantees room for daily snapshots: they are
 // the ones that cover "yesterday", which no pre-op backup can replace.
 function _trimBackups(bks,max){
+  // Was declared twice until 1.2.11 and the older version further down won:
+  // it dropped daily snapshots first, so this floor never applied.
+  max=max||BK_MAX;
   // Newest first, as before — but daily snapshots have a floor, not a ceiling.
   // Trimming purely by date let seven pre-op backups made within one hour push
   // out every daily snapshot, which is why the oldest copy available on the day
   // it mattered was 19 hours old.
-  const AUTO_MIN=5;
+  const AUTO_MIN=Math.min(5,Math.max(1,max-1));
   const sorted=bks.slice().sort((a,b)=>(b&&b.ts||0)-(a&&a.ts||0));
   const keep=sorted.slice(0,max);
   const autosKept=keep.filter(b=>b&&b.kind==='auto').length;
@@ -29746,7 +28165,10 @@ function _trimBackups(bks,max){
       keep.push(a);
     }
   }
-  return keep.sort((a,b)=>(b&&b.ts||0)-(a&&a.ts||0));
+  keep.sort((a,b)=>(b&&b.ts||0)-(a&&a.ts||0));
+  // In place: two callers use the array they passed in
+  bks.splice(0,bks.length,...keep);
+  return bks;
 }
 function saveBackups(bks,skipFb){
   // Local: keep only most recent BK_MAX (small to fit localStorage quota)
@@ -29869,20 +28291,6 @@ function _buildBackupEntry(opts){
       return v;
     })
   };
-}
-// Trim backup list to a given limit, preserving pre-op entries first.
-// IMPORTANT: previously this used BK_MAX (=3) unconditionally — destroyed
-// older Firebase backups every time a new one was created. Now caller must
-// specify the appropriate limit (BK_MAX for local, BK_FB_MAX for Firebase).
-function _trimBackups(bks,limit){
-  limit=limit||BK_MAX;
-  while(bks.length>limit){
-    let dropIdx=-1;
-    for(let i=bks.length-1;i>=0;i--){if(bks[i].kind!=='pre-op'){dropIdx=i;break;}}
-    if(dropIdx<0)dropIdx=bks.length-1;
-    bks.splice(dropIdx,1);
-  }
-  return bks;
 }
 function _normalizeBkArray(raw){
   if(Array.isArray(raw))return raw.filter(Boolean);
@@ -30734,130 +29142,6 @@ function renderPresence(){
   // Refresh inline indicators (e.g. "X is here too" pills) whenever presence changes
   if(typeof updateInlinePresence==='function')updateInlinePresence();
   if(typeof _hxActSync==='function')_hxActSync();
-}
-// ── CONFLICT RESOLUTION (Phase 2) ────────────────────────────
-// State: when a conflict is detected, we store remote data and pause saves until user decides.
-let _conflictRemote=null;
-function showConflictDialog(remoteData){
-  if(!remoteData)return;
-  // SMART AUTO-RESOLVE: if our local data is significantly stale (last sync >5min)
-  // OR diverges from remote by many entities (>3 diffs in players/sessions/lineups),
-  // this is NOT a real concurrent edit — it's just "trainer was away too long".
-  // In that case auto-adopt remote without asking. Showing the dialog gives the
-  // trainer a way to accidentally overwrite hours of work with stale data.
-  try{
-    const ageMs=(typeof _dataAgeMs==='function')?_dataAgeMs():0;
-    const localStats=typeof computeBackupStats==='function'?computeBackupStats(G):null;
-    const remoteStats=typeof computeBackupStats==='function'?computeBackupStats(remoteData):null;
-    let diffCount=0;
-    if(localStats&&remoteStats){
-      if(localStats.players!==remoteStats.players)diffCount++;
-      if(localStats.sessions!==remoteStats.sessions)diffCount++;
-      if(localStats.notes!==remoteStats.notes)diffCount++;
-      if(localStats.lineups!==remoteStats.lineups)diffCount++;
-      if((localStats.trainers||0)!==(remoteStats.trainers||0))diffCount++;
-    }
-    const isStale=ageMs>300000;       // >5 min since last sync
-    const bigDiff=diffCount>=3;       // many categories diverge
-    if(isStale||bigDiff){
-      console.info('[Conflict] Auto-resolving: '+(isStale?'stale local ('+Math.round(ageMs/1000)+'s)':'')+(isStale&&bigDiff?' + ':'')+(bigDiff?'large diff ('+diffCount+' categories)':''));
-      // Adopt remote silently
-      if(remoteData.version>=14){
-        _adoptData(remoteData);
-        _persistLocal();
-        if(typeof _markSynced==='function')_markSynced();
-        initUI();
-        if(typeof render==='function')render();
-        setFbStatus('connected');
-        // Brief non-modal notification: trainer should know data was refreshed
-        const remoteSaver=remoteData._lastSaveBy||'anderer Trainer';
-        if(typeof showSaveFlash==='function'){
-          showSaveFlash('🔄 Daten synchronisiert ('+remoteSaver+')',3000);
-        }
-        if(typeof logAudit==='function'){
-          logAudit('Auto-Sync',remoteSaver,(isStale?'lokal veraltet ('+Math.round(ageMs/1000)+'s)':'')+(isStale&&bigDiff?', ':'')+(bigDiff?'große Abweichung':''));
-        }
-      }
-      return;
-    }
-  }catch(e){console.warn('[Conflict] Auto-resolve check failed, falling back to dialog',e);}
-  // REAL CONCURRENT EDIT: data is fresh + only small diff = both trainers
-  // edited the same thing within seconds. Trainer must choose.
-  _conflictRemote=remoteData;
-  const moe=document.getElementById('moConflict');
-  const msgEl=document.getElementById('moConflict-msg');
-  const diffEl=document.getElementById('moConflict-diff');
-  if(!moe||!msgEl)return;
-  const remoteSaver=remoteData._lastSaveBy||'jemand anderes';
-  const remoteTime=remoteData._lastSaveTs?new Date(remoteData._lastSaveTs).toLocaleString('de-DE',{hour:'2-digit',minute:'2-digit',second:'2-digit'}):'?';
-  msgEl.innerHTML=`<b>${escapeHtml(remoteSaver)}</b> hat um <b>${escapeHtml(remoteTime)}</b> gleichzeitig Daten gespeichert, während du Änderungen vorgenommen hast.<br><br>Eine automatische Zusammenführung ist nicht möglich. Wähle bitte:`;
-  // Build a quick diff summary if possible
-  if(diffEl){
-    try{
-      const localStats=typeof computeBackupStats==='function'?computeBackupStats(G):null;
-      const remoteStats=typeof computeBackupStats==='function'?computeBackupStats(remoteData):null;
-      if(localStats&&remoteStats){
-        const rows=[];
-        function row(k,a,b){if(a!==b)rows.push(`<div style="display:flex;justify-content:space-between;padding:2px 0;"><span>${k}</span><span><b>${a}</b> vs <b>${b}</b></span></div>`);}
-        row('Spieler',localStats.players,remoteStats.players);
-        row('Sitzungen',localStats.sessions,remoteStats.sessions);
-        row('Notizen',localStats.notes,remoteStats.notes);
-        row('Aufstellungen',localStats.lineups,remoteStats.lineups);
-        if(rows.length){
-          diffEl.innerHTML=`<div style="font-weight:700;margin-bottom:4px;font-size:.72rem;color:var(--gd);">Lokal vs. Remote:</div>${rows.join('')}`;
-          diffEl.style.display='block';
-        } else {
-          diffEl.style.display='none';
-        }
-      }
-    }catch(e){}
-  }
-  // Show modal
-  moe.classList.add('open');
-  setFbStatus('error'); // visual signal
-}
-function resolveConflict(action){
-  const moe=document.getElementById('moConflict');
-  if(moe)moe.classList.remove('open');
-  const remote=_conflictRemote;
-  _conflictRemote=null;
-  if(action==='reload'){
-    // Adopt remote, discard our local changes
-    if(remote&&remote.version>=14){
-      G=sanitizeG(remote);
-      _persistLocal();
-      initUI();render();
-      if(typeof showSaveFlash==='function')showSaveFlash('🔄 Daten neu geladen');
-      setFbStatus('connected');
-      logAudit('Konflikt: neu geladen',(remote._lastSaveBy||'?'),'fremde Version übernommen');
-    }
-  } else if(action==='overwrite'){
-    // Force-save local (will overwrite remote)
-    G._lastSaveBy=(CU&&CU.name)||'?';
-    G._lastSaveTs=Date.now();
-    if(fbRef){
-      if(_writeBlocked('\u00dcberschreiben'))return;
-      // Deliberate full replacement (user chose "overwrite remote"), but the
-      // shadow must follow — otherwise the next diff compares against the
-      // discarded remote state and re-uploads everything again.
-      _fbSaving=true;
-      const _enc=fbEncode(G);
-      fbRef.set(_enc).then(()=>{
-        _fbShadow=_enc;
-        _fbSaving=false;
-        setFbStatus('connected');
-        if(typeof showSaveFlash==='function')showSaveFlash('💪 Lokal gespeichert (überschrieben)');
-        logAudit('Konflikt: überschrieben',(remote&&remote._lastSaveBy)||'?','fremde Version verworfen');
-      }).catch(e=>{
-        _fbSaving=false;
-        setFbStatus('error');
-        alert('Speichern fehlgeschlagen: '+(e.message||e));
-      });
-    }
-  } else {
-    // Defer: do nothing. User can re-trigger by editing again.
-    if(typeof showSaveFlash==='function')showSaveFlash('⏸ Entscheidung verschoben');
-  }
 }
 
 // Render small "X is here too" pills next to titles based on shared viewing context.
@@ -34341,27 +32625,6 @@ function lpRenderSubPopup(subIdx){
 }
 
 
-function lpMaybeRemoveGuest(pid){
-  if(pid===undefined||pid===null)return;
-  const D=cd();if(!D||!D.players[pid])return;
-  const p=D.players[pid];
-  if(!p.isGuest)return;
-  // Check if guest is still used somewhere in the CURRENT planner
-  const usedSlots=Object.values(lpState.slots).includes(pid);
-  const usedSubs=lpState.subs.includes(pid);
-  if(usedSlots||usedSubs)return;
-  // Remove guest from team roster
-  D.players.splice(pid,1);
-  // Update references in ALL saved lineups of current team+season (other matches)
-  cleanPlayerFromLineups(UI.currentTeam,pid);
-  // Also fix the live in-memory planner state (current open lineup)
-  Object.keys(lpState.slots).forEach(k=>{if(lpState.slots[k]>pid)lpState.slots[k]--;});
-  lpState.subs=lpState.subs.map(s=>s>pid?s-1:s);
-  if(Array.isArray(lpState.guests)){
-    lpState.guests=lpState.guests.filter(v=>!(typeof v==='number'&&v===pid)).map(v=>(typeof v==='number'&&v>pid)?v-1:v);
-  }
-  saveG();
-}
 function lpAddGuest(slotId){
   const inp=document.getElementById('lp-guest-input');
   if(!inp)return;
@@ -34440,10 +32703,6 @@ function lpRemoveSubAt(subIdx){
 }
 
 
-function lpAddSub(pi){
-  if(!lpState.subs.includes(pi)&&lpState.subs.length<7){lpState.subs.push(pi);lpRender();}
-}
-function lpRemoveSub(si){lpState.subs.splice(si,1);lpRender();}
 function lpClearAll(){
   if(!confirm('Alle Positionen leeren?'))return;
   lpState.slots={};lpState.subs=[];lpState.selectedSlot=null;lpState.selectedBench=null;lpClosePopup();
@@ -34528,22 +32787,7 @@ function lpRenderSaves(){
   }
 }
 
-function lpLoad(id){
-  const l=lpGetLineups().find(x=>x.id===id);if(!l)return;
-  lpState.currentLineupId=l.id;lpState.formation=l.formation;
-  lpState.slots={...l.slots};lpState.subs=[...(l.subs||[])];lpState.selectedSlot=null;lpState.selectedBench=null;
-  lpState.matchKind=l.matchKind||'meisterschaft';
-  lpSyncKindBtns();
-  renderFmtBtns('lp-fmt-btns',l.formation,'lpSetFormation');
-  lpRender();lpRenderSaves();
-}
 
-function lpDelete(id){
-  if(!confirm('Aufstellung löschen?'))return;
-  snap();G.lineups=lpGetLineups().filter(l=>l.id!==id);
-  if(lpState.currentLineupId===id){lpState.currentLineupId=null;lpState.slots={};lpState.subs=[];}
-  saveG();lpRenderSaves();lpRender();
-}
 
 
 
@@ -34684,10 +32928,6 @@ function _slpSlotsEffectivelyDirty(){
       || cur.formation!==_slpSlotSnapshot.formation
       || JSON.stringify(cur.customSlots)!==JSON.stringify(_slpSlotSnapshot.customSlots);
 }
-// Combined dirty check — any unsaved change in modal
-function _slpAnyDirty(){
-  return _slpStatusEffectivelyDirty()||_slpSlotsEffectivelyDirty();
-}
 // Commit draft → G → Firebase. Called from closeSeasonLineup when user clicks "Speichern".
 function _slpCommitDraft(){
   if(!_slpStatusDraft)return;
@@ -34718,8 +32958,8 @@ function slpToggleConf(pi){
   // Update main app too (player names in attendance table reflect color)
   if(typeof render==='function')render();
 }
-function slpOpenConfirmList(){slpOpenStatusList();} // backward-compat shim
-function slpOpenRegList(){slpOpenStatusList();}     // backward-compat shim
+ // backward-compat shim
+     // backward-compat shim
 function slpOpenStatusList(){
   slpRenderStatusList();
   openM('moSlpStatus');
@@ -34820,9 +33060,6 @@ function slpRenderStatusList(){
   const stEl=document.getElementById('slp-status-stats');
   if(stEl)stEl.innerHTML=`${confCount} / ${total} bestätigt · ${regCount} / ${total} angemeldet${dirtyMark}`;
 }
-// Backward-compat aliases (called from older code paths)
-function slpRenderConfList(){slpRenderStatusList();}
-function slpRenderRegList(){slpRenderStatusList();}
 
 // ══ SEASON LINEUP PLANNER ════════════════════════════════════
 let slpState={formation:'4-2-3-1',slots:{},currentId:null,openSlot:null,editing:false};
@@ -35690,12 +33927,6 @@ function slpClearAll(){
   slpState.slots={};slpState.openSlot=null;
   slpClosePopup();slpRender();
 }
-function slpDelete(id){
-  if(!confirm('Plan löschen?'))return;
-  snap();G.seasonLineups=slpAllPlans().filter(p=>p.id!==id);
-  if(slpState.currentId===id){slpState.currentId=null;slpState.slots={};}
-  saveG();slpRenderSaves();slpRender();
-}
 
 // Close popups when clicking outside
 document.addEventListener('click',(e)=>{
@@ -35988,35 +34219,6 @@ _pubCleanupSchedule();
       <p class="set-sec-sub">Gilt nur für dich.</p>
   <div id="tpushBox" class="tp-box"></div>
 
-  <!-- AUTOMATION (canEdit only) -->
-  <div id="setAutomationSection" style="display:none;margin-top:16px;">
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1.5px;color:var(--bd);margin-bottom:4px;">⏰ Erinnerungen</div>
-    <div style="font-size:.7rem;color:var(--gm);margin-bottom:10px;line-height:1.4;">ℹ Persönlich (pro Trainer): wann dich die App daran erinnert, die Anwesenheit einzutragen. Wer „Schon erledigt“ klickt, blendet die Karte für alle aus.</div>
-    <div class="setting-row">
-      <div class="setting-label-wrap">
-        <div class="setting-label">Roll-Call-Erinnerung</div>
-        <div class="setting-sub">Karte erscheint nach Trainings/Spielen, wenn die Anwesenheit noch nicht eingetragen ist</div>
-      </div>
-      <div class="setting-control">
-        <label class="setting-switch"><input type="checkbox" id="autoRollCallEnabled" onchange="onAutoRollCallToggle(this)"/><span class="setting-slider"></span></label>
-      </div>
-    </div>
-    <div id="autoRollCallConfig" style="display:none;padding:10px 12px;background:rgba(0,0,0,.025);border-radius:8px;margin-top:-4px;">
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-        <label style="font-size:.78rem;color:var(--gd);font-weight:600;">Karte erscheint:</label>
-        <select id="autoRollCallMinutes" onchange="onAutoRollCallChange()" style="padding:5px 8px;border:1.5px solid var(--gl);border-radius:6px;font-size:.82rem;font-family:'Barlow',sans-serif;background:#fff;color:var(--bd);">
-          <option value="0">Sofort nach Ende</option>
-          <option value="15" selected>15 Min nach Ende</option>
-          <option value="30">30 Min nach Ende</option>
-          <option value="60">1 Std nach Ende</option>
-          <option value="120">2 Std nach Ende</option>
-          <option value="240">4 Std nach Ende</option>
-          <option value="720">12 Std nach Ende</option>
-          <option value="1440">Am nächsten Tag</option>
-        </select>
-      </div>
-    </div>
-  </div>
 
     </section>
 
@@ -36159,20 +34361,6 @@ _pubCleanupSchedule();
 </div></div>
 
 
-<!-- Conflict Resolution Modal -->
-<div class="mo" id="moConflict" style="z-index:99998;"><div class="mob" style="width:520px;max-width:96vw;">
-  <h3 style="margin:0 0 8px;color:#a02525;">⚠ Speicher-Konflikt</h3>
-  <p id="moConflict-msg" style="font-size:.86rem;line-height:1.5;color:var(--bd);margin:0 0 12px;">–</p>
-  <div id="moConflict-diff" style="background:var(--ow);border-radius:6px;padding:9px 12px;margin-bottom:12px;font-size:.78rem;display:none;"></div>
-  <div style="background:rgba(241,196,15,.13);border:1px solid rgba(241,196,15,.4);border-radius:7px;padding:9px 12px;margin-bottom:12px;font-size:.76rem;color:#7a5500;">
-    💡 <b>Tipp:</b> Wenn unsicher → „Ihre Daten neu laden" wählen, deine Änderungen erneut machen und speichern.
-  </div>
-  <div class="mob-btns" style="flex-direction:column;align-items:stretch;gap:6px;">
-    <button class="btn" style="background:var(--bm);color:#fff;font-size:.82rem;" onclick="resolveConflict('reload')">🔄 Ihre Daten neu laden <span style="font-size:.7rem;opacity:.85;">(meine Änderungen verwerfen)</span></button>
-    <button class="btn" style="background:#c0392b;color:#fff;font-size:.82rem;" onclick="resolveConflict('overwrite')">💪 Meine Änderungen speichern <span style="font-size:.7rem;opacity:.85;">(überschreibt fremde Änderungen)</span></button>
-    <button class="btn bs" style="font-size:.78rem;" onclick="resolveConflict('defer')">Später entscheiden</button>
-  </div>
-</div></div>
 
 <div class="user-dropdown" id="userDropdown" style="z-index:99999;">
   <!-- What people look for under their own name: their account, the look,
