@@ -10,10 +10,12 @@
 //                                   cancellations shortly before the start
 //   fcf_push/status                 last round, for the trainers' panel
 //   fcf_push/pub                    public VAPID key, read by the app
+//   fcf_data/db/<team>__news        a notice from the trainers to the team
+//                                   ({t, title, body}), sent once to everyone
 //   fcf_push_keys/vapid             key pair — no rule grants clients access
 //
 // db: {get(path), set(path,v), remove(path)}; push: web-push or a stand-in.
-import { decode, pathKey, berlin, plan, anyDue, quiet, addDays } from './lib.mjs';
+import { decode, pathKey, berlin, plan, anyDue, quiet, addDays, newsFresh, planNews } from './lib.mjs';
 import { trainerOwner, allowed, kindsOf, needsPlayers, birthdays, rollCall, cancellations, lineup,
   messages, machinery, BDAY_DAY, BDAY_EVE, ATT_FROM } from './trainer.mjs';
 
@@ -42,8 +44,15 @@ export async function round({ db, push, ts = Date.now(), log = console.log, dry 
       if (!cache.has(id)) cache.set(id, decode(await db.get(`fcf_data/db/${pathKey(bk)}/${what}`)) || []);
       return cache.get(id);
     };
-    let sentToday = null;
+    let sentToday = null, sentYest = null;
     const today = async () => (sentToday = sentToday || (await db.get(`fcf_push/sent/${now.day}`)) || {});
+    const yesterday = async () => (sentYest = sentYest || (await db.get(`fcf_push/sent/${addDays(now.day, -1)}`)) || {});
+    // Notices from the trainers, one read per team
+    const newsOf = new Map();
+    const teamNews = async team => {
+      if (!newsOf.has(team)) newsOf.set(team, decode(await db.get(`fcf_data/db/${pathKey(team + '__news')}`)) || null);
+      return newsOf.get(team);
+    };
 
     // To every device of an owner (or one of them); dead devices are removed
     async function deliver(owner, payload, ttl, only) {
@@ -89,13 +98,18 @@ export async function round({ db, push, ts = Date.now(), log = console.log, dry 
         const base = `fcf_data/db/${pathKey(bk)}`;
         const cfg = configs[pathKey(team)] || {};
         const sessions = await load(bk, 'sessions');
-        if (!anyDue(sessions, season, now, cfg)) continue;          // most rounds end here
+        const news = await teamNews(team);
+        const hasNews = newsFresh(news, now);
+        if (!hasNews && !anyDue(sessions, season, now, cfg)) continue;          // most rounds end here
         const players = await load(bk, 'players');
         const sentT = await today();
-        for (const t of plan({ sessions, players, season, team, now, cfg, owners, sent: sentT })) {
+        const todo = plan({ sessions, players, season, team, now, cfg, owners, sent: sentT });
+        if (hasNews) todo.push(...planNews({ news, players, now, owners, log: sentT, logY: await yesterday() }));
+        for (const t of todo) {
           const n = await deliver(t.owner, t.payload, t.ttl);
           if (n) {
             sent += n;
+            (sentT[t.kind + '-' + t.key] = sentT[t.kind + '-' + t.key] || {})[t.owner] = ts;
             if (!dry) await db.set(`fcf_push/sent/${now.day}/${t.kind}-${t.key}/${t.owner}`, ts);
             log(t.kind, t.key, t.owner.slice(0, 9), n + ' Gerät(e)');
           }

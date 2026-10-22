@@ -2678,6 +2678,46 @@ html:has(body.hub-mode){background:#080f22;}
   font-family:'Barlow',sans-serif;font-size:.98rem;font-weight:700;cursor:pointer;}
 .mvp-go:disabled{background:#E6EBF2;color:#8A97B0;cursor:default;}
 .hub-mvp{cursor:default;}
+.hub-news{align-items:flex-start;border-color:var(--hacc);}
+.hub-news .hub-txt span{color:var(--htx);opacity:.88;font-size:.8rem;line-height:1.42;}
+.pm-news{display:flex;gap:11px;align-items:flex-start;margin:14px 16px 4px;padding:12px 14px;border-radius:14px;
+  background:#fff;border-left:4px solid #F2C230;box-shadow:0 2px 8px rgba(0,0,0,.12);color:#0E2350;font-family:'Barlow',sans-serif;}
+.pm-news-ic{font-size:1.3rem;line-height:1.2;}
+.pm-news-txt{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.pm-news-txt b{font-size:.94rem;}
+.pm-news-txt span{font-size:.82rem;line-height:1.42;color:#33425F;}
+.rs-lead{font-size:.8rem;line-height:1.45;color:var(--hx-muted,var(--gm));margin:-2px 0 12px;}
+.rs-two{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.rs-two input{width:100%;box-sizing:border-box;}
+.rs-days{gap:6px;}
+.rs-days .dow-btn{flex:1 1 0;min-width:36px;min-height:38px;font-size:.8rem;}
+.rs-days .dow-btn:focus-visible{outline:2px solid var(--hx-blue,var(--bm));outline-offset:2px;}
+body.design-heute .dow-btn{background:var(--hx-field,#fff);color:var(--hx-ink,var(--gd));border-color:var(--hx-line,var(--gl));}
+body.design-heute .dow-btn.sel{background:var(--hx-blue,var(--bm));border-color:var(--hx-blue,var(--bm));color:var(--hx-field,#fff);}
+body.design-heute .dow-btn.sel-m{background:var(--mc1);border-color:var(--mc1);color:#fff;}
+.rs-mob select{width:100%;}
+.rs-prev{margin:14px 0 4px;border:1px solid var(--hx-line,var(--gl));border-radius:12px;overflow:hidden;}
+.rs-g{padding:10px 12px;border-top:1px solid var(--hx-line,var(--gl));}
+.rs-g:first-child{border-top:none;}
+.rs-gh{display:flex;align-items:baseline;flex-wrap:wrap;gap:3px 8px;font-size:.85rem;color:var(--hx-ink,var(--gd));}
+.rs-n{font-weight:800;font-variant-numeric:tabular-nums;min-width:1.3em;}
+.rs-sub{font-size:.74rem;color:var(--hx-muted,var(--gm));}
+.rs-items{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px;font-size:.76rem;color:var(--hx-ink2,var(--gd));}
+.rs-items span{background:var(--hx-card2,#EEF2F8);border-radius:7px;padding:3px 8px;}
+.rs-items em{font-style:normal;font-weight:700;color:#B3261E;margin-left:3px;}
+.rs-items .rs-more{background:none;padding:3px 2px;color:var(--hx-muted,var(--gm));}
+.rs-change .rs-n,.rs-add .rs-n{color:var(--hx-blue,var(--bm));}
+.rs-move .rs-n{color:#A35A00;}
+.rs-drop .rs-n{color:#B3261E;}
+.rs-empty{padding:12px;font-size:.8rem;line-height:1.45;color:var(--hx-muted,var(--gm));}
+.rs-foot{padding:9px 12px;border-top:1px solid var(--hx-line,var(--gl));font-size:.75rem;line-height:1.45;color:var(--hx-muted,var(--gm));}
+.rs-prev .rs-empty+.rs-foot{border-top:none;padding-top:0;}
+.mob label.rs-chk{display:flex;align-items:flex-start;gap:10px;margin:12px 0 2px;padding:2px 0;cursor:pointer;
+  font-size:inherit;font-weight:400;text-transform:none;letter-spacing:normal;line-height:1.3;}
+.mob label.rs-chk input[type=checkbox]{width:18px;height:18px;margin:1px 0 0;padding:0;flex-shrink:0;accent-color:var(--hx-blue,var(--bm));}
+.rs-chk>span{font-size:.86rem;font-weight:600;color:var(--hx-ink,var(--gd));}
+.rs-chk small{display:block;font-weight:500;font-size:.74rem;line-height:1.4;color:var(--hx-muted,var(--gm));margin-top:2px;}
+.rs-opt{font-weight:400;}
 /* ── Bewegung ────────────────────────────────────────────────
    Movement says what happened, nothing else. Sections switch without any —
    they are tabs, not layers. Windows open with one short step: side panels
@@ -6623,13 +6663,19 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.5'; // v1.2.5: weniger Handarbeit
-const APP_VERSION_LABEL='1.2.5';
+const APP_VERSION='1.2.6'; // v1.2.6: Trainingszeiten ändern und Pausen
+const APP_VERSION_LABEL='1.2.6';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792662879326; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792664571527; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.6',date:'22.10.2026',title:'Trainingszeiten ändern und Pausen',items:[
+    {icon:'🕖',title:'Trainingszeiten ändern',desc:'Kalender → „⋯“ → „Trainingszeiten ändern“: neue Tage, Uhrzeit, Dauer oder Ort ab einem Datum – für alle Trainings, die noch kommen. Die Vorschau zeigt vorher, was passiert: Bleibt der Tag, bleiben die Zu- und Absagen. Wird ein Training auf einen anderen Tag verlegt, beginnen sie neu (Entschuldigungen bleiben). Was wegfällt, kommt in den Papierkorb. Spiele bleiben unberührt.'},
+    {icon:'⏸️',title:'Trainingspause',desc:'Kalender → „⋯“ → „Trainingspause“: alle Trainings in einem Zeitraum absagen, etwa in den Ferien. Spiele bleiben.'},
+    {icon:'📣',title:'Die Spieler erfahren es von selbst',desc:'Wer Erinnerungen an hat, bekommt eine Nachricht aufs Handy (nie nachts). Alle sehen sie eine Woche lang oben in ihrer Übersicht. Für die übrigen gibt es den Text für die WhatsApp-Gruppe.'},
+    {icon:'⏰',title:'Antwortfrist wandert mit',desc:'Wird ein Termin verlegt oder bekommt er eine andere Uhrzeit, verschiebt sich eine gesetzte Antwortfrist um dieselbe Zeit.'},
+  ]},
   {version:'1.2.5',date:'22.10.2026',title:'Weniger Handarbeit',items:[
     {icon:'✍️',title:'„Anwesenheit fehlt“ immer im Blick',desc:'Die Übersicht zeigt unter „Im Blick behalten“ jede Einheit der letzten 14 Tage, bei der noch Spieler ohne Eintrag sind – „?“ oder „M“. Ein Tippen öffnet das Erfassen. Die alte Einstellung „Roll-Call-Erinnerung“ ist dafür nicht mehr nötig und entfällt.'},
     {icon:'🔔',title:'„Erinnern“ aufs Handy',desc:'Im Terminfenster schickt „Erinnern“ allen, die noch nicht geantwortet und Erinnerungen an haben, eine persönliche Nachricht (mit der nächsten Runde, nie nachts). Für die übrigen gibt es den Text für die WhatsApp-Gruppe – ohne Namensliste.'},
@@ -8403,10 +8449,11 @@ async function fbCleanupOrphans(dryRun){
     const decoded=k.replace(/__SL__/g,'/').replace(/__DOT__/g,'.');
     // Real team key: encoded__season form, where encoded is a string with __SL__ ⟹ has '/' after decode
     // OR exact match like U19__2025__SL__26
-    const isReal=k.includes('__SL__')||k.endsWith('__focuses')||k.endsWith('__schedule');
+    const wide=k.endsWith('__focuses')||TEAM_WIDE_KEYS.some(x=>k.endsWith('__'+x));
+    const isReal=k.includes('__SL__')||wide;
     const startsBad=k.startsWith('undefined__');
     const endsBad=k.endsWith('__undefined');
-    const looksOrphan=startsBad||endsBad||(!isReal&&!k.endsWith('__focuses')&&!k.endsWith('__schedule'));
+    const looksOrphan=startsBad||endsBad||!isReal;
     if(looksOrphan)orphans.push(k);
     else realTeams.push(k);
   });
@@ -15307,6 +15354,9 @@ function _pmSanitizeG(){
   delete G._lastSaveTs;
   const keepDb={};
   if(G.db[myKey])keepDb[myKey]=G.db[myKey];
+  // The team's notice (new training times, a break): title and text only
+  const _nw=teamNews(myTeam);
+  if(_nw)keepDb[myTeam+'__news']={t:_nw.t,title:_nw.title,body:_nw.body||''};
   G.db=keepDb;
   if(Array.isArray(G.teamList))G.teamList=[myTeam];
   if(Array.isArray(G.seasonList))G.seasonList=[mySeason];
@@ -18388,7 +18438,7 @@ function renderHub(){
     return `<a class="hub-card" href="${href}">${inner}</a>`;
   };
   const tok=p.confirmToken||'';
-  let cards='';
+  let cards=_newsHtml('hub');
   if(weekTotal){
     cards+=card('\ud83d\udcc5','Meine Woche',
       weekOpen?(weekOpen+' von '+weekTotal+' offen'):('alle '+weekTotal+' beantwortet'),
@@ -18986,6 +19036,7 @@ function renderPlayerMode(){
       +`<div class="pm-focus-hint">Danach siehst du deine Termine f\u00fcr die Woche.</div></div></div>`;
     return;
   }
+  html+=_newsHtml('pm');
   // ── THIS WEEK'S DATES ──
   // One flat list, every entry equal. Singling out the next session made the
   // rest look optional, while the weekly survey needs an answer for ALL of
@@ -23525,6 +23576,7 @@ function updSessDate(si,iso){
   const lineupKey=_mlKey(team,UI.currentSeason,si);
   const savedLineup=(G.matchLineups&&G.matchLineups[lineupKey])?G.matchLineups[lineupKey]:null;
   const metaKey0=rpeMetaKey(sess);
+  const start0=_sessStartMs(sess,UI.currentSeason);
   // Remove from current position, keeping what each player had there
   D.sessions.splice(si,1);
   const moved=D.players.map(p=>_sessRemoveAt(p,si));
@@ -23532,6 +23584,7 @@ function updSessDate(si,iso){
   // Update date and reinsert in sorted position
   sess.date=disp;
   sess.month=moFromDisp(disp);
+  _sessShiftDeadline(sess,start0,UI.currentSeason);
   const newPos=insertSorted(D,sess); // also shifts matchLineups +1 from newPos
   // Put each player's values back at the new position
   D.players.forEach((p,pi)=>{
@@ -23558,8 +23611,9 @@ function updSessTime(si,v){
   if(!canEdit())return;
   snap();
   const D=cd(),s=D.sessions[si];
-  const k0=rpeMetaKey(s);
+  const k0=rpeMetaKey(s),start0=_sessStartMs(s,UI.currentSeason);
   s.time=v;
+  _sessShiftDeadline(s,start0,UI.currentSeason);
   rpeMetaRekey(D,k0,rpeMetaKey(s));
   saveG();
 }
@@ -24327,7 +24381,9 @@ const _CAL_IC={
   train:'<circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.6 2.2M9.5 2.5h5M12 2.5V6"/>',
   ball:'<circle cx="12" cy="12" r="9"/><path d="m12 7.2 3.9 2.8-1.5 4.6H9.6L8.1 10z"/><path d="M12 3v4.2M20.6 9.3l-4.7.7M17.4 19.3l-3-4.7M6.6 19.3l3-4.7M3.4 9.3l4.7.7"/>',
   plan:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M7.5 14h3M7.5 17.5h6"/>',
-  exp:'<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>'
+  exp:'<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/>',
+  pause:'<circle cx="12" cy="12" r="9"/><path d="M10 9v6M14 9v6"/>'
 };
 function _calSvg(k,sz,sw){return `<svg width="${sz||16}" height="${sz||16}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw||2}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${_CAL_IC[k]||''}</svg>`;}
 const _calK=d=>d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
@@ -24570,6 +24626,8 @@ function calMoreMenu(btn,e){
   const ed=typeof canEdit==='function'&&canEdit();
   _calMenu(btn,[
     ed?{ic:'plan',label:'Saisonplan erstellen',sub:'Trainings und Spiele auf einmal',fn:()=>openGenSch()}:null,
+    ed?{ic:'clock',label:'Trainingszeiten ändern',sub:'Ab einem Datum: Tage, Uhrzeit, Ort',fn:()=>openResched()}:null,
+    ed?{ic:'pause',label:'Trainingspause',sub:'Trainings in einem Zeitraum absagen',fn:()=>openPause()}:null,
     {ic:'exp',label:'Exportieren',sub:'In Google- oder Apple-Kalender',fn:()=>openExportIcs()},
   ].filter(Boolean));
 }
@@ -27490,6 +27548,7 @@ async function delTeam(t){
   G.teamList=G.teamList.filter(x=>x!==t);
   G.seasonList.forEach(s=>delete G.db[t+'__'+s]);
   delete G.db[t+'__focuses'];
+  TEAM_WIDE_KEYS.forEach(x=>{delete G.db[t+'__'+x];});
   // Cleanup all team-related data across all seasons
   cleanupTeamReferences(t);
   if(UI.currentTeam===t)UI.currentTeam=G.teamList[0];
@@ -27948,6 +28007,435 @@ function doGen(){
   _saveSchedulePattern(tD,mD,tTime,mTime);
   saveG();render();closeM('moGenSch');
   alert(`${ns.length} Einheit(en) generiert (${toRemove.length} alte ersetzt).`);
+}
+
+// ══════════════════════════════
+//  TRAININGSZEITEN ÄNDERN · TRAININGSPAUSE
+// ══════════════════════════════
+// The weekly pattern changes during a season (winter pitch times, a new school
+// timetable) and there are breaks. Both used to mean editing session after
+// session. Only trainings that have not taken place are touched, matches never.
+// Team-wide entries in G.db besides __focuses: they move and go with the team.
+const TEAM_WIDE_KEYS=['schedule','rules','news'];
+const _rsDate=k=>new Date(Math.floor(k/10000),Math.floor(k/100)%100-1,k%100);
+const _rsK=d=>d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
+const _rsIso=k=>Math.floor(k/10000)+'-'+String(Math.floor(k/100)%100).padStart(2,'0')+'-'+String(k%100).padStart(2,'0');
+const _rsDisp=k=>isoToDisp(_rsIso(k));
+function _rsWeek(k){const d=_rsDate(k);d.setDate(d.getDate()-(d.getDay()+6)%7);return _rsK(d);}
+function _rsMin(t){const m=String(t||'').match(/^(\d{1,2}):(\d{2})/);return m?(+m[1])*60+(+m[2]):null;}
+function _rsSk(s,season){return (season&&typeof _dbSortKey==='function')?_dbSortKey(s.date,season):dispToSortKey(s.date);}
+// Start of a session in ms, local time; null without a date
+function _sessStartMs(s,season){
+  if(!s||!s.date)return null;
+  const k=_rsSk(s,season);if(!k||k===99999999)return null;
+  const m=_rsMin(s.time)||0;
+  return new Date(Math.floor(k/10000),Math.floor(k/100)%100-1,k%100,Math.floor(m/60),m%60).getTime();
+}
+// A deadline is stored as a point in time; when its session moves, it moves by
+// the same amount — "two hours before" stays two hours before.
+function _sessShiftDeadline(s,start0,season){
+  if(!s||typeof s.rsvpUntil!=='number'||start0==null)return;
+  const n=_sessStartMs(s,season);
+  if(n!=null&&n!==start0)s.rsvpUntil+=n-start0;
+}
+// Answers given for a session — the team rule's "M" is not one
+function _rsAnswers(D,si){
+  let n=0;
+  (D.players||[]).forEach(p=>{
+    if(!p||!Array.isArray(p.s))return;
+    const v=p.s[si];
+    if(v===0||v===2||(v===4&&!(Array.isArray(p.ay)&&p.ay[si]===1)))n++;
+  });
+  return n;
+}
+const _rsTop=a=>{const c=new Map();a.forEach(x=>{if(x!=null&&x!=='')c.set(x,(c.get(x)||0)+1);});let b=null,n=0;c.forEach((v,k)=>{if(v>n){b=k;n=v;}});return b;};
+
+// What a new pattern would do. o: {from, to: ISO; days: [0..6]; time; dur;
+// loc: '' = place unchanged}. Week by week: a training already on one of the
+// new days stays there (time, duration, place updated), the others move to the
+// remaining new days in order, what is left over falls away, missing days are
+// added. How many a week gets: as many as it had, plus the difference between
+// the new number of days and the usual number per week — so a week cut short
+// by holidays stays short, and two days instead of three means one less in
+// every week, but never none. No new training on a day that already had one or
+// has a match, and none in a week without any training planned (a break, or
+// past the end of the plan).
+function _reschedPlan(D,season,o){
+  const res={change:[],move:[],add:[],drop:[],same:0,free:0,skipped:[],loc0:''};
+  const today=todaySK();
+  const fromK=Math.max(isoToSortKey(o.from),today),toK=isoToSortKey(o.to);
+  const days=new Set(o.days||[]),tMin=_rsMin(o.time);
+  if(!(fromK<=toK)||!days.size||tMin==null)return res;
+  const old=[],busy=new Set(),games=new Set();
+  ((D&&D.sessions)||[]).forEach((s,si)=>{
+    if(!s||!s.date)return;
+    const k=_rsSk(s,season);if(k<fromK||k>toK)return;
+    if(s.type==='match'){games.add(k);return;}
+    if(s.type!=='training')return;
+    if(sessTookPlace(s,season)){busy.add(k);return;}
+    old.push({s,si,k});
+  });
+  res.loc0=_rsTop(old.map(x=>x.s.location))||'';
+  const now=new Date(),nowMin=now.getHours()*60+now.getMinutes();
+  const weeks=new Map();
+  const wk=k=>{const w=_rsWeek(k);if(!weeks.has(w))weeks.set(w,{o:[],n:[],g:[]});return weeks.get(w);};
+  old.forEach(x=>wk(x.k).o.push(x));
+  for(const d=_rsDate(fromK);_rsK(d)<=toK;d.setDate(d.getDate()+1)){
+    const k=_rsK(d);
+    if(!days.has(d.getDay())||busy.has(k)||(k===today&&tMin<=nowMin))continue;
+    if(games.has(k)){wk(k).g.push(k);continue;}
+    wk(k).n.push(k);
+  }
+  const dur=o.dur||90;
+  const same=s=>s.time===o.time&&(+s.duration>0?+s.duration:90)===dur&&(!o.loc||String(s.location||'')===o.loc);
+  // A week without any training still to come is a break (holidays) or lies
+  // past the end of the plan: it stays empty.
+  const lastW=old.length?Math.max(...old.map(x=>_rsWeek(x.k))):0;
+  // The usual number of trainings a week (the most common; a tie goes up)
+  const per=new Map();weeks.forEach(g=>{if(g.o.length)per.set(g.o.length,(per.get(g.o.length)||0)+1);});
+  let usual=0,most=0;per.forEach((v,c)=>{if(v>most||(v===most&&c>usual)){most=v;usual=c;}});
+  const delta=days.size-usual;
+  // Days the plan already uses: when a week gets one more, a new day comes
+  // first — a day missing from a short week was most likely left out on purpose
+  const dc=new Map();old.forEach(x=>{const d=_rsDate(x.k).getDay();dc.set(d,(dc.get(d)||0)+1);});
+  const had=d=>(dc.get(d)||0)>1;
+  [...weeks.keys()].sort((a,b)=>a-b).forEach(w=>{
+    const g=weeks.get(w),taken=new Set(),rest=[];
+    if(!g.o.length){if(g.n.length&&w<lastW)res.free++;return;}
+    res.skipped.push(...g.g);
+    const want=Math.min(g.n.length,Math.max(1,g.o.length+delta));
+    let n=0;
+    g.o.sort((a,b)=>a.k-b.k||(_rsMin(a.s.time)||0)-(_rsMin(b.s.time)||0));
+    g.o.forEach(x=>{
+      if(n<want&&g.n.includes(x.k)&&!taken.has(x.k)){taken.add(x.k);n++;if(same(x.s))res.same++;else res.change.push(x);}
+      else rest.push(x);
+    });
+    const free=g.n.filter(k=>!taken.has(k));
+    rest.forEach(x=>{if(n<want&&free.length){res.move.push(Object.assign({to:free.shift()},x));n++;}else res.drop.push(x);});
+    free.sort((a,b)=>(had(_rsDate(a).getDay())-had(_rsDate(b).getDay()))||a-b);
+    while(n<want&&free.length){res.add.push(free.shift());n++;}
+  });
+  return res;
+}
+// The trainings of a period that have not taken place
+function _pausePlan(D,season,o){
+  const res={drop:[],games:0};
+  const fromK=Math.max(isoToSortKey(o.from),todaySK()),toK=isoToSortKey(o.to);
+  if(!(fromK<=toK))return res;
+  ((D&&D.sessions)||[]).forEach((s,si)=>{
+    if(!s||!s.date)return;
+    const k=_rsSk(s,season);if(k<fromK||k>toK)return;
+    if(s.type==='match'){res.games++;return;}
+    if(s.type==='training'&&!sessTookPlace(s,season))res.drop.push({s,si,k});
+  });
+  return res;
+}
+
+// ── applying ──
+function _rsDrop(D,s,team,season){
+  const si=D.sessions.indexOf(s);if(si<0)return;
+  const it=_trashSnapSession(si);if(it)_trashAdd(it);
+  D.sessions.splice(si,1);D.players.forEach(p=>_sessRemoveAt(p,si));
+  shiftMatchLineupsIndices(team,si,-1,season);
+}
+// To another day. A yes or no was given for the old day, so answers start
+// again; an excuse from the trainers stays (holidays, an injury), and so do the
+// plan, notes and a physio booking.
+function _rsMove(D,s,k,o,team,season){
+  const si=D.sessions.indexOf(s);if(si<0)return;
+  const lk=_mlKey(team,season,si);
+  const lineup=(G.matchLineups&&G.matchLineups[lk])?G.matchLineups[lk]:null;
+  const k0=rpeMetaKey(s),start0=_sessStartMs(s,season);
+  D.sessions.splice(si,1);
+  const was=D.players.map(p=>_sessRemoveAt(p,si));
+  shiftMatchLineupsIndices(team,si,-1,season);
+  s.date=_rsDisp(k);s.month=moFromDisp(s.date);
+  s.time=o.time;s.duration=o.dur||90;if(o.loc)s.location=o.loc;
+  delete s.remind;
+  _sessShiftDeadline(s,start0,season);
+  const at=insertSorted(D,s);
+  D.players.forEach((p,pi)=>{
+    if(!p)return;
+    const v=was[pi]||{};
+    if(v.s!==2){v.s=3;v.excOK=null;v.preconfReason=null;}
+    v.ay=null;
+    _sessSetAt(p,at,v);
+  });
+  rpeMetaRekey(D,k0,rpeMetaKey(s));
+  if(lineup){if(!G.matchLineups)G.matchLineups={};G.matchLineups[_mlKey(team,season,at)]=Object.assign({},lineup,{sessDate:s.date,season});}
+}
+function rsApply(){
+  if(!canEdit())return;
+  const o=_rsRead('moResched');
+  const D=cd(),season=UI.currentSeason,team=UI.currentTeam;
+  const pl=_reschedPlan(D,season,o);
+  const n=pl.change.length+pl.move.length+pl.add.length+pl.drop.length;
+  if(!n||!_guardDestructive())return;
+  if(typeof autoBackupBeforeOp==='function')autoBackupBeforeOp('Trainingszeiten geändert: '+team+' '+o.from+'–'+o.to);
+  snap();
+  pl.change.forEach(x=>{
+    const k0=rpeMetaKey(x.s),start0=_sessStartMs(x.s,season);
+    x.s.time=o.time;x.s.duration=o.dur||90;if(o.loc)x.s.location=o.loc;
+    _sessShiftDeadline(x.s,start0,season);
+    rpeMetaRekey(D,k0,rpeMetaKey(x.s));
+  });
+  pl.drop.forEach(x=>_rsDrop(D,x.s,team,season));
+  pl.move.forEach(x=>_rsMove(D,x.s,x.to,o,team,season));
+  const loc=o.loc||pl.loc0;
+  pl.add.forEach(k=>{const date=_rsDisp(k);insertSorted(D,{date,month:moFromDisp(date),type:'training',focus:'',time:o.time,duration:o.dur||90,location:loc||undefined});});
+  if(o.loc&&typeof rememberLocation==='function')rememberLocation(o.loc);
+  // Running to the season's end: the pattern for next season's plan too
+  if(o.to>=getSeasonBounds().max){
+    const p0=G.db[team+'__schedule'];
+    const p=Object.assign({dowMa:[0],timeM:'15:00'},(p0&&typeof p0==='object')?p0:{});
+    G.db[team+'__schedule']=Object.assign(p,{dowTr:o.days.slice(),timeT:o.time,durT:o.dur||90,updatedAt:Date.now()});
+  }
+  const news=_rsChecked('rsNotify')?_newsPost('Neue Trainingszeiten',_rsNewsText(o)):null;
+  saveG();render();_rsCalRefresh();closeM('moResched');
+  logAudit('Trainingszeiten geändert',_rsSpan(o),[
+    pl.change.length&&pl.change.length+' angepasst',pl.move.length&&pl.move.length+' verlegt',
+    pl.add.length&&pl.add.length+' neu',pl.drop.length&&pl.drop.length+' entfallen',news&&'Spieler benachrichtigt'].filter(Boolean).join(', '));
+  _rsDone(n===1?'1 Training geändert':n+' Trainings geändert',news);
+}
+function psApply(){
+  if(!canEdit())return;
+  const o=_rsRead('moPause');
+  const D=cd(),season=UI.currentSeason,team=UI.currentTeam;
+  const pl=_pausePlan(D,season,o);
+  const n=pl.drop.length;
+  if(!n||!_guardDestructive())return;
+  if(typeof autoBackupBeforeOp==='function')autoBackupBeforeOp('Trainingspause: '+team+' '+o.from+'–'+o.to);
+  snap();
+  pl.drop.forEach(x=>_rsDrop(D,x.s,team,season));
+  const news=_rsChecked('psNotify')?_newsPost('Trainingspause',_psNewsText(o,pl)):null;
+  saveG();render();_rsCalRefresh();closeM('moPause');
+  logAudit('Trainingspause',_rsSpan(o),(n===1?'1 Training':n+' Trainings')+' abgesagt'+(o.why?' ('+o.why+')':'')+(news?', Spieler benachrichtigt':''));
+  _rsDone(n===1?'1 Training abgesagt':n+' Trainings abgesagt',news);
+}
+function _rsChecked(id){const e=document.getElementById(id);return !!(e&&e.checked);}
+function _rsSpan(o){
+  const a=_rsDisp(Math.max(isoToSortKey(o.from),todaySK())),b=_rsDisp(isoToSortKey(o.to));
+  return a===b?a:a+' – '+b;
+}
+function _rsCalRefresh(){try{if(document.getElementById('moCalendar')?.classList.contains('open')&&typeof renderCalendar==='function')renderCalendar();}catch(e){}}
+function _rsNight(){const h=new Date(),m=h.getHours()*60+h.getMinutes();return m>=22*60+30||m<8*60;}
+// Done: say so; players without reminders on the phone get the group text
+function _rsDone(msg,news){
+  if(typeof showSaveFlash==='function')showSaveFlash('✓ '+msg);
+  if(!news)return;
+  const all=(cd().players||[]).filter(Boolean);
+  const push=all.filter(p=>p.push&&p.push.t).length,rest=all.length-push;
+  if(!rest)return;
+  const head=push?push+(push===1?' Spieler bekommt':' Spieler bekommen')+' die Nachricht aufs Handy'+(_rsNight()?' – morgen ab 8 Uhr.':' – in den nächsten 15 Minuten.')+'\n\n':'';
+  if(!confirm(head+rest+(rest===1?' Spieler hat':' Spieler haben')+' keine Erinnerungen aufs Handy. Text für die WhatsApp-Gruppe öffnen?'))return;
+  const txt='📣 '+news.title+'\n'+news.body;
+  if(typeof _dbCopyText==='function')_dbCopyText(txt);
+  window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank','noopener');
+}
+
+// ── the notice ──
+// One notice per team: G.db[team+'__news'] = {t, title, body, by}. The players
+// see it for a week at the top of their overview; the job on GitHub sends it
+// once to everyone with reminders on (tools/erinnerungen, kind "news").
+const NEWS_DAYS=7;
+function _newsPost(title,body){
+  const t=UI.currentTeam;if(!t||!G.db)return null;
+  const n={t:Date.now(),title:String(title).slice(0,80),body:String(body).slice(0,240),by:(CU&&CU.name)||''};
+  G.db[t+'__news']=n;
+  return n;
+}
+function teamNews(t){
+  const n=G&&G.db&&G.db[(t||UI.currentTeam)+'__news'];
+  if(!n||typeof n!=='object'||typeof n.t!=='number'||!n.title)return null;
+  const age=Date.now()-n.t;
+  return (age<NEWS_DAYS*864e5&&age>-864e5)?n:null;
+}
+function _newsHtml(kind){
+  const n=teamNews();if(!n)return '';
+  if(kind==='hub')return `<div class="hub-card hub-mvp hub-news"><span class="hub-ic" aria-hidden="true">📣</span><span class="hub-txt"><b>${escapeHtml(n.title)}</b><span>${escapeHtml(n.body||'')}</span></span></div>`;
+  return `<div class="pm-news"><span class="pm-news-ic" aria-hidden="true">📣</span><div class="pm-news-txt"><b>${escapeHtml(n.title)}</b><span>${escapeHtml(n.body||'')}</span></div></div>`;
+}
+function _rsDaysTxt(days){
+  const a=[1,2,3,4,5,6,0].filter(d=>days.includes(d)).map(d=>DOW[d]);
+  return a.length>1?a.slice(0,-1).join(', ')+' und '+a[a.length-1]:(a[0]||'');
+}
+function _rsNewsText(o){
+  const a=_rsDisp(Math.max(isoToSortKey(o.from),todaySK()))+'.';
+  const when=(o.to>=getSeasonBounds().max)?'Ab '+a:'Vom '+a+' bis '+_rsDisp(isoToSortKey(o.to))+'.';
+  return when+' trainieren wir '+_rsDaysTxt(o.days)+' um '+o.time+' Uhr'+(o.loc?' – '+o.loc:'')+'.';
+}
+function _psNewsText(o,pl){
+  const a=_rsDisp(Math.max(isoToSortKey(o.from),todaySK())),b=_rsDisp(isoToSortKey(o.to));
+  return (a===b?'Am '+a+'. ist kein Training':'Vom '+a+'. bis '+b+'. ist kein Training')+(o.why?' ('+o.why+')':'')+'.'
+    +(pl.games?(pl.games===1?' Das Spiel findet statt.':' Die Spiele finden statt.'):'');
+}
+
+// ── the windows ──
+function _rsEnsure(id){
+  if(document.getElementById(id))return;
+  const days=[1,2,3,4,5,6,0].map(d=>`<button type="button" class="dow-btn" data-d="${d}" aria-pressed="false">${DOW[d]}</button>`).join('');
+  const notify=x=>`<label class="rs-chk"><input type="checkbox" id="${x}Notify" checked><span>Spieler benachrichtigen<small id="${x}NotifyHint"></small></span></label>`;
+  const w=document.createElement('div');
+  w.innerHTML=(id==='moResched')?`<div class="mo hx-full" id="moResched" style="z-index:860;"><div class="mob rs-mob" style="width:440px;">
+    <h3>Trainingszeiten ändern</h3>
+    <p class="rs-lead">Neue Tage, Uhrzeit oder Ort für alle Trainings ab einem Datum. Spiele und Trainings, die schon stattgefunden haben, bleiben, wie sie sind.</p>
+    <div class="rs-two"><div><label for="rsFrom">Ab</label><input type="date" id="rsFrom"></div><div><label for="rsTo">Bis</label><input type="date" id="rsTo"></div></div>
+    <label id="rsDaysL">Trainingstage</label>
+    <div class="dow-grid rs-days" id="rsDays" role="group" aria-labelledby="rsDaysL">${days}</div>
+    <div class="rs-two"><div><label for="rsTime">Uhrzeit</label><input type="time" id="rsTime"></div><div><label for="rsDur">Dauer (Min.)</label><input type="number" id="rsDur" min="15" max="240" step="5" inputmode="numeric"></div></div>
+    <label for="rsLoc">Ort</label><select id="rsLoc"></select>
+    <div class="rs-prev" id="rsPrev" aria-live="polite"></div>
+    ${notify('rs')}
+    <div class="mob-btns"><button type="button" class="btn bp" id="rsGo" onclick="rsApply()">Übernehmen</button><button type="button" class="btn bs" onclick="closeM('moResched')">Abbrechen</button></div>
+  </div></div>`:`<div class="mo hx-full" id="moPause" style="z-index:860;"><div class="mob rs-mob" style="width:440px;">
+    <h3>Trainingspause</h3>
+    <p class="rs-lead">Alle Trainings im Zeitraum fallen aus, etwa in den Ferien. Spiele bleiben.</p>
+    <div class="rs-two"><div><label for="psFrom">Von</label><input type="date" id="psFrom"></div><div><label for="psTo">Bis</label><input type="date" id="psTo"></div></div>
+    <label for="psWhy">Grund <span class="rs-opt">(optional)</span></label><input type="text" id="psWhy" maxlength="60" placeholder="z. B. Herbstferien">
+    <div class="rs-prev" id="psPrev" aria-live="polite"></div>
+    ${notify('ps')}
+    <div class="mob-btns"><button type="button" class="btn bp" id="psGo" onclick="psApply()">Trainings absagen</button><button type="button" class="btn bs" onclick="closeM('moPause')">Abbrechen</button></div>
+  </div></div>`;
+  const m=w.firstElementChild;document.body.appendChild(m);
+  m.querySelectorAll('input,select').forEach(el=>{
+    const upd=()=>{
+      // "Bis" never before "Ab"
+      if(el.id==='rsFrom'||el.id==='psFrom'){const to=document.getElementById(el.id==='rsFrom'?'rsTo':'psTo');if(to&&el.value&&to.value<el.value)to.value=el.value;}
+      _rsRender(id);
+    };
+    el.addEventListener('input',upd);el.addEventListener('change',upd);
+  });
+  m.querySelectorAll('.rs-days .dow-btn').forEach(b=>b.addEventListener('click',()=>{
+    const on=!b.classList.contains('sel');b.classList.toggle('sel',on);b.setAttribute('aria-pressed',on?'true':'false');_rsRender(id);
+  }));
+  const loc=m.querySelector('#rsLoc');
+  if(loc)loc.addEventListener('change',()=>{
+    if(loc.value!=='__new__')return;
+    _rsLocFill(String(prompt('Neuen Ort eingeben:')||'').trim().slice(0,80));_rsRender(id);
+  });
+}
+function _rsLocFill(cur){
+  const el=document.getElementById('rsLoc');if(!el)return;
+  const list=getLocations().slice();
+  if(cur&&!list.includes(cur))list.push(cur);
+  el.innerHTML='<option value="">Unverändert</option>'+list.map(l=>`<option value="${escapeHtml(l)}">${escapeHtml(l)}</option>`).join('')
+    +'<option value="__new__">➕ Neuer Ort…</option>';
+  el.value=cur||'';
+}
+function _rsRead(id){
+  const v=x=>{const e=document.getElementById(x);return e?String(e.value||''):'';};
+  if(id==='moPause')return {from:v('psFrom'),to:v('psTo'),why:v('psWhy').trim().slice(0,60)};
+  const loc=v('rsLoc');
+  return {from:v('rsFrom'),to:v('rsTo'),days:[...document.querySelectorAll('#rsDays .dow-btn.sel')].map(b=>+b.dataset.d),
+    time:v('rsTime'),dur:Math.max(15,Math.min(240,parseInt(v('rsDur'),10)||90)),loc:loc==='__new__'?'':loc.trim()};
+}
+// What the next four weeks look like now — the window opens on "no change"
+function _rsDefaults(D,season,fromK){
+  const until=_rsK((d=>{d.setDate(d.getDate()+27);return d;})(_rsDate(fromK)));
+  const near=((D&&D.sessions)||[]).filter(s=>s&&s.type==='training'&&s.date&&!sessTookPlace(s,season))
+    .map(s=>({s,k:_rsSk(s,season)})).filter(x=>x.k>=fromK&&x.k<=until);
+  if(near.length){
+    const cnt=new Map();near.forEach(x=>{const d=_rsDate(x.k).getDay();cnt.set(d,(cnt.get(d)||0)+1);});
+    const reg=[...cnt.keys()].filter(d=>cnt.get(d)>1);
+    return {days:reg.length?reg:[...cnt.keys()],time:_rsTop(near.map(x=>x.s.time))||'18:30',dur:+_rsTop(near.map(x=>+x.s.duration>0?+x.s.duration:90))||90};
+  }
+  const pat=G.db&&G.db[UI.currentTeam+'__schedule'];
+  return {days:(pat&&Array.isArray(pat.dowTr))?pat.dowTr.slice():[2,4],time:(pat&&pat.timeT)||'18:30',dur:(pat&&+pat.durT)||90};
+}
+function _rsNextMonday(){const t=new Date();return new Date(t.getFullYear(),t.getMonth(),t.getDate()+((8-t.getDay())%7||7));}
+function _rsBounds(ids){
+  const b=getSeasonBounds(),lo=_rsIso(Math.max(todaySK(),isoToSortKey(b.min)));
+  ids.forEach(x=>{const e=document.getElementById(x);if(e){e.min=lo;e.max=b.max;}});
+  return {lo,hi:b.max};
+}
+function openResched(){
+  if(!(typeof canEdit==='function'&&canEdit()))return;
+  _rsEnsure('moResched');
+  const bd=_rsBounds(['rsFrom','rsTo']);
+  let f=_rsIso(_rsK(_rsNextMonday()));
+  if(f>bd.hi||f<bd.lo)f=bd.lo;
+  document.getElementById('rsFrom').value=f;document.getElementById('rsTo').value=bd.hi;
+  const df=_rsDefaults(cd(),UI.currentSeason,isoToSortKey(f));
+  document.querySelectorAll('#rsDays .dow-btn').forEach(x=>{const on=df.days.includes(+x.dataset.d);x.classList.toggle('sel',on);x.setAttribute('aria-pressed',on?'true':'false');});
+  document.getElementById('rsTime').value=df.time;document.getElementById('rsDur').value=df.dur;
+  _rsLocFill('');
+  document.getElementById('rsNotify').checked=true;
+  _rsRender('moResched');
+  openM('moResched');
+}
+function openPause(){
+  if(!(typeof canEdit==='function'&&canEdit()))return;
+  _rsEnsure('moPause');
+  const bd=_rsBounds(['psFrom','psTo']);
+  const m=_rsNextMonday();
+  let f=_rsIso(_rsK(m)),t=_rsIso(_rsK(new Date(m.getFullYear(),m.getMonth(),m.getDate()+6)));
+  if(f>bd.hi||f<bd.lo){f=bd.lo;t=bd.lo;}
+  if(t>bd.hi)t=bd.hi;
+  document.getElementById('psFrom').value=f;document.getElementById('psTo').value=t;
+  document.getElementById('psWhy').value='';
+  document.getElementById('psNotify').checked=true;
+  _rsRender('moPause');
+  openM('moPause');
+}
+function _rsReach(){
+  const all=(cd().players||[]).filter(Boolean),push=all.filter(p=>p.push&&p.push.t).length;
+  return (push?push+' von '+all.length+' bekommen es aufs Handy, alle':'Alle')+' sehen es eine Woche lang in ihrer Übersicht.';
+}
+function _rsItem(D,x,label,warn){
+  const w=[];
+  if(warn){
+    const a=_rsAnswers(D,x.si);if(a)w.push(a===1?'1 Antwort':a+' Antworten');
+    if(warn==='all'&&x.s.pid)w.push('Trainingsplan');
+    if(warn==='all'&&x.s.note&&String(x.s.note).trim())w.push('Notiz');
+  }
+  return escapeHtml(label)+(w.length?` <em>${escapeHtml(w.join(', '))}</em>`:'');
+}
+function _rsGroup(kind,title,sub,items){
+  if(!items.length)return '';
+  const max=6;
+  return `<div class="rs-g rs-${kind}"><div class="rs-gh"><span class="rs-n">${items.length}</span><b>${title}</b>${sub?`<span class="rs-sub">${sub}</span>`:''}</div>`
+    +`<div class="rs-items">${items.slice(0,max).map(i=>`<span>${i}</span>`).join('')}${items.length>max?`<span class="rs-more">und ${items.length-max} weitere</span>`:''}</div></div>`;
+}
+function _rsRender(id){
+  const D=cd(),season=UI.currentSeason;if(!D)return;
+  const pause=id==='moPause',o=_rsRead(id);
+  const box=document.getElementById(pause?'psPrev':'rsPrev'),go=document.getElementById(pause?'psGo':'rsGo');
+  const hint=document.getElementById(pause?'psNotifyHint':'rsNotifyHint');
+  if(!box||!go)return;
+  if(hint)hint.textContent=_rsReach();
+  let n=0,html='';
+  const msg=t=>`<div class="rs-empty">${t}</div>`;
+  if(!o.from||!o.to||o.from>o.to)html=msg('Bitte einen Zeitraum wählen: „'+(pause?'Von':'Ab')+'“ vor „Bis“.');
+  else if(pause){
+    const pl=_pausePlan(D,season,o);n=pl.drop.length;
+    html=n?_rsGroup('drop','Fallen aus','kommen in den Papierkorb',pl.drop.map(x=>_rsItem(D,x,x.s.date,'all')))
+      :msg('In diesem Zeitraum ist kein Training mehr geplant.');
+    if(pl.games)html+=`<div class="rs-foot">${pl.games===1?'Das Spiel in diesem Zeitraum bleibt.':'Die '+pl.games+' Spiele in diesem Zeitraum bleiben.'}</div>`;
+    go.textContent=n===1?'1 Training absagen':n?n+' Trainings absagen':'Trainings absagen';
+  }else if(!o.days.length){
+    html=msg('Mindestens einen Trainingstag wählen. Fällt das Training aus, nimm „Trainingspause“.');
+  }else if(_rsMin(o.time)==null){
+    html=msg('Bitte eine Uhrzeit eingeben.');
+  }else{
+    const pl=_reschedPlan(D,season,o);
+    n=pl.change.length+pl.move.length+pl.add.length+pl.drop.length;
+    if(!n)html=msg('Keine Änderung – die Trainings im Zeitraum passen schon.');
+    html+=_rsGroup('change','Gleicher Tag, neu: '+[
+        pl.change.some(x=>x.s.time!==o.time)&&'Uhrzeit',pl.change.some(x=>(+x.s.duration>0?+x.s.duration:90)!==o.dur)&&'Dauer',
+        o.loc&&pl.change.some(x=>String(x.s.location||'')!==o.loc)&&'Ort'].filter(Boolean).join(', '),
+      'Zu- und Absagen bleiben',pl.change.map(x=>_rsItem(D,x,x.s.date)));
+    html+=_rsGroup('move','Auf einen anderen Tag','Zu- und Absagen beginnen neu',pl.move.map(x=>_rsItem(D,x,x.s.date+' → '+_rsDisp(x.to),'answers')));
+    html+=_rsGroup('add','Neu','',pl.add.map(k=>escapeHtml(_rsDisp(k))));
+    html+=_rsGroup('drop','Fallen weg','kommen in den Papierkorb',pl.drop.map(x=>_rsItem(D,x,x.s.date,'all')));
+    const foot=[];
+    if(n&&pl.same)foot.push(pl.same===1?'Ein Training passt schon.':pl.same+' Trainings passen schon.');
+    if(n&&pl.free)foot.push(pl.free===1?'Eine Woche ohne Training bleibt frei.':pl.free+' Wochen ohne Training bleiben frei.');
+    if(pl.skipped.length)foot.push('An Spieltagen kein Training: '+pl.skipped.slice(0,3).map(_rsDisp).join(', ')+(pl.skipped.length>3?' …':'')+'.');
+    if(foot.length)html+=`<div class="rs-foot">${foot.map(escapeHtml).join('<br>')}</div>`;
+    go.textContent=n===1?'1 Änderung übernehmen':n?n+' Änderungen übernehmen':'Übernehmen';
+  }
+  box.innerHTML=html;
+  go.disabled=!n;
 }
 
 // ══════════════════════════════
@@ -28484,6 +28972,7 @@ function adminRenameTeam(old){
     if(G.db[old+'__'+s]){G.db[newName+'__'+s]=G.db[old+'__'+s];delete G.db[old+'__'+s];}
   });
   if(G.db[old+'__focuses']){G.db[newName+'__focuses']=G.db[old+'__focuses'];delete G.db[old+'__focuses'];}
+  TEAM_WIDE_KEYS.forEach(x=>{if(G.db[old+'__'+x]){G.db[newName+'__'+x]=G.db[old+'__'+x];delete G.db[old+'__'+x];}});
   // Update trainers
   G.trainers.forEach(t=>{t.teams=t.teams.map(x=>x===old?newName:x);});
   // Migrate all team-keyed structures
@@ -35726,7 +36215,7 @@ _pubCleanupSchedule();
         <button type="button" class="mx-add" id="cal-add-btn" onclick="openCalEvent(null)" title="Termin anlegen"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Termin</button>
       </span>
       <button type="button" class="mx-add pri calx-one" id="cal-add-one" onclick="calAddMenu(this,event)" aria-haspopup="menu" aria-label="Neu: Training, Spiel oder Termin" title="Training, Spiel oder Termin anlegen"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Neu</span></button>
-      <button type="button" class="mx-add calx-more" id="cal-more" onclick="calMoreMenu(this,event)" aria-haspopup="menu" aria-label="Weitere: Saisonplan, Export" title="Saisonplan, Export"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg></button>
+      <button type="button" class="mx-add calx-more" id="cal-more" onclick="calMoreMenu(this,event)" aria-haspopup="menu" aria-label="Weitere: Saisonplan, Trainingszeiten, Pause, Export" title="Saisonplan, Trainingszeiten, Pause, Export"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg></button>
     </div>
   </div>
   <div id="cal-content" class="cal-wrap" style="overflow-y:auto;flex:1;margin-top:12px;padding-right:4px;"></div>

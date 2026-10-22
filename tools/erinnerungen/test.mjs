@@ -191,4 +191,42 @@ function world() {
   await round({ db: db3, push, ts: Date.UTC(2026, 9, 22, 6, 7), log: q });
   ok(push.calls.length === 2 && push.calls[0].p.title === 'Training heute, 18:30', 'pressed at night: the next morning, "heute": ' + push.calls.map(c => c.p.title).join());
 }
+// ── a notice from the trainers ("Neue Trainingszeiten", "Trainingspause") ──
+{
+  const { sess, players } = data();
+  const subs = { [ownerOf('tok0')]: { a: dev('max'), b: dev('max2') }, [ownerOf('tok1')]: { a: dev('ali') }, [ownerOf('tok5')]: { a: dev('finn') } };
+  const at = Date.UTC(2026, 9, 21, 8, 0);                                             // Wed 10:00
+  const news = { t: at, title: 'Neue Trainingszeiten', body: 'Ab Mo 26.10. trainieren wir Mo und Mi um 19:00 Uhr.', by: 'Artem' };
+  const db = makeDb({ fcf_data: { db: { 'U19__2026__SL__27': { sessions: enc(sess), players: enc(players) }, U19__news: news } }, fcf_push: { subs, config: { U19: { rsvp: false, rpe: false, vote: false } } } });
+  let push = makePush();
+  await round({ db, push, ts: at + 7 * 60e3, log: q });
+  const to = push.calls.map(c => c.ep.replace('https://push.example/', '')).sort().join(',');
+  ok(to === 'ali,finn,max,max2' && push.calls[0].p.title === 'Neue Trainingszeiten' && /Mo und Mi um 19:00/.test(push.calls[0].p.body)
+    && /\?p=tok\d$/.test(push.calls[0].p.url), 'notice: to every subscribed player and device, whatever the reminders are set to: ' + to + ' ' + (push.calls[0] || { p: {} }).p.url);
+  push = makePush();
+  await round({ db, push, ts: at + 22 * 60e3, log: q });
+  ok(push.calls.length === 0, 'notice: once');
+  push = makePush();
+  await round({ db, push, ts: at + 23 * 3600e3, log: q });                               // next morning 9:00
+  ok(push.calls.length === 0, 'notice: not again the next day (yesterday\'s log)');
+  // written at night: in the morning
+  const n2 = { t: Date.UTC(2026, 9, 21, 20, 50), title: 'Trainingspause', body: 'Vom Mo 26.10. bis So 1.11. ist kein Training.' };
+  const db2 = makeDb({ fcf_data: { db: { 'U19__2026__SL__27': { sessions: enc(sess), players: enc(players) }, U19__news: n2 } }, fcf_push: { subs } });
+  push = makePush();
+  await round({ db: db2, push, ts: Date.UTC(2026, 9, 21, 21, 7), log: q });
+  ok(push.calls.length === 0, 'notice at night: not at night');
+  push = makePush();
+  await round({ db: db2, push, ts: Date.UTC(2026, 9, 22, 6, 7), log: q });
+  ok(push.calls.length === 4 && push.calls.every(c => c.p.title === 'Trainingspause'), 'notice at night: the next morning (' + push.calls.length + ')');
+  // too old
+  const db3 = makeDb({ fcf_data: { db: { 'U19__2026__SL__27': { sessions: enc(sess), players: enc(players) }, U19__news: news } }, fcf_push: { subs } });
+  push = makePush();
+  await round({ db: db3, push, ts: at + 25 * 3600e3, log: q });
+  ok(!push.calls.some(c => c.p.title === 'Neue Trainingszeiten'), 'notice older than a day: not sent');
+  // another team's notice: not to these players
+  const db4 = makeDb({ fcf_data: { db: { 'U19__2026__SL__27': { sessions: enc(sess), players: enc(players) }, U17__news: news } }, fcf_push: { subs } });
+  push = makePush();
+  await round({ db: db4, push, ts: at + 7 * 60e3, log: q });
+  ok(push.calls.length === 0, 'another team\'s notice: nothing');
+}
 console.log(fails ? fails + ' FAILED' : 'all passed');
