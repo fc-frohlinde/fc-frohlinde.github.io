@@ -67,7 +67,9 @@ await cannot('ein Trainer sich selbst zum Admin machen (Rolle der eigenen Einlad
 await cannot('ein Zurückgezogener eine Einladung anlegen', req('PUT', 'fcf_invites/GONEMADE000000000001', inv({ name: 'X' }), 'uGone'));
 
 // ── redeeming ──
-const redeem = (uid, code) => req('PATCH', '/', { ['fcf_members/' + uid]: { code, t: Date.now(), email: uid + '@x.de' }, ['fcf_invites/' + code + '/used']: uid, ['fcf_invites/' + code + '/usedAt']: Date.now() }, uid);
+// exactly what the app writes (invAccept): server time, e-mail and the Google name
+const TS = { '.sv': 'timestamp' };
+const redeem = (uid, code) => req('PATCH', '/', { ['fcf_members/' + uid]: { code, t: TS, email: uid + '@x.de', name: 'Name ' + uid }, ['fcf_invites/' + code + '/used']: uid, ['fcf_invites/' + code + '/usedAt']: TS }, uid);
 await cannot('ohne Anmeldung einlösen', req('PATCH', '/', { 'fcf_members/anon': { code: 'OPENCODE000000000001', t: now }, 'fcf_invites/OPENCODE000000000001/used': 'anon' }));
 await cannot('nur den Mitgliedseintrag schreiben (Einladung nicht als benutzt markiert)', req('PUT', 'fcf_members/uNeu', { code: 'OPENCODE000000000001', t: Date.now() }, 'uNeu'));
 await cannot('nur die Einladung als benutzt markieren', req('PUT', 'fcf_invites/OPENCODE000000000001/used', 'uNeu', 'uNeu'));

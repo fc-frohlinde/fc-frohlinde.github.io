@@ -1,0 +1,41 @@
+# Flutlicht · Zugang
+# Once, by hand: makes the account with the given ID the first admin. Everyone
+# else gets access through an invite link from the admin in the app.
+# The ID is shown in the app after signing in with Google or e-mail
+# ("Konto-ID"). It is not a secret; the invite code written here is never
+# printed. Code: tools/zugang.
+name: Zugang
+
+on:
+  workflow_dispatch:
+    inputs:
+      uid:
+        description: 'Konto-ID aus der App'
+        required: true
+      name:
+        description: 'Vorname'
+        required: true
+        default: 'Artem'
+
+permissions:
+  contents: read
+
+jobs:
+  admin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: tools/zugang
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci --omit=dev --no-audit --no-fund
+        working-directory: tools/zugang
+      - run: node admin.mjs
+        working-directory: tools/zugang
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          UID_IN: ${{ inputs.uid }}
+          NAME_IN: ${{ inputs.name }}
