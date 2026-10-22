@@ -15,14 +15,14 @@ async function req(method, path, body, uid) {
 }
 let fails = 0, n = 0;
 const ok = (c, m) => { n++; if (c) console.log('ok   ' + m); else { fails++; console.log('FAIL ' + m); console.log('::error title=Regeln::' + m); } };
-const can = async (m, p) => { const r = await p; ok(r.ok, 'darf: ' + m + (r.ok ? '' : ' (' + r.status + ' ' + r.body.slice(0, 200) + ')')); };
-const cannot = async (m, p) => { const r = await p; ok(!r.ok, 'darf nicht: ' + m + (r.ok ? '' : '')); };
+const can = async (m, p) => { const r = await p; ok(r.ok, 'можно: ' + m + (r.ok ? '' : ' (' + r.status + ' ' + r.body.slice(0, 200) + ')')); };
+const cannot = async (m, p) => { const r = await p; ok(!r.ok, 'нельзя: ' + m + (r.ok ? '' : '')); };
 
 // rules into the emulator
 const rules = fs.readFileSync(new URL('./database.rules.json', import.meta.url), 'utf8');
 const rr = await fetch(HOST + '/.settings/rules.json?ns=' + NS, { method: 'PUT', headers: { Authorization: 'Bearer owner' }, body: rules });
 const rrBody = await rr.text();
-ok(rr.ok, 'Regeln geladen (' + rr.status + ')' + (rr.ok ? '' : ': ' + rrBody.slice(0, 600).replace(/\n/g, ' ')));
+ok(rr.ok, 'правила загружены (' + rr.status + ')' + (rr.ok ? '' : ': ' + rrBody.slice(0, 600).replace(/\n/g, ' ')));
 if (!rr.ok) process.exit(1);
 
 const now = Date.now(), DAY = 864e5;
@@ -47,63 +47,63 @@ await req('PUT', '/', {
 }, 'owner');
 
 // ── reading ──
-await can('jeder liest eine Einladung über ihren Code', req('GET', 'fcf_invites/OPENCODE000000000001'));
-await cannot('ohne Anmeldung die Liste der Einladungen lesen', req('GET', 'fcf_invites'));
-await cannot('ein Trainer die Liste der Einladungen lesen', req('GET', 'fcf_invites', undefined, 'uTrainer'));
-await can('der Admin die Liste der Einladungen lesen', req('GET', 'fcf_invites', undefined, 'uAdmin'));
-await cannot('ohne Anmeldung die Mitglieder lesen', req('GET', 'fcf_members'));
-await cannot('ein Trainer alle Mitglieder lesen', req('GET', 'fcf_members', undefined, 'uTrainer'));
-await can('ein Trainer seinen eigenen Eintrag lesen', req('GET', 'fcf_members/uTrainer', undefined, 'uTrainer'));
-await cannot('ein Trainer den Eintrag eines anderen lesen', req('GET', 'fcf_members/uAdmin', undefined, 'uTrainer'));
-await can('der Admin alle Mitglieder lesen', req('GET', 'fcf_members', undefined, 'uAdmin'));
-await cannot('ein Zurückgezogener die Liste lesen, auch als ehemaliger', req('GET', 'fcf_members', undefined, 'uGone'));
+await can('любой читает приглашение по его коду', req('GET', 'fcf_invites/OPENCODE000000000001'));
+await cannot('без входа читать список приглашений', req('GET', 'fcf_invites'));
+await cannot('тренеру читать список приглашений', req('GET', 'fcf_invites', undefined, 'uTrainer'));
+await can('админу читать список приглашений', req('GET', 'fcf_invites', undefined, 'uAdmin'));
+await cannot('без входа читать участников', req('GET', 'fcf_members'));
+await cannot('тренеру читать всех участников', req('GET', 'fcf_members', undefined, 'uTrainer'));
+await can('тренеру читать свою запись', req('GET', 'fcf_members/uTrainer', undefined, 'uTrainer'));
+await cannot('тренеру читать чужую запись', req('GET', 'fcf_members/uAdmin', undefined, 'uTrainer'));
+await can('админу читать всех участников', req('GET', 'fcf_members', undefined, 'uAdmin'));
+await cannot('отозванному читать список, даже бывшему админу', req('GET', 'fcf_members', undefined, 'uGone'));
 
 // ── making invites ──
-await can('der Admin eine Einladung anlegen', req('PUT', 'fcf_invites/ADMINMADE00000000001', inv({ name: 'Tom' }), 'uAdmin'));
-await cannot('ein Trainer eine Einladung anlegen', req('PUT', 'fcf_invites/TRAINERMADE000000001', inv({ name: 'Tom' }), 'uTrainer'));
-await cannot('jemand ohne Zugang eine Einladung anlegen', req('PUT', 'fcf_invites/STRANGER000000000001', inv({ name: 'X' }), 'uStranger'));
-await cannot('der Admin eine Einladung mit unbekannter Rolle', req('PUT', 'fcf_invites/BADROLE0000000000001', inv({ role: 'owner' }), 'uAdmin'));
-await cannot('ein Trainer sich selbst zum Admin machen (Rolle der eigenen Einladung)', req('PUT', 'fcf_invites/TRAINERCODE000000001/role', 'admin', 'uTrainer'));
-await cannot('ein Zurückgezogener eine Einladung anlegen', req('PUT', 'fcf_invites/GONEMADE000000000001', inv({ name: 'X' }), 'uGone'));
+await can('админу создать приглашение', req('PUT', 'fcf_invites/ADMINMADE00000000001', inv({ name: 'Tom' }), 'uAdmin'));
+await cannot('тренеру создать приглашение', req('PUT', 'fcf_invites/TRAINERMADE000000001', inv({ name: 'Tom' }), 'uTrainer'));
+await cannot('кому-то без доступа создать приглашение', req('PUT', 'fcf_invites/STRANGER000000000001', inv({ name: 'X' }), 'uStranger'));
+await cannot('админу создать приглашение с неизвестной ролью', req('PUT', 'fcf_invites/BADROLE0000000000001', inv({ role: 'owner' }), 'uAdmin'));
+await cannot('тренеру сделать себя админом (роль своего приглашения)', req('PUT', 'fcf_invites/TRAINERCODE000000001/role', 'admin', 'uTrainer'));
+await cannot('отозванному создать приглашение', req('PUT', 'fcf_invites/GONEMADE000000000001', inv({ name: 'X' }), 'uGone'));
 
 // ── redeeming ──
 // exactly what the app writes (invAccept): server time, e-mail and the Google name
 const TS = { '.sv': 'timestamp' };
 const redeem = (uid, code) => req('PATCH', '/', { ['fcf_members/' + uid]: { code, t: TS, email: uid + '@x.de', name: 'Name ' + uid }, ['fcf_invites/' + code + '/used']: uid, ['fcf_invites/' + code + '/usedAt']: TS }, uid);
-await cannot('ohne Anmeldung einlösen', req('PATCH', '/', { 'fcf_members/anon': { code: 'OPENCODE000000000001', t: now }, 'fcf_invites/OPENCODE000000000001/used': 'anon' }));
-await cannot('nur den Mitgliedseintrag schreiben (Einladung nicht als benutzt markiert)', req('PUT', 'fcf_members/uNeu', { code: 'OPENCODE000000000001', t: Date.now() }, 'uNeu'));
-await cannot('nur die Einladung als benutzt markieren', req('PUT', 'fcf_invites/OPENCODE000000000001/used', 'uNeu', 'uNeu'));
-await cannot('für einen anderen einlösen', req('PATCH', '/', { 'fcf_members/uOther': { code: 'OPENCODE000000000001', t: Date.now() }, 'fcf_invites/OPENCODE000000000001/used': 'uOther' }, 'uNeu'));
-await can('eine gültige Einladung einlösen', redeem('uNeu', 'OPENCODE000000000001'));
-await cannot('dieselbe Einladung ein zweites Mal (anderes Konto)', redeem('uZweit', 'OPENCODE000000000001'));
-await cannot('eine abgelaufene Einladung', redeem('uLate', 'EXPIREDCODE000000001'));
-await cannot('eine zurückgezogene Einladung', redeem('uRev', 'REVOKEDCODE000000001'));
-await cannot('mit einem erfundenen Code', redeem('uFake', 'FAKECODE000000000001'));
-await cannot('ein Mitglied eine zweite Einladung für sich', redeem('uNeu', 'OPENCODE000000000002'));
-await cannot('ein Mitglied seinen Eintrag ändern (anderer Code)', req('PUT', 'fcf_members/uTrainer/code', 'ADMINCODE00000000001', 'uTrainer'));
-await cannot('ein Mitglied seinen Eintrag löschen und neu anlegen lassen', req('DELETE', 'fcf_members/uTrainer', undefined, 'uTrainer'));
+await cannot('активировать без входа', req('PATCH', '/', { 'fcf_members/anon': { code: 'OPENCODE000000000001', t: now }, 'fcf_invites/OPENCODE000000000001/used': 'anon' }));
+await cannot('записать только участника (приглашение не помечено использованным)', req('PUT', 'fcf_members/uNeu', { code: 'OPENCODE000000000001', t: Date.now() }, 'uNeu'));
+await cannot('только пометить приглашение использованным', req('PUT', 'fcf_invites/OPENCODE000000000001/used', 'uNeu', 'uNeu'));
+await cannot('активировать за другого', req('PATCH', '/', { 'fcf_members/uOther': { code: 'OPENCODE000000000001', t: Date.now() }, 'fcf_invites/OPENCODE000000000001/used': 'uOther' }, 'uNeu'));
+await can('активировать действующее приглашение', redeem('uNeu', 'OPENCODE000000000001'));
+await cannot('то же приглашение второй раз (другой аккаунт)', redeem('uZweit', 'OPENCODE000000000001'));
+await cannot('истёкшее приглашение', redeem('uLate', 'EXPIREDCODE000000001'));
+await cannot('отозванное приглашение', redeem('uRev', 'REVOKEDCODE000000001'));
+await cannot('с выдуманным кодом', redeem('uFake', 'FAKECODE000000000001'));
+await cannot('участнику второе приглашение для себя', redeem('uNeu', 'OPENCODE000000000002'));
+await cannot('участнику изменить свою запись (другой код)', req('PUT', 'fcf_members/uTrainer/code', 'ADMINCODE00000000001', 'uTrainer'));
+await cannot('участнику удалить свою запись', req('DELETE', 'fcf_members/uTrainer', undefined, 'uTrainer'));
 const after = JSON.parse((await req('GET', 'fcf_invites/OPENCODE000000000001')).body || 'null');
-ok(after && after.used === 'uNeu' && after.role === 'trainer', 'Einladung danach: benutzt von uNeu, Rolle unverändert');
-await cannot('beim Einlösen eine fremde Rolle mitschreiben', req('PATCH', '/', { 'fcf_members/uRole': { code: 'OPENCODE000000000002', t: Date.now() }, 'fcf_invites/OPENCODE000000000002/used': 'uRole', 'fcf_invites/OPENCODE000000000002/role': 'admin' }, 'uRole'));
-await can('die zweite offene Einladung danach normal einlösen', redeem('uRole', 'OPENCODE000000000002'));
-await cannot('ein frisch Eingeladener (Trainer) eine Einladung anlegen', req('PUT', 'fcf_invites/NEUMADE0000000000001', inv({ name: 'X' }), 'uNeu'));
+ok(after && after.used === 'uNeu' && after.role === 'trainer', 'приглашение после этого: использовано uNeu, роль не изменилась');
+await cannot('при активации дописать чужую роль', req('PATCH', '/', { 'fcf_members/uRole': { code: 'OPENCODE000000000002', t: Date.now() }, 'fcf_invites/OPENCODE000000000002/used': 'uRole', 'fcf_invites/OPENCODE000000000002/role': 'admin' }, 'uRole'));
+await can('после этого обычно активировать второе открытое приглашение', redeem('uRole', 'OPENCODE000000000002'));
+await cannot('только что приглашённому тренеру создать приглашение', req('PUT', 'fcf_invites/NEUMADE0000000000001', inv({ name: 'X' }), 'uNeu'));
 
 // ── managing ──
-await can('der Admin die Rolle ändern (uNeu wird Admin)', req('PUT', 'fcf_invites/OPENCODE000000000001/role', 'admin', 'uAdmin'));
-await can('der neue Admin liest die Mitglieder', req('GET', 'fcf_members', undefined, 'uNeu'));
-await can('der Admin den Zugang zurückziehen', req('PUT', 'fcf_invites/OPENCODE000000000001/revoked', Date.now(), 'uAdmin'));
-await cannot('danach ist uNeu kein Admin mehr', req('GET', 'fcf_members', undefined, 'uNeu'));
-await cannot('danach legt uNeu keine Einladung mehr an', req('PUT', 'fcf_invites/NEUMADE0000000000002', inv({ name: 'X' }), 'uNeu'));
-await cannot('ein Zurückgezogener die Rücknahme aufheben', req('DELETE', 'fcf_invites/OPENCODE000000000001/revoked', undefined, 'uNeu'));
-await can('der Admin einen Mitgliedseintrag löschen', req('DELETE', 'fcf_members/uRole', undefined, 'uAdmin'));
-await cannot('der Admin Unsinn in eine Einladung schreiben', req('PUT', 'fcf_invites/OPENCODE000000000001/foo', 1, 'uAdmin'));
+await can('админу изменить роль (uNeu становится админом)', req('PUT', 'fcf_invites/OPENCODE000000000001/role', 'admin', 'uAdmin'));
+await can('новый админ читает участников', req('GET', 'fcf_members', undefined, 'uNeu'));
+await can('админу отозвать доступ', req('PUT', 'fcf_invites/OPENCODE000000000001/revoked', Date.now(), 'uAdmin'));
+await cannot('после этого uNeu больше не админ', req('GET', 'fcf_members', undefined, 'uNeu'));
+await cannot('после этого uNeu не создаёт приглашений', req('PUT', 'fcf_invites/NEUMADE0000000000002', inv({ name: 'X' }), 'uNeu'));
+await cannot('отозванному отменить отзыв', req('DELETE', 'fcf_invites/OPENCODE000000000001/revoked', undefined, 'uNeu'));
+await can('админу удалить запись участника', req('DELETE', 'fcf_members/uRole', undefined, 'uAdmin'));
+await cannot('админу записать мусор в приглашение', req('PUT', 'fcf_invites/OPENCODE000000000001/foo', 1, 'uAdmin'));
 
 // ── what stays as it is until the lock (Teil 3) ──
-await can('ohne Anmeldung fcf_data lesen (noch offen)', req('GET', 'fcf_data/version'));
-await can('Push-Schlüssel lesen', req('GET', 'fcf_push/pub'));
-await cannot('fcf_safe lesen', req('GET', 'fcf_safe'));
-await cannot('unbekannte Knoten schreiben', req('PUT', 'fremd/x', 1, 'uAdmin'));
+await can('без входа читать fcf_data (пока открыто)', req('GET', 'fcf_data/version'));
+await can('читать push-ключ', req('GET', 'fcf_push/pub'));
+await cannot('читать fcf_safe', req('GET', 'fcf_safe'));
+await cannot('писать в неизвестные узлы', req('PUT', 'fremd/x', 1, 'uAdmin'));
 
 console.log(fails ? fails + ' FAILED' : 'all passed');
-console.log('::notice title=Regeln::' + (n - fails) + ' von ' + n + ' Prüfungen bestanden' + (fails ? ', ' + fails + ' FEHLER' : ''));
+console.log('::notice title=Regeln::' + (n - fails) + ' из ' + n + ' проверок пройдено' + (fails ? ', ОШИБОК: ' + fails : ''));
 process.exit(fails ? 1 : 0);
