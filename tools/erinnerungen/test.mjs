@@ -125,6 +125,26 @@ function world() {
   ok(push.calls.length === 1 && push.calls[0].ep.endsWith('/max') && push.calls[0].p.body === 'Gegen SV Brackel fehlt noch deine Stimme – bis heute 24 Uhr.'
     && push.calls[0].p.url.endsWith('&do=vote&s=' + mi), 'vote: only who rated and has not voted: ' + JSON.stringify(push.calls.map(c => c.ep + ' ' + c.p.url)));
 }
+// ── not in the squad (1.2.18): no load question, no vote ──
+{
+  const { sess, players } = data();
+  const mi = sess.findIndex(s => s.date === 'So 18.10');
+  sess[mi].squad = { p: ['Max Müller', 'Tom Berg'], out: ['Ali Kaya'], meet: '11:30', where: '', t: Date.UTC(2026, 9, 16, 12, 0), by: 'Artem' };
+  // Max picked (Zusage), Ali confirmed but not picked, Tom picked and present,
+  // Jonas already N, Luca not picked but marked present (came anyway)
+  [4, 4, 1, 5, 1].forEach((v, i) => { players[i].s[mi] = v; });
+  const subs = {}; [0, 1, 2, 3, 4].forEach(i => { subs[ownerOf('tok' + i)] = { a: dev('d' + i) }; });
+  const mk = () => makeDb({ fcf_data: { db: { 'U19__2026__SL__27': { sessions: enc(sess), players: enc(players) } } }, fcf_push: { subs, config: { U19: { rsvp: false, rpe: true, vote: true } } } });
+  let db = mk(), push = makePush();
+  await round({ db, push, ts: Date.UTC(2026, 9, 18, 13, 0), log: q });               // So 15:00, match 13:00–14:30
+  const got = push.calls.filter(c => /^rpe-/.test(c.p.tag || '')).map(c => c.ep.split('/').pop()).sort().join();
+  ok(got === 'd0,d2,d4', 'Belastung: the squad and who came anyway — not Ali (not picked), not Jonas (N): ' + got);
+  players[0].rpe[mi] = 7; players[1].rpe[mi] = 5; players[3].rpe[mi] = 4;
+  db = mk(); push = makePush();
+  await round({ db, push, ts: Date.UTC(2026, 9, 19, 15, 5), log: q });                // Mo 17:05
+  const v = push.calls.filter(c => /^vote-/.test(c.p.tag || '')).map(c => c.ep.split('/').pop()).sort().join();
+  ok(v === 'd0', 'vote: only who was in it and rated: ' + v);
+}
 // ── the answer, the evening before Thursday ──
 {
   const { sess, players } = data();

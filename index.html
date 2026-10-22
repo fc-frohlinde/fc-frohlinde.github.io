@@ -696,6 +696,16 @@ td:hover .ncell .ni{opacity:1;}
 /* Angemeldet — Spieler hat zugesagt; Trainer überprüft am Termin */
 .csm{background:#3b82c4 !important;color:#fff !important;}
 tbody tr:hover td.csm.past-locked{background:#3b82c4 !important;}
+.csn{background:#E3E8F0 !important;color:#5B6B82 !important;}
+tbody tr:hover td.csn.past-locked,tbody td.next-col.csn{background:#E3E8F0 !important;color:#5B6B82 !important;}
+body.design-kabine .csn{background:color-mix(in srgb,var(--d-q-fg) 30%,transparent)!important;color:var(--d-ink,#33415C)!important;}
+body.design-kabine tbody tr:hover td.csn.past-locked{background:color-mix(in srgb,var(--d-q-fg) 30%,transparent)!important;}
+.ss-n{background:#E3E8F0;color:#5B6B82;}
+.ma-btn.ma-6{background:#7C8AA3;}
+.ma-btn.ma-6.dim{background:#e3e8f0;color:#8fa0b8;}
+body.design-heute .ssx-gh > i.s-nk,body.design-heute .s-nk{background:#8E9BB0;}
+.pm-fb-nk{background:rgba(124,138,163,.14);color:#46536A;}
+.rc-b.sel-n{background:#7C8AA3 !important;border-color:#7C8AA3 !important;color:#fff !important;}
 
 .past-locked{cursor:default !important;opacity:.65;}
 tbody tr:hover td.csa.past-locked{background:var(--cp) !important;}
@@ -6540,13 +6550,18 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.17'; // v1.2.17: Kader und Aufstellung kennen sich
-const APP_VERSION_LABEL='1.2.17';
+const APP_VERSION='1.2.18'; // v1.2.18: Status Nicht im Kader
+const APP_VERSION_LABEL='1.2.18';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792691940386; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792693686619; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.18',date:'22.10.2026',title:'Nicht im Kader',items:[
+    {icon:'➖',title:'Eigener Status statt „Entschuldigt“',desc:'Wer zugesagt hat, aber nicht im Kader steht, bekommt nach dem Anpfiff von selbst „Nicht im Kader“ (N). Das zählt weder für noch gegen ihn: nicht in der Anwesenheit, nicht auf der Karte, die Serie läuft weiter. Bisher stand dort meist E – das verbrauchte sein „entschuldigt ohne Abzug“ und drückte die Quote, obwohl er bereit war.'},
+    {icon:'✍',title:'Von Hand',desc:'Bei Spielen ohne veröffentlichten Kader und für frühere Spiele lässt sich N in der Tabelle, beim Erfassen und im Spiel-Fenster wählen. Wer nicht im Kader war und trotzdem mitgefahren ist, bekommt wie immer A.'},
+    {icon:'📵',title:'Keine Fragen nach dem Spiel',desc:'Wer nicht im Kader ist, wird nach dem Spiel nicht mehr nach der Belastung gefragt und steht nicht zur Wahl „Spieler des Spiels“.'},
+  ]},
   {version:'1.2.17',date:'22.10.2026',title:'Kader und Aufstellung',items:[
     {icon:'🔗',title:'Die Aufstellung kennt den Kader',desc:'Ist der Kader veröffentlicht, stehen seine Spieler in der Aufstellung oben in der Auswahl. Wer nicht im Kader ist, steht darunter mit „nicht im Kader“ und lässt sich trotzdem wählen.'},
     {icon:'⚠',title:'Wenn beide auseinanderlaufen',desc:'Steht jemand in der Aufstellung, aber nicht im Kader, sagen es die Aufstellung und die Kader-Karte im Spiel – er bekäme keinen Treffpunkt. „Kader anpassen“ öffnet das Kader-Fenster mit ihm schon angehakt; geändert wird erst mit „Änderungen veröffentlichen“.'},
@@ -6827,10 +6842,12 @@ const POS_ORDER=POS; // sorted goalkeeper→forward
 const POS_LBL={TW:'Torwart',RV:'Rechter Verteidiger',IV:'Innenverteidiger',LV:'Linker Verteidiger',
   '6er':'Def. MF','8er':'Zentr. MF','10er':'Off. MF',RF:'Rechter Flügel',LF:'Linker Flügel',ST:'Stürmer'};
  // trainer cycle: ?→A→F→E (status 4 not in cycle — set by player only)
-const SYM={1:'A',0:'F',2:'E',3:'?',4:'M'}; // M for "aMgemeldet" (Angemeldet)
-const CLS={1:'csa',0:'csf',2:'cse',3:'csq',4:'csm'};
-const STLBL={1:'Anwesend',0:'Fehlend',2:'Entschuldigt',3:'Ausstehend',4:'Angemeldet'};
-const STCLS={1:'ss-a',0:'ss-f',2:'ss-e',3:'ss-q',4:'ss-m'};
+// 5 = Nicht im Kader (1.2.18): confirmed for a match but not picked. Neutral —
+// every count of attendance takes 1/0/2 only, so it is left out everywhere.
+const SYM={1:'A',0:'F',2:'E',3:'?',4:'M',5:'N'}; // M for "aMgemeldet" (Angemeldet)
+const CLS={1:'csa',0:'csf',2:'cse',3:'csq',4:'csm',5:'csn'};
+const STLBL={1:'Anwesend',0:'Fehlend',2:'Entschuldigt',3:'Ausstehend',4:'Angemeldet',5:'Nicht im Kader'};
+const STCLS={1:'ss-a',0:'ss-f',2:'ss-e',3:'ss-q',4:'ss-m',5:'ss-n'};
 const DOW=['So','Mo','Di','Mi','Do','Fr','Sa'];
 const DEM={1:'Januar',2:'Februar',3:'März',4:'April',5:'Mai',6:'Juni',
   7:'Juli',8:'August',9:'September',10:'Oktober',11:'November',12:'Dezember'};
@@ -8188,13 +8205,13 @@ function sanitizeG(data){
     d.players.forEach(p=>{
       if(!p)return;
       if(!Array.isArray(p.s))p.s=p.s?Object.values(p.s):[];
-      // Validate status values: must be int 0-4. Garbage → 3 (Ausstehend).
+      // Validate status values: must be int 0-5. Garbage → 3 (Ausstehend).
       // Without this, corrupted Firebase data (e.g. strings, out-of-range numbers,
       // bool from legacy versions) leaks into render and breaks CLS[v]/SYM[v] lookups.
       p.s=(p.s||[]).map(v=>{
         if(v===null||v===undefined)return 3;
         const n=typeof v==='number'?v:parseInt(v,10);
-        if(isNaN(n)||n<0||n>4)return 3;
+        if(isNaN(n)||n<0||n>5)return 3;
         return n;
       });
       // Firebase returns a sparse array as an object keyed by index. p.s above
@@ -11496,7 +11513,7 @@ function renderShortcutsList(){
   });
   el.innerHTML=html;
 }
-function _statusName(v){return ({0:'Fehlend',1:'Anwesend',2:'Entschuldigt',3:'Ausstehend',4:'Angemeldet'})[v]||'?';}
+function _statusName(v){return ({0:'Fehlend',1:'Anwesend',2:'Entschuldigt',3:'Ausstehend',4:'Angemeldet',5:'Nicht im Kader'})[v]||'?';}
 
 // Format relative time (e.g. "vor 5 Min")
 function relTime(ts){
@@ -11797,7 +11814,15 @@ function pctColor(pct){return pct>=80?'var(--cp)':pct>=60?'var(--ce)':'var(--ca)
 // Now Ausstehend (3) stays — neutral "no data", excluded from stats. The
 // Roll-Call automation card already reminds trainers to enter results.
 // Kept as a no-op so any cached call sites don't break.
-function autoConvertPast(){}
+function autoConvertPast(){
+  // 1.2.18: after kick-off, "Nicht im Kader" for whoever confirmed and was not
+  // picked (_sqSettleBlock). A trainer's copy saves it; others only show it.
+  try{
+    if(!G||G.__sanitized||(typeof isPlayerMode==='function'&&isPlayerMode()))return;
+    const D=cd();if(!D)return;
+    if(_sqSettleBlock(D,UI.currentSeason)&&typeof canEdit==='function'&&canEdit())saveG(false);
+  }catch(e){console.warn('[Kader] settle',e);}
+}
 
 function render(){
   // Player mode has no table: the roster is reduced to the link-holder and the
@@ -11987,6 +12012,7 @@ function renderBody(){
       // For Angemeldet (4) and Entschuldigt-by-player (2), show reason in tooltip
       let title='';
       if(sVal===4)title=' title="Vom Spieler angemeldet — noch nicht überprüft"';
+      else if(sVal===5)title=' title="'+escapeHtml(_nkTitle(origPi,realSi))+'"';
       else if(sVal===2&&Array.isArray(p.preconfReason)&&p.preconfReason[realSi])title=` title="Abgemeldet: ${(p.preconfReason[realSi]||'').replace(/"/g,'&quot;')}"`;
       cells+=`<td class="${cls}" data-pi="${origPi}" data-si="${realSi}"${title} ${!ro?(isPast?`onclick="event.stopPropagation();cellOpenMenu(${origPi},${realSi},this)"`:`onclick="cycSt(${origPi},${realSi})"`):''}>${SYM[sVal]}</td>`;
     }
@@ -12034,7 +12060,8 @@ function renderTfoot(){
   let cells='';
   for(let si=0;si<ss.length;si++){
     const realSi=D.sessions.indexOf(ss[si]);
-    const onTeam=D.players.filter(p=>p&&_sessAfterJoin(p,ss[si])); // not yet joined → not in the base
+    // not yet joined, or not in the squad of a match → not in the base
+    const onTeam=D.players.filter(p=>p&&_sessAfterJoin(p,ss[si])&&!(p.s&&p.s[realSi]===5));
     const c=onTeam.filter(p=>p.s&&realSi<p.s.length&&p.s[realSi]===1).length;
     const pct=onTeam.length?Math.round((c/onTeam.length)*100):0;
     const isMat=ss[si].type==='match';
@@ -12247,23 +12274,24 @@ function _mxCell(p,pi,c,ro){
   const cls=`cs ${CLS[sVal]}${isNext?' next-col':''}${ro?' ro':''}${isPast?' past-locked':''}`;
   let title='';
   if(sVal===4)title=' title="Vom Spieler angemeldet — noch nicht überprüft"';
+  else if(sVal===5)title=' title="'+escapeHtml(_nkTitle(pi,si))+'"';
   else if(sVal===2&&Array.isArray(p.preconfReason)&&p.preconfReason[si])title=` title="Abgemeldet: ${(p.preconfReason[si]||'').replace(/"/g,'&quot;')}"`;
   return `<td class="${cls}" data-pi="${pi}" data-si="${si}"${dma}${title} ${!ro?(isPast?`onclick="event.stopPropagation();cellOpenMenu(${pi},${si},this)"`:`onclick="cycSt(${pi},${si})"`):''}>${SYM[sVal]}</td>`;
 }
 // A folded week: anwesend von erfasst, coloured by the share
 function _mxWeekCell(p,c){
   const w=c.w,dm=_mxDm(c);
-  let n=0,a=0,f=0,x=0;
+  let n=0,a=0,f=0,x=0,nk=0;
   w.items.forEach(it=>{
     if(!_sessAfterJoin(p,it.s))return;n++;
     const v=p.s&&p.s[it.si];
-    if(v===1)a++;else if(v===0)f++;else if(v===2)x++;
+    if(v===1)a++;else if(v===0)f++;else if(v===2)x++;else if(v===5)nk++;
   });
   const k=a+f+x,head=`KW ${w.kw} (${_mxSpan(w.wk)})`;
   if(!n)return `<td class="mx-wc mx-wc-pre" data-mx="${dm}" title="${head}: noch nicht im Team">–</td>`;
-  if(!k)return `<td class="mx-wc mx-wc-q" data-mx="${dm}" onclick="mxWeek(${w.wk})" title="${head}: nichts erfasst">?</td>`;
+  if(!k)return `<td class="mx-wc mx-wc-q" data-mx="${dm}" onclick="mxWeek(${w.wk})" title="${head}: ${nk&&nk===n?'nicht im Kader':'nichts erfasst'}">${nk&&nk===n?'N':'?'}</td>`;
   const r=a/k,h=r>=.999?3:r>=.6?2:r>=.34?1:0;
-  const tip=[`${a} anwesend`,x?`${x} entschuldigt`:'',f?`${f} fehlend`:'',n>k?`${n-k} nicht erfasst`:''].filter(Boolean).join(' · ');
+  const tip=[`${a} anwesend`,x?`${x} entschuldigt`:'',f?`${f} fehlend`:'',nk?`${nk} nicht im Kader`:'',n>k+nk?`${n-k-nk} nicht erfasst`:''].filter(Boolean).join(' · ');
   return `<td class="mx-wc h${h}" data-mx="${dm}" onclick="mxWeek(${w.wk})" title="${head}: ${tip}">${a}/${k}</td>`;
 }
 function mxBody(){
@@ -12331,7 +12359,7 @@ function mxFoot(){
   });
   const avg=N?Math.round(A/N*100):null;
   const present=it=>{
-    const on=D.players.filter(p=>p&&_sessAfterJoin(p,it.s));
+    const on=D.players.filter(p=>p&&_sessAfterJoin(p,it.s)&&!(p.s&&p.s[it.si]===5));   // N: not expected
     return {c:on.filter(p=>p.s&&it.si<p.s.length&&p.s[it.si]===1).length,n:on.length};
   };
   const cells=M.cols.map(c=>{
@@ -12785,7 +12813,7 @@ function cellOpenMenu(pi,si,cell){
   const cur=(p&&p.s&&si<p.s.length)?p.s[si]:3;
   const nm=p?((typeof getDisplayName==='function'?getDisplayName(p):p.name)||''):'';
   menu.innerHTML=`<div class="ssx-menu-h">${escapeHtml(nm)}${s&&s.date?' · '+escapeHtml(s.date):''}</div>`
-    +[1,0,2].map(v=>{const mt=SS_ATT_META[v];return `<button type="button" class="ssx-menu-i${v===cur?' on':''}" onclick="event.stopPropagation();setCellStatus(${pi},${si},${v})"><span class="ssa-st ${mt.cls}">${mt.i}</span>${mt.n}</button>`;}).join('');
+    +_stRoll(si).map(v=>{const mt=SS_ATT_META[v];return `<button type="button" class="ssx-menu-i${v===cur?' on':''}" onclick="event.stopPropagation();setCellStatus(${pi},${si},${v})"><span class="ssa-st ${mt.cls}">${mt.i}</span>${mt.n}</button>`;}).join('');
   // Position near cell (clamped/flipped by the shared helper)
   menu.style.display='block';
   _placePopup(menu,cell.getBoundingClientRect(),{gap:3});
@@ -13997,9 +14025,10 @@ function renderMobileAtt(){
       {v:0,sym:'✗',cls:'ma-2'},
       {v:2,sym:'E',cls:'ma-4'},
       {v:4,sym:'M',cls:'ma-5'},
+      {v:5,sym:'N',cls:'ma-6'},
       {v:3,sym:'?',cls:'ma-3'}
     ];
-    const allowed=rollCall?[1,0,2]:[3,4,0,2];
+    const allowed=rollCall?_stRoll(si):[3,4,0,2];
     // A value already stored outside the current phase (e.g. an Angemeldet
     // left over from before the session started) stays visible so the trainer
     // can see and change it — it just can't be newly selected.
@@ -14037,7 +14066,7 @@ function maSetStatus(pi,si,val){
   const rollCall=(typeof _isSessRollCallTime==='function')?_isSessRollCallTime(si):false;
   // Planning phase includes Fehlend: a player's own "Kann nicht" lands there,
   // so trainers must be able to set and correct it before the session too.
-  const allowed=rollCall?[1,0,2]:[3,4,0,2];
+  const allowed=rollCall?_stRoll(si):[3,4,0,2];
   const D=cd();
   const cur=(D&&D.players&&D.players[pi]&&D.players[pi].s)?D.players[pi].s[si]:undefined;
   if(!allowed.includes(val)&&val!==cur)return;
@@ -15390,6 +15419,49 @@ function _sqFlags(D,season){
 }
 // ── players ──
 // In player mode s.squad is reduced to {in, meet, where, t} (_pmSanitizeG)
+// Nicht im Kader (1.2.18). After kick-off, whoever confirmed but is not in
+// the published squad gets 5: neutral — it counts neither for nor against him
+// (attendance, card, streak), he is not asked to rate the load, the roll call
+// does not wait for him. Someone not picked who came anyway is set to
+// Anwesend by hand and stays so: only Zugesagt (4) is converted, and
+// Ausstehend (3) only for those who had confirmed when the squad went out
+// (an older copy of the app turns an unknown 5 back into 3).
+function _sqSettleBlock(d,season){
+  if(!d||!Array.isArray(d.sessions)||!Array.isArray(d.players))return 0;
+  let n=0;
+  d.sessions.forEach((s,si)=>{
+    const q=(s&&s.type==='match'&&s.date)?_sqOf(s):null;
+    if(!q||!_sqStarted(s,season))return;
+    const out=Array.isArray(q.out)?q.out:[];
+    d.players.forEach(p=>{
+      if(!p||!p.name||q.p.includes(p.name))return;
+      if(typeof _sessAfterJoin==='function'&&!_sessAfterJoin(p,s,season))return;
+      if(!Array.isArray(p.s))p.s=[];
+      const v=(si<p.s.length&&p.s[si]!=null)?p.s[si]:3;
+      if(v===4||(v===3&&out.includes(p.name))){
+        while(p.s.length<=si)p.s.push(3);
+        p.s[si]=5;n++;
+      }
+    });
+  });
+  return n;
+}
+// Is this player outside the published squad of match s? Trainer data has the
+// list; in player mode the session only says whether he himself is in it.
+function _sqOutOf(s,p){
+  if(!s||s.type!=='match'||!p)return false;
+  const q=_sqOf(s);
+  if(q)return !q.p.includes(p.name);
+  const pm=_sqPm(s);
+  return !!(pm&&pm.in===false&&typeof isPlayerMode==='function'&&isPlayerMode());
+}
+// What N stands for — and when the week's training rule was not met (the same
+// check as the lineup, lpDisciplineState), that this was the reason. Still
+// neutral: the missed trainings already count against him.
+function _nkWhy(pi,si){try{const d=(typeof lpDisciplineState==='function'&&pi>=0)?lpDisciplineState(pi,si):null;return d?'Trainingsregel: '+d.reason:'';}catch(e){return '';}}
+function _nkTitle(pi,si){const w=_nkWhy(pi,si);return 'Nicht im Kader'+(w?' · '+w:'')+' – zählt weder für noch gegen ihn';}
+// Roll-call choices: Anwesend, Fehlend, Entschuldigt — for a match also N
+function _stRoll(si){const D=cd(),s=D&&D.sessions&&D.sessions[si];return (s&&s.type==='match')?[1,0,2,5]:[1,0,2];}
 function _sqPm(s){const q=s&&s.squad;return (q&&typeof q.in==='boolean')?q:null;}
 // The next match with a squad that concerns him: picked, or confirmed and not picked
 function _sqPmNext(D,p){
@@ -15513,6 +15585,8 @@ function rpeIsOpen(s,si,p,season){
   // absent or excused is asked. If the trainer marks them absent afterwards,
   // the entry simply stops being shown and is ignored in the evaluation.
   if(v===0||v===2)return false;
+  // Not in the squad (and not marked present after all): nothing to rate
+  if(v===5||(v!==1&&_sqOutOf(s,p)))return false;
   const sk=(typeof dispToSortKey==='function')?dispToSortKey(s.date):null;
   if(!sk||sk===99999999)return false;
   const y=Math.floor(sk/10000),m=Math.floor(sk/100)%100,d=sk%100;
@@ -16301,6 +16375,8 @@ function mvpEligible(p,s,si,season){
   const st=(p.s&&si<p.s.length)?p.s[si]:3;
   if(st===0||st===2)return false;
   if(typeof rpeNotThere==='function'&&rpeNotThere(p,s))return false;
+  if(st===5)return false;
+  {const q=_sqOf(s);if(q&&st!==1&&!q.p.includes(p.name))return false;}
   return st===1||st===4||(Array.isArray(p.rpe)&&typeof p.rpe[si]==='number');
 }
 // May this player vote now: open, he rated the match, not yet voted
@@ -19009,6 +19085,7 @@ function renderPlayerMode(){
         +'</div>';
     }
     else if(status===2)feedback='<div class="pm-feedback pm-fb-exc">\ud83d\udccb Entschuldigt</div>';
+    else if(status===5||(status===4&&_sqOutOf(s,p)&&_sqStarted(s,UI.currentSeason)))feedback='<div class="pm-feedback pm-fb-nk">Diesmal nicht im Kader</div>';
     else if(status===4&&Array.isArray(p.ay)&&p.ay[si]===1)feedback='<div class="pm-feedback pm-fb-yes">\u2713 Du bist dabei – wenn du nicht kannst, sag ab.</div>';
     else if(status===4)feedback='<div class="pm-feedback pm-fb-yes">\u2713 Du bist angemeldet</div>';
     // Reason textarea: show only when Entschuldigt (status===2). Player can edit own reason.
@@ -20149,7 +20226,7 @@ function dbRenderWeekReportSection(data){
   }
   html+='</div>';
   // ── 1. Week grid ──
-  const sym={1:['A','csa'],0:['F','csf'],2:['E','cse'],4:['M','csm'],3:['?','csq']};
+  const sym={1:['A','csa'],0:['F','csf'],2:['E','cse'],4:['M','csm'],3:['?','csq'],5:['N','csn']};
   const rows=players.map((p,pi)=>({p,pi})).filter(x=>x.p).map(x=>{
     const now=pctOf(x.p,held),pr=pctOf(x.p,prevHeld);
     return Object.assign(x,{now,pr});
@@ -20605,7 +20682,7 @@ function dbExportCsv(){
     data.players.forEach(p=>{
       if(!p)return;
       const v=p.s&&p.s[si];
-      if(v===1)pres++;else if(v===0)abs++;else if(v===2)exc++;else pen++;
+      if(v===1)pres++;else if(v===0)abs++;else if(v===2)exc++;else if(v!==5)pen++;
     });
     const type=s.type==='match'?'Spiel':'Training';
     const lbl=(s.label||s.focus||'').replace(/"/g,'""');
@@ -21982,7 +22059,8 @@ function openPlayerStats(pi,opts){
     const menuItems=past
       ? `<div onclick="event.stopPropagation();setSessPlayerStatus(${currentPI},${i},1);openPlayerStats(${currentPI});" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.8);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">\u2705 <span>Anwesend</span></div>
          <div onclick="event.stopPropagation();setSessPlayerStatus(${currentPI},${i},0);openPlayerStats(${currentPI});" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.8);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">\u274c <span>Fehlend</span></div>
-         <div onclick="event.stopPropagation();setSessPlayerStatus(${currentPI},${i},2);openPlayerStats(${currentPI});" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.8);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">\ud83d\udccb <span>Entschuldigt</span></div>`
+         <div onclick="event.stopPropagation();setSessPlayerStatus(${currentPI},${i},2);openPlayerStats(${currentPI});" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.8);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">\ud83d\udccb <span>Entschuldigt</span></div>${isMat?`
+         <div onclick="event.stopPropagation();setSessPlayerStatus(${currentPI},${i},5);openPlayerStats(${currentPI});" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.8);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">➖ <span>Nicht im Kader</span></div>`:''}`
       : `<div onclick="event.stopPropagation();setSessPlayerStatus(${currentPI},${i},4);openPlayerStats(${currentPI});" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.8);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">\ud83d\udcdd <span>Angemeldet</span></div>
          <div onclick="event.stopPropagation();setSessPlayerStatus(${currentPI},${i},2);openPlayerStats(${currentPI});" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.8);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">\ud83d\udccb <span>Entschuldigt</span></div>
          <div onclick="event.stopPropagation();setSessPlayerStatus(${currentPI},${i},3);openPlayerStats(${currentPI});" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.8);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">\u2754 <span>Ausstehend</span></div>`;
@@ -22254,6 +22332,7 @@ const SS_ATT_META={
   1:{n:'Anwesend',    i:'A',cls:'csa'},
   0:{n:'Fehlend',     i:'F',cls:'csf'},
   2:{n:'Entschuldigt',i:'E',cls:'cse'},
+  5:{n:'Nicht im Kader',i:'N',cls:'csn'},
   4:{n:'Angemeldet',  i:'M',cls:'csm'},
   3:{n:'Ausstehend',  i:'?',cls:'csq'}
 };
@@ -22381,7 +22460,7 @@ function ssAttMenu(pi,btn){
   const D=cd();const p=D&&D.players&&D.players[pi];
   const cur=(p&&p.s&&_ssAttSi<p.s.length)?p.s[_ssAttSi]:3;
   const rollCall=(typeof _isSessRollCallTime==='function')?_isSessRollCallTime(_ssAttSi):false;
-  const allowed=rollCall?[1,0,2]:[4,2,0,3];
+  const allowed=rollCall?_stRoll(_ssAttSi):[4,2,0,3];
   // A value already stored outside the current phase stays selectable, so a
   // status set earlier can still be corrected.
   const opts=allowed.slice();
@@ -22554,6 +22633,7 @@ function _rcHint(p,si,s){
   if((v===2||v===0)&&why)return {t:(v===2?'entschuldigt':'abgesagt')+': '+why,c:'warn'};
   // Having rated the load is proof of presence; a Zusage only a plan
   if(v!==1&&Array.isArray(p.rpe)&&typeof p.rpe[si]==='number')return {t:'hat Belastung bewertet',c:'ok'};
+  if(v===5){const w=_nkWhy((cd().players||[]).indexOf(p),si);return {t:'nicht im Kader'+(w?' · '+w:''),c:''};}
   if(v===4)return {t:'zugesagt',c:'ok'};
   if(v===3)return {t:'keine Antwort',c:''};
   return null;
@@ -22613,7 +22693,7 @@ function rcRender(){
   const rows=_rcSorted(D,s,season);
   // "Marked" = a real decision was taken (Anwesend / Fehlend / Entschuldigt).
   // Ausstehend (3/null) and Angemeldet (4) are pre-states → still open.
-  const isMarked=v=>(v===1||v===0||v===2);
+  const isMarked=v=>(v===1||v===0||v===2||v===5);
   const st=p=>(p.s&&si<p.s.length)?p.s[si]:3;
   // Grading is offered once the session has started — it is the same visit to
   // the window, but its own mode.
@@ -22673,6 +22753,7 @@ function rcRender(){
           +'<button class="rc-b'+(v===1?' sel-a':'')+'" onclick="rcSet('+pi+',1)" title="Anwesend" aria-label="Anwesend">✓</button>'
           +'<button class="rc-b'+(v===0?' sel-f':'')+'" onclick="rcSet('+pi+',0)" title="Fehlend" aria-label="Fehlend">✕</button>'
           +'<button class="rc-b'+(v===2?' sel-e':'')+'" onclick="rcSet('+pi+',2)" title="Entschuldigt" aria-label="Entschuldigt">E</button>'
+          +(s.type==='match'?'<button class="rc-b'+(v===5?' sel-n':'')+'" onclick="rcSet('+pi+',5)" title="Nicht im Kader – zählt weder für noch gegen ihn" aria-label="Nicht im Kader">N</button>':'')
         +'</div></div>';
     });
     if(!html)html='<div class="rc-empty">✅ Alle Spieler erfasst.</div>';
@@ -22718,7 +22799,7 @@ function rcMarkRest(){
   const D=cd();const sess=D.sessions[si];
   const unset=_rcSorted(D,sess,UI.currentSeason).filter(({p})=>{
     const v=p&&p.s?p.s[si]:3;
-    return !(v===1||v===0||v===2);
+    return !(v===1||v===0||v===2||v===5);
   });
   // Whoever answered "Ich war nicht dabei" keeps that answer until the trainer
   // decides on him — a tap on "Rest anwesend" must not overwrite it in passing.
@@ -22901,7 +22982,8 @@ function buildSessAtt(si){
   const exc=D.players.filter(p=>p.s&&p.s[si]===2).length;
   const ang=D.players.filter(p=>p.s&&p.s[si]===4).length;
   const unk=D.players.filter(p=>p.s&&p.s[si]===3).length;
-  const total=D.players.length,pct=total?Math.round((pres/total)*100):0;
+  const nk=D.players.filter(p=>p.s&&p.s[si]===5).length;
+  const total=D.players.length-nk,pct=total?Math.round((pres/total)*100):0;
   // Show plan link if exists
   const sl=D.sessions[si]?.planLink;
   const slEl=document.getElementById('ss-plan-link');
@@ -22926,7 +23008,8 @@ function buildSessAtt(si){
       t=tile(pres,'Anwesend',pct+'%','var(--cp)',1)
        +tile(abs,'Fehlend','','var(--ca)',0)
        +(exc?tile(exc,'Entschuldigt','','var(--ce)',2):'')
-       +(ang?tile(ang,'Offen','nicht erfasst','#3b82c4',4):'');
+       +(ang?tile(ang,'Offen','nicht erfasst','#3b82c4',4):'')
+       +(nk?tile(nk,'Nicht im Kader','zählt nicht','#7C8AA3',5):'');
     }else{
       // Before the session the useful figure is how many have answered — this
       // was shown nowhere, so the window was empty exactly when planning needs it
@@ -22995,6 +23078,7 @@ function buildSessAtt(si){
                 <div onclick="event.stopPropagation();setSessPlayerStatus(${pi},${si},1);buildSessAtt(${si});renderBody();renderTfoot();" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.8);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">\u2705 <span>Anwesend</span></div>
                 <div onclick="event.stopPropagation();setSessPlayerStatus(${pi},${si},0);buildSessAtt(${si});renderBody();renderTfoot();" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.8);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">\u274c <span>Fehlend</span></div>
                 <div onclick="event.stopPropagation();setSessPlayerStatus(${pi},${si},2);buildSessAtt(${si});renderBody();renderTfoot();" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.8);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">\ud83d\udccb <span>Entschuldigt</span></div>
+                ${s&&s.type==='match'?`<div onclick="event.stopPropagation();setSessPlayerStatus(${pi},${si},5);buildSessAtt(${si});renderBody();renderTfoot();" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.8);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">➖ <span>Nicht im Kader</span></div>`:''}
               `
               : `
                 <div onclick="event.stopPropagation();setSessPlayerStatus(${pi},${si},4);buildSessAtt(${si});renderBody();renderTfoot();" style="padding:7px 14px;font-size:.8rem;font-weight:600;color:rgba(255,255,255,.8);cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.background='rgba(255,255,255,.08)'" onmouseout="this.style.background=''">\ud83d\udcdd <span>Angemeldet</span></div>
@@ -23060,7 +23144,7 @@ function _ssHxAttRender(si){
   const ed=typeof canEdit==='function'&&canEdit();
   const season=UI.currentSeason;
   const groups=roll
-    ?[[1,'Anwesend','ok'],[0,'Fehlend','bad'],[2,'Entschuldigt','warn'],[4,'Nicht erfasst','open'],[3,'Offen','open']]
+    ?[[1,'Anwesend','ok'],[0,'Fehlend','bad'],[2,'Entschuldigt','warn'],[4,'Nicht erfasst','open'],[3,'Offen','open'],[5,'Nicht im Kader','nk']]
     :[[4,'Zugesagt','ok'],[3,'Offen','open'],[2,'Entschuldigt','warn'],[0,'Abgesagt','bad'],[1,'Anwesend','ok']];
   const by={};groups.forEach(g=>{by[g[0]]=[];});
   (D.players||[]).forEach((p,pi)=>{
@@ -23155,8 +23239,8 @@ function _ssxMenu(ev,si,pi){
   const D=cd();const p=D.players[pi];
   const cur=(p&&p.s&&si<p.s.length)?p.s[si]:3;
   const roll=typeof _isSessRollCallTime==='function'&&_isSessRollCallTime(si);
-  const opts=(roll?[1,0,2]:[4,2,0,3]).slice();if(!opts.includes(cur))opts.push(cur);
-  const L=roll?{1:'Anwesend',0:'Fehlend',2:'Entschuldigt',4:'Nicht erfasst',3:'Offen'}:{4:'Zugesagt',2:'Entschuldigt',0:'Abgesagt',3:'Offen',1:'Anwesend'};
+  const opts=(roll?_stRoll(si):[4,2,0,3]).slice();if(!opts.includes(cur))opts.push(cur);
+  const L=roll?{1:'Anwesend',0:'Fehlend',2:'Entschuldigt',5:'Nicht im Kader',4:'Nicht erfasst',3:'Offen'}:{4:'Zugesagt',2:'Entschuldigt',0:'Abgesagt',3:'Offen',1:'Anwesend'};
   m.innerHTML=`<div class="ssx-menu-h">${escapeHtml((getDisplayName?getDisplayName(p):p.name)||'')}</div>`+opts.map(v=>{
     const mt=SS_ATT_META[v]||SS_ATT_META[3];
     return `<button type="button" class="ssx-menu-i${v===cur?' on':''}" onclick="_ssxSet(${si},${pi},${v})"><span class="ssa-st ${mt.cls}">${mt.i}</span>${L[v]||mt.n}</button>`;
@@ -24083,8 +24167,9 @@ function _hxSessAtt(si){
   let a=0,n=0,fact=0;
   D.players.forEach(p=>{
     if(typeof _sessAfterJoin==='function'&&!_sessAfterJoin(p,s))return;
-    n++;
     const v=p.s?p.s[si]:3;
+    if(v===5)return;   // not in the squad: not expected
+    n++;
     if(v===1)a++;
     if(v===0||v===1||v===2)fact++;
   });
@@ -25066,11 +25151,13 @@ function _hxEnd(time,dur){
   return String(Math.floor(t/60)%24).padStart(2,'0')+':'+String(t%60).padStart(2,'0');
 }
 function _hxCounts(D,si,season){
-  const s=D.sessions[si];const c={yes:0,present:0,exc:0,no:0,open:0,total:0,openList:[]};
+  const s=D.sessions[si];const c={yes:0,present:0,exc:0,no:0,open:0,total:0,openList:[],nk:0};
   (D.players||[]).forEach((p,pi)=>{
     if(!p||!_sessAfterJoin(p,s,season))return;
-    c.total++;
     const v=(p.s&&si<p.s.length)?p.s[si]:3;
+    // Not in the squad: not expected, so not part of "x of y"
+    if(v===5){c.nk++;return;}
+    c.total++;
     if(v===1){c.present++;c.yes++;}
     else if(v===4)c.yes++;
     else if(v===2)c.exc++;
@@ -29638,7 +29725,7 @@ window.repairAttendance=async function(apply,opts){
   const force=!!(opts&&opts.force);
   const D=cd();
   if(!D||!Array.isArray(D.players)||!Array.isArray(D.sessions)){console.log('Keine Daten.');return;}
-  const NAME2VAL={'Fehlend':0,'Anwesend':1,'Entschuldigt':2,'Ausstehend':3,'Angemeldet':4};
+  const NAME2VAL={'Fehlend':0,'Anwesend':1,'Entschuldigt':2,'Ausstehend':3,'Angemeldet':4,'Nicht im Kader':5};
   let entries=(G.auditLog||[]).slice();
   // The player app writes to its own node; pull it in as well
   try{

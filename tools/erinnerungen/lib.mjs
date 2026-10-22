@@ -85,6 +85,10 @@ const afterJoin = (p, s, season) => !p.joinDate || sortKey(s.date, season) >= is
 const rated = (p, si) => Array.isArray(p.rpe) && typeof p.rpe[si] === 'number';
 const notThere = (p, s) => { const k = metaKey(s); const m = k && p.rpeMeta && p.rpeMeta[k]; return !!(m && m.nd); };
 const voted = (p, s) => { const k = metaKey(s); return !!(k && p.mvpV && p.mvpV[k]); };
+// Not in the published squad of a match (1.2.18): 5 = Nicht im Kader; with an
+// unchanged Zusage the squad itself decides — marked present (1) counts, he
+// came after all. Same rule as the app (rpeIsOpen, mvpEligible).
+const outOfSquad = (p, s, v) => v === 5 || (v !== 1 && s.type === 'match' && (() => { const q = squadOf(s); return !!(q && !q.p.includes(p.name)); })());
 const minutes = (s, p, si) => (Array.isArray(p.rpeMin) && typeof p.rpeMin[si] === 'number') ? p.rpeMin[si]
   : (typeof s.duration === 'number' && s.duration > 0) ? s.duration : RPE_DEFAULT_MIN;
 const hhmm = s => String(s.time || '').trim();
@@ -126,7 +130,7 @@ export function plan({ sessions, players, season, team, now, cfg, owners, sent }
       const k = sortKey(s.date, season), key = metaKey(s), v = st(p, si), sm = startMin(s);
       if (!key) return;
       // Belastung: this session today, over for RPE_AFTER minutes, not answered
-      if (on(cfg, 'rpe') && k === today && sm != null && v !== 0 && v !== 2
+      if (on(cfg, 'rpe') && k === today && sm != null && v !== 0 && v !== 2 && !outOfSquad(p, s, v)
         && now.min >= sm + minutes(s, p, si) + RPE_AFTER
         && !rated(p, si) && !notThere(p, s) && !was('rpe', key, owner)) {
         out.push({ owner, pi, kind: 'rpe', key, ttl: ttlToMidnight(now), payload: {
@@ -137,7 +141,7 @@ export function plan({ sessions, players, season, team, now, cfg, owners, sent }
       }
       // Spieler des Spiels: yesterday's match, rated, not voted (vote closes tonight)
       if (on(cfg, 'vote') && s.type === 'match' && k === yest && now.min >= VOTE_FROM
-        && v !== 0 && v !== 2 && rated(p, si) && !voted(p, s) && !was('vote', key, owner)) {
+        && v !== 0 && v !== 2 && !outOfSquad(p, s, v) && rated(p, si) && !voted(p, s) && !was('vote', key, owner)) {
         out.push({ owner, pi, kind: 'vote', key, ttl: ttlToMidnight(now), payload: {
           title: 'Spieler des Spiels',
           body: (s.label ? 'Gegen ' + s.label + ' fehlt' : 'Für das Spiel gestern fehlt') + ' noch deine Stimme – bis heute 24 Uhr.',
