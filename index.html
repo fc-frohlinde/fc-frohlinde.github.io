@@ -5255,6 +5255,23 @@ body.design-heute .a2hs{background:var(--hx-nav);bottom:calc(var(--mob-nav-h,62p
 .tpl-dlg label{font-size:13px;font-weight:700;color:var(--tp-mut);display:flex;flex-direction:column;gap:4px;}
 .tpl-dlg .two{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
 .tpl-dlg-f{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:4px;}
+/* 1.2.34: Intensität — help and chip */
+.tpl-ichip{display:inline-flex;align-items:center;gap:6px;}
+.tpl-ichip label{display:inline-flex;align-items:center;gap:8px;cursor:pointer;}
+.tpl-ichip select{field-sizing:content;max-width:190px;text-overflow:ellipsis;}
+.tpl-ihelp{width:24px;height:24px;flex:0 0 auto;border-radius:50%;border:1px solid var(--tp-line2);background:var(--tp-card);color:var(--tp-link);font:700 13px 'Barlow',sans-serif;cursor:pointer;padding:0;line-height:1;}
+.tpl-ihelp:hover,.tpl-ihelp:focus-visible{background:var(--tp-soft);outline:2px solid var(--tp-link);outline-offset:1px;}
+.tpl-ilbl{display:inline-flex;align-items:center;gap:6px;}
+.tpl-dlg .tpl-two2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:10px;}
+.tpl-ig{display:flex;flex-direction:column;gap:6px;}
+.tpl-ig-r{display:grid;grid-template-columns:52px minmax(0,1fr);gap:10px;align-items:baseline;font-size:14px;line-height:1.45;color:var(--tp-ink);}
+.tpl-ig-r>b{justify-self:start;min-width:40px;text-align:center;padding:2px 8px;border-radius:999px;background:var(--tp-soft);border:1px solid var(--tp-line2);font-weight:700;}
+.tpl-ig-r span b{font-weight:700;}
+.tpl-ig-h{margin:6px 0 0;font:700 14px 'Barlow',sans-serif;color:var(--tp-ink);}
+.tpl-ig2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.tpl-ig2>div{display:flex;flex-direction:column;gap:4px;padding:10px 12px;border-radius:12px;background:var(--tp-soft);font-size:13px;line-height:1.45;color:var(--tp-mut);}
+.tpl-ig2 b{color:var(--tp-ink);font-size:14px;}
+@media (max-width:560px){.tpl-ig2,.tpl-dlg .tpl-two2{grid-template-columns:1fr;}}
 .tpl-dlg-f .sp{margin-right:auto;}
 .tpl-btn{height:40px;padding:0 16px;border-radius:10px;border:1px solid var(--tp-line2);background:var(--tp-card);color:var(--tp-ink);font-weight:700;font-size:14px;cursor:pointer;}
 .tpl-btn.pri{background:var(--tp-navy);border-color:var(--tp-navy);color:#fff;}
@@ -6665,13 +6682,18 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.33'; // v1.2.33: Zeichenbrett — zeichnen und gleich ändern
-const APP_VERSION_LABEL='1.2.33';
+const APP_VERSION='1.2.34'; // v1.2.34: Intensität einschätzen
+const APP_VERSION_LABEL='1.2.34';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792764996990; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792767559564; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.34',date:'23.10.2026',title:'Intensität einschätzen',items:[
+    {icon:'❓',title:'Hilfe zur Intensität',desc:'Das „?“ neben „Intensität“ zeigt Anhaltspunkte auf der Skala der Spieler: von Auslaufen bis Sprint, Spielformen nach Größe (1 gegen 1 bis 11 gegen 11, Überzahl) und was die Belastung erhöht oder senkt.'},
+    {icon:'⚽',title:'„auto“ kennt Spielformen',desc:'Steht in einer Spielform das Format im Namen – „3 gegen 3“, „4v4“, „5:5“ –, schlägt „auto“ den Wert dafür vor: 1 gegen 1 → 9, 2 gegen 2 → 8, 3 gegen 3 und 4 gegen 4 → 7, größer → 6.'},
+    {icon:'📋',title:'Beispiele in der Auswahl',desc:'Jede Stufe nennt ein Beispiel („7 · Sehr anstrengend – z. B. 3 gegen 3, 4 gegen 4“). Neue Übungen in der Bibliothek haben jetzt auch das Feld „Intensität“.'},
+  ]},
   {version:'1.2.33',date:'23.10.2026',title:'Zeichenbrett: zeichnen und gleich ändern',items:[
     {icon:'✏️',title:'Gezeichnetes direkt anpassen',desc:'Mit einem Linien-Werkzeug lässt sich ein vorhandener Pfeil packen und verschieben, an seinen Punkten Ende und Bogen ändern – ohne Werkzeugwechsel. Ein Druck auf freies Feld, einen Spieler oder ein Hütchen zeichnet weiter neue Pfeile. Genauso verschieben Spieler- und Material-Werkzeuge das, was schon steht.'},
     {icon:'🎨',title:'Farbe bleibt',desc:'Die zuletzt gewählte Farbe gilt für die nächsten Hütchen, Markierungen, Hürden, Ringe, Dummys und Reihen – jede Art für sich, gemerkt auf diesem Gerät. Bei aktivem Werkzeug lässt sie sich unter dem Feld auch vorher wählen.'},
@@ -31745,7 +31767,7 @@ function _tplReadView(b,i){
       <h3 class="tpl-ro-ttl${b.title?'':' empty'}">${_tplE(_tplBN(b))}</h3>
       <div class="tpl-chips">
         <span class="tpl-chip"><span class="tpl-catdot" style="background:${_tplCatColor(b.cat)}"></span><b>${_tplE(b.cat)}</b></span>
-        ${chip('Dauer',(+b.min||0)+' Min.')}${chip('Spieler',b.players)}${chip('Feld',b.area)}${chip('Intensität',intv)}
+        ${chip('Dauer',(+b.min||0)+' Min.')}${chip('Spieler',b.players)}${chip('Feld',b.area)}${chip('Intensität',intv||('auto · '+_tplBlockInt(b)))}
       </div></div></div>
     ${_dgHas(b.dia)?`<div class="tpl-ro-dia">${_dgSvg(b.dia,'Skizze: '+(b.title||''))}</div><div class="tpl-ro-diab"><button type="button" class="tpl-lnk" onclick="dgImage()">Skizze als Bild speichern</button></div>`:''}
     ${(b.desc||coach.length)?`<div class="tpl-grid2">
@@ -31788,7 +31810,7 @@ function _tplRenderEd(){
         <span class="tpl-chip"><span>Dauer</span><button type="button" class="tpl-step" onclick="tplStepMin(-5)" aria-label="5 Minuten weniger">–</button><input class="w-min" id="tplMinIn" type="number" inputmode="numeric" min="1" max="240" value="${+b.min||0}" aria-label="Dauer in Minuten" oninput="tplSetMin(this.value)"><span>Min.</span><button type="button" class="tpl-step" onclick="tplStepMin(5)" aria-label="5 Minuten mehr">+</button></span>
         <label class="tpl-chip"><span>Spieler</span><input class="w-txt" value="${_tplE(b.players)}" placeholder="z. B. 7 pro Feld" oninput="tplSetF('players',this.value)"></label>
         <label class="tpl-chip"><span>Feld</span><input class="w-txt" value="${_tplE(b.area)}" placeholder="z. B. 15 × 15 m" oninput="tplSetF('area',this.value)"></label>
-        <label class="tpl-chip" title="Geplante Intensität auf der Skala der Spieler (0–10). Ohne Angabe gilt der Wert der Kategorie."><span>Intensität</span><select aria-label="Geplante Intensität" onchange="tplSetF('int',this.value?+this.value:'')"><option value=""${(+b.int>=1)?'':' selected'}>auto · ${TPL_CAT_INT[b.cat]||5}</option>${[1,2,3,4,5,6,7,8,9,10].map(v=>`<option value="${v}"${+b.int===v?' selected':''}>${v}${rpeLabel(v)?' · '+rpeLabel(v):''}</option>`).join('')}</select></label>
+        <span class="tpl-chip tpl-ichip"><label title="Geplante Intensität auf der Skala der Spieler (0–10). Ohne Angabe gilt „auto“: der Wert der Kategorie, bei Spielformen nach dem Format im Namen."><span>Intensität</span><select id="tplIntSel" aria-label="Geplante Intensität" onchange="tplSetF('int',this.value?+this.value:'')">${_tplIntOpts(b.int,_tplAutoInt(b))}</select></label><button type="button" class="tpl-ihelp" onclick="tplIntHelp()" title="So schätzt du die Intensität" aria-label="Intensität einschätzen – Hilfe">?</button></span>
       </div>
     </div>
     <div class="tpl-acts">
@@ -31877,6 +31899,7 @@ function _tplAfterEdit(){
 function tplSetF(f,v){
   const b=_tplCur();if(!b)return;
   b[f]=v;
+  if(f==='title'||f==='cat')_tplIntAutoRefresh();
   if(f==='cat'){const d=document.getElementById('tplCatDot');if(d)d.style.background=_tplCatColor(v);}
   _tplAfterEdit();
 }
@@ -32030,7 +32053,8 @@ function tplLibEdit(id){
     <div class="two"><label>Kategorie${_tplCatSelect('tlCat',x.cat)}</label>
       <label>Dauer (Min.)<input id="tlMin" type="number" inputmode="numeric" min="1" max="240" value="${+x.min||''}"></label>
       <label>Spieler<input id="tlPl" value="${_tplE(x.players)}" placeholder="z. B. 8–12"></label></div>
-    <label>Feld<input id="tlArea" value="${_tplE(x.area)}" placeholder="z. B. 30 × 25 m"></label>
+    <div class="tpl-two2"><label>Feld<input id="tlArea" value="${_tplE(x.area)}" placeholder="z. B. 30 × 25 m"></label>
+      <label><span class="tpl-ilbl">Intensität <button type="button" class="tpl-ihelp" onclick="event.preventDefault();_tplLibIntHelp()" aria-label="Intensität einschätzen – Hilfe">?</button></span><select id="tlInt">${_tplIntOpts(x.int,_tplAutoInt({cat:x.cat,title:x.title}))}</select></label></div>
     <label>Ablauf<textarea id="tlDesc" rows="5" placeholder="Aufbau, Regeln, Durchgänge und Pausen …">${_tplE(x.desc)}</textarea></label>
     <label>Coaching-Punkte<textarea id="tlCoach" rows="4" placeholder="Ein Punkt pro Zeile">${_tplE(x.coach)}</textarea></label>
     <div class="tpl-dlg-f">${it?`<button type="button" class="tpl-btn danger sp" onclick="tplLibDel(this,'${id}')">Löschen</button>`:''}
@@ -32038,13 +32062,21 @@ function tplLibEdit(id){
       <button type="button" class="tpl-btn pri" onclick="tplLibSave('${id||''}')">Speichern</button></div>`);
   setTimeout(()=>{const t=document.getElementById('tlTitle');if(t)t.focus();},40);
 }
+// the help from inside the drill dialog: keep what was typed, come back to it
+function _tplLibIntHelp(){
+  const box=document.getElementById('tplDlgBox');if(!box)return;
+  const keep=[...box.querySelectorAll('input,select,textarea')].map(e=>[e.id,e.value]);const html=box.innerHTML;
+  tplIntHelp();
+  const btn=document.querySelector('#tplDlgBox .tpl-dlg-f .tpl-btn.pri');
+  if(btn){btn.textContent='Zurück zur Übung';btn.onclick=()=>{box.innerHTML=html;keep.forEach(([id,v])=>{const e=id&&document.getElementById(id);if(e)e.value=v;});};}
+}
 function tplLibSave(id){
   const v=k=>{const e=document.getElementById(k);return e?String(e.value||'').trim():'';};
   const title=v('tlTitle');
   if(!title){const t=document.getElementById('tlTitle');if(t){t.focus();t.style.borderColor='#D9443F';}return;}
   const nid=id||_tplId('l');
   const it=Object.assign({},TPL.lib[nid]||{},{title:title,cat:v('tlCat')||'Sonstiges',min:Math.max(0,Math.min(240,parseInt(v('tlMin'),10)||0)),
-    players:v('tlPl'),area:v('tlArea'),desc:v('tlDesc'),coach:v('tlCoach'),upd:Date.now()});
+    players:v('tlPl'),area:v('tlArea'),desc:v('tlDesc'),coach:v('tlCoach'),int:(+v('tlInt')>=1&&+v('tlInt')<=10)?+v('tlInt'):'',upd:Date.now()});
   TPL.lib[nid]=it;_tplWrite(_tplBase()+'/lib/'+nid,_tplClean(it));
   tplDlgClose();TPL.libOpen=nid;
   if(TPL.libCat!=='Alle'&&TPL.libCat!==it.cat)TPL.libCat='Alle';
@@ -33935,7 +33967,68 @@ function _tplPitchEndHtml(r){
 // Intensity uses the players' own scale (sRPE 0–10): a block's planned
 // intensity is set in the editor or falls back to its category's default.
 const TPL_CAT_INT={'Aufwärmen':3,'Rondo':5,'Passspiel':4,'Technik':4,'Spielform':7,'Umschalten':8,'Torschuss':6,'Athletik':8,'Torwart':5,'Auslaufen':2,'Sonstiges':5};
-function _tplBlockInt(b){const v=+b.int;return (v>=1&&v<=10)?v:(TPL_CAT_INT[b.cat]||5);}
+// Spielformen by size (1.2.34). The smaller the teams, the harder (2 gegen 2
+// clearly above 4 gegen 4 and 6 gegen 6, Hill-Haas et al. 2009 with U17);
+// 3–6 a side 4.8–7.2 on CR10 depending on field and coaching (Rampinini et
+// al. 2007); 5–7 a side lower than both smaller and large games, which come
+// back up through high-speed running (pro data, Frontiers 2023). Rounded for
+// amateur youth; "auto" only — the trainer's choice always wins.
+// Format in the name: "3 gegen 3", "4v4", "5:5", "4 + 2 gegen 4" (neutrals not counted)
+function _tplFmt(title){
+  const m=String(title||'').match(/(?:^|\D)(\d{1,2})\s*(?:\+\s*\d{1,2}\s*)?(?:gegen|vs\.?|v|:)\s*(\d{1,2})(?!\d)/i);
+  if(!m)return null;
+  const a=+m[1],b=+m[2];if(!a||!b||a>11||b>11)return null;
+  return {a:a,b:b,n:(a+b)/2,txt:a+' gegen '+b};
+}
+// clear overload (4 gegen 2, 5 gegen 2 …) plays like a rondo
+function _tplFmtInt(f){
+  const lo=Math.min(f.a,f.b),hi=Math.max(f.a,f.b),n=f.n;
+  if(hi>=4&&hi>=2*lo)return 5;
+  return n<=1?9:n<=2?8:n<=4?7:6;
+}
+// The value "auto" stands for, and why
+function _tplAutoInt(b){
+  const f=b&&b.cat==='Spielform'?_tplFmt(b.title):null;
+  return f?{v:_tplFmtInt(f),why:f.txt}:{v:TPL_CAT_INT[b&&b.cat]||5,why:''};
+}
+function _tplBlockInt(b){const v=+b.int;return (v>=1&&v<=10)?v:_tplAutoInt(b).v;}
+// One example per step of the players' scale
+const TPL_INT_EX={1:'Auslaufen, Dehnen',2:'Passen im Stand',3:'Aufwärmen, Lauf-ABC',4:'Passformen, Technik',5:'Rondos, Torschuss',
+  6:'5 gegen 5 bis 11 gegen 11',7:'3 gegen 3, 4 gegen 4',8:'2 gegen 2, Umschalten',9:'1 gegen 1, Intervallläufe',10:'Sprints'};
+function _tplIntOpts(cur,auto){
+  return `<option value=""${(+cur>=1)?'':' selected'}>auto · ${auto.v}${auto.why?' ('+_tplE(auto.why)+')':''}</option>`
+    +[1,2,3,4,5,6,7,8,9,10].map(v=>`<option value="${v}"${+cur===v?' selected':''}>${v}${rpeLabel(v)?' · '+rpeLabel(v):''}${TPL_INT_EX[v]?' – z. B. '+TPL_INT_EX[v]:''}</option>`).join('');
+}
+// "auto" follows the name and the category while they are typed
+function _tplIntAutoRefresh(){
+  const sel=document.getElementById('tplIntSel'),b=_tplCur();if(!sel||!b||!sel.options[0])return;
+  const a=_tplAutoInt(b);sel.options[0].textContent='auto · '+a.v+(a.why?' ('+a.why+')':'');
+}
+function tplIntHelp(){
+  const R=(v,t,cls)=>`<div class="tpl-ig-r${cls?' '+cls:''}"><b>${v}</b><span>${t}</span></div>`;
+  _tplDlg(`<h4>Intensität einschätzen</h4>
+    <p class="tpl-hint">Geplant auf der Skala der Spieler (0–10): Wie anstrengend wird sich die Übung für sie anfühlen? Unter „Statistik“ steht später daneben, wie die Spieler das Training empfunden haben.</p>
+    <div class="tpl-ig">
+      ${R('1–2','<b>Sehr leicht bis leicht</b> – Auslaufen, Dehnen, Passen im Stand')}
+      ${R('3','<b>Moderat</b> – Aufwärmen, Lauf-ABC, Ballgewöhnung')}
+      ${R('4','<b>Etwas anstrengend</b> – Passformen mit Bewegung, Technik ohne Gegner')}
+      ${R('5','<b>Anstrengend</b> – Rondos, Torschuss mit Laufwegen, Positionsspiel')}
+      ${R('8','<b>Sehr anstrengend</b> – Umschalten, Gegenpressing, Athletik')}
+      ${R('9–10','<b>Maximal</b> – Sprints, Intervallläufe, 1 gegen 1 in Serien')}
+    </div>
+    <h5 class="tpl-ig-h">Spielformen nach Größe</h5>
+    <div class="tpl-ig">
+      ${R('9','1 gegen 1')}${R('8','2 gegen 2')}${R('7','3 gegen 3, 4 gegen 4')}
+      ${R('6','5 gegen 5 bis 7 gegen 7')}${R('6','8 gegen 8 bis 11 gegen 11 – großes Feld, hohes Tempo: 7')}
+      ${R('5','Überzahl und Rondos, z. B. 4 gegen 2, 5 gegen 2, 4 + 2 gegen 4')}
+    </div>
+    <div class="tpl-ig2">
+      <div><b>Eher höher (+1)</b><span>mehr Fläche pro Spieler · Anfeuern und Coaching von außen · Kontaktbegrenzung · lange Belastung ohne Pause · Wettkampf mit Punkten</span></div>
+      <div><b>Eher niedriger (−1)</b><span>häufige Unterbrechungen · lange Pausen · Neutrale und Anspieler (für sie) · Torhüter und Standards</span></div>
+    </div>
+    <p class="tpl-hint">Steht in einer Spielform das Format im Namen (z. B. „3 gegen 3“), schlägt „auto“ den Wert dafür vor. Eine eigene Wahl gilt immer.</p>
+    <div class="tpl-dlg-f"><button type="button" class="tpl-btn pri" onclick="tplDlgClose()">Verstanden</button></div>`);
+}
 function _tplIdxSum(p){
   const bl=_tplArr(p.blocks);const tot=_tplTotal(bl);
   const cm={};bl.forEach(b=>{const m=+b.min||0;const k=String(b.cat||'Sonstiges').replace(/[|:]/g,' ');if(m)cm[k]=(cm[k]||0)+m;});
