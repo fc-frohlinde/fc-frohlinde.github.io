@@ -145,6 +145,13 @@
   .full-card{background:var(--card);border:1px solid var(--card-br);border-radius:14px;padding:13px 15px;}
   .full-lbl{font-size:.74rem;color:var(--txt-faint);margin-bottom:4px;}
   .full-names{font-weight:700;font-size:.95rem;line-height:1.45;color:var(--txt);}
+  /* "Immer dabei" as a wall of faces (1.2.35) */
+  .full-card .full-lbl{margin-bottom:12px;}
+  .full-wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:14px 8px;}
+  .fw-p{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;text-align:center;}
+  .fw-p .avatar,.fw-p .avatar-ph{width:56px;height:56px;border:2px solid rgba(61,220,132,.55);box-shadow:0 0 0 3px rgba(61,220,132,.10);}
+  .fw-p .avatar-ph{font-size:1.4rem;}
+  .fw-n{font-weight:700;font-size:.78rem;line-height:1.2;color:var(--txt);overflow-wrap:anywhere;}
   .preview-note{font-size:.78rem;color:var(--txt-faint);text-align:center;}
   /* ── Personal statistics page ── */
   .ps-wrap{max-width:560px;margin:0 auto;padding:18px 14px 40px;}
@@ -578,9 +585,15 @@ function renderReport(r){
     </div>`;
   }
   if(hasWeekSessions&&full.length){
+    // A wall of faces (1.2.35): photo or initials and the name, by name —
+    // praise without numbers or order. Old snapshots: names, photos if given.
+    const fp=(Array.isArray(r.fullP)&&r.fullP.length)?r.fullP
+      :full.map(n=>((r.players||[]).find(p=>p&&p.name===n))||{name:n});
+    const tiles=fp.slice().sort((a,b)=>String(a.name).localeCompare(String(b.name),'de'))
+      .map(p=>`<div class="fw-p">${av(p)}<span class="fw-n">${esc(p.name)}</span></div>`).join('');
     html+=`<div class="sec fade-seq" style="animation-delay:.15s">
       <div class="sec-head"><h2>\ud83d\udcaa Immer dabei</h2><div class="sec-line"></div></div>
-      <div class="full-card"><div class="full-lbl">Bei allen Terminen dieser Woche dabei:</div><div class="full-names">${full.map(esc).join(', ')}</div></div>
+      <div class="full-card"><div class="full-lbl">Bei allen Terminen dieser Woche dabei</div><div class="full-wall">${tiles}</div></div>
     </div>`;
   }
   if(r.aud==='players'&&!r.me){
@@ -591,14 +604,16 @@ function renderReport(r){
   html+=`<div class="sec fade-seq" style="animation-delay:.2s">
     <div class="sec-head"><h2>\u26bd Mannschaft</h2><div class="sec-line"></div></div>
     <div class="team-grid">`;
+  // only training or only a match this week: that tile takes the whole row (no gap beside it)
+  const one=(ts.weekTrainCount?1:0)+(ts.weekMatchCount?1:0)===1?' wide':'';
   if(ts.weekTrainCount){
-    html+=`<div class="team-stat">
+    html+=`<div class="team-stat${one}">
       <div class="ts-val ${pctClass(ts.weekPct)}">${ts.trainingAvg==null?'\u2013':'\u2300 '+ts.trainingAvg}</div>
       <div class="ts-lbl">\u00d8 Training (${ts.weekTrainCount}\u00d7)</div>
     </div>`;
   }
   if(ts.weekMatchCount){
-    html+=`<div class="team-stat">
+    html+=`<div class="team-stat${one}">
       <div class="ts-val ${pctClass(ts.weekPct)}">${ts.matchAvg==null?'\u2013':ts.matchAvg}</div>
       <div class="ts-lbl">\u00d8 Spiel (${ts.weekMatchCount}\u00d7)</div>
     </div>`;

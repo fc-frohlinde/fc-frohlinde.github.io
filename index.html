@@ -6682,13 +6682,18 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.34'; // v1.2.34: Intensität einschätzen
-const APP_VERSION_LABEL='1.2.34';
+const APP_VERSION='1.2.35'; // v1.2.35: Wochenbericht — Immer dabei mit Fotos
+const APP_VERSION_LABEL='1.2.35';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792767559564; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792768959907; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.35',date:'23.10.2026',title:'Wochenbericht für Spieler',items:[
+    {icon:'💪',title:'„Immer dabei“ mit Fotos',desc:'Wer bei allen Terminen der Woche dabei war, steht jetzt mit Foto (oder Initialen) und Namen im Wochenbericht – nach Namen sortiert, ohne Zahlen und ohne Rangfolge.'},
+    {icon:'🛠',title:'„Deine Woche“ wieder da',desc:'Öffneten Spieler den Wochenbericht aus ihrer Übersicht, fehlte seit 22.10. ihre eigene Woche – der Weg mit Fotos baute den Bericht ohne die Spieler-Fassung. Jetzt bekommen sie wieder genau diese: eigene Woche, Mannschaft, „Immer dabei“.'},
+    {icon:'⚽',title:'Mannschaft ohne Lücke',desc:'Gab es in der Woche nur Training oder nur ein Spiel, blieb neben der Kachel ein leerer Platz. Jetzt nimmt sie die ganze Zeile ein.'},
+  ]},
   {version:'1.2.34',date:'23.10.2026',title:'Intensität einschätzen',items:[
     {icon:'❓',title:'Hilfe zur Intensität',desc:'Das „?“ neben „Intensität“ zeigt Anhaltspunkte auf der Skala der Spieler: von Auslaufen bis Sprint, Spielformen nach Größe (1 gegen 1 bis 11 gegen 11, Überzahl) und was die Belastung erhöht oder senkt.'},
     {icon:'⚽',title:'„auto“ kennt Spielformen',desc:'Steht in einer Spielform das Format im Namen – „3 gegen 3“, „4v4“, „5:5“ –, schlägt „auto“ den Wert dafür vor: 1 gegen 1 → 9, 2 gegen 2 → 8, 3 gegen 3 und 4 gegen 4 → 7, größer → 6.'},
@@ -18043,6 +18048,9 @@ async function _hubLivePhotos(kind){
   if(d&&Array.isArray(d.players)){
     await Promise.all(d.players.map(async p=>{if(p&&p.photo)p.photo=await _hubThumb(p.photo,kind==='report'?96:160);}));
   }
+  // what a player gets of the report: his own week, the team, "Immer dabei"
+  // (without this the hub handed the whole snapshot over, without "Deine Woche")
+  if(kind==='report'&&d)d=_reportForPlayers(d,L.pi);
   return d;
 }
 let _hubOpening=false;
@@ -20294,10 +20302,13 @@ function dbBuildPlayerStatsSnapshot(data,pi,offset,includePhoto){
 // for the trainers' preview.
 function _reportForPlayers(r,me){
   if(!r||!Array.isArray(r.players))return r;
-  const full=r.players.filter(p=>p&&p.wTotal>0&&p.wPct===100).map(p=>p.name);
+  // by name, with their photo (if the snapshot has photos) for the
+  // "Immer dabei" wall (1.2.35) — names and faces only, no numbers
+  const fullPl=r.players.filter(p=>p&&p.wTotal>0&&p.wPct===100).sort((a,b)=>String(a.name).localeCompare(String(b.name),'de'));
+  const full=fullPl.map(p=>p.name),fullP=fullPl.map(p=>({name:p.name,photo:p.photo||null}));
   const mine=(me!=null)?r.players.find(p=>p&&p._pi===me):null;
   const strip=p=>{const o=Object.assign({},p);delete o._pi;return o;};
-  return Object.assign({},r,{aud:'players',full,me:mine?mine.name:null,players:mine?[strip(mine)]:[]});
+  return Object.assign({},r,{aud:'players',full,fullP,me:mine?mine.name:null,players:mine?[strip(mine)]:[]});
 }
 function dbBuildReportSnapshot(data,offset,includePhotos){
   const r=dbComputeWeekReport(data,offset);
@@ -20620,6 +20631,7 @@ async function dbOpenPlayerReport(){
   const data={team,season,block,sessions:block.sessions,players:block.players};
   const snap=_reportForPlayers(dbBuildReportSnapshot(data,_dbState.weekReportOffset||0,true),null);
   if(Array.isArray(snap.players))await Promise.all(snap.players.map(async p=>{if(p&&p.photo)p.photo=await _hubThumb(p.photo,96);}));
+  if(Array.isArray(snap.fullP))await Promise.all(snap.fullP.map(async p=>{if(p&&p.photo)p.photo=await _hubThumb(p.photo,96);}));
   // localStorage, not sessionStorage: the tab is already open and would not see later writes
   try{localStorage.setItem('fcf_live_report',JSON.stringify(snap));}catch(e){if(w)w.close();alert('Vorschau nicht möglich.');return;}
   if(standalone){allowLeaveOnce&&allowLeaveOnce();location.href=url;}
