@@ -22,7 +22,15 @@ const db = {
 };
 try {
   // KALENDER_TOKEN: GitHub token with only the "gist" scope, for the calendar feed
-  await round({ db, push: webpush, dry: process.argv.includes('--dry'), cal: { token: process.env.KALENDER_TOKEN || '', fetch: globalThis.fetch } });
+  const r = await round({ db, push: webpush, dry: process.argv.includes('--dry'), cal: { token: process.env.KALENDER_TOKEN || '', fetch: globalThis.fetch } });
+  // Состояние календаря — одной аннотацией, без адреса (лог публичный)
+  const c = r && r.cal;
+  if (c) {
+    const urls = Object.keys((await db.get('fcf_cal')) || {}).length;
+    const when = c.t ? new Date(c.t).toISOString().slice(0, 16).replace('T', ' ') + ' UTC' : 'ещё не было';
+    console.log('::notice title=Календарь::' + (c.off ? 'нет секрета KALENDER_TOKEN, календарь не публикуется'
+      : `команд: ${c.n || 0}, адресов в fcf_cal: ${urls}, последняя публикация: ${when}` + (c.err ? `, ошибка: ${c.err}` : '')));
+  }
 } catch (e) {
   process.exitCode = 1;
 } finally {

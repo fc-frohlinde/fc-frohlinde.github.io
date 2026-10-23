@@ -225,7 +225,7 @@ export async function round({ db, push, ts = Date.now(), log = console.log, dry 
       t: ts, day: now.day, sent: (prev.day === now.day ? (prev.sent || 0) : 0) + sent,
       err: errors, gone, devices: nDev, v: 1, cal: calSt });
     log(`Runde fertig: ${sent} gesendet, ${errors} Fehler, ${gone} abgemeldet, ${nDev} Geräte`);
-    return { sent, errors, gone, devices: nDev };
+    return { sent, errors, gone, devices: nDev, cal: calSt };
   } catch (e) {
     log('Runde abgebrochen:', e && e.stack || e);
     try { const prev = (await db.get('fcf_push/status')) || {}; await db.set('fcf_push/status', { ...prev, t: ts, fail: String(e.message || e).slice(0, 200) }); } catch (_) {}
