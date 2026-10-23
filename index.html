@@ -197,6 +197,89 @@ if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostnam
 .rc-g.rc-down.on{background:#D98316;border-color:#D98316;color:#fff;}
 .rc-filter[hidden]{display:none;}
 @media(max-width:480px){.rc-g span{display:none;}.rc-g{width:44px;justify-content:center;padding:0;font-size:1.05rem;}}
+/* ── SPIELBERICHT (1.2.37): full screen like the roll call, one column ── */
+.sb-ov .rc-head-top,.sb-ov .sb-body,.sb-ov .rc-foot>*{max-width:680px;margin-left:auto;margin-right:auto;width:100%;box-sizing:border-box;}
+.sb-ov .rc-foot{justify-content:center;}
+.sb-ov button:focus-visible,.sb-ov select:focus-visible,.sb-ov input:focus-visible{outline:3px solid #F2C230;outline-offset:2px;}
+.sb-sec{margin:0 0 12px;padding:12px;border-radius:14px;background:rgba(255,255,255,.06);}
+.sb-h{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 8px;margin-bottom:10px;font-weight:700;font-size:.9rem;color:#fff;}
+.sb-h b{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.5px;font-weight:400;color:rgba(255,255,255,.8);}
+.sb-h b.sb-ok{color:#8FD9AE;}
+.sb-h span{font-weight:500;font-size:.76rem;color:rgba(255,255,255,.58);}
+.sb-hint{font-size:.8rem;line-height:1.45;color:rgba(255,255,255,.6);padding:2px 2px 4px;}
+/* score */
+.sb-score{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:start;gap:4px 10px;padding:16px 12px 12px;}
+.sb-side{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;}
+.sb-tn{max-width:100%;font-size:.82rem;font-weight:600;color:rgba(255,255,255,.62);text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sb-ours .sb-tn{color:#fff;font-weight:700;}
+.sb-num{font-family:'Bebas Neue',sans-serif;font-size:3.6rem;line-height:1;color:#fff;font-variant-numeric:tabular-nums;}
+.sb-colon{font-family:'Bebas Neue',sans-serif;font-size:2.6rem;line-height:1;color:rgba(255,255,255,.35);margin-top:30px;}
+.sb-step{display:flex;gap:6px;}
+.sb-step button{width:46px;height:42px;border-radius:10px;border:1.5px solid rgba(255,255,255,.18);background:rgba(255,255,255,.07);color:#fff;font-size:1.3rem;font-weight:700;cursor:pointer;font-family:'Barlow',sans-serif;}
+.sb-step button:active{transform:scale(.94);}
+.sb-step button:disabled{opacity:.3;cursor:default;transform:none;}
+.sb-outcome{grid-column:1/-1;margin-top:8px;text-align:center;font-size:.8rem;font-weight:700;letter-spacing:.3px;color:rgba(255,255,255,.5);}
+.sb-o-w{color:#8FD9AE;}.sb-o-l{color:#FF9C90;}.sb-o-d{color:#F5C26B;}
+/* starting eleven */
+.sb-lu{display:block;margin:0 0 10px;padding:8px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;font:600 .84rem 'Barlow',sans-serif;cursor:pointer;}
+.sb-more{margin-top:2px;padding:6px 2px;border:none;background:none;color:rgba(255,255,255,.7);font:600 .82rem 'Barlow',sans-serif;cursor:pointer;text-decoration:underline;text-underline-offset:3px;}
+/* substitutions */
+.sb-subr{display:flex;align-items:center;gap:10px;min-height:40px;padding:4px 2px;border-bottom:1px solid rgba(255,255,255,.07);font-size:.88rem;font-weight:600;color:#fff;}
+.sb-min{min-width:2.4em;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;font-weight:400;color:rgba(255,255,255,.7);}
+.sb-in,.sb-out{flex:1;min-width:0;display:inline-flex;align-items:center;gap:5px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.sb-out{color:rgba(255,255,255,.75);}
+.sb-none{color:rgba(255,255,255,.35);}
+.sb-arr{font-size:.66rem;color:#8FD9AE;}
+.sb-out .sb-arr,.sb-arr-o{color:#FF9C90;}
+.sb-x{flex-shrink:0;width:34px;height:34px;border-radius:50%;border:none;background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);font-size:.85rem;cursor:pointer;}
+.sb-add{margin-top:8px;padding:9px 16px;border-radius:999px;border:1px dashed rgba(255,255,255,.32);background:transparent;color:#fff;font:600 .86rem 'Barlow',sans-serif;cursor:pointer;}
+.sb-subf{display:grid;grid-template-columns:96px minmax(0,1fr) minmax(0,1fr);gap:8px;align-items:end;margin-top:10px;}
+.sb-subf label{display:flex;flex-direction:column;gap:4px;font-size:.74rem;font-weight:600;color:rgba(255,255,255,.65);}
+.sb-subf input,.sb-subf select{height:42px;min-width:0;padding:0 8px;border-radius:10px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;font:600 .9rem 'Barlow',sans-serif;color-scheme:dark;}
+.sb-subf select option{color:#0E2350;background:#fff;}
+.sb-f-b{grid-column:1/-1;display:flex;gap:8px;}
+.sb-btn{flex:1;height:42px;border-radius:10px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;font:700 .86rem 'Barlow',sans-serif;cursor:pointer;}
+.sb-btn-p{background:#2E8B5E;border-color:#2E8B5E;}
+.sb-btn:disabled{opacity:.45;cursor:default;}
+@media(max-width:480px){.sb-subf{grid-template-columns:1fr 1fr;}.sb-f-m{grid-column:1/-1;}}
+/* who played */
+.sb-pl{margin-bottom:4px;border-radius:10px;background:rgba(255,255,255,.04);}
+.sb-pl.open{background:rgba(255,255,255,.1);}
+.sb-pl-r{display:flex;align-items:center;gap:8px;width:100%;min-height:44px;padding:6px 10px;border:none;background:none;color:#fff;font:600 .9rem 'Barlow',sans-serif;text-align:left;cursor:pointer;border-radius:10px;}
+.sb-pl-n{flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.sb-pl-s{display:inline-flex;align-items:center;gap:6px;}
+.sb-g b{font-size:.76rem;margin-left:1px;}
+.sb-pl-m{min-width:2.4em;text-align:right;font-family:'Bebas Neue',sans-serif;font-size:1.05rem;font-weight:400;color:rgba(255,255,255,.62);}
+.sb-pl-c{width:20px;text-align:center;font-size:1.1rem;color:rgba(255,255,255,.45);}
+.sb-ed{display:flex;flex-direction:column;gap:8px;padding:2px 10px 12px;}
+.sb-ed-r{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:.84rem;color:rgba(255,255,255,.75);}
+.sb-step-s{align-items:center;}
+.sb-step-s b{min-width:1.6em;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.35rem;font-weight:400;color:#fff;}
+.sb-step-s button{width:40px;height:36px;}
+.sb-cards{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px;}
+.sb-cb{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 11px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:transparent;color:#fff;font:600 .8rem 'Barlow',sans-serif;cursor:pointer;}
+.sb-cb.on{background:#fff;border-color:#fff;color:#0E2350;}
+/* a card, drawn: same everywhere (emoji differ by phone) */
+.cd-ic{display:inline-flex;align-items:center;vertical-align:-2px;}
+.cd-ic i{display:block;width:9px;height:12px;border-radius:2px;box-shadow:0 0 0 1px rgba(0,0,0,.18);}
+.cd-y i{background:#F2C230;}.cd-r i{background:#D93A2F;}
+.cd-gr i:first-child{background:#F2C230;}.cd-gr i:last-child{background:#D93A2F;margin-left:-4px;transform:rotate(10deg);}
+/* suspensions */
+.sb-ban{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px;padding:8px 2px;color:#fff;}
+.sb-ban-t{flex:1;min-width:150px;display:flex;flex-direction:column;font-size:.88rem;}
+.sb-ban-t span{font-size:.74rem;color:rgba(255,255,255,.6);}
+.sb-ban-d{display:flex;align-items:center;gap:6px;font-size:.78rem;color:rgba(255,255,255,.65);}
+.sb-ban-d input{height:38px;padding:0 6px;border-radius:8px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;font:600 .86rem 'Barlow',sans-serif;color-scheme:dark;}
+/* the card in the match window */
+button.sb-card{border:1px solid var(--hx-line,var(--gl));background:var(--hx-card,#fff);color:var(--hx-ink,var(--bd));}
+.sb-card .sb-card-res{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:.5px;font-weight:400;}
+.sb-card-w .sb-card-res{color:#1a7a40;}.sb-card-l .sb-card-res{color:#b8322a;}.sb-card-d .sb-card-res{color:#a56a0a;}
+.sb-card .cd-ic{margin-left:2px;}
+.sqd-ban{color:#b8322a !important;font-weight:700;}
+.sb-flag-ban{color:#b8322a;}
+.st-cards{white-space:nowrap;}
+.st-cards b{font-size:.72rem;margin:0 2px 0 1px;}
+.sb-hsub{font-size:var(--fs-sm);color:rgba(255,255,255,.55);margin-top:2px;}
 .rc-foot{flex-shrink:0;padding:var(--sp-3) var(--sp-4) calc(var(--sp-4) + env(safe-area-inset-bottom,0px));border-top:1px solid rgba(255,255,255,.1);display:flex;gap:var(--sp-2);}
 .rc-fb{flex:1;padding:13px;border-radius:var(--r-md);border:none;font-family:'Barlow',sans-serif;font-size:var(--fs-md);font-weight:700;cursor:pointer;transition:transform .12s;}
 .rc-fb:active{transform:scale(.97);}
@@ -6316,6 +6399,7 @@ if(window._fbBlocked){
         <button class="btn" style="background:rgba(52,152,219,.15);color:#1f6ea8;border:1.5px solid rgba(52,152,219,.4);font-size:.78rem;" onclick="openLineupForSess()">📋 Aufstellung ansehen</button>
       </div>
       </div><!-- /ss-actions -->
+      <div id="ss-report-wrap" style="display:none;"></div>
       <div id="ss-rpe-wrap" style="display:none;"></div>
       <div id="ss-mvp-wrap" style="display:none;"></div>
       <div id="ss-physio-wrap" style="display:none;"></div>
@@ -6682,13 +6766,21 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.36'; // v1.2.36: Spieler-Ausschnitte (Sicherheit Teil 2)
-const APP_VERSION_LABEL='1.2.36';
+const APP_VERSION='1.2.37'; // v1.2.37: Spielbericht und Karten
+const APP_VERSION_LABEL='1.2.37';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792773633850; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792778959042; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.37',date:'23.10.2026',title:'Spielbericht und Karten',items:[
+    {icon:'📋',title:'Spielbericht nach dem Spiel',desc:'Im Fenster eines Spiels: Ergebnis, Startelf, Wechsel mit Minute, Tore, Vorlagen und Karten an einem Ort. Wer in der Startelf stand oder eingewechselt wurde, gilt als anwesend.'},
+    {icon:'⏱',title:'Spielminuten',desc:'Aus Startelf und Wechseln ergeben sich die Minuten jedes Spielers. Die Belastung rechnet mit ihnen statt mit der ganzen Spielzeit – außer ihr habt die Minuten selbst eingetragen.'},
+    {icon:'🟥',title:'Karten und Sperren',desc:'Nach Rot ist ein Spieler mindestens zwei Wochen gesperrt; das Datum lässt sich nach der Entscheidung des Sportgerichts ändern. Kader, Aufstellung und „Im Blick behalten“ zeigen die Sperre. Die Regeln (Gelbsperre, Gelb-Rot, Rot) stehen unter Einstellungen → Mannschaft, voreingestellt wie bei den Junioren im WDFV.'},
+    {icon:'📊',title:'Bilanz und Statistik',desc:'Statistik zeigt die Bilanz der Saison (Siege, Unentschieden, Niederlagen, Tore), die Tabelle aller Spieler Minuten und Karten. Im Profil stehen die Karten und eine laufende Sperre.'},
+    {icon:'👀',title:'Spielbericht fehlt',desc:'Bis drei Tage nach einem Spiel ohne Ergebnis erinnert „Im Blick behalten“ daran.'},
+    {icon:'🔗',title:'fussball.de verlinkt',desc:'Einstellungen → Mannschaft → „fussball.de“: die Seite der Mannschaft eintragen, dann führt Kalender → „⋯“ → „Tabelle auf fussball.de“ dorthin. Daten werden nicht übernommen – das erlauben die Nutzungsbedingungen des DFB nicht.'},
+  ]},
   {version:'1.2.36',date:'23.10.2026',title:'Spieler sehen nur noch ihre eigenen Daten',items:[
     {icon:'🔒',title:'Eigener Ausschnitt für jeden Spieler',desc:'Spieler-Links laden nicht mehr die Daten der ganzen Mannschaft. Beim Speichern legt die App jedem Spieler bereit, was seine Seiten brauchen: seine Antworten, Belastung, Statistik, Karte und Wochenbericht, dazu Termine, Neuigkeiten und die Telefonnummern der Trainer. Notizen, Telefonnummern und Geburtsdaten der anderen bleiben bei euch.'},
     {icon:'📥',title:'Antworten über einen Eingang',desc:'Zusagen, Absagen, Belastung und Physio-Termine landen erst im Eingang des Spielers. Ist die App bei einem Trainer mit eigenem Konto offen, stehen sie sofort in der Tabelle, sonst übernimmt sie der Job „Erinnerungen“ (alle 15 Minuten). Der Spieler sieht seine Antwort sofort.'},
@@ -10901,6 +10993,7 @@ function _navCloseLayer(el){
     if(el.id==='tplDlg'&&typeof tplDlgClose==='function')return tplDlgClose();
     if(el.id==='tplPitch'&&typeof tplPitchClose==='function'){if(TPL.pv.view!=='blk')return tplPitchView('blk');return tplPitchClose();}
     if(el.id==='tplOverlay'&&typeof tplClose==='function')return tplClose();
+    if(el.id==='sbOverlay'&&typeof sbClose==='function')return sbClose();
     if(el.classList.contains('rc-overlay')&&typeof rcClose==='function')return rcClose();
     // Planners are lp-overlay / slp-overlay, not .mo — without these they fell
     // through to the class strip below and lost unsaved work in silence.
@@ -11956,7 +12049,11 @@ function _sbAbDisp(p,withYear){
 function _sbShort(p){const d=_sbAbDisp(p);return d?'spielberechtigt ab '+d:'noch nicht spielberechtigt';}
 // Lineup of a match: a small flag at a player who may not play that day
 function _lpSbFlag(p){
-  if(!(typeof canEdit==='function'&&canEdit())||!p||!p.noSb)return '';
+  if(!(typeof canEdit==='function'&&canEdit())||!p)return '';
+  {const D=cd(),si=lpState&&lpState.sessIdx;
+   const b=(si!=null&&D&&D.sessions&&D.sessions[si])?sbBanAt(p,si,D,UI.currentSeason):null;
+   if(b)return `<span class="sb-flag sb-flag-ban" title="${escapeHtml(sbBanText(b,D))}">⛔</span>`;}
+  if(!p.noSb)return '';
   const D=cd(),si=lpState&&lpState.sessIdx,s=(si!=null&&D&&D.sessions)?D.sessions[si]:null;
   if(!s||playerSb(p,_dbSortKey(s.date,UI.currentSeason)))return '';
   return `<span class="sb-flag" title="${escapeHtml(_sbShort(p))}">⚠</span>`;
@@ -14011,6 +14108,8 @@ function _setFill(){
   if(typeof updateAppearanceUI==='function')updateAppearanceUI();
   if(typeof ayRender==='function')ayRender();
   if(typeof meetRender==='function')meetRender();
+  if(typeof cardRulesRender==='function')cardRulesRender();
+  if(typeof fdbRender==='function')fdbRender();
   _setLogoSync();
   const tc=document.getElementById('set-trash-count');
   if(tc)tc.textContent=Array.isArray(G.trash)&&G.trash.length?`(${G.trash.length})`:'';
@@ -15899,6 +15998,455 @@ async function _pvTeamLink(team,lk,overlay){
   inp.addEventListener('keydown',e=>{if(e.key==='Enter')submit();});
 }
 
+// ══ Spielbericht und Karten (1.2.37) ═════════════════════════════════
+// After a match the trainers note the result, the starting eleven, the
+// substitutions (minute, in, out), goals, assists and cards. Minutes on the
+// pitch follow from the substitutions and go into the load (sRPE × minutes);
+// a card can mean a suspension, which the squad, the lineup and "Im Blick"
+// then show.
+//   s.rep = {f, a, st:[names], sub:[{m, i, o}], ban:{name:'YYYY-MM-DD'}, t, by}
+//           f/a goals for/against; by name, like the squad, so it survives a
+//           change of the player order; ban = end of a suspension after a red
+//           card where the Sportgericht decided otherwise than the rule
+//   p.cards[si] = 'y' (Gelb) | 'gr' (Gelb-Rot) | 'r' (Rot)
+//   G.db[team+'__rules'].cards = {y, gr, r}: suspension after every y-th
+//           yellow card (0 = none), gr matches after Gelb-Rot (0 = none),
+//           r days after Rot (until the Sportgericht decides)
+// The defaults are the WDFV youth rules of 2025/26 (JSpO §26, Kreis
+// Durchführungsbestimmungen): no Gelbsperre, Gelb-Rot without a further
+// suspension, Rot at least two weeks.
+const CARD_RULES_DEF={y:0,gr:0,r:14};
+const CARD_NAMES={y:'Gelb',gr:'Gelb-Rot',r:'Rot'};
+function cardRules(team){
+  const r=((G&&G.db&&G.db[(team||UI.currentTeam)+'__rules'])||{}).cards||{};
+  const n=(v,lo,hi,d)=>(typeof v==='number'&&v>=lo&&v<=hi)?Math.round(v):d;
+  return {y:n(r.y,0,15,CARD_RULES_DEF.y),gr:n(r.gr,0,5,CARD_RULES_DEF.gr),r:n(r.r,0,365,CARD_RULES_DEF.r)};
+}
+function _cardIc(c){
+  return c==='gr'?'<span class="cd-ic cd-gr" aria-hidden="true"><i></i><i></i></span>'
+    :c?`<span class="cd-ic cd-${c}" aria-hidden="true"><i></i></span>`:'';
+}
+function _sbDur(s){return (s&&typeof s.duration==='number'&&s.duration>0)?s.duration:90;}
+function _sbRep(s){return (s&&s.rep&&typeof s.rep==='object')?s.rep:null;}
+// Minutes on the pitch, by name, from the starting eleven and the
+// substitutions (a player may come back: youth football allows it).
+// null without a starting eleven.
+function sbMinutes(s){
+  const r=_sbRep(s);
+  if(!r||!Array.isArray(r.st)||!r.st.length)return null;
+  const D=_sbDur(s),on=new Map(),min={};
+  r.st.forEach(n=>{on.set(n,0);min[n]=0;});
+  (Array.isArray(r.sub)?r.sub:[]).filter(Boolean).slice().sort((a,b)=>(+a.m||0)-(+b.m||0)).forEach(x=>{
+    const m=Math.max(0,Math.min(D,+x.m||0));
+    if(x.o&&on.has(x.o)){min[x.o]=(min[x.o]||0)+m-on.get(x.o);on.delete(x.o);}
+    if(x.i&&!on.has(x.i)){on.set(x.i,m);if(!(x.i in min))min[x.i]=0;}
+  });
+  on.forEach((m0,n)=>{min[n]=(min[n]||0)+D-m0;});
+  return min;
+}
+// Minutes for the load: what a trainer typed in for this player, else the
+// match report, else the length of the session. (The rating window keeps the
+// planned end: rpeSessionMinutes.)
+function rpePlayedMin(s,p,si){
+  if(p&&Array.isArray(p.rpeMin)&&typeof p.rpeMin[si]==='number')return p.rpeMin[si];
+  if(p&&s&&s.type==='match'){const m=sbMinutes(s);if(m)return m[p.name]||0;}
+  return rpeSessionMinutes(s,null,si);
+}
+function sbResult(s){
+  const r=_sbRep(s);
+  if(!r||typeof r.f!=='number'||typeof r.a!=='number')return null;
+  const k=r.f>r.a?'w':r.f<r.a?'l':'d';
+  // ours first: "2:1 Sieg" reads the same at home and away (the report
+  // itself shows the board with the home side first, names beside it)
+  return {f:r.f,a:r.a,k,txt:r.f+':'+r.a,word:{w:'Sieg',d:'Unentschieden',l:'Niederlage'}[k]};
+}
+// ── suspensions ──
+const _skISO=k=>String(k).slice(0,4)+'-'+String(k).slice(4,6)+'-'+String(k).slice(6,8);
+function _skAdd(k,days){
+  const d=new Date(+String(k).slice(0,4),+String(k).slice(4,6)-1,+String(k).slice(6,8)+days);
+  return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
+}
+const _skDM=k=>String(k).slice(6,8)+'.'+String(k).slice(4,6)+'.';
+function _sbMatches(D,season){
+  return (D&&D.sessions||[]).map((s,i)=>({s,i,k:(s&&s.type==='match'&&s.date)?_dbSortKey(s.date,season):null}))
+    .filter(x=>x.k!=null).sort((a,b)=>a.k-b.k);
+}
+// The suspension a player serves at match ti, or null:
+//   {c, si, until (sort key, red), n (matches, yellow/yellow-red), yc}
+function sbBanAt(p,ti,D,season){
+  if(!p||!Array.isArray(p.cards)||!D||!D.sessions||!D.sessions[ti])return null;
+  season=season||UI.currentSeason;
+  const R=cardRules(),M=_sbMatches(D,season),tk=_dbSortKey(D.sessions[ti].date,season);
+  let yc=0,res=null;
+  M.forEach((x,idx)=>{
+    if(x.k>=tk)return;
+    const c=p.cards[x.i];if(!c)return;
+    const later=M.slice(idx+1).filter(y=>y.k>x.k),nth=later.findIndex(y=>y.i===ti);
+    if(c==='r'){
+      const o=(_sbRep(x.s)&&x.s.rep.ban)?x.s.rep.ban[p.name]:null;
+      const until=/^\d{4}-\d{2}-\d{2}$/.test(o||'')?isoToSortKey(o):_skAdd(x.k,cardRules().r);
+      if(tk<=until)res={c,si:x.i,until};
+    }else if(c==='gr'){
+      if(R.gr>0&&nth>=0&&nth<R.gr)res={c,si:x.i,n:R.gr};
+    }else if(c==='y'&&R.y>0){
+      yc++;
+      if(yc%R.y===0&&nth===0)res={c,si:x.i,n:1,yc};
+    }
+  });
+  return res;
+}
+// In words, for a list or a warning
+function sbBanText(b,D){
+  if(!b)return '';
+  const s=D&&D.sessions&&D.sessions[b.si],when=s?s.date.replace(/^\S+\s/,'').replace(/\.?$/,'.'):'';
+  if(b.c==='r')return 'gesperrt bis '+_skDM(b.until)+' (Rot am '+when+')';
+  if(b.c==='gr')return 'gesperrt (Gelb-Rot am '+when+')';
+  return 'gesperrt ('+b.yc+'. Gelbe Karte)';
+}
+// Yellow cards so far, and whether the next one means a suspension
+function sbYellow(p,D,season){
+  const R=cardRules();let n=0;
+  if(p&&Array.isArray(p.cards))_sbMatches(D,season).forEach(x=>{if(p.cards[x.i]==='y')n++;});
+  return {n,warn:R.y>0&&n>0&&n%R.y===R.y-1};
+}
+function sbCardCounts(p,D,season){
+  const o={y:0,gr:0,r:0};
+  if(p&&Array.isArray(p.cards))_sbMatches(D,season).forEach(x=>{const c=p.cards[x.i];if(c&&c in o)o[c]++;});
+  return o;
+}
+// The next match a player is suspended for (or null), for the profile
+function sbNextBan(p,D,season){
+  const tk=todaySK();
+  for(const x of _sbMatches(D,season)){
+    if(x.k<tk)continue;
+    const b=sbBanAt(p,x.i,D,season);
+    if(b)return Object.assign({ti:x.i},b);
+    return null;
+  }
+  return null;
+}
+// "Im Blick behalten": a suspension at the next match, a yellow card away
+// from one, a match without its report
+function _sbFlags(D,season){
+  if(!(typeof canEdit==='function'&&canEdit())||!D)return [];
+  const out=[],tk=todaySK(),M=_sbMatches(D,season),nm=p=>(getDisplayName?getDisplayName(p):p.name)||'';
+  const next=M.find(x=>x.k>=tk&&!sessTookPlace(x.s,season));
+  if(next&&_skAdd(tk,10)>=next.k){
+    (D.players||[]).forEach((p,pi)=>{
+      if(!p)return;
+      const b=sbBanAt(p,next.i,D,season);
+      if(b)out.push({dot:'#C9373E',who:nm(p),what:sbBanText(b,D)+' – fehlt am '+next.s.date,on:`openPlayerFromMain(${pi})`});
+      else if(sbYellow(p,D,season).warn)out.push({dot:'#E0912F',who:nm(p),what:'Bei der nächsten Gelben Karte gesperrt',on:`openPlayerFromMain(${pi})`});
+    });
+  }
+  M.forEach(x=>{
+    if(!sessTookPlace(x.s,season)||x.k<_skAdd(tk,-3)||x.k>tk)return;
+    if(sbResult(x.s))return;
+    const st=new Date();const t=String(x.s.time||'').split(':').map(Number);
+    if(x.k===tk&&t.length===2&&(st.getHours()*60+st.getMinutes())<t[0]*60+(t[1]||0)+_sbDur(x.s))return;
+    out.push({dot:'#1659B8',who:'Spiel vom '+x.s.date+(x.s.label?' · '+x.s.label:''),what:'Spielbericht fehlt: Ergebnis, Wechsel, Karten',on:`sbOpen(${x.i})`});
+  });
+  return out;
+}
+// ── the card in the match window ──
+function renderSessReport(si){
+  const box=document.getElementById('ss-report-wrap');if(!box)return;
+  const D=cd(),s=D&&D.sessions&&D.sessions[si];
+  if(!s||s.type!=='match'||!sessTookPlace(s,UI.currentSeason)){box.style.display='none';return;}
+  const res=sbResult(s),r=_sbRep(s),mins=sbMinutes(s),e=escapeHtml;
+  const used=mins?Object.keys(mins).filter(n=>mins[n]>0).length:0;
+  let goals=0,cards={y:0,gr:0,r:0};
+  (D.players||[]).forEach(p=>{if(!p)return;goals+=(Array.isArray(p.goals)?+p.goals[si]:0)||0;const c=Array.isArray(p.cards)?p.cards[si]:null;if(c&&c in cards)cards[c]++;});
+  const cardTxt=['y','gr','r'].filter(c=>cards[c]).map(c=>_cardIc(c)+(cards[c]>1?'<b>'+cards[c]+'</b>':'')).join(' ');
+  const bits=[];
+  if(used)bits.push(used+' eingesetzt');
+  if(r&&Array.isArray(r.sub)&&r.sub.length)bits.push(r.sub.length+' Wechsel');
+  if(goals)bits.push(goals+(goals===1?' Tor':' Tore')+' zugeordnet');
+  const edit=canEdit();
+  if(!res&&!edit){box.style.display='none';return;}
+  box.style.display='block';
+  box.innerHTML=`<button type="button" class="rpe-card sb-card${res?' sb-card-'+res.k:' rpe-none'}"${edit?` onclick="sbOpen(${si})"`:' disabled'}>
+    <span class="rpe-card-ic">📋</span>
+    <span class="rpe-card-txt"><b>Spielbericht${res?': <span class="sb-card-res">'+e(res.txt)+'</span> '+res.word:''}</b>
+      <span>${res?(bits.join(' · ')||'Startelf und Wechsel noch offen')+(cardTxt?' · '+cardTxt:''):'Ergebnis, Startelf, Wechsel, Tore und Karten eintragen'}</span></span>
+    ${edit?'<span class="rpe-card-chev">›</span>':''}
+  </button>`;
+}
+// ── the report itself (full screen, like "Anwesenheit erfassen") ──
+let _sbSi=null,_sbOpenPl=null,_sbMore=false,_sbSubDraft=null;
+function sbOpen(si){
+  if(!canEdit())return;
+  const D=cd(),s=D&&D.sessions&&D.sessions[si];
+  if(!s||s.type!=='match')return;
+  if(typeof _navArm==='function')_navArm();
+  _sbSi=si;_sbOpenPl=null;_sbMore=false;_sbSubDraft=null;
+  const ov=document.getElementById('sbOverlay');if(!ov)return;
+  document.getElementById('sb-date').textContent=s.date+(s.label?' · '+s.label:'');
+  document.getElementById('sb-sub').textContent=[s.time||'',s.homeAway==='home'?'Heimspiel':'Auswärtsspiel'].filter(Boolean).join(' · ');
+  ov.classList.add('open');
+  sbRender();
+  setTimeout(()=>{const x=ov.querySelector('.sb-score button');if(x)try{x.focus({preventScroll:true});}catch(e){}},60);
+}
+function sbClose(){
+  const ov=document.getElementById('sbOverlay');if(ov)ov.classList.remove('open');
+  const si=_sbSi;_sbSi=null;
+  if(typeof render==='function')render();
+  if(si!=null&&_currentSessIdx===si){try{renderSessReport(si);buildSessAtt(si);}catch(e){}}
+}
+function _sbEdit(fn,what,detail){
+  const D=cd(),s=D&&D.sessions&&D.sessions[_sbSi];if(!s||!canEdit())return;
+  snap();
+  if(!s.rep||typeof s.rep!=='object')s.rep={};
+  fn(s.rep,s,D);
+  s.rep.t=Date.now();s.rep.by=(CU&&CU.name)||'';
+  // came on: from the bench → the old "eingewechselt" list stays right
+  const ins=[...new Set((Array.isArray(s.rep.sub)?s.rep.sub:[]).map(x=>x&&x.i).filter(Boolean))];
+  if(Array.isArray(s.rep.sub)&&s.rep.sub.length){if(ins.length)s.subIn=ins;else delete s.subIn;}
+  // who played was there
+  const mins=sbMinutes(s);
+  if(mins)(D.players||[]).forEach((p,pi)=>{
+    if(p&&p.name in mins&&Array.isArray(p.s)&&p.s[_sbSi]!==1&&sessTookPlace(s,UI.currentSeason)){
+      while(p.s.length<=_sbSi)p.s.push(3);p.s[_sbSi]=1;
+    }
+  });
+  saveG();
+  if(what)logAudit(what,s.date+(s.label?' '+s.label:''),detail||'');
+  sbRender();
+}
+function sbScore(k,d){
+  _sbEdit(r=>{
+    const v=typeof r[k]==='number'?r[k]:null;
+    r[k]=v==null?(d>0?1:0):Math.max(0,Math.min(30,v+d));
+  },null);
+  const s=cd().sessions[_sbSi],res=sbResult(s);
+  if(res)try{logAudit('Ergebnis',s.date+(s.label?' '+s.label:''),res.txt);}catch(e){}
+}
+function sbStarter(pi){
+  const D=cd(),p=D.players[pi];if(!p)return;
+  _sbEdit(r=>{
+    const a=Array.isArray(r.st)?r.st.slice():[],i=a.indexOf(p.name);
+    if(i<0)a.push(p.name);else a.splice(i,1);
+    r.st=a;
+  },null);
+}
+function sbStartersFromLineup(){
+  const D=cd(),st=_luStarters(_sbSi);if(!st)return;
+  _sbEdit(r=>{r.st=[...st].map(pi=>D.players[pi]&&D.players[pi].name).filter(Boolean);},'Startelf aus der Aufstellung',st.size+' Spieler');
+}
+function sbSubStart(){
+  const s=cd().sessions[_sbSi];
+  _sbSubDraft={m:Math.min(_sbDur(s),60),i:'',o:''};
+  sbRender();
+  setTimeout(()=>{const x=document.getElementById('sb-sub-m');if(x)x.focus();},40);
+}
+function sbSubSet(k,v){
+  if(!_sbSubDraft)return;
+  if(k==='m'){const n=Math.round(+v);_sbSubDraft.m=isFinite(n)?Math.max(1,Math.min(_sbDur(cd().sessions[_sbSi]),n)):_sbSubDraft.m;}
+  else _sbSubDraft[k]=v;
+  sbRender();
+}
+function sbSubAdd(){
+  const x=_sbSubDraft;if(!x||!x.i)return;
+  _sbEdit(r=>{
+    const a=Array.isArray(r.sub)?r.sub.slice():[];
+    a.push({m:x.m,i:x.i,o:x.o||''});
+    a.sort((p,q)=>(+p.m||0)-(+q.m||0));
+    r.sub=a;
+  },'Wechsel erfasst',x.m+'. Min.: '+x.i+(x.o?' für '+x.o:''));
+  _sbSubDraft=null;sbRender();
+}
+function sbSubDel(idx){
+  _sbEdit(r=>{const a=Array.isArray(r.sub)?r.sub.slice():[];a.splice(idx,1);if(a.length)r.sub=a;else delete r.sub;},'Wechsel entfernt',null);
+}
+function sbStat(pi,field,d){
+  const D=cd(),p=D.players[pi],si=_sbSi;if(!p)return;
+  _sbEdit(()=>{
+    if(!Array.isArray(p[field]))p[field]=[];
+    while(p[field].length<D.sessions.length)p[field].push(null);
+    const cur=+p[field][si]||0,next=Math.max(0,Math.min(20,cur+d));
+    p[field][si]=next||null;
+  },field==='goals'?'Tor erfasst':'Vorlage erfasst',(getDisplayName?getDisplayName(p):p.name));
+}
+function sbCard(pi,c){
+  const D=cd(),p=D.players[pi],si=_sbSi;if(!p)return;
+  const cur=Array.isArray(p.cards)?p.cards[si]:null,next=cur===c?null:c;
+  _sbEdit(r=>{
+    if(!Array.isArray(p.cards))p.cards=[];
+    while(p.cards.length<D.sessions.length)p.cards.push(null);
+    p.cards[si]=next;
+    if(r.ban&&r.ban[p.name]&&next!=='r'){delete r.ban[p.name];if(!Object.keys(r.ban).length)delete r.ban;}
+  },next?'Karte erfasst':'Karte entfernt',(getDisplayName?getDisplayName(p):p.name)+(next?' · '+CARD_NAMES[next]:''));
+}
+function sbBanSet(pi,iso){
+  const D=cd(),p=D.players[pi];if(!p)return;
+  _sbEdit(r=>{
+    if(!r.ban||typeof r.ban!=='object')r.ban={};
+    if(/^\d{4}-\d{2}-\d{2}$/.test(iso||''))r.ban[p.name]=iso;else delete r.ban[p.name];
+    if(!Object.keys(r.ban).length)delete r.ban;
+  },'Sperre geändert',(getDisplayName?getDisplayName(p):p.name)+': '+(iso||'nach Regel'));
+}
+function sbTogglePl(pi){_sbOpenPl=_sbOpenPl===pi?null:pi;sbRender();}
+function sbToggleMore(){_sbMore=!_sbMore;sbRender();}
+function sbRender(){
+  const body=document.getElementById('sb-body');if(!body||_sbSi==null)return;
+  const D=cd(),si=_sbSi,s=D.sessions[si],season=UI.currentSeason,e=escapeHtml,r=_sbRep(s)||{};
+  const club=(G&&G.clubName)||'Wir',opp=s.label||'Gegner',home=s.homeAway!=='away';
+  const nm=p=>(getDisplayName?getDisplayName(p):p.name)||'';
+  const byName={};(D.players||[]).forEach((p,pi)=>{if(p&&p.name)byName[p.name]={p,pi};});
+  const join=p=>typeof _sessAfterJoin!=='function'||_sessAfterJoin(p,s,season);
+  const pIdx=x=>{const i=POS.indexOf(x);return i<0?99:i;};
+  const all=(D.players||[]).map((p,pi)=>({p,pi})).filter(x=>x.p&&x.p.name&&join(x.p))
+    .sort((a,b)=>(pIdx(a.p.pos)-pIdx(b.p.pos))||((+a.p.nr||999)-(+b.p.nr||999)));
+  const st=Array.isArray(r.st)?r.st:[],stSet=new Set(st);
+  const q=_sqOf(s),inSquad=n=>q&&q.p.includes(n);
+  const v=x=>(Array.isArray(x.p.s)&&si<x.p.s.length)?x.p.s[si]:3;
+  const likely=all.filter(x=>stSet.has(x.p.name)||v(x)===1||v(x)===4||inSquad(x.p.name));
+  const rest=all.filter(x=>!likely.includes(x));
+  const res=sbResult(s);
+  // ── score: home side first ──
+  const side=(k,name,ours)=>{
+    const val=typeof r[k]==='number'?r[k]:null;
+    return `<div class="sb-side${ours?' sb-ours':''}"><div class="sb-tn">${e(name)}</div>
+      <div class="sb-num" aria-live="polite">${val==null?'–':val}</div>
+      <div class="sb-step"><button type="button" onclick="sbScore('${k}',-1)" aria-label="${e(name)}: ein Tor weniger">−</button><button type="button" onclick="sbScore('${k}',1)" aria-label="${e(name)}: ein Tor mehr">+</button></div></div>`;
+  };
+  let h=`<section class="sb-sec sb-score" aria-label="Ergebnis">
+    ${home?side('f',club,1)+'<div class="sb-colon">:</div>'+side('a',opp,0):side('a',opp,0)+'<div class="sb-colon">:</div>'+side('f',club,1)}
+    <div class="sb-outcome${res?' sb-o-'+res.k:''}">${res?res.word:'Ergebnis eintragen'}</div>
+  </section>`;
+  // ── starting eleven ──
+  const lu=_luStarters(si);
+  const luBtn=(lu&&!st.length)?`<button type="button" class="sb-lu" onclick="sbStartersFromLineup()">Aus der Aufstellung übernehmen (${lu.size})</button>`:'';
+  const chip=x=>`<button type="button" class="rc-sc${stSet.has(x.p.name)?' on':''}" aria-pressed="${stSet.has(x.p.name)}" onclick="sbStarter(${x.pi})">${x.p.nr?'<i>'+e(String(x.p.nr))+'</i>':''}${e(nm(x.p))}</button>`;
+  h+=`<section class="sb-sec"><div class="sb-h">Startelf <b class="${st.length===11?'sb-ok':''}">${st.length}</b><span>antippen, wer begonnen hat</span></div>
+    ${luBtn}<div class="rc-sub-c">${likely.map(chip).join('')}${_sbMore?rest.map(chip).join(''):''}</div>
+    ${rest.length?`<button type="button" class="sb-more" onclick="sbToggleMore()">${_sbMore?'Weniger zeigen':'Weitere Spieler ('+rest.length+')'}</button>`:''}
+  </section>`;
+  // ── substitutions ──
+  const subs=(Array.isArray(r.sub)?r.sub:[]).filter(Boolean);
+  const dn=n=>byName[n]?nm(byName[n].p):n;
+  let sh=subs.map((x,i)=>`<div class="sb-subr"><span class="sb-min">${+x.m||0}′</span>
+    <span class="sb-in"><span class="sb-arr" aria-label="rein">▲</span>${e(dn(x.i))}</span>
+    ${x.o?`<span class="sb-out"><span class="sb-arr" aria-label="raus">▼</span>${e(dn(x.o))}</span>`:'<span class="sb-out sb-none">–</span>'}
+    <button type="button" class="sb-x" onclick="sbSubDel(${i})" aria-label="Wechsel entfernen">✕</button></div>`).join('');
+  if(!st.length)sh+=`<div class="sb-hint">Erst die Startelf wählen – dann lassen sich Wechsel und Minuten erfassen.</div>`;
+  else if(_sbSubDraft){
+    const x=_sbSubDraft;
+    // on the pitch at that minute: whoever started or came on, minus who went off
+    const onAt=new Set(st);
+    subs.filter(y=>(+y.m||0)<=x.m).forEach(y=>{if(y.o)onAt.delete(y.o);if(y.i)onAt.add(y.i);});
+    const cand=all.filter(y=>!onAt.has(y.p.name)),off=all.filter(y=>onAt.has(y.p.name));
+    const opt=(list,cur)=>`<option value="">– wählen –</option>`+list.map(y=>`<option value="${e(y.p.name)}"${y.p.name===cur?' selected':''}>${e((y.p.nr?y.p.nr+' ':'')+nm(y.p))}</option>`).join('');
+    sh+=`<div class="sb-subf">
+      <label class="sb-f-m">Minute<input type="number" id="sb-sub-m" min="1" max="${_sbDur(s)}" value="${x.m}" inputmode="numeric" onchange="sbSubSet('m',this.value)"></label>
+      <label class="sb-f-p"><span><span class="sb-arr">▲</span> Rein</span><select onchange="sbSubSet('i',this.value)">${opt(cand,x.i)}</select></label>
+      <label class="sb-f-p"><span><span class="sb-arr sb-arr-o">▼</span> Raus</span><select onchange="sbSubSet('o',this.value)">${opt(off,x.o)}</select></label>
+      <div class="sb-f-b"><button type="button" class="sb-btn sb-btn-p" onclick="sbSubAdd()"${x.i?'':' disabled'}>Wechsel speichern</button><button type="button" class="sb-btn" onclick="_sbSubDraft=null;sbRender()">Abbrechen</button></div>
+    </div>`;
+  }else sh+=`<button type="button" class="sb-add" onclick="sbSubStart()">+ Wechsel</button>`;
+  h+=`<section class="sb-sec"><div class="sb-h">Wechsel <b>${subs.length}</b><span>Minute, wer kam, wer ging</span></div>${sh}</section>`;
+  // ── who played: minutes, goals, assists, card ──
+  const mins=sbMinutes(s);
+  const val=(p,f)=>(Array.isArray(p[f])?+p[f][si]:0)||0;
+  const card=p=>Array.isArray(p.cards)?p.cards[si]:null;
+  let rows=mins?all.filter(x=>x.p.name in mins&&(mins[x.p.name]>0||stSet.has(x.p.name)||subs.some(y=>y.i===x.p.name)))
+    :all.filter(x=>v(x)===1);
+  // goals or cards entered for someone not in the list stay visible
+  all.forEach(x=>{if(!rows.includes(x)&&(val(x.p,'goals')||val(x.p,'assists')||card(x.p)))rows.push(x);});
+  if(mins)rows.sort((a,b)=>(stSet.has(b.p.name)-stSet.has(a.p.name))||((mins[b.p.name]||0)-(mins[a.p.name]||0)));
+  const gSum=rows.reduce((t,x)=>t+val(x.p,'goals'),0);
+  const gHint=(typeof r.f==='number'&&r.f>0)?(gSum===r.f?`Tore ${gSum} von ${r.f} zugeordnet`:gSum<r.f?`Tore ${gSum} von ${r.f} zugeordnet – Rest z. B. Eigentor`:`${gSum} Tore zugeordnet, aber nur ${r.f} geschossen`):'';
+  const ed=x=>{
+    const p=x.p,c=card(p);
+    const stp=(f,l)=>`<div class="sb-ed-r"><span>${l}</span><div class="sb-step sb-step-s"><button type="button" onclick="sbStat(${x.pi},'${f}',-1)" aria-label="${l}: eins weniger"${val(p,f)?'':' disabled'}>−</button><b>${val(p,f)}</b><button type="button" onclick="sbStat(${x.pi},'${f}',1)" aria-label="${l}: eins mehr">+</button></div></div>`;
+    return `<div class="sb-ed">${stp('goals','Tore')}${stp('assists','Vorlagen')}
+      <div class="sb-ed-r"><span>Karte</span><div class="sb-cards" role="group" aria-label="Karte">${['y','gr','r'].map(k=>`<button type="button" class="sb-cb${c===k?' on':''}" aria-pressed="${c===k}" onclick="sbCard(${x.pi},'${k}')">${_cardIc(k)}${CARD_NAMES[k]}</button>`).join('')}</div></div></div>`;
+  };
+  const prow=x=>{
+    const p=x.p,open=_sbOpenPl===x.pi,g=val(p,'goals'),a=val(p,'assists'),c=card(p);
+    const m=mins?(mins[p.name]||0):null;
+    const sum=[g?`<span class="sb-g">⚽${g>1?'<b>'+g+'</b>':''}</span>`:'',a?`<span class="sb-g">🎯${a>1?'<b>'+a+'</b>':''}</span>`:'',_cardIc(c)].join('');
+    return `<div class="sb-pl${open?' open':''}"><button type="button" class="sb-pl-r" aria-expanded="${open}" onclick="sbTogglePl(${x.pi})">
+      <span class="rc-nr">${e(String(p.nr||''))}</span><span class="sb-pl-n">${e(nm(p))}</span>
+      <span class="sb-pl-s">${sum}</span>${m!=null?`<span class="sb-pl-m">${m}′</span>`:''}<span class="sb-pl-c">${open?'–':'+'}</span></button>${open?ed(x):''}</div>`;
+  };
+  h+=`<section class="sb-sec"><div class="sb-h">${mins?'Im Einsatz':'Anwesend'} <b>${rows.length}</b><span>${e(gHint||'antippen für Tore, Vorlagen, Karte')}</span></div>
+    ${rows.length?rows.map(prow).join(''):'<div class="sb-hint">Noch niemand: Startelf wählen oder Anwesenheit erfassen.</div>'}</section>`;
+  // ── suspensions from this match ──
+  const R=cardRules(),bans=all.filter(x=>card(x.p)==='r'||(card(x.p)==='gr'&&R.gr>0));
+  if(bans.length){
+    const k=_dbSortKey(s.date,season);
+    h+=`<section class="sb-sec"><div class="sb-h">Sperren</div>${bans.map(x=>{
+      const c=card(x.p);
+      if(c==='gr')return `<div class="sb-ban">${_cardIc('gr')}<span class="sb-ban-t"><b>${e(nm(x.p))}</b><span>gesperrt für ${R.gr===1?'das nächste Spiel':'die nächsten '+R.gr+' Spiele'} (Regel der Mannschaft)</span></span></div>`;
+      const o=r.ban&&r.ban[x.p.name],iso=/^\d{4}-\d{2}-\d{2}$/.test(o||'')?o:_skISO(_skAdd(k,R.r));
+      return `<div class="sb-ban">${_cardIc('r')}<span class="sb-ban-t"><b>${e(nm(x.p))}</b><span>${o?'Sperre nach Entscheidung':'mindestens '+R.r+' Tage, bis das Sportgericht entscheidet'}</span></span>
+        <label class="sb-ban-d">bis<input type="date" value="${iso}" onchange="sbBanSet(${x.pi},this.value)"></label></div>`;
+    }).join('')}</section>`;
+  }
+  body.innerHTML=h;
+}
+// ── Einstellungen → Mannschaft: Karten und Sperren ──
+function cardRulesRender(){
+  const box=document.getElementById('cardBox');if(!box)return;
+  if(!CU||!(typeof canEdit==='function'&&canEdit())){box.innerHTML='';return;}
+  const t=UI.currentTeam||'',R=cardRules(t),e=escapeHtml;
+  const sel=(k,opts)=>`<select id="cr-${k}" onchange="cardRuleSet('${k}',this.value)">${opts.map(([v,l])=>`<option value="${v}"${R[k]===v?' selected':''}>${l}</option>`).join('')}</select>`;
+  box.innerHTML=`<div class="setting-label ay-h">🟥 Karten und Sperren <span>${e(t)}</span></div>
+    <p class="ay-note">Danach richten sich die Hinweise im Kader, in der Aufstellung und unter „Im Blick“. Voreinstellung: Regeln für Junioren im WDFV (seit 2025/26).</p>
+    <div class="setting-row"><div><div class="setting-label"><label for="cr-y">Gelbsperre</label></div><div class="setting-sub">nach jeder wievielten Gelben Karte ein Spiel</div></div>
+      <div class="setting-control">${sel('y',[[0,'keine'],[3,'3.'],[4,'4.'],[5,'5.'],[10,'10.']])}</div></div>
+    <div class="setting-row"><div><div class="setting-label"><label for="cr-gr">Gelb-Rot</label></div><div class="setting-sub">Sperre danach</div></div>
+      <div class="setting-control">${sel('gr',[[0,'keine'],[1,'1 Spiel'],[2,'2 Spiele']])}</div></div>
+    <div class="setting-row"><div><div class="setting-label"><label for="cr-r">Rot</label></div><div class="setting-sub">bis das Sportgericht entscheidet</div></div>
+      <div class="setting-control">${sel('r',[[7,'1 Woche'],[14,'2 Wochen'],[21,'3 Wochen'],[28,'4 Wochen']])}</div></div>`;
+}
+function cardRuleSet(k,val){
+  if(!(typeof canEdit==='function'&&canEdit()))return;
+  const t=UI.currentTeam,v=Math.round(+val);
+  if(!isFinite(v))return;
+  snap();
+  if(!G.db[t+'__rules']||typeof G.db[t+'__rules']!=='object')G.db[t+'__rules']={};
+  const c=Object.assign({},G.db[t+'__rules'].cards||{});
+  c[k]=v;
+  G.db[t+'__rules'].cards=c;
+  saveG();
+  logAudit('Karten-Regel',t,({y:'Gelbsperre',gr:'Gelb-Rot',r:'Rot'})[k]+': '+v);
+  if(typeof showSaveFlash==='function')showSaveFlash('✓ Gespeichert');
+  cardRulesRender();
+}
+// ── fussball.de: the team's page, as a link (1.2.37) ──
+// No import: the DFB's terms forbid automated reading of fussball.de, and the
+// widget would bring its trackers onto the players' phones. A link gives the
+// table, the official fixtures and the results where they are kept.
+//   G.db[team+'__rules'].fdb = 'https://www.fussball.de/mannschaft/…'
+function fdbUrl(team){
+  const u=((G&&G.db&&G.db[(team||UI.currentTeam)+'__rules'])||{}).fdb;
+  return (typeof u==='string'&&/^https:\/\/(www\.)?fussball\.de\//.test(u))?u:'';
+}
+function fdbOpen(){const u=fdbUrl();if(u)window.open(u,'_blank','noopener');}
+function fdbRender(){
+  const box=document.getElementById('fdbBox');if(!box)return;
+  if(!CU||!(typeof canEdit==='function'&&canEdit())){box.innerHTML='';return;}
+  const t=UI.currentTeam||'',u=fdbUrl(t),e=escapeHtml;
+  box.innerHTML=`<div class="setting-label ay-h">🔗 fussball.de <span>${e(t)}</span></div>
+    <p class="ay-note">Die Seite der Mannschaft auf fussball.de (Tabelle, Spielplan, Ergebnisse). Dann steht im Kalender unter „⋯“ ein Link dorthin. Auf fussball.de die Mannschaft öffnen und die Adresse hier einfügen.</p>
+    <div class="setting-row meet-where"><input type="url" id="fdb-url" value="${e(u)}" placeholder="https://www.fussball.de/mannschaft/…" onchange="fdbSet(this.value)" aria-label="Adresse der Mannschaft auf fussball.de"></div>
+    ${u?`<p class="ay-note"><a href="${e(u)}" target="_blank" rel="noopener">Seite öffnen</a></p>`:''}`;
+}
+function fdbSet(val){
+  if(!(typeof canEdit==='function'&&canEdit()))return;
+  const t=UI.currentTeam,v=String(val||'').trim();
+  if(v&&!/^https:\/\/(www\.)?fussball\.de\/\S+$/.test(v)){alert('Bitte die Adresse einer Seite auf fussball.de einfügen (beginnt mit https://www.fussball.de/).');fdbRender();return;}
+  snap();
+  if(!G.db[t+'__rules']||typeof G.db[t+'__rules']!=='object')G.db[t+'__rules']={};
+  if(v)G.db[t+'__rules'].fdb=v.slice(0,300);else delete G.db[t+'__rules'].fdb;
+  saveG();
+  logAudit('fussball.de-Link',t,v?'gesetzt':'entfernt');
+  if(typeof showSaveFlash==='function')showSaveFlash('✓ Gespeichert');
+  fdbRender();
+}
+
 // ══ Spieltag: Kader und Treffpunkt (1.2.13) ══════════════════════
 // The trainers pick the squad for a match, say when and where to meet and
 // publish. The job on GitHub tells every player with reminders on: in the
@@ -16134,7 +16682,7 @@ function _sqRenderList(){
     .sort((a,b)=>(pIdx(a.p.pos)-pIdx(b.p.pos))||((+a.p.nr||999)-(+b.p.nr||999)));
   const nm=p=>(getDisplayName?getDisplayName(p):p.name)||'';
   const sbk=_dbSortKey(s.date,season);
-  const sbF=x=>playerSb(x.p,sbk)?'':`<span class="sqd-sb">⚠ ${e(_sbShort(x.p))}</span>`;
+  const sbF=x=>{const b=sbBanAt(x.p,si,D,season);if(b)return `<span class="sqd-sb sqd-ban">⛔ ${e(sbBanText(b,D))}</span>`;return playerSb(x.p,sbk)?'':`<span class="sqd-sb">⚠ ${e(_sbShort(x.p))}</span>`;};
   const row=x=>`<label class="sqd-row"><input type="checkbox" data-pi="${x.pi}"${_SQ.sel.has(x.pi)?' checked':''} onchange="sqToggle(${x.pi},this.checked)">`
     +`<span class="sqd-nr">${e(String(x.p.nr||'–'))}</span><span class="sqd-nm">${e(nm(x.p))}${sbF(x)}</span><span class="sqd-pos">${e(x.p.pos||'')}</span></label>`;
   const grp=(title,list,sub)=>list.length?`<div class="sqd-g"><div class="sqd-gh">${title} <b>${list.length}</b>${sub?`<span>${sub}</span>`:''}</div>${list.map(row).join('')}</div>`:'';
@@ -16197,6 +16745,7 @@ function _sqRenderSum(){
   const sbk=_dbSortKey(s.date,season);
   const nsb=ins.filter(p=>!playerSb(p,sbk)).map(nm);
   const warn=[];
+  ins.forEach(p=>{const b=sbBanAt(p,si,D,season);if(b)warn.push(`<b>${e(nm(p))}</b> ist ${e(sbBanText(b,D))} – trotzdem im Kader?`);});
   if(nsb.length)warn.push(`<b>${e(nsb.join(', '))}</b> ${nsb.length===1?'ist':'sind'} laut Profil am Spieltag noch nicht spielberechtigt.`);
   if(twice.length)warn.push(`<b>${e(twice.join(', '))}</b> ${twice.length===1?'ist':'sind'} zum 2. Mal in Folge trotz Zusage nicht im Kader – besser persönlich sprechen.`);
   const w=document.getElementById('sqWarn');
@@ -16451,7 +17000,7 @@ function rpeSessionMinutes(s,p,si){
 function rpeLoad(s,p,si){
   const r=(p&&Array.isArray(p.rpe))?p.rpe[si]:null;
   if(typeof r!=='number')return null;
-  return Math.round(r*rpeSessionMinutes(s,p,si));
+  return Math.round(r*rpePlayedMin(s,p,si));
 }
 // Who gave a rating, and when: p.rpeMeta[key] = {s, t, by, nd}
 //   s   'p' the player himself, 't' entered by a trainer (told, or corrected)
@@ -16718,7 +17267,7 @@ function computeLoadMatrix(data,weeks){
         possible++;
         const r=Array.isArray(p.rpe)?p.rpe[si]:null;
         if(typeof r==='number'){
-          load+=r*rpeSessionMinutes(block.sessions[si],p,si);
+          load+=r*rpePlayedMin(block.sessions[si],p,si);
           rated++;
         }
       });
@@ -17098,7 +17647,7 @@ function rpeEditMin(delta,abs){
   if(!_rpeEdit)return;
   const D=cd();const p=D.players[_rpeEdit.pi];
   const cur=(Array.isArray(p.rpeMin)?p.rpeMin[_rpeEdit.si]:null);
-  const base=(abs!==undefined&&abs!=='')?parseInt(abs,10):(cur==null?rpeSessionMinutes(D.sessions[_rpeEdit.si],null,_rpeEdit.si):cur);
+  const base=(abs!==undefined&&abs!=='')?parseInt(abs,10):(cur==null?rpePlayedMin(D.sessions[_rpeEdit.si],D.players[_rpeEdit.pi],_rpeEdit.si):cur);
   const next=Math.max(0,Math.min(240,(isNaN(base)?0:base)+(delta||0)));
   sessSetPlayerMinutes(_rpeEdit.si,_rpeEdit.pi,next);
   const inp=document.getElementById('rpe-ed-min-in');
@@ -20900,7 +21449,7 @@ function dbBuildPlayerStatsSnapshot(data,pi,offset,includePhoto){
     const y=Math.floor(sk/10000),m=Math.floor(sk/100)%100,d=sk%100;
     const key=isoWeekKey(new Date(y,m-1,d));
     if(!rpeWeeks[key])rpeWeeks[key]={load:0,n:0,sk};
-    rpeWeeks[key].load+=v*rpeSessionMinutes(s,p,si);
+    rpeWeeks[key].load+=v*rpePlayedMin(s,p,si);
     rpeWeeks[key].n++;
   });
   // Season totals, and per match for the detail list
@@ -21386,7 +21935,13 @@ function renderDashboard(){
   html+=dbKpiCard('Spiele','%',m.pct.match,mDoneTxt);
   html+=dbKpiCard('Ø Training','Spieler',m.groupSize.training,m.counts.trainingsDone?'von '+m.counts.players+' Spielern':'noch keine');
   html+=dbKpiCard('Ø Spiel','Spieler',m.groupSize.match,m.counts.matchesDone?'von '+m.counts.players+' Spielern':'noch keine');
-  html+=dbKpiCard('Kader',null,m.counts.players,'Spieler insgesamt');
+  {
+    // The season's record, once results are entered (Spielbericht); else the squad size
+    let w=0,dr=0,l=0,gf=0,ga=0;
+    (data.sessions||[]).forEach(s=>{const r=sbResult(s);if(!r)return;gf+=r.f;ga+=r.a;if(r.k==='w')w++;else if(r.k==='l')l++;else dr++;});
+    if(w+dr+l)html+=dbKpiCard('Bilanz',null,w+'\u2013'+dr+'\u2013'+l,'S\u2013U\u2013N \u00b7 Tore '+gf+':'+ga);
+    else html+=dbKpiCard('Kader',null,m.counts.players,'Spieler insgesamt');
+  }
   html+='</div>';
   // Row: Status breakdown + Sessions overview
   html+='<div class="db-two-col">';
@@ -22864,6 +23419,12 @@ function openPlayerStats(pi,opts){
     if(p.foot)info.push(_row('Starker Fu\u00df',p.foot==='right'?'Rechts':p.foot==='left'?'Links':'Beidf\u00fc\u00dfig'));
     if(p.passnr)info.push(_row('Pass-Nr.',escapeHtml(p.passnr)));
     if(canEdit()&&!playerSb(p))info.push(_row('Spielberechtigt',_sbAbDisp(p,true)?'ab '+_sbAbDisp(p,true):'noch nicht'));
+    if(canEdit()){
+      const _D=cd(),_cc=sbCardCounts(p,_D,UI.currentSeason);
+      if(_cc.y+_cc.gr+_cc.r)info.push(_row('Karten',['y','gr','r'].filter(k=>_cc[k]).map(k=>_cardIc(k)+' '+_cc[k]+' '+CARD_NAMES[k]).join(' \u00b7 ')));
+      const _nb=sbNextBan(p,_D,UI.currentSeason);
+      if(_nb)info.push(_row('Gesperrt',escapeHtml(sbBanText(_nb,_D).replace(/^gesperrt /,''))+' \u2013 fehlt am '+escapeHtml(_D.sessions[_nb.ti].date)));
+    }
     const personSec=document.getElementById('ps-sec-person');
     noteEl.innerHTML=info.join('');
     if(personSec)personSec.style.display=info.length?'':'none';
@@ -23893,6 +24454,7 @@ function openSessStats(si){
   try{renderSessPhysio(si);}catch(e){console.error('sessPhysio:',e);}
   try{renderSessRpe(si);}catch(e){console.error('sessRpe:',e);}
   try{renderSessMvp(si);}catch(e){console.error('sessMvp:',e);}
+  try{renderSessReport(si);}catch(e){console.error('sessReport:',e);}
   try{_ssSyncMore();}catch(e){}
   const rcw=document.getElementById('ss-rollcall-wrap');
   if(rcw)rcw.style.display=(canEdit()&&typeof _isSessRollCallTime==='function'&&_isSessRollCallTime(si))?'block':'none';
@@ -23972,7 +24534,7 @@ function openSessStats(si){
           </select></div>`}
         <div class="tp-row"><span class="tp-l">Physio dabei</span>
           <label class="ss-e-check"><input type="checkbox" id="ss-e-physio" ${sessPhysioOn(s)?'checked':''} onchange="sessSetPhysio(${si},this.checked)"><span>am Trainingstag verf\u00fcgbar</span></label></div>
-        <div class="tp-row"><span class="tp-l">${isMat?'Spielbericht':'Trainingsplan'}</span>
+        <div class="tp-row"><span class="tp-l">${isMat?'Link zum Spiel':'Trainingsplan'}</span>
           <input type="url" id="ss-e-link" value="${escapeHtml(s.planLink||'')}" class="tp-in" placeholder="https://..." onchange="updSessLink(${si},this.value)"/></div>
       </div>
       <div class="tp-sec">
@@ -25218,7 +25780,8 @@ const _CAL_IC={
   plan:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M7.5 14h3M7.5 17.5h6"/>',
   exp:'<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>',
   clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/>',
-  pause:'<circle cx="12" cy="12" r="9"/><path d="M10 9v6M14 9v6"/>'
+  pause:'<circle cx="12" cy="12" r="9"/><path d="M10 9v6M14 9v6"/>',
+  table:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9.5h18M3 15h18M9 4v16"/>'
 };
 function _calSvg(k,sz,sw){return `<svg width="${sz||16}" height="${sz||16}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw||2}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${_CAL_IC[k]||''}</svg>`;}
 const _calK=d=>d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
@@ -25464,6 +26027,7 @@ function calMoreMenu(btn,e){
     ed?{ic:'clock',label:'Trainingszeiten ändern',sub:'Ab einem Datum: Tage, Uhrzeit, Ort',fn:()=>openResched()}:null,
     ed?{ic:'pause',label:'Trainingspause',sub:'Trainings in einem Zeitraum absagen',fn:()=>openPause()}:null,
     {ic:'exp',label:ed?'Kalender abonnieren':'Exportieren',sub:ed?'Google, Apple, Outlook – ändert sich mit':'In Google- oder Apple-Kalender',fn:()=>openExportIcs()},
+    fdbUrl()?{ic:'table',label:'Tabelle auf fussball.de',sub:'Spielplan, Ergebnisse, Tabelle',fn:()=>fdbOpen()}:null,
   ].filter(Boolean));
 }
 
@@ -26358,6 +26922,7 @@ function hxRender(){
   const flags=[];
   try{const nf=_newsFlag();if(nf)flags.push(nf);}catch(e){}
   try{_sqFlags(D,season).forEach(f=>flags.push(f));}catch(e){}
+  try{_sbFlags(D,season).forEach(f=>flags.push(f));}catch(e){}
   try{
     _rcMissing(D,season).forEach(x=>flags.push({dot:'#C9373E',who:'Anwesenheit fehlt',
       what:(x.s.type==='match'?'Spiel':'Training')+' vom '+x.s.date+(x.there?': '+x.open+' Spieler ohne Eintrag':' ist noch nicht erfasst'),on:`rcOpen(${x.si})`}));
@@ -26546,7 +27111,7 @@ function _mobCurrentView(){
 function _mobNavVisibility(){
   const nav=document.getElementById('mobNav');
   if(!nav)return;
-  const blocking=['moLineup','moSeasonLineup','rcOverlay'].some(id=>{
+  const blocking=['moLineup','moSeasonLineup','rcOverlay','sbOverlay'].some(id=>{
     const el=document.getElementById(id);
     return el&&(el.classList.contains('open')||el.style.display==='flex');
   })||document.body.classList.contains('player-mode');
@@ -26737,7 +27302,7 @@ function _a2hsMaybe(){
   const mode=_a2hsEvt?'native':(_a2hsIOS()?'ios':'');
   if(!mode)return; // this browser can do neither (e.g. an in-app browser)
   // Not on top of something the user is busy with — try again a bit later
-  if(document.querySelector('.mo.open:not(.hx-page),.tpl-ov.open,#moLineup.open,#moSeasonLineup.open,#rcOverlay.open,#mobSheet.open')){_a2hsLater_(15000);return;}
+  if(document.querySelector('.mo.open:not(.hx-page),.tpl-ov.open,#moLineup.open,#moSeasonLineup.open,#rcOverlay.open,#sbOverlay.open,#mobSheet.open')){_a2hsLater_(15000);return;}
   // Not over the rating either: it would cover the bottom of the scale. The
   // moment after "Danke" is the better one to ask.
   if(document.querySelector('.rpo-list,#hubThanks')){_a2hsLater_(8000);return;}
@@ -27697,6 +28262,9 @@ function _statsPlayerTable(D,opts){
   const _bm=/^(.+)__(\d{4}\/\d{2})$/.exec(_bk);
   const luAt=ss.map((s,i)=>{
     if(!_bm||!s||s.type!=='match'||!_isPast(i))return null;
+    // The match report names the starting eleven; else a saved lineup
+    const rst=(s.rep&&Array.isArray(s.rep.st)&&s.rep.st.length)?s.rep.st:null;
+    if(rst){const set=new Set();rst.forEach(n=>{const k=(D.players||[]).findIndex(x=>x&&x.name===n);if(k>=0)set.add(k);});if(set.size)return set;}
     const lu=G.matchLineups&&G.matchLineups[_mlKey(_bm[1],_bm[2],i)];
     if(!lu||(lu.sessDate&&lu.sessDate!==s.date))return null;
     const st=Object.values(lu.slots||{}).filter(v=>typeof v==='number');
@@ -27722,12 +28290,15 @@ function _statsPlayerTable(D,opts){
     const stIn=mIdx.filter(i=>luAt[i]&&luAt[i].has(_pi)).length;
     const stOf=mIdx.filter(i=>luAt[i]&&(luAt[i].has(_pi)||(p.s&&p.s[i]===1))).length;
     const subN=mIdx.filter(i=>luAt[i]&&!luAt[i].has(_pi)&&Array.isArray(ss[i].subIn)&&ss[i].subIn.includes(p.name)).length;
-    return{pi:D.players.indexOf(p),nr:p.nr,name:p.name,shortname:p.shortname,pos:p.pos,pos2:p.pos2||'',tA,tPl,tPct,mA,mPl,mPct,pct:tPct,perfAvg,perfAvgSort:perfAvg!=null?perfAvg:99,perfCount:perfVals.length,
+    const minT=mIdx.reduce((t,i)=>{const m=sbMinutes(ss[i]);return t+(m?(m[p.name]||0):0);},0);
+    const cc={y:0,gr:0,r:0};mIdx.forEach(i=>{const c=Array.isArray(p.cards)?p.cards[i]:null;if(c&&c in cc)cc[c]++;});
+    return{minT,cy:cc.y,cgr:cc.gr,cr:cc.r,cSort:cc.r*100+cc.gr*10+cc.y,pi:D.players.indexOf(p),nr:p.nr,name:p.name,shortname:p.shortname,pos:p.pos,pos2:p.pos2||'',tA,tPl,tPct,mA,mPl,mPct,pct:tPct,perfAvg,perfAvgSort:perfAvg!=null?perfAvg:99,perfCount:perfVals.length,
       goals,assists,gSort:goals*1000+assists,mvp,stIn,stOf,stSort:stIn*1000+stOf,subN};
   });
   // The columns appear once the season has any of it — empty columns of
   // dashes would only push the rest off a phone screen
   const hasG=rows.some(r=>r.goals||r.assists),hasM=rows.some(r=>r.mvp),hasL=luAt.some(Boolean),hasS=rows.some(r=>r.subN);
+  const hasMin=rows.some(r=>r.minT),hasC=rows.some(r=>r.cSort);
   // Equal shares: the one who was there more often first (18/18 before 2/2)
   rows.sort((a,b)=>{const v=statsSort.col;let r=typeof a[v]==='string'?a[v].localeCompare(b[v]):a[v]-b[v];
     if(!r&&v==='tPct')r=a.tA-b.tA;if(!r&&v==='mPct')r=a.mA-b.mA;return statsSort.asc?r:-r;});
@@ -27738,7 +28309,7 @@ function _statsPlayerTable(D,opts){
   return `${opts.noHead?'':`    <div class="sec" style="margin-top:12px;margin-bottom:8px;">🏆 Alle Spieler</div>
 `}    <div style="${wrap}">
     <table class="full-table"><thead><tr>
-      ${th('nr','#')}${th('name','Spieler')}${th('pos','Pos.')}${th('tPct','Training')}${mS?th('mPct','Spiele'):''}${hasL?th('stSort','Startelf'):''}${hasS?th('subN','Eingew.'):''}${hasG?th('gSort','Tore · Vorl.'):''}${hasM?`<th onclick="sortStats('mvp')" title="Spieler des Spiels">🏅 ${sa('mvp')}</th>`:''}${th('perfAvgSort','⭐ Einsatz')}
+      ${th('nr','#')}${th('name','Spieler')}${th('pos','Pos.')}${th('tPct','Training')}${mS?th('mPct','Spiele'):''}${hasL?th('stSort','Startelf'):''}${hasS?th('subN','Eingew.'):''}${hasMin?th('minT','Min.'):''}${hasG?th('gSort','Tore · Vorl.'):''}${hasC?th('cSort','Karten'):''}${hasM?`<th onclick="sortStats('mvp')" title="Spieler des Spiels">🏅 ${sa('mvp')}</th>`:''}${th('perfAvgSort','⭐ Einsatz')}
     </tr></thead><tbody>
     ${rows.map(r=>{const bc=pctColor(r.tPct);
       const openHandler=open(r.pi);
@@ -27751,7 +28322,9 @@ function _statsPlayerTable(D,opts){
       ${mS?_stPc(r.mA,r.mPl,r.mPct,'Spielen'):''}
       ${hasL?`<td class="st-gv" title="${r.stIn} von ${r.stOf} Spielen mit Aufstellung, bei denen er dabei war">${r.stOf?`<b>${r.stIn}</b><small>/</small>${r.stOf}`:'–'}</td>`:''}
       ${hasS?`<td title="${r.subN}× eingewechselt">${r.subN||'–'}</td>`:''}
+      ${hasMin?`<td title="${r.minT} Minuten laut Spielbericht">${r.minT||'–'}</td>`:''}
       ${hasG?`<td class="st-gv" title="${r.goals} ${r.goals===1?'Tor':'Tore'}, ${r.assists} ${r.assists===1?'Vorlage':'Vorlagen'}">${r.goals||r.assists?`<b>${r.goals}</b><small>·</small>${r.assists}`:'–'}</td>`:''}
+      ${hasC?`<td class="st-cards" title="${r.cy} Gelb, ${r.cgr} Gelb-Rot, ${r.cr} Rot">${r.cSort?[['y',r.cy],['gr',r.cgr],['r',r.cr]].filter(x=>x[1]).map(x=>_cardIc(x[0])+(x[1]>1?'<b>'+x[1]+'</b>':'')).join(' '):'–'}</td>`:''}
       ${hasM?`<td title="${r.mvp}× Spieler des Spiels">${r.mvp||'–'}</td>`:''}
       <td style="font-weight:700;color:${perfColor};" title="${r.perfCount} bewertete Termine">${r.perfAvg!=null?r.perfAvg.toFixed(1).replace('.',','):'–'}</td>
     </tr>`;}).join('')}
@@ -37360,6 +37933,8 @@ _pubCleanupSchedule();
       </div>
       <div id="ayBox" class="ay-box"></div>
       <div id="meetBox" class="ay-box"></div>
+      <div id="cardBox" class="ay-box"></div>
+      <div id="fdbBox" class="ay-box"></div>
 
       <div class="set-hx-only" id="set-foc-host" style="margin:16px 0 4px;"><div class="setting-label" style="margin-bottom:6px;">🎯 Schwerpunkte</div>
         <p class="note">Schwerpunkte für <strong id="foc-team-lbl">–</strong></p>
@@ -37588,6 +38163,20 @@ _pubCleanupSchedule();
 </div></div>
 
 <!-- Roll-call: fullscreen attendance capture -->
+<div class="rc-overlay sb-ov" id="sbOverlay" role="dialog" aria-modal="true" aria-labelledby="sb-date">
+  <div class="rc-head">
+    <div class="rc-head-top">
+      <div class="rc-title">
+        <div class="rc-kind">Spielbericht</div>
+        <div class="rc-date" id="sb-date">–</div>
+        <div class="sb-hsub" id="sb-sub"></div>
+      </div>
+      <button class="rc-x" onclick="sbClose()" title="Schließen" aria-label="Schließen">✕</button>
+    </div>
+  </div>
+  <div class="rc-list sb-body" id="sb-body"></div>
+  <div class="rc-foot"><button class="rc-fb rc-fb-done" onclick="sbClose()">Fertig</button></div>
+</div>
 <div class="rc-overlay" id="rcOverlay">
   <div class="rc-head">
     <div class="rc-head-top">
