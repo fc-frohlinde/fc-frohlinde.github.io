@@ -5609,6 +5609,7 @@ body.design-heute .tst-filter .tpl-hint{color:var(--hx-og-muted);}
 .dg-gap{width:1px;height:22px;background:rgba(255,255,255,.2);margin:0 3px;flex:0 0 auto;}
 /* 1.2.31: frame, group, context menu */
 .dg-svg{-webkit-touch-callout:none;}
+.dg-svg:focus{outline:none;}
 .dg-band{fill:rgba(255,210,90,.12);stroke:#FFD25A;stroke-width:1.5;stroke-dasharray:5 4;pointer-events:none;}
 .dg-grp{fill:none;stroke:rgba(255,210,90,.6);stroke-width:1.2;stroke-dasharray:3 4;pointer-events:none;}
 .dg-cm{position:fixed;z-index:820;min-width:220px;max-width:280px;padding:6px;border-radius:12px;background:var(--tp-card);color:var(--tp-ink);border:1px solid var(--tp-line);box-shadow:0 12px 32px rgba(5,14,32,.28);font:500 14px 'Barlow',sans-serif;}
@@ -5638,6 +5639,11 @@ body.design-heute .tst-filter .tpl-hint{color:var(--hx-og-muted);}
 .dg-svg{display:block;width:100%;height:100%;touch-action:none;user-select:none;-webkit-user-select:none;}
 .dg-svg .dg-it{cursor:move;}
 .dg-svg.draw,.dg-svg.draw .dg-it{cursor:crosshair;}
+.dg-svg.draw[data-fam="line"] .dg-it:is([data-t="l"],[data-t="r"]),
+.dg-svg.draw[data-fam="z"] .dg-it[data-t="z"],
+.dg-svg.draw[data-fam="pt"] .dg-it:not([data-t="l"]):not([data-t="r"]):not([data-t="z"]){cursor:move;}
+.dg-pre{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.dg-bar .tpl-ab.dg-done{background:var(--tp-navy);border-color:var(--tp-navy);color:#fff;font-weight:700;}
 .dg-h{fill:#FFFFFF;stroke:#0B2550;stroke-width:2;cursor:grab;}
 .dg-h.mid{fill:#FFD25A;}
 .dg-h.rot{fill:#FFD25A;stroke:#0B2550;cursor:grab;}
@@ -6659,13 +6665,20 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.32'; // v1.2.32: Zeichenbrett — Zonen, Drehen, Hintergründe, Bild
-const APP_VERSION_LABEL='1.2.32';
+const APP_VERSION='1.2.33'; // v1.2.33: Zeichenbrett — zeichnen und gleich ändern
+const APP_VERSION_LABEL='1.2.33';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792763331409; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792764996990; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.33',date:'23.10.2026',title:'Zeichenbrett: zeichnen und gleich ändern',items:[
+    {icon:'✏️',title:'Gezeichnetes direkt anpassen',desc:'Mit einem Linien-Werkzeug lässt sich ein vorhandener Pfeil packen und verschieben, an seinen Punkten Ende und Bogen ändern – ohne Werkzeugwechsel. Ein Druck auf freies Feld, einen Spieler oder ein Hütchen zeichnet weiter neue Pfeile. Genauso verschieben Spieler- und Material-Werkzeuge das, was schon steht.'},
+    {icon:'🎨',title:'Farbe bleibt',desc:'Die zuletzt gewählte Farbe gilt für die nächsten Hütchen, Markierungen, Hürden, Ringe, Dummys und Reihen – jede Art für sich, gemerkt auf diesem Gerät. Bei aktivem Werkzeug lässt sie sich unter dem Feld auch vorher wählen.'},
+    {icon:'⚽',title:'Neuer Ball',desc:'Der Ball sieht jetzt wie ein Fußball aus: Fünfecke, Nähte, ein leichter Schatten – im Feld, im Druck und im Bild.'},
+    {icon:'⌨️',title:'Tastenkürzel ohne Umweg',desc:'Strg+C / Strg+V, Entf, Pfeiltasten usw. wirken jetzt gleich nach einem Klick ins Feld – vorher blieben sie im zuletzt benutzten Textfeld (z. B. Name der Übung) hängen, bis das Menü einmal offen war.'},
+    {icon:'🖱',title:'Zeichnen beenden',desc:'Rechtsklick legt das Werkzeug weg (ohne Menü), ebenso ein zweiter Klick auf das Werkzeug, Esc oder „Fertig“ unter dem Feld. Das zuletzt Gezeichnete bleibt ausgewählt.'},
+  ]},
   {version:'1.2.32',date:'23.10.2026',title:'Zeichenbrett, Teil 2',items:[
     {icon:'↗',title:'Torschuss und Linie',desc:'Zwei neue Linien: Torschuss (kräftig, rot) und eine Linie ohne Pfeil, z. B. für Grenzen oder Gassen.'},
     {icon:'⬭',title:'Zonen: oval, farbig, mit Maßen',desc:'Eine Zone kann rechteckig oder oval sein, eine Füllfarbe haben (Weiß, Gelb, Blau, Rot) und ihre Maße zeigen, z. B. „20 × 15 m“.'},
@@ -32354,7 +32367,7 @@ const DG_TOOLS=[
   ['h','Hürde','M4 9h16M7 9v9M17 9v9M5 18h4M15 18h4'],
   ['ri','Ring','M12 12m-8 0a8 8 0 1 0 16 0a8 8 0 1 0-16 0M12 12m-4.5 0a4.5 4.5 0 1 0 9 0a4.5 4.5 0 1 0-9 0'],
   ['d','Dummy','M12 6m-2.3 0a2.3 2.3 0 1 0 4.6 0a2.3 2.3 0 1 0-4.6 0M8.5 21l1.2-11h4.6l1.2 11z'],
-  ['b','Ball','M12 12m-7 0a7 7 0 1 0 14 0a7 7 0 1 0-14 0'],
+  ['b','Ball','M12 12m-8.5 0a8.5 8.5 0 1 0 17 0a8.5 8.5 0 1 0-17 0M12 9l2.85 2.07-1.09 3.36h-3.52l-1.09-3.36zM12 9V4.2M14.85 11.07l4.3-1.4M13.76 14.43l2.6 3.6M10.24 14.43l-2.6 3.6M9.15 11.07l-4.3-1.4'],
   ['g','Minitor','M4 18V8h16v10M4 8l3-3h10l3 3'],
   ['G','Großes Tor','M2 19V7h20v12M2 7l2-3h16l2 3M8 7v12M16 7v12'],
   ['ld','Koordinationsleiter','M3 8h18M3 16h18M6 8v8M10 8v8M14 8v8M18 8v8'],['|'],
@@ -32375,6 +32388,21 @@ const DG_COLORED={c:1,m:1,h:1,ri:1,d:1};
 // Turned in 90° steps by "Drehen"
 const DG_ROT={g:1,G:1,ld:1,h:1};
 const DG_CLIP_LS='fcf_dg_clip';
+const DG_LASTC_LS='fcf_dg_last';
+// The colour new material of a kind gets: the last one chosen (this device)
+function _dgLastMap(){
+  if(DG.lastC)return DG.lastC;
+  let v={};try{v=JSON.parse(localStorage.getItem(DG_LASTC_LS)||'{}')||{};}catch(e){v={};}
+  return (DG.lastC=(v&&typeof v==='object')?v:{});
+}
+function _dgLastC(k){const c=_dgLastMap()[k];return DG_CONES.indexOf(c)>=0?c:DG_DEFC[k];}
+function _dgRemember(k,c){
+  if(!DG_COLORED[k]||DG_CONES.indexOf(c)<0)return;
+  const m=_dgLastMap();m[k]=c;try{localStorage.setItem(DG_LASTC_LS,JSON.stringify(m));}catch(e){}
+}
+// the colour for the next pieces, chosen while the tool is active
+function dgToolColor(c){const k=DG.tool==='row'?DG.rowK:DG.tool;_dgRemember(k,c);_dgBar();}
+function dgToolRowKind(k){if(DG_ROWK[k]){DG.rowK=k;_dgBar();}}
 // sel: the one selected item (-1); ms: several (then sel is -1)
 const DG={tool:'sel',sel:-1,ms:[],drag:null,undo:[],redo:[],focus:false,bid:null,clip:null,pasteN:0,nudgeT:null,lp:null,lpT:null,lpMenu:false,cmP:null,rowK:'c'};
 function _dgN(v,d){v=+v;return isFinite(v)?v:(d||0);}
@@ -32469,8 +32497,24 @@ function _dgRowPts(it){
 function _dgRowAng(it){return Math.atan2(_dgN(it.y2)-_dgN(it.y1),_dgN(it.x2)-_dgN(it.x1))*180/Math.PI;}
 // while drawing: about one piece every 45 units (2–12)
 function _dgRowAuto(it){return _dgCl(Math.round(Math.hypot(_dgN(it.x2)-_dgN(it.x1),_dgN(it.y2)-_dgN(it.y1))/45)+1,2,12);}
+// A football seen from above: a black pentagon in the middle, five at the
+// rim (cut by the outline), seams to them, a soft shadow (1.2.33)
+function _dgBall(x,y){
+  const R=8.5,P=(r,a)=>{const t=a*Math.PI/180;return (x+Math.cos(t)*r).toFixed(2)+','+(y+Math.sin(t)*r).toFixed(2);};
+  let rim='',seam='';const mid=[];
+  for(let k=0;k<5;k++){
+    const a=-90+72*k;mid.push(P(R*0.4,a));
+    rim+=`M${P(R,a-13)} L${P(R*0.82,a-9)} L${P(R*0.71,a)} L${P(R*0.82,a+9)} L${P(R,a+13)} A${R},${R} 0 0,0 ${P(R,a-13)}Z `;
+    seam+=`M${P(R*0.4,a)} L${P(R*0.71,a)} `;
+  }
+  return `<ellipse cx="${x+1}" cy="${(y+R-1).toFixed(1)}" rx="${(R*0.9).toFixed(1)}" ry="2.4" fill="rgba(0,0,0,.28)"/>`
+    +`<circle cx="${x}" cy="${y}" r="${R}" fill="#FFFFFF"/>`
+    +`<path d="${seam}" stroke="#4A4F57" stroke-width="0.55" fill="none"/>`
+    +`<path d="M${mid.join(' L')}Z ${rim}" fill="#1B1B1B"/>`
+    +`<circle cx="${x}" cy="${y}" r="${R}" fill="none" stroke="#1B1B1B" stroke-width="1"/>`;
+}
 function _dgItem(it,i,edit){
-  const da=edit?` data-i="${i}" class="dg-it"`:'';
+  const da=edit?` data-i="${i}" data-t="${it.t}" class="dg-it"`:'';
   const x=_dgN(it.x),y=_dgN(it.y);
   // small things get a larger invisible target in the editor
   const pad=edit?`<circle cx="${x}" cy="${y}" r="13" fill="rgba(0,0,0,0)"/>`:'';
@@ -32479,7 +32523,7 @@ function _dgItem(it,i,edit){
       return `<g${da}><circle cx="${x}" cy="${y}" r="16" fill="${c.f}" stroke="#FFFFFF" stroke-width="2.5"/>${n?`<text x="${x}" y="${y+5}" text-anchor="middle" font-family="Barlow,Arial,sans-serif" font-weight="700" font-size="${n.length>2?11:14}" fill="${c.t}">${_tplE(n)}</text>`:''}</g>`;}
     case 'c':case 'm':case 's':case 'ri':case 'd':return `<g${da}>${pad}${_dgEl(it.t,x,y,it.c)}</g>`;
     case 'h':return `<g${da}>${pad}${_dgEl('h',x,y,it.c,_dgN(it.r))}</g>`;
-    case 'b':return `<g${da}>${pad}<circle cx="${x}" cy="${y}" r="7" fill="#FFFFFF" stroke="#1B1B1B" stroke-width="1.5"/><path d="M${x-2.5},${y-1.5} l2.5,-2 l2.5,2 l-1,3 h-3z" fill="#1B1B1B"/></g>`;
+    case 'b':return `<g${da}>${pad}${_dgBall(x,y)}</g>`;
     case 'g':case 'G':{const W=it.t==='G'?64:34,D=it.t==='G'?14:10;let net='';
       for(let k=-W/2+8;k<W/2;k+=8)net+=`<line x1="${k}" y1="${-D/2}" x2="${k}" y2="${D/2}"/>`;
       return `<g${da}><g transform="translate(${x} ${y}) rotate(${_dgN(it.r)})"><rect x="${-W/2}" y="${-D/2}" width="${W}" height="${D}" fill="rgba(255,255,255,.2)" stroke="#FFFFFF" stroke-width="2"/><g stroke="rgba(255,255,255,.5)" stroke-width="1">${net}</g><line x1="${-W/2}" y1="${D/2}" x2="${W/2}" y2="${D/2}" stroke="#FFFFFF" stroke-width="3.5"/></g></g>`;}
@@ -32561,6 +32605,12 @@ function _dgName(it){
   const t=DG_TOOLS.find(x=>x[0]===it.t);return t?t[1].replace(/ \(.*\)$/,''):'Element';
 }
 
+// What a drawing tool may grab instead of drawing anew (1.2.33): line tools
+// lines and Reihen, the zone tool zones, the others players and material.
+// Zones never count for the others — drawing inside a zone must stay possible.
+function _dgFam(t){return (t==='l'||t==='r')?'line':t==='z'?'z':'pt';}
+function _dgToolFam(tool){return (DG_LINE[tool]||tool==='row')?'line':tool==='z'?'z':'pt';}
+
 // ── Selection
 function _dgSelIdx(){return DG.ms.length?DG.ms.slice():(DG.sel>=0?[DG.sel]:[]);}
 function _dgSelect(idx){
@@ -32586,7 +32636,7 @@ function _dgToolIcon(k){
 function _dgEditorHtml(b){
   const dia=b.dia||{};
   const tools=DG_TOOLS.map(([k,lbl])=>k==='|'?'<span class="dg-gap" aria-hidden="true"></span>'
-    :`<button type="button" class="dg-tb${DG.tool===k?' on':''}" data-tool="${k}" title="${lbl}" aria-label="${lbl}" aria-pressed="${DG.tool===k}" onclick="dgTool('${k}')">${_dgToolIcon(k)}</button>`).join('');
+    :`<button type="button" class="dg-tb${DG.tool===k?' on':''}" data-tool="${k}" title="${lbl}" aria-label="${lbl}" aria-pressed="${DG.tool===k}" onclick="dgTool('${k}',1)">${_dgToolIcon(k)}</button>`).join('');
   const bg=dia.bg||'grass';
   return `<div class="dg-wrap" id="dgWrap">
     <div class="dg-tools" role="toolbar" aria-label="Zeichenwerkzeuge">${tools}<span class="dg-tr">
@@ -32596,7 +32646,7 @@ function _dgEditorHtml(b){
       <button type="button" class="dg-tb" title="Als Bild speichern" aria-label="Skizze als Bild speichern" onclick="dgImage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 16l5-5 4 4 3-3 6 6"/><circle cx="15.5" cy="9.5" r="1.5"/></svg></button>
       <button type="button" class="dg-tb" title="Skizze leeren" aria-label="Skizze leeren" onclick="dgClear()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button></span>
     </div>
-    <div class="dg-box"><svg id="dgSvg" class="dg-svg" viewBox="0 0 640 400" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Skizze der Übung"><g id="dgBgG">${_dgBg(bg)}</g><g id="dgG"></g></svg></div>
+    <div class="dg-box"><svg id="dgSvg" class="dg-svg" tabindex="-1" viewBox="0 0 640 400" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Skizze der Übung"><g id="dgBgG">${_dgBg(bg)}</g><g id="dgG"></g></svg></div>
     <div class="dg-bar" id="dgBar"></div>
   </div>`;
 }
@@ -32644,6 +32694,7 @@ function _dgDraw(){
   const g=document.getElementById('dgG');const svg=document.getElementById('dgSvg');if(!g||!svg)return;
   const dia=_dgCurDia(false);
   svg.classList.toggle('draw',DG.tool!=='sel');
+  svg.dataset.fam=DG.tool==='sel'?'':_dgToolFam(DG.tool);
   const items=_dgItems(dia);
   if(DG.sel>=items.length)DG.sel=-1;
   DG.ms=DG.ms.filter(i=>i<items.length);
@@ -32676,8 +32727,8 @@ function _dgNextNo(items,k){
 // A new single item at p for a tool
 function _dgNewItem(tool,p,dia){
   if(tool[0]==='p'&&tool.length===2){const k=tool[1];return {t:'p',k:k,x:p.x,y:p.y,n:_dgNextNo(dia.it,k)};}
-  if(DG_COLORED[tool]&&tool!=='h')return {t:tool,x:p.x,y:p.y,c:DG_DEFC[tool]};
-  if(tool==='h')return {t:'h',x:p.x,y:p.y,r:0,c:DG_DEFC.h};
+  if(DG_COLORED[tool]&&tool!=='h')return {t:tool,x:p.x,y:p.y,c:_dgLastC(tool)};
+  if(tool==='h')return {t:'h',x:p.x,y:p.y,r:0,c:_dgLastC('h')};
   if(tool==='b'||tool==='s')return {t:tool,x:p.x,y:p.y};
   if(tool==='g'||tool==='G'||tool==='ld')return {t:tool,x:p.x,y:p.y,r:0};
   if(tool==='tx')return {t:'tx',x:p.x,y:p.y,s:'Text'};
@@ -32698,8 +32749,17 @@ function _dgLP(e,ctx){
   },500);
 }
 function _dgLPCancel(){clearTimeout(DG.lpT);DG.lpT=null;DG.lp=null;}
+// The pointerdown below is prevented (no text selection, no scrolling), and
+// with it the browser's own focus change: a text field touched before kept
+// the keyboard, and Strg+C/V went there. The field takes the focus itself.
+function _dgFocusSvg(){
+  const a=document.activeElement,svg=document.getElementById('dgSvg');
+  if(a&&a!==svg&&a!==document.body&&a.blur)try{a.blur();}catch(x){}
+  if(svg)try{svg.focus({preventScroll:true});}catch(x){}
+}
 function _dgDown(e){
   DG.lpMenu=false;
+  _dgFocusSvg();
   if(e.pointerType==='mouse'&&e.button!==0)return;
   const b=_tplCur();if(!b)return;
   DG.focus=true;
@@ -32735,10 +32795,22 @@ function _dgDown(e){
     _dgLP(e,{p:p});
     return;
   }
+  {
+    const dia0=_dgCurDia(false);
+    if(dia0&&hEl&&+hEl.dataset.i===DG.sel){
+      DG.drag={m:'h',h:hEl.dataset.h,i:DG.sel,p0:p,moved:false,snap:JSON.stringify(dia0)};return;
+    }
+    const i=iEl?+iEl.dataset.i:-1,it0=dia0&&dia0.it[i];
+    if(it0&&tool!=='tx'&&_dgFam(it0.t)===_dgToolFam(tool)){
+      _dgSelect([i]);
+      DG.drag={m:'mv',i:i,p0:p,orig:_tplClean(it0),moved:false,snap:JSON.stringify(dia0)};
+      _dgDraw();_dgBar();return;
+    }
+  }
   const dia=_dgCurDia(true);const snap=JSON.stringify(dia);
   let it=null,m='mv';
   if(DG_LINE[tool]){it={t:'l',k:tool,x1:p.x,y1:p.y,x2:p.x,y2:p.y};m='new';}
-  else if(tool==='row'){it={t:'r',k:DG_ROWK[DG.rowK]?DG.rowK:'c',n:2,x1:p.x,y1:p.y,x2:p.x,y2:p.y};if(DG_COLORED[it.k])it.c=DG_DEFC[it.k];m='new';}
+  else if(tool==='row'){it={t:'r',k:DG_ROWK[DG.rowK]?DG.rowK:'c',n:2,x1:p.x,y1:p.y,x2:p.x,y2:p.y};if(DG_COLORED[it.k])it.c=_dgLastC(it.k);m='new';}
   else if(tool==='z'){it={t:'z',x:p.x,y:p.y,w:0,h:0};m='newz';}
   else it=_dgNewItem(tool,p,dia);
   if(!it)return;
@@ -32820,7 +32892,8 @@ function _dgDbl(e){
   const it=_dgItems(_dgCurDia(false))[DG.sel];
   if(it&&(it.t==='p'||it.t==='tx'))_dgBar(true);
 }
-function dgTool(k){
+function dgTool(k,fromBar){
+  if(fromBar&&k===DG.tool&&k!=='sel')k='sel';
   DG.tool=k;DG.focus=true;
   if(k!=='sel')_dgNone();
   _dgCmClose();
@@ -32829,14 +32902,14 @@ function dgTool(k){
 }
 function _dgTouch(){return !!(window.matchMedia&&matchMedia('(pointer:coarse)').matches);}
 function _dgToolHint(){
-  const t=DG.tool;
-  if(t==='line')return 'Im Feld von einem Ende zum anderen ziehen. Später lässt sich die Linie über den mittleren Punkt biegen.';
-  if(DG_LINE[t])return 'Im Feld vom Start zum Ziel ziehen. Später lässt sich der Pfeil über den mittleren Punkt biegen.';
-  if(t==='row')return 'Im Feld von der ersten zur letzten Position ziehen – je länger, desto mehr. Art und Anzahl danach unten ändern.';
-  if(t==='z')return 'Im Feld ein Rechteck aufziehen.';
+  const t=DG.tool,end=_dgTouch()?' „Fertig“ legt das Werkzeug weg.':' Rechtsklick, Esc oder „Fertig“ legt das Werkzeug weg.';
+  if(t==='line')return 'Im Feld von einem Ende zum anderen ziehen, beliebig viele nacheinander. Eine gezeichnete Linie packen verschiebt sie, ihre Punkte ändern Enden und Bogen.'+end;
+  if(DG_LINE[t])return 'Im Feld vom Start zum Ziel ziehen, beliebig viele nacheinander. Einen gezeichneten Pfeil packen verschiebt ihn, seine Punkte ändern Ende und Bogen.'+end;
+  if(t==='row')return 'Im Feld von der ersten zur letzten Position ziehen – je länger, desto mehr. Eine Reihe packen verschiebt sie. Art und Anzahl unten ändern.'+end;
+  if(t==='z')return 'Im Feld ein Rechteck aufziehen. Eine Zone packen verschiebt sie.'+end;
   if(t==='tx')return 'Ins Feld klicken und Text eingeben.';
   const tl=DG_TOOLS.find(x=>x[0]===t);
-  return (tl?tl[1]:'Element')+': ins Feld klicken, so oft wie nötig. Esc oder „Auswählen“ beendet.';
+  return (tl?tl[1]:'Element')+': ins Feld klicken, so oft wie nötig. Was schon steht, lässt sich direkt verschieben.'+end;
 }
 // zone fills: none + four colours; fn = 'dgSet' (bar) or the menu's wrapper
 function _dgZfSw(it,fn){
@@ -32851,6 +32924,7 @@ function _dgBar(focusInput){
   const el=document.getElementById('dgBar');if(!el)return;
   const dia=_dgCurDia(false);
   const B=(lbl,fn,cls,title)=>`<button type="button" class="tpl-ab${cls?' '+cls:''}" onclick="${fn}"${title?` title="${title}"`:''}>${lbl}</button>`;
+  const done=DG.tool!=='sel'?B('✓ Fertig',"dgTool('sel')",'dg-done','Werkzeug weglegen, zurück zum Auswählen (Esc, Rechtsklick)'):'';
   if(DG.ms.length){
     el.innerHTML=`<b class="dg-cnt">${DG.ms.length} Elemente</b><span class="dg-hint">Ziehen verschiebt alle, Pfeiltasten fein.</span><span class="dg-sp"></span>`
       +B('↻ Drehen','dgRotate()','','Um 90° drehen (R)')+B('Kopie','dgDup()','','Duplizieren (Strg+D)')+B('Löschen','dgDel()','danger','Entfernen (Entf)');
@@ -32861,7 +32935,13 @@ function _dgBar(focusInput){
     el.innerHTML=`<span class="dg-hint">${DG.tool==='sel'
       ?(_dgTouch()?'Werkzeug oben wählen und ins Feld tippen. Lange drücken öffnet das Menü, ein Rahmen wählt mehrere aus.'
         :'Werkzeug oben wählen und ins Feld klicken. Rechtsklick öffnet das Menü, ein Rahmen (oder Shift + Klick) wählt mehrere aus.')
-      :_dgToolHint()}</span>`;
+      :_dgToolHint()}</span>${done?'<span class="dg-sp"></span>'+done:''}`;
+    const tk=DG.tool==='row'?DG.rowK:DG.tool;
+    if(DG.tool==='row'||DG_COLORED[tk]){
+      let pre=DG.tool==='row'?`<select class="dg-sel" aria-label="Art der nächsten Reihe" onchange="dgToolRowKind(this.value)">${Object.keys(DG_ROWK).map(x=>`<option value="${x}"${x===tk?' selected':''}>${DG_ROWK[x]}</option>`).join('')}</select>`:'';
+      if(DG_COLORED[tk])pre+='<span class="dg-lbl">Farbe</span>'+DG_CONES.map(c=>`<button type="button" class="dg-sw${_dgLastC(tk)===c?' on':''}" style="background:${c}" aria-label="Farbe für die nächsten: ${c}" onclick="dgToolColor('${c}')"></button>`).join('');
+      el.innerHTML='<span class="dg-pre">'+pre+'</span>'+el.innerHTML;
+    }
     return;
   }
   let h='';
@@ -32890,7 +32970,7 @@ function _dgBar(focusInput){
   }else if(it.t==='tx'){
     h+=`<input id="dgLblIn" class="dg-txt" maxlength="60" value="${_tplE(it.s||'')}" aria-label="Text" onfocus="_dgPush()" oninput="dgSet('s',this.value,true)" onkeydown="if(event.key==='Enter')this.blur()">`;
   }
-  h+='<span class="dg-sp"></span>'+B('Kopie','dgDup()','','Duplizieren (Strg+D)')+B('Löschen','dgDel()','danger','Entfernen (Entf)');
+  h+='<span class="dg-sp"></span>'+B('Kopie','dgDup()','','Duplizieren (Strg+D)')+B('Löschen','dgDel()','danger','Entfernen (Entf)')+done;
   el.innerHTML=h;
   if(focusInput){const i=document.getElementById('dgLblIn');if(i){i.focus();i.select();}}
 }
@@ -32898,6 +32978,7 @@ function dgSet(prop,val,noPush){
   const dia=_dgCurDia(false);const it=dia&&dia.it[DG.sel];if(!it)return;
   if(!noPush)_dgPush();
   it[prop]=val;
+  if(prop==='c')_dgRemember(it.t==='r'?(DG_ROWK[it.k]?it.k:'c'):it.t,val);
   _dgDraw();_dgCommit();
   if(!noPush)_dgBar();
 }
@@ -32991,7 +33072,7 @@ function dgRowN(d){
 function dgRowKind(k){
   const dia=_dgCurDia(false),it=dia&&dia.it[DG.sel];if(!it||it.t!=='r'||!DG_ROWK[k])return;
   _dgPush();it.k=k;DG.rowK=k;
-  if(DG_COLORED[k]){if(DG_CONES.indexOf(it.c)<0)it.c=DG_DEFC[k];}else delete it.c;
+  if(DG_COLORED[k]){if(DG_CONES.indexOf(it.c)<0)it.c=_dgLastC(k);}else delete it.c;
   _dgDraw();_dgCommit();_dgBar();
 }
 // the Reihe as single pieces, e.g. to move one cone of a slalom
@@ -33049,8 +33130,9 @@ function dgCm(fn){_dgCmClose();DG.focus=true;fn();}
 function _dgCtx(e){
   e.preventDefault();
   if(DG.lpMenu){DG.lpMenu=false;return;} // a long press opened it already
-  _dgLPCancel();DG.drag=null;DG.focus=true;
-  if(DG.tool!=='sel')dgTool('sel');
+  _dgLPCancel();DG.drag=null;DG.focus=true;_dgFocusSvg();
+  // while drawing, a right click only puts the tool down (the last drawn stays selected)
+  if(DG.tool!=='sel'){dgTool('sel');return;}
   const iEl=e.target.closest&&e.target.closest('[data-i]');
   _dgCmOpen(e.clientX,e.clientY,iEl?{i:+iEl.dataset.i}:{p:_dgPt(e)});
 }
