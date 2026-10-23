@@ -10,6 +10,11 @@ on:
       - 'tools/regeln/**'
       - '.github/workflows/regeln.yml'
   workflow_dispatch:
+    inputs:
+      veroeffentlichen:
+        description: 'Опубликовать в Firebase после успешных тестов (иначе только показать отличия)'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -50,3 +55,25 @@ jobs:
             dbg=$(grep -iE 'denied|error|fail' database-debug.log | tail -n 25 | cut -c1-300 | sed 's/%/%25/g' | sed ':a;N;$!ba;s/\n/%0A/g')
             echo "::warning title=Emulator::$dbg"
           fi
+
+  # By hand only: compare with the live rules and, if asked, publish them.
+  # Runs after the tests above passed. Code: tools/regeln/publish.mjs.
+  veroeffentlichen:
+    needs: pruefen
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: tools/regeln
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci --omit=dev --no-audit --no-fund
+        working-directory: tools/regeln
+      - run: node publish.mjs
+        working-directory: tools/regeln
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          PUBLISH: ${{ inputs.veroeffentlichen && '1' || '' }}
