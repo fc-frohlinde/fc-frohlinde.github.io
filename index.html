@@ -6766,13 +6766,16 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.40'; // v1.2.40: Wechsel-Auswahl öffnet an Ort und Stelle
-const APP_VERSION_LABEL='1.2.40';
+const APP_VERSION='1.2.41'; // v1.2.41: Links am Handy
+const APP_VERSION_LABEL='1.2.41';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792782004561; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792783222167; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.41',date:'23.10.2026',title:'Links am Handy',items:[
+    {icon:'🔗',title:'Links über die ganze Breite',desc:'„Mehr“ → „Links“ öffnete die Liste am Handy als schmales Kästchen oben in der Ecke: sie richtete sich nach der Zeile im Menü, das sich dabei schon schloss. Jetzt erscheint sie wie „Aktivität“ über die ganze Breite oben.'},
+  ]},
   {version:'1.2.40',date:'23.10.2026',title:'Wechsel: Auswahl am richtigen Platz',items:[
     {icon:'🔁',title:'Liste öffnet unter dem Feld',desc:'Nach dem Eintippen der Minute öffnete sich die Liste „Rein“ manchmal oben links. Der Spielbericht baute sich beim Verlassen des Minutenfelds neu auf und ersetzte dabei das Feld, das gerade aufging. Jetzt ändern sich nur noch die Einträge der Listen.'},
   ]},
@@ -26359,8 +26362,13 @@ function hxLinks(btn,e){
   if(dd.classList.contains('open')){dd.classList.remove('open');return;}
   closeUserMenuIfOpen&&closeUserMenuIfOpen();
   renderLinksMenu();
-  Object.assign(dd.style,{position:'fixed',zIndex:'99999',right:'auto',bottom:'auto',minWidth:'260px',maxWidth:'320px'});
+  Object.assign(dd.style,{position:'fixed',zIndex:'99999',right:'auto',bottom:'auto',minWidth:'260px',maxWidth:'320px',maxHeight:'',overflowY:''});
   dd.classList.add('open');
+  // Phone (from "Mehr", whose row is gone by now): across the top, like Aktivität
+  if(!btn||window.innerWidth<=767){
+    Object.assign(dd.style,{left:'12px',right:'12px',top:'calc(12px + env(safe-area-inset-top,0px))',minWidth:'0',maxWidth:'none',maxHeight:'calc(100dvh - 140px)',overflowY:'auto'});
+    return;
+  }
   const r=btn.getBoundingClientRect(),ph=dd.offsetHeight;
   dd.style.left=(r.right+10)+'px';
   dd.style.top=Math.max(8,Math.min(r.top,innerHeight-ph-8))+'px';
@@ -27124,7 +27132,7 @@ function mobSheetOpen(){
     ['week','Wochenbericht','openWeekReport()',ed],
   ],[
     ['activity','Aktivität','hxActivity(null,event)',adm],
-    ['links','Links','toggleLinksMenu(event)',!!((G&&G.quickLinks&&G.quickLinks.length)||adm)],
+    ['links','Links','hxLinks(null,event)',!!((G&&G.quickLinks&&G.quickLinks.length)||adm)],
     ['settings','Einstellungen','openSettings()',true],
   ]].map(g=>g.filter(r=>r[3])).filter(g=>g.length);
   const areas=document.getElementById('ms-areas');
@@ -31011,7 +31019,7 @@ function toggleLinksMenu(e){
   const estW=260;
   const leftPos=Math.min(r.left, window.innerWidth-estW-8);
   dd.style.left=Math.max(8,leftPos)+'px';
-  dd.style.right='auto';
+  dd.style.right='auto';dd.style.bottom='auto';dd.style.maxHeight='';
   dd.classList.toggle('open');
   renderLinksMenu();
 }
