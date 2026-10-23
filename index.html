@@ -2392,6 +2392,57 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 .pm-call-btn:active{transform:scale(.98);}
 .pm-callout-note{font-size:.78rem;margin-top:10px;opacity:.9;}
 .pm-fb-exc{background:rgba(243,156,18,.14);color:#7a4f00;}
+/* ── „Meine Woche“ (1.2.45) ── */
+.pm-top{max-width:560px;margin:0 auto;padding:calc(14px + env(safe-area-inset-top,0px)) 16px 4px;}
+.pm-top-back{margin:0 0 10px -2px;}
+.pm-top-row{display:flex;align-items:center;gap:12px;}
+.pm-top-av{width:44px;height:44px;border-radius:50%;overflow:hidden;flex-shrink:0;box-shadow:0 0 0 2px rgba(255,255,255,.18);}
+.pm-top-av .pm-avatar-ini{font-size:1.15rem;letter-spacing:.5px;}
+.pm-top-name{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:1px;line-height:1;color:#fff;}
+.pm-top-sub{font-size:.76rem;font-weight:600;color:rgba(255,255,255,.66);margin-top:3px;}
+.pm-rule{margin:-4px 16px 12px;font-size:.84rem;line-height:1.45;color:rgba(255,255,255,.8);}
+.pm-rule b{color:#fff;}
+.pm-card.st-open{border-left-color:#9AA8BF;}.pm-card.st-yes{border-left-color:#27ae60;}.pm-card.st-plan{border-left-color:#8FD9AE;}
+.pm-card.st-no{border-left-color:#e74c3c;}.pm-card.st-exc{border-left-color:#f39c12;}.pm-card.st-nk{border-left-color:#9AA8BF;}
+.pm-card-date .pm-dow{font-size:.72rem;font-weight:700;color:var(--gd);margin:0 0 1px;}
+.pm-card-date .pm-mo{margin-top:3px;}
+.pm-when{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;color:var(--bd);line-height:1.15;}
+.pm-when b{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;font-weight:400;letter-spacing:.5px;}
+.pm-when span{font-size:.98rem;font-weight:700;}
+.pm-card.pm-match .pm-when b{color:#B35A00;}
+.pm-where{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 2px;}
+.pm-chip{font-size:.74rem;font-weight:600;color:#3A4A66;background:#EEF2F8;padding:3px 8px;border-radius:6px;}
+.pm-chip a{color:inherit;}
+.pm-btn.pm-yes.plan{background:rgba(39,174,96,.16);border:1.5px dashed #27ae60;color:#1f7a45;}
+.pm-state{margin-top:10px;font-size:.8rem;font-weight:700;line-height:1.35;padding:6px 10px;border-radius:8px;display:inline-block;}
+.pm-state.ok{background:rgba(39,174,96,.12);color:#0e6c30;}
+.pm-state.exc{background:rgba(243,156,18,.15);color:#7a4f00;}
+.pm-state.nk{background:rgba(124,138,163,.14);color:#46536A;}
+.pm-state.late{background:#F1F4F9;color:#46536A;font-weight:600;}
+.pm-call{margin-top:10px;padding:12px;border-radius:12px;background:#FDF1EF;border:1px solid #F2C4BD;color:#7A2219;}
+.pm-call-t{font-size:.86rem;font-weight:800;}
+.pm-call-b{font-size:.82rem;line-height:1.45;margin-top:4px;color:#5E2A24;}
+.pm-call-btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.pm-tel{flex:1 1 140px;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 12px;border-radius:10px;
+  background:#C0392B;color:#fff;font-weight:700;font-size:.86rem;text-decoration:none;}
+.pm-tel:active{transform:scale(.98);}
+button.pm-tel{border:none;font-family:'Barlow',sans-serif;cursor:pointer;}
+.pm-call.ok{background:#FFF6E6;border-color:#F1D29A;color:#6B4500;}
+.pm-call.ok .pm-call-b{color:#5A3E07;}
+.pm-tel.pm-confirm{background:#B07A12;}
+.pm-tel:focus-visible,.pm-btn:focus-visible{outline:3px solid #1659B8;outline-offset:2px;}
+/* settings: the rule (.mob label / .mob input would make it caps and full width) */
+#absBox label.abs-opt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;margin:6px 0;border-radius:12px;border:1px solid var(--hx-line,var(--gl));cursor:pointer;
+  font:inherit;text-transform:none;letter-spacing:normal;color:var(--hx-ink,var(--bd));line-height:1.3;}
+#absBox label.abs-opt.on{border-color:var(--hx-blue,var(--bm));background:var(--hx-card2,rgba(22,89,184,.05));}
+#absBox label.abs-opt input{width:18px;height:18px;flex:none;margin:1px 0 0;padding:0;accent-color:var(--hx-blue,var(--bm));}
+#absBox .abs-txt{display:flex;flex-direction:column;gap:2px;}
+#absBox .abs-txt b{font-size:.9rem;font-weight:700;}
+#absBox .abs-txt span{font-size:.8rem;font-weight:400;color:var(--hx-muted,var(--gm));line-height:1.4;}
+#absBox .abs-h{margin:2px 0 8px 30px;}
+#absBox .setting-label label{font:inherit;text-transform:none;letter-spacing:normal;margin:0;color:inherit;}
+#absBox .abs-h select{width:auto;height:36px;margin:0;border-radius:8px;}
+#absBox label.abs-opt input:focus-visible{outline:3px solid #1659B8;outline-offset:2px;}
 
 /* RECENT (past sessions, collapsible) */
 /* ── sRPE card ──────────────────────────────────────────────
@@ -6778,13 +6829,17 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.44'; // v1.2.44: Ergebnis im Spieler-Überblick
-const APP_VERSION_LABEL='1.2.44';
+const APP_VERSION='1.2.45'; // v1.2.45: Absage-Regel und Meine Woche
+const APP_VERSION_LABEL='1.2.45';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792787579264; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792798327012; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.45',date:'24.10.2026',title:'Absagen: rechtzeitig reicht die App',items:[
+    {icon:'📞',title:'Neue Absage-Regel',desc:'Sagt ein Spieler rechtzeitig in der App ab, gilt das jetzt von selbst als entschuldigt. Rechtzeitig heißt: vor der Antwortfrist des Termins, ohne eigene Frist bis 4 Stunden vor Beginn. Später – oder bei einem Spiel, sobald er im veröffentlichten Kader steht – braucht es weiter einen Anruf, bevor ihr „E“ eintragt. Einstellen lässt sich das unter Einstellungen → Mannschaft → „Absagen“ (Frist, „immer per Anruf“ oder „die App reicht immer“).'},
+    {icon:'📅',title:'„Meine Woche“ für die Spieler aufgeräumt',desc:'Oben nur noch Name und „‹ Übersicht“, die Termine stehen sofort im Blick. Uhrzeit als Überschrift, automatisch eingeplante Termine heißen „Eingeplant“ statt wie eine eigene Zusage auszusehen, ein Hinweis zur Absage-Regel statt drei gleicher Sätze. Nach einer späten Absage ein ruhiger Hinweis mit Knöpfen, die direkt anrufen.'},
+  ]},
   {version:'1.2.44',date:'23.10.2026',title:'Ergebnis für die Spieler',items:[
     {icon:'⚽',title:'Das letzte Spiel im Überblick der Spieler',desc:'Sobald im Spielbericht das Ergebnis steht, sehen die Spieler es eine Woche lang oben in ihrem Überblick: „2:1 – Sieg gegen …“, dazu ihre eigenen Tore und Vorlagen. Minuten und Karten sehen sie nicht, die Tore und Vorlagen der anderen auch nicht. Steht der Spieler des Spiels fest, kommt er in dieselbe Karte.'},
   ]},
@@ -12997,6 +13052,36 @@ function ayRender(){
     ${row('training','🏃 Trainings: alle gelten als dabei')}
     ${row('match','⚽ Spiele: alle gelten als dabei')}`;
 }
+// ── Absage-Regel (1.2.45): Einstellungen → Mannschaft → „Absagen“ ──
+// G.db[team+'__rules'].abs = {m:'frist'|'anruf'|'app', h:hours}; see pvAbsRule
+function absRender(){
+  const box=document.getElementById('absBox');if(!box)return;
+  if(!CU||!(typeof canEdit==='function'&&canEdit())){box.innerHTML='';return;}
+  const t=UI.currentTeam||'',r=pvAbsRule(teamRules(t)),e=escapeHtml;
+  const opt=(m,label,sub)=>`<label class="abs-opt${r.m===m?' on':''}"><input type="radio" name="abs-m" value="${m}"${r.m===m?' checked':''} onchange="absSet('m',this.value)"><span class="abs-txt"><b>${label}</b><span>${sub}</span></span></label>`;
+  const hs=[2,3,4,6,12,24].map(h=>`<option value="${h}"${r.h===h?' selected':''}>${h} Std.</option>`).join('');
+  box.innerHTML=`<div class="setting-label ay-h">📞 Absagen <span>${e(t)}</span></div>
+    <p class="ay-note">Wann gilt ein „Kann nicht“ aus der Spieler-App als entschuldigt? Ihr könnt es jederzeit selbst ändern.</p>
+    ${opt('frist','Rechtzeitig in der App','Bis kurz vor dem Termin reicht die App. Danach – und bei Spielen, sobald er im veröffentlichten Kader steht – nur per Anruf.')}
+    ${r.m==='frist'?`<div class="setting-row abs-h"><div><div class="setting-label"><label for="abs-h">Rechtzeitig heißt bis</label></div><div class="setting-sub">Hat ein Termin eine eigene Antwortfrist, gilt diese.</div></div>
+      <div class="setting-control meet-min"><select id="abs-h" onchange="absSet('h',this.value)">${hs}</select><span>vor Beginn</span></div></div>`:''}
+    ${opt('anruf','Immer per Anruf','Eine Absage in der App ist erst entschuldigt, wenn ihr „E“ eintragt.')}
+    ${opt('app','Die App reicht immer','Jede Absage in der App gilt als entschuldigt.')}`;
+}
+function absSet(k,v){
+  if(!(typeof canEdit==='function'&&canEdit()))return;
+  const t=UI.currentTeam;
+  const a=pvAbsRule(teamRules(t));
+  if(k==='m'){if(!['frist','anruf','app'].includes(v))return;a.m=v;}
+  else{const h=+v;if(!(h>=0&&h<=72))return;a.h=h;}
+  snap();
+  if(!G.db[t+'__rules']||typeof G.db[t+'__rules']!=='object')G.db[t+'__rules']={};
+  G.db[t+'__rules'].abs=a;
+  saveG();
+  logAudit('Absage-Regel',t,a.m==='frist'?'rechtzeitig in der App ('+a.h+' Std. vor Beginn)':a.m==='anruf'?'immer per Anruf':'die App reicht immer');
+  if(typeof showSaveFlash==='function')showSaveFlash('\u2713 Gespeichert');
+  absRender();
+}
 function _noteExcuse(p,si){
   if(!p||!Array.isArray(p.s))return;
   _ayTouch(p,si);
@@ -14138,6 +14223,7 @@ function _setFill(){
   if(_setVisible('konto'))_kontoFill();
   if(typeof updateAppearanceUI==='function')updateAppearanceUI();
   if(typeof ayRender==='function')ayRender();
+  if(typeof absRender==='function')absRender();
   if(typeof meetRender==='function')meetRender();
   if(typeof cardRulesRender==='function')cardRulesRender();
   if(typeof fdbRender==='function')fdbRender();
@@ -15401,6 +15487,8 @@ function _pmSanitizeG(){
   // The team's notice (new training times, a break): title and text only
   const _nw=teamNews(myTeam);
   if(_nw)keepDb[myTeam+'__news']={t:_nw.t,title:_nw.title,body:_nw.body||''};
+  // The Absage-Regel only (1.2.45): his screen explains it
+  keepDb[myTeam+'__rules']={abs:pvAbsRule(teamRules(myTeam))};
   G.db=keepDb;
   if(Array.isArray(G.teamList))G.teamList=[myTeam];
   if(Array.isArray(G.seasonList))G.seasonList=[mySeason];
@@ -15490,9 +15578,63 @@ function pvTeamSecret(team){
 }
 
 // ==PV-APPLY-BEGIN== (also run by tools/erinnerungen: self-contained, no app globals)
+// ── Absage-Regel (1.2.45) ── R = the team's rules (G.db[team+'__rules']).
+// A "Kann nicht" given in the app counts as excused (Entschuldigt) when
+//   abs.m 'frist' (default): it came before the session's own deadline
+//     ("Antwort bis"), else before abs.h hours (default 4) ahead of the start —
+//     and, for a match, not once he stands in its published squad
+//   'anruf': never — the trainers excuse after a call (as up to 1.2.44)
+//   'app': always
+// `when` is the server's time of the answer (e.st): a player cannot set it.
+// Without it (an app before 1.2.45) nothing is excused: the call decides.
+const PV_ABS_H=4;
+function pvAbsRule(R){
+  const a=(R&&R.abs&&typeof R.abs==='object')?R.abs:{};
+  return {m:(a.m==='anruf'||a.m==='app')?a.m:'frist',h:(typeof a.h==='number'&&a.h>=0&&a.h<=72)?a.h:PV_ABS_H};
+}
+// Wall-clock time in Berlin → ms (the job runs on UTC)
+function pvBerlinTs(y,mo,d,h,mi){
+  const f=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Berlin',hourCycle:'h23',year:'numeric',month:'numeric',day:'numeric',hour:'numeric',minute:'numeric'});
+  const off=t=>{const p={};f.formatToParts(new Date(t)).forEach(x=>{if(x.type!=='literal')p[x.type]=+x.value;});return Date.UTC(p.year,p.month-1,p.day,p.hour,p.minute)-t;};
+  const g=Date.UTC(y,mo-1,d,h,mi);let t=g-off(g);t=g-off(t);return t;
+}
+// Start of session s ("Di 27.10", "18:30"); the year is the one nearest `near`
+function pvStartTs(s,near){
+  const m=String((s&&s.date)||'').match(/(\d+)\.(\d+)/);if(!m)return null;
+  const hm=String((s&&s.time)||'').match(/(\d{1,2}):(\d{2})/);
+  const y0=new Date(near).getUTCFullYear();let best=null;
+  for(const y of [y0-1,y0,y0+1]){
+    const t=pvBerlinTs(y,+m[2],+m[1],hm?+hm[1]:12,hm?+hm[2]:0);
+    if(best==null||Math.abs(t-near)<Math.abs(best-near))best=t;
+  }
+  return best;
+}
+// Until when the app is enough: the session's own deadline, else h hours ahead
+function pvAbsUntil(s,R,near){
+  if(s&&typeof s.rsvpUntil==='number'&&s.rsvpUntil>0)return s.rsvpUntil;
+  const t=pvStartTs(s,near);return t==null?null:t-pvAbsRule(R).h*3600e3;
+}
+// He stands in the published squad of match s (the trainers' shape {p:[names]},
+// a player's own {in:true}), published before `when`
+function pvAbsInSquad(s,P,when){
+  const q=s&&s.type==='match'&&s.squad;
+  if(!q||typeof q!=='object'||typeof q.t!=='number'||q.off)return false;
+  if(typeof when==='number'&&when<q.t)return false;
+  return Array.isArray(q.p)?q.p.includes(P&&P.name):q.in===true;
+}
+function pvAbsOk(s,P,R,when){
+  const r=pvAbsRule(R);
+  if(r.m==='app')return true;
+  if(r.m==='anruf'||typeof when!=='number')return false;
+  if(pvAbsInSquad(s,P,when))return false;
+  const u=pvAbsUntil(s,R,when);
+  return u!=null&&when<=u;
+}
 // One answer from a player's inbox, applied to his record in the team block.
-// e = {a, k, si, v, t}. Returns {ok, why, f: changed fields, si, audit}.
-function pvApply(blk,pi,e){
+// e = {a, k, si, v, t, st}; R = the team's rules (Absage-Regel; R.trustT: a
+// player's own device lays his answers over his slice — its clock counts).
+// Returns {ok, why, f: changed fields, si, audit}.
+function pvApply(blk,pi,e,R){
   const P=(blk&&Array.isArray(blk.players))?blk.players[pi]:null;
   const S=(blk&&Array.isArray(blk.sessions))?blk.sessions:[];
   if(!P||!e||typeof e!=='object'||typeof e.a!=='string')return {ok:false,why:'leer',f:[]};
@@ -15529,9 +15671,15 @@ function pvApply(blk,pi,e){
     // them must not undo them
     if(cur===1||cur===5)return {ok:false,why:'trainer',f:[],si};
     const f=[];
-    if(cur===2){arr('excOK',si,null)[si]=true;f.push('excOK');}
+    // excOK: true = the trainers excused him (comes back with a later "Kann
+    // nicht"); 'a' = the app did, by the rule (only the rule gives it again)
+    const exc=Array.isArray(P.excOK)?P.excOK[si]:null;
+    if(cur===2&&exc!=='a'&&exc!==true){arr('excOK',si,null)[si]=true;f.push('excOK');}
     const hadExc=Array.isArray(P.excOK)&&P.excOK[si]===true;
-    const target=(e.v===1)?4:(hadExc?2:0);
+    const when=(typeof e.st==='number')?e.st:((R&&R.trustT)?t:null);
+    // Already excused and still not coming: it stays
+    const byApp=e.v===0&&cur!==2&&!hadExc&&pvAbsOk(s,P,R,when);
+    const target=(e.v===1)?4:((hadExc||byApp||cur===2)?2:0);
     const ay=arr('ay',si,null);
     if(cur===target){
       // "Komme" on the rule's M: from now on his own answer
@@ -15539,10 +15687,12 @@ function pvApply(blk,pi,e){
       return {ok:true,f,si};
     }
     ay[si]=0;st[si]=target;f.push('s','ay');
+    if(byApp){arr('excOK',si,null)[si]='a';f.push('excOK');}
+    else if(exc==='a'&&target!==2){P.excOK[si]=null;f.push('excOK');}
     if(target!==4&&Array.isArray(P.physio)&&P.physio[si]===true){P.physio[si]=null;f.push('physio');}
     if(target===4&&Array.isArray(P.preconfReason)&&si<P.preconfReason.length&&P.preconfReason[si]){P.preconfReason[si]='';f.push('preconfReason');}
     return {ok:true,f,si,audit:{action:'Anmeldung (Spieler-App)',target:P.name||'?',
-      details:s.date+(s.type==='match'?' (Spiel)':' (Training)')+': '+(NAMES[cur]||'?')+' → '+(NAMES[target]||'?')}};
+      details:s.date+(s.type==='match'?' (Spiel)':' (Training)')+': '+(NAMES[cur]||'?')+' → '+(NAMES[target]||'?')+(byApp?' (rechtzeitig in der App abgesagt)':'')}};
   }
   const meta=v=>{
     if(!P.rpeMeta||typeof P.rpeMeta!=='object'||Array.isArray(P.rpeMeta))P.rpeMeta={};
@@ -15666,7 +15816,7 @@ function _pvBuildSync(team,season){
   const loc={},la=(G.locationAddr&&typeof G.locationAddr==='object')?G.locationAddr:{};
   sessions.forEach(s=>{if(s&&s.location&&la[s.location])loc[s.location]=la[s.location];});
   const shared={v:PV_V,team,season,club:G.clubName||'',sessions:sessions.map(_pvSess),news,trainers,loc,
-    roster:{disp,nr,elig},names:[],rep:{}};
+    roster:{disp,nr,elig},names:[],rep:{},abs:pvAbsRule(teamRules(team))};
   weeks.forEach(w=>{
     const r=reps[w.wk];if(!r)return;
     const tp=_reportForPlayers(r,null);
@@ -15810,7 +15960,7 @@ async function pvMergeInbox(){
         const got=res&&res.committed&&res.snapshot&&res.snapshot.val();
         if(!got||got.m!==mt)continue;
         const blk=G.db[who.key];if(!blk)continue;
-        const r=pvApply(blk,who.pi,e);
+        const r=pvApply(blk,who.pi,e,teamRules(who.team));
         // Refused (after the deadline, after the roll call): gone, so the
         // player's page stops showing it as his answer
         if(!r.ok){try{fbDb.ref('fcf_in/'+pk+'/'+id).remove();}catch(err){}continue;}
@@ -15867,6 +16017,7 @@ function _pvAdopt(x,token){
   });
   const db={[key]:{sessions,players}};
   if(T.news)db[P.team+'__news']=T.news;
+  if(T.abs)db[P.team+'__rules']={abs:T.abs};
   G={version:20,db,teamList:[P.team],seasonList:[P.season],trainers:T.trainers||[],clubName:T.club||'',
     locationAddr:T.loc||{},auditLog:[],trash:[],backups:[],matchLineups:{},seasonLineups:{},
     sessionTemplates:[],exerciseLibrary:[],calEvents:[]};
@@ -15892,7 +16043,8 @@ function _pvAdopt(x,token){
     lay.push(e);_pvPut(id,e,true);
   });
   _pvOutboxSave(out);
-  lay.sort((a,b)=>(a.t||0)-(b.t||0)).forEach(e=>{try{pvApply(db[key],P.pi,e);}catch(err){}});
+  const _R=Object.assign({},T.abs?{abs:T.abs}:{},{trustT:true});
+  lay.sort((a,b)=>(a.t||0)-(b.t||0)).forEach(e=>{try{pvApply(db[key],P.pi,e,_R);}catch(err){}});
   // Votes given from this device and not counted into the slice yet
   try{
     const me=P.me;Object.keys(_pvVotes()).forEach(k=>{if(!me.mvpV||typeof me.mvpV!=='object')me.mvpV={};me.mvpV[k]=1;});
@@ -15942,6 +16094,8 @@ function pvSend(a,s,si,v){
   const e={a,t:Date.now()};
   if(k){e.k=k;e.si=si;}
   if(v!==undefined)e.v=v;
+  // The server's clock decides whether a "Kann nicht" came in time (1.2.45)
+  if(a==='rsvp'&&typeof firebase!=='undefined'&&firebase.database&&firebase.database.ServerValue)e.st=firebase.database.ServerValue.TIMESTAMP;
   _pvPut(id,e);
   return true;
 }
@@ -20620,145 +20774,97 @@ function renderPlayerMode(){
   // Secondary position is squad planning, not something the player screen
   // should state as a fact about him.
   const posLine=p.pos||'';
-  // ── HERO ──
+  // ── TOP (1.2.45) ──
+  // The screen is for answering: name and the way back, the rest (season
+  // share, series) lives on the overview and the statistics.
+  const _R=teamRules(UI.currentTeam),_rule=pvAbsRule(_R);
   let html='<div class="pm-wrap">';
-  html+='<div class="pm-hero">';
-  html+='<div class="pm-hero-content">';
-  html+=`<div class="pm-avatar">${_pmAvatar(p)}</div>`;
-  html+=`<h1 class="pm-name">${_amEscapeText(nm)}</h1>`;
-  html+='<div class="pm-meta">';
-  if(p.nr)html+=`<span class="pm-nr">#${_amEscapeText(p.nr)}</span>`;
-  if(posLine&&!p.hidePos)html+=`<span class="pm-pos">${_amEscapeText(posLine)}</span>`;
-  html+='</div>';
-  html+=`<div class="pm-team-info">${_amEscapeText(UI.currentTeam)} \u00b7 Saison ${_amEscapeText(UI.currentSeason)}</div>`;
-  if(stats&&(stats.marked>0||stats.streak>0)){
-    html+='<div class="pm-stats">';
-    if(stats.pct!=null){
-      html+=`<div class="pm-stat"><div class="pm-stat-val">${stats.pct}%</div><div class="pm-stat-lbl">Saison</div></div>`;
-    }
-    if(stats.streak>0){
-      html+=`<div class="pm-stat"><div class="pm-stat-val">\ud83d\udd25 ${stats.streak}</div><div class="pm-stat-lbl">Streak</div></div>`;
-    }
-    // No place in the team (1.2.5): the card and this page are about him alone.
-    html+='</div>';
-  }
-  html+='</div></div>';
+  html+='<div class="pm-top">';
+  if(window._hubMode)html+='<button class="hub-back pm-top-back" onclick="hubBack()">\u2039 \u00dcbersicht</button>';
+  html+=`<div class="pm-top-row"><div class="pm-top-av">${_pmAvatar(p)}</div><div class="pm-top-txt">`
+    +`<div class="pm-top-name">${_amEscapeText(nm)}</div>`
+    +`<div class="pm-top-sub">${p.nr?'#'+_amEscapeText(p.nr)+' \u00b7 ':''}${posLine&&!p.hidePos?_amEscapeText(posLine)+' \u00b7 ':''}${_amEscapeText(UI.currentTeam)}</div>`
+    +'</div></div></div>';
   // ── CARD HELPER ──
-  const renderCard=(s,si,sk,isHero)=>{
+  const _trs=(G.trainers||[]).filter(t=>t&&t.phone);
+  const _trNames=()=>{const n=_trs.map(t=>String(t.name||'').split(' ')[0]).filter(Boolean);
+    return n.length===0?'einen Trainer':n.length===1?n[0]:n.slice(0,-1).join(', ')+' oder '+n[n.length-1];};
+  // Buttons that call (tel:) — the rule is "call, a message is not enough",
+  // so they must not open a chat
+  const _callBtns=()=>_trs.map(t=>{
+    const c=_amCleanPhone(t.phone);if(!c)return '';
+    return `<a class="pm-tel" href="tel:+${_amEscapeText(c)}">\ud83d\udcde ${_amEscapeText(String(t.name||'').split(' ')[0])} anrufen</a>`;
+  }).join('');
+  const renderCard=(s,si,sk)=>{
     const f=_pmFmtUpcoming(s,sk);
-    // Single source of truth: p.s[si]
-    //   1 = Anwesend (trainer set)         | 0 = Fehlend (trainer set)
-    //   2 = Entschuldigt (player or trainer)| 3 = Ausstehend (default)
-    //   4 = Angemeldet (player promised)
+    // Single source of truth: p.s[si] — 1 Anwesend, 0 Fehlend, 2 Entschuldigt,
+    // 3 offen, 4 Angemeldet (ay 1: by the team's rule), 5 Nicht im Kader
     const status=(p.s&&si<p.s.length)?p.s[si]:3;
-
+    const auto=status===4&&Array.isArray(p.ay)&&p.ay[si]===1;
+    const excA=Array.isArray(p.excOK)&&p.excOK[si]==='a';
     const rsvpUntil=_amSessionDeadline(si);
     const locked=_amRsvpLocked(si);
+    const now=Date.now();
+    const appOk=pvAbsOk(s,p,_R,now);
     let deadlineLine='';
     if(rsvpUntil){
-      if(locked)deadlineLine=`<div class="pm-deadline locked">\ud83d\udd12 Antworten gesperrt seit ${_amFmtDeadline(rsvpUntil)}</div>`;
-      else deadlineLine=`<div class="pm-deadline">\u23f0 Antwort bis ${_amFmtDeadline(rsvpUntil)}</div>`;
+      if(locked)deadlineLine=`<div class="pm-deadline locked">\ud83d\udd12 Antworten geschlossen</div>`;
+      else deadlineLine=`<div class="pm-deadline">\u23f0 Antwort bis ${_pmRelTime(rsvpUntil)}</div>`;
     }
-    // Only the deadline locks the buttons. Fehlend (0) used to lock them as a
-    // roll-call result — but that is now exactly what the player's own "Kann
-    // nicht" writes, so locking on it meant one tap was final. After the
-    // deadline everything is closed anyway, which is what protects the
-    // trainer's roll call.
-    // Physio is offered only after the player has said he is coming: there is
-    // no point booking treatment on a day he will not be there. It disappears
-    // again if he cancels, and the booking is cleared with it.
+    // Physio: only reported here, booked in its own step
     const _phOn=(typeof sessPhysioOn==='function')?sessPhysioOn(s):false;
     const _phBooked=!!(Array.isArray(p.physio)&&p.physio[si]===true);
-    const _phComing=(status===4||status===1);
-    let physioHtml='';
-    // Booking moved to its own step after the registration; the card only
-    // reports what was chosen there.
-    if(_phOn&&_phComing&&_phBooked){
-      physioHtml='<div class="pm-physio on pm-physio-ro">'
-        +'<span class="pm-physio-ic">\ud83e\uddd1\u200d\u2695\ufe0f</span>'
-        +'<span>Physio-Termin gebucht</span></div>';
-    }
-
-    const kommeActive=(status===4||status===1);
+    const physioHtml=(_phOn&&(status===4||status===1)&&_phBooked)
+      ?'<div class="pm-physio on pm-physio-ro"><span class="pm-physio-ic">\ud83e\uddd1\u200d\u2695\ufe0f</span><span>Physio-Termin gebucht</span></div>':'';
+    const kommeActive=(status===4&&!auto)||status===1;
     const kannNichtActive=(status===2||status===0);
-    const kommeDisabled=locked;
-    const kannNichtDisabled=locked;
-    const kommeAttr=kommeDisabled?' disabled':'';
-    const kannNichtAttr=kannNichtDisabled?' disabled':'';
-    // Feedback messages
-    let feedback='';
-    if(status===1)feedback='<div class="pm-feedback pm-fb-yes">\u2713 Vom Trainer als anwesend eingetragen</div>';
-    // Status 0 is now what the player's own "Kann nicht" writes, so reporting
-    // it back as a trainer entry was simply wrong. What the player needs here
-    // is the one thing that turns an absence into an excused one: a call.
+    const dis=locked?' disabled':'';
+    // One line at most, and only when the buttons do not say it already
+    let state='';
+    if(status===1)state='<div class="pm-state ok">\u2713 Vom Trainer als anwesend eingetragen</div>';
+    else if(status===5||(status===4&&_sqOutOf(s,p)&&_sqStarted(s,UI.currentSeason)))state='<div class="pm-state nk">Diesmal nicht im Kader</div>';
+    else if(status===2)state=`<div class="pm-state exc">Abgesagt \u00b7 entschuldigt${excA?' \u2013 danke f\u00fcrs Bescheid geben':''}</div>`;
+    else if(status===0&&appOk&&!locked){
+      // Said no before this rule (or the app was offline): in time it still
+      // counts — one tap sends it again, now with the server's time
+      state=`<div class="pm-call ok"><div class="pm-call-t">Abgesagt · noch nicht entschuldigt</div>`
+        +`<div class="pm-call-b">${_rule.m==='app'?'Bestätige':'Bis '+_pmRelTime(pvAbsUntil(s,_R,now))+' reicht die App: bestätige'} deine Absage, dann gilt sie als entschuldigt.</div>`
+        +`<div class="pm-call-btns"><button type="button" class="pm-tel pm-confirm" onclick="pmSetStatus(${si},0)">Absage bestätigen</button></div></div>`;
+    }
     else if(status===0){
-      const tr=(G.trainers||[]).filter(t=>t&&t.phone);
-      const btns=tr.map(t=>{
-        const tel=String(t.phone).replace(/[^0-9+]/g,'');
-        // wa.me needs the international form without + or leading zero
-        let wa=tel.replace(/^\+/,'');
-        if(wa.startsWith('00'))wa=wa.slice(2);
-        else if(wa.startsWith('0'))wa='49'+wa.slice(1);
-        const first=_amEscapeText(String(t.name||'').split(' ')[0]);
-        // One button per trainer, opening WhatsApp. Note WhatsApp has no link
-        // that starts a voice call directly — this opens the conversation,
-        // where the call icon is one tap away. The label says "anrufen" on
-        // purpose: it is the instruction, not a description of the target.
-        return `<a class="pm-call-btn pm-call-wa" href="https://wa.me/${_amEscapeText(wa)}" target="_blank" rel="noopener">\ud83d\udcde ${first} anrufen</a>`;
-      }).join('');
-      // Names come from the trainer list, not from the sentence: hard-coding
-      // them meant the message would keep naming people who had left.
-      const names=tr.map(t=>String(t.name||'').split(' ')[0]).filter(Boolean);
-      const who=names.length===0?'den Trainer'
-        :names.length===1?names[0]
-        :names.slice(0,-1).join(', ')+' oder '+names[names.length-1];
-      feedback='<div class="pm-callout">'
-        +'<div class="pm-callout-head">\u260e\ufe0f JETZT ANRUFEN</div>'
-        +'<div class="pm-callout-main">Ruf '+_amEscapeText(who)+' an</div>'
-        +'<div class="pm-callout-main pm-callout-not"><u>NICHT schreiben!</u></div>'
-        +'<div class="pm-callout-warn">Sonst fehlst du <b>unentschuldigt</b>.</div>'
-        +(btns?'<div class="pm-callout-btns">'+btns+'</div>'
-             :'<div class="pm-callout-note">Nummern beim Trainer erfragen.</div>')
+      const why=_rule.m==='anruf'?''
+        :pvAbsInSquad(s,p,now)?'Du stehst im Kader. '
+        :`Die Frist f\u00fcr Absagen in der App war ${_pmRelTime(pvAbsUntil(s,_R,now))}. `;
+      const btns=_callBtns();
+      state=`<div class="pm-call"><div class="pm-call-t">Abgesagt \u00b7 noch nicht entschuldigt</div>`
+        +`<div class="pm-call-b">${why}Damit es entschuldigt ist, ruf ${_amEscapeText(_trNames())} an \u2013 eine Nachricht reicht nicht.</div>`
+        +(btns?`<div class="pm-call-btns">${btns}</div>`:'<div class="pm-call-b">Die Nummern bekommst du bei den Trainern.</div>')
         +'</div>';
     }
-    else if(status===2)feedback='<div class="pm-feedback pm-fb-exc">\ud83d\udccb Entschuldigt</div>';
-    else if(status===5||(status===4&&_sqOutOf(s,p)&&_sqStarted(s,UI.currentSeason)))feedback='<div class="pm-feedback pm-fb-nk">Diesmal nicht im Kader</div>';
-    else if(status===4&&Array.isArray(p.ay)&&p.ay[si]===1)feedback='<div class="pm-feedback pm-fb-yes">\u2713 Du bist dabei – wenn du nicht kannst, sag ab.</div>';
-    else if(status===4)feedback='<div class="pm-feedback pm-fb-yes">\u2713 Du bist angemeldet</div>';
-    // Reason textarea: show only when Entschuldigt (status===2). Player can edit own reason.
-
-    const haInfo=f.isMatch&&s.homeAway?`<div class="pm-loc">${s.homeAway==='home'?'\ud83c\udfe0 Heim':'\ud83d\ude8c Ausw\u00e4rts'}</div>`:'';
-    // Location line — only if the session has one defined
-    const locInfo=(s.location&&s.location.trim())
-      ?`<div class="pm-loc">${locNameHtml(s,_amEscapeText)}</div>`
-      :'';
-    // Trainer's note for this session — surfaced for the player (e.g. "Bring 2 pairs of cleats")
-    const noteInfo='';   // trainers' note, not player-facing
-    // Lineup position — only for matches where trainer has named player in the starting XI/bank
+    else if(_rule.m==='frist'&&!locked&&!appOk&&(status===3||status===4))
+      state=`<div class="pm-state late">\ud83d\udcde Absage jetzt nur noch per Anruf</div>`;
+    const where=[];
+    if(f.isMatch&&s.homeAway)where.push(`<span class="pm-chip">${s.homeAway==='home'?'\ud83c\udfe0 Heim':'\ud83d\ude8c Ausw\u00e4rts'}</span>`);
+    if(s.location&&s.location.trim())where.push(`<span class="pm-chip">${locNameHtml(s,_amEscapeText)}</span>`);
     const lineupInfo=f.isMatch?_squadCardLine(s,si,p):'';
-    const cls=`pm-card pm-${f.isMatch?'match':'train'}${locked?' pm-locked':''}${isHero?' pm-hero-card':''}${status!==3?' pm-answered':''}`;
+    const stc=status===1||(status===4&&!auto)?'st-yes':auto?'st-plan':status===0?'st-no':status===2?'st-exc':status===5?'st-nk':'st-open';
+    const cls=`pm-card pm-${f.isMatch?'match':'train'} ${stc}${locked?' pm-locked':''}`;
     return `<div class="${cls}" data-si="${si}">
       <div class="pm-card-date">
+        <div class="pm-dow">${f.dow}</div>
         <div class="pm-day">${f.day}</div>
         <div class="pm-mo">${f.monName}</div>
-        <div class="pm-dow">${f.dow}</div>
       </div>
       <div class="pm-card-body">
-        <div class="pm-title">${f.isMatch?'\u26bd':'\ud83c\udfc3'} ${_amEscapeText(f.title)}</div>
-        <div class="pm-time">${_amEscapeText(f.time)} Uhr</div>
-        ${haInfo}
-        ${locInfo}
+        <div class="pm-when"><b>${_amEscapeText(f.time)}</b><span>${f.isMatch?'gegen '+_amEscapeText(f.title):'Training'}</span></div>
+        ${where.length?`<div class="pm-where">${where.join('')}</div>`:''}
         ${lineupInfo}
-        ${noteInfo}
         ${deadlineLine}
         <div class="pm-actions pm-actions-2">
-          <button class="pm-btn pm-yes${kommeActive?' active':''}"${kommeAttr} onclick="pmSetStatus(${si},1)"><span class="pm-btn-ico">\u2713</span><span class="pm-btn-lbl">Komme</span></button>
-          <button class="pm-btn pm-no${kannNichtActive?' active':''}"${kannNichtAttr} onclick="pmSetStatus(${si},0)"><span class="pm-btn-ico">\u2717</span><span class="pm-btn-lbl">Kann nicht</span></button>
+          <button class="pm-btn pm-yes${kommeActive?' active':''}${auto?' plan':''}"${dis} onclick="pmSetStatus(${si},1)"${auto?' aria-label="Eingeplant – tippen zum Zusagen"':''}><span class="pm-btn-ico">\u2713</span><span class="pm-btn-lbl">${auto?'Eingeplant':'Komme'}</span></button>
+          <button class="pm-btn pm-no${kannNichtActive?' active':''}"${dis} onclick="pmSetStatus(${si},0)"><span class="pm-btn-ico">\u2717</span><span class="pm-btn-lbl">Kann nicht</span></button>
         </div>
-<!-- Reason field removed: the weekly survey asks for availability, not for
-             justifications. Existing reasons stay in the data and remain
-             visible to trainers; nothing new is collected here. -->
-        ${feedback}
+        ${state}
         ${physioHtml}
       </div>
     </div>`;
@@ -20828,8 +20934,14 @@ function renderPlayerMode(){
       +(openCount?`<span class="pm-count pm-count-open">${openCount} offen</span>`
                  :`<span class="pm-count">\u2713 vollst\u00e4ndig</span>`)
       +`</div>`;
+    // The rule in one place instead of a sentence under every card
+    const planned=upcoming.some(({si})=>p.s&&p.s[si]===4&&Array.isArray(p.ay)&&p.ay[si]===1);
+    const ruleTxt=_rule.m==='app'?'Wenn du nicht kannst, sag hier ab.'
+      :_rule.m==='anruf'?'Wenn du nicht kannst, sag hier ab und ruf einen Trainer an.'
+      :`Wenn du nicht kannst, sag hier ab. Bis ${_rule.h} Std. vor Beginn ist das entschuldigt, danach nur per Anruf.`;
+    html+=`<div class="pm-rule">${planned?'<b>Du bist eingeplant.</b> ':''}${ruleTxt}</div>`;
     html+='<div class="pm-list">';
-    upcoming.forEach(({s,si,sk})=>{html+=renderCard(s,si,sk,false);});
+    upcoming.forEach(({s,si,sk})=>{html+=renderCard(s,si,sk);});
     html+='</div>';
   } else {
     html+='<div class="pm-empty">\ud83d\udcc5 Diese Woche sind keine Termine mehr geplant.</div>';
@@ -20878,6 +20990,19 @@ function renderPlayerMode(){
   }
 }
 
+// "heute, 12:00" · "morgen, 12:00" · "Mo, 12:00" · "27.10., 12:00"
+function _pmRelTime(ts){
+  if(typeof ts!=='number')return '';
+  const d=new Date(ts),n=new Date();
+  const day=x=>new Date(x.getFullYear(),x.getMonth(),x.getDate()).getTime();
+  const diff=Math.round((day(d)-day(n))/864e5);
+  const hm=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+  if(diff===0)return 'heute, '+hm;
+  if(diff===1)return 'morgen, '+hm;
+  if(diff===-1)return 'gestern, '+hm;
+  if(diff>1&&diff<7)return ['So','Mo','Di','Mi','Do','Fr','Sa'][d.getDay()]+', '+hm;
+  return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'., '+hm;
+}
 function _amEscapeText(s){
   if(s==null)return '';
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -20902,13 +21027,16 @@ function pmSetStatus(si,val){
   // have spoken to the player. A player's own "no" is a plain absence until
   // then. Nothing changes on the player's screen — only what lands in the
   // table.
-  if(current===2){
+  const _excMark=Array.isArray(p.excOK)?p.excOK[si]:null;
+  if(current===2&&_excMark!=='a'){
     if(!Array.isArray(p.excOK))p.excOK=[];
     while(p.excOK.length<=si)p.excOK.push(null);
     p.excOK[si]=true;
   }
   const _hadExcuse=Array.isArray(p.excOK)&&p.excOK[si]===true;
-  const targetStatus=(val===1)?4:(_hadExcuse?2:0);
+  // Absage-Regel (1.2.45): in time in the app → excused straight away
+  const _byApp=val===0&&current!==2&&!_hadExcuse&&pvAbsOk(D.sessions[si],p,teamRules(UI.currentTeam),Date.now());
+  const targetStatus=(val===1)?4:((_hadExcuse||_byApp||(val===0&&current===2))?2:0);
   // Permission rules (relaxed in 1.0.4-beta after trainer feedback):
   //   Player can freely transition between 2 (Entschuldigt), 3 (Ausstehend), 4 (Angemeldet)
   //   before the RSVP deadline. Only blocked: 1 (Anwesend) and 0 (Fehlend) — those are
@@ -20930,6 +21058,11 @@ function pmSetStatus(si,val){
   p.ay[si]=0;
   const oldVal=current;
   p.s[si]=targetStatus;
+  if(_byApp||(_excMark==='a'&&targetStatus!==2)){
+    if(!Array.isArray(p.excOK))p.excOK=[];
+    while(p.excOK.length<=si)p.excOK.push(null);
+    p.excOK[si]=_byApp?'a':null;
+  }
   // Only a booking is cleared, and only when he stops attending: it would
   // otherwise hold a place nobody can use. A declined offer stays declined —
   // re-asking after every status tap is what made it feel nagging, and the
@@ -38205,6 +38338,7 @@ _pubCleanupSchedule();
         </div>
       </div>
       <div id="ayBox" class="ay-box"></div>
+      <div id="absBox" class="ay-box"></div>
       <div id="meetBox" class="ay-box"></div>
       <div id="cardBox" class="ay-box"></div>
       <div id="fdbBox" class="ay-box"></div>
