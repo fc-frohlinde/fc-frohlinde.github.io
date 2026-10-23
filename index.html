@@ -5046,6 +5046,10 @@ body.design-kabine #mainTable.mx tfoot td.mx-pct{font-size:.95rem;}
 .tpl-acts{display:flex;gap:6px;flex-wrap:wrap;}
 .tpl-ab{height:38px;padding:0 12px;border-radius:10px;border:1px solid var(--tp-line2);background:var(--tp-card);color:var(--tp-ink);font-weight:600;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;}
 .tpl-ab.ico{width:38px;padding:0;justify-content:center;}
+.tpl-ab.acc{background:var(--tp-navy);border-color:var(--tp-navy);color:#fff;font-weight:700;}
+.tpl-ab.acc:hover:not(:disabled){background:var(--tp-navy);border-color:var(--tp-navy);filter:brightness(1.15);}
+.tpl-dlg .tpl-pick{max-height:min(52vh,460px);overflow:auto;}
+.tpl-dlg label.tpl-srch{flex-direction:row;font-weight:500;}
 .tpl-ab:hover:not(:disabled){background:var(--tp-soft);border-color:#B9C6DB;}
 .tpl-ab:disabled{opacity:.35;cursor:default;}
 .tpl-ab.danger:hover{color:#D9443F;border-color:#E9A3A1;}
@@ -6625,13 +6629,16 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.28'; // v1.2.28: Trainingsplaner — Standardablauf
-const APP_VERSION_LABEL='1.2.28';
+const APP_VERSION='1.2.29'; // v1.2.29: Standardablauf — Übung wählen
+const APP_VERSION_LABEL='1.2.29';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792755902648; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792759646405; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.29',date:'23.10.2026',title:'Trainingsplaner: Abschnitt füllen',items:[
+    {icon:'👆',title:'Abschnitt antippen, Übung eintragen',desc:'Der Hinweis über dem Standardablauf sagt jetzt genau, was zu tun ist. Ist die Bibliothek leer, trägst du die Übung direkt in den Abschnitt ein. Gibt es Übungen, steht im Abschnitt „Aus der Bibliothek wählen“: Liste öffnen, Übung antippen, fertig.'},
+  ]},
   {version:'1.2.28',date:'23.10.2026',title:'Trainingsplaner: Standardablauf',items:[
     {icon:'📝',title:'Neuer Plan mit festem Aufbau',desc:'Ein neuer Trainingsplan beginnt mit dem Standardablauf der Mannschaft: Aktivierung 1 und 2 (je 10 Min.), Hauptteil 1 und 2 (je 20 Min.), Schlussteil (30 Min.). In der Bibliothek auf + tippen: Die Übung landet im ausgewählten Abschnitt, danach ist der nächste dran. Gespeichert wird der Plan erst, wenn du etwas einträgst.'},
     {icon:'⚙️',title:'Standard ändern',desc:'„Standardablauf für neue Pläne“ unter dem Ablauf: Abschnitte, Kategorie und Minuten festlegen oder „Wie dieser Plan“ übernehmen. Ohne Abschnitte beginnen neue Pläne leer. Gespeicherte Pläne ändern sich nicht.'},
@@ -31184,7 +31191,7 @@ const TPL_CATS=[
 // drill from the library fills.
 const TPL_STD_DEF=[{ph:'Aktivierung 1',cat:'Aufwärmen',min:10},{ph:'Aktivierung 2',cat:'Aufwärmen',min:10},
   {ph:'Hauptteil 1',cat:'Sonstiges',min:20},{ph:'Hauptteil 2',cat:'Sonstiges',min:20},{ph:'Schlussteil',cat:'Spielform',min:30}];
-const TPL={team:null,season:null,si:null,pid:null,sessDate:null,sessTime:'',plan:null,sel:0,std:null,draft:false,stdEd:null,dropFill:null,
+const TPL={team:null,season:null,si:null,pid:null,sessDate:null,sessTime:'',plan:null,sel:0,std:null,draft:false,stdEd:null,dropFill:null,pickFor:null,pickQ:'',newFor:null,
   lib:{},tpls:{},idx:{},undo:[],saveT:null,inflight:0,err:null,libCat:'Alle',libQ:'',libOpen:null,
   mode:'replace',drag:null,dropAt:null,openSeq:0,idxCache:{},readFail:false};
 const TPL_IC={
@@ -31638,7 +31645,7 @@ function _tplRenderList(){
     :'<div class="tpl-hint">Für dieses Training gibt es noch keinen Plan.</div>';
   else if(tot>dur)msg=`<div class="tpl-hint" style="color:#D9443F">${tot-dur} Min. mehr, als die Einheit dauert.</div>`;
   else if(tot<dur)msg=`<div class="tpl-hint">Noch ${dur-tot} Min. frei.</div>`;
-  const stdNote=(ed&&TPL.draft&&bl.length)?`<div class="tpl-stdn"><span><b>Standardablauf</b> – wähle für jeden Abschnitt eine Übung aus der Bibliothek (+) oder trag sie selbst ein.</span>
+  const stdNote=(ed&&TPL.draft&&bl.length)?`<div class="tpl-stdn"><span><b>Standardablauf</b> – tippe auf einen Abschnitt und trag die Übung ein${_tplLibItems().length?' oder wähle sie aus der Bibliothek':''}.</span>
       <span class="tpl-stdn-a"><button type="button" class="tpl-lnk" onclick="tplStdClear()">Leer beginnen</button><button type="button" class="tpl-lnk" onclick="tplStdDlg()">Standard ändern</button></span></div>`:'';
   el.innerHTML=`<div class="tpl-row"><h3 class="tpl-h3">Ablauf</h3><span class="tpl-tot"><span class="${cls}">${tot}</span> / ${dur} Min.</span></div>
     <div class="tpl-bar" role="img" aria-label="Zeitaufteilung: ${tot} von ${dur} Minuten verplant">${bar}</div>${stdNote}${msg}${doneTxt}
@@ -31703,7 +31710,7 @@ function _tplRenderEd(){
   <div class="tpl-ed-top">
     <div class="tpl-ed-l">
       <span class="tpl-kick" id="tplKick">${_tplKick(i)}</span>
-      <textarea class="tpl-in-title" id="tplTitle" rows="1" placeholder="${b.ph&&!b.title?'Übung eintragen oder aus der Bibliothek wählen':'Name der Übung'}" aria-label="Name der Übung" oninput="_tplGrow(this);tplSetF('title',this.value.replace(/[\\r\\n]+/g,' '))" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${_tplE(b.title)}</textarea>
+      <textarea class="tpl-in-title" id="tplTitle" rows="1" placeholder="${b.ph&&!b.title?'Name der Übung eintragen':'Name der Übung'}" aria-label="Name der Übung" oninput="_tplGrow(this);tplSetF('title',this.value.replace(/[\\r\\n]+/g,' '))" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${_tplE(b.title)}</textarea>
       <div class="tpl-chips">
         <label class="tpl-chip"><span class="tpl-catdot" id="tplCatDot" style="background:${_tplCatColor(b.cat)}"></span><select aria-label="Kategorie" onchange="tplSetF('cat',this.value)">${catOpts}</select></label>
         <span class="tpl-chip"><span>Dauer</span><button type="button" class="tpl-step" onclick="tplStepMin(-5)" aria-label="5 Minuten weniger">–</button><input class="w-min" id="tplMinIn" type="number" inputmode="numeric" min="1" max="240" value="${+b.min||0}" aria-label="Dauer in Minuten" oninput="tplSetMin(this.value)"><span>Min.</span><button type="button" class="tpl-step" onclick="tplStepMin(5)" aria-label="5 Minuten mehr">+</button></span>
@@ -31713,6 +31720,7 @@ function _tplRenderEd(){
       </div>
     </div>
     <div class="tpl-acts">
+      ${(_tplIsSlot(b)&&_tplLibItems().length)?`<button type="button" class="tpl-ab acc" onclick="tplPickLib()">Aus der Bibliothek wählen</button>`:''}
       <button type="button" class="tpl-ab" id="tplLibBtn" onclick="tplToLib()" title="${inLib?'Übung in der Bibliothek aktualisieren':'Als Übung in der Bibliothek speichern'}">${_tplLibLbl(inLib)}</button>
       <button type="button" class="tpl-ab ico" title="Nach oben" aria-label="Nach oben" onclick="tplMove(-1)"${i===0?' disabled':''}>${TPL_IC.up}</button>
       <button type="button" class="tpl-ab ico" title="Nach unten" aria-label="Nach unten" onclick="tplMove(1)"${i===bl.length-1?' disabled':''}>${TPL_IC.down}</button>
@@ -31848,6 +31856,31 @@ function _tplFill(i,id){
   TPL.sel=nx>=0?nx:i;_tplRedraw();
   _tplToast(`„${it.title}“ → ${b.ph||'Block '+(i+1)}`);
 }
+// "Aus der Bibliothek wählen" (1.2.29): the library as a list for the selected
+// empty block — the same as + in the library, without having to know that +
+// fills the selected block. The block's own category first.
+function tplPickLib(i){
+  if(i==null)i=TPL.sel;
+  const b=TPL.plan&&TPL.plan.blocks[i];if(!b)return;
+  TPL.pickFor=i;TPL.pickQ='';
+  _tplDlg(`<h4>Übung für ${_tplE(b.ph||'Block '+(i+1))}</h4>
+    <label class="tpl-srch">${TPL_IC.find}<input type="search" id="tpkQ" placeholder="Übung suchen" aria-label="Übung suchen" oninput="TPL.pickQ=this.value;_tplPickList()"></label>
+    <div class="tpl-pick" id="tpkList"></div>
+    <div class="tpl-dlg-f"><button type="button" class="tpl-btn sp" onclick="tplPickNew()">+ Neue Übung</button><button type="button" class="tpl-btn" onclick="tplDlgClose()">Schließen</button></div>`);
+  _tplPickList();
+}
+function _tplPickList(){
+  const el=document.getElementById('tpkList');if(!el||!TPL.plan)return;
+  const q=String(TPL.pickQ||'').trim().toLowerCase(),b=TPL.plan.blocks[TPL.pickFor]||{};
+  const items=_tplLibItems().filter(x=>!q||(x.title+' '+x.cat+' '+(x.desc||'')).toLowerCase().indexOf(q)>=0)
+    .sort((x,y)=>((x.cat===b.cat?0:1)-(y.cat===b.cat?0:1))||(_tplCatIdx(x.cat)-_tplCatIdx(y.cat))||String(x.title).localeCompare(String(y.title),'de'));
+  el.innerHTML=items.length?items.map(x=>`<button type="button" class="tpl-pk" onclick="tplPickDo('${x.id}')">${_tplMiniBar([{cat:x.cat,min:1}])}
+      <span class="tpl-bt"><b>${_tplE(x.title)}</b><span>${_tplE([x.cat,x.min?x.min+' Min.':'',x.players?_tplPlayersTxt(x.players):''].filter(Boolean).join(' · '))}</span></span></button>`).join('')
+    :`<div class="tpl-none">${q?'Keine Übung gefunden.':'Die Bibliothek ist noch leer.'}</div>`;
+}
+function tplPickDo(id){const i=TPL.pickFor;TPL.pickFor=null;tplDlgClose();if(i!=null)_tplFill(i,id);}
+// A new drill from the picker goes into the block once it is saved
+function tplPickNew(){const i=TPL.pickFor;TPL.pickFor=null;tplLibEdit();TPL.newFor=i;}
 function tplDel(){
   const bl=TPL.plan&&TPL.plan.blocks;if(!bl||!bl.length)return;
   _tplPushUndo();
@@ -31917,6 +31950,7 @@ function _tplCatSelect(id,cur){
   return `<select id="${id}">${TPL_CATS.map(c=>`<option${c.k===cur?' selected':''}>${c.k}</option>`).join('')}${(!known&&cur)?`<option selected>${_tplE(cur)}</option>`:''}</select>`;
 }
 function tplLibEdit(id){
+  TPL.newFor=null;
   const it=id?TPL.lib[id]:null;
   const x=it||{title:'',cat:(TPL.libCat&&TPL.libCat!=='Alle')?TPL.libCat:'Spielform',min:15,players:'',area:'',desc:'',coach:''};
   _tplDlg(`<h4>${it?'Übung bearbeiten':'Neue Übung'}</h4>
@@ -31943,6 +31977,8 @@ function tplLibSave(id){
   tplDlgClose();TPL.libOpen=nid;
   if(TPL.libCat!=='Alle'&&TPL.libCat!==it.cat)TPL.libCat='Alle';
   _tplRenderLib();_tplRenderEd();
+  const nf=TPL.newFor;TPL.newFor=null;
+  if(!id&&nf!=null&&TPL.plan&&_tplIsSlot(TPL.plan.blocks[nf])){_tplFill(nf,nid);return;}
   _tplToast(id?'Übung gespeichert':'Neue Übung in der Bibliothek');
 }
 function tplLibDel(btn,id){
@@ -33536,7 +33572,7 @@ function tplMoreDo(fn){const m=document.getElementById('tplMoreMenu');if(m)m.hid
    'tplUndo','dgTool','dgSet','dgStraight','dgRotate','dgDel','dgDup','dgSetBg','dgClear','dgUndo','dgRedo',
    'tplGrpToggle','tplGrpMove','tplGrpN','tplGrpOpt','tplGrpShuffle','tplGrpFor','tplBlockGrp','tplGrpDrag','tplGrpDrop','tplPitchSave',
    'tplGrpNew','tplGrpDel','tplGrpAssign','tplBlockGrpSet',
-   'tplStdDlg','tplStdSave','tplStdClear','tplStdAdd','tplStdMove','tplStdDel','tplStdFromPlan'
+   'tplStdDlg','tplStdSave','tplStdClear','tplStdAdd','tplStdMove','tplStdDel','tplStdFromPlan','tplPickLib','tplPickDo','tplPickNew'
   ].forEach(n=>{
     const f=window[n];if(typeof f!=='function')return;
     window[n]=function(){
