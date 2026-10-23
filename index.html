@@ -6766,13 +6766,16 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.39'; // v1.2.39: Wechsel nur aus dem Spieltagskader
-const APP_VERSION_LABEL='1.2.39';
+const APP_VERSION='1.2.40'; // v1.2.40: Wechsel-Auswahl öffnet an Ort und Stelle
+const APP_VERSION_LABEL='1.2.40';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792780937405; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792782004561; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.40',date:'23.10.2026',title:'Wechsel: Auswahl am richtigen Platz',items:[
+    {icon:'🔁',title:'Liste öffnet unter dem Feld',desc:'Nach dem Eintippen der Minute öffnete sich die Liste „Rein“ manchmal oben links. Der Spielbericht baute sich beim Verlassen des Minutenfelds neu auf und ersetzte dabei das Feld, das gerade aufging. Jetzt ändern sich nur noch die Einträge der Listen.'},
+  ]},
   {version:'1.2.39',date:'23.10.2026',title:'Wechsel nur mit Spielern des Spiels',items:[
     {icon:'🔁',title:'„Rein“ zeigt die Bank',desc:'Beim Erfassen eines Wechsels standen alle Spieler der Mannschaft zur Wahl, auch wer gar nicht dabei war. Jetzt nur, wer zum Spiel gehört: als anwesend erfasst, im veröffentlichten Kader (ohne Kader: wer zugesagt hat) oder schon im Spielbericht – und nicht auf dem Platz. Abwesende, Entschuldigte und „Nicht im Kader“ fehlen. Wer trotzdem fehlt, steht nach „Weitere Spieler“ unter Startelf in einer eigenen Gruppe.'},
   ]},
@@ -16246,17 +16249,47 @@ function sbStartersFromLineup(){
   const D=cd(),st=_luStarters(_sbSi);if(!st)return;
   _sbEdit(r=>{r.st=[...st].map(pi=>D.players[pi]&&D.players[pi].name).filter(Boolean);},'Startelf aus der Aufstellung',st.size+' Spieler');
 }
+let _sbSubCtx=null;
 function sbSubStart(){
   const s=cd().sessions[_sbSi];
   _sbSubDraft={m:Math.min(_sbDur(s),60),i:'',o:''};
   sbRender();
-  setTimeout(()=>{const x=document.getElementById('sb-sub-m');if(x)x.focus();},40);
+  // No focus on the minute: on a phone the keyboard would cover the lists
+  const f=document.querySelector('#sb-body .sb-subf');if(f)try{f.scrollIntoView({block:'nearest'});}catch(e){}
+}
+// Who can come on and go off at the draft's minute, as <option>s
+function _sbSubLists(){
+  const c=_sbSubCtx,x=_sbSubDraft;if(!c||!x)return null;
+  const e=escapeHtml,nm=c.nm;
+  // on the pitch at that minute: whoever started or came on, minus who went off
+  const onAt=new Set(c.st);
+  c.subs.filter(y=>(+y.m||0)<=x.m).forEach(y=>{if(y.o)onAt.delete(y.o);if(y.i)onAt.add(y.i);});
+  // in: the bench of this match (and whoever went off earlier — youth
+  // football allows coming back); the rest of the squad only on request
+  const cand=c.likely.filter(y=>!onAt.has(y.p.name)),more=_sbMore?c.rest.filter(y=>!onAt.has(y.p.name)):[];
+  const off=c.all.filter(y=>onAt.has(y.p.name));
+  // a pick that does not fit the new minute is dropped
+  if(x.i&&!cand.concat(more).some(y=>y.p.name===x.i))x.i='';
+  if(x.o&&!off.some(y=>y.p.name===x.o))x.o='';
+  const o1=(y,cur)=>`<option value="${e(y.p.name)}"${y.p.name===cur?' selected':''}>${e((y.p.nr?y.p.nr+' ':'')+nm(y.p))}</option>`;
+  const opt=(list,cur,extra)=>`<option value="">\u2013 w\u00e4hlen \u2013</option>`+list.map(y=>o1(y,cur)).join('')
+    +((extra&&extra.length)?`<optgroup label="Weitere Spieler">${extra.map(y=>o1(y,cur)).join('')}</optgroup>`:'');
+  return {inHtml:opt(cand,x.i,more),outHtml:opt(off,x.o),empty:!cand.length&&!more.length};
 }
 function sbSubSet(k,v){
   if(!_sbSubDraft)return;
-  if(k==='m'){const n=Math.round(+v);_sbSubDraft.m=isFinite(n)?Math.max(1,Math.min(_sbDur(cd().sessions[_sbSi]),n)):_sbSubDraft.m;}
-  else _sbSubDraft[k]=v;
-  sbRender();
+  if(k==='m'){
+    const n=Math.round(+v);
+    if(String(v).trim()===''||!isFinite(n))return;     // still typing
+    _sbSubDraft.m=Math.max(1,Math.min(_sbDur(cd().sessions[_sbSi]),n));
+  }else _sbSubDraft[k]=v;
+  const L=_sbSubLists();if(!L)return;
+  // the minute changes who is on the pitch: new options, same elements
+  if(k==='m')[['sb-sub-i',L.inHtml],['sb-sub-o',L.outHtml]].forEach(([id,html])=>{
+    const el=document.getElementById(id);if(el&&el._h!==html){el.innerHTML=html;el._h=html;}
+  });
+  const ok=document.getElementById('sb-sub-ok');if(ok)ok.disabled=!_sbSubDraft.i;
+  const nh=document.getElementById('sb-sub-none');if(nh)nh.hidden=!L.empty;
 }
 function sbSubAdd(){
   const x=_sbSubDraft;if(!x||!x.i)return;
@@ -16354,22 +16387,17 @@ function sbRender(){
   if(!st.length)sh+=`<div class="sb-hint">Erst die Startelf wählen – dann lassen sich Wechsel und Minuten erfassen.</div>`;
   else if(_sbSubDraft){
     const x=_sbSubDraft;
-    // on the pitch at that minute: whoever started or came on, minus who went off
-    const onAt=new Set(st);
-    subs.filter(y=>(+y.m||0)<=x.m).forEach(y=>{if(y.o)onAt.delete(y.o);if(y.i)onAt.add(y.i);});
-    // in: the bench of this match (and whoever went off earlier — youth
-    // football allows coming back); the rest of the squad only on request
-    const cand=likely.filter(y=>!onAt.has(y.p.name)),more=_sbMore?rest.filter(y=>!onAt.has(y.p.name)):[];
-    const off=all.filter(y=>onAt.has(y.p.name));
-    const o1=(y,cur)=>`<option value="${e(y.p.name)}"${y.p.name===cur?' selected':''}>${e((y.p.nr?y.p.nr+' ':'')+nm(y.p))}</option>`;
-    const opt=(list,cur,extra)=>`<option value="">– wählen –</option>`+list.map(y=>o1(y,cur)).join('')
-      +((extra&&extra.length)?`<optgroup label="Weitere Spieler">${extra.map(y=>o1(y,cur)).join('')}</optgroup>`:'');
+    // The lists are kept for _sbSubLists: typing the minute or picking a name
+    // refreshes the options only — a repaint replaced the list that was just
+    // opening, and the phone/browser then showed it in a corner
+    _sbSubCtx={likely,rest,all,st,subs,nm};
+    const L=_sbSubLists();
     sh+=`<div class="sb-subf">
-      <label class="sb-f-m">Minute<input type="number" id="sb-sub-m" min="1" max="${_sbDur(s)}" value="${x.m}" inputmode="numeric" onchange="sbSubSet('m',this.value)"></label>
-      <label class="sb-f-p"><span><span class="sb-arr">▲</span> Rein</span><select onchange="sbSubSet('i',this.value)">${opt(cand,x.i,more)}</select></label>
-      <label class="sb-f-p"><span><span class="sb-arr sb-arr-o">▼</span> Raus</span><select onchange="sbSubSet('o',this.value)">${opt(off,x.o)}</select></label>
-      ${(!cand.length&&!more.length)?'<div class="sb-hint" style="grid-column:1/-1">Niemand auf der Bank: erst die Anwesenheit erfassen \u2013 oder unter Startelf \u201eWeitere Spieler\u201c \u00f6ffnen.</div>':''}
-      <div class="sb-f-b"><button type="button" class="sb-btn sb-btn-p" onclick="sbSubAdd()"${x.i?'':' disabled'}>Wechsel speichern</button><button type="button" class="sb-btn" onclick="_sbSubDraft=null;sbRender()">Abbrechen</button></div>
+      <label class="sb-f-m">Minute<input type="number" id="sb-sub-m" min="1" max="${_sbDur(s)}" value="${x.m}" inputmode="numeric" oninput="sbSubSet('m',this.value)" onblur="if(_sbSubDraft)this.value=_sbSubDraft.m"></label>
+      <label class="sb-f-p"><span><span class="sb-arr">▲</span> Rein</span><select id="sb-sub-i" onchange="sbSubSet('i',this.value)">${L.inHtml}</select></label>
+      <label class="sb-f-p"><span><span class="sb-arr sb-arr-o">▼</span> Raus</span><select id="sb-sub-o" onchange="sbSubSet('o',this.value)">${L.outHtml}</select></label>
+      <div class="sb-hint" id="sb-sub-none" style="grid-column:1/-1"${L.empty?'':' hidden'}>Niemand auf der Bank: erst die Anwesenheit erfassen \u2013 oder unter Startelf \u201eWeitere Spieler\u201c \u00f6ffnen.</div>
+      <div class="sb-f-b"><button type="button" class="sb-btn sb-btn-p" id="sb-sub-ok" onclick="sbSubAdd()"${x.i?'':' disabled'}>Wechsel speichern</button><button type="button" class="sb-btn" onclick="_sbSubDraft=null;sbRender()">Abbrechen</button></div>
     </div>`;
   }else sh+=`<button type="button" class="sb-add" onclick="sbSubStart()">+ Wechsel</button>`;
   h+=`<section class="sb-sec"><div class="sb-h">Wechsel <b>${subs.length}</b><span>Minute, wer kam, wer ging</span></div>${sh}</section>`;
