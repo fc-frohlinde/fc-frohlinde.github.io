@@ -1407,6 +1407,12 @@ select.lp-fmt-btn option:checked{background:var(--bm);color:#fff;}
 .slp-sort-label{display:inline-flex;align-items:center;color:rgba(255,255,255,.55);font-size:.85rem;font-weight:700;margin-right:1px;align-self:center;}
 
 /* Destructive-confirm modal rows */
+.mdc-mob{width:400px;max-width:94vw;}
+.mdc-mob h3{margin:0 0 6px;}
+.mdc-mob p{margin:0 0 16px;font-size:.88rem;line-height:1.45;color:var(--hx-muted,var(--gm));}
+.mdc-mob .mob-btns{margin-top:0;}
+.mdc-mob .mdc-drop{margin-left:auto;background:#C0392B;color:#fff;border:1px solid #C0392B;font-weight:700;}
+.mdc-mob .mdc-drop:hover{background:#A93226;}
 .mcd-list-title{font-size:.74rem;font-weight:700;color:var(--bd);margin-bottom:7px;letter-spacing:.3px;text-transform:uppercase;}
 .mcd-row{display:flex;align-items:center;gap:9px;padding:5px 0;border-bottom:1px dashed rgba(0,0,0,.06);font-size:.82rem;}
 .mcd-row:last-child{border-bottom:none;}
@@ -6766,13 +6772,17 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.42'; // v1.2.42: Links und Aktivität unten
-const APP_VERSION_LABEL='1.2.42';
+const APP_VERSION='1.2.43'; // v1.2.43: Tippen neben ein Fenster schließt es
+const APP_VERSION_LABEL='1.2.43';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792785403511; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792786210807; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.43',date:'23.10.2026',title:'Fenster schließen beim Tippen daneben',items:[
+    {icon:'👆',title:'Daneben tippen schließt',desc:'Ein Fenster (am Computer in der Mitte, am Handy von unten) schließt wieder, wenn du daneben tippst – wie man es von anderen Apps kennt. Seiten, Seitenleisten und „Foto zuschneiden“ bleiben, wie sie sind.'},
+    {icon:'✋',title:'Nichts geht verloren',desc:'Hast du im Fenster schon etwas eingegeben oder ausgewählt, fragt die App erst „Änderungen verwerfen?“. Das gilt jetzt auch für „Zurück“ am Handy und Esc – bisher war Eingetipptes dabei ohne Nachfrage weg.'},
+  ]},
   {version:'1.2.42',date:'23.10.2026',title:'Links und Aktivität am Handy unten',items:[
     {icon:'🔗',title:'Dort, wo der Finger ist',desc:'„Mehr“ → „Links“ öffnete die Liste als schmales Kästchen oben in der Ecke – sie richtete sich nach der Zeile im Menü, das sich dabei schon schloss. „Links“ und „Aktivität“ öffnen jetzt unten über der Leiste, an der Stelle von „Mehr“, über die ganze Breite. Beim Eintippen eines neuen Links rückt die Liste über die Tastatur.'},
   ]},
@@ -30830,6 +30840,8 @@ function openM(id){
   // behaves normally, so one back press = one closed layer.
   if(typeof _navArm==='function')_navArm();
   const _moEl=document.getElementById(id);
+  _moEl._moSnap=null;   // what was in the fields is read again at the first touch
+  _moTapOn(_moEl);
   _moEl.classList.add('open');
   requestAnimationFrame(()=>{try{_syncCloseHeight(_moEl);}catch(e){}});
   // Mark plain ✕ close buttons so design "Heute" can draw them round
@@ -30891,6 +30903,7 @@ function closeM(id){
     return;
   }
   document.getElementById(id).classList.remove('open');
+  document.getElementById(id)._moSnap=null;
   // Design "Heute": pages stay under dialogs — refresh the Kader page when a
   // dialog opened from it closes, and move the nav highlight when a page closes.
   if(typeof _hxOn==='function'&&_hxOn()){
@@ -30903,9 +30916,139 @@ function closeM(id){
     if(typeof setPresenceContext==='function')setPresenceContext('');
   }
 }
-// Modals close only via their explicit close button (X / Schließen / Fertig).
-// Clicking the backdrop no longer dismisses — prevents accidental loss of edits
-// in progress (e.g. half-typed Spielerverwaltung input that would vanish on a stray click).
+// ── Tapping beside a dialog closes it (1.2.43) ──
+// Until 1.2.42 dialogs closed only through their ✕, so a stray tap could not
+// wipe half-typed input. Most big windows have since become pages and side
+// panels (no "beside" at all); what is left are dialogs over a backdrop —
+// centred on the computer, sheets from below on the phone — and there tapping
+// beside is what everyone tries first. Typed input is kept safe by a question
+// instead: whatever changed in the fields since the dialog opened makes a tap
+// beside, the back gesture and Esc ask "Änderungen verwerfen?". The dialog's
+// own ✕ / Abbrechen still closes without asking (that is a decision).
+// Not closed by a tap beside: pages, panels, and the photo cropper (dragging
+// the frame easily ends beside it).
+const _MO_KEEP=new Set(['moPhotoCrop']);
+// Filters, choices and file pickers: nothing typed that could be lost
+const _MO_NOASK=new Set(['moSearch','moAuditLog','moExportIcs','moConfirmDestructive','moBackup','moPhotoCrop','moDiscard']);
+let _moForce=false,_moAskThen=null,_moAskFocus=null,_moDown=null;
+function _moPlain(mo){return !!(mo&&mo.classList&&mo.classList.contains('mo')&&!mo.classList.contains('hx-page')&&!mo.classList.contains('hx-panel'));}
+function _moIsField(f){
+  if(!f||!f.matches)return false;
+  if(f.matches('select,textarea,[contenteditable="true"],[contenteditable=""]'))return true;
+  return f.tagName==='INPUT'&&!/^(button|submit|reset|hidden|file|image)$/i.test(f.type||'');
+}
+function _moFields(mo){return Array.from(mo.querySelectorAll('input,select,textarea,[contenteditable]')).filter(_moIsField);}
+function _moVal(f){
+  if(f.type==='checkbox'||f.type==='radio')return f.checked;
+  if(f.tagName==='SELECT'&&f.multiple)return Array.from(f.selectedOptions).map(o=>o.value).join('\n');
+  if(f.isContentEditable&&f.tagName!=='INPUT'&&f.tagName!=='TEXTAREA')return f.innerText;
+  return f.value;
+}
+function _moSnapAll(mo){mo._moSnap=new Map(_moFields(mo).map(f=>[f,_moVal(f)]));}
+// The first touch inside an open dialog notes what its fields hold, and each
+// field touched later for the first time (re-rendered rows) is noted then.
+// Values the app fills in before that are not counted as changes.
+function _moSeen(e){
+  const t=e.target,mo=t&&t.closest?t.closest('.mo.open'):null;
+  if(!_moPlain(mo)||mo===t)return;
+  if(!mo._moSnap)_moSnapAll(mo);
+  let f=_moIsField(t)?t:null;
+  if(!f){const l=t.closest('label');if(l&&l.control)f=l.control;}
+  if(f&&mo.contains(f)&&!mo._moSnap.has(f))mo._moSnap.set(f,_moVal(f));
+}
+function _moDirty(mo){
+  if(!_moPlain(mo)||_MO_NOASK.has(mo.id)||!mo._moSnap)return false;
+  for(const [f,v] of mo._moSnap)if(f.isConnected&&mo.contains(f)&&_moVal(f)!==v)return true;
+  return false;
+}
+// Changed input in dialog `id`: ask first; `then` runs once discarding is confirmed
+function _moGuard(id,then){
+  if(_moForce)return false;
+  const mo=document.getElementById(id);
+  if(!mo||!mo.classList.contains('open')||!_moDirty(mo))return false;
+  _moAsk(mo,then);
+  return true;
+}
+function _moAsk(mo,then){
+  _moAskThen=then;_moAskFocus=document.activeElement;
+  const h=mo.querySelector('h3,h2,.mo-title');
+  const name=h?h.textContent.replace(/^[^\p{L}\p{N}]+/u,'').replace(/\s+/g,' ').trim():'';
+  const p=document.getElementById('mdc-s');
+  if(p)p.textContent=name&&name.length<=48?'Deine Eingaben in „'+name+'“ sind noch nicht gespeichert.':'Deine Eingaben sind noch nicht gespeichert.';
+  openM('moDiscard');
+  setTimeout(()=>{const b=document.getElementById('mdc-keep');if(b)try{b.focus({preventScroll:true});}catch(e){}},30);
+}
+function _moAskDone(drop){
+  const then=_moAskThen,back=_moAskFocus;_moAskThen=null;_moAskFocus=null;
+  closeM('moDiscard');
+  if(drop){if(then){_moForce=true;try{then();}finally{_moForce=false;}}}
+  else if(back&&back.isConnected&&back.focus&&!_touchUi())try{back.focus({preventScroll:true});}catch(e){}
+}
+function _touchUi(){return !!(window.matchMedia&&matchMedia('(hover: none)').matches);}
+// A tap beside closes like the dialog's own ✕ (with the question when needed)
+function _moDismiss(mo){
+  const id=mo.id;
+  if(id==='moDiscard')return _moAskDone(false);
+  const go=()=>{
+    if(id==='moConfirmDestructive'){const b=document.getElementById('mcd-cancel');if(b)b.click();return;}
+    if(id==='moRpeEdit'&&typeof rpeEditClose==='function')return rpeEditClose();
+    if(id==='moSearch'&&typeof closeSearch==='function')return closeSearch();
+    closeM(id);
+  };
+  if(_moGuard(id,go))return;
+  go();
+}
+// window, capture: runs before the menus' own outside-press closers, so a
+// press that only closes an open menu or list does not close the dialog too
+function _moMenuOpen(){
+  if(typeof HXS!=='undefined'&&HXS&&HXS.menu)return true;
+  if(document.querySelector('.user-dropdown.open,.notif-panel.open,#linksDropdown.open,#viewDropdown2.open,.team-tabs.open,.legend-pop.open,.ssx-menu.open,.ssa-menu.open'))return true;
+  const a=document.getElementById('hxActivity');return !!(a&&!a.hidden);
+}
+window.addEventListener('pointerdown',e=>{
+  const t=e.target;
+  // both press and release beside it: a text selection dragged out of the
+  // dialog, or a scroll that starts on the backdrop, does not close it
+  _moDown=(_moPlain(t)&&t.classList.contains('open')&&!_MO_KEEP.has(t.id)&&e.button===0&&!_moMenuOpen())?t:null;
+  if(_moDown)_moTapOn(_moDown);
+  _moSeen(e);
+},true);
+window.addEventListener('focusin',_moSeen,true);
+window.addEventListener('keydown',e=>{
+  const q=document.getElementById('moDiscard');
+  if(q&&q.classList.contains('open')&&(e.key==='Escape'||e.key==='Enter')){
+    // the question answers its own keys; Enter on a focused button presses it
+    e.preventDefault();e.stopImmediatePropagation();
+    const b=document.activeElement;
+    if(e.key==='Enter'&&b&&q.contains(b)&&b.tagName==='BUTTON')b.click();else _moAskDone(false);
+    return;
+  }
+  _moSeen(e);
+},true);
+// On the dialog itself (openM adds it): iOS sends no click for a tap on a
+// plain element unless the element itself listens for one
+function _moBackdropClick(e){
+  const mo=_moDown;_moDown=null;
+  if(!mo||e.target!==mo||e.currentTarget!==mo||!mo.classList.contains('open'))return;
+  _moDismiss(mo);
+}
+function _moTapOn(el){if(el&&!el._moTap){el._moTap=1;el.addEventListener('click',_moBackdropClick);}}
+// openM adds it; this covers dialogs opened another way (confirmDestructive)
+document.addEventListener('DOMContentLoaded',()=>document.querySelectorAll('.mo').forEach(_moTapOn));
+// "Hinzufügen" in a dialog that stays open (a new place, a new status …) saves
+// and empties its field: what is in the fields after that counts as the start.
+// When nothing changed (the check stopped it), the input still counts as new.
+window.addEventListener('click',e=>{
+  const b=e.target&&e.target.closest?e.target.closest('.btn.bp,button.bp'):null;
+  const mo=b?b.closest('.mo.open'):null;
+  if(!_moPlain(mo)||!mo._moSnap)return;
+  const before=new Map(_moFields(mo).map(f=>[f,_moVal(f)]));
+  const check=()=>{
+    if(!mo.classList.contains('open'))return;
+    for(const [f,v] of before)if(f.isConnected&&_moVal(f)!==v){_moSnapAll(mo);return;}
+  };
+  setTimeout(check,0);setTimeout(check,400);
+},true);
 document.querySelectorAll('#dowTr .dow-btn').forEach(b=>b.addEventListener('click',()=>{
   b.classList.toggle('sel');
   // If now selected as training, deselect from match days
@@ -30973,11 +31116,15 @@ const _navStack=[];
 function navPush(fromId){_navStack.push(fromId);}
 // The player and trainer panels ask about unsaved edits, as their ✕ does
 function _navGuardClose(id){
+  if(id==='moDiscard')return _moAskDone(false);
+  if(_moGuard(id,()=>_navGuardClose(id)))return;
   if(id==='moPlayer'&&typeof psCloseGuard==='function')return psCloseGuard();
   if(id==='moTrainerProfile'&&typeof tpCloseGuard==='function')return tpCloseGuard();
   return closeM(id);
 }
 function navBack(currentId){
+  if(currentId==='moDiscard')return _moAskDone(false);
+  if(_moGuard(currentId,()=>navBack(currentId)))return;
   _navGuardClose(currentId);
   const prev=_navStack.pop();
   if(prev){
@@ -38105,6 +38252,11 @@ _pubCleanupSchedule();
 </div></div>
 
 <!-- Destructive Action Confirm Modal -->
+<div class="mo" id="moDiscard" style="z-index:99999;" role="alertdialog" aria-modal="true" aria-labelledby="mdc-t" aria-describedby="mdc-s"><div class="mob mdc-mob">
+  <h3 id="mdc-t">Änderungen verwerfen?</h3>
+  <p id="mdc-s">Deine Eingaben sind noch nicht gespeichert.</p>
+  <div class="mob-btns"><button type="button" class="btn bs" id="mdc-keep" onclick="_moAskDone(false)">Weiter bearbeiten</button><button type="button" class="btn mdc-drop" id="mdc-drop" onclick="_moAskDone(true)">Verwerfen</button></div>
+</div></div>
 <div class="mo" id="moConfirmDestructive" style="z-index:99998;"><div class="mob" style="width:480px;max-width:96vw;max-height:88vh;display:flex;flex-direction:column;">
   <h3 id="mcd-title" style="margin:0 0 6px;color:#a02525;">Wirklich löschen?</h3>
   <p id="mcd-subtitle" style="font-size:.78rem;color:var(--gm);margin:0 0 12px;line-height:1.4;">–</p>
