@@ -139,6 +139,13 @@ await cannot('ответ с неизвестным видом', req('PUT', 'fcf_
 await cannot('ответ под неизвестным ключом', req('PUT', 'fcf_in/' + PK + '/role', ent));
 await cannot('ответ с лишним полем', req('PUT', 'fcf_in/' + PK + '/a_k1027-1830t', Object.assign({ x: 1 }, ent)));
 await cannot('ответ из будущего', req('PUT', 'fcf_in/' + PK + '/a_k1027-1830t', Object.assign({}, ent, { t: now + 3600e3 })));
+// the server's time (1.2.45): only the real one, unchanged when marked merged
+await can('ответ со временем сервера', req('PUT', 'fcf_in/' + PK + '/a_k1103-1830t', Object.assign({}, ent, { k: 'k1103-1830t', v: 0, st: TS })));
+const stored = JSON.parse((await req('GET', 'fcf_in/' + PK + '/a_k1103-1830t')).body || 'null');
+ok(stored && typeof stored.st === 'number' && Math.abs(stored.st - Date.now()) < 60000, 'время сервера записано: ' + (stored && stored.st));
+await can('отметить перенесённым, время сервера то же', req('PUT', 'fcf_in/' + PK + '/a_k1103-1830t', Object.assign({}, stored, { m: Date.now() })));
+await cannot('своё время вместо серверного (раньше)', req('PUT', 'fcf_in/' + PK + '/a_k1103-1830t', Object.assign({}, ent, { k: 'k1103-1830t', v: 0, st: now - 3 * DAY })));
+await cannot('время сервера не числом', req('PUT', 'fcf_in/' + PK + '/a_k1105-1830t', Object.assign({}, ent, { k: 'k1105-1830t', st: 'früh' })));
 await can('голос записать', req('PUT', 'fcf_vote/' + PK + '/k1025-1300m', { n: 'Tom Berg', t: now }));
 await cannot('голос второй раз', req('PUT', 'fcf_vote/' + PK + '/k1025-1300m', { n: 'Ali Kaya', t: now }));
 await cannot('голос удалить', req('DELETE', 'fcf_vote/' + PK + '/k1025-1300m'));

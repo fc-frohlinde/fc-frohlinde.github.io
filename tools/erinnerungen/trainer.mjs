@@ -112,7 +112,9 @@ export function cancellations(b, now, snap) {
       const v = st(p, si), nk = p.name;
       cur[nk] = v;
       if (v === 4 || v === 1) there++;
-      if (prev && v === 0 && prev[nk] !== undefined && prev[nk] !== 0 && prev[nk] !== 2) gone.push(p.name);
+      // a "Kann nicht" excused by the app in time (excOK 'a', 1.2.45) is a cancellation too
+      const byApp = v === 2 && Array.isArray(p.excOK) && p.excOK[si] === 'a';
+      if (prev && (v === 0 || byApp) && prev[nk] !== undefined && prev[nk] !== 0 && prev[nk] !== 2) gone.push(p.name);
     });
     next[key] = cur;
     if (!gone.length) return;

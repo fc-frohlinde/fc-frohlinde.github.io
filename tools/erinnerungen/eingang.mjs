@@ -51,6 +51,9 @@ export async function inbox({ db, apply, ts = Date.now(), dry = false, log = () 
     blocks[ek] = { key, team: key.slice(0, i), season: key.slice(i + 2), blk, raw: r };
     blk.players.forEach((p, pi) => { if (p && p.confirmToken) map[sha('fcf-pv|' + p.confirmToken)] = { ek, pi }; });
   }
+  // The teams' rules (Absage-Regel, 1.2.45): pvApply decides with them
+  const rules = {};
+  for (const [ek, r] of Object.entries(raw || {})) { const key = dk(ek); if (key.endsWith('__rules')) rules[key.slice(0, -7)] = decode(r) || {}; }
   const w = {}, audit = [];
   const rawPlayer = (ek, pi) => { const pl = blocks[ek].raw.players; const v = pl && (pl.v || pl); return (v && v[pi]) || {}; };
   // ── answers ──
@@ -72,7 +75,7 @@ export async function inbox({ db, apply, ts = Date.now(), dry = false, log = () 
       }
       if (!dry && !(await db.claim(path, e.t, ts))) continue;
       const B = blocks[who.ek];
-      const r = apply(B.blk, who.pi, e);
+      const r = apply(B.blk, who.pi, e, rules[B.team]);
       // Refused (after the deadline, after the roll call): gone, so the player's
       // page stops showing it as his answer
       if (!r.ok) { out.refused++; out.why[r.why] = (out.why[r.why] || 0) + 1; w[path] = null; continue; }

@@ -207,6 +207,10 @@ rules = {
                 "t": {".validate": "newData.isNumber()"}, "a": {".validate": "newData.isNumber()"},
                 "$other": {".validate": False}},
           "t": {".validate": True},
+          # The server's time of the answer (1.2.45): only the real one — it
+          # decides whether a "Kann nicht" came in time to count as excused.
+          # Unchanged when the trainer app marks the entry merged (m).
+          "st": {".validate": "newData.isNumber() && (newData.val() === now || newData.val() === data.val())"},
           "m": {".validate": "newData.isNumber()"},
           "$other": {".validate": False}
         }
