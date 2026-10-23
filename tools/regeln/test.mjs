@@ -112,6 +112,39 @@ await can('записать стандартный ход тренировки',
 await cannot('стандартный ход без upd', req('PUT', 'fcf_plans/U19/std', { rows: [{ ph: 'Hauptteil', cat: 'Spielform', min: 20 }] }));
 await cannot('неизвестный узел в fcf_plans', req('PUT', 'fcf_plans/U19/xyz', { upd: now }));
 
+// ── Ausschnitte für Spieler (1.2.36) ──
+const PK = 'a'.repeat(64), PK2 = 'b'.repeat(64), TK = 'c'.repeat(64), H = 'd'.repeat(64);
+const slice = { t: now, h: 'abc123', j: '{"v":1}' };
+await can('записать срез игрока', req('PUT', 'fcf_pv/' + PK, slice));
+await can('прочитать свой срез по ключу (без входа)', req('GET', 'fcf_pv/' + PK));
+await cannot('прочитать список срезов', req('GET', 'fcf_pv'));
+await cannot('срез с неверным ключом', req('PUT', 'fcf_pv/abc', slice));
+await cannot('срез без j', req('PUT', 'fcf_pv/' + PK2, { t: now, h: 'x' }));
+await cannot('срез с лишним полем', req('PUT', 'fcf_pv/' + PK2, Object.assign({ x: 1 }, slice)));
+await can('записать общую часть команды по частям (t, h, j)', req('PATCH', '/', { ['fcf_pt/' + TK + '/t']: now, ['fcf_pt/' + TK + '/h']: 'h1', ['fcf_pt/' + TK + '/j']: '{}' }));
+await can('прочитать общую часть по ключу', req('GET', 'fcf_pt/' + TK));
+await cannot('прочитать список общих частей', req('GET', 'fcf_pt'));
+await can('записать коды групповой ссылки', req('PUT', 'fcf_pk/' + TK, { [H]: 'p_0123456789abcdef0123' }));
+await can('прочитать код по ключу дня рождения', req('GET', 'fcf_pk/' + TK + '/' + H));
+await cannot('прочитать все коды команды', req('GET', 'fcf_pk/' + TK));
+const ent = { a: 'rsvp', k: 'k1027-1830t', si: 36, v: 1, t: now };
+await can('игрок пишет ответ во входящие', req('PUT', 'fcf_in/' + PK + '/a_k1027-1830t', ent));
+await can('игрок пишет seen', req('PUT', 'fcf_in/' + PK + '/seen', { a: 'seen', t: now, v: { t: now, a: now } }));
+await can('игрок читает свои входящие', req('GET', 'fcf_in/' + PK));
+await cannot('без входа читать все входящие', req('GET', 'fcf_in'));
+await cannot('чужому аккаунту читать все входящие', req('GET', 'fcf_in', undefined, 'uStranger'));
+await can('тренеру с аккаунтом читать все входящие', req('GET', 'fcf_in', undefined, 'uTrainer'));
+await can('отметить ответ перенесённым (m)', req('PUT', 'fcf_in/' + PK + '/a_k1027-1830t', Object.assign({ m: now }, ent)));
+await cannot('ответ с неизвестным видом', req('PUT', 'fcf_in/' + PK + '/a_k1027-1830t', Object.assign({}, ent, { a: 'admin' })));
+await cannot('ответ под неизвестным ключом', req('PUT', 'fcf_in/' + PK + '/role', ent));
+await cannot('ответ с лишним полем', req('PUT', 'fcf_in/' + PK + '/a_k1027-1830t', Object.assign({ x: 1 }, ent)));
+await cannot('ответ из будущего', req('PUT', 'fcf_in/' + PK + '/a_k1027-1830t', Object.assign({}, ent, { t: now + 3600e3 })));
+await can('голос записать', req('PUT', 'fcf_vote/' + PK + '/k1025-1300m', { n: 'Tom Berg', t: now }));
+await cannot('голос второй раз', req('PUT', 'fcf_vote/' + PK + '/k1025-1300m', { n: 'Ali Kaya', t: now }));
+await cannot('голос удалить', req('DELETE', 'fcf_vote/' + PK + '/k1025-1300m'));
+await cannot('голос прочитать (даже админу)', req('GET', 'fcf_vote/' + PK + '/k1025-1300m', undefined, 'uAdmin'));
+await cannot('голос за тренировку', req('PUT', 'fcf_vote/' + PK + '/k1027-1830t', { n: 'Tom Berg', t: now }));
+
 // ── what stays as it is until the lock (Teil 3) ──
 await can('без входа читать fcf_data (пока открыто)', req('GET', 'fcf_data/version'));
 await can('читать push-ключ', req('GET', 'fcf_push/pub'));

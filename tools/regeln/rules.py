@@ -32,6 +32,15 @@ REDEEM_USED = ("(auth != null && !data.exists() && newData.val() === auth.uid"
                " && !data.parent().child('revoked').exists()"
                " && newData.parent().parent().parent().child('fcf_members/'+auth.uid+'/code').val() === $code)")
 STR = lambda n: "newData.isString() && newData.val().length <= %d" % n
+# A slice (1.2.36): {t: built at, h: hash, j: JSON text}; t, h and j may be
+# written one by one (the job's mvp beside them stays)
+SLICE = {
+  ".validate": "$KEY.matches(/^[0-9a-f]{64}$/) && newData.hasChildren(['t','h','j'])",
+  "t": {".validate": "newData.isNumber() && newData.val() <= now + 3600000"},
+  "h": {".validate": STR(64)},
+  "j": {".validate": "newData.isString() && newData.val().length <= 3000000"},
+  "$other": {".validate": False}
+}
 
 rules = {
   "rules": {
@@ -162,6 +171,57 @@ rules = {
     "fcf_cal": {
       ".read": IS_MEMBER,
       ".write": False
+    },
+    # ── Schritt B, Teil 2 (1.2.36): Ausschnitte für Spieler ──
+    # Read by key only, never as a list: the key is a hash of the player's
+    # link (fcf_pv, fcf_in, fcf_vote) or of the team's group-link secret
+    # (fcf_pt, fcf_pk). Written by the trainers' app — until Teil 3 by any
+    # client, like fcf_data; Teil 3 makes it members only.
+    "fcf_pv": {
+      "$pk": dict(SLICE, **{".validate": SLICE[".validate"].replace("$KEY", "$pk"), ".read": True, ".write": True})
+    },
+    "fcf_pt": {
+      "$tk": dict(SLICE, **{".validate": SLICE[".validate"].replace("$KEY", "$tk"), ".read": True, ".write": True,
+        # the job's winners of a closed vote
+        "mvp": {"$k": {".validate": "newData.hasChildren()"}}})
+    },
+    "fcf_pk": {
+      "$tk": {
+        ".write": True, ".validate": "$tk.matches(/^[0-9a-f]{64}$/)",
+        "$h": {".read": True, ".validate": "$h.matches(/^[0-9a-f]{64}$/) && newData.isString() && newData.val().length <= 40"}
+      }
+    },
+    # A player's inbox: he writes his answers, an open trainer app (members:
+    # the list) or the job merges them. One entry per thing, replaced by the next.
+    "fcf_in": {
+      ".read": IS_MEMBER,
+      "$pk": {
+        ".read": "$pk.matches(/^[0-9a-f]{64}$/)",
+        "$id": {
+          ".write": "$pk.matches(/^[0-9a-f]{64}$/) && $id.matches(/^(a|r|f)_k[0-9]{4}-[0-9]{4}[mt]$|^seen$|^push$/)",
+          ".validate": "newData.hasChildren(['a','t']) && newData.child('t').isNumber() && newData.child('t').val() <= now + 600000",
+          "a": {".validate": "newData.isString() && newData.val().matches(/^(rsvp|rpe|nd|phy|seen|push)$/)"},
+          "k": {".validate": "newData.isString() && newData.val().length <= 20"},
+          "si": {".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() < 2000"},
+          "v": {".validate": "newData.isNumber() || newData.isBoolean() || newData.child('t').isNumber()",
+                "t": {".validate": "newData.isNumber()"}, "a": {".validate": "newData.isNumber()"},
+                "$other": {".validate": False}},
+          "t": {".validate": True},
+          "m": {".validate": "newData.isNumber()"},
+          "$other": {".validate": False}
+        }
+      }
+    },
+    # A vote for Spieler des Spiels: given once, read by nobody but the job
+    "fcf_vote": {
+      "$pk": {
+        "$k": {
+          ".write": "!data.exists() && $pk.matches(/^[0-9a-f]{64}$/) && $k.matches(/^k[0-9]{4}-[0-9]{4}m$/)",
+          ".validate": "newData.hasChildren(['n','t']) && newData.child('n').isString() && newData.child('n').val().length <= 80 && newData.child('t').isNumber() && newData.child('t').val() <= now + 600000",
+          "n": {".validate": True}, "t": {".validate": True},
+          "$other": {".validate": False}
+        }
+      }
     },
     "$other": {".read": False, ".write": False}
   }
