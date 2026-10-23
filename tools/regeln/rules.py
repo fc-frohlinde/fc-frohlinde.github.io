@@ -198,7 +198,7 @@ rules = {
       "$pk": {
         ".read": "$pk.matches(/^[0-9a-f]{64}$/)",
         "$id": {
-          ".write": "$pk.matches(/^[0-9a-f]{64}$/) && $id.matches(/^(a|r|f)_k[0-9]{4}-[0-9]{4}[mt]$|^seen$|^push$/)",
+          ".write": "$pk.matches(/^[0-9a-f]{64}$/) && $id.matches(/^((a|r|f)_k[0-9]{4}-[0-9]{4}[mt]|seen|push)$/)",
           ".validate": "newData.hasChildren(['a','t']) && newData.child('t').isNumber() && newData.child('t').val() <= now + 600000",
           "a": {".validate": "newData.isString() && newData.val().matches(/^(rsvp|rpe|nd|phy|seen|push)$/)"},
           "k": {".validate": "newData.isString() && newData.val().length <= 20"},
