@@ -51,6 +51,17 @@ try {
       }
     }
   }
+  // При ручном запуске: сколько всего в планировщике (только числа)
+  if (process.env.GITHUB_EVENT_NAME === 'workflow_dispatch') {
+    const teams = decode(await db.get('fcf_data/teamList')) || [];
+    for (const t of teams) {
+      if (typeof t !== 'string') continue;
+      const k = t.replace(/\//g, '__SL__').replace(/\./g, '__DOT__').replace(/[#$\[\]]/g, '_');
+      const n = async x => Object.keys((await db.get(`fcf_plans/${k}/${x}`)) || {}).length;
+      const std = await db.get(`fcf_plans/${k}/std`);
+      console.log(`::notice title=Планировщик ${t}::упражнений в библиотеке: ${await n('lib')}, планов: ${await n('plans')}, шаблонов: ${await n('tpl')}, свой стандарт: ${std ? 'да' : 'нет'}`);
+    }
+  }
 } catch (e) {
   process.exitCode = 1;
 } finally {
