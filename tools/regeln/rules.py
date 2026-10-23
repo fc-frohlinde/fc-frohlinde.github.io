@@ -94,6 +94,8 @@ rules = {
         "lib": {"$id": {".validate": "newData.hasChildren(['title','upd'])"}},
         "tpl": {"$id": {".validate": "newData.hasChildren(['name','upd'])"}},
         "meta": {".validate": "newData.hasChild('seeded')"},
+        # Standardablauf for new plans (1.2.28): {rows:[{ph,cat,min}], upd, by}
+        "std": {".validate": "newData.hasChild('upd')"},
         "$other": {".validate": False}
       }
     },

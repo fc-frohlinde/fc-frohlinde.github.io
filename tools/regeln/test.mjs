@@ -107,6 +107,11 @@ await cannot('чужому аккаунту (не участник) читать
 await cannot('отозванному читать адрес календаря', req('GET', 'fcf_cal/U19', undefined, 'uGone'));
 await cannot('админу записать адрес календаря (только джоб)', req('PUT', 'fcf_cal/U19/url', 'https://evil', 'uAdmin'));
 
+// ── Trainingsplaner: Standardablauf (1.2.28) ──
+await can('записать стандартный ход тренировки', req('PUT', 'fcf_plans/U19/std', { rows: [{ ph: 'Aktivierung 1', cat: 'Aufwärmen', min: 10 }], upd: now, by: 'Artem' }));
+await cannot('стандартный ход без upd', req('PUT', 'fcf_plans/U19/std', { rows: [] }));
+await cannot('неизвестный узел в fcf_plans', req('PUT', 'fcf_plans/U19/xyz', { upd: now }));
+
 // ── what stays as it is until the lock (Teil 3) ──
 await can('без входа читать fcf_data (пока открыто)', req('GET', 'fcf_data/version'));
 await can('читать push-ключ', req('GET', 'fcf_push/pub'));
