@@ -6629,13 +6629,17 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.29'; // v1.2.29: Standardablauf — Übung wählen
-const APP_VERSION_LABEL='1.2.29';
+const APP_VERSION='1.2.30'; // v1.2.30: Standardablauf auch in leeren Plänen
+const APP_VERSION_LABEL='1.2.30';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792759646405; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792760432885; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.30',date:'23.10.2026',title:'Standardablauf repariert',items:[
+    {icon:'🛠',title:'Auch in leeren Plänen',desc:'Wer einmal den Reiter „Gruppen“ geöffnet hatte, bekam einen leeren gespeicherten Plan – und dort erschien der Standardablauf nicht. Jetzt bekommt jeder Plan ohne Blöcke den Standardablauf, und „Gruppen“ speichert erst, wenn du dort etwas änderst.'},
+    {icon:'📋',title:'Standard in jeden Plan laden',desc:'„Vorlage laden“ bietet den Standardablauf als erste Vorlage an – ersetzen oder hinten anhängen. Nach dem Speichern des Standards steht jetzt, ob er in den offenen Plan übernommen wurde.'},
+  ]},
   {version:'1.2.29',date:'23.10.2026',title:'Trainingsplaner: Abschnitt füllen',items:[
     {icon:'👆',title:'Abschnitt antippen, Übung eintragen',desc:'Der Hinweis über dem Standardablauf sagt jetzt genau, was zu tun ist. Ist die Bibliothek leer, trägst du die Übung direkt in den Abschnitt ein. Gibt es Übungen, steht im Abschnitt „Aus der Bibliothek wählen“: Liste öffnen, Übung antippen, fertig.'},
   ]},
@@ -31421,15 +31425,14 @@ async function tplOpen(si,opts){
   // were seeded for a while are removed again, unless a trainer changed one.
   if(meta&&meta.seeded&&(meta.seedV||1)<3&&!TPL.readFail)_tplDropStd(meta);
   TPL.std=(std&&typeof std==='object')?std:null;
-  TPL.plan=_tplNorm(plan);TPL.draft=false;
-  if(!TPL.plan){
-    TPL.plan={v:1,blocks:[]};
-    // A new plan starts with the Standardablauf. It is a draft: saved only
-    // once something is changed, so opening and closing plans nothing. Not
-    // when the read failed or the summary says a plan exists (not loaded).
-    if(_tplEditor()&&!TPL.readFail&&!(TPL.idx&&TPL.idx[TPL.pid])){
-      const bl=_tplStdBlocks();if(bl.length){TPL.plan.blocks=bl;TPL.draft=true;}
-    }
+  TPL.plan=_tplNorm(plan)||{v:1,blocks:[]};TPL.draft=false;
+  // A plan without blocks — new, or saved empty (1.2.30: the Gruppen tab used
+  // to save one just by being opened) — starts with the Standardablauf. It is
+  // a draft: saved only once something is changed, so opening and closing
+  // plans nothing. Not when the read failed or the summary says the plan has
+  // blocks that did not load.
+  if(!TPL.plan.blocks.length&&_tplEditor()&&!TPL.readFail&&!(TPL.idx&&TPL.idx[TPL.pid]&&+TPL.idx[TPL.pid].n>0)){
+    const bl=_tplStdBlocks();if(bl.length){TPL.plan.blocks=bl;TPL.draft=true;}
   }
   _tplRenderAll();
   if(opts&&opts.pitch&&TPL.plan.blocks.length&&!TPL.draft)tplPitchOpen();
@@ -31694,7 +31697,7 @@ function _tplRenderEd(){
   if(!bl.length){
     el.innerHTML=`<div class="tpl-empty"><h4>Noch kein Ablauf</h4>
       <p>Wähle rechts Übungen aus der Bibliothek, lege einen leeren Block an oder übernimm einen früheren Plan.</p>
-      <div class="tpl-acts"><button type="button" class="tpl-ab" onclick="tplAddBlock()">+ Leerer Block</button>
+      <div class="tpl-acts">${_tplStdRows().length?'<button type="button" class="tpl-ab acc" onclick="tplApplyStd()">Standardablauf</button>':''}<button type="button" class="tpl-ab" onclick="tplAddBlock()">+ Leerer Block</button>
       <button type="button" class="tpl-ab" onclick="tplCopyDlg()">Früheren Plan übernehmen</button>
       <button type="button" class="tpl-ab" onclick="tplLoadTplDlg()">Vorlage laden</button></div></div>`;
     return;
@@ -32068,10 +32071,14 @@ function tplLoadTplDlg(){
     return `<div style="display:flex;gap:8px;align-items:center"><button type="button" class="tpl-pk" onclick="tplApplyTpl('${id}')">${_tplMiniBar(bl)}
       <span class="tpl-bt"><b>${_tplE(t.name)}</b><span>${bl.length} ${bl.length===1?'Block':'Blöcke'} · ${_tplTotal(bl)} Min. · ${_tplE(bl.map(b=>b.title).filter(Boolean).slice(0,3).join(', '))}</span></span></button>
       <button type="button" class="tpl-pk-del" title="Vorlage löschen" aria-label="Vorlage löschen" onclick="tplTplDel(this,'${id}')">${TPL_IC.del}</button></div>`;}).join('')
-    :'<div class="tpl-none">Noch keine Vorlagen. Einen fertigen Ablauf oben mit „Als Vorlage speichern“ ablegen.</div>';
-  _tplDlg(`<h4>Vorlage laden</h4>${_tplModeSeg()}<div class="tpl-pick">${rows}</div>
+    :(_tplStdRows().length?'':'<div class="tpl-none">Noch keine Vorlagen. Einen fertigen Ablauf oben mit „Als Vorlage speichern“ ablegen.</div>');
+  const sr=_tplStdRows();
+  const stdRow=sr.length?`<button type="button" class="tpl-pk" onclick="tplApplyStd()">${_tplMiniBar(sr)}
+      <span class="tpl-bt"><b>Standardablauf</b><span>${sr.length} ${sr.length===1?'Abschnitt':'Abschnitte'} · ${_tplTotal(sr)} Min. · ${_tplE(sr.map(r=>r.ph).slice(0,3).join(', '))}</span></span></button>`:'';
+  _tplDlg(`<h4>Vorlage laden</h4>${_tplModeSeg()}<div class="tpl-pick">${stdRow}${rows}</div>
     <div class="tpl-dlg-f"><button type="button" class="tpl-btn" onclick="tplDlgClose()">Schließen</button></div>`);
 }
+function tplApplyStd(){const sr=_tplStdRows();if(!sr.length)return;_tplApplyBlocks(sr.map(r=>({ph:r.ph,cat:r.cat,min:r.min})),'Standardablauf',[]);}
 function tplApplyTpl(id){const t=TPL.tpls[id];if(!t)return;_tplApplyBlocks(t.blocks,`Vorlage „${t.name}“`,t.grps);}
 function tplTplDel(btn,id){
   if(!btn.dataset.arm){btn.dataset.arm='1';btn.classList.add('arm');btn.textContent='Löschen?';return;}
@@ -32149,11 +32156,14 @@ function tplStdSave(){
   const v={rows:rows,upd:Date.now(),by:(CU&&CU.name)||''};
   TPL.std=v;_tplWrite(_tplBase()+'/std',_tplClean(v));
   tplDlgClose();TPL.stdEd=null;
-  // The plan on screen is still unsaved (the old standard or emptied): show the new one
-  if(TPL.plan&&(TPL.draft||(!TPL.plan.blocks.length&&!(TPL.idx&&TPL.idx[TPL.pid])))){
-    TPL.plan.blocks=_tplStdBlocks();TPL.draft=TPL.plan.blocks.length>0;TPL.sel=0;_tplRenderList();_tplRenderEd();
+  // The plan on screen is still the standard or empty: it shows the new one
+  let took=false;
+  if(TPL.plan&&(TPL.draft||!TPL.plan.blocks.length)){
+    TPL.plan.blocks=_tplStdBlocks();TPL.draft=TPL.plan.blocks.length>0;TPL.sel=0;took=TPL.draft;_tplRenderList();_tplRenderEd();
   }
-  _tplToast(rows.length?'Standardablauf gespeichert':'Neue Pläne beginnen jetzt leer');
+  _tplToast(!rows.length?'Gespeichert – neue Pläne beginnen leer'
+    :took?'Standardablauf gespeichert und in diesen Plan übernommen'
+    :'Gespeichert – gilt für neue Pläne. Diesen Plan: „Vorlage laden“ → Standardablauf');
 }
 // This one plan without the standard (nothing saved: the plan is empty)
 function tplStdClear(){
@@ -32763,7 +32773,9 @@ function _tplGrpEnsure(){
   const L=_tplGrps();
   if(!L.length){
     const g=Object.assign(_tplGrpDefault(_tplRoster().yes.length),{id:_tplId('g'),l:'A'});
-    L.push(g);_tplDistribute(g);TPL.gSel=g.id;_tplTouch();
+    L.push(g);_tplDistribute(g);TPL.gSel=g.id;
+    // Only looking at the tab saves nothing while the plan has no content yet
+    if(!TPL.draft&&TPL.plan.blocks.length)_tplTouch();
   }
   const g=_tplGrpCur();if(g)g.n=Math.max(2,Math.min(TPL_GRP.length,+g.n||4));
   return g;
@@ -32883,7 +32895,7 @@ function _tplRenderGrp(){
   const g=_tplGrpEnsure();if(!g)return;
   const wx=TPL.gView==='wx'&&_tplGrpChanges().length>0;if(!wx)TPL.gView='set';
   const V=_tplGrpView(g);
-  if(V.changed)_tplTouch();
+  if(V.changed&&!TPL.draft&&TPL.plan.blocks.length)_tplTouch();
   const R=V.R;const yes=R.yes.length;const gkN=R.yes.filter(x=>x.line===0).length;
   const prev=_tplGrpPrev(g);const used=_tplGrpBlocks(g).length;const many=_tplGrps().length>1;
   const set=`<section class="tpl-col tpl-gset" aria-label="Einteilung">
@@ -33572,7 +33584,7 @@ function tplMoreDo(fn){const m=document.getElementById('tplMoreMenu');if(m)m.hid
    'tplUndo','dgTool','dgSet','dgStraight','dgRotate','dgDel','dgDup','dgSetBg','dgClear','dgUndo','dgRedo',
    'tplGrpToggle','tplGrpMove','tplGrpN','tplGrpOpt','tplGrpShuffle','tplGrpFor','tplBlockGrp','tplGrpDrag','tplGrpDrop','tplPitchSave',
    'tplGrpNew','tplGrpDel','tplGrpAssign','tplBlockGrpSet',
-   'tplStdDlg','tplStdSave','tplStdClear','tplStdAdd','tplStdMove','tplStdDel','tplStdFromPlan','tplPickLib','tplPickDo','tplPickNew'
+   'tplStdDlg','tplStdSave','tplStdClear','tplStdAdd','tplStdMove','tplStdDel','tplStdFromPlan','tplPickLib','tplPickDo','tplPickNew','tplApplyStd'
   ].forEach(n=>{
     const f=window[n];if(typeof f!=='function')return;
     window[n]=function(){
