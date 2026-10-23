@@ -5640,6 +5640,11 @@ body.design-heute .tst-filter .tpl-hint{color:var(--hx-og-muted);}
 .dg-svg.draw,.dg-svg.draw .dg-it{cursor:crosshair;}
 .dg-h{fill:#FFFFFF;stroke:#0B2550;stroke-width:2;cursor:grab;}
 .dg-h.mid{fill:#FFD25A;}
+.dg-h.rot{fill:#FFD25A;stroke:#0B2550;cursor:grab;}
+.dg-sw.none{background:repeating-linear-gradient(135deg,#FFFFFF 0 5px,#E4E9F2 5px 6px)!important;}
+.dg-bar input.dg-mass{width:150px;}
+.tpl-ro-diab{display:flex;justify-content:flex-end;margin-top:4px;}
+.tpl-ro-diab .tpl-lnk{padding:4px 2px;font-size:13px;}
 .dg-selr{fill:none;stroke:#FFD25A;stroke-width:2;stroke-dasharray:5 4;pointer-events:none;}
 .dg-bar{min-height:38px;display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:13px;color:var(--tp-mut);}
 .dg-bar .tpl-ab{height:34px;font-size:13px;padding:0 10px;}
@@ -6654,13 +6659,20 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.31'; // v1.2.31: Zeichenbrett — Menü, Mehrfachauswahl, Reihe
-const APP_VERSION_LABEL='1.2.31';
+const APP_VERSION='1.2.32'; // v1.2.32: Zeichenbrett — Zonen, Drehen, Hintergründe, Bild
+const APP_VERSION_LABEL='1.2.32';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792762138259; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792763331409; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.32',date:'23.10.2026',title:'Zeichenbrett, Teil 2',items:[
+    {icon:'↗',title:'Torschuss und Linie',desc:'Zwei neue Linien: Torschuss (kräftig, rot) und eine Linie ohne Pfeil, z. B. für Grenzen oder Gassen.'},
+    {icon:'⬭',title:'Zonen: oval, farbig, mit Maßen',desc:'Eine Zone kann rechteckig oder oval sein, eine Füllfarbe haben (Weiß, Gelb, Blau, Rot) und ihre Maße zeigen, z. B. „20 × 15 m“.'},
+    {icon:'↻',title:'Frei drehen',desc:'Tore, Leiter und Hürde haben einen gelben Drehpunkt: daran ziehen dreht in 15°-Schritten, mit Shift ganz frei. „Drehen“ dreht weiter um 90°.'},
+    {icon:'🥅',title:'Neue Untergründe',desc:'„Strafraum“ (16er groß) und „Rasen mit Raster“ zum Abmessen.'},
+    {icon:'🖼',title:'Skizze als Bild',desc:'Das Bild-Symbol über dem Feld speichert die Skizze als PNG – am Handy direkt zum Teilen, z. B. an einen Co-Trainer. Auch in der Ansicht für Trainer.'},
+  ]},
   {version:'1.2.31',date:'23.10.2026',title:'Zeichenbrett',items:[
     {icon:'🖱',title:'Menü mit Rechtsklick',desc:'Rechtsklick auf ein Element (am Handy: lange drücken): Farbe, Nummer, Drehen, Kopie, Kopieren, Ausschneiden, nach vorne/hinten, Löschen. Auf freiem Feld: Einfügen und Spieler, Hütchen, Ball, Minitor, Stange direkt an diese Stelle.'},
     {icon:'⬚',title:'Mehrere auf einmal',desc:'Rahmen über das Feld ziehen oder Shift + Klick: mehrere Elemente auswählen und zusammen verschieben, drehen, kopieren oder löschen. Pfeiltasten schieben fein (mit Shift in großen Schritten), Strg+A wählt alles.'},
@@ -31722,7 +31734,7 @@ function _tplReadView(b,i){
         <span class="tpl-chip"><span class="tpl-catdot" style="background:${_tplCatColor(b.cat)}"></span><b>${_tplE(b.cat)}</b></span>
         ${chip('Dauer',(+b.min||0)+' Min.')}${chip('Spieler',b.players)}${chip('Feld',b.area)}${chip('Intensität',intv)}
       </div></div></div>
-    ${_dgHas(b.dia)?`<div class="tpl-ro-dia">${_dgSvg(b.dia,'Skizze: '+(b.title||''))}</div>`:''}
+    ${_dgHas(b.dia)?`<div class="tpl-ro-dia">${_dgSvg(b.dia,'Skizze: '+(b.title||''))}</div><div class="tpl-ro-diab"><button type="button" class="tpl-lnk" onclick="dgImage()">Skizze als Bild speichern</button></div>`:''}
     ${(b.desc||coach.length)?`<div class="tpl-grid2">
       ${b.desc?`<div class="tpl-fld"><label>Ablauf</label><div class="tpl-ro-txt">${txt(b.desc)}</div></div>`:''}
       ${coach.length?`<div class="tpl-fld"><label>Coaching-Punkte</label><ul class="tpl-ro-list">${coach.map(c=>`<li>${_tplE(c)}</li>`).join('')}</ul></div>`:''}
@@ -32327,7 +32339,11 @@ const DG_TEAM={a:{f:'#1E5BC6',t:'#FFFFFF',n:'Team A'},b:{f:'#D9443F',t:'#FFFFFF'
   n:{f:'#E8C840',t:'#0B2550',n:'Neutral'},k:{f:'#14181F',t:'#FFFFFF',n:'Torwart'}};
 const DG_TEAML={a:'A',b:'B',o:'C',n:'N',k:'T'};
 const DG_CONES=['#F28C28','#E8C840','#1E5BC6','#D9443F','#FFFFFF'];
-const DG_LINE={pass:{c:'#FFFFFF',dash:'9 7',w:2.6,n:'Pass'},run:{c:'#FFD25A',dash:'',w:3,n:'Laufweg'},drib:{c:'#FFFFFF',dash:'',w:2.2,n:'Dribbling'}};
+const DG_LINE={pass:{c:'#FFFFFF',dash:'9 7',w:2.6,n:'Pass'},run:{c:'#FFD25A',dash:'',w:3,n:'Laufweg'},drib:{c:'#FFFFFF',dash:'',w:2.2,n:'Dribbling'},
+  shot:{c:'#FF6F61',dash:'',w:4.4,n:'Torschuss'},line:{c:'#FFFFFF',dash:'',w:2.4,n:'Linie',na:1}};
+// Zone fills (none = the faint default)
+const DG_ZF={w:{n:'Weiß',c:'#FFFFFF',a:'rgba(255,255,255,.22)'},y:{n:'Gelb',c:'#E8C840',a:'rgba(232,200,64,.30)'},
+  b:{n:'Blau',c:'#1E5BC6',a:'rgba(30,91,198,.32)'},r:{n:'Rot',c:'#D9443F',a:'rgba(217,68,63,.30)'}};
 // Toolbar; '|' separates the groups (players, material, Reihe, lines, zone/text)
 const DG_TOOLS=[
   ['sel','Auswählen','M5 3l14 8-6 2-2 6z'],['|'],
@@ -32345,7 +32361,9 @@ const DG_TOOLS=[
   ['row','Reihe: Hütchen, Stangen … in gleichem Abstand','M3 18l2-4 2 4zM10 18l2-4 2 4zM17 18l2-4 2 4zM3 9h2M8 9h2M13 9h2M18 9h3'],['|'],
   ['run','Laufweg','M4 18C8 10 14 8 20 6M15 4l5 2-2 5'],
   ['pass','Pass','M4 18l3-2.25M10 13.5l3-2.25M16 9l4-3M15 6h5v5'],
-  ['drib','Dribbling','M3 14c2-4 4 4 6 0s4 4 6 0 3 2 6-2M18 9l3 3-3 3'],['|'],
+  ['drib','Dribbling','M3 14c2-4 4 4 6 0s4 4 6 0 3 2 6-2M18 9l3 3-3 3'],
+  ['shot','Torschuss','M3 16L15 6M6 20L18 10M14 3h7v7'],
+  ['line','Linie (ohne Pfeil)','M4 20L20 4'],['|'],
   ['z','Zone','M4 6h16v12H4z'],
   ['tx','Text','M5 6h14M12 6v13']
 ];
@@ -32377,6 +32395,15 @@ function _dgBg(bg){
       <path d="M128,160.7 A49,49 0 0,1 128,239.3"/><path d="M512,160.7 A49,49 0 0,0 512,239.3"/>
       <rect x="31" y="180" width="9" height="40"/><rect x="600" y="180" width="9" height="40"/></g>
       <g fill="rgba(255,255,255,.8)"><circle cx="320" cy="200" r="2.5"/><circle cx="98.7" cy="200" r="2.5"/><circle cx="541.3" cy="200" r="2.5"/></g>`;
+  }else if(bg==='grid'){
+    // 40 units a square — handy to judge sizes
+    let g='';for(let x=40;x<640;x+=40)g+=`<line x1="${x}" y1="0" x2="${x}" y2="400"/>`;for(let y=40;y<400;y+=40)g+=`<line x1="0" y1="${y}" x2="640" y2="${y}"/>`;
+    s+=`<g stroke="rgba(255,255,255,.16)" stroke-width="1">${g}</g>`;
+  }else if(bg==='pen'){
+    // the penalty area large: 60 m wide, goal at the top (about 10.7 units a metre)
+    s+=`<g ${L}><line x1="0" y1="10" x2="640" y2="10"/><rect x="105" y="10" width="430" height="176"/><rect x="222" y="10" width="196" height="59"/>
+      <path d="M241.8,186 A98,98 0 0,0 398.2,186"/><rect x="281" y="2" width="78" height="8"/></g>
+      <circle cx="320" cy="127" r="2.5" fill="rgba(255,255,255,.8)"/>`;
   }else if(bg==='half'){
     s+=`<g ${L}><rect x="67.5" y="10" width="505" height="388"/><rect x="170.2" y="10" width="299.6" height="122.6"/>
       <rect x="252" y="10" width="136" height="40.9"/><path d="M265.7,132.6 A68,68 0 0,0 374.3,132.6"/>
@@ -32412,7 +32439,7 @@ function _dgLinePath(g,k){
     d+=(d?'L':'M')+(g.x2-g.ux*AH).toFixed(1)+','+(g.y2-g.uy*AH).toFixed(1);
     return d;
   }
-  const ex=g.x2-g.ux*(AH-2),ey=g.y2-g.uy*(AH-2);
+  const na=DG_LINE[k]&&DG_LINE[k].na,ex=na?g.x2:g.x2-g.ux*(AH-2),ey=na?g.y2:g.y2-g.uy*(AH-2);
   return g.cv?`M${g.x1},${g.y1} Q${g.cx},${g.cy} ${ex.toFixed(1)},${ey.toFixed(1)}`:`M${g.x1},${g.y1} L${ex.toFixed(1)},${ey.toFixed(1)}`;
 }
 function _dgArrow(g,c){
@@ -32458,10 +32485,13 @@ function _dgItem(it,i,edit){
       return `<g${da}><g transform="translate(${x} ${y}) rotate(${_dgN(it.r)})"><rect x="${-W/2}" y="${-D/2}" width="${W}" height="${D}" fill="rgba(255,255,255,.2)" stroke="#FFFFFF" stroke-width="2"/><g stroke="rgba(255,255,255,.5)" stroke-width="1">${net}</g><line x1="${-W/2}" y1="${D/2}" x2="${W/2}" y2="${D/2}" stroke="#FFFFFF" stroke-width="3.5"/></g></g>`;}
     case 'ld':{let r='';for(let k=-60;k<=60;k+=20)r+=`<line x1="${k}" y1="-11" x2="${k}" y2="11"/>`;
       return `<g${da}><g transform="translate(${x} ${y}) rotate(${_dgN(it.r)})" stroke="#FFD25A" stroke-width="2.2" fill="none"><rect x="-60" y="-11" width="120" height="22" fill="rgba(0,0,0,.001)"/>${r}</g></g>`;}
-    case 'z':return `<g${da}><rect x="${x}" y="${y}" width="${Math.max(1,_dgN(it.w))}" height="${Math.max(1,_dgN(it.h))}" fill="rgba(255,255,255,.07)" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="10 8"/></g>`;
+    case 'z':{const w=Math.max(1,_dgN(it.w)),h=Math.max(1,_dgN(it.h)),F=DG_ZF[it.f];
+      const at=`fill="${F?F.a:'rgba(255,255,255,.07)'}" stroke="${F?F.c:'#FFFFFF'}" stroke-width="2" stroke-dasharray="10 8"`;
+      const lb=String(it.lb||'').trim().slice(0,24);
+      return `<g${da}>${it.sh==='ell'?`<ellipse cx="${x+w/2}" cy="${y+h/2}" rx="${w/2}" ry="${h/2}" ${at}/>`:`<rect x="${x}" y="${y}" width="${w}" height="${h}" ${at}/>`}${lb?`<text x="${x+w/2}" y="${h<30?y-7:y+18}" text-anchor="middle" font-family="Barlow,Arial,sans-serif" font-weight="700" font-size="13" fill="#FFFFFF" stroke="rgba(0,0,0,.45)" stroke-width="3" paint-order="stroke">${_tplE(lb)}</text>`:''}</g>`;}
     case 'tx':return `<g${da}><text x="${x}" y="${y}" text-anchor="middle" font-family="Barlow,Arial,sans-serif" font-weight="700" font-size="15" fill="#FFFFFF" stroke="rgba(0,0,0,.45)" stroke-width="3" paint-order="stroke">${_tplE(String(it.s||'').slice(0,60))}</text></g>`;
     case 'l':{const st=DG_LINE[it.k]||DG_LINE.pass;const g=_dgLineGeo(it);const d=_dgLinePath(g,it.k);
-      return `<g${da}>${edit?`<path d="${g.cv?`M${g.x1},${g.y1} Q${g.cx},${g.cy} ${g.x2},${g.y2}`:`M${g.x1},${g.y1} L${g.x2},${g.y2}`}" stroke="rgba(0,0,0,0)" stroke-width="16" fill="none"/>`:''}<path d="${d}" fill="none" stroke="${st.c}" stroke-width="${st.w}" stroke-linecap="round" stroke-linejoin="round"${st.dash?` stroke-dasharray="${st.dash}"`:''}/>${_dgArrow(g,st.c)}</g>`;}
+      return `<g${da}>${edit?`<path d="${g.cv?`M${g.x1},${g.y1} Q${g.cx},${g.cy} ${g.x2},${g.y2}`:`M${g.x1},${g.y1} L${g.x2},${g.y2}`}" stroke="rgba(0,0,0,0)" stroke-width="16" fill="none"/>`:''}<path d="${d}" fill="none" stroke="${st.c}" stroke-width="${st.w}" stroke-linecap="round" stroke-linejoin="round"${st.dash?` stroke-dasharray="${st.dash}"`:''}/>${st.na?'':_dgArrow(g,st.c)}</g>`;}
     case 'r':{const k=DG_ROWK[it.k]?it.k:'c';const rr=k==='h'?_dgRowAng(it)+90:0;
       return `<g${da}>${edit?`<line x1="${_dgN(it.x1)}" y1="${_dgN(it.y1)}" x2="${_dgN(it.x2)}" y2="${_dgN(it.y2)}" stroke="rgba(0,0,0,0)" stroke-width="24" stroke-linecap="round"/>`:''}${_dgRowPts(it).map(p=>_dgEl(k,+p.x.toFixed(1),+p.y.toFixed(1),it.c,rr)).join('')}</g>`;}
   }
@@ -32561,8 +32591,9 @@ function _dgEditorHtml(b){
   return `<div class="dg-wrap" id="dgWrap">
     <div class="dg-tools" role="toolbar" aria-label="Zeichenwerkzeuge">${tools}<span class="dg-tr">
       <select class="dg-bgsel" aria-label="Untergrund" onchange="dgSetBg(this.value)">
-        <option value="grass"${bg==='grass'?' selected':''}>Rasen</option><option value="half"${bg==='half'?' selected':''}>Halbes Feld</option><option value="full"${bg==='full'?' selected':''}>Ganzes Feld</option></select>
+        ${[['grass','Rasen'],['grid','Rasen mit Raster'],['pen','Strafraum'],['half','Halbes Feld'],['full','Ganzes Feld']].map(([v,l])=>`<option value="${v}"${bg===v?' selected':''}>${l}</option>`).join('')}</select>
       <button type="button" class="dg-tb" id="dgUndoBtn" title="Skizze: Rückgängig (Strg+Z)" aria-label="Skizze: Rückgängig" onclick="dgUndo()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 7L4 12l5 5"/><path d="M4 12h11a5 5 0 0 1 0 10h-2"/></svg></button>
+      <button type="button" class="dg-tb" title="Als Bild speichern" aria-label="Skizze als Bild speichern" onclick="dgImage()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 16l5-5 4 4 3-3 6 6"/><circle cx="15.5" cy="9.5" r="1.5"/></svg></button>
       <button type="button" class="dg-tb" title="Skizze leeren" aria-label="Skizze leeren" onclick="dgClear()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button></span>
     </div>
     <div class="dg-box"><svg id="dgSvg" class="dg-svg" viewBox="0 0 640 400" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Skizze der Übung"><g id="dgBgG">${_dgBg(bg)}</g><g id="dgG"></g></svg></div>
@@ -32601,7 +32632,13 @@ function _dgOutline(it,i,handles){
   if(it.t==='tx'){const w=Math.max(30,String(it.s||'').length*8.5);
     return `<rect class="dg-selr" x="${_dgN(it.x)-w/2-6}" y="${_dgN(it.y)-17}" width="${w+12}" height="24" rx="4"/>`;}
   const r={ld:66,G:36,g:22,p:22,h:21,d:19,ri:15,m:13}[it.t]||15;
-  return `<circle class="dg-selr" cx="${_dgN(it.x)}" cy="${_dgN(it.y)}" r="${r}"/>`;
+  let rot='';
+  if(handles&&DG_ROT[it.t]){
+    // the yellow point turns the item: 15° steps, Shift = free
+    const d=({ld:34,G:30,g:24,h:24})[it.t],a=_dgN(it.r)*Math.PI/180,x=_dgN(it.x),y=_dgN(it.y),hx=+(x+Math.sin(a)*d).toFixed(1),hy=+(y-Math.cos(a)*d).toFixed(1);
+    rot=`<line class="dg-selr" x1="${x}" y1="${y}" x2="${hx}" y2="${hy}"/><circle data-i="${i}" data-h="rot" class="dg-h rot" cx="${hx}" cy="${hy}" r="7"><title>Drehen</title></circle>`;
+  }
+  return `<circle class="dg-selr" cx="${_dgN(it.x)}" cy="${_dgN(it.y)}" r="${r}"/>${rot}`;
 }
 function _dgDraw(){
   const g=document.getElementById('dgG');const svg=document.getElementById('dgSvg');if(!g||!svg)return;
@@ -32700,7 +32737,7 @@ function _dgDown(e){
   }
   const dia=_dgCurDia(true);const snap=JSON.stringify(dia);
   let it=null,m='mv';
-  if(tool==='run'||tool==='pass'||tool==='drib'){it={t:'l',k:tool,x1:p.x,y1:p.y,x2:p.x,y2:p.y};m='new';}
+  if(DG_LINE[tool]){it={t:'l',k:tool,x1:p.x,y1:p.y,x2:p.x,y2:p.y};m='new';}
   else if(tool==='row'){it={t:'r',k:DG_ROWK[DG.rowK]?DG.rowK:'c',n:2,x1:p.x,y1:p.y,x2:p.x,y2:p.y};if(DG_COLORED[it.k])it.c=DG_DEFC[it.k];m='new';}
   else if(tool==='z'){it={t:'z',x:p.x,y:p.y,w:0,h:0};m='newz';}
   else it=_dgNewItem(tool,p,dia);
@@ -32750,6 +32787,11 @@ function _dgMove(e){
       const cx=Math.round(2*p.x-(it.x1+it.x2)/2),cy=Math.round(2*p.y-(it.y1+it.y2)/2);
       if(Math.hypot(p.x-(it.x1+it.x2)/2,p.y-(it.y1+it.y2)/2)<5){delete it.cx;delete it.cy;}else{it.cx=cx;it.cy=cy;}
     }else if(d.h==='rs'){it.w=Math.max(16,p.x-it.x);it.h=Math.max(16,p.y-it.y);}
+    else if(d.h==='rot'){
+      let a=Math.atan2(p.y-_dgN(it.y),p.x-_dgN(it.x))*180/Math.PI+90;
+      if(!e.shiftKey)a=Math.round(a/15)*15;
+      it.r=((Math.round(a)%360)+360)%360;
+    }
   }else if(d.m==='new'){it.x2=p.x;it.y2=p.y;d.moved=true;if(it.t==='r')it.n=_dgRowAuto(it);}
   else if(d.m==='newz'){it.x=Math.min(d.ox,p.x);it.y=Math.min(d.oy,p.y);it.w=Math.abs(p.x-d.ox);it.h=Math.abs(p.y-d.oy);d.moved=true;}
   _dgDraw();
@@ -32788,12 +32830,18 @@ function dgTool(k){
 function _dgTouch(){return !!(window.matchMedia&&matchMedia('(pointer:coarse)').matches);}
 function _dgToolHint(){
   const t=DG.tool;
-  if(t==='run'||t==='pass'||t==='drib')return 'Im Feld vom Start zum Ziel ziehen. Später lässt sich der Pfeil über den mittleren Punkt biegen.';
+  if(t==='line')return 'Im Feld von einem Ende zum anderen ziehen. Später lässt sich die Linie über den mittleren Punkt biegen.';
+  if(DG_LINE[t])return 'Im Feld vom Start zum Ziel ziehen. Später lässt sich der Pfeil über den mittleren Punkt biegen.';
   if(t==='row')return 'Im Feld von der ersten zur letzten Position ziehen – je länger, desto mehr. Art und Anzahl danach unten ändern.';
   if(t==='z')return 'Im Feld ein Rechteck aufziehen.';
   if(t==='tx')return 'Ins Feld klicken und Text eingeben.';
   const tl=DG_TOOLS.find(x=>x[0]===t);
   return (tl?tl[1]:'Element')+': ins Feld klicken, so oft wie nötig. Esc oder „Auswählen“ beendet.';
+}
+// zone fills: none + four colours; fn = 'dgSet' (bar) or the menu's wrapper
+function _dgZfSw(it,fn){
+  const one=(k,bg,lbl,cls)=>`<button type="button" class="dg-sw${cls||''}${(it.f||'')===k?' on':''}" style="background:${bg}" title="${lbl}" aria-label="Fläche: ${lbl}" onclick="${fn==='dgSet'?`dgSet('f','${k}')`:`dgCm(()=>dgSet('f','${k}'))`}"></button>`;
+  return one('','transparent','ohne',' none')+Object.keys(DG_ZF).map(k=>one(k,DG_ZF[k].c,DG_ZF[k].n)).join('');
 }
 function _dgSw(list,cur,prop,named){
   return list.map(c=>{const col=named?DG_TEAM[c].f:c,lbl=named?DG_TEAM[c].n:'Farbe '+c;
@@ -32830,11 +32878,15 @@ function _dgBar(focusInput){
     h+=`<span class="dg-step" role="group" aria-label="Anzahl">${B('–','dgRowN(-1)','ico','Eins weniger')}<b>${_dgRowN(it)}</b>${B('+','dgRowN(1)','ico','Eins mehr')}</span>`;
     if(DG_COLORED[k])h+=_dgSw(DG_CONES,_dgTint(it.c,k),'c');
     h+=B('↻ Drehen','dgRotate()')+B('Einzeln','dgExplode()','','In einzelne Elemente auflösen');
+  }else if(it.t==='z'){
+    h+='<span class="tpl-seg">'+[['rect','Rechteck'],['ell','Oval']].map(([k,l])=>`<button type="button" class="${(it.sh==='ell'?'ell':'rect')===k?'on':''}" onclick="dgSet('sh','${k}')">${l}</button>`).join('')+'</span>';
+    h+=_dgZfSw(it,'dgSet');
+    h+=`<label class="dg-lbl">Maße<input id="dgLblIn" class="dg-txt dg-mass" maxlength="24" value="${_tplE(it.lb||'')}" placeholder="z. B. 20 × 15 m" onfocus="_dgPush()" oninput="dgSet('lb',this.value,true)" onkeydown="if(event.key==='Enter')this.blur()"></label>`;
   }else if(DG_COLORED[it.t]){
     h+='<span class="dg-lbl">Farbe</span>'+_dgSw(DG_CONES,_dgTint(it.c,it.t),'c');
-    if(DG_ROT[it.t])h+=B('↻ Drehen','dgRotate()');
+    if(DG_ROT[it.t])h+=B('↻ 90°','dgRotate()','','Um 90° drehen (R) – frei drehen am gelben Punkt');
   }else if(DG_ROT[it.t]){
-    h+=B('↻ Drehen','dgRotate()');
+    h+=B('↻ 90°','dgRotate()','','Um 90° drehen (R) – frei drehen am gelben Punkt')+'<span class="dg-hint">oder am gelben Punkt drehen</span>';
   }else if(it.t==='tx'){
     h+=`<input id="dgLblIn" class="dg-txt" maxlength="60" value="${_tplE(it.s||'')}" aria-label="Text" onfocus="_dgPush()" oninput="dgSet('s',this.value,true)" onkeydown="if(event.key==='Enter')this.blur()">`;
   }
@@ -33024,6 +33076,10 @@ function _dgCmOpen(cx,cy,ctx){
         h+=I('Richtung umkehren','dgReverse()');
       }
       if(it.t==='r')h+=I('Eins mehr','dgRowN(1)')+I('Eins weniger','dgRowN(-1)')+I('In Einzelteile','dgExplode()');
+      if(it.t==='z'){
+        h+=`<div class="dg-cmsw">${_dgZfSw(it,'menu')}</div>`;
+        h+=I('Rechteck',`dgSet('sh','rect')`,'',it.sh!=='ell'?'on':'')+I('Oval',`dgSet('sh','ell')`,'',it.sh==='ell'?'on':'')+I('Maße eintragen','_dgBar(true)');
+      }
       if(DG_ROT[it.t]||it.t==='r')h+=I('Drehen (90°)','dgRotate()','R');
     }else h+=I('Drehen (90°)','dgRotate()','R');
     h+='<hr>'+I('Kopie','dgDup()',mod+'D')+I('Kopieren','dgCopy()',mod+'C')+I('Ausschneiden','dgCut()',mod+'X');
@@ -33036,15 +33092,38 @@ function _dgCmOpen(cx,cy,ctx){
     if(_dgClip())h+=I('Einfügen','dgPaste(DG.cmP)',mod+'V');
     h+=`<div class="dg-cmq">${[['pa','Spieler A'],['pb','Spieler B'],['c','Hütchen'],['b','Ball'],['g','Minitor'],['s','Stange']]
       .map(([k,l])=>`<button type="button" role="menuitem" class="dg-cmq-b" onclick="dgCm(()=>dgAddAt('${k}'))">${_dgToolIcon(k)}<span>${l}</span></button>`).join('')}</div>`;
-    if(items.length)h+='<hr>'+I('Alles auswählen','dgSelAll()',mod+'A');
+    if(items.length)h+='<hr>'+I('Alles auswählen','dgSelAll()',mod+'A')+I('Als Bild speichern','dgImage()');
   }
   const m=_dgCmEl();m.innerHTML=h;m.hidden=false;
   m.style.left='0px';m.style.top='0px';
   const r=m.getBoundingClientRect(),W=window.innerWidth,H=window.innerHeight;
   m.style.left=Math.max(8,Math.min(cx,W-r.width-8))+'px';
   m.style.top=Math.max(8,Math.min(cy,H-r.height-8))+'px';
-  setTimeout(()=>{if(_dgCmIsOpen())document.addEventListener('pointerdown',_dgCmAway,true);},0);
+  document.removeEventListener('pointerdown',_dgCmAway,true);document.addEventListener('pointerdown',_dgCmAway,true);
   if(!_dgTouch()){const f=m.querySelector('.dg-cmi')||m.querySelector('button');if(f)try{f.focus({preventScroll:true});}catch(x){}}
+}
+// The sketch as a PNG (1280 × 800): on a phone to share, else a download.
+// Read-only trainers can save it too (it changes nothing).
+async function dgImage(){
+  const b=_tplCur();const dia=b&&b.dia;
+  if(!dia||(!_dgHas(dia)&&(!dia.bg||dia.bg==='grass'))){_tplToast('Die Skizze ist noch leer');return;}
+  try{
+    const svg=_dgSvg(dia,b.title||'Skizze').replace('<svg ','<svg xmlns="http://www.w3.org/2000/svg" ').replace('width="100%" height="100%"','width="1280" height="800"');
+    const img=new Image();
+    await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);});
+    const c=document.createElement('canvas');c.width=1280;c.height=800;
+    c.getContext('2d').drawImage(img,0,0,1280,800);
+    const blob=await new Promise(r=>c.toBlob(r,'image/png'));
+    if(!blob)throw new Error('kein Bild');
+    const name=(('Skizze '+(b.title||b.ph||'')).trim().replace(/[\\/:*?"<>|]+/g,'').slice(0,60)||'Skizze')+'.png';
+    let file=null;try{file=new File([blob],name,{type:'image/png'});}catch(e){}
+    if(file&&_dgTouch()&&navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+      try{await navigator.share({files:[file],title:name});return;}catch(e){if(e&&e.name==='AbortError')return;}
+    }
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();
+    setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1500);
+    _tplToast('Bild gespeichert: '+name);
+  }catch(e){console.error('[Skizze] Bild:',e);_tplToast('Das Bild ließ sich nicht erstellen');}
 }
 function dgSetBg(v){
   const dia=_dgCurDia(true);_dgPush();dia.bg=v;
