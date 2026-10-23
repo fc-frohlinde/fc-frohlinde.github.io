@@ -6766,13 +6766,16 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.37'; // v1.2.37: Spielbericht und Karten
-const APP_VERSION_LABEL='1.2.37';
+const APP_VERSION='1.2.38'; // v1.2.38: Rot – höchstens ein Spiel je Woche
+const APP_VERSION_LABEL='1.2.38';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792778959042; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792780511636; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.38',date:'23.10.2026',title:'Sperre nach Rot genauer',items:[
+    {icon:'🟥',title:'Zwei Wochen, höchstens zwei Spiele',desc:'Nach der Jugendspielordnung des WDFV ist ein Spieler nach Rot automatisch zwei Wochen gesperrt, aber höchstens für zwei Pflichtspiele der Mannschaft. Bei einem Spiel unter der Woche zählt die Sperre jetzt so. Die endgültige Sperre legen Staffelleiter oder Sportgericht fest – ihr Datum lässt sich im Spielbericht eintragen.'},
+  ]},
   {version:'1.2.37',date:'23.10.2026',title:'Spielbericht und Karten',items:[
     {icon:'📋',title:'Spielbericht nach dem Spiel',desc:'Im Fenster eines Spiels: Ergebnis, Startelf, Wechsel mit Minute, Tore, Vorlagen und Karten an einem Ort. Wer in der Startelf stand oder eingewechselt wurde, gilt als anwesend.'},
     {icon:'⏱',title:'Spielminuten',desc:'Aus Startelf und Wechseln ergeben sich die Minuten jedes Spielers. Die Belastung rechnet mit ihnen statt mit der ganzen Spielzeit – außer ihr habt die Minuten selbst eingetragen.'},
@@ -16083,9 +16086,16 @@ function sbBanAt(p,ti,D,season){
     const c=p.cards[x.i];if(!c)return;
     const later=M.slice(idx+1).filter(y=>y.k>x.k),nth=later.findIndex(y=>y.i===ti);
     if(c==='r'){
+      // Automatic: R.r days, but no more matches of the team than weeks
+      // (WDFV youth: 2 weeks, at most 2 Pflichtspiele — JSpO §§ 25 (4), 27 (1)).
+      // A date from the Staffelleiter or the Sportgericht replaces both.
       const o=(_sbRep(x.s)&&x.s.rep.ban)?x.s.rep.ban[p.name]:null;
-      const until=/^\d{4}-\d{2}-\d{2}$/.test(o||'')?isoToSortKey(o):_skAdd(x.k,cardRules().r);
-      if(tk<=until)res={c,si:x.i,until};
+      if(/^\d{4}-\d{2}-\d{2}$/.test(o||'')){const until=isoToSortKey(o);if(tk<=until)res={c,si:x.i,until};}
+      else{
+        const until=_skAdd(x.k,R.r),cap=Math.max(1,Math.round(R.r/7));
+        const inside=later.filter(y=>y.k<=until).slice(0,cap);
+        if(inside.some(y=>y.i===ti))res={c,si:x.i,until:inside.length?inside[inside.length-1].k:until};
+      }
     }else if(c==='gr'){
       if(R.gr>0&&nth>=0&&nth<R.gr)res={c,si:x.i,n:R.gr};
     }else if(c==='y'&&R.y>0){
@@ -16380,7 +16390,7 @@ function sbRender(){
       const c=card(x.p);
       if(c==='gr')return `<div class="sb-ban">${_cardIc('gr')}<span class="sb-ban-t"><b>${e(nm(x.p))}</b><span>gesperrt für ${R.gr===1?'das nächste Spiel':'die nächsten '+R.gr+' Spiele'} (Regel der Mannschaft)</span></span></div>`;
       const o=r.ban&&r.ban[x.p.name],iso=/^\d{4}-\d{2}-\d{2}$/.test(o||'')?o:_skISO(_skAdd(k,R.r));
-      return `<div class="sb-ban">${_cardIc('r')}<span class="sb-ban-t"><b>${e(nm(x.p))}</b><span>${o?'Sperre nach Entscheidung':'mindestens '+R.r+' Tage, bis das Sportgericht entscheidet'}</span></span>
+      return `<div class="sb-ban">${_cardIc('r')}<span class="sb-ban-t"><b>${e(nm(x.p))}</b><span>${o?'Sperre nach Entscheidung':'automatisch '+(R.r%7?R.r+' Tage':(R.r/7)+(R.r===7?' Woche':' Wochen'))+', h\u00f6chstens '+Math.max(1,Math.round(R.r/7))+(Math.round(R.r/7)===1?' Spiel':' Spiele')+' \u2013 die endg\u00fcltige Sperre legt der Staffelleiter oder das Sportgericht fest'}</span></span>
         <label class="sb-ban-d">bis<input type="date" value="${iso}" onchange="sbBanSet(${x.pi},this.value)"></label></div>`;
     }).join('')}</section>`;
   }
@@ -16398,7 +16408,7 @@ function cardRulesRender(){
       <div class="setting-control">${sel('y',[[0,'keine'],[3,'3.'],[4,'4.'],[5,'5.'],[10,'10.']])}</div></div>
     <div class="setting-row"><div><div class="setting-label"><label for="cr-gr">Gelb-Rot</label></div><div class="setting-sub">Sperre danach</div></div>
       <div class="setting-control">${sel('gr',[[0,'keine'],[1,'1 Spiel'],[2,'2 Spiele']])}</div></div>
-    <div class="setting-row"><div><div class="setting-label"><label for="cr-r">Rot</label></div><div class="setting-sub">bis das Sportgericht entscheidet</div></div>
+    <div class="setting-row"><div><div class="setting-label"><label for="cr-r">Rot</label></div><div class="setting-sub">automatisch, h\u00f6chstens ein Spiel je Woche – bis Staffelleiter oder Sportgericht entscheiden</div></div>
       <div class="setting-control">${sel('r',[[7,'1 Woche'],[14,'2 Wochen'],[21,'3 Wochen'],[28,'4 Wochen']])}</div></div>`;
 }
 function cardRuleSet(k,val){
