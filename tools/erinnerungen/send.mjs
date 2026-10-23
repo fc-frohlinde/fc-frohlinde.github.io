@@ -8,6 +8,7 @@ import webpush from 'web-push';
 import { round } from './round.mjs';
 import { decode, pathKey, berlin } from './lib.mjs';
 import { seasonOf } from './kalender.mjs';
+import { inbox, loadApply } from './eingang.mjs';
 
 const DB_URL = 'https://fc-frohlinde-ea23f-default-rtdb.europe-west1.firebasedatabase.app';
 const sa = process.env.FIREBASE_SERVICE_ACCOUNT;
@@ -21,8 +22,28 @@ const db = {
   get: async p => (await ref(p).get()).val(),
   set: (p, v) => ref(p).set(v),
   remove: p => ref(p).remove(),
+  update: m => admin.database().ref().update(m),
+  inc: n => admin.database.ServerValue.increment(n),
+  // An inbox entry is merged once: whoever sets m first (an open trainer app does the same)
+  claim: async (p, t, now) => {
+    const r = await ref(p).transaction(cur => {
+      if (cur === null) return null;              // not here yet: the server answers, then again
+      if (cur.m || cur.t !== t) return;           // merged already, or a newer answer
+      return Object.assign({}, cur, { m: now });
+    });
+    const v = r.committed && r.snapshot.val();
+    return !!(v && v.m === now);
+  },
 };
 try {
+  // Входящие игроков (1.2.36): сначала перенести ответы, чтобы напоминания видели их
+  try {
+    const apply = loadApply(new URL('../../index.html', import.meta.url).pathname);
+    const r = await inbox({ db, apply, dry: process.argv.includes('--dry') });
+    const why = Object.entries(r.why).map(([k, n]) => `${k} ${n}`).join(', ');
+    if (r.writes || process.env.GITHUB_EVENT_NAME === 'workflow_dispatch')
+      console.log(`::notice title=Входящие::перенесено: ${r.merged}, отклонено: ${r.refused}${why ? ' (' + why + ')' : ''}, голосов: ${r.votes} (отклонено ${r.voteRefused}), победителей опубликовано: ${r.winners}, убрано: ${r.cleaned}, неизвестных: ${r.unknown}`);
+  } catch (e) { console.log('::warning title=Входящие::' + String((e && e.message) || e).slice(0, 200)); }
   // KALENDER_TOKEN: GitHub token with only the "gist" scope, for the calendar feed
   const r = await round({ db, push: webpush, dry: process.argv.includes('--dry'), cal: { token: process.env.KALENDER_TOKEN || '', fetch: globalThis.fetch } });
   // Состояние календаря — одной аннотацией, без адреса (лог публичный)
@@ -74,6 +95,15 @@ try {
         console.log(`::notice title=Поля событий ${name}::` + Object.entries(sc).sort((a, b) => b[1] - a[1]).map(([f, n]) => `${f} ${n}`).join(', '));
       }
     } catch (e) { console.log('::warning title=Данные::' + String((e && e.message) || e).slice(0, 160)); }
+    // Срезы игроков (1.2.36): сколько, какого возраста, сколько входящих — только числа
+    try {
+      const pv = (await db.get('fcf_pv')) || {}, pt = (await db.get('fcf_pt')) || {}, pk = (await db.get('fcf_pk')) || {};
+      const inb = (await db.get('fcf_in')) || {}, vt = (await db.get('fcf_vote')) || {};
+      const ts = Object.values(pv).map(x => +x.t || 0).filter(Boolean), sz = Object.values(pv).map(x => (x.j || '').length);
+      const age = t => t ? Math.round((Date.now() - t) / 60000) + ' мин' : '–';
+      const ent = Object.values(inb).flatMap(o => Object.values(o || {}));
+      console.log(`::notice title=Срезы::игроков: ${ts.length} (размер ${sz.length ? Math.min(...sz) + '–' + Math.max(...sz) : 0} байт, самый свежий ${age(Math.max(0, ...ts))} назад, самый старый ${age(ts.length ? Math.min(...ts) : 0)}), команд: ${Object.keys(pt).length} (${Object.values(pt).map(x => Math.round((x.j || '').length / 1024) + 'K').join(', ')}), кодов групповой ссылки: ${Object.values(pk).reduce((a, o) => a + Object.keys(o || {}).length, 0)}; входящие: ${ent.length} (перенесено ${ent.filter(e => e && e.m).length}), голосов ждёт: ${Object.values(vt).reduce((a, o) => a + Object.keys(o || {}).length, 0)}`);
+    } catch (e) { console.log('::warning title=Срезы::' + String((e && e.message) || e).slice(0, 160)); }
   }
   // При ручном запуске: сколько всего в планировщике (только числа)
   if (process.env.GITHUB_EVENT_NAME === 'workflow_dispatch') {

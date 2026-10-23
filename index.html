@@ -6682,13 +6682,18 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.35'; // v1.2.35: Wochenbericht — Immer dabei mit Fotos
-const APP_VERSION_LABEL='1.2.35';
+const APP_VERSION='1.2.36'; // v1.2.36: Spieler-Ausschnitte (Sicherheit Teil 2)
+const APP_VERSION_LABEL='1.2.36';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792768959907; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792773633850; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.36',date:'23.10.2026',title:'Spieler sehen nur noch ihre eigenen Daten',items:[
+    {icon:'🔒',title:'Eigener Ausschnitt für jeden Spieler',desc:'Spieler-Links laden nicht mehr die Daten der ganzen Mannschaft. Beim Speichern legt die App jedem Spieler bereit, was seine Seiten brauchen: seine Antworten, Belastung, Statistik, Karte und Wochenbericht, dazu Termine, Neuigkeiten und die Telefonnummern der Trainer. Notizen, Telefonnummern und Geburtsdaten der anderen bleiben bei euch.'},
+    {icon:'📥',title:'Antworten über einen Eingang',desc:'Zusagen, Absagen, Belastung und Physio-Termine landen erst im Eingang des Spielers. Ist die App bei einem Trainer mit eigenem Konto offen, stehen sie sofort in der Tabelle, sonst übernimmt sie der Job „Erinnerungen“ (alle 15 Minuten). Der Spieler sieht seine Antwort sofort.'},
+    {icon:'🔗',title:'Neuer Gruppenlink',desc:'Der Gruppenlink „Wer bist du?“ enthält jetzt einen geheimen Teil. Bitte den neuen Link einmal in die WhatsApp-Gruppe stellen. Handys, auf denen sich ein Spieler schon ausgewählt hat, funktionieren weiter.'},
+  ]},
   {version:'1.2.35',date:'23.10.2026',title:'Wochenbericht für Spieler',items:[
     {icon:'💪',title:'„Immer dabei“ mit Fotos',desc:'Wer bei allen Terminen der Woche dabei war, steht jetzt mit Foto (oder Initialen) und Namen im Wochenbericht – nach Namen sortiert, ohne Zahlen und ohne Rangfolge.'},
     {icon:'🛠',title:'„Deine Woche“ wieder da',desc:'Öffneten Spieler den Wochenbericht aus ihrer Übersicht, fehlte seit 22.10. ihre eigene Woche – der Weg mit Fotos baute den Bericht ohne die Spieler-Fassung. Jetzt bekommen sie wieder genau diese: eigene Woche, Mannschaft, „Immer dabei“.'},
@@ -7857,6 +7862,7 @@ function _adoptData(data){
     return;
   }
   G=clean;
+  try{pvSchedule(6000);}catch(e){}
 }
 // Player mode must not persist its reduced copy to this device either: the
 // next trainer session on the same browser reads that cache.
@@ -9063,6 +9069,7 @@ function saveG(badge=true){
     },400);
   }
   updateUndoBtns();
+  try{pvSchedule();}catch(e){}
 }
 function ck(){
   if(!UI.currentTeam||!UI.currentSeason)return null;
@@ -9092,8 +9099,10 @@ function initAuth(){
       fbApp=firebase.initializeApp(fbCfg,'fcf');
       fbDb=firebase.database(fbApp);
       fbRef=fbDb.ref('fcf_data');
-      // Try to get latest data from Firebase for auth (one-time fetch)
-      fbRef.once('value').then(snap=>{
+      // Try to get latest data from Firebase for auth (one-time fetch).
+      // Not for a player's link or a group link with the team's secret: they
+      // read only their slice (1.2.36); the old way calls it if there is none.
+      const _first=()=>fbRef.once('value').then(snap=>{
         const raw=snap.val();
         const data=raw?fbDecode(raw):null;
         // Track whether the fetch actually returned data (for diagnostics
@@ -9124,6 +9133,7 @@ function initAuth(){
         _fbInitialLoaded=true;
         if(_pendingSave){_pendingSave=false;setTimeout(()=>saveG(false),50);}
       });
+      if(_pvDefer())window._pvFirst=_first;else _first();
     }catch(e){_fbInitialLoaded=true;}
   } else if(!fbCfg){
     // No Firebase configured - saves are local only
@@ -14820,7 +14830,11 @@ function appShareOpen(){
   // The team link needs a token per player; create the missing ones first
   let made=0;
   (D.players||[]).forEach(p=>{if(p&&!p.confirmToken){p.confirmToken=generatePlayerToken();made++;}});
+  // …and the team its group-link secret (1.2.36), laid out at once
+  {const t=UI.currentTeam;if(!G.db[t+'__rules']||typeof G.db[t+'__rules']!=='object')G.db[t+'__rules']={};
+   if(!G.db[t+'__rules'].lk){G.db[t+'__rules'].lk=_pvRand(10);made++;}}
   if(made){snap();saveG();}
+  try{pvSchedule(300);}catch(e){}
   const pl=(D.players||[]).filter(Boolean);
   const noBday=pl.filter(p=>!p.birthdate);
   const seen=pl.filter(p=>p.seen&&p.seen.t),app=pl.filter(p=>p.seen&&p.seen.a);
@@ -14881,10 +14895,11 @@ function copyPlayerLink(token){
 const _SHARE_FALLBACK_HOST='https://fc-frohlinde.github.io';
 function buildTeamLink(team){
   const t=team||UI.currentTeam||'';
-  if(location.protocol==='file:'){
-    return _SHARE_FALLBACK_HOST+'/?team='+encodeURIComponent(t);
-  }
-  return location.origin+location.pathname+'?team='+encodeURIComponent(t);
+  // The team's secret makes it a link only the group has (1.2.36)
+  const lk=(typeof pvTeamSecret==='function')?pvTeamSecret(t):'';
+  const q='?team='+encodeURIComponent(t)+(lk?'&k='+lk:'');
+  if(location.protocol==='file:')return _SHARE_FALLBACK_HOST+'/'+q;
+  return location.origin+location.pathname+q;
 }
 // Open WhatsApp with pre-filled text — no specific recipient, trainer picks
 // the group after the share sheet opens. This is the only WhatsApp pattern that
@@ -15296,6 +15311,594 @@ function _pmSanitizeG(){
     delete D.notes;
   }
 }
+// ══ Spieler-Ausschnitte (Sicherheit Schritt B, Teil 2 — 1.2.36) ═══════════
+// Players no longer download the team's data. The trainers' app lays out for
+// each player what his screens need, every time it saves:
+//   fcf_pv/<pk>       his own part      pk = SHA-256('fcf-pv|'+token)
+//   fcf_pt/<tk>       the team's part   tk = SHA-256('fcf-pt|'+lk)
+//   fcf_pk/<tk>/<h>   token for the group link, h = SHA-256('fcf-pick|'+lk+'|'+pid+'|'+birthdate)
+// fcf_pv and fcf_pt are {t: built at, h: hash, j: JSON text}. lk is the team's
+// group-link secret (G.db[team+'__rules'].lk) and part of the group link. The
+// keys are hashes, and nothing can be listed: only who holds the link finds it.
+// What a player does goes into his inbox, fcf_in/<pk>/<id> = {a, k, si, v, t}
+// (one entry per thing; a later answer replaces the earlier one). An open
+// trainer app with an account merges it at once, the job Erinnerungen every
+// 15 minutes; both through pvApply, the one copy of the rules (the job reads it
+// from index.html between the PV-APPLY markers). A merged entry keeps `m` until
+// a newer slice includes it, and the player lays every entry newer than his
+// slice over it, so his own answer shows at once.
+// Spieler des Spiels: fcf_vote/<pk>/<k> = {n, t}, written once, read by nobody
+// but the job, which counts it — nobody sees who voted for whom.
+// No slice yet (trainers still on an older app): the link loads as before.
+const PV_V=1;
+const PV_ID=/^(a|r|f)_k\d{4}-\d{4}[mt]$|^seen$|^push$/;
+const _pvHex=t=>_pushSha(t);
+const pvKeyOf=tok=>_pvHex('fcf-pv|'+tok);
+const pvTeamKeyOf=lk=>_pvHex('fcf-pt|'+lk);
+async function _pvPid(tok){return (await _pvHex('fcf-pid|'+tok)).slice(0,12);}
+// A birthdate as YYYY-MM-DD, whichever way it was typed in
+function _pvBd(v){
+  const n=String(v||'').match(/\d+/g);
+  if(!n||n.length<3)return '';
+  const x=n.map(Number);
+  const o=(String(n[0]).length===4)?{y:x[0],m:x[1],d:x[2]}:{d:x[0],m:x[1],y:x[2]};
+  if(!(o.y>1900&&o.m>=1&&o.m<=12&&o.d>=1&&o.d<=31))return '';
+  return o.y+'-'+String(o.m).padStart(2,'0')+'-'+String(o.d).padStart(2,'0');
+}
+const pvPickKeyOf=(lk,pid,bd)=>_pvHex('fcf-pick|'+lk+'|'+pid+'|'+_pvBd(bd));
+function _pvRand(n){
+  const a=new Uint8Array(n);crypto.getRandomValues(a);
+  return Array.from(a).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+// The team's group-link secret, if it has one yet
+function pvTeamSecret(team){
+  if(isPlayerMode())return (_pv&&_pv.team===team)?(_pv.lk||''):'';
+  const r=G&&G.db&&G.db[team+'__rules'];
+  return (r&&typeof r.lk==='string')?r.lk:'';
+}
+
+// ==PV-APPLY-BEGIN== (also run by tools/erinnerungen: self-contained, no app globals)
+// One answer from a player's inbox, applied to his record in the team block.
+// e = {a, k, si, v, t}. Returns {ok, why, f: changed fields, si, audit}.
+function pvApply(blk,pi,e){
+  const P=(blk&&Array.isArray(blk.players))?blk.players[pi]:null;
+  const S=(blk&&Array.isArray(blk.sessions))?blk.sessions:[];
+  if(!P||!e||typeof e!=='object'||typeof e.a!=='string')return {ok:false,why:'leer',f:[]};
+  const t=(typeof e.t==='number')?e.t:0;
+  const NAMES={0:'Fehlend',1:'Anwesend',2:'Entschuldigt',3:'Ausstehend',4:'Angemeldet',5:'Nicht im Kader'};
+  const keyOf=s=>{
+    const m=String((s&&s.date)||'').match(/(\d+)\.(\d+)/);if(!m)return null;
+    const hm=String(s.time||'').replace(/\D/g,'').padStart(4,'0').slice(0,4);
+    return 'k'+String(+m[2]).padStart(2,'0')+String(+m[1]).padStart(2,'0')+'-'+hm+(s.type==='match'?'m':'t');
+  };
+  const arr=(f,si,fill)=>{if(!Array.isArray(P[f]))P[f]=[];while(P[f].length<=si)P[f].push(fill);return P[f];};
+  if(e.a==='seen'){
+    const v=(e.v&&typeof e.v==='object')?e.v:null;
+    if(!v||typeof v.t!=='number')return {ok:false,why:'wert',f:[]};
+    const prev=(P.seen&&typeof P.seen==='object')?P.seen:{};
+    if(prev.t&&prev.t>=v.t)return {ok:true,f:[]};
+    const a=(typeof v.a==='number'&&v.a)?v.a:(prev.a||0);
+    P.seen=a?{t:v.t,a}:{t:v.t};
+    return {ok:true,f:['seen']};
+  }
+  if(e.a==='push'){P.push=e.v?{t:t}:null;return {ok:true,f:['push']};}
+  // The rest concerns one session: found by its key, the index is only a hint
+  let si=-1;
+  if(typeof e.si==='number'&&S[e.si]&&keyOf(S[e.si])===e.k)si=e.si;
+  else if(e.k)si=S.findIndex(s=>s&&keyOf(s)===e.k);
+  if(si<0)return {ok:false,why:'termin',f:[]};
+  const s=S[si];
+  if(e.a==='rsvp'){
+    if(e.v!==1&&e.v!==0)return {ok:false,why:'wert',f:[]};
+    // Given before the deadline counts, however late it is merged
+    if(typeof s.rsvpUntil==='number'&&s.rsvpUntil>0&&t>s.rsvpUntil)return {ok:false,why:'frist',f:[],si};
+    const st=arr('s',si,3),cur=st[si];
+    // The trainers' roll call and squad are theirs: an answer merged after
+    // them must not undo them
+    if(cur===1||cur===5)return {ok:false,why:'trainer',f:[],si};
+    const f=[];
+    if(cur===2){arr('excOK',si,null)[si]=true;f.push('excOK');}
+    const hadExc=Array.isArray(P.excOK)&&P.excOK[si]===true;
+    const target=(e.v===1)?4:(hadExc?2:0);
+    const ay=arr('ay',si,null);
+    if(cur===target){
+      // "Komme" on the rule's M: from now on his own answer
+      if(ay[si]===1){ay[si]=0;f.push('ay');}
+      return {ok:true,f,si};
+    }
+    ay[si]=0;st[si]=target;f.push('s','ay');
+    if(target!==4&&Array.isArray(P.physio)&&P.physio[si]===true){P.physio[si]=null;f.push('physio');}
+    if(target===4&&Array.isArray(P.preconfReason)&&si<P.preconfReason.length&&P.preconfReason[si]){P.preconfReason[si]='';f.push('preconfReason');}
+    return {ok:true,f,si,audit:{action:'Anmeldung (Spieler-App)',target:P.name||'?',
+      details:s.date+(s.type==='match'?' (Spiel)':' (Training)')+': '+(NAMES[cur]||'?')+' → '+(NAMES[target]||'?')}};
+  }
+  const meta=v=>{
+    if(!P.rpeMeta||typeof P.rpeMeta!=='object'||Array.isArray(P.rpeMeta))P.rpeMeta={};
+    P.rpeMeta[keyOf(s)]=v;
+  };
+  if(e.a==='rpe'){
+    if(typeof e.v!=='number'||e.v<0||e.v>10||Math.round(e.v)!==e.v)return {ok:false,why:'wert',f:[]};
+    arr('rpe',si,null)[si]=e.v;meta({s:'p',t});
+    return {ok:true,f:['rpe','rpeMeta'],si,audit:{action:'Belastung bewertet',target:s.date||'?',detail:'RPE '+e.v}};
+  }
+  if(e.a==='nd'){
+    const f=['rpeMeta'];
+    if(Array.isArray(P.rpe)&&typeof P.rpe[si]==='number'){P.rpe[si]=null;f.push('rpe');}
+    meta({s:'p',t,nd:1});
+    return {ok:true,f,si,audit:{action:'Belastung bewertet',target:s.date||'?',detail:'nicht dabei'}};
+  }
+  if(e.a==='phy'){arr('physio',si,null)[si]=!!e.v;return {ok:true,f:['physio'],si};}
+  return {ok:false,why:'art',f:[]};
+}
+// ==PV-APPLY-END==
+
+// ── Trainer side: writing the slices ─────────────────────────────────
+let _pvTimer=null,_pvBusy=false,_pvAgain=false;
+const _pvLast={};            // path → hash this page wrote or found there
+let _pvMapCache=null;        // pk → {key, team, season, pi}, from the last run
+function _pvCanWrite(){
+  return !!(fbDb&&CU&&!isPlayerMode()&&(CU.role==='admin'||CU.role==='trainer')
+    &&_fbInitialLoaded&&G&&G.db&&!G.__sanitized&&!(typeof RPE_IS_PREVIEW!=='undefined'&&RPE_IS_PREVIEW)
+    &&getUserPref('autoSync',true));
+}
+function pvSchedule(ms){
+  if(!_pvCanWrite())return;
+  clearTimeout(_pvTimer);
+  _pvTimer=setTimeout(()=>{_pvTimer=null;pvWriteAll();},ms||4000);
+}
+// The blocks players can reach: the season running now (or the one on
+// screen) of every team this trainer works with
+function _pvBlocks(){
+  const out=[],today=new Date(),y=today.getMonth()>=6?today.getFullYear():today.getFullYear()-1;
+  const active=y+'/'+String(y+1).slice(-2);
+  Object.keys(G.db||{}).forEach(key=>{
+    const i=key.indexOf('__');if(i<0)return;
+    const team=key.slice(0,i),season=key.slice(i+2);
+    if(!/^\d{4}\/\d{2}$/.test(season))return;
+    if(season!==active&&season!==UI.currentSeason)return;
+    if(CU.role!=='admin'&&!(Array.isArray(CU.teams)&&CU.teams.includes(team)))return;
+    const b=G.db[key];
+    if(!b||!Array.isArray(b.players)||!b.players.some(p=>p&&p.name))return;
+    out.push({key,team,season});
+  });
+  return out;
+}
+async function pvWriteAll(){
+  if(_pvBusy){_pvAgain=true;return;}
+  if(!_pvCanWrite())return;
+  _pvBusy=true;
+  try{
+    // Every player needs a link, every team a group-link secret: made here
+    // once, saved like any edit
+    let made=false;
+    _pvBlocks().forEach(b=>{
+      const blk=G.db[b.key];
+      (blk.players||[]).forEach(p=>{if(p&&p.name&&!p.confirmToken){p.confirmToken=generatePlayerToken();made=true;}});
+      if(!G.db[b.team+'__rules']||typeof G.db[b.team+'__rules']!=='object')G.db[b.team+'__rules']={};
+      if(!G.db[b.team+'__rules'].lk){G.db[b.team+'__rules'].lk=_pvRand(10);made=true;}
+    });
+    if(made){_systemWrite=true;try{saveG(false);}finally{_systemWrite=false;}}
+    const map={};
+    for(const b of _pvBlocks())Object.assign(map,await _pvWriteBlock(b));
+    _pvMapCache=map;
+  }catch(e){console.warn('[Ausschnitte]',e);}
+  finally{
+    _pvBusy=false;
+    if(_pvAgain){_pvAgain=false;pvSchedule(1500);}
+  }
+  try{pvInboxWatch();}catch(e){}
+}
+// What each player's screens read of his own record — nothing else leaves
+// (no note, phone, birthdate, Einsatz, Spielberechtigung …)
+const PV_ME=['name','shortname','nr','pos','hidePos','confirmToken','joinDate','s','rpe','rpeMin','rpeMeta',
+  'physio','ay','excOK','preconfReason','mvpV','goals','assists','seen','push'];
+// The part of a session a player sees (as _pmSanitizeG)
+function _pvSess(s){
+  if(!s)return s;
+  const o={date:s.date,time:s.time,type:s.type,label:s.label||'',homeAway:s.homeAway||'',
+    focus:s.focus||'',focus2:s.focus2||'',location:s.location||''};
+  if(typeof s.rsvpUntil==='number')o.rsvpUntil=s.rsvpUntil;
+  if(typeof s.duration==='number')o.duration=s.duration;
+  if(sessPhysioOn(s))o.physio=true;
+  try{const r=mvpResult(s);if(r&&r.winners.length)o.mvpWin=r.winners.slice();}catch(e){}
+  return o;
+}
+// Everything that needs the whole roster, computed while it is there. Runs
+// with the block as the "current" one (several helpers read UI), synchronously.
+function _pvBuildSync(team,season){
+  const key=team+'__'+season,block=G.db[key];
+  const players=block.players,sessions=block.sessions||[];
+  try{_mediaReinject(players);}catch(e){}
+  const data={team,season,block,sessions,players};
+  const now=Date.now();
+  // The week the report shows now and the one before it: whatever day the
+  // player looks, the right one is there (Mon–Thu the last, Fri–Sun this one)
+  const weeks=[-1,0].map(off=>({off,wk:_dbWeekBounds(off).mondayYSK}));
+  const reps={};
+  weeks.forEach(w=>{try{reps[w.wk]=dbBuildReportSnapshot(data,w.off,true);}catch(e){console.warn('[Ausschnitte] Bericht',e);}});
+  const disp={},nr={},elig={};
+  players.forEach(p=>{if(p&&p.name){disp[p.name]=getDisplayName(p)||p.name;nr[p.name]=p.nr||'';}});
+  sessions.forEach((s,si)=>{
+    if(!s||s.type!=='match')return;
+    const w=_mvpSpan(s);if(!w)return;
+    if(w.end<now-864e5||w.start>now+14*864e5)return;
+    elig[si]=players.filter(p=>mvpEligible(p,s,si,season)).map(p=>p.name);
+  });
+  const trainers=(Array.isArray(G.trainers)?G.trainers:[]).filter(t=>t&&t.phone&&(!Array.isArray(t.teams)||t.teams.includes(team))&&(t.role||'Trainer')==='Trainer')
+    .map(t=>({name:t.name,phone:t.phone,role:'Trainer',teams:[team]}));
+  const nw=G.db[team+'__news'];
+  const news=(nw&&typeof nw==='object'&&typeof nw.t==='number'&&nw.title)?{t:nw.t,title:nw.title,body:nw.body||'',off:nw.off||undefined}:null;
+  const loc={},la=(G.locationAddr&&typeof G.locationAddr==='object')?G.locationAddr:{};
+  sessions.forEach(s=>{if(s&&s.location&&la[s.location])loc[s.location]=la[s.location];});
+  const shared={v:PV_V,team,season,club:G.clubName||'',sessions:sessions.map(_pvSess),news,trainers,loc,
+    roster:{disp,nr,elig},names:[],rep:{}};
+  weeks.forEach(w=>{
+    const r=reps[w.wk];if(!r)return;
+    const tp=_reportForPlayers(r,null);
+    shared.rep[w.wk]=Object.assign({},tp,{me:null,players:[]});
+  });
+  const people=[];
+  players.forEach((p,pi)=>{
+    if(!p||!p.name||!p.confirmToken)return;
+    const me={};
+    PV_ME.forEach(f=>{if(p[f]!==undefined)me[f]=JSON.parse(JSON.stringify(p[f]));});
+    const squad={};
+    sessions.forEach((s,si)=>{const q=_sqOf(s);if(q)squad[si]={in:q.p.includes(p.name),meet:q.meet||'',where:q.where||'',t:q.t};});
+    let rank=null;try{rank=_pmComputeRank(p,block);}catch(e){}
+    const size=players.filter(pp=>pp&&Array.isArray(pp.s)&&sessions.some((s,si)=>{
+      if(!s||!sessTookPlace(s,season)||!_sessAfterJoin(pp,s))return false;
+      const v=si<pp.s.length?pp.s[si]:3;return v===1||v===0||v===2;})).length;
+    const stats={},rep={};
+    weeks.forEach(w=>{
+      try{stats[w.wk]=dbBuildPlayerStatsSnapshot(data,pi,w.off,true);}catch(e){}
+      const r=reps[w.wk];
+      if(r){const mine=_reportForPlayers(r,pi);rep[w.wk]={me:mine.me,players:mine.players};}
+    });
+    people.push({pi,tok:p.confirmToken,name:p.name,nr:p.nr||'',bd:_pvBd(p.birthdate),photo:p.photo||null,
+      obj:{v:PV_V,team,season,pi,n:players.length,me,squad,rank,size,stats,rep}});
+  });
+  return {shared,people};
+}
+const _pvThumbs=new Map();
+function _pvThumb(src,n){
+  if(!src||typeof src!=='string')return Promise.resolve(null);
+  const k=n+':'+src.length+':'+src.slice(-48);
+  if(!_pvThumbs.has(k))_pvThumbs.set(k,_hubThumb(src,n));
+  return _pvThumbs.get(k);
+}
+function _pvHashText(o){
+  // publishedAt changes with every build; it is not a change of content
+  return JSON.stringify(o,(k,v)=>k==='publishedAt'?undefined:v);
+}
+async function _pvWriteBlock(b){
+  const {team,season,key}=b;
+  const lk=pvTeamSecret(team);if(!lk)return {};
+  const prevT=UI.currentTeam,prevS=UI.currentSeason;
+  let built;
+  UI.currentTeam=team;UI.currentSeason=season;
+  try{built=_pvBuildSync(team,season);}
+  finally{UI.currentTeam=prevT;UI.currentSeason=prevS;}
+  const now=Date.now(),tk=await pvTeamKeyOf(lk);
+  const {shared,people}=built;
+  // Thumbnails: 20+ portraits must stay small (made once per photo and page)
+  const th=_pvThumb;
+  for(const r of Object.values(shared.rep)){
+    r.clubLogo=null;
+    if(Array.isArray(r.fullP))await Promise.all(r.fullP.map(async x=>{x.photo=await th(x.photo,96);}));
+  }
+  shared.logo=(typeof G.clubLogo==='string'&&G.clubLogo.indexOf('data:image')===0)?G.clubLogo:null;
+  const map={},picks={},upd={};
+  for(const x of people){
+    const pk=await pvKeyOf(x.tok),pid=await _pvPid(x.tok);
+    map[pk]={key,team,season,pi:x.pi};
+    x.obj.tk=tk;x.obj.lk=lk;
+    // His photo once, the club's logo in the team's part: statistics and
+    // report take them from there (_pvAdopt)
+    x.obj.me.photo=await th(x.photo,160);
+    for(const st of Object.values(x.obj.stats)){if(!st)continue;st.clubLogo=null;(st.players||[]).forEach(r=>{if(r)r.photo=null;});}
+    for(const r of Object.values(x.obj.rep))for(const row of (r.players||[]))if(row)row.photo=null;
+    if(x.bd){
+      picks[await pvPickKeyOf(lk,pid,x.bd)]=x.tok;
+      shared.names.push({id:pid,n:x.name,nr:String(x.nr||'')});
+    }
+    const text=JSON.stringify(x.obj),h=(await _pvHex(_pvHashText(x.obj))).slice(0,24);
+    if(await _pvChanged('fcf_pv/'+pk,h))upd['fcf_pv/'+pk]={t:now,h,j:text};
+  }
+  shared.names.sort((a,b2)=>a.n.localeCompare(b2.n,'de'));
+  const st=JSON.stringify(shared),sh=(await _pvHex(_pvHashText(shared))).slice(0,24);
+  // t, h and j separately: the job's mvp next to them stays
+  if(await _pvChanged('fcf_pt/'+tk,sh)){upd['fcf_pt/'+tk+'/t']=now;upd['fcf_pt/'+tk+'/h']=sh;upd['fcf_pt/'+tk+'/j']=st;}
+  const ph=(await _pvHex(JSON.stringify(picks))).slice(0,24);
+  if(_pvLast['fcf_pk/'+tk]!==ph)upd['fcf_pk/'+tk]=picks;
+  const n=Object.keys(upd).length;
+  if(n){
+    _fbCount('tx','Ausschnitte',JSON.stringify(upd).length);
+    await fbDb.ref().update(upd);
+    Object.keys(upd).forEach(p=>{
+      if(p.indexOf('fcf_pv/')===0)_pvLast[p]=upd[p].h;
+      else if(/\/h$/.test(p))_pvLast[p.slice(0,-2)]=upd[p];
+    });
+    _pvLast['fcf_pk/'+tk]=ph;
+  }
+  window._pvStat={t:now,team,season,players:people.length,written:n,bytes:JSON.stringify(upd).length};
+  return map;
+}
+// First look at a node on this page: ask the server for its hash, so a second
+// device does not rewrite what another one wrote a minute ago
+async function _pvChanged(path,h){
+  if(_pvLast[path]===undefined){
+    try{_pvLast[path]=(await fbDb.ref(path+'/h').once('value')).val()||'';}catch(e){_pvLast[path]='';}
+  }
+  return _pvLast[path]!==h;
+}
+
+// ── Trainer side: merging the inbox (trainers with an account) ───────────
+let _pvInRef=null,_pvInbox={},_pvMergeT=null,_pvMerging=false,_pvInDenied=0;
+function pvInboxWatch(){
+  if(_pvInRef||!fbDb||isPlayerMode()||!_acctUser||!_pvCanWrite())return;
+  // Refused (no member, rules not there yet): try again in an hour, not on every save
+  if(_pvInDenied&&Date.now()-_pvInDenied<3600e3)return;
+  const ref=fbDb.ref('fcf_in');_pvInRef=ref;
+  ref.on('value',snap=>{
+    _pvInbox=snap.val()||{};
+    clearTimeout(_pvMergeT);_pvMergeT=setTimeout(pvMergeInbox,600);
+  },()=>{if(_pvInRef===ref){_pvInRef=null;_pvInDenied=Date.now();}});
+}
+async function _pvKeyMap(){
+  if(_pvMapCache)return _pvMapCache;
+  const map={};
+  for(const b of _pvBlocks()){
+    const pl=G.db[b.key].players||[];
+    for(let pi=0;pi<pl.length;pi++){const p=pl[pi];if(p&&p.confirmToken)map[await pvKeyOf(p.confirmToken)]={key:b.key,team:b.team,season:b.season,pi};}
+  }
+  return (_pvMapCache=map);
+}
+async function pvMergeInbox(){
+  if(_pvMerging||!_pvCanWrite())return;
+  _pvMerging=true;
+  let changed=0;
+  try{
+    const map=await _pvKeyMap();
+    for(const [pk,box] of Object.entries(_pvInbox||{})){
+      const who=map[pk];if(!who||!box||typeof box!=='object')continue;
+      if(CU.role!=='admin'&&!(CU.teams||[]).includes(who.team))continue;
+      for(const [id,e] of Object.entries(box)){
+        if(!e||typeof e!=='object'||e.m)continue;
+        // Whoever sets m first merges it (the job does the same)
+        let res;
+        const mt=Date.now();
+        try{res=await fbDb.ref('fcf_in/'+pk+'/'+id).transaction(cur=>{
+          if(cur===null)return null;                  // not cached: the server answers, then again
+          if(cur.m||cur.t!==e.t)return;
+          return Object.assign({},cur,{m:mt});
+        },undefined,false);}catch(err){continue;}
+        const got=res&&res.committed&&res.snapshot&&res.snapshot.val();
+        if(!got||got.m!==mt)continue;
+        const blk=G.db[who.key];if(!blk)continue;
+        const r=pvApply(blk,who.pi,e);
+        // Refused (after the deadline, after the roll call): gone, so the
+        // player's page stops showing it as his answer
+        if(!r.ok){try{fbDb.ref('fcf_in/'+pk+'/'+id).remove();}catch(err){}continue;}
+        if(r.f.length){
+          changed++;
+          if(r.audit)try{fbDb.ref('fcf_data/auditLogP').push(Object.assign({ts:e.t||Date.now(),user:(blk.players[who.pi]||{}).name||'Spieler',role:'player',team:who.team,season:who.season},r.audit));}catch(err){}
+        }
+      }
+    }
+  }catch(e){console.warn('[Eingang]',e);}
+  finally{_pvMerging=false;}
+  if(changed){
+    saveG(false);
+    try{if(typeof render==='function')render();}catch(e){}
+  }
+}
+
+// ── Player side: reading the slices ──────────────────────────────────
+let _pv=null;   // {pk, tk, t, team, season, pi, lk}
+function _pvDefer(){
+  try{const q=new URLSearchParams(location.search);return !!(q.get('p')||q.get('rpe')||q.get('player')||(q.get('team')&&q.get('k')));}catch(e){return false;}
+}
+function _pvUrlToken(){
+  try{const q=new URLSearchParams(location.search);return q.get('p')||q.get('rpe')||q.get('player')||'';}catch(e){return '';}
+}
+async function _pvLoad(token){
+  if(!fbDb||!token)return null;
+  const pk=await pvKeyOf(token);
+  const pv=(await fbDb.ref('fcf_pv/'+pk).once('value')).val();
+  if(!pv||typeof pv.j!=='string')return null;
+  const P=JSON.parse(pv.j);
+  if(!P||P.v!==PV_V||!P.me||P.me.confirmToken!==token||!P.tk)return null;
+  const [tv,inb]=await Promise.all([
+    fbDb.ref('fcf_pt/'+P.tk).once('value').then(s=>s.val()),
+    fbDb.ref('fcf_in/'+pk).once('value').then(s=>s.val()).catch(()=>null)]);
+  if(!tv||typeof tv.j!=='string')return null;
+  const T=JSON.parse(tv.j);
+  if(!T||T.v!==PV_V||!Array.isArray(T.sessions))return null;
+  return {pk,t:pv.t||0,P,T,mvp:(tv.mvp&&typeof tv.mvp==='object')?tv.mvp:{},inbox:(inb&&typeof inb==='object')?inb:{}};
+}
+// Builds the same state _pmSanitizeG leaves behind, from the slice
+function _pvAdopt(x,token){
+  const {P,T}=x,key=P.team+'__'+P.season;
+  const players=new Array(Math.max(P.n||0,P.pi+1)).fill(null);
+  players[P.pi]=P.me;
+  const sessions=T.sessions.map((s,si)=>{
+    if(!s)return s;
+    const o=Object.assign({},s);
+    const q=P.squad&&P.squad[si];if(q)o.squad=q;
+    // The job names the winner once the vote has closed
+    const w=x.mvp[rpeMetaKey(o)];
+    if(!o.mvpWin&&Array.isArray(w)&&w.length)o.mvpWin=w.slice(0,2);
+    return o;
+  });
+  const db={[key]:{sessions,players}};
+  if(T.news)db[P.team+'__news']=T.news;
+  G={version:20,db,teamList:[P.team],seasonList:[P.season],trainers:T.trainers||[],clubName:T.club||'',
+    locationAddr:T.loc||{},auditLog:[],trash:[],backups:[],matchLineups:{},seasonLineups:{},
+    sessionTemplates:[],exerciseLibrary:[],calEvents:[]};
+  try{Object.defineProperty(G,'__sanitized',{value:true,enumerable:false,configurable:true,writable:true});}
+  catch(e){G.__sanitized=true;}
+  UI.currentTeam=P.team;UI.currentSeason=P.season;
+  CU={role:'player',name:P.me.name||'Spieler',teams:[P.team],playerToken:token,playerIdx:P.pi};
+  CU._pmRank=P.rank==null?null:P.rank;CU._pmTeamSize=P.size||0;CU._pmLineupRoles={};
+  _pmRoster=T.roster||{disp:{},nr:{},elig:{}};
+  _pv={pk:x.pk,tk:P.tk,t:x.t,team:P.team,season:P.season,pi:P.pi,lk:P.lk||''};
+  // His own answers the slice does not have yet: entries not merged, or
+  // merged after the slice was built. Plus what this device sent without
+  // hearing back (the page changed before the write went out): again.
+  const out=_pvOutbox(),now=Date.now();
+  const lay=[];
+  Object.entries(x.inbox).forEach(([id,e])=>{
+    if(e&&typeof e==='object'&&(!e.m||e.m>=x.t))lay.push(e);
+  });
+  Object.entries(out).forEach(([id,e])=>{
+    const r=x.inbox[id];
+    if(r&&(r.t||0)>=(e.t||0)){delete out[id];return;}    // it arrived
+    if(!(now-(e.t||0)<24*3600e3)){delete out[id];return;} // too old to trust
+    lay.push(e);_pvPut(id,e,true);
+  });
+  _pvOutboxSave(out);
+  lay.sort((a,b)=>(a.t||0)-(b.t||0)).forEach(e=>{try{pvApply(db[key],P.pi,e);}catch(err){}});
+  // Votes given from this device and not counted into the slice yet
+  try{
+    const me=P.me;Object.keys(_pvVotes()).forEach(k=>{if(!me.mvpV||typeof me.mvpV!=='object')me.mvpV={};me.mvpV[k]=1;});
+  }catch(e){}
+  // Weekly report and statistics of the week shown now
+  const off=_dbCompletedWeekOffset(),wk=_dbWeekBounds(off).mondayYSK;
+  const tr=T.rep&&T.rep[wk],mr=P.rep&&P.rep[wk],ph=P.me.photo||null,logo=T.logo||null;
+  if(mr&&Array.isArray(mr.players))mr.players.forEach(r=>{if(r)r.photo=ph;});
+  if(tr)tr.clubLogo=logo;
+  const stx=(P.stats&&P.stats[wk])||null;
+  if(stx){stx.clubLogo=logo;(stx.players||[]).forEach(r=>{if(r)r.photo=ph;});}
+  if(logo)G.clubLogo=logo;
+  _hubLive={report:tr?Object.assign({},tr,mr||{}):null,stats:stx,data:null,off,pi:P.pi};
+  // A player's device keeps no copy of the team's data: an older version
+  // stored the whole database here. Not on a trainer's device (a trainer
+  // may look at a player's link) — his session stays.
+  try{
+    const trainerHere=localStorage.getItem(AUTH_SK)||localStorage.getItem(AUTH_SK+'_parked')||sessionStorage.getItem(AUTH_SK);
+    if(!trainerHere){localStorage.removeItem(SK);localStorage.removeItem('fcf_media_v1');}
+  }catch(e){}
+}
+// Local copy of what this device sent, until a slice includes it
+function _pvOutKey(){return 'fcf_pv_out_'+((_pv&&_pv.pk)||'').slice(0,16);}
+function _pvOutbox(){try{return JSON.parse(localStorage.getItem(_pvOutKey())||'{}')||{};}catch(e){return {};}}
+function _pvOutboxSave(o){
+  try{
+    const lim=Date.now()-14*864e5;Object.keys(o).forEach(k=>{if(!o[k]||!(o[k].t>lim))delete o[k];});
+    if(Object.keys(o).length)localStorage.setItem(_pvOutKey(),JSON.stringify(o));else localStorage.removeItem(_pvOutKey());
+  }catch(e){}
+}
+function _pvPut(id,e,again){
+  if(!_pv||!fbDb||!PV_ID.test(id))return;
+  // Kept on the device until the database confirms it
+  if(!again){const o=_pvOutbox();o[id]=e;_pvOutboxSave(o);}
+  fbDb.ref('fcf_in/'+_pv.pk+'/'+id).set(e).then(()=>{
+    const o=_pvOutbox();if(o[id]&&o[id].t===e.t){delete o[id];_pvOutboxSave(o);}
+  }).catch(err=>console.warn('[Eingang]',err&&err.message));
+}
+// A player's action, as an entry in his inbox. false: not in slice mode (the
+// old way writes directly, as before)
+function pvSend(a,s,si,v){
+  if(!_pv)return false;
+  if(typeof RPE_IS_PREVIEW!=='undefined'&&RPE_IS_PREVIEW)return true;
+  const k=s?rpeMetaKey(s):null;
+  if(s&&!k)return true;
+  const id=a==='seen'?'seen':a==='push'?'push':({rsvp:'a',rpe:'r',nd:'r',phy:'f'}[a]+'_'+k);
+  const e={a,t:Date.now()};
+  if(k){e.k=k;e.si=si;}
+  if(v!==undefined)e.v=v;
+  _pvPut(id,e);
+  return true;
+}
+function _pvVoteKey(){return 'fcf_pv_vote_'+((_pv&&_pv.pk)||'').slice(0,16);}
+function _pvVotes(){try{return JSON.parse(localStorage.getItem(_pvVoteKey())||'{}')||{};}catch(e){return {};}}
+function pvSendVote(k,name){
+  if(!_pv)return false;
+  if(typeof RPE_IS_PREVIEW!=='undefined'&&RPE_IS_PREVIEW)return true;
+  fbDb.ref('fcf_vote/'+_pv.pk+'/'+k).set({n:name,t:Date.now()}).catch(err=>console.warn('[Stimme]',err&&err.message));
+  try{const v=_pvVotes();v[k]=Date.now();localStorage.setItem(_pvVoteKey(),JSON.stringify(v));}catch(e){}
+  return true;
+}
+
+// ── Group link with the team's secret: name, birthdate, his own link ──
+async function _pvTeamLink(team,lk,overlay){
+  let T=null;
+  try{
+    const tk=await pvTeamKeyOf(lk);
+    const tv=(await fbDb.ref('fcf_pt/'+tk).once('value')).val();
+    T=(tv&&typeof tv.j==='string')?JSON.parse(tv.j):null;
+    if(T)T._tk=tk;
+  }catch(e){T=null;}
+  if(overlay){overlay.classList.remove('open');overlay.innerHTML='';}
+  document.body.classList.add('player-mode','hub-mode');
+  let wrap=document.getElementById('playerModeWrap');
+  if(!wrap){wrap=document.createElement('div');wrap.id='playerModeWrap';document.body.appendChild(wrap);}
+  wrap.style.display='';
+  if(typeof _bootVeilHide==='function')try{_bootVeilHide();}catch(e){}
+  if(!T||!Array.isArray(T.names)){
+    wrap.innerHTML=`<div class="rpo-wrap"><div class="rpo-card"><div class="rpo-h">${escapeHtml(team)}</div>
+      <div class="rpo-sub" style="margin-top:12px;">Dieser Link ist nicht mehr gültig. Bitte frag deinen Trainer nach dem aktuellen Gruppenlink.</div></div></div>`;
+    return;
+  }
+  const list=T.names;
+  let pending=null,attempts=0;
+  wrap.innerHTML=`<div class="rpo-wrap"><div class="rpo-card">
+    <div class="rpo-h">${escapeHtml(T.team||team)}</div>
+    <div class="rpo-q">Wer bist du?</div>
+    <div id="tau-verify" class="rpo-verify" style="display:none;">
+      <div class="rpo-verify-h">Bist du <b id="tau-verify-name"></b>?</div>
+      <div class="rpo-verify-s">Einmalig zur Sicherheit: dein Geburtsdatum</div>
+      <input id="rpo-verify-in" type="date">
+      <div id="tau-verify-err" class="rpo-verify-e"></div>
+      <div class="rpo-verify-b">
+        <button class="rpo-mbtn rpo-verify-ok" id="tau-ok">Weiter</button>
+        <button class="rpo-full" id="tau-cancel">Abbrechen</button>
+      </div>
+    </div>
+    <div class="rpo-who" id="tau-who">${list.map((x,i)=>
+      `<button class="rpo-who-b" data-i="${i}"><span class="rpo-who-nr">${escapeHtml(String(x.nr||''))}</span>${escapeHtml(x.n)}</button>`).join('')}</div>
+    <div class="rpo-sub" style="margin-top:10px;">Nicht in der Liste? Dann fehlt noch dein Geburtsdatum — sag deinem Trainer Bescheid.</div>
+  </div>
+  <div class="rpo-foot">Nur beim ersten Mal — danach erkennt dich dieses Gerät.</div></div>`;
+  const box=document.getElementById('tau-verify'),inp=document.getElementById('rpo-verify-in');
+  const err=document.getElementById('tau-verify-err'),okBtn=document.getElementById('tau-ok');
+  document.getElementById('tau-who').addEventListener('click',e=>{
+    const b=e.target.closest('.rpo-who-b');if(!b)return;
+    pending=list[+b.dataset.i];
+    document.getElementById('tau-verify-name').textContent=pending.n;
+    box.style.display='';inp.value='';err.textContent='';
+    window.scrollTo({top:0,behavior:'smooth'});
+    setTimeout(()=>inp.focus(),60);
+  });
+  document.getElementById('tau-cancel').addEventListener('click',()=>{pending=null;box.style.display='none';});
+  const submit=async()=>{
+    if(!pending)return;
+    if(!inp.value){err.textContent='Bitte dein Geburtsdatum eingeben.';return;}
+    okBtn.disabled=true;
+    let tok=null;
+    try{
+      const h=await pvPickKeyOf(lk,pending.id,inp.value);
+      tok=(await fbDb.ref('fcf_pk/'+T._tk+'/'+h).once('value')).val();
+    }catch(e2){
+      okBtn.disabled=false;err.textContent='Keine Verbindung. Bitte gleich noch einmal versuchen.';return;
+    }
+    if(typeof tok!=='string'||!tok){
+      attempts++;
+      if(attempts>=5){
+        err.textContent='Zu viele Fehlversuche. Bitte 60 Sekunden warten.';
+        setTimeout(()=>{attempts=0;err.textContent='';okBtn.disabled=false;},60000);
+        return;
+      }
+      okBtn.disabled=false;err.textContent='Das Geburtsdatum stimmt nicht.';return;
+    }
+    _meSet(team,tok);
+    allowLeaveOnce();
+    location.replace(buildHubLink(tok));
+  };
+  okBtn.addEventListener('click',submit);
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')submit();});
+}
+
 // ══ Spieltag: Kader und Treffpunkt (1.2.13) ══════════════════════
 // The trainers pick the squad for a match, say when and where to meet and
 // publish. The job on GitHub tells every player with reminders on: in the
@@ -16529,7 +17132,7 @@ function pmSetRpe(si,val){
   // still updates so the screen can be judged; nothing leaves the browser.
   if(RPE_IS_PREVIEW){
     if(typeof showSaveFlash==='function')showSaveFlash('\ud83d\udc41 Vorschau \u2014 nicht gespeichert');
-  }else{
+  }else if(!pvSend('rpe',s,si,val)){
     _pmSaveTargeted(si);
     _pmSaveMeta(s);
   }
@@ -16630,6 +17233,7 @@ function _pmMarkSeen(){
   if(app)v.a=now;else if(prevA)v.a=prevA;
   p.seen=v;
   try{localStorage.setItem(lsKey,JSON.stringify({t:now,a:app?now:(last.a||0)}));}catch(e){}
+  if(pvSend('seen',null,null,v))return;
   const path='fcf_data/db/'+_fbPathKey(myTeam+'__'+mySeason)+'/players/v/'+myPi+'/seen';
   fbDb.ref().update({[path]:v}).catch(e=>console.warn('[Seen]',e&&e.message));
 }
@@ -16753,6 +17357,8 @@ function mvpVote(si,name){
     if(typeof showSaveFlash==='function')showSaveFlash('👁 Vorschau — nicht gespeichert');
     return true;
   }
+  // From a slice: the job counts it (nobody reads whom he chose)
+  if(pvSendVote(k,name))return true;
   const SV=(typeof firebase!=='undefined'&&firebase.database&&firebase.database.ServerValue)||null;
   if(!fbDb||!fbRef||!SV||typeof SV.increment!=='function')return true;
   // One atomic update: the count goes up and the voter is marked together
@@ -17249,6 +17855,7 @@ function _pmSavePush(on){
   const D=G.db[UI.currentTeam+'__'+UI.currentSeason];
   const p=D&&D.players&&D.players[myPi];if(!p)return;
   p.push=on?{t:Date.now()}:null;
+  if(pvSend('push',null,null,!!on))return;
   const path='fcf_data/db/'+_fbPathKey(UI.currentTeam+'__'+UI.currentSeason)+'/players/v/'+myPi+'/push';
   fbDb.ref().update({[path]:p.push}).catch(e=>console.warn('[Push]',e&&e.message));
 }
@@ -17724,8 +18331,10 @@ function pmSetNotThere(si){
     if(typeof showSaveFlash==='function')showSaveFlash('\ud83d\udc41 Vorschau \u2014 nicht gespeichert');
     return;
   }
-  if(had)_pmSaveTargeted(si);
-  _pmSaveMeta(s);
+  if(!pvSend('nd',s,si)){
+    if(had)_pmSaveTargeted(si);
+    _pmSaveMeta(s);
+  }
   if(window._rpeAuditTimers&&window._rpeAuditTimers[si]){clearTimeout(window._rpeAuditTimers[si]);window._rpeAuditTimers[si]=null;}
   try{
     _pmAppendAudit({ts:Date.now(),user:p.name||'Spieler',role:'player',
@@ -17986,6 +18595,8 @@ window.repairRpe=function(apply){
 };
 function _pmAppendAudit(entry){
   if(!fbDb||!entry)return;
+  // From a slice the journal entry is written where the answer is merged
+  if(_pv)return;
   // A transaction READS the node before writing — the whole 500-entry audit
   // log, for every single player action, plus a re-read on every retry. With
   // 27 players answering and rating in one evening that is the dominant
@@ -18178,8 +18789,36 @@ function tryPlayerUrlAuth(){
     }
     setTimeout(tryFinalize,200);
   };
-  tryFinalize();
+  // His slice first (1.2.36); the old way only when there is none — trainers
+  // still on an older app have not laid it out yet
+  const legacy=()=>{
+    window._pvLegacy=true;
+    if(window._pvFirst){const f=window._pvFirst;window._pvFirst=null;f();}
+    tryFinalize();
+  };
+  if(!fbDb){tryFinalize();return true;}
+  _pvLoad(token).then(x=>{
+    if(!x){legacy();return;}
+    _pvAdopt(x,token);
+    _pmEnterSlice(token);
+  }).catch(e=>{console.warn('[Ausschnitt]',e);legacy();});
   return true;
+}
+function _pmEnterSlice(token){
+  try{
+    localStorage.setItem('fcf_currentTeam',UI.currentTeam);
+    localStorage.setItem('fcf_currentSeason',UI.currentSeason);
+  }catch(e){}
+  if(window._hubMode&&!RPE_IS_PREVIEW)_meSet(UI.currentTeam,token);
+  const overlay=document.getElementById('authOverlay');
+  if(overlay){overlay.classList.remove('open');overlay.innerHTML='';}
+  document.body.classList.add('player-mode');
+  if(window._rpeOnly)document.body.classList.add('rpe-only');
+  if(window._hubMode)document.body.classList.add('hub-mode');
+  let wrap=document.getElementById('playerModeWrap');
+  if(!wrap){wrap=document.createElement('div');wrap.id='playerModeWrap';document.body.appendChild(wrap);}
+  renderPlayerMode();
+  if(typeof _bootVeilHide==='function')_bootVeilHide();
 }
 
 // ── TEAM-LEVEL SHARED LINK ───────────────────────────────────
@@ -18274,6 +18913,15 @@ function tryTeamUrlAuth(){
   if(sessParam)try{sessionStorage.setItem('_pmFocusSess',sessParam);}catch(e){}
   const overlay=document.getElementById('authOverlay');
   if(!overlay)return false;
+  // With the team's secret (1.2.36): names from the team's slice, the
+  // birthdate opens his own link — no team data on the phone
+  const lk=params.get('k');
+  if(lk&&fbDb){
+    overlay.innerHTML='<div class="auth-box"><div style="text-align:center;padding:30px 16px;color:var(--gd);"><div style="font-size:1.4rem;margin-bottom:12px;">⏳</div><div style="font-size:1rem;font-weight:600;color:var(--bd);">Lade Mannschaft...</div></div></div>';
+    overlay.classList.add('open');
+    _pvTeamLink(teamParam,lk,overlay);
+    return true;
+  }
   overlay.innerHTML='<div class="auth-box"><div style="text-align:center;padding:30px 16px;color:var(--gd);"><div style="font-size:1.4rem;margin-bottom:12px;">⏳</div><div style="font-size:1rem;font-weight:600;color:var(--bd);">Lade Mannschaft...</div></div></div>';
   overlay.classList.add('open');
   // Self-sufficient fetch — we don't trust _fbInitialLoaded (it can be set by
@@ -18774,7 +19422,7 @@ function pmAnswerPhysio(si,yes){
   if(!Array.isArray(p.physio))p.physio=[];
   while(p.physio.length<D.sessions.length)p.physio.push(null);
   p.physio[si]=yes?true:false;
-  if(!RPE_IS_PREVIEW)_pmSaveTargeted(si);
+  if(!RPE_IS_PREVIEW){if(!pvSend('phy',D.sessions[si],si,!!yes))_pmSaveTargeted(si);}
   else if(typeof showSaveFlash==='function')showSaveFlash('\ud83d\udc41 Vorschau \u2014 nicht gespeichert');
   // Repaint first, so the chosen button is marked whatever happens next
   try{renderPhysioAsk();}catch(e){}
@@ -19609,7 +20257,7 @@ function pmSetStatus(si,val){
   while(p.ay.length<=si)p.ay.push(null);
   if(current===targetStatus){
     // "Komme" on the rule's "M": now it is his own answer
-    if(p.ay[si]===1&&!RPE_IS_PREVIEW){p.ay[si]=0;_pmSaveTargeted(si);renderPlayerMode();if(typeof showSaveFlash==='function')showSaveFlash('✓ Bestätigt');}
+    if(p.ay[si]===1&&!RPE_IS_PREVIEW){p.ay[si]=0;if(!pvSend('rsvp',D.sessions[si],si,1))_pmSaveTargeted(si);renderPlayerMode();if(typeof showSaveFlash==='function')showSaveFlash('✓ Bestätigt');}
     return;
   }
   p.ay[si]=0;
@@ -19629,6 +20277,11 @@ function pmSetStatus(si,val){
   // Preview is for looking, not for answering on a player's behalf
   if(RPE_IS_PREVIEW){
     if(typeof showSaveFlash==='function')showSaveFlash('\ud83d\udc41 Vorschau \u2014 nicht gespeichert');
+    renderPlayerMode();
+    try{_hubCheckDone();}catch(e){}
+    return;
+  }
+  if(pvSend('rsvp',D.sessions[si],si,val===1?1:0)){
     renderPlayerMode();
     try{_hubCheckDone();}catch(e){}
     return;
