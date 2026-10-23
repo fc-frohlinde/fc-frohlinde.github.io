@@ -6766,15 +6766,15 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.41'; // v1.2.41: Links am Handy
-const APP_VERSION_LABEL='1.2.41';
+const APP_VERSION='1.2.42'; // v1.2.42: Links und Aktivität unten
+const APP_VERSION_LABEL='1.2.42';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792783222167; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792785403511; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
-  {version:'1.2.41',date:'23.10.2026',title:'Links am Handy',items:[
-    {icon:'🔗',title:'Links über die ganze Breite',desc:'„Mehr“ → „Links“ öffnete die Liste am Handy als schmales Kästchen oben in der Ecke: sie richtete sich nach der Zeile im Menü, das sich dabei schon schloss. Jetzt erscheint sie wie „Aktivität“ über die ganze Breite oben.'},
+  {version:'1.2.42',date:'23.10.2026',title:'Links und Aktivität am Handy unten',items:[
+    {icon:'🔗',title:'Dort, wo der Finger ist',desc:'„Mehr“ → „Links“ öffnete die Liste als schmales Kästchen oben in der Ecke – sie richtete sich nach der Zeile im Menü, das sich dabei schon schloss. „Links“ und „Aktivität“ öffnen jetzt unten über der Leiste, an der Stelle von „Mehr“, über die ganze Breite. Beim Eintippen eines neuen Links rückt die Liste über die Tastatur.'},
   ]},
   {version:'1.2.40',date:'23.10.2026',title:'Wechsel: Auswahl am richtigen Platz',items:[
     {icon:'🔁',title:'Liste öffnet unter dem Feld',desc:'Nach dem Eintippen der Minute öffnete sich die Liste „Rein“ manchmal oben links. Der Spielbericht baute sich beim Verlassen des Minutenfelds neu auf und ersetzte dabei das Feld, das gerade aufging. Jetzt ändern sich nur noch die Einträge der Listen.'},
@@ -26343,12 +26343,11 @@ function hxActivity(btn,e){
   closeUserMenuIfOpen&&closeUserMenuIfOpen();
   _hxActRender();
   pop.hidden=false;
-  if(btn&&window.innerWidth>767){
+  pop._phone=!(btn&&window.innerWidth>767);
+  if(!pop._phone){
     const r=btn.getBoundingClientRect(),ph=pop.offsetHeight;
-    Object.assign(pop.style,{left:(r.right+10)+'px',right:'auto',top:Math.max(8,Math.min(r.top,innerHeight-ph-8))+'px'});
-  }else{
-    Object.assign(pop.style,{left:'12px',right:'12px',top:'calc(12px + env(safe-area-inset-top,0px))'});
-  }
+    Object.assign(pop.style,{left:(r.right+10)+'px',right:'auto',bottom:'auto',top:Math.max(8,Math.min(r.top,innerHeight-ph-8))+'px'});
+  }else _hxPhonePop(pop);
 }
 document.addEventListener('pointerdown',ev=>{
   const pop=document.getElementById('hxActivity');
@@ -26356,6 +26355,20 @@ document.addEventListener('pointerdown',ev=>{
   if(pop.contains(ev.target)||(ev.target.closest&&ev.target.closest('#hxActItem')))return;
   pop.hidden=true;
 },true);
+// Phone: Links and Aktivität open where "Mehr" was — at the bottom, above the
+// bar, across the width; with the keyboard up (a new link being typed) above it
+function _hxPhonePop(el){
+  const vv=window.visualViewport;
+  const kb=vv?Math.max(0,window.innerHeight-vv.height-vv.offsetTop):0;
+  Object.assign(el.style,{left:'12px',right:'12px',top:'auto',minWidth:'0',maxWidth:'none',width:'auto',overflowY:'auto',
+    bottom:kb>80?(kb+8)+'px':'calc(var(--mob-nav-h,62px) + 8px)',
+    maxHeight:kb>80?(Math.max(160,(vv?vv.height:innerHeight)-24))+'px':'calc(100dvh - var(--mob-nav-h,62px) - 96px)'});
+}
+if(window.visualViewport)window.visualViewport.addEventListener('resize',()=>{
+  if(window.innerWidth>767)return;
+  const dd=document.getElementById('linksDropdown');if(dd&&dd.classList.contains('open')&&dd._phone)_hxPhonePop(dd);
+  const ac=document.getElementById('hxActivity');if(ac&&!ac.hidden&&ac._phone)_hxPhonePop(ac);
+});
 function hxLinks(btn,e){
   if(e)e.stopPropagation();
   const dd=document.getElementById('linksDropdown');if(!dd)return;
@@ -26364,11 +26377,9 @@ function hxLinks(btn,e){
   renderLinksMenu();
   Object.assign(dd.style,{position:'fixed',zIndex:'99999',right:'auto',bottom:'auto',minWidth:'260px',maxWidth:'320px',maxHeight:'',overflowY:''});
   dd.classList.add('open');
-  // Phone (from "Mehr", whose row is gone by now): across the top, like Aktivität
-  if(!btn||window.innerWidth<=767){
-    Object.assign(dd.style,{left:'12px',right:'12px',top:'calc(12px + env(safe-area-inset-top,0px))',minWidth:'0',maxWidth:'none',maxHeight:'calc(100dvh - 140px)',overflowY:'auto'});
-    return;
-  }
+  // Phone (from "Mehr", whose row is gone by now)
+  dd._phone=!btn||window.innerWidth<=767;
+  if(dd._phone){_hxPhonePop(dd);return;}
   const r=btn.getBoundingClientRect(),ph=dd.offsetHeight;
   dd.style.left=(r.right+10)+'px';
   dd.style.top=Math.max(8,Math.min(r.top,innerHeight-ph-8))+'px';
