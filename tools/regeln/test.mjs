@@ -109,7 +109,7 @@ await cannot('админу записать адрес календаря (то�
 
 // ── Trainingsplaner: Standardablauf (1.2.28) ──
 await can('записать стандартный ход тренировки', req('PUT', 'fcf_plans/U19/std', { rows: [{ ph: 'Aktivierung 1', cat: 'Aufwärmen', min: 10 }], upd: now, by: 'Artem' }));
-await cannot('стандартный ход без upd', req('PUT', 'fcf_plans/U19/std', { rows: [] }));
+await cannot('стандартный ход без upd', req('PUT', 'fcf_plans/U19/std', { rows: [{ ph: 'Hauptteil', cat: 'Spielform', min: 20 }] }));
 await cannot('неизвестный узел в fcf_plans', req('PUT', 'fcf_plans/U19/xyz', { upd: now }));
 
 // ── what stays as it is until the lock (Teil 3) ──
