@@ -60,6 +60,11 @@ try {
       const n = async x => Object.keys((await db.get(`fcf_plans/${k}/${x}`)) || {}).length;
       const std = await db.get(`fcf_plans/${k}/std`);
       console.log(`::notice title=Планировщик ${t}::упражнений в библиотеке: ${await n('lib')}, планов: ${await n('plans')}, шаблонов: ${await n('tpl')}, свой стандарт: ${std ? 'да' : 'нет'}`);
+      const arr = x => Array.isArray(x) ? x.filter(Boolean) : (x && typeof x === 'object' ? Object.values(x).filter(Boolean) : []);
+      const plans = (await db.get(`fcf_plans/${k}/plans`)) || {}, idx = (await db.get(`fcf_plans/${k}/idx`)) || {};
+      const pb = Object.values(plans).map(p => arr(p && p.blocks).length);
+      const sr = std ? arr(std.rows) : [];
+      console.log(`::notice title=Планировщик ${t} подробно::блоков в планах: ${pb.join(', ') || '–'}; в сводках n: ${Object.values(idx).map(x => x && x.n).join(', ') || '–'}; стандарт: строк ${sr.length}, с названием ${sr.filter(r => r && r.ph).length}, минут ${sr.reduce((a, r) => a + (+(r && r.min) || 0), 0)}`);
     }
   }
 } catch (e) {
