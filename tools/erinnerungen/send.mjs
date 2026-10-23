@@ -51,6 +51,30 @@ try {
       }
     }
   }
+  // При ручном запуске: как устроены данные игроков (только названия полей и числа, без значений) —
+  // для срезов игроков (часть 2)
+  if (process.env.GITHUB_EVENT_NAME === 'workflow_dispatch') {
+    try {
+      const top = (await db.get('fcf_data')) || {};
+      const sz = v => JSON.stringify(v == null ? null : v).length;
+      console.log('::notice title=Данные: узлы::' + Object.keys(top).sort().map(k => `${k} ${Math.round(sz(top[k]) / 1024)}K`).join(', '));
+      const dbk = Object.keys(top.db || {});
+      console.log('::notice title=Данные: db::' + dbk.map(k => { const d = k.replace(/__SL__/g, '/').replace(/__DOT__/g, '.'); return `${d} ${Math.round(sz(top.db[k]) / 1024)}K`; }).join(', '));
+      for (const k of dbk) {
+        const blk = decode(top.db[k]);
+        if (!blk || !Array.isArray(blk.players)) continue;
+        const name = k.replace(/__SL__/g, '/').replace(/__DOT__/g, '.');
+        const pl = blk.players.filter(p => p && typeof p === 'object'), cnt = {};
+        pl.forEach(p => Object.keys(p).forEach(f => { cnt[f] = (cnt[f] || 0) + 1; }));
+        const se = (blk.sessions || []).filter(s => s && typeof s === 'object'), sc = {};
+        se.forEach(s => Object.keys(s).forEach(f => { sc[f] = (sc[f] || 0) + 1; }));
+        const raw = top.db[k], rawPl = raw && raw.players;
+        console.log(`::notice title=Игроки ${name}::игроков: ${pl.length}, с кодом ссылки: ${pl.filter(p => p.confirmToken).length}, с датой рождения: ${pl.filter(p => p.birthdate).length}, с фото: ${pl.filter((p, i) => p.photo || p._mid_photo || (rawPl && ((rawPl.v || rawPl)[i] || {}).photo)).length}; размер игроков ${Math.round(sz(rawPl) / 1024)}K, событий ${se.length} (${Math.round(sz(raw && raw.sessions) / 1024)}K); поля блока: ${Object.keys(blk).sort().join(' ')}`);
+        console.log(`::notice title=Поля игроков ${name}::` + Object.entries(cnt).sort((a, b) => b[1] - a[1]).map(([f, n]) => `${f} ${n}`).join(', '));
+        console.log(`::notice title=Поля событий ${name}::` + Object.entries(sc).sort((a, b) => b[1] - a[1]).map(([f, n]) => `${f} ${n}`).join(', '));
+      }
+    } catch (e) { console.log('::warning title=Данные::' + String((e && e.message) || e).slice(0, 160)); }
+  }
   // При ручном запуске: сколько всего в планировщике (только числа)
   if (process.env.GITHUB_EVENT_NAME === 'workflow_dispatch') {
     const teams = decode(await db.get('fcf_data/teamList')) || [];
