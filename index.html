@@ -5606,6 +5606,31 @@ body.design-heute .tst-filter .tpl-hint{color:var(--hx-og-muted);}
 .dg-tb:disabled{opacity:.35;cursor:default;}
 .dg-dot{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 11px 'Barlow',sans-serif;border:2px solid #FFFFFF;}
 .dg-sp{flex:1 1 auto;}
+.dg-gap{width:1px;height:22px;background:rgba(255,255,255,.2);margin:0 3px;flex:0 0 auto;}
+/* 1.2.31: frame, group, context menu */
+.dg-svg{-webkit-touch-callout:none;}
+.dg-band{fill:rgba(255,210,90,.12);stroke:#FFD25A;stroke-width:1.5;stroke-dasharray:5 4;pointer-events:none;}
+.dg-grp{fill:none;stroke:rgba(255,210,90,.6);stroke-width:1.2;stroke-dasharray:3 4;pointer-events:none;}
+.dg-cm{position:fixed;z-index:820;min-width:220px;max-width:280px;padding:6px;border-radius:12px;background:var(--tp-card);color:var(--tp-ink);border:1px solid var(--tp-line);box-shadow:0 12px 32px rgba(5,14,32,.28);font:500 14px 'Barlow',sans-serif;}
+.dg-cm[hidden]{display:none;}
+.dg-cmh{padding:6px 10px 4px;font-size:12px;font-weight:700;color:var(--tp-mut);}
+.dg-cmi{display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;height:34px;padding:0 10px;border:none;border-radius:8px;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;}
+.dg-cmi:hover,.dg-cmi:focus-visible{background:var(--tp-soft);outline:none;}
+.dg-cmi kbd{font:600 12px 'Barlow',sans-serif;color:var(--tp-mut);}
+.dg-cmi.danger{color:#C23A35;}
+.dg-cmi.on{font-weight:700;}
+.dg-cmi.on span::after{content:' ✓';}
+.dg-cm hr{border:none;border-top:1px solid var(--tp-line);margin:4px 2px;}
+.dg-cmsw{display:flex;gap:6px;padding:4px 10px 8px;}
+.dg-cmsw .dg-sw{width:24px;height:24px;}
+.dg-cmq{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:2px 2px 4px;}
+.dg-cmq-b{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border:none;border-radius:8px;background:none;color:inherit;font:600 12px 'Barlow',sans-serif;cursor:pointer;}
+.dg-cmq-b:hover,.dg-cmq-b:focus-visible{background:var(--tp-soft);outline:none;}
+@media (pointer:coarse){.dg-cmi{height:42px;}.dg-cmq-b{padding:10px 4px;}}
+.dg-step{display:inline-flex;align-items:center;gap:4px;}
+.dg-step b{min-width:22px;text-align:center;color:var(--tp-ink);font-size:15px;}
+.dg-cnt{color:var(--tp-ink);font-size:14px;}
+.dg-bar select.dg-sel{height:34px;border:1px solid var(--tp-line2);border-radius:9px;background:var(--tp-soft);color:var(--tp-ink);font:600 13px 'Barlow',sans-serif;padding:0 8px;}
 .dg-tr{display:flex;align-items:center;gap:3px;margin-left:auto;}
 .dg-bgsel{height:34px;border-radius:9px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#FFFFFF;font:600 13px 'Barlow',sans-serif;padding:0 6px;cursor:pointer;}
 .dg-bgsel option{color:#0E2350;background:#FFFFFF;}
@@ -6629,13 +6654,20 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.30'; // v1.2.30: Standardablauf auch in leeren Plänen
-const APP_VERSION_LABEL='1.2.30';
+const APP_VERSION='1.2.31'; // v1.2.31: Zeichenbrett — Menü, Mehrfachauswahl, Reihe
+const APP_VERSION_LABEL='1.2.31';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792760432885; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792762138259; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.31',date:'23.10.2026',title:'Zeichenbrett',items:[
+    {icon:'🖱',title:'Menü mit Rechtsklick',desc:'Rechtsklick auf ein Element (am Handy: lange drücken): Farbe, Nummer, Drehen, Kopie, Kopieren, Ausschneiden, nach vorne/hinten, Löschen. Auf freiem Feld: Einfügen und Spieler, Hütchen, Ball, Minitor, Stange direkt an diese Stelle.'},
+    {icon:'⬚',title:'Mehrere auf einmal',desc:'Rahmen über das Feld ziehen oder Shift + Klick: mehrere Elemente auswählen und zusammen verschieben, drehen, kopieren oder löschen. Pfeiltasten schieben fein (mit Shift in großen Schritten), Strg+A wählt alles.'},
+    {icon:'📋',title:'Kopieren und Einfügen',desc:'Strg+C / Strg+V – auch in eine andere Übung oder einen anderen Plan, z. B. denselben Aufbau mit anderen Laufwegen.'},
+    {icon:'🔺',title:'Reihe',desc:'Neues Werkzeug: von der ersten zur letzten Position ziehen, und Hütchen, Markierungen, Stangen, Hürden, Ringe oder Dummys stehen in gleichem Abstand – für Slalom, Gassen und Mauern. Anzahl und Art lassen sich danach ändern, „Einzeln“ löst die Reihe auf.'},
+    {icon:'🧰',title:'Mehr Material',desc:'Flache Markierung, Hürde, Ring, Dummy und eine dritte Mannschaft (orange – grün ginge auf dem Rasen unter).'},
+  ]},
   {version:'1.2.30',date:'23.10.2026',title:'Standardablauf repariert',items:[
     {icon:'🛠',title:'Auch in leeren Plänen',desc:'Wer einmal den Reiter „Gruppen“ geöffnet hatte, bekam einen leeren gespeicherten Plan – und dort erschien der Standardablauf nicht. Jetzt bekommt jeder Plan ohne Blöcke den Standardablauf, und „Gruppen“ speichert erst, wenn du dort etwas änderst.'},
     {icon:'📋',title:'Standard in jeden Plan laden',desc:'„Vorlage laden“ bietet den Standardablauf als erste Vorlage an – ersetzen oder hinten anhängen. Nach dem Speichern des Standards steht jetzt, ob er in den offenen Plan übernommen wurde.'},
@@ -31400,7 +31432,7 @@ async function tplOpen(si,opts){
   if(typeof _navArm==='function')_navArm();
   if(!ov._dgFocusHook){
     ov._dgFocusHook=true;
-    ov.addEventListener('pointerdown',e=>{DG.focus=!!(e.target.closest&&e.target.closest('#dgWrap'));},true);
+    ov.addEventListener('pointerdown',e=>{DG.focus=!!(e.target.closest&&e.target.closest('#dgWrap,#dgCm'));},true);
   }
   DG.focus=false;DG.tool='sel';DG.bid=null;TPL.tab='a';TPL.gOpen=null;TPL.gSel=null;TPL.gView='set';tplTab('a');
   ov.classList.toggle('tpl-ro',!_tplEditor());
@@ -31468,12 +31500,13 @@ function tplHandleEsc(ev){
   if(!_tplIsOpen())return false;
   ev.preventDefault();
   const d=document.getElementById('tplDlg');
-  if(d&&d.classList.contains('open'))tplDlgClose();
+  if(typeof _dgCmIsOpen==='function'&&_dgCmIsOpen())_dgCmClose();
+  else if(d&&d.classList.contains('open'))tplDlgClose();
   else if(_tplPitchIsOpen()){if(TPL.pv.view!=='blk')tplPitchView('blk');else tplPitchClose();}
-  else if(DG.focus&&(DG.tool!=='sel'||DG.sel>=0)&&document.getElementById('dgSvg')){
+  else if(DG.focus&&(DG.tool!=='sel'||_dgSelIdx().length)&&document.getElementById('dgSvg')){
     // first Esc puts the pen down, the next one closes the planner
     const a=document.activeElement;if(a&&a.blur&&a!==document.body)a.blur();
-    DG.sel=-1;dgTool('sel');
+    _dgNone();dgTool('sel');
   }
   else tplClose();
   return true;
@@ -31490,10 +31523,21 @@ function tplKey(e){
   const mod=e.ctrlKey||e.metaKey;
   if(DG.focus&&_tplCur()&&document.getElementById('dgSvg')){
     // Last touched was the sketch: keys act on the sketch, not on the plan
-    if(!mod&&(k==='delete'||k==='backspace')){if(DG.sel>=0){e.preventDefault();dgDel();}return;}
+    _dgCmClose();
+    const has=_dgSelIdx().length>0;
+    if(!mod&&(k==='delete'||k==='backspace')){if(has){e.preventDefault();dgDel();}return;}
     if(mod&&k==='z'&&!e.shiftKey){e.preventDefault();dgUndo();return;}
     if(mod&&(k==='y'||(k==='z'&&e.shiftKey))){e.preventDefault();dgRedo();return;}
-    if(mod&&k==='d'){e.preventDefault();if(DG.sel>=0)dgDup();return;}
+    if(mod&&k==='d'){e.preventDefault();if(has)dgDup();return;}
+    if(mod&&k==='c'){if(has){e.preventDefault();dgCopy();}return;}
+    if(mod&&k==='x'){if(has){e.preventDefault();dgCut();}return;}
+    if(mod&&k==='v'){if(_dgClip()){e.preventDefault();dgPaste();}return;}
+    if(mod&&k==='a'){e.preventDefault();dgSelAll();return;}
+    if(!mod&&has&&/^arrow(left|right|up|down)$/.test(k)){
+      e.preventDefault();const st=e.shiftKey?10:1;
+      dgNudge(k==='arrowleft'?-st:k==='arrowright'?st:0,k==='arrowup'?-st:k==='arrowdown'?st:0);return;
+    }
+    if(!mod&&!e.altKey&&k==='r'&&has){e.preventDefault();dgRotate();return;}
   }
   if(!mod||(k!=='z'&&k!=='y'))return;
   e.preventDefault();
@@ -32279,29 +32323,47 @@ ${_tplGrpPrint()}
 //        z (zone x y w h) · tx (text s)
 const DG_W=640,DG_H=400;
 const DG_TEAM={a:{f:'#1E5BC6',t:'#FFFFFF',n:'Team A'},b:{f:'#D9443F',t:'#FFFFFF',n:'Team B'},
+  o:{f:'#EE7A2E',t:'#2B1400',n:'Team C'},
   n:{f:'#E8C840',t:'#0B2550',n:'Neutral'},k:{f:'#14181F',t:'#FFFFFF',n:'Torwart'}};
+const DG_TEAML={a:'A',b:'B',o:'C',n:'N',k:'T'};
 const DG_CONES=['#F28C28','#E8C840','#1E5BC6','#D9443F','#FFFFFF'];
 const DG_LINE={pass:{c:'#FFFFFF',dash:'9 7',w:2.6,n:'Pass'},run:{c:'#FFD25A',dash:'',w:3,n:'Laufweg'},drib:{c:'#FFFFFF',dash:'',w:2.2,n:'Dribbling'}};
+// Toolbar; '|' separates the groups (players, material, Reihe, lines, zone/text)
 const DG_TOOLS=[
-  ['sel','Auswählen','M5 3l14 8-6 2-2 6z'],
-  ['pa','Spieler Team A','a'],['pb','Spieler Team B','b'],['pn','Neutraler Spieler','n'],['pk','Torwart','k'],
+  ['sel','Auswählen','M5 3l14 8-6 2-2 6z'],['|'],
+  ['pa','Spieler Team A','a'],['pb','Spieler Team B','b'],['po','Spieler Team C','o'],['pn','Neutraler Spieler','n'],['pk','Torwart','k'],['|'],
   ['c','Hütchen','M12 4l7 15H5z'],
+  ['m','Markierung (flach)','M4 13a8 4 0 1 0 16 0a8 4 0 1 0-16 0'],
+  ['s','Stange','M12 3v15M8 20h8'],
+  ['h','Hürde','M4 9h16M7 9v9M17 9v9M5 18h4M15 18h4'],
+  ['ri','Ring','M12 12m-8 0a8 8 0 1 0 16 0a8 8 0 1 0-16 0M12 12m-4.5 0a4.5 4.5 0 1 0 9 0a4.5 4.5 0 1 0-9 0'],
+  ['d','Dummy','M12 6m-2.3 0a2.3 2.3 0 1 0 4.6 0a2.3 2.3 0 1 0-4.6 0M8.5 21l1.2-11h4.6l1.2 11z'],
   ['b','Ball','M12 12m-7 0a7 7 0 1 0 14 0a7 7 0 1 0-14 0'],
   ['g','Minitor','M4 18V8h16v10M4 8l3-3h10l3 3'],
   ['G','Großes Tor','M2 19V7h20v12M2 7l2-3h16l2 3M8 7v12M16 7v12'],
-  ['s','Stange','M12 3v15M8 20h8'],
-  ['ld','Koordinationsleiter','M3 8h18M3 16h18M6 8v8M10 8v8M14 8v8M18 8v8'],
+  ['ld','Koordinationsleiter','M3 8h18M3 16h18M6 8v8M10 8v8M14 8v8M18 8v8'],['|'],
+  ['row','Reihe: Hütchen, Stangen … in gleichem Abstand','M3 18l2-4 2 4zM10 18l2-4 2 4zM17 18l2-4 2 4zM3 9h2M8 9h2M13 9h2M18 9h3'],['|'],
   ['run','Laufweg','M4 18C8 10 14 8 20 6M15 4l5 2-2 5'],
   ['pass','Pass','M4 18l3-2.25M10 13.5l3-2.25M16 9l4-3M15 6h5v5'],
-  ['drib','Dribbling','M3 14c2-4 4 4 6 0s4 4 6 0 3 2 6-2M18 9l3 3-3 3'],
+  ['drib','Dribbling','M3 14c2-4 4 4 6 0s4 4 6 0 3 2 6-2M18 9l3 3-3 3'],['|'],
   ['z','Zone','M4 6h16v12H4z'],
   ['tx','Text','M5 6h14M12 6v13']
 ];
-const DG={tool:'sel',sel:-1,drag:null,undo:[],redo:[],focus:false,bid:null};
+// Equipment that a Reihe can be made of
+const DG_ROWK={c:'Hütchen',m:'Markierungen',s:'Stangen',h:'Hürden',ri:'Ringe',d:'Dummys'};
+// Colours of new equipment (the cone palette)
+const DG_DEFC={c:DG_CONES[0],m:DG_CONES[0],h:DG_CONES[0],ri:DG_CONES[2],d:DG_CONES[1]};
+const DG_COLORED={c:1,m:1,h:1,ri:1,d:1};
+// Turned in 90° steps by "Drehen"
+const DG_ROT={g:1,G:1,ld:1,h:1};
+const DG_CLIP_LS='fcf_dg_clip';
+// sel: the one selected item (-1); ms: several (then sel is -1)
+const DG={tool:'sel',sel:-1,ms:[],drag:null,undo:[],redo:[],focus:false,bid:null,clip:null,pasteN:0,nudgeT:null,lp:null,lpT:null,lpMenu:false,cmP:null,rowK:'c'};
 function _dgN(v,d){v=+v;return isFinite(v)?v:(d||0);}
 function _dgCl(v,a,b){return Math.max(a,Math.min(b,v));}
 function _dgItems(dia){return (dia&&typeof dia==='object')?_tplArr(dia.it):[];}
 function _dgHas(dia){return _dgItems(dia).length>0;}
+function _dgMac(){return /Mac|iPhone|iPad/.test(navigator.platform||'');}
 
 // ── Static drawing
 function _dgBg(bg){
@@ -32357,28 +32419,55 @@ function _dgArrow(g,c){
   const bx=g.x2-g.ux*12,by=g.y2-g.uy*12,px=-g.uy*6,py=g.ux*6;
   return `<path d="M${g.x2.toFixed(1)},${g.y2.toFixed(1)} L${(bx+px).toFixed(1)},${(by+py).toFixed(1)} L${(bx-px).toFixed(1)},${(by-py).toFixed(1)}Z" fill="${c}"/>`;
 }
+function _dgTint(c,t){return DG_CONES.indexOf(c)>=0?c:(DG_DEFC[t]||DG_CONES[0]);}
+// One piece of equipment at x,y — on its own or as part of a Reihe
+function _dgEl(t,x,y,c,r){
+  const f=_dgTint(c,t);
+  switch(t){
+    case 'c':return `<path d="M${x},${y-10} L${x+9},${y+7} L${x-9},${y+7}Z" fill="${f}" stroke="rgba(0,0,0,.3)" stroke-width="1"/>`;
+    case 'm':return `<ellipse cx="${x}" cy="${y}" rx="8.5" ry="4.5" fill="${f}" stroke="rgba(0,0,0,.3)" stroke-width="1"/><ellipse cx="${x}" cy="${y}" rx="2.6" ry="1.4" fill="rgba(0,0,0,.35)"/>`;
+    case 's':return `<ellipse cx="${x}" cy="${y+7}" rx="6" ry="2.5" fill="#FFD25A"/><line x1="${x}" y1="${y-14}" x2="${x}" y2="${y+6}" stroke="#FFD25A" stroke-width="3" stroke-linecap="round"/>`;
+    case 'h':return `<g transform="translate(${x} ${y}) rotate(${_dgN(r).toFixed(1)})"><line x1="-13" y1="-6" x2="-13" y2="6" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round"/><line x1="13" y1="-6" x2="13" y2="6" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round"/><rect x="-16" y="-2.6" width="32" height="5.2" rx="2" fill="${f}" stroke="rgba(0,0,0,.35)" stroke-width="1"/></g>`;
+    case 'ri':return `<circle cx="${x}" cy="${y}" r="9" fill="none" stroke="${f}" stroke-width="3.2"/>`;
+    case 'd':return `<circle cx="${x}" cy="${y-11}" r="4.6" fill="${f}" stroke="#0B2550" stroke-width="1.3"/><path d="M${x-5},${y-5} L${x+5},${y-5} L${x+7},${y+13} L${x-7},${y+13}Z" fill="${f}" stroke="#0B2550" stroke-width="1.3" stroke-linejoin="round"/>`;
+  }
+  return '';
+}
+// Reihe: n pieces from the first to the last point, evenly spaced
+function _dgRowN(it){return _dgCl(Math.round(_dgN(it.n,5)),2,20);}
+function _dgRowPts(it){
+  const n=_dgRowN(it),x1=_dgN(it.x1),y1=_dgN(it.y1),x2=_dgN(it.x2),y2=_dgN(it.y2);
+  return Array.from({length:n},(_,i)=>({x:x1+(x2-x1)*i/(n-1),y:y1+(y2-y1)*i/(n-1)}));
+}
+function _dgRowAng(it){return Math.atan2(_dgN(it.y2)-_dgN(it.y1),_dgN(it.x2)-_dgN(it.x1))*180/Math.PI;}
+// while drawing: about one piece every 45 units (2–12)
+function _dgRowAuto(it){return _dgCl(Math.round(Math.hypot(_dgN(it.x2)-_dgN(it.x1),_dgN(it.y2)-_dgN(it.y1))/45)+1,2,12);}
 function _dgItem(it,i,edit){
   const da=edit?` data-i="${i}" class="dg-it"`:'';
   const x=_dgN(it.x),y=_dgN(it.y);
+  // small things get a larger invisible target in the editor
+  const pad=edit?`<circle cx="${x}" cy="${y}" r="13" fill="rgba(0,0,0,0)"/>`:'';
   switch(it.t){
     case 'p':{const c=DG_TEAM[it.k]||DG_TEAM.a;const n=String(it.n==null?'':it.n).slice(0,3);
       return `<g${da}><circle cx="${x}" cy="${y}" r="16" fill="${c.f}" stroke="#FFFFFF" stroke-width="2.5"/>${n?`<text x="${x}" y="${y+5}" text-anchor="middle" font-family="Barlow,Arial,sans-serif" font-weight="700" font-size="${n.length>2?11:14}" fill="${c.t}">${_tplE(n)}</text>`:''}</g>`;}
-    case 'c':return `<g${da}><path d="M${x},${y-10} L${x+9},${y+7} L${x-9},${y+7}Z" fill="${DG_CONES.indexOf(it.c)>=0?it.c:DG_CONES[0]}" stroke="rgba(0,0,0,.3)" stroke-width="1"/></g>`;
-    case 'b':return `<g${da}><circle cx="${x}" cy="${y}" r="7" fill="#FFFFFF" stroke="#1B1B1B" stroke-width="1.5"/><path d="M${x-2.5},${y-1.5} l2.5,-2 l2.5,2 l-1,3 h-3z" fill="#1B1B1B"/></g>`;
+    case 'c':case 'm':case 's':case 'ri':case 'd':return `<g${da}>${pad}${_dgEl(it.t,x,y,it.c)}</g>`;
+    case 'h':return `<g${da}>${pad}${_dgEl('h',x,y,it.c,_dgN(it.r))}</g>`;
+    case 'b':return `<g${da}>${pad}<circle cx="${x}" cy="${y}" r="7" fill="#FFFFFF" stroke="#1B1B1B" stroke-width="1.5"/><path d="M${x-2.5},${y-1.5} l2.5,-2 l2.5,2 l-1,3 h-3z" fill="#1B1B1B"/></g>`;
     case 'g':case 'G':{const W=it.t==='G'?64:34,D=it.t==='G'?14:10;let net='';
       for(let k=-W/2+8;k<W/2;k+=8)net+=`<line x1="${k}" y1="${-D/2}" x2="${k}" y2="${D/2}"/>`;
       return `<g${da}><g transform="translate(${x} ${y}) rotate(${_dgN(it.r)})"><rect x="${-W/2}" y="${-D/2}" width="${W}" height="${D}" fill="rgba(255,255,255,.2)" stroke="#FFFFFF" stroke-width="2"/><g stroke="rgba(255,255,255,.5)" stroke-width="1">${net}</g><line x1="${-W/2}" y1="${D/2}" x2="${W/2}" y2="${D/2}" stroke="#FFFFFF" stroke-width="3.5"/></g></g>`;}
-    case 's':return `<g${da}><ellipse cx="${x}" cy="${y+7}" rx="6" ry="2.5" fill="#FFD25A"/><line x1="${x}" y1="${y-14}" x2="${x}" y2="${y+6}" stroke="#FFD25A" stroke-width="3" stroke-linecap="round"/></g>`;
     case 'ld':{let r='';for(let k=-60;k<=60;k+=20)r+=`<line x1="${k}" y1="-11" x2="${k}" y2="11"/>`;
       return `<g${da}><g transform="translate(${x} ${y}) rotate(${_dgN(it.r)})" stroke="#FFD25A" stroke-width="2.2" fill="none"><rect x="-60" y="-11" width="120" height="22" fill="rgba(0,0,0,.001)"/>${r}</g></g>`;}
     case 'z':return `<g${da}><rect x="${x}" y="${y}" width="${Math.max(1,_dgN(it.w))}" height="${Math.max(1,_dgN(it.h))}" fill="rgba(255,255,255,.07)" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="10 8"/></g>`;
     case 'tx':return `<g${da}><text x="${x}" y="${y}" text-anchor="middle" font-family="Barlow,Arial,sans-serif" font-weight="700" font-size="15" fill="#FFFFFF" stroke="rgba(0,0,0,.45)" stroke-width="3" paint-order="stroke">${_tplE(String(it.s||'').slice(0,60))}</text></g>`;
     case 'l':{const st=DG_LINE[it.k]||DG_LINE.pass;const g=_dgLineGeo(it);const d=_dgLinePath(g,it.k);
       return `<g${da}>${edit?`<path d="${g.cv?`M${g.x1},${g.y1} Q${g.cx},${g.cy} ${g.x2},${g.y2}`:`M${g.x1},${g.y1} L${g.x2},${g.y2}`}" stroke="rgba(0,0,0,0)" stroke-width="16" fill="none"/>`:''}<path d="${d}" fill="none" stroke="${st.c}" stroke-width="${st.w}" stroke-linecap="round" stroke-linejoin="round"${st.dash?` stroke-dasharray="${st.dash}"`:''}/>${_dgArrow(g,st.c)}</g>`;}
+    case 'r':{const k=DG_ROWK[it.k]?it.k:'c';const rr=k==='h'?_dgRowAng(it)+90:0;
+      return `<g${da}>${edit?`<line x1="${_dgN(it.x1)}" y1="${_dgN(it.y1)}" x2="${_dgN(it.x2)}" y2="${_dgN(it.y2)}" stroke="rgba(0,0,0,0)" stroke-width="24" stroke-linecap="round"/>`:''}${_dgRowPts(it).map(p=>_dgEl(k,+p.x.toFixed(1),+p.y.toFixed(1),it.c,rr)).join('')}</g>`;}
   }
   return '';
 }
-const DG_LAYER={z:0,ld:1,l:2,c:3,s:3,g:3,G:3,p:4,b:5,tx:6};
+const DG_LAYER={z:0,ri:1,m:1,ld:1,l:2,r:3,c:3,s:3,h:3,g:3,G:3,d:4,p:4,b:5,tx:6};
 function _dgItemsSvg(dia,edit){
   const it=_dgItems(dia);
   return it.map((x,i)=>({x,i})).sort((a,b)=>(DG_LAYER[a.x.t]||0)-(DG_LAYER[b.x.t]||0)||a.i-b.i)
@@ -32389,6 +32478,68 @@ function _dgSvg(dia,label){
 }
 function _dgThumb(dia,cls){return _dgHas(dia)?`<span class="${cls||'tpl-th'}" aria-hidden="true">${_dgSvg(dia)}</span>`:'';}
 
+// ── Geometry shared by moving, turning, the frame selection and pasting
+// The points that define an item
+function _dgKeys(it){return (it.t==='l'||it.t==='r')?[['x1','y1'],['x2','y2']].concat(it.cx!=null&&it.cy!=null?[['cx','cy']]:[]):[['x','y']];}
+function _dgBox(it){
+  if(it.t==='z'){const x=_dgN(it.x),y=_dgN(it.y);return {x0:x,y0:y,x1:x+_dgN(it.w),y1:y+_dgN(it.h)};}
+  const ks=_dgKeys(it),xs=ks.map(k=>_dgN(it[k[0]])),ys=ks.map(k=>_dgN(it[k[1]]));
+  return {x0:Math.min(...xs),y0:Math.min(...ys),x1:Math.max(...xs),y1:Math.max(...ys)};
+}
+function _dgUnion(items){
+  const B=items.map(_dgBox);
+  return {x0:Math.min(...B.map(b=>b.x0)),y0:Math.min(...B.map(b=>b.y0)),x1:Math.max(...B.map(b=>b.x1)),y1:Math.max(...B.map(b=>b.y1))};
+}
+function _dgCenter(it){
+  if(it.t==='l'){const g=_dgLineGeo(it);return {x:g.mx,y:g.my};}
+  const b=_dgBox(it);return {x:(b.x0+b.x1)/2,y:(b.y0+b.y1)/2};
+}
+function _dgShift(it,dx,dy){_dgKeys(it).forEach(([kx,ky])=>{it[kx]=Math.round(_dgN(it[kx])+dx);it[ky]=Math.round(_dgN(it[ky])+dy);});}
+// a quarter turn clockwise around cx,cy
+function _dgRot90(it,cx,cy){
+  const R=(x,y)=>[Math.round(cx-(y-cy)),Math.round(cy+(x-cx))];
+  if(it.t==='z'){
+    const x=_dgN(it.x),y=_dgN(it.y),a=R(x,y),b=R(x+_dgN(it.w),y+_dgN(it.h));
+    it.x=Math.min(a[0],b[0]);it.y=Math.min(a[1],b[1]);it.w=Math.abs(b[0]-a[0]);it.h=Math.abs(b[1]-a[1]);return;
+  }
+  _dgKeys(it).forEach(([kx,ky])=>{const p=R(_dgN(it[kx]),_dgN(it[ky]));it[kx]=p[0];it[ky]=p[1];});
+  if(DG_ROT[it.t])it.r=(_dgN(it.r)+90)%360;
+}
+// Back inside the field, as a whole; whatever is still outside is clamped
+function _dgFit(items){
+  if(!items.length)return;
+  const b=_dgUnion(items);
+  const dx=b.x0<0?-b.x0:(b.x1>DG_W?DG_W-b.x1:0),dy=b.y0<0?-b.y0:(b.y1>DG_H?DG_H-b.y1:0);
+  items.forEach(it=>{
+    if(dx||dy)_dgShift(it,dx,dy);
+    _dgKeys(it).forEach(([kx,ky])=>{it[kx]=_dgCl(_dgN(it[kx]),0,DG_W);it[ky]=_dgCl(_dgN(it[ky]),0,DG_H);});
+    if(it.t==='z'){it.w=Math.max(16,Math.min(_dgN(it.w),DG_W-it.x));it.h=Math.max(16,Math.min(_dgN(it.h),DG_H-it.y));}
+  });
+}
+// An offset that keeps a copy next to the original and inside the field
+function _dgOff(b,d){
+  const ox=b.x1+d<=DG_W?d:(b.x0-d>=0?-d:0),oy=b.y1+d<=DG_H?d:(b.y0-d>=0?-d:0);
+  return [ox,oy];
+}
+function _dgName(it){
+  switch(it.t){
+    case 'p':return (it.k==='k'?'Torwart':'Spieler '+(DG_TEAML[it.k]||'A'))+(it.n?' · '+it.n:'');
+    case 'l':return (DG_LINE[it.k]||DG_LINE.pass).n;
+    case 'r':return 'Reihe · '+_dgRowN(it)+' '+(DG_ROWK[it.k]||DG_ROWK.c);
+    case 'z':return 'Zone';case 'tx':return 'Text';
+  }
+  const t=DG_TOOLS.find(x=>x[0]===it.t);return t?t[1].replace(/ \(.*\)$/,''):'Element';
+}
+
+// ── Selection
+function _dgSelIdx(){return DG.ms.length?DG.ms.slice():(DG.sel>=0?[DG.sel]:[]);}
+function _dgSelect(idx){
+  idx=[...new Set(idx)].filter(i=>i>=0).sort((a,b)=>a-b);
+  if(idx.length===1){DG.sel=idx[0];DG.ms=[];}else{DG.sel=-1;DG.ms=idx;}
+}
+function _dgNone(){DG.sel=-1;DG.ms=[];}
+function _dgAddKey(e){return e.shiftKey||(_dgMac()?e.metaKey:e.ctrlKey);}
+
 // ── Editor
 function _dgCurDia(make){
   const b=_tplCur();if(!b)return null;
@@ -32396,14 +32547,16 @@ function _dgCurDia(make){
   if(!Array.isArray(b.dia.it))b.dia.it=_tplArr(b.dia.it);
   return b.dia;
 }
+function _dgToolIcon(k){
+  const t=DG_TOOLS.find(x=>x[0]===k);if(!t)return '';
+  const team=(k[0]==='p'&&k.length===2)?DG_TEAM[t[2]]:null;
+  return team?`<span class="dg-dot" style="background:${team.f};color:${team.t}">${DG_TEAML[t[2]]}</span>`
+    :`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${t[2]}"/></svg>`;
+}
 function _dgEditorHtml(b){
   const dia=b.dia||{};
-  const tools=DG_TOOLS.map(([k,lbl,ic])=>{
-    const team=DG_TEAM[ic];
-    const inner=team?`<span class="dg-dot" style="background:${team.f};color:${team.t}">${k==='pk'?'T':ic.toUpperCase()}</span>`
-      :`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${ic}"/></svg>`;
-    return `<button type="button" class="dg-tb${DG.tool===k?' on':''}" data-tool="${k}" title="${lbl}" aria-label="${lbl}" aria-pressed="${DG.tool===k}" onclick="dgTool('${k}')">${inner}</button>`;
-  }).join('');
+  const tools=DG_TOOLS.map(([k,lbl])=>k==='|'?'<span class="dg-gap" aria-hidden="true"></span>'
+    :`<button type="button" class="dg-tb${DG.tool===k?' on':''}" data-tool="${k}" title="${lbl}" aria-label="${lbl}" aria-pressed="${DG.tool===k}" onclick="dgTool('${k}')">${_dgToolIcon(k)}</button>`).join('');
   const bg=dia.bg||'grass';
   return `<div class="dg-wrap" id="dgWrap">
     <div class="dg-tools" role="toolbar" aria-label="Zeichenwerkzeuge">${tools}<span class="dg-tr">
@@ -32418,14 +32571,37 @@ function _dgEditorHtml(b){
 }
 function _dgMount(){
   const b=_tplCur();
-  if(!b||DG.bid!==b.id){DG.bid=b?b.id:null;DG.sel=-1;DG.undo=[];DG.redo=[];DG.drag=null;}
+  if(!b||DG.bid!==b.id){DG.bid=b?b.id:null;_dgNone();DG.undo=[];DG.redo=[];DG.drag=null;DG.pasteN=0;}
+  _dgCmClose();
   const svg=document.getElementById('dgSvg');if(!svg)return;
   svg.addEventListener('pointerdown',_dgDown);
   svg.addEventListener('pointermove',_dgMove);
   svg.addEventListener('pointerup',_dgUp);
   svg.addEventListener('pointercancel',_dgUp);
   svg.addEventListener('dblclick',_dgDbl);
+  svg.addEventListener('contextmenu',_dgCtx);
+  if(!window.__dgCmHooks){
+    window.__dgCmHooks=1;
+    document.addEventListener('scroll',()=>_dgCmClose(),true);
+    window.addEventListener('resize',()=>_dgCmClose());
+  }
   _dgDraw();_dgBar();
+}
+// dashed outline of one item; handles only for the single selection
+function _dgOutline(it,i,handles){
+  const H=(x,y,h,sq)=>sq?`<rect data-i="${i}" data-h="${h}" class="dg-h" x="${x-6}" y="${y-6}" width="12" height="12" rx="2"/>`
+    :`<circle data-i="${i}" data-h="${h}" class="dg-h" cx="${x}" cy="${y}" r="7"/>`;
+  if(it.t==='l'){const ge=_dgLineGeo(it);
+    if(!handles){const b=_dgBox(it);return `<rect class="dg-selr" x="${b.x0-8}" y="${b.y0-8}" width="${b.x1-b.x0+16}" height="${b.y1-b.y0+16}" rx="6"/>`;}
+    return `${H(ge.x1,ge.y1,'p1')}${H(ge.x2,ge.y2,'p2')}<circle data-i="${i}" data-h="mid" class="dg-h mid" cx="${ge.mx}" cy="${ge.my}" r="7"/>`;}
+  if(it.t==='r'){const x1=_dgN(it.x1),y1=_dgN(it.y1),x2=_dgN(it.x2),y2=_dgN(it.y2);
+    return `<line class="dg-selr" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>${handles?H(x1,y1,'p1')+H(x2,y2,'p2'):''}`;}
+  if(it.t==='z'){const x=_dgN(it.x),y=_dgN(it.y),w=_dgN(it.w),h=_dgN(it.h);
+    return `<rect class="dg-selr" x="${x-3}" y="${y-3}" width="${w+6}" height="${h+6}"/>${handles?H(x+w,y+h,'rs',true):''}`;}
+  if(it.t==='tx'){const w=Math.max(30,String(it.s||'').length*8.5);
+    return `<rect class="dg-selr" x="${_dgN(it.x)-w/2-6}" y="${_dgN(it.y)-17}" width="${w+12}" height="24" rx="4"/>`;}
+  const r={ld:66,G:36,g:22,p:22,h:21,d:19,ri:15,m:13}[it.t]||15;
+  return `<circle class="dg-selr" cx="${_dgN(it.x)}" cy="${_dgN(it.y)}" r="${r}"/>`;
 }
 function _dgDraw(){
   const g=document.getElementById('dgG');const svg=document.getElementById('dgSvg');if(!g||!svg)return;
@@ -32433,19 +32609,17 @@ function _dgDraw(){
   svg.classList.toggle('draw',DG.tool!=='sel');
   const items=_dgItems(dia);
   if(DG.sel>=items.length)DG.sel=-1;
+  DG.ms=DG.ms.filter(i=>i<items.length);
   let html=_dgItemsSvg(dia,true);
   const it=items[DG.sel];
-  if(it){
-    const H=(x,y,h,sq)=>sq?`<rect data-i="${DG.sel}" data-h="${h}" class="dg-h" x="${x-6}" y="${y-6}" width="12" height="12" rx="2"/>`
-      :`<circle data-i="${DG.sel}" data-h="${h}" class="dg-h" cx="${x}" cy="${y}" r="7"/>`;
-    if(it.t==='l'){const ge=_dgLineGeo(it);
-      html+=`<g class="dg-selg">${H(ge.x1,ge.y1,'p1')}${H(ge.x2,ge.y2,'p2')}<circle data-i="${DG.sel}" data-h="mid" class="dg-h mid" cx="${ge.mx}" cy="${ge.my}" r="7"/></g>`;}
-    else if(it.t==='z'){const x=_dgN(it.x),y=_dgN(it.y),w=_dgN(it.w),h=_dgN(it.h);
-      html+=`<g class="dg-selg"><rect class="dg-selr" x="${x-3}" y="${y-3}" width="${w+6}" height="${h+6}"/>${H(x+w,y+h,'rs',true)}</g>`;}
-    else if(it.t==='tx'){const w=Math.max(30,String(it.s||'').length*8.5);
-      html+=`<g class="dg-selg"><rect class="dg-selr" x="${_dgN(it.x)-w/2-6}" y="${_dgN(it.y)-17}" width="${w+12}" height="24" rx="4"/></g>`;}
-    else{const r=(it.t==='ld')?66:(it.t==='G')?36:(it.t==='g')?22:it.t==='p'?22:15;
-      html+=`<g class="dg-selg"><circle class="dg-selr" cx="${_dgN(it.x)}" cy="${_dgN(it.y)}" r="${r}"/></g>`;}
+  if(it)html+=`<g class="dg-selg">${_dgOutline(it,DG.sel,true)}</g>`;
+  if(DG.ms.length){
+    const b=_dgUnion(DG.ms.map(i=>items[i]));
+    html+=`<g class="dg-selg">${DG.ms.map(i=>_dgOutline(items[i],i,false)).join('')}<rect class="dg-grp" x="${b.x0-24}" y="${b.y0-24}" width="${b.x1-b.x0+48}" height="${b.y1-b.y0+48}" rx="10"/></g>`;
+  }
+  const d=DG.drag;
+  if(d&&d.m==='band'&&d.moved){
+    html+=`<rect class="dg-band" x="${Math.min(d.x0,d.x1)}" y="${Math.min(d.y0,d.y1)}" width="${Math.abs(d.x1-d.x0)}" height="${Math.abs(d.y1-d.y0)}"/>`;
   }
   g.innerHTML=html;
   const ub=document.getElementById('dgUndoBtn');if(ub)ub.disabled=!DG.undo.length;
@@ -32462,10 +32636,37 @@ function _dgNextNo(items,k){
   const used=new Set(items.filter(x=>x.t==='p'&&x.k===k).map(x=>String(x.n)));
   let n=1;while(used.has(String(n)))n++;return String(n);
 }
+// A new single item at p for a tool
+function _dgNewItem(tool,p,dia){
+  if(tool[0]==='p'&&tool.length===2){const k=tool[1];return {t:'p',k:k,x:p.x,y:p.y,n:_dgNextNo(dia.it,k)};}
+  if(DG_COLORED[tool]&&tool!=='h')return {t:tool,x:p.x,y:p.y,c:DG_DEFC[tool]};
+  if(tool==='h')return {t:'h',x:p.x,y:p.y,r:0,c:DG_DEFC.h};
+  if(tool==='b'||tool==='s')return {t:tool,x:p.x,y:p.y};
+  if(tool==='g'||tool==='G'||tool==='ld')return {t:tool,x:p.x,y:p.y,r:0};
+  if(tool==='tx')return {t:'tx',x:p.x,y:p.y,s:'Text'};
+  return null;
+}
+// Long press (touch, pen) opens the menu like a right click
+function _dgLP(e,ctx){
+  if(e.pointerType==='mouse')return;
+  _dgLPCancel();
+  DG.lp={x:e.clientX,y:e.clientY,ctx:ctx};
+  DG.lpT=setTimeout(()=>{
+    const lp=DG.lp;DG.lp=null;if(!lp)return;
+    const d=DG.drag;if(d&&d.moved)return;
+    DG.drag=null;
+    try{if(navigator.vibrate)navigator.vibrate(12);}catch(x){}
+    DG.lpMenu=true; // Android follows a long press with a contextmenu event
+    _dgCmOpen(lp.x,lp.y,lp.ctx);
+  },500);
+}
+function _dgLPCancel(){clearTimeout(DG.lpT);DG.lpT=null;DG.lp=null;}
 function _dgDown(e){
+  DG.lpMenu=false;
   if(e.pointerType==='mouse'&&e.button!==0)return;
   const b=_tplCur();if(!b)return;
   DG.focus=true;
+  _dgCmClose();
   e.preventDefault();
   try{e.currentTarget.setPointerCapture(e.pointerId);}catch(x){}
   const p=_dgPt(e);const tool=DG.tool;
@@ -32476,41 +32677,65 @@ function _dgDown(e){
       DG.drag={m:'h',h:hEl.dataset.h,i:DG.sel,p0:p,moved:false,snap:JSON.stringify(dia)};return;
     }
     if(iEl&&dia){
-      const i=+iEl.dataset.i;DG.sel=i;
+      const i=+iEl.dataset.i;
+      if(_dgAddKey(e)){
+        // Shift / Strg (Mac: Cmd) adds to the selection or takes out
+        const S=_dgSelIdx(),k=S.indexOf(i);if(k>=0)S.splice(k,1);else S.push(i);
+        _dgSelect(S);_dgDraw();_dgBar();return;
+      }
+      if(DG.ms.length&&DG.ms.indexOf(i)>=0){
+        // one of several selected: they all move
+        const orig={};DG.ms.forEach(j=>{orig[j]=_tplClean(dia.it[j]);});
+        DG.drag={m:'gmv',idx:DG.ms.slice(),p0:p,orig:orig,box:_dgUnion(DG.ms.map(j=>dia.it[j])),moved:false,snap:JSON.stringify(dia)};
+        _dgLP(e,{i:i});return;
+      }
+      _dgSelect([i]);
       DG.drag={m:'mv',i:i,p0:p,orig:_tplClean(dia.it[i]),moved:false,snap:JSON.stringify(dia)};
-      _dgDraw();_dgBar();return;
+      _dgDraw();_dgBar();_dgLP(e,{i:i});return;
     }
-    if(DG.sel>=0){DG.sel=-1;_dgDraw();_dgBar();}
+    // empty field: a frame selects what lies inside (a plain click clears)
+    DG.drag={m:'band',x0:p.x,y0:p.y,x1:p.x,y1:p.y,add:_dgAddKey(e),base:_dgSelIdx(),moved:false};
+    _dgLP(e,{p:p});
     return;
   }
   const dia=_dgCurDia(true);const snap=JSON.stringify(dia);
   let it=null,m='mv';
-  if(tool[0]==='p'&&tool.length===2){const k=tool[1];it={t:'p',k:k,x:p.x,y:p.y,n:_dgNextNo(dia.it,k)};}
-  else if(tool==='c')it={t:'c',x:p.x,y:p.y,c:DG_CONES[0]};
-  else if(tool==='b')it={t:'b',x:p.x,y:p.y};
-  else if(tool==='g'||tool==='G')it={t:tool,x:p.x,y:p.y,r:0};
-  else if(tool==='s')it={t:'s',x:p.x,y:p.y};
-  else if(tool==='ld')it={t:'ld',x:p.x,y:p.y,r:0};
-  else if(tool==='run'||tool==='pass'||tool==='drib'){it={t:'l',k:tool,x1:p.x,y1:p.y,x2:p.x,y2:p.y};m='new';}
+  if(tool==='run'||tool==='pass'||tool==='drib'){it={t:'l',k:tool,x1:p.x,y1:p.y,x2:p.x,y2:p.y};m='new';}
+  else if(tool==='row'){it={t:'r',k:DG_ROWK[DG.rowK]?DG.rowK:'c',n:2,x1:p.x,y1:p.y,x2:p.x,y2:p.y};if(DG_COLORED[it.k])it.c=DG_DEFC[it.k];m='new';}
   else if(tool==='z'){it={t:'z',x:p.x,y:p.y,w:0,h:0};m='newz';}
-  else if(tool==='tx')it={t:'tx',x:p.x,y:p.y,s:'Text'};
+  else it=_dgNewItem(tool,p,dia);
   if(!it)return;
   _dgPushSnap(snap);
-  dia.it.push(it);const i=dia.it.length-1;DG.sel=i;
+  dia.it.push(it);const i=dia.it.length-1;_dgSelect([i]);
   DG.drag={m:m,i:i,p0:p,ox:p.x,oy:p.y,orig:_tplClean(it),moved:false,created:true};
   _dgDraw();
   if(tool==='tx'){DG.drag=null;dgTool('sel');_dgCommit();_dgBar(true);}
 }
 function _dgMove(e){
+  if(DG.lp&&Math.hypot(e.clientX-DG.lp.x,e.clientY-DG.lp.y)>8)_dgLPCancel();
   const d=DG.drag;if(!d)return;
-  const dia=_dgCurDia(false);const it=dia&&dia.it[d.i];if(!it)return;
+  const dia=_dgCurDia(false);if(!dia)return;
   const p=_dgPt(e);
+  if(d.m==='band'){
+    d.x1=p.x;d.y1=p.y;
+    if(!d.moved&&Math.hypot(p.x-d.x0,p.y-d.y0)<4)return;
+    d.moved=true;_dgDraw();return;
+  }
+  if(d.m==='gmv'){
+    const dx=p.x-d.p0.x,dy=p.y-d.p0.y;
+    if(!d.moved&&Math.hypot(dx,dy)<3)return;
+    if(!d.moved){d.moved=true;_dgPushSnap(d.snap);}
+    const ddx=_dgCl(dx,-d.box.x0,DG_W-d.box.x1),ddy=_dgCl(dy,-d.box.y0,DG_H-d.box.y1);
+    d.idx.forEach(j=>{const it=dia.it[j];if(!it)return;Object.assign(it,_tplClean(d.orig[j]));_dgShift(it,ddx,ddy);});
+    _dgDraw();return;
+  }
+  const it=dia.it[d.i];if(!it)return;
   if(d.m==='mv'){
     const dx=p.x-d.p0.x,dy=p.y-d.p0.y;
     if(!d.moved&&Math.hypot(dx,dy)<3)return;
     if(!d.moved){d.moved=true;if(!d.created)_dgPushSnap(d.snap);}
     const o=d.orig;
-    if(it.t==='l'){
+    if(it.t==='l'||it.t==='r'){
       const ddx=_dgCl(dx,-Math.min(o.x1,o.x2),DG_W-Math.max(o.x1,o.x2)),ddy=_dgCl(dy,-Math.min(o.y1,o.y2),DG_H-Math.max(o.y1,o.y2));
       it.x1=o.x1+ddx;it.y1=o.y1+ddy;it.x2=o.x2+ddx;it.y2=o.y2+ddy;
       if(o.cx!=null){it.cx=o.cx+ddx;it.cy=o.cy+ddy;}
@@ -32525,16 +32750,25 @@ function _dgMove(e){
       const cx=Math.round(2*p.x-(it.x1+it.x2)/2),cy=Math.round(2*p.y-(it.y1+it.y2)/2);
       if(Math.hypot(p.x-(it.x1+it.x2)/2,p.y-(it.y1+it.y2)/2)<5){delete it.cx;delete it.cy;}else{it.cx=cx;it.cy=cy;}
     }else if(d.h==='rs'){it.w=Math.max(16,p.x-it.x);it.h=Math.max(16,p.y-it.y);}
-  }else if(d.m==='new'){it.x2=p.x;it.y2=p.y;d.moved=true;}
+  }else if(d.m==='new'){it.x2=p.x;it.y2=p.y;d.moved=true;if(it.t==='r')it.n=_dgRowAuto(it);}
   else if(d.m==='newz'){it.x=Math.min(d.ox,p.x);it.y=Math.min(d.oy,p.y);it.w=Math.abs(p.x-d.ox);it.h=Math.abs(p.y-d.oy);d.moved=true;}
   _dgDraw();
 }
 function _dgUp(){
+  _dgLPCancel();
   const d=DG.drag;DG.drag=null;if(!d)return;
-  const dia=_dgCurDia(false);const it=dia&&dia.it[d.i];
+  const dia=_dgCurDia(false);
+  if(d.m==='band'){
+    if(!d.moved){if(!d.add)_dgNone();_dgDraw();_dgBar();return;}
+    const x0=Math.min(d.x0,d.x1),x1=Math.max(d.x0,d.x1),y0=Math.min(d.y0,d.y1),y1=Math.max(d.y0,d.y1);
+    const hit=_dgItems(dia).map((it,i)=>({c:_dgCenter(it),i:i})).filter(o=>o.c.x>=x0&&o.c.x<=x1&&o.c.y>=y0&&o.c.y<=y1).map(o=>o.i);
+    _dgSelect(d.add?d.base.concat(hit):hit);_dgDraw();_dgBar();return;
+  }
+  if(d.m==='gmv'){if(d.moved)_dgCommit();_dgDraw();_dgBar();return;}
+  const it=dia&&dia.it[d.i];
   if(it&&((d.m==='new'&&Math.hypot(it.x2-it.x1,it.y2-it.y1)<12)||(d.m==='newz'&&(it.w<14||it.h<14)))){
     // a click, not a drag: nothing to keep
-    dia.it.splice(d.i,1);DG.undo.pop();DG.sel=-1;_dgDraw();_dgBar();return;
+    dia.it.splice(d.i,1);DG.undo.pop();_dgNone();_dgDraw();_dgBar();return;
   }
   if(d.created||d.moved)_dgCommit();
   _dgDraw();_dgBar();
@@ -32546,38 +32780,60 @@ function _dgDbl(e){
 }
 function dgTool(k){
   DG.tool=k;DG.focus=true;
-  if(k!=='sel')DG.sel=-1;
+  if(k!=='sel')_dgNone();
+  _dgCmClose();
   document.querySelectorAll('#dgWrap .dg-tb[data-tool]').forEach(b=>{const on=b.dataset.tool===k;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on);});
   _dgDraw();_dgBar();
 }
+function _dgTouch(){return !!(window.matchMedia&&matchMedia('(pointer:coarse)').matches);}
 function _dgToolHint(){
   const t=DG.tool;
   if(t==='run'||t==='pass'||t==='drib')return 'Im Feld vom Start zum Ziel ziehen. Später lässt sich der Pfeil über den mittleren Punkt biegen.';
+  if(t==='row')return 'Im Feld von der ersten zur letzten Position ziehen – je länger, desto mehr. Art und Anzahl danach unten ändern.';
   if(t==='z')return 'Im Feld ein Rechteck aufziehen.';
   if(t==='tx')return 'Ins Feld klicken und Text eingeben.';
   const tl=DG_TOOLS.find(x=>x[0]===t);
   return (tl?tl[1]:'Element')+': ins Feld klicken, so oft wie nötig. Esc oder „Auswählen“ beendet.';
 }
+function _dgSw(list,cur,prop,named){
+  return list.map(c=>{const col=named?DG_TEAM[c].f:c,lbl=named?DG_TEAM[c].n:'Farbe '+c;
+    return `<button type="button" class="dg-sw${cur===c?' on':''}" style="background:${col}" title="${lbl}" aria-label="${lbl}" onclick="dgSet('${prop}','${c}')"></button>`;}).join('');
+}
 function _dgBar(focusInput){
   const el=document.getElementById('dgBar');if(!el)return;
-  const it=_dgItems(_dgCurDia(false))[DG.sel];
+  const dia=_dgCurDia(false);
+  const B=(lbl,fn,cls,title)=>`<button type="button" class="tpl-ab${cls?' '+cls:''}" onclick="${fn}"${title?` title="${title}"`:''}>${lbl}</button>`;
+  if(DG.ms.length){
+    el.innerHTML=`<b class="dg-cnt">${DG.ms.length} Elemente</b><span class="dg-hint">Ziehen verschiebt alle, Pfeiltasten fein.</span><span class="dg-sp"></span>`
+      +B('↻ Drehen','dgRotate()','','Um 90° drehen (R)')+B('Kopie','dgDup()','','Duplizieren (Strg+D)')+B('Löschen','dgDel()','danger','Entfernen (Entf)');
+    return;
+  }
+  const it=_dgItems(dia)[DG.sel];
   if(!it){
     el.innerHTML=`<span class="dg-hint">${DG.tool==='sel'
-      ?'Werkzeug oben wählen und ins Feld klicken. Elemente lassen sich verschieben, Pfeile über den mittleren Punkt biegen.'
+      ?(_dgTouch()?'Werkzeug oben wählen und ins Feld tippen. Lange drücken öffnet das Menü, ein Rahmen wählt mehrere aus.'
+        :'Werkzeug oben wählen und ins Feld klicken. Rechtsklick öffnet das Menü, ein Rahmen (oder Shift + Klick) wählt mehrere aus.')
       :_dgToolHint()}</span>`;
     return;
   }
-  const B=(lbl,fn,cls,title)=>`<button type="button" class="tpl-ab${cls?' '+cls:''}" onclick="${fn}"${title?` title="${title}"`:''}>${lbl}</button>`;
   let h='';
   if(it.t==='p'){
-    h+='<span class="dg-lbl">Farbe</span>'+Object.keys(DG_TEAM).map(k=>`<button type="button" class="dg-sw${it.k===k?' on':''}" style="background:${DG_TEAM[k].f}" title="${DG_TEAM[k].n}" aria-label="${DG_TEAM[k].n}" onclick="dgSet('k','${k}')"></button>`).join('');
+    h+='<span class="dg-lbl">Farbe</span>'+_dgSw(Object.keys(DG_TEAM),it.k,'k',true);
     h+=`<label class="dg-lbl">Nr.<input id="dgLblIn" maxlength="3" value="${_tplE(it.n||'')}" onfocus="_dgPush()" oninput="dgSet('n',this.value,true)"></label>`;
   }else if(it.t==='l'){
     h+='<span class="tpl-seg">'+Object.keys(DG_LINE).map(k=>`<button type="button" class="${it.k===k?'on':''}" onclick="dgSet('k','${k}')">${DG_LINE[k].n}</button>`).join('')+'</span>';
     if(it.cx!=null)h+=B('Gerade','dgStraight()');
-  }else if(it.t==='c'){
-    h+='<span class="dg-lbl">Farbe</span>'+DG_CONES.map(c=>`<button type="button" class="dg-sw${(it.c||DG_CONES[0])===c?' on':''}" style="background:${c}" aria-label="Farbe ${c}" onclick="dgSet('c','${c}')"></button>`).join('');
-  }else if(it.t==='g'||it.t==='G'||it.t==='ld'){
+    h+=B('⇄ Umkehren','dgReverse()','','Richtung umkehren');
+  }else if(it.t==='r'){
+    const k=DG_ROWK[it.k]?it.k:'c';
+    h+=`<select class="dg-sel" aria-label="Art" onchange="dgRowKind(this.value)">${Object.keys(DG_ROWK).map(x=>`<option value="${x}"${x===k?' selected':''}>${DG_ROWK[x]}</option>`).join('')}</select>`;
+    h+=`<span class="dg-step" role="group" aria-label="Anzahl">${B('–','dgRowN(-1)','ico','Eins weniger')}<b>${_dgRowN(it)}</b>${B('+','dgRowN(1)','ico','Eins mehr')}</span>`;
+    if(DG_COLORED[k])h+=_dgSw(DG_CONES,_dgTint(it.c,k),'c');
+    h+=B('↻ Drehen','dgRotate()')+B('Einzeln','dgExplode()','','In einzelne Elemente auflösen');
+  }else if(DG_COLORED[it.t]){
+    h+='<span class="dg-lbl">Farbe</span>'+_dgSw(DG_CONES,_dgTint(it.c,it.t),'c');
+    if(DG_ROT[it.t])h+=B('↻ Drehen','dgRotate()');
+  }else if(DG_ROT[it.t]){
     h+=B('↻ Drehen','dgRotate()');
   }else if(it.t==='tx'){
     h+=`<input id="dgLblIn" class="dg-txt" maxlength="60" value="${_tplE(it.s||'')}" aria-label="Text" onfocus="_dgPush()" oninput="dgSet('s',this.value,true)" onkeydown="if(event.key==='Enter')this.blur()">`;
@@ -32594,18 +32850,201 @@ function dgSet(prop,val,noPush){
   if(!noPush)_dgBar();
 }
 function dgStraight(){const it=_dgItems(_dgCurDia(false))[DG.sel];if(!it)return;_dgPush();delete it.cx;delete it.cy;_dgDraw();_dgCommit();_dgBar();}
-function dgRotate(){const it=_dgItems(_dgCurDia(false))[DG.sel];if(!it)return;_dgPush();it.r=(_dgN(it.r)+90)%360;_dgDraw();_dgCommit();}
+// a quarter turn: one item around itself, several around their middle
+function dgRotate(){
+  const dia=_dgCurDia(false),S=_dgSelIdx().filter(i=>dia&&dia.it[i]);if(!S.length)return;
+  _dgPush();
+  const items=S.map(i=>dia.it[i]);
+  let c;if(items.length===1)c=_dgCenter(items[0]);else{const b=_dgUnion(items);c={x:(b.x0+b.x1)/2,y:(b.y0+b.y1)/2};}
+  items.forEach(it=>_dgRot90(it,c.x,c.y));_dgFit(items);
+  _dgDraw();_dgCommit();_dgBar();
+}
 function dgDel(){
-  const dia=_dgCurDia(false);if(!dia||!dia.it[DG.sel])return;
-  _dgPush();dia.it.splice(DG.sel,1);DG.sel=-1;_dgDraw();_dgBar();_dgCommit();
+  const dia=_dgCurDia(false),S=_dgSelIdx().filter(i=>dia&&dia.it[i]);if(!S.length)return;
+  _dgPush();S.sort((a,b)=>b-a).forEach(i=>dia.it.splice(i,1));_dgNone();_dgDraw();_dgBar();_dgCommit();
+  if(S.length>1)_tplToast(S.length+' Elemente gelöscht','Rückgängig',dgUndo);
+}
+// Add copies of items (players get the next free number); they become the selection
+function _dgAddCopies(dia,items){
+  const start=dia.it.length;
+  items.forEach(it=>{
+    if(it.t==='p'&&it.k!=='k'&&dia.it.some(x=>x.t==='p'&&x.k===it.k&&String(x.n)===String(it.n)))it.n=_dgNextNo(dia.it,it.k);
+    dia.it.push(it);
+  });
+  _dgSelect(items.map((_,j)=>start+j));
 }
 function dgDup(){
-  const dia=_dgCurDia(false);const it=dia&&dia.it[DG.sel];if(!it)return;
-  _dgPush();const c=_tplClean(it);
-  ['x','x1','x2','cx'].forEach(k=>{if(c[k]!=null)c[k]=_dgCl(c[k]+18,0,DG_W);});
-  ['y','y1','y2','cy'].forEach(k=>{if(c[k]!=null)c[k]=_dgCl(c[k]+18,0,DG_H);});
-  if(c.t==='p')c.n=_dgNextNo(dia.it,c.k);
-  dia.it.push(c);DG.sel=dia.it.length-1;_dgDraw();_dgBar();_dgCommit();
+  const dia=_dgCurDia(false),S=_dgSelIdx().filter(i=>dia&&dia.it[i]);if(!S.length)return;
+  _dgPush();
+  const items=S.map(i=>_tplClean(dia.it[i]));
+  const [ox,oy]=_dgOff(_dgUnion(items),18);
+  items.forEach(it=>_dgShift(it,ox,oy));_dgFit(items);
+  _dgAddCopies(dia,items);
+  _dgDraw();_dgBar();_dgCommit();
+}
+// Kopieren / Einfügen: also into another drill or plan (kept on this device)
+function _dgClip(){
+  if(DG.clip)return DG.clip;
+  try{const v=JSON.parse(localStorage.getItem(DG_CLIP_LS)||'null');if(v&&Array.isArray(v.it)&&v.it.length)return (DG.clip=v);}catch(e){}
+  return null;
+}
+function dgCopy(quiet){
+  const dia=_dgCurDia(false),S=_dgSelIdx().filter(i=>dia&&dia.it[i]);if(!S.length)return false;
+  const v={it:S.map(i=>_tplClean(dia.it[i])),bid:DG.bid,t:Date.now()};
+  DG.clip=v;DG.pasteN=0;
+  try{localStorage.setItem(DG_CLIP_LS,JSON.stringify(v));}catch(e){}
+  if(!quiet)_tplToast(S.length===1?'Kopiert':S.length+' Elemente kopiert');
+  return true;
+}
+function dgCut(){if(dgCopy(true)){dgDel();_tplToast('Ausgeschnitten');}}
+// at: a point (from the menu) — the copies are centred there
+function dgPaste(at){
+  const c=_dgClip();if(!c)return;
+  const dia=_dgCurDia(true);_dgPush();
+  const items=c.it.map(x=>_tplClean(x));
+  let dx=0,dy=0;
+  if(at){const b=_dgUnion(items);dx=at.x-(b.x0+b.x1)/2;dy=at.y-(b.y0+b.y1)/2;}
+  else if(c.bid===DG.bid){DG.pasteN=(DG.pasteN||0)+1;dx=dy=18*DG.pasteN;}
+  items.forEach(it=>_dgShift(it,dx,dy));_dgFit(items);
+  if(DG.tool!=='sel')dgTool('sel');
+  _dgAddCopies(dia,items);
+  _dgDraw();_dgBar();_dgCommit();
+  _tplToast(items.length===1?'Eingefügt':items.length+' Elemente eingefügt');
+}
+function dgSelAll(){
+  const n=_dgItems(_dgCurDia(false)).length;if(!n)return;
+  if(DG.tool!=='sel')dgTool('sel');
+  _dgSelect(Array.from({length:n},(_,i)=>i));_dgDraw();_dgBar();
+}
+// arrow keys: 1 unit, with Shift 10; one undo step per burst
+function dgNudge(dx,dy){
+  const dia=_dgCurDia(false),S=_dgSelIdx().filter(i=>dia&&dia.it[i]);if(!S.length)return;
+  if(!DG.nudgeT)_dgPush();
+  clearTimeout(DG.nudgeT);DG.nudgeT=setTimeout(()=>{DG.nudgeT=null;},700);
+  const items=S.map(i=>dia.it[i]),b=_dgUnion(items);
+  const ddx=_dgCl(dx,-b.x0,DG_W-b.x1),ddy=_dgCl(dy,-b.y0,DG_H-b.y1);
+  items.forEach(it=>_dgShift(it,ddx,ddy));
+  _dgDraw();_dgCommit();
+}
+function dgReverse(){
+  const dia=_dgCurDia(false),it=dia&&dia.it[DG.sel];if(!it||(it.t!=='l'&&it.t!=='r'))return;
+  _dgPush();[it.x1,it.x2]=[it.x2,it.x1];[it.y1,it.y2]=[it.y2,it.y1];
+  _dgDraw();_dgCommit();
+}
+function dgRowN(d){
+  const dia=_dgCurDia(false),it=dia&&dia.it[DG.sel];if(!it||it.t!=='r')return;
+  const n=_dgCl(_dgRowN(it)+d,2,20);if(n===_dgRowN(it))return;
+  _dgPush();it.n=n;_dgDraw();_dgCommit();_dgBar();
+}
+function dgRowKind(k){
+  const dia=_dgCurDia(false),it=dia&&dia.it[DG.sel];if(!it||it.t!=='r'||!DG_ROWK[k])return;
+  _dgPush();it.k=k;DG.rowK=k;
+  if(DG_COLORED[k]){if(DG_CONES.indexOf(it.c)<0)it.c=DG_DEFC[k];}else delete it.c;
+  _dgDraw();_dgCommit();_dgBar();
+}
+// the Reihe as single pieces, e.g. to move one cone of a slalom
+function dgExplode(){
+  const dia=_dgCurDia(false),it=dia&&dia.it[DG.sel];if(!it||it.t!=='r')return;
+  _dgPush();
+  const k=DG_ROWK[it.k]?it.k:'c',rr=k==='h'?((Math.round(_dgRowAng(it)+90)%360)+360)%360:0;
+  const pts=_dgRowPts(it).map(p=>{const o={t:k,x:Math.round(p.x),y:Math.round(p.y)};
+    if(DG_COLORED[k])o.c=_dgTint(it.c,k);if(k==='h')o.r=rr;return o;});
+  dia.it.splice(DG.sel,1);
+  const start=dia.it.length;pts.forEach(o=>dia.it.push(o));
+  _dgSelect(pts.map((_,j)=>start+j));
+  _dgDraw();_dgBar();_dgCommit();
+}
+// within its layer (players stay above cones): to the front or the back
+function dgOrder(dir){
+  const dia=_dgCurDia(false),i=DG.sel;if(!dia||!dia.it[i])return;
+  _dgPush();const [it]=dia.it.splice(i,1);
+  if(dir>0)dia.it.push(it);else dia.it.unshift(it);
+  _dgSelect([dir>0?dia.it.length-1:0]);_dgDraw();_dgCommit();
+}
+function dgAddAt(k){
+  const p=DG.cmP;if(!p)return;
+  const dia=_dgCurDia(true);const it=_dgNewItem(k,p,dia);if(!it)return;
+  _dgPush();dia.it.push(it);
+  if(DG.tool!=='sel')dgTool('sel');
+  _dgSelect([dia.it.length-1]);_dgDraw();_dgBar();_dgCommit();
+}
+
+// ── Context menu: right click, or a long press on a phone
+function _dgCmEl(){
+  let m=document.getElementById('dgCm');
+  if(!m){
+    m=document.createElement('div');m.id='dgCm';m.className='dg-cm';m.setAttribute('role','menu');m.setAttribute('aria-label','Skizze');m.hidden=true;
+    (document.getElementById('tplOverlay')||document.body).appendChild(m);
+    m.addEventListener('keydown',_dgCmKey);
+  }
+  return m;
+}
+function _dgCmIsOpen(){const m=document.getElementById('dgCm');return !!(m&&!m.hidden);}
+function _dgCmClose(){
+  const m=document.getElementById('dgCm');if(!m||m.hidden)return;
+  m.hidden=true;document.removeEventListener('pointerdown',_dgCmAway,true);
+}
+function _dgCmAway(e){const m=document.getElementById('dgCm');if(m&&m.contains(e.target))return;_dgCmClose();}
+function _dgCmKey(e){
+  const bs=[...e.currentTarget.querySelectorAll('button:not(:disabled)')];const i=bs.indexOf(document.activeElement);
+  if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+    e.preventDefault();e.stopPropagation();
+    const j=i<0?0:(i+(e.key==='ArrowDown'?1:-1)+bs.length)%bs.length;if(bs[j])bs[j].focus();
+  }else if(e.key==='Escape'){e.preventDefault();e.stopPropagation();_dgCmClose();}
+}
+// every menu entry runs through here: close first, then act
+function dgCm(fn){_dgCmClose();DG.focus=true;fn();}
+function _dgCtx(e){
+  e.preventDefault();
+  if(DG.lpMenu){DG.lpMenu=false;return;} // a long press opened it already
+  _dgLPCancel();DG.drag=null;DG.focus=true;
+  if(DG.tool!=='sel')dgTool('sel');
+  const iEl=e.target.closest&&e.target.closest('[data-i]');
+  _dgCmOpen(e.clientX,e.clientY,iEl?{i:+iEl.dataset.i}:{p:_dgPt(e)});
+}
+function _dgCmOpen(cx,cy,ctx){
+  const dia=_dgCurDia(false),items=_dgItems(dia);
+  const mod=_dgMac()?'⌘':'Strg+';
+  const I=(lbl,fn,kb,cls)=>`<button type="button" role="menuitem" class="dg-cmi${cls?' '+cls:''}" onclick="dgCm(()=>${fn})"><span>${lbl}</span>${kb&&!_dgTouch()?`<kbd>${kb}</kbd>`:''}</button>`;
+  let h='';
+  if(ctx.i!=null&&items[ctx.i]){
+    if(_dgSelIdx().indexOf(ctx.i)<0)_dgSelect([ctx.i]);
+    _dgDraw();_dgBar();
+    const S=_dgSelIdx(),it=S.length===1?items[S[0]]:null;
+    h+=`<div class="dg-cmh">${it?_tplE(_dgName(it)):S.length+' Elemente'}</div>`;
+    if(it){
+      const k=it.t==='r'?(DG_ROWK[it.k]?it.k:'c'):it.t;
+      if(it.t==='p')h+=`<div class="dg-cmsw">${Object.keys(DG_TEAM).map(t=>`<button type="button" class="dg-sw${it.k===t?' on':''}" style="background:${DG_TEAM[t].f}" title="${DG_TEAM[t].n}" aria-label="${DG_TEAM[t].n}" onclick="dgCm(()=>dgSet('k','${t}'))"></button>`).join('')}</div>`;
+      else if(DG_COLORED[k])h+=`<div class="dg-cmsw">${DG_CONES.map(c=>`<button type="button" class="dg-sw${_dgTint(it.c,k)===c?' on':''}" style="background:${c}" aria-label="Farbe ${c}" onclick="dgCm(()=>dgSet('c','${c}'))"></button>`).join('')}</div>`;
+      if(it.t==='p')h+=I('Nummer ändern','_dgBar(true)');
+      if(it.t==='tx')h+=I('Text ändern','_dgBar(true)');
+      if(it.t==='l'){
+        h+=Object.keys(DG_LINE).map(x=>I(DG_LINE[x].n,`dgSet('k','${x}')`,'',it.k===x?'on':'')).join('');
+        if(it.cx!=null)h+=I('Gerade machen','dgStraight()');
+        h+=I('Richtung umkehren','dgReverse()');
+      }
+      if(it.t==='r')h+=I('Eins mehr','dgRowN(1)')+I('Eins weniger','dgRowN(-1)')+I('In Einzelteile','dgExplode()');
+      if(DG_ROT[it.t]||it.t==='r')h+=I('Drehen (90°)','dgRotate()','R');
+    }else h+=I('Drehen (90°)','dgRotate()','R');
+    h+='<hr>'+I('Kopie','dgDup()',mod+'D')+I('Kopieren','dgCopy()',mod+'C')+I('Ausschneiden','dgCut()',mod+'X');
+    if(it)h+=I('Nach vorne','dgOrder(1)')+I('Nach hinten','dgOrder(-1)');
+    h+='<hr>'+I('Löschen','dgDel()','Entf','danger');
+  }else{
+    DG.cmP=ctx.p||{x:DG_W/2,y:DG_H/2};
+    if(DG.ms.length||DG.sel>=0){_dgNone();_dgDraw();_dgBar();}
+    h+=`<div class="dg-cmh">Hier hinzufügen</div>`;
+    if(_dgClip())h+=I('Einfügen','dgPaste(DG.cmP)',mod+'V');
+    h+=`<div class="dg-cmq">${[['pa','Spieler A'],['pb','Spieler B'],['c','Hütchen'],['b','Ball'],['g','Minitor'],['s','Stange']]
+      .map(([k,l])=>`<button type="button" role="menuitem" class="dg-cmq-b" onclick="dgCm(()=>dgAddAt('${k}'))">${_dgToolIcon(k)}<span>${l}</span></button>`).join('')}</div>`;
+    if(items.length)h+='<hr>'+I('Alles auswählen','dgSelAll()',mod+'A');
+  }
+  const m=_dgCmEl();m.innerHTML=h;m.hidden=false;
+  m.style.left='0px';m.style.top='0px';
+  const r=m.getBoundingClientRect(),W=window.innerWidth,H=window.innerHeight;
+  m.style.left=Math.max(8,Math.min(cx,W-r.width-8))+'px';
+  m.style.top=Math.max(8,Math.min(cy,H-r.height-8))+'px';
+  setTimeout(()=>{if(_dgCmIsOpen())document.addEventListener('pointerdown',_dgCmAway,true);},0);
+  if(!_dgTouch()){const f=m.querySelector('.dg-cmi')||m.querySelector('button');if(f)try{f.focus({preventScroll:true});}catch(x){}}
 }
 function dgSetBg(v){
   const dia=_dgCurDia(true);_dgPush();dia.bg=v;
@@ -32614,7 +33053,7 @@ function dgSetBg(v){
 }
 function dgClear(){
   const dia=_dgCurDia(false);if(!_dgHas(dia))return;
-  _dgPush();dia.it=[];DG.sel=-1;_dgDraw();_dgBar();_dgCommit();
+  _dgPush();dia.it=[];_dgNone();_dgDraw();_dgBar();_dgCommit();
   _tplToast('Skizze geleert','Rückgängig',dgUndo);
 }
 function _dgRestore(json){
@@ -32622,7 +33061,7 @@ function _dgRestore(json){
   b.dia=JSON.parse(json);
   const g=document.getElementById('dgBgG');if(g)g.innerHTML=_dgBg(b.dia&&b.dia.bg);
   const s=document.querySelector('#dgWrap .dg-bgsel');if(s)s.value=(b.dia&&b.dia.bg)||'grass';
-  if(DG.sel>=_dgItems(b.dia).length)DG.sel=-1;
+  DG.ms=[];if(DG.sel>=_dgItems(b.dia).length)DG.sel=-1;
   _dgDraw();_dgBar();_dgCommit();
 }
 function dgUndo(){
@@ -33582,6 +34021,7 @@ function tplMoreDo(fn){const m=document.getElementById('tplMoreMenu');if(m)m.hid
   ['tplSetF','tplSetMin','tplStepMin','tplAddBlock','tplAddLib','tplDel','tplDup','tplMove','tplDragStart','tplLibDragStart','tplDrop',
    'tplLibEdit','tplLibSave','tplLibDel','tplToLib','tplSaveTplDlg','tplSaveTpl','tplLoadTplDlg','tplApplyTpl','tplTplDel','tplCopyDlg','tplApplyCopy',
    'tplUndo','dgTool','dgSet','dgStraight','dgRotate','dgDel','dgDup','dgSetBg','dgClear','dgUndo','dgRedo',
+   'dgCut','dgPaste','dgNudge','dgReverse','dgRowN','dgRowKind','dgExplode','dgOrder','dgAddAt',
    'tplGrpToggle','tplGrpMove','tplGrpN','tplGrpOpt','tplGrpShuffle','tplGrpFor','tplBlockGrp','tplGrpDrag','tplGrpDrop','tplPitchSave',
    'tplGrpNew','tplGrpDel','tplGrpAssign','tplBlockGrpSet',
    'tplStdDlg','tplStdSave','tplStdClear','tplStdAdd','tplStdMove','tplStdDel','tplStdFromPlan','tplPickLib','tplPickDo','tplPickNew','tplApplyStd'
