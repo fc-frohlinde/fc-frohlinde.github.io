@@ -2771,6 +2771,12 @@ body.design-heute .lp-nik-t{color:var(--hx-muted);}
 .pm-squad{font-size:.76rem;font-weight:700;color:#5B6B88;margin:0 0 8px;}
 .pm-squad.in{color:#1E7A4C;}
 .hub-sq.in{border-color:#2E8B5E;}
+/* the last result (1.2.44): the score where the icon sits, coloured by outcome */
+.hub-score{flex-shrink:0;min-width:56px;height:44px;padding:0 9px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:1.65rem;letter-spacing:.5px;line-height:1;color:#fff;font-variant-numeric:tabular-nums;}
+.hub-res-w .hub-score{background:#2E8B5E;}.hub-res-d .hub-score{background:#A8740F;}.hub-res-l .hub-score{background:#B8322A;}
+.hub-res-w{border-color:#2E8B5E;}
+.hub-res .hub-txt span.hub-res-me{color:var(--htx);font-weight:600;font-size:.78rem;margin-top:2px;}
 /* ── Bewegung ────────────────────────────────────────────────
    Movement says what happened, nothing else. Sections switch without any —
    they are tabs, not layers. Windows open with one short step: side panels
@@ -6772,13 +6778,16 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.43'; // v1.2.43: Tippen neben ein Fenster schließt es
-const APP_VERSION_LABEL='1.2.43';
+const APP_VERSION='1.2.44'; // v1.2.44: Ergebnis im Spieler-Überblick
+const APP_VERSION_LABEL='1.2.44';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792786210807; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792787579264; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.44',date:'23.10.2026',title:'Ergebnis für die Spieler',items:[
+    {icon:'⚽',title:'Das letzte Spiel im Überblick der Spieler',desc:'Sobald im Spielbericht das Ergebnis steht, sehen die Spieler es eine Woche lang oben in ihrem Überblick: „2:1 – Sieg gegen …“, dazu ihre eigenen Tore und Vorlagen. Minuten und Karten sehen sie nicht, die Tore und Vorlagen der anderen auch nicht. Steht der Spieler des Spiels fest, kommt er in dieselbe Karte.'},
+  ]},
   {version:'1.2.43',date:'23.10.2026',title:'Fenster schließen beim Tippen daneben',items:[
     {icon:'👆',title:'Daneben tippen schließt',desc:'Ein Fenster (am Computer in der Mitte, am Handy von unten) schließt wieder, wenn du daneben tippst – wie man es von anderen Apps kennt. Seiten, Seitenleisten und „Foto zuschneiden“ bleiben, wie sie sind.'},
     {icon:'✋',title:'Nichts geht verloren',desc:'Hast du im Fenster schon etwas eingegeben oder ausgewählt, fragt die App erst „Änderungen verwerfen?“. Das gilt jetzt auch für „Zurück“ am Handy und Esc – bisher war Eingetipptes dabei ohne Nachfrage weg.'},
@@ -15421,6 +15430,8 @@ function _pmSanitizeG(){
           // Spieler des Spiels: the winner(s) once the vote has closed — never the counts
           mvpWin:(()=>{try{const r=mvpResult(s);return (r&&r.winners.length)?r.winners.slice():undefined;}catch(e){return undefined;}})(),
           squad:(()=>{const q=_sqOf(s);return (q&&_meName)?{in:q.p.includes(_meName),meet:q.meet||'',where:q.where||'',t:q.t}:undefined;})(),
+          // The score only (1.2.44), as in the slices
+          res:(()=>{const r=sbResult(s);return r?{f:r.f,a:r.a}:undefined;})(),
           // Player-visible session info — explicitly whitelisted
           location:s.location||''
           // note deliberately omitted — trainers' own record
@@ -15622,6 +15633,9 @@ function _pvSess(s){
   if(typeof s.duration==='number')o.duration=s.duration;
   if(sessPhysioOn(s))o.physio=true;
   try{const r=mvpResult(s);if(r&&r.winners.length)o.mvpWin=r.winners.slice();}catch(e){}
+  // The score of the match report (1.2.44) — nothing else of it: no starting
+  // eleven, substitutions, minutes or cards
+  const rs=sbResult(s);if(rs)o.res={f:rs.f,a:rs.a};
   return o;
 }
 // Everything that needs the whole roster, computed while it is there. Runs
@@ -16075,7 +16089,8 @@ function rpePlayedMin(s,p,si){
   return rpeSessionMinutes(s,null,si);
 }
 function sbResult(s){
-  const r=_sbRep(s);
+  // players get only the score (s.res), never the report itself
+  const r=_sbRep(s)||(s&&s.res&&typeof s.res==='object'?s.res:null);
   if(!r||typeof r.f!=='number'||typeof r.a!=='number')return null;
   const k=r.f>r.a?'w':r.f<r.a?'l':'d';
   // ours first: "2:1 Sieg" reads the same at home and away (the report
@@ -17020,6 +17035,33 @@ function _squadHubHtml(D,p){
   const t=b.q.in?'Im Kader '+f:'Kader '+f+' steht';
   const sub=b.q.in?'Treffpunkt '+b.q.meet+(b.q.where?' · '+b.q.where:''):'Diesmal bist du nicht dabei';
   return `<div class="hub-card hub-mvp hub-news hub-sq${b.q.in?' in':''}"><span class="hub-ic" aria-hidden="true">${b.q.in?'⚽':'📋'}</span><span class="hub-txt"><b>${e(t)}</b><span>${e(sub)}</span></span></div>`;
+}
+// ── The last result in the player's overview (1.2.44) ──
+// The newest match with a score, from its day until MVP_SHOW_DAYS after it
+function _resHubPick(D){
+  const today=todaySK();let best=null;
+  (D&&D.sessions||[]).forEach((s,si)=>{
+    if(!s||s.type!=='match'||!s.date)return;
+    const r=sbResult(s);if(!r)return;
+    const k=dispToSortKey(s.date);
+    if(k>today||_skAdd(k,MVP_SHOW_DAYS)<today)return;
+    if(!best||k>best.k)best={s,si,k,r};
+  });
+  return best;
+}
+function _resHubHtml(x,p,mvpWho){
+  const e=escapeHtml,{s,si,r}=x;
+  const n=a=>(Array.isArray(a)?+a[si]:0)||0;
+  const g=n(p.goals),a=n(p.assists);
+  const mine=[g?g+(g===1?' Tor':' Tore'):'',a?a+(a===1?' Vorlage':' Vorlagen'):''].filter(Boolean).join(' und ');
+  const where=s.homeAway==='home'?' (Heim)':s.homeAway==='away'?' (auswärts)':'';
+  return `<div class="hub-card hub-mvp hub-res hub-res-${r.k}">`
+    +`<span class="hub-score">${r.f}:${r.a}</span>`
+    +`<span class="hub-txt"><b>${r.word}${s.label?' gegen '+e(s.label):''}</b>`
+    +`<span>${e(s.date)}${e(where)}</span>`
+    +(mine?`<span class="hub-res-me">⚽ Du: ${mine}</span>`:'')
+    +(mvpWho?`<span class="hub-res-me">🏆 Spieler des Spiels: ${mvpWho}</span>`:'')
+    +`</span></div>`;
 }
 // One line on the match in "Meine Woche"
 function _squadCardLine(s,si,p){
@@ -20188,6 +20230,9 @@ function renderHub(){
       (sv.label?'gegen '+escapeHtml(sv.label)+' \u00b7 ':'')+'bis '+escapeHtml(mvpEndsLabel(sv)),
       cnt.vote,buildHubLink(tok,'vote',cnt.voteLast));
   }
+  // The latest match result, for a week (1.2.44): the score, and what he
+  // scored or set up himself. Its Spieler des Spiels joins the same card.
+  const res=_resHubPick(D);
   // The latest result, for a week: the winner only
   {
     let best=null;
@@ -20198,10 +20243,14 @@ function renderHub(){
       const wn=Array.isArray(sx.mvpWin)?sx.mvpWin:null;if(!wn||!wn.length)return;
       if(!best||w.end>best.end)best={sx,winners:wn,end:w.end};
     });
+    let who=null;
     if(best){
       const me=best.winners.includes(p.name);
       const others=best.winners.filter(n=>n!==p.name).map(n=>escapeHtml(_mvpName(n)));
-      const who=me?(others.length?'Du und '+others.join(' & ')+' \ud83c\udf89':'Du! \ud83c\udf89'):others.join(' & ');
+      who=me?(others.length?'Du und '+others.join(' & ')+' \ud83c\udf89':'Du! \ud83c\udf89'):others.join(' & ');
+    }
+    if(res)cards+=_resHubHtml(res,p,(best&&best.sx===res.s)?who:null);
+    if(best&&!(res&&best.sx===res.s)){
       cards+=`<div class="hub-card hub-mvp"><span class="hub-ic">\ud83c\udfc6</span>
         <span class="hub-txt"><b>Spieler des Spiels: ${who}</b><span>${best.sx.label?'gegen '+escapeHtml(best.sx.label)+' \u00b7 ':''}${escapeHtml(best.sx.date)}</span></span></div>`;
     }
