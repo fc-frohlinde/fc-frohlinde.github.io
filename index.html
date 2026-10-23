@@ -6766,13 +6766,16 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.38'; // v1.2.38: Rot – höchstens ein Spiel je Woche
-const APP_VERSION_LABEL='1.2.38';
+const APP_VERSION='1.2.39'; // v1.2.39: Wechsel nur aus dem Spieltagskader
+const APP_VERSION_LABEL='1.2.39';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792780511636; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792780937405; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.39',date:'23.10.2026',title:'Wechsel nur mit Spielern des Spiels',items:[
+    {icon:'🔁',title:'„Rein“ zeigt die Bank',desc:'Beim Erfassen eines Wechsels standen alle Spieler der Mannschaft zur Wahl, auch wer gar nicht dabei war. Jetzt nur, wer zum Spiel gehört: als anwesend erfasst, im veröffentlichten Kader (ohne Kader: wer zugesagt hat) oder schon im Spielbericht – und nicht auf dem Platz. Abwesende, Entschuldigte und „Nicht im Kader“ fehlen. Wer trotzdem fehlt, steht nach „Weitere Spieler“ unter Startelf in einer eigenen Gruppe.'},
+  ]},
   {version:'1.2.38',date:'23.10.2026',title:'Sperre nach Rot genauer',items:[
     {icon:'🟥',title:'Zwei Wochen, höchstens zwei Spiele',desc:'Nach der Jugendspielordnung des WDFV ist ein Spieler nach Rot automatisch zwei Wochen gesperrt, aber höchstens für zwei Pflichtspiele der Mannschaft. Bei einem Spiel unter der Woche zählt die Sperre jetzt so. Die endgültige Sperre legen Staffelleiter oder Sportgericht fest – ihr Datum lässt sich im Spielbericht eintragen.'},
   ]},
@@ -16308,9 +16311,17 @@ function sbRender(){
   const all=(D.players||[]).map((p,pi)=>({p,pi})).filter(x=>x.p&&x.p.name&&join(x.p))
     .sort((a,b)=>(pIdx(a.p.pos)-pIdx(b.p.pos))||((+a.p.nr||999)-(+b.p.nr||999)));
   const st=Array.isArray(r.st)?r.st:[],stSet=new Set(st);
-  const q=_sqOf(s),inSquad=n=>q&&q.p.includes(n);
+  const q=_sqOf(s),inSquad=n=>!!(q&&q.p.includes(n));
   const v=x=>(Array.isArray(x.p.s)&&si<x.p.s.length)?x.p.s[si]:3;
-  const likely=all.filter(x=>stSet.has(x.p.name)||v(x)===1||v(x)===4||inSquad(x.p.name));
+  // Who belongs to this match: in the report already, marked present, or —
+  // before the roll call — in the published squad (without one: said yes).
+  // Absent, excused and "nicht im Kader" are not offered.
+  const used=new Set(st);
+  (Array.isArray(r.sub)?r.sub:[]).forEach(y=>{if(y&&y.i)used.add(y.i);if(y&&y.o)used.add(y.o);});
+  // An "M" the team's answer rule set (p.ay) is nobody's answer: not counted
+  const auto=x=>Array.isArray(x.p.ay)&&x.p.ay[si]===1;
+  const there=x=>{const t=v(x);if(t===1)return true;if(t===0||t===2||t===5)return false;return q?inSquad(x.p.name):(t===4&&!auto(x));};
+  const likely=all.filter(x=>used.has(x.p.name)||there(x));
   const rest=all.filter(x=>!likely.includes(x));
   const res=sbResult(s);
   // ── score: home side first ──
@@ -16328,8 +16339,9 @@ function sbRender(){
   const lu=_luStarters(si);
   const luBtn=(lu&&!st.length)?`<button type="button" class="sb-lu" onclick="sbStartersFromLineup()">Aus der Aufstellung übernehmen (${lu.size})</button>`:'';
   const chip=x=>`<button type="button" class="rc-sc${stSet.has(x.p.name)?' on':''}" aria-pressed="${stSet.has(x.p.name)}" onclick="sbStarter(${x.pi})">${x.p.nr?'<i>'+e(String(x.p.nr))+'</i>':''}${e(nm(x.p))}</button>`;
+  const rcHint=all.some(x=>v(x)===1)?'':`<div class="sb-hint">Anwesenheit noch nicht erfasst \u2013 hier steht, wer ${q?'im Kader ist':'zugesagt hat'}. <button type="button" class="sb-more" onclick="rcOpen(${si})">Anwesenheit erfassen</button></div>`;
   h+=`<section class="sb-sec"><div class="sb-h">Startelf <b class="${st.length===11?'sb-ok':''}">${st.length}</b><span>antippen, wer begonnen hat</span></div>
-    ${luBtn}<div class="rc-sub-c">${likely.map(chip).join('')}${_sbMore?rest.map(chip).join(''):''}</div>
+    ${rcHint}${luBtn}<div class="rc-sub-c">${likely.map(chip).join('')}${_sbMore?rest.map(chip).join(''):''}</div>
     ${rest.length?`<button type="button" class="sb-more" onclick="sbToggleMore()">${_sbMore?'Weniger zeigen':'Weitere Spieler ('+rest.length+')'}</button>`:''}
   </section>`;
   // ── substitutions ──
@@ -16345,12 +16357,18 @@ function sbRender(){
     // on the pitch at that minute: whoever started or came on, minus who went off
     const onAt=new Set(st);
     subs.filter(y=>(+y.m||0)<=x.m).forEach(y=>{if(y.o)onAt.delete(y.o);if(y.i)onAt.add(y.i);});
-    const cand=all.filter(y=>!onAt.has(y.p.name)),off=all.filter(y=>onAt.has(y.p.name));
-    const opt=(list,cur)=>`<option value="">– wählen –</option>`+list.map(y=>`<option value="${e(y.p.name)}"${y.p.name===cur?' selected':''}>${e((y.p.nr?y.p.nr+' ':'')+nm(y.p))}</option>`).join('');
+    // in: the bench of this match (and whoever went off earlier — youth
+    // football allows coming back); the rest of the squad only on request
+    const cand=likely.filter(y=>!onAt.has(y.p.name)),more=_sbMore?rest.filter(y=>!onAt.has(y.p.name)):[];
+    const off=all.filter(y=>onAt.has(y.p.name));
+    const o1=(y,cur)=>`<option value="${e(y.p.name)}"${y.p.name===cur?' selected':''}>${e((y.p.nr?y.p.nr+' ':'')+nm(y.p))}</option>`;
+    const opt=(list,cur,extra)=>`<option value="">– wählen –</option>`+list.map(y=>o1(y,cur)).join('')
+      +((extra&&extra.length)?`<optgroup label="Weitere Spieler">${extra.map(y=>o1(y,cur)).join('')}</optgroup>`:'');
     sh+=`<div class="sb-subf">
       <label class="sb-f-m">Minute<input type="number" id="sb-sub-m" min="1" max="${_sbDur(s)}" value="${x.m}" inputmode="numeric" onchange="sbSubSet('m',this.value)"></label>
-      <label class="sb-f-p"><span><span class="sb-arr">▲</span> Rein</span><select onchange="sbSubSet('i',this.value)">${opt(cand,x.i)}</select></label>
+      <label class="sb-f-p"><span><span class="sb-arr">▲</span> Rein</span><select onchange="sbSubSet('i',this.value)">${opt(cand,x.i,more)}</select></label>
       <label class="sb-f-p"><span><span class="sb-arr sb-arr-o">▼</span> Raus</span><select onchange="sbSubSet('o',this.value)">${opt(off,x.o)}</select></label>
+      ${(!cand.length&&!more.length)?'<div class="sb-hint" style="grid-column:1/-1">Niemand auf der Bank: erst die Anwesenheit erfassen \u2013 oder unter Startelf \u201eWeitere Spieler\u201c \u00f6ffnen.</div>':''}
       <div class="sb-f-b"><button type="button" class="sb-btn sb-btn-p" onclick="sbSubAdd()"${x.i?'':' disabled'}>Wechsel speichern</button><button type="button" class="sb-btn" onclick="_sbSubDraft=null;sbRender()">Abbrechen</button></div>
     </div>`;
   }else sh+=`<button type="button" class="sb-add" onclick="sbSubStart()">+ Wechsel</button>`;
@@ -24230,6 +24248,8 @@ function rcClose(){
   // Refresh whatever is behind us
   if(typeof render==='function')render();
   if(typeof buildSessAtt==='function'&&typeof _currentSessIdx!=='undefined'&&_currentSessIdx!=null){try{buildSessAtt(_currentSessIdx);}catch(e){}}
+  // opened from the match report: it lists who was there
+  if(typeof _sbSi!=='undefined'&&_sbSi!=null)try{sbRender();}catch(e){}
 }
 function rcToggleFilter(){
   _rcOnlyOpen=!_rcOnlyOpen;
