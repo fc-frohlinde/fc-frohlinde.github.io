@@ -2645,7 +2645,7 @@ body.design-heute .lp-sq-btn{background:var(--hx-blue);color:#fff;}
 .slp-pick-item.lp-nik,#lp-kader-list>div.lp-nik{opacity:.62;}
 .lp-nik-t{margin-left:6px;font-size:.6rem;font-weight:600;color:rgba(255,255,255,.6);white-space:nowrap;}
 body.design-heute .lp-nik-t{color:var(--hx-muted);}
-.sqd-acts{display:flex;align-items:center;gap:16px;margin-top:10px;}
+.sqd-acts{display:flex;align-items:center;flex-wrap:wrap;gap:6px 16px;margin-top:10px;}
 .sqd-go{height:34px;padding:0 14px;border-radius:999px;border:none;background:var(--hx-yellow,#F2C230);color:var(--hx-on-acc,#0E2350);font:700 .84rem 'Barlow',sans-serif;cursor:pointer;}
 .sqd-go.alt{background:var(--hx-field,#fff);color:var(--hx-ink,var(--gd));border:1px solid var(--hx-line,var(--gl));}
 .sqd-link{background:none;border:none;padding:4px 0;color:var(--hx-blue,var(--bm));font:700 .84rem 'Barlow',sans-serif;cursor:pointer;}
@@ -6604,13 +6604,16 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.26'; // v1.2.26: Kalender abonnieren
-const APP_VERSION_LABEL='1.2.26';
+const APP_VERSION='1.2.27'; // v1.2.27: Kader für die WhatsApp-Gruppe
+const APP_VERSION_LABEL='1.2.27';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792703076632; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792753368660; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.27',date:'23.10.2026',title:'Kader in die WhatsApp-Gruppe',items:[
+    {icon:'💬',title:'Kader als Text für die Gruppe',desc:'Nach „Kader veröffentlichen“ steht der Text für die WhatsApp-Gruppe fertig da: Datum, Gegner, Treffpunkt, Anstoß und die Spieler, Torhüter zuerst. Bei Bedarf noch ändern, dann „In WhatsApp öffnen“ und die Gruppe wählen. Wer zugesagt hat und nicht dabei ist, steht nicht drin – das erfährt er in der App. Später auch über „WhatsApp-Text“ an der Kader-Karte im Spiel.'},
+  ]},
   {version:'1.2.26',date:'22.10.2026',title:'Kalender abonnieren',items:[
     {icon:'📅',title:'Termine im eigenen Kalender',desc:'Kalender → „⋯“ → „Kalender abonnieren“: Trainings, Spiele (mit Treffpunkt, sobald der Kader steht) und Termine der Mannschaft erscheinen in Google, Apple oder Outlook und ändern sich dort mit – verschobene Trainings rücken, abgesagte verschwinden. Ohne Namen von Spielern. Für Trainer mit eigenem Konto.'},
     {icon:'🛠',title:'Export repariert',desc:'„Einmal herunterladen“ (.ics) enthielt keine Trainings und Spiele mehr – nur sonstige Termine. Jetzt wieder alle, mit Ort.'},
@@ -15271,7 +15274,7 @@ function _sqPanelHtml(si){
   if(!q){
     if(!ed)return '';
     return `<div class="sqd-card"><div class="sqd-h"><b>Kader und Treffpunkt</b></div>
-      <p class="sqd-txt">Noch nicht veröffentlicht. Wer dabei ist, bekommt Treffpunkt und Uhrzeit aufs Handy – wer zugesagt hat und nicht dabei ist, erfährt es auch.</p>
+      <p class="sqd-txt">Noch nicht veröffentlicht. Wer dabei ist, bekommt Treffpunkt und Uhrzeit aufs Handy – wer zugesagt hat und nicht dabei ist, erfährt es auch. Danach gibt es den Text für die WhatsApp-Gruppe.</p>
       <button type="button" class="sqd-go" onclick="squadOpen(${si})">Kader festlegen</button></div>`;
   }
   const due=_newsDue(q.t),hm=x=>{const d=new Date(x);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');};
@@ -15284,7 +15287,7 @@ function _sqPanelHtml(si){
     <div class="sqd-meet">Treffpunkt <b>${e(q.meet)}</b>${q.where?' · '+e(q.where):''}</div>
     ${outNow.length?`<div class="sqd-out">Zugesagt, nicht im Kader: ${e(outNow.join(', '))}</div>`:''}
     ${ni.length?`<div class="sqd-lu">In der Aufstellung, aber nicht im Kader: <b>${e(_sqNames(D,ni))}</b> – ${ni.length===1?'bekommt':'bekommen'} keinen Treffpunkt.</div>`:''}
-    ${ed?`<div class="sqd-acts"><button type="button" class="sqd-go alt" onclick="squadOpen(${si}${ni.length?',true':''})">${ni.length?'Kader anpassen':'Ändern'}</button><button type="button" class="sqd-link" onclick="squadWithdraw(${si})">Zurücknehmen</button></div>`:''}</div>`;
+    ${ed?`<div class="sqd-acts"><button type="button" class="sqd-go alt" onclick="squadOpen(${si}${ni.length?',true':''})">${ni.length?'Kader anpassen':'Ändern'}</button><button type="button" class="sqd-link" onclick="squadShare(${si})">WhatsApp-Text</button><button type="button" class="sqd-link" onclick="squadWithdraw(${si})">Zurücknehmen</button></div>`:''}</div>`;
 }
 // ── the window ──
 let _SQ=null;
@@ -15530,6 +15533,59 @@ function sqPublish(){
   closeM('moKader');
   _sqRefresh(si);
   if(typeof showSaveFlash==='function')showSaveFlash(was?'✓ Kader geändert':'✓ Kader veröffentlicht');
+  squadShare(si,was?'changed':'new');
+}
+// The squad as a text for the team's WhatsApp group (1.2.27). The app is
+// where the squad is decided, WhatsApp where everybody reads it — so one step
+// does both and nobody types the list twice. The date is written out (the
+// message is read later, "morgen" would be wrong by then), the players are in
+// the order of the Kader window, goalkeepers first. Who confirmed and is left
+// out is not named: the app tells him itself.
+function _sqWaText(D,si,season){
+  const s=D&&D.sessions&&D.sessions[si],q=_sqOf(s);if(!q)return '';
+  // "Sonntag, 18.10." (s.date is "So 18.10")
+  const k=_dbSortKey(s.date,season),dt=(k&&k!==99999999)?_hxDate(k):null;
+  const day=dt?SQUAD_WD[dt.getDay()]+', '+String(dt.getDate()).padStart(2,'0')+'.'+String(dt.getMonth()+1).padStart(2,'0')+'.':String(s.date||'');
+  const pIdx=x=>{const i=POS.indexOf(x);return i<0?99:i;};
+  const byName=new Map((D.players||[]).filter(p=>p&&p.name).map(p=>[p.name,p]));
+  const list=q.p.map(n=>({n,p:byName.get(n)})).sort((a,b)=>(a.p&&b.p)?((pIdx(a.p.pos)-pIdx(b.p.pos))||((+a.p.nr||999)-(+b.p.nr||999))):(a.p?-1:b.p?1:0));
+  const nm=x=>(x.p&&typeof getDisplayName==='function'&&getDisplayName(x.p))||x.n;
+  const ha=s.homeAway==='home'?' (Heimspiel)':s.homeAway==='away'?' (auswärts)':'';
+  const loc=s.location&&s.location!==q.where?s.location:'';
+  const L=['⚽ Kader für '+day+(s.label?' gegen '+s.label:'')+ha,
+    'Treffpunkt '+q.meet+(q.where?', '+q.where:'')];
+  if(s.time)L.push('Anstoß '+s.time+(loc?', '+loc:''));
+  else if(loc)L.push('Spielort: '+loc);
+  L.push('',...list.map(nm));
+  return L.join('\n');
+}
+function _sqWaEnsure(){
+  if(document.getElementById('moSqWa'))return;
+  const w=document.createElement('div');
+  w.innerHTML=`<div class="mo" id="moSqWa" style="z-index:870;"><div class="mob" style="width:460px;max-width:94vw;">
+    <div class="ps-title-row"><h3 class="ps-title" id="sqWaTitle">Kader für WhatsApp</h3><button type="button" class="btn bs" onclick="closeM('moSqWa')" aria-label="Schließen">✕</button></div>
+    <p class="app-sh-p" id="sqWaLead"></p>
+    <textarea id="sqWaText" class="app-sh-text" rows="12" spellcheck="false" aria-label="Text für die WhatsApp-Gruppe"></textarea>
+    <div class="app-sh-btns"><button type="button" class="btn bp" onclick="sqWaSend()">In WhatsApp öffnen</button><button type="button" class="btn bs" onclick="sqWaCopy()">Text kopieren</button></div>
+  </div></div>`;
+  document.body.appendChild(w.firstElementChild);
+}
+// mode: 'new' or 'changed' right after publishing, else from the card
+function squadShare(si,mode){
+  if(!(typeof canEdit==='function'&&canEdit()))return;
+  const txt=_sqWaText(cd(),si,UI.currentSeason);if(!txt)return;
+  _sqWaEnsure();
+  document.getElementById('sqWaTitle').textContent=mode==='new'?'✓ Kader veröffentlicht':mode==='changed'?'✓ Kader geändert':'Kader für WhatsApp';
+  document.getElementById('sqWaLead').textContent=(mode?'Jetzt noch in die WhatsApp-Gruppe. ':'')
+    +'Den Text kannst du vorher ändern. Wer zugesagt hat und nicht dabei ist, steht nicht drin – das erfährt er in der App.';
+  const ta=document.getElementById('sqWaText');
+  ta.value=txt;ta.rows=Math.min(18,Math.max(8,txt.split('\n').length+1));
+  openM('moSqWa');
+}
+function sqWaSend(){const t=document.getElementById('sqWaText');if(t&&t.value.trim())_openWhatsAppGroupCompose(t.value);}
+function sqWaCopy(){
+  const t=document.getElementById('sqWaText');if(!t||!t.value.trim())return;
+  _dbCopyText(t.value,()=>{if(typeof showSaveFlash==='function')showSaveFlash('📋 Text kopiert · in die Gruppe einfügen');});
 }
 function squadWithdraw(si){
   if(!(typeof canEdit==='function'&&canEdit()))return;
