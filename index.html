@@ -2402,8 +2402,18 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 .pm-top-sub{font-size:.76rem;font-weight:600;color:rgba(255,255,255,.66);margin-top:3px;}
 .pm-rule{margin:-4px 16px 12px;font-size:.84rem;line-height:1.45;color:rgba(255,255,255,.8);}
 .pm-rule b{color:#fff;}
-.pm-card.st-open{border-left-color:#9AA8BF;}.pm-card.st-yes{border-left-color:#27ae60;}.pm-card.st-plan{border-left-color:#8FD9AE;}
-.pm-card.st-no{border-left-color:#e74c3c;}.pm-card.st-exc{border-left-color:#f39c12;}.pm-card.st-nk{border-left-color:#9AA8BF;}
+.pm-list .pm-card{border-left:0;}
+.pm-ic{display:inline-block;vertical-align:-.14em;flex-shrink:0;}
+.pm-week-h .pm-ic{font-size:1.05rem;color:rgba(255,255,255,.75);vertical-align:-.1em;}
+.pm-week-h .pm-count{text-transform:none;letter-spacing:0;font-size:.74rem;}
+.pm-list .pm-btn{flex-direction:row;gap:6px;align-items:center;justify-content:center;padding:10px 6px;}
+.pm-list .pm-btn-ico{font-size:1.1rem;line-height:0;}
+.pm-list .pm-btn-lbl{text-transform:none;letter-spacing:0;font-size:.92rem;font-weight:700;line-height:1.1;white-space:nowrap;}
+/* narrow phones: the icon above the word, as before, so nothing wraps */
+@media(max-width:380px){.pm-list .pm-btn{flex-direction:column;gap:3px;}.pm-list .pm-btn-lbl{font-size:.86rem;}}
+.pm-chip .pm-ic{margin-right:2px;}
+.pm-deadline .pm-ic,.pm-state .pm-ic{margin-right:3px;}
+.pm-tel .pm-ic{font-size:1.05rem;}
 .pm-card-date .pm-dow{font-size:.72rem;font-weight:700;color:var(--gd);margin:0 0 1px;}
 .pm-card-date .pm-mo{margin-top:3px;}
 .pm-when{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;color:var(--bd);line-height:1.15;}
@@ -2413,7 +2423,7 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
 .pm-where{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 2px;}
 .pm-chip{font-size:.74rem;font-weight:600;color:#3A4A66;background:#EEF2F8;padding:3px 8px;border-radius:6px;}
 .pm-chip a{color:inherit;}
-.pm-btn.pm-yes.plan{background:rgba(39,174,96,.16);border:1.5px dashed #27ae60;color:#1f7a45;}
+.pm-btn.pm-yes.plan{background:#E4F5EA;border:1.5px solid rgba(39,174,96,.5);color:#1f7a45;box-shadow:none;}
 .pm-state{margin-top:10px;font-size:.8rem;font-weight:700;line-height:1.35;padding:6px 10px;border-radius:8px;display:inline-block;}
 .pm-state.ok{background:rgba(39,174,96,.12);color:#0e6c30;}
 .pm-state.exc{background:rgba(243,156,18,.15);color:#7a4f00;}
@@ -6829,13 +6839,16 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.45'; // v1.2.45: Absage-Regel und Meine Woche
-const APP_VERSION_LABEL='1.2.45';
+const APP_VERSION='1.2.46'; // v1.2.46: Meine Woche ruhiger
+const APP_VERSION_LABEL='1.2.46';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792798327012; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792799570936; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.46',date:'24.10.2026',title:'„Meine Woche“ ruhiger',items:[
+    {icon:'🎨',title:'Weniger Signale pro Termin',desc:'Bei den Spielern: keine farbigen Streifen mehr am Rand, Knöpfe in normaler Schrift statt in Großbuchstaben, schlichte Symbole statt Emoji (das Kalender-Emoji zeigte auf dem iPhone „17. Juli“). „Eingeplant“ ist ein ruhiger hellgrüner Knopf. Steht die Mannschaft auf „Immer per Anruf“, sieht der Spieler nach einer Absage auch, warum ein Anruf nötig ist.'},
+  ]},
   {version:'1.2.45',date:'24.10.2026',title:'Absagen: rechtzeitig reicht die App',items:[
     {icon:'📞',title:'Neue Absage-Regel',desc:'Sagt ein Spieler rechtzeitig in der App ab, gilt das jetzt von selbst als entschuldigt. Rechtzeitig heißt: vor der Antwortfrist des Termins, ohne eigene Frist bis 4 Stunden vor Beginn. Später – oder bei einem Spiel, sobald er im veröffentlichten Kader steht – braucht es weiter einen Anruf, bevor ihr „E“ eintragt. Einstellen lässt sich das unter Einstellungen → Mannschaft → „Absagen“ (Frist, „immer per Anruf“ oder „die App reicht immer“).'},
     {icon:'📅',title:'„Meine Woche“ für die Spieler aufgeräumt',desc:'Oben nur noch Name und „‹ Übersicht“, die Termine stehen sofort im Blick. Uhrzeit als Überschrift, automatisch eingeplante Termine heißen „Eingeplant“ statt wie eine eigene Zusage auszusehen, ein Hinweis zur Absage-Regel statt drei gleicher Sätze. Nach einer späten Absage ein ruhiger Hinweis mit Knöpfen, die direkt anrufen.'},
@@ -20793,7 +20806,7 @@ function renderPlayerMode(){
   // so they must not open a chat
   const _callBtns=()=>_trs.map(t=>{
     const c=_amCleanPhone(t.phone);if(!c)return '';
-    return `<a class="pm-tel" href="tel:+${_amEscapeText(c)}">\ud83d\udcde ${_amEscapeText(String(t.name||'').split(' ')[0])} anrufen</a>`;
+    return `<a class="pm-tel" href="tel:+${_amEscapeText(c)}">${PM_IC.phone} ${_amEscapeText(String(t.name||'').split(' ')[0])} anrufen</a>`;
   }).join('');
   const renderCard=(s,si,sk)=>{
     const f=_pmFmtUpcoming(s,sk);
@@ -20808,8 +20821,8 @@ function renderPlayerMode(){
     const appOk=pvAbsOk(s,p,_R,now);
     let deadlineLine='';
     if(rsvpUntil){
-      if(locked)deadlineLine=`<div class="pm-deadline locked">\ud83d\udd12 Antworten geschlossen</div>`;
-      else deadlineLine=`<div class="pm-deadline">\u23f0 Antwort bis ${_pmRelTime(rsvpUntil)}</div>`;
+      if(locked)deadlineLine=`<div class="pm-deadline locked">${PM_IC.lock} Antworten geschlossen</div>`;
+      else deadlineLine=`<div class="pm-deadline">${PM_IC.clock} Antwort bis ${_pmRelTime(rsvpUntil)}</div>`;
     }
     // Physio: only reported here, booked in its own step
     const _phOn=(typeof sessPhysioOn==='function')?sessPhysioOn(s):false;
@@ -20832,7 +20845,7 @@ function renderPlayerMode(){
         +`<div class="pm-call-btns"><button type="button" class="pm-tel pm-confirm" onclick="pmSetStatus(${si},0)">Absage bestätigen</button></div></div>`;
     }
     else if(status===0){
-      const why=_rule.m==='anruf'?''
+      const why=_rule.m==='anruf'?'Bei uns zählt eine Absage erst nach einem Anruf als entschuldigt. '
         :pvAbsInSquad(s,p,now)?'Du stehst im Kader. '
         :`Die Frist f\u00fcr Absagen in der App war ${_pmRelTime(pvAbsUntil(s,_R,now))}. `;
       const btns=_callBtns();
@@ -20842,9 +20855,9 @@ function renderPlayerMode(){
         +'</div>';
     }
     else if(_rule.m==='frist'&&!locked&&!appOk&&(status===3||status===4))
-      state=`<div class="pm-state late">\ud83d\udcde Absage jetzt nur noch per Anruf</div>`;
+      state=`<div class="pm-state late">${PM_IC.phone} Absage jetzt nur noch per Anruf</div>`;
     const where=[];
-    if(f.isMatch&&s.homeAway)where.push(`<span class="pm-chip">${s.homeAway==='home'?'\ud83c\udfe0 Heim':'\ud83d\ude8c Ausw\u00e4rts'}</span>`);
+    if(f.isMatch&&s.homeAway)where.push(`<span class="pm-chip">${s.homeAway==='home'?PM_IC.home+' Heim':PM_IC.away+' Ausw\u00e4rts'}</span>`);
     if(s.location&&s.location.trim())where.push(`<span class="pm-chip">${locNameHtml(s,_amEscapeText)}</span>`);
     const lineupInfo=f.isMatch?_squadCardLine(s,si,p):'';
     const stc=status===1||(status===4&&!auto)?'st-yes':auto?'st-plan':status===0?'st-no':status===2?'st-exc':status===5?'st-nk':'st-open';
@@ -20861,8 +20874,8 @@ function renderPlayerMode(){
         ${lineupInfo}
         ${deadlineLine}
         <div class="pm-actions pm-actions-2">
-          <button class="pm-btn pm-yes${kommeActive?' active':''}${auto?' plan':''}"${dis} onclick="pmSetStatus(${si},1)"${auto?' aria-label="Eingeplant – tippen zum Zusagen"':''}><span class="pm-btn-ico">\u2713</span><span class="pm-btn-lbl">${auto?'Eingeplant':'Komme'}</span></button>
-          <button class="pm-btn pm-no${kannNichtActive?' active':''}"${dis} onclick="pmSetStatus(${si},0)"><span class="pm-btn-ico">\u2717</span><span class="pm-btn-lbl">Kann nicht</span></button>
+          <button class="pm-btn pm-yes${kommeActive?' active':''}${auto?' plan':''}"${dis} onclick="pmSetStatus(${si},1)"${auto?' aria-label="Eingeplant – tippen zum Zusagen"':''}><span class="pm-btn-ico">${PM_IC.yes}</span><span class="pm-btn-lbl">${auto?'Eingeplant':'Komme'}</span></button>
+          <button class="pm-btn pm-no${kannNichtActive?' active':''}"${dis} onclick="pmSetStatus(${si},0)"><span class="pm-btn-ico">${PM_IC.no}</span><span class="pm-btn-lbl">Kann nicht</span></button>
         </div>
         ${state}
         ${physioHtml}
@@ -20930,9 +20943,9 @@ function renderPlayerMode(){
       const v=(p.s&&si<p.s.length)?p.s[si]:3;
       return v===3;
     }).length;
-    html+=`<div class="pm-section-h">\ud83d\udcc5 Deine Termine`
+    html+=`<div class="pm-section-h pm-week-h">${PM_IC.cal} Deine Termine`
       +(openCount?`<span class="pm-count pm-count-open">${openCount} offen</span>`
-                 :`<span class="pm-count">\u2713 vollst\u00e4ndig</span>`)
+                 :`<span class="pm-count">alle beantwortet</span>`)
       +`</div>`;
     // The rule in one place instead of a sentence under every card
     const planned=upcoming.some(({si})=>p.s&&p.s[si]===4&&Array.isArray(p.ay)&&p.ay[si]===1);
@@ -20990,6 +21003,21 @@ function renderPlayerMode(){
   }
 }
 
+// Line icons for the player's week (1.2.46): emoji look different on every
+// phone, and the calendar emoji shows "17 July" on a screen about dates
+const PM_IC=(()=>{
+  const sv=d=>`<svg class="pm-ic" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+  return {
+    cal:sv('<rect x="3" y="4.5" width="18" height="17" rx="2.5"/><path d="M8 2.5v4M16 2.5v4M3 10h18"/>'),
+    home:sv('<path d="M3 11 12 3.5 21 11"/><path d="M5.5 9.5V20.5h13V9.5"/><path d="M10 20.5v-5h4v5"/>'),
+    away:sv('<rect x="4" y="3.5" width="16" height="14" rx="2.5"/><path d="M4 11h16M7.5 20.5v-3M16.5 20.5v-3"/><circle cx="8" cy="14.2" r=".6" fill="currentColor"/><circle cx="16" cy="14.2" r=".6" fill="currentColor"/>'),
+    clock:sv('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/>'),
+    lock:sv('<rect x="5" y="10.5" width="14" height="10.5" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/>'),
+    phone:sv('<path d="M21.5 16.7v3a2 2 0 0 1-2.2 2 19.6 19.6 0 0 1-8.5-3 19.3 19.3 0 0 1-6-6A19.6 19.6 0 0 1 1.8 4.2 2 2 0 0 1 3.8 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L7.8 9.8a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.6 1.9z"/>'),
+    yes:sv('<path d="M5 12.5l4.5 4.5L19 7.5"/>'),
+    no:sv('<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>'),
+  };
+})();
 // "heute, 12:00" · "morgen, 12:00" · "Mo, 12:00" · "27.10., 12:00"
 function _pmRelTime(ts){
   if(typeof ts!=='number')return '';
