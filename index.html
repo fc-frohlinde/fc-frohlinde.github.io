@@ -4996,6 +4996,27 @@ body.design-kabine #mainTable.mx tfoot td.mx-pct{font-size:.95rem;}
 .tpl-bk{font-size:12px;font-weight:700;color:var(--tp-mut);}
 .tpl-bn{font-weight:700;font-size:15px;line-height:1.25;overflow-wrap:anywhere;}
 .tpl-bn.empty{color:var(--tp-mut);font-style:italic;font-weight:600;}
+/* Standardablauf (1.2.28): a section still without a drill */
+.tpl-bn.slot{color:var(--tp-mut);font-weight:600;}
+.tpl-blk.slot .tpl-stripe{opacity:.4;}
+.tpl-blk.dropin{outline:2px dashed var(--tp-link);outline-offset:-2px;}
+.tpl-stdn{display:flex;flex-direction:column;gap:4px;margin:2px 0 6px;padding:10px 12px;border-radius:12px;background:var(--tp-soft);font-size:13px;line-height:1.45;color:var(--tp-mut);}
+.tpl-stdn b{color:var(--tp-ink);}
+.tpl-stdn-a{display:flex;gap:16px;flex-wrap:wrap;}
+.tpl-stdn-a .tpl-lnk{padding:2px 0;font-size:13px;}
+.tpl-std{display:flex;flex-direction:column;gap:8px;}
+.tpl-dlg.wide{width:660px;}
+.tpl-std-r{display:grid;grid-template-columns:minmax(0,1fr) 150px auto auto;gap:6px;align-items:center;}
+.tpl-std-min{display:flex;align-items:center;gap:4px;font-size:13px;font-weight:700;color:var(--tp-mut);}
+.tpl-dlg .tpl-std-min input{width:64px;padding:10px 8px;text-align:right;}
+.tpl-std-b{display:flex;gap:2px;}
+.tpl-std-f{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.tpl-std-f .tpl-lnk{padding:4px 0;}
+.tpl-std-f .tpl-hint{margin-left:auto;}
+@media (max-width:560px){
+  .tpl-std-r{grid-template-columns:minmax(0,1fr) auto;padding-bottom:8px;border-bottom:1px solid var(--tp-line);}
+  .tpl-std-b{justify-content:flex-end;}
+}
 .tpl-bo{font-size:13px;color:var(--tp-mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .tpl-bm{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.5px;align-self:center;white-space:nowrap;}
 .tpl-add{height:44px;border-radius:12px;border:1.5px dashed #AEBBD1;background:var(--tp-soft);color:var(--tp-mut);font-weight:600;font-size:14px;cursor:pointer;flex:0 0 auto;}
@@ -6604,13 +6625,17 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.27'; // v1.2.27: Kader für die WhatsApp-Gruppe
-const APP_VERSION_LABEL='1.2.27';
+const APP_VERSION='1.2.28'; // v1.2.28: Trainingsplaner — Standardablauf
+const APP_VERSION_LABEL='1.2.28';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792753368660; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792755902648; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.28',date:'23.10.2026',title:'Trainingsplaner: Standardablauf',items:[
+    {icon:'📝',title:'Neuer Plan mit festem Aufbau',desc:'Ein neuer Trainingsplan beginnt mit dem Standardablauf der Mannschaft: Aktivierung 1 und 2 (je 10 Min.), Hauptteil 1 und 2 (je 20 Min.), Schlussteil (30 Min.). In der Bibliothek auf + tippen: Die Übung landet im ausgewählten Abschnitt, danach ist der nächste dran. Gespeichert wird der Plan erst, wenn du etwas einträgst.'},
+    {icon:'⚙️',title:'Standard ändern',desc:'„Standardablauf für neue Pläne“ unter dem Ablauf: Abschnitte, Kategorie und Minuten festlegen oder „Wie dieser Plan“ übernehmen. Ohne Abschnitte beginnen neue Pläne leer. Gespeicherte Pläne ändern sich nicht.'},
+  ]},
   {version:'1.2.27',date:'23.10.2026',title:'Kader in die WhatsApp-Gruppe',items:[
     {icon:'💬',title:'Kader als Text für die Gruppe',desc:'Nach „Kader veröffentlichen“ steht der Text für die WhatsApp-Gruppe fertig da: Datum, Gegner, Treffpunkt, Anstoß und die Spieler, Torhüter zuerst. Bei Bedarf noch ändern, dann „In WhatsApp öffnen“ und die Gruppe wählen. Wer zugesagt hat und nicht dabei ist, steht nicht drin – das erfährt er in der App. Später auch über „WhatsApp-Text“ an der Kader-Karte im Spiel.'},
   ]},
@@ -31152,7 +31177,14 @@ const TPL_CATS=[
   {k:'Spielform',c:'#E8A928'},{k:'Umschalten',c:'#8B5CC7'},{k:'Torschuss',c:'#D9443F'},{k:'Athletik',c:'#E07A3A'},
   {k:'Torwart',c:'#2E7D46'},{k:'Auslaufen',c:'#7A8BA6'},{k:'Sonstiges',c:'#9AA5B8'}
 ];
-const TPL={team:null,season:null,si:null,pid:null,sessDate:null,sessTime:'',plan:null,sel:0,
+// Standardablauf (1.2.28): what a new plan starts with, per team in
+// fcf_plans/<team>/std = {rows:[{ph,cat,min}], upd, by}. Without an entry this
+// structure (FC Frohlinde U19); saved without rows, new plans start empty.
+// Each row becomes an empty block with a section name (b.ph) — a slot that a
+// drill from the library fills.
+const TPL_STD_DEF=[{ph:'Aktivierung 1',cat:'Aufwärmen',min:10},{ph:'Aktivierung 2',cat:'Aufwärmen',min:10},
+  {ph:'Hauptteil 1',cat:'Sonstiges',min:20},{ph:'Hauptteil 2',cat:'Sonstiges',min:20},{ph:'Schlussteil',cat:'Spielform',min:30}];
+const TPL={team:null,season:null,si:null,pid:null,sessDate:null,sessTime:'',plan:null,sel:0,std:null,draft:false,stdEd:null,dropFill:null,
   lib:{},tpls:{},idx:{},undo:[],saveT:null,inflight:0,err:null,libCat:'Alle',libQ:'',libOpen:null,
   mode:'replace',drag:null,dropAt:null,openSeq:0,idxCache:{},readFail:false};
 const TPL_IC={
@@ -31338,6 +31370,7 @@ function _tplNewBlock(src,keepId){
   return {id:(keepId&&src.id)||_tplId('b'),cat:src.cat||'Sonstiges',title:src.title||'',
     min:(src.min===0||src.min)?(+src.min||0):15,players:src.players||'',area:src.area||'',
     desc:src.desc||'',coach:src.coach||'',org:src.org||'',libId:src.libId||'',int:(+src.int>=1&&+src.int<=10)?+src.int:'',
+    ph:src.ph?String(src.ph).slice(0,40):'',
     dia:(src.dia&&typeof src.dia==='object')?_tplClean(src.dia):null,
     grp:(typeof src.grp==='string'&&src.grp)?src.grp:((src.grp===1||src.grp===true)?1:'')};
 }
@@ -31349,7 +31382,7 @@ async function tplOpen(si,opts){
   if(!s||s.type==='match')return;
   const seq=++TPL.openSeq;
   Object.assign(TPL,{team:UI.currentTeam,season:UI.currentSeason,si:si,sessDate:s.date,sessTime:s.time||'',
-    plan:null,sel:0,undo:[],libOpen:null,libQ:'',libCat:'Alle',err:null,drag:null,readFail:false});
+    plan:null,sel:0,undo:[],libOpen:null,libQ:'',libCat:'Alle',err:null,drag:null,readFail:false,std:null,draft:false,dropFill:null});
   TPL.pid=_tplPidFor(D,s,TPL.season);
   const ov=document.getElementById('tplOverlay');
   if(!ov)return;
@@ -31371,8 +31404,8 @@ async function tplOpen(si,opts){
   if(typeof setPresenceContext==='function')setPresenceContext('📝 Trainingsplan '+s.date);
   _tplFlush();
   const b=_tplBase();
-  const [plan,idx,lib,tpls,meta]=await Promise.all([
-    _tplRead(b+'/plans/'+TPL.pid),_tplRead(b+'/idx'),_tplRead(b+'/lib'),_tplRead(b+'/tpl'),_tplRead(b+'/meta')]);
+  const [plan,idx,lib,tpls,meta,std]=await Promise.all([
+    _tplRead(b+'/plans/'+TPL.pid),_tplRead(b+'/idx'),_tplRead(b+'/lib'),_tplRead(b+'/tpl'),_tplRead(b+'/meta'),_tplRead(b+'/std')]);
   if(seq!==TPL.openSeq||!ov.classList.contains('open'))return;
   TPL.idx=(idx&&typeof idx==='object')?idx:{};TPL.idxCache[TPL.team]=TPL.idx;_tplIdxRemember(TPL.team);
   TPL.lib=(lib&&typeof lib==='object')?lib:{};
@@ -31380,9 +31413,19 @@ async function tplOpen(si,opts){
   // Libraries start empty: each team builds its own. The standard drills that
   // were seeded for a while are removed again, unless a trainer changed one.
   if(meta&&meta.seeded&&(meta.seedV||1)<3&&!TPL.readFail)_tplDropStd(meta);
-  TPL.plan=_tplNorm(plan)||{v:1,blocks:[]};
+  TPL.std=(std&&typeof std==='object')?std:null;
+  TPL.plan=_tplNorm(plan);TPL.draft=false;
+  if(!TPL.plan){
+    TPL.plan={v:1,blocks:[]};
+    // A new plan starts with the Standardablauf. It is a draft: saved only
+    // once something is changed, so opening and closing plans nothing. Not
+    // when the read failed or the summary says a plan exists (not loaded).
+    if(_tplEditor()&&!TPL.readFail&&!(TPL.idx&&TPL.idx[TPL.pid])){
+      const bl=_tplStdBlocks();if(bl.length){TPL.plan.blocks=bl;TPL.draft=true;}
+    }
+  }
   _tplRenderAll();
-  if(opts&&opts.pitch&&TPL.plan.blocks.length)tplPitchOpen();
+  if(opts&&opts.pitch&&TPL.plan.blocks.length&&!TPL.draft)tplPitchOpen();
 }
 function _tplDropStd(meta){
   const b=_tplBase();
@@ -31517,6 +31560,7 @@ function _tplSyncSessBtn(si){
 // ── Saving
 function _tplTouch(){
   if(!TPL.plan||!_tplEditor())return;
+  TPL.draft=false;
   TPL.plan.upd=Date.now();TPL.plan.by=(CU&&CU.name)||'';
   clearTimeout(TPL.saveT);
   TPL.saveT=setTimeout(_tplSaveNow,700);
@@ -31548,7 +31592,7 @@ function _tplPushUndo(){
 }
 function tplUndo(){
   const x=TPL.undo.pop();if(!x||!TPL.plan)return;
-  const o=JSON.parse(x);TPL.plan.blocks=o.b;TPL.sel=o.s;
+  const o=JSON.parse(x);TPL.plan.blocks=o.b;TPL.sel=o.s;TPL.draft=false;
   if('g' in o){TPL.plan.grps=Array.isArray(o.g)?o.g:[];TPL.gSel=o.gs||null;}
   _tplRenderList();_tplRenderEd();_tplUndoBtn();_tplTouch();
   if(TPL.tab==='g')_tplRenderGrp();
@@ -31579,11 +31623,11 @@ function _tplRenderList(){
   const ed=_tplEditor();
   const drag=i=>ed?`draggable="true" ondragstart="tplDragStart(event,${i})" ondragend="tplDragEnd()"
       ondragover="tplDragOver(event,${i})" ondragleave="tplDragLeave(event)" ondrop="tplDrop(event)"`:'';
-  const rows=bl.map((b,i)=>`<div role="button" tabindex="0" class="tpl-blk${i===TPL.sel?' sel':''}" data-i="${i}"
+  const rows=bl.map((b,i)=>`<div role="button" tabindex="0" class="tpl-blk${i===TPL.sel?' sel':''}${_tplIsSlot(b)&&b.ph?' slot':''}" data-i="${i}"
       aria-pressed="${i===TPL.sel}" onclick="tplSelect(${i})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();tplSelect(${i});}" ${drag(i)}>
       <span class="tpl-stripe" style="background:${_tplCatColor(b.cat)}"></span>${_dgThumb(b.dia)}
-      <span class="tpl-bt"><span class="tpl-bk">${st[i].clock?st[i].clock+' · ':''}${_tplE(b.cat)}</span>
-        <span class="tpl-bn${b.title?'':' empty'}">${b.title?_tplE(b.title):'Ohne Titel'}</span>
+      <span class="tpl-bt"><span class="tpl-bk">${st[i].clock?st[i].clock+' · ':''}${b.title&&b.ph?_tplE(b.ph)+' · ':''}${_tplE(b.cat)}</span>
+        <span class="tpl-bn${b.title?'':(b.ph?' slot':' empty')}">${b.title?_tplE(b.title):(b.ph?_tplE(b.ph):'Ohne Titel')}</span>
         ${(()=>{const n=_tplBlkGrpNote(i);if(!b.org&&!n)return '';
           return `<span class="tpl-bo">${n?`<span class="tpl-bgd" title="${n.many?'Einteilung '+_tplE(n.g.l)+' · ':''}${n.g.n} Gruppen">${n.many?`<b>${_tplE(n.g.l)}</b>`:''}${_tplGrpDots(n.g)}</span>`:''}${n&&n.d?`<span class="tpl-bchg" title="${n.d.moved} ${n.d.moved===1?'wechselt':'wechseln'} das Leibchen">${TPL_IC_SWAP}${n.d.moved}</span>`:''}${_tplE(b.org||(n?n.g.n+' Gruppen':''))}</span>`;})()}</span>
       <span class="tpl-bm">${+b.min||0}′</span></div>`).join('');
@@ -31594,18 +31638,21 @@ function _tplRenderList(){
     :'<div class="tpl-hint">Für dieses Training gibt es noch keinen Plan.</div>';
   else if(tot>dur)msg=`<div class="tpl-hint" style="color:#D9443F">${tot-dur} Min. mehr, als die Einheit dauert.</div>`;
   else if(tot<dur)msg=`<div class="tpl-hint">Noch ${dur-tot} Min. frei.</div>`;
+  const stdNote=(ed&&TPL.draft&&bl.length)?`<div class="tpl-stdn"><span><b>Standardablauf</b> – wähle für jeden Abschnitt eine Übung aus der Bibliothek (+) oder trag sie selbst ein.</span>
+      <span class="tpl-stdn-a"><button type="button" class="tpl-lnk" onclick="tplStdClear()">Leer beginnen</button><button type="button" class="tpl-lnk" onclick="tplStdDlg()">Standard ändern</button></span></div>`:'';
   el.innerHTML=`<div class="tpl-row"><h3 class="tpl-h3">Ablauf</h3><span class="tpl-tot"><span class="${cls}">${tot}</span> / ${dur} Min.</span></div>
-    <div class="tpl-bar" role="img" aria-label="Zeitaufteilung: ${tot} von ${dur} Minuten verplant">${bar}</div>${msg}${doneTxt}
+    <div class="tpl-bar" role="img" aria-label="Zeitaufteilung: ${tot} von ${dur} Minuten verplant">${bar}</div>${stdNote}${msg}${doneTxt}
     ${bl.length?`<div class="tpl-blocks">${rows}</div>`:''}
     ${ed?`<button type="button" class="tpl-add" ondragover="tplDragOver(event,-1)" ondragleave="tplDragLeave(event)" ondrop="tplDrop(event)" onclick="tplAddBlock()">+ Block hinzufügen</button>
     <div class="tpl-links">
       <button type="button" class="tpl-lnk" onclick="tplCopyDlg()">Aus früherem Training übernehmen</button>
       <button type="button" class="tpl-lnk" onclick="tplLoadTplDlg()">Vorlage laden</button>
+      <button type="button" class="tpl-lnk" onclick="tplStdDlg()">Standardablauf für neue Pläne</button>
     </div>`:''}`;
 }
 function _tplKick(i){
   const st=_tplStarts()[i];const b=TPL.plan.blocks[i];
-  return `Block ${i+1}`+(st&&st.clock?` · ${st.clock}–${st.clockEnd}`:'')+` · ${_tplE(b.cat)}`;
+  return (b.ph?_tplE(b.ph):`Block ${i+1}`)+(st&&st.clock?` · ${st.clock}–${st.clockEnd}`:'')+` · ${_tplE(b.cat)}`;
 }
 // Read-only block for trainers: the same content as the editor, as text.
 function _tplReadView(b,i){
@@ -31616,7 +31663,7 @@ function _tplReadView(b,i){
   const org=String(b.org||'').trim();
   return `<div class="tpl-ed-top"><div class="tpl-ed-l">
       <span class="tpl-kick">${_tplKick(i)}</span>
-      <h3 class="tpl-ro-ttl${b.title?'':' empty'}">${b.title?_tplE(b.title):'Ohne Titel'}</h3>
+      <h3 class="tpl-ro-ttl${b.title?'':' empty'}">${_tplE(_tplBN(b))}</h3>
       <div class="tpl-chips">
         <span class="tpl-chip"><span class="tpl-catdot" style="background:${_tplCatColor(b.cat)}"></span><b>${_tplE(b.cat)}</b></span>
         ${chip('Dauer',(+b.min||0)+' Min.')}${chip('Spieler',b.players)}${chip('Feld',b.area)}${chip('Intensität',intv)}
@@ -31656,7 +31703,7 @@ function _tplRenderEd(){
   <div class="tpl-ed-top">
     <div class="tpl-ed-l">
       <span class="tpl-kick" id="tplKick">${_tplKick(i)}</span>
-      <textarea class="tpl-in-title" id="tplTitle" rows="1" placeholder="Name der Übung" aria-label="Name der Übung" oninput="_tplGrow(this);tplSetF('title',this.value.replace(/[\\r\\n]+/g,' '))" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${_tplE(b.title)}</textarea>
+      <textarea class="tpl-in-title" id="tplTitle" rows="1" placeholder="${b.ph&&!b.title?'Übung eintragen oder aus der Bibliothek wählen':'Name der Übung'}" aria-label="Name der Übung" oninput="_tplGrow(this);tplSetF('title',this.value.replace(/[\\r\\n]+/g,' '))" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}">${_tplE(b.title)}</textarea>
       <div class="tpl-chips">
         <label class="tpl-chip"><span class="tpl-catdot" id="tplCatDot" style="background:${_tplCatColor(b.cat)}"></span><select aria-label="Kategorie" onchange="tplSetF('cat',this.value)">${catOpts}</select></label>
         <span class="tpl-chip"><span>Dauer</span><button type="button" class="tpl-step" onclick="tplStepMin(-5)" aria-label="5 Minuten weniger">–</button><input class="w-min" id="tplMinIn" type="number" inputmode="numeric" min="1" max="240" value="${+b.min||0}" aria-label="Dauer in Minuten" oninput="tplSetMin(this.value)"><span>Min.</span><button type="button" class="tpl-step" onclick="tplStepMin(5)" aria-label="5 Minuten mehr">+</button></span>
@@ -31742,6 +31789,7 @@ function tplLibToggle(id){TPL.libOpen=(TPL.libOpen===id)?null:id;_tplRenderLibLi
 // ── Editing blocks
 function _tplCur(){return TPL.plan&&TPL.plan.blocks[TPL.sel];}
 function _tplAfterEdit(){
+  TPL.draft=false;
   _tplRenderList();
   const k=document.getElementById('tplKick');if(k&&_tplCur())k.innerHTML=_tplKick(TPL.sel);
   _tplTouch();
@@ -31759,7 +31807,7 @@ function tplStepMin(d){
   const inp=document.getElementById('tplMinIn');if(inp)inp.value=b.min;
   _tplAfterEdit();
 }
-function _tplRedraw(){_tplRenderList();_tplRenderEd();_tplTouch();}
+function _tplRedraw(){TPL.draft=false;_tplRenderList();_tplRenderEd();_tplTouch();}
 function _tplFocusEd(focusTitle){
   if(window.innerWidth<=760){const e=document.getElementById('tplEd');if(e)e.scrollIntoView({behavior:'smooth',block:'start'});}
   if(focusTitle)setTimeout(()=>{const t=document.getElementById('tplTitle');if(t)try{t.focus({preventScroll:window.innerWidth<=760});}catch(e){t.focus();}},60);
@@ -31774,12 +31822,31 @@ function tplAddBlock(at){
 }
 function tplAddLib(id,at){
   const it=TPL.lib[id];if(!it||!TPL.plan)return;
+  // The selected block is still empty (a section of the Standardablauf or a
+  // fresh blank block): the drill goes into it, not next to it
+  if(at==null&&_tplIsSlot(_tplCur())){_tplFill(TPL.sel,id);return;}
   _tplPushUndo();
   const bl=TPL.plan.blocks;
   const pos=(at==null||at<0)?(bl.length?Math.min(TPL.sel+1,bl.length):0):at;
   bl.splice(pos,0,_tplNewBlock(Object.assign({},it,{libId:id,org:''})));
   TPL.sel=pos;_tplRedraw();
   _tplToast(`„${it.title}“ eingefügt`);
+}
+// Empty: nothing a trainer wrote or picked yet (players/field may be preset)
+function _tplIsSlot(b){return !!b&&!String(b.title||'').trim()&&!String(b.desc||'').trim()&&!String(b.coach||'').trim()&&!_dgHas(b.dia)&&!b.libId;}
+function _tplBN(b){return (b&&(b.title||b.ph))||'Ohne Titel';}
+// A drill into block i. A section of the Standardablauf keeps its name and its
+// minutes (the structure is the frame); a blank block takes the drill's
+// minutes. Then the next empty section is selected, so "+ + +" fills them in order.
+function _tplFill(i,id){
+  const it=TPL.lib[id],bl=TPL.plan&&TPL.plan.blocks,b=bl&&bl[i];if(!it||!b)return;
+  _tplPushUndo();
+  const nb=_tplNewBlock(Object.assign({},it,{libId:id,org:b.org||'',ph:b.ph||'',grp:b.grp||'',
+    min:b.ph?b.min:((+it.min>0)?it.min:b.min),players:it.players||b.players||'',area:it.area||b.area||''}));
+  nb.id=b.id;bl[i]=nb;
+  let nx=-1;for(let j=i+1;j<bl.length;j++)if(_tplIsSlot(bl[j])&&bl[j].ph){nx=j;break;}
+  TPL.sel=nx>=0?nx:i;_tplRedraw();
+  _tplToast(`„${it.title}“ → ${b.ph||'Block '+(i+1)}`);
 }
 function tplDel(){
   const bl=TPL.plan&&TPL.plan.blocks;if(!bl||!bl.length)return;
@@ -31813,22 +31880,29 @@ function tplLibDragStart(e,id){
 }
 function tplDragEnd(){
   TPL.drag=null;
-  document.querySelectorAll('#tplOverlay .drag,#tplOverlay .dropb,#tplOverlay .dropa').forEach(x=>x.classList.remove('drag','dropb','dropa'));
+  document.querySelectorAll('#tplOverlay .drag,#tplOverlay .dropb,#tplOverlay .dropa,#tplOverlay .dropin').forEach(x=>x.classList.remove('drag','dropb','dropa','dropin'));
 }
 function tplDragOver(e,i){
   if(!TPL.drag||!TPL.plan||TPL.drag.k==='gp')return;
   e.preventDefault();
   const t=e.currentTarget;let after=false;
+  document.querySelectorAll('#tplOverlay .dropb,#tplOverlay .dropa,#tplOverlay .dropin').forEach(x=>{if(x!==t)x.classList.remove('dropb','dropa','dropin');});
+  if(TPL.drag.k==='lib'&&i>=0&&_tplIsSlot(TPL.plan.blocks[i])){
+    t.classList.remove('dropb','dropa');t.classList.add('dropin');TPL.dropFill=i;TPL.dropAt=null;
+    try{e.dataTransfer.dropEffect='copy';}catch(x){}
+    return;
+  }
+  TPL.dropFill=null;t.classList.remove('dropin');
   if(i>=0){const r=t.getBoundingClientRect();after=e.clientY>r.top+r.height/2;}
-  document.querySelectorAll('#tplOverlay .dropb,#tplOverlay .dropa').forEach(x=>{if(x!==t)x.classList.remove('dropb','dropa');});
   if(i<0)t.classList.add('dropa');else{t.classList.toggle('dropa',after);t.classList.toggle('dropb',!after);}
   TPL.dropAt=i<0?TPL.plan.blocks.length:(after?i+1:i);
   try{e.dataTransfer.dropEffect=TPL.drag.k==='lib'?'copy':'move';}catch(x){}
 }
-function tplDragLeave(e){const t=e.currentTarget;if(!t.contains(e.relatedTarget))t.classList.remove('dropb','dropa');}
+function tplDragLeave(e){const t=e.currentTarget;if(!t.contains(e.relatedTarget))t.classList.remove('dropb','dropa','dropin');}
 function tplDrop(e){
   e.preventDefault();
-  const d=TPL.drag,at=TPL.dropAt;tplDragEnd();TPL.dropAt=null;
+  const d=TPL.drag,at=TPL.dropAt,fill=TPL.dropFill;tplDragEnd();TPL.dropAt=null;TPL.dropFill=null;
+  if(d&&d.k==='lib'&&fill!=null&&TPL.plan){_tplFill(fill,d.id);return;}
   if(!d||at==null||!TPL.plan)return;
   if(d.k==='lib'){tplAddLib(d.id,at);return;}
   let to=at;if(to>d.i)to--;
@@ -31990,10 +32064,72 @@ async function tplApplyCopy(btn,pid){
   _tplApplyBlocks(p.blocks,'Plan vom '+(e?_tplDateLong(e.d,e.s,'short'):''),p.grps);
 }
 
+// ── Standardablauf (1.2.28)
+function _tplStdSan(r){
+  const m=parseInt(r&&r.min,10);
+  return {ph:String((r&&r.ph)||'').trim().slice(0,40),cat:String((r&&r.cat)||'Sonstiges'),min:Math.max(1,Math.min(240,isFinite(m)&&m>0?m:10))};
+}
+function _tplStdRows(){return (TPL.std?_tplArr(TPL.std.rows):TPL_STD_DEF).map(_tplStdSan).filter(r=>r.ph);}
+function _tplStdBlocks(){return _tplStdRows().map(r=>_tplNewBlock({ph:r.ph,cat:r.cat,min:r.min}));}
+function tplStdDlg(){
+  TPL.stdEd=_tplStdRows();
+  const fromPlan=TPL.plan&&TPL.plan.blocks.length&&!TPL.draft;
+  _tplDlg(`<h4>Standardablauf</h4>
+    <p class="tpl-hint">Damit beginnt jeder neue Trainingsplan für ${_tplE(TPL.team)}. Die Übungen wählst du dann im Plan. Gespeicherte Pläne ändern sich nicht.</p>
+    <div class="tpl-std" id="tsRows"></div>
+    <div class="tpl-std-f"><button type="button" class="tpl-lnk" onclick="tplStdAdd()">+ Abschnitt</button>${fromPlan?'<button type="button" class="tpl-lnk" onclick="tplStdFromPlan()">Wie dieser Plan</button>':''}<span class="tpl-hint" id="tsSum"></span></div>
+    <div class="tpl-dlg-f"><button type="button" class="tpl-btn" onclick="tplDlgClose()">Abbrechen</button><button type="button" class="tpl-btn pri" onclick="tplStdSave()">Speichern</button></div>`,'wide');
+  _tplStdRender();
+}
+function _tplStdRender(){
+  const el=document.getElementById('tsRows');if(!el)return;
+  const R=TPL.stdEd||[];
+  el.innerHTML=R.length?R.map((r,i)=>`<div class="tpl-std-r">
+      <input class="tpl-std-n" aria-label="Name des Abschnitts" value="${_tplE(r.ph)}" maxlength="40" placeholder="z. B. Hauptteil" oninput="TPL.stdEd[${i}].ph=this.value">
+      <select aria-label="Kategorie" onchange="TPL.stdEd[${i}].cat=this.value">${TPL_CATS.map(c=>`<option${c.k===r.cat?' selected':''}>${c.k}</option>`).join('')}</select>
+      <span class="tpl-std-min"><input type="number" inputmode="numeric" min="1" max="240" value="${r.min}" aria-label="Minuten" oninput="TPL.stdEd[${i}].min=parseInt(this.value,10)||0;_tplStdSum()"><span>Min.</span></span>
+      <span class="tpl-std-b"><button type="button" class="tpl-ab ico" title="Nach oben" aria-label="Nach oben" onclick="tplStdMove(${i},-1)"${i?'':' disabled'}>${TPL_IC.up}</button><button type="button" class="tpl-ab ico" title="Nach unten" aria-label="Nach unten" onclick="tplStdMove(${i},1)"${i<R.length-1?'':' disabled'}>${TPL_IC.down}</button><button type="button" class="tpl-ab ico danger" title="Abschnitt entfernen" aria-label="Abschnitt entfernen" onclick="tplStdDel(${i})">${TPL_IC.del}</button></span>
+    </div>`).join('')
+    :'<div class="tpl-none">Ohne Abschnitte beginnt jeder neue Plan leer.</div>';
+  _tplStdSum();
+}
+function _tplStdSum(){
+  const e=document.getElementById('tsSum');if(!e)return;
+  const t=(TPL.stdEd||[]).reduce((a,r)=>a+(+r.min||0),0);
+  e.textContent=t?'Zusammen '+t+' Min.':'';
+}
+function tplStdAdd(){
+  TPL.stdEd=TPL.stdEd||[];TPL.stdEd.push({ph:'',cat:'Sonstiges',min:10});_tplStdRender();
+  const ins=document.querySelectorAll('#tsRows .tpl-std-n');const l=ins[ins.length-1];if(l)l.focus();
+}
+function tplStdMove(i,d){const R=TPL.stdEd||[],j=i+d;if(j<0||j>=R.length)return;const [r]=R.splice(i,1);R.splice(j,0,r);_tplStdRender();}
+function tplStdDel(i){(TPL.stdEd||[]).splice(i,1);_tplStdRender();}
+function tplStdFromPlan(){
+  if(!TPL.plan)return;
+  TPL.stdEd=TPL.plan.blocks.map(b=>_tplStdSan({ph:b.ph||b.title||b.cat,cat:b.cat,min:b.min}));_tplStdRender();
+}
+function tplStdSave(){
+  const rows=(TPL.stdEd||[]).map(_tplStdSan).map((r,i)=>Object.assign(r,{ph:r.ph||('Abschnitt '+(i+1))}));
+  const v={rows:rows,upd:Date.now(),by:(CU&&CU.name)||''};
+  TPL.std=v;_tplWrite(_tplBase()+'/std',_tplClean(v));
+  tplDlgClose();TPL.stdEd=null;
+  // The plan on screen is still unsaved (the old standard or emptied): show the new one
+  if(TPL.plan&&(TPL.draft||(!TPL.plan.blocks.length&&!(TPL.idx&&TPL.idx[TPL.pid])))){
+    TPL.plan.blocks=_tplStdBlocks();TPL.draft=TPL.plan.blocks.length>0;TPL.sel=0;_tplRenderList();_tplRenderEd();
+  }
+  _tplToast(rows.length?'Standardablauf gespeichert':'Neue Pläne beginnen jetzt leer');
+}
+// This one plan without the standard (nothing saved: the plan is empty)
+function tplStdClear(){
+  if(!TPL.plan)return;
+  _tplPushUndo();TPL.plan.blocks=[];TPL.sel=0;TPL.draft=false;_tplRenderList();_tplRenderEd();
+}
+
 // ── Dialog and toast
-function _tplDlg(html){
+function _tplDlg(html,cls){
   const bg=document.getElementById('tplDlg');const box=document.getElementById('tplDlgBox');
   if(!bg||!box)return;
+  box.className='tpl-dlg'+(cls?' '+cls:'');
   box.innerHTML=html;bg.classList.add('open');
   if(typeof _navArm==='function')_navArm();
 }
@@ -32026,8 +32162,8 @@ function _tplPrintHtml(s){
     const coach=String(b.coach||'').split(/\n+/).map(x=>x.replace(/^[-•*]\s*/,'').trim()).filter(Boolean);
     const meta=[b.players?_tplPlayersTxt(b.players):'',b.area||''].filter(Boolean).map(E).join(' · ');
     return `<section class="b"><div class="tm"><b>${starts[i].clock||('+'+starts[i].from+'′')}</b><span>${+b.min||0} Min.</span></div>
-      ${_dgHas(b.dia)?`<div class="dg">${_dgSvg(b.dia,'Skizze: '+(b.title||''))}</div>`:''}<div class="bd"><div class="k"><i style="background:${_tplCatColor(b.cat)}"></i>${E(b.cat)}${(()=>{const g=_tplBlkGrp(b);return g?(_tplGrps().length>1?' · Einteilung '+E(g.l):' · in Gruppen'):'';})()}${b.org?' · '+E(b.org):''}</div>
-      <h2>${E(b.title||'Ohne Titel')}</h2>${meta?`<div class="m">${meta}</div>`:''}${b.desc?`<p>${E(b.desc)}</p>`:''}
+      ${_dgHas(b.dia)?`<div class="dg">${_dgSvg(b.dia,'Skizze: '+(b.title||''))}</div>`:''}<div class="bd"><div class="k"><i style="background:${_tplCatColor(b.cat)}"></i>${b.title&&b.ph?E(b.ph)+' · ':''}${E(b.cat)}${(()=>{const g=_tplBlkGrp(b);return g?(_tplGrps().length>1?' · Einteilung '+E(g.l):' · in Gruppen'):'';})()}${b.org?' · '+E(b.org):''}</div>
+      <h2>${E(_tplBN(b))}</h2>${meta?`<div class="m">${meta}</div>`:''}${b.desc?`<p>${E(b.desc)}</p>`:''}
       ${coach.length?`<ul>${coach.map(c=>'<li>'+E(c)+'</li>').join('')}</ul>`:''}</div></section>`;
   }).join('');
   const date=_tplDateLong(s.date,TPL.season,'year');
@@ -32665,7 +32801,7 @@ function _tplGrpCntTxt(){
 // The splits as tabs (in Ablauf order), a new one, and the changes
 function _tplGrpTabs(cur,wx){
   const L=_tplGrpsOrdered();const ch=_tplGrpChanges();
-  const tabs=L.map(g=>{const on=!wx&&cur&&cur.id===g.id;const bl=_tplGrpBlocks(g).map(x=>x.b.title||'Ohne Titel');
+  const tabs=L.map(g=>{const on=!wx&&cur&&cur.id===g.id;const bl=_tplGrpBlocks(g).map(x=>_tplBN(x.b));
     return `<button type="button" role="tab" aria-selected="${on}" class="tpl-gtab hk-isle${on?' on':''}" onclick="tplGrpSel('${g.id}')">
       <span class="t"><b>${_tplE(g.l)}</b><span class="tpl-bgd">${_tplGrpDots(g)}</span>${g.n} Gruppen</span>
       <span class="s">${bl.length?_tplE(bl.join(' · ')):'noch keiner Übung zugeordnet'}</span></button>`;}).join('');
@@ -32686,7 +32822,7 @@ function _tplGrpAbl(){
       h+=`<button type="button" class="tpl-gchg" onclick="tplGrpWx(${i})" title="Zeigen, wer in welche Gruppe geht">${TPL_IC_SWAP}${_tplE(c.from.l)} → ${_tplE(c.to.l)} · ${d.moved?d.moved+' '+(d.moved===1?'wechselt':'wechseln'):'niemand wechselt'}</button>`;}
     const seg=[{id:'',t:'–',tip:'Ohne Gruppen'}].concat(L.map(g=>({id:g.id,t:g.l,tip:'Einteilung '+g.l+' · '+g.n+' Gruppen'})));
     const cur=b.grp||'';
-    h+=`<div class="tpl-gab"><span class="tpl-catdot" style="background:${_tplCatColor(b.cat)}"></span><span class="nm">${_tplE(b.title||'Ohne Titel')}</span>
+    h+=`<div class="tpl-gab"><span class="tpl-catdot" style="background:${_tplCatColor(b.cat)}"></span><span class="nm">${_tplE(_tplBN(b))}</span>
       <span class="tpl-gseg" role="group" aria-label="Gruppen für ${_tplE(b.title||'Block '+(i+1))}">${seg.map(o=>`<button type="button" class="${cur===o.id?'on':''}" title="${_tplE(o.tip)}" aria-pressed="${cur===o.id}" onclick="tplGrpAssign(${i},'${o.id}')"${ed?'':' disabled'}>${_tplE(o.t)}</button>`).join('')}</span></div>`;
   });
   return h;
@@ -32701,7 +32837,7 @@ function _tplWxHtml(){
         <div class="tpl-gl">${list.map(o=>{const F=o.from==null?null:_tplGrpColor(o.from);
           return `<div class="tpl-wxp${o.stay?' stay':''}">${F?_tplDot(o.from):'<i class="tpl-gdot new"></i>'}<span class="nm">${_tplE(o.x.p.name)}</span><span class="tpl-wxf">${o.stay?'bleibt':F?'aus '+F.n:'neu dabei'}</span></div>`;}).join('')||'<span class="tpl-none">–</span>'}</div></div>`;};
     return `<section class="tpl-col tpl-wx" id="tplWx${c.i}" aria-label="Wechsel vor ${_tplE(b.title||'Block '+(c.i+1))}">
-      <div class="tpl-wxh"><span class="k">${st[c.i]&&st[c.i].clock?st[c.i].clock+' · ':''}vor „${_tplE(b.title||'Ohne Titel')}“</span>
+      <div class="tpl-wxh"><span class="k">${st[c.i]&&st[c.i].clock?st[c.i].clock+' · ':''}vor „${_tplE(_tplBN(b))}“</span>
         <b>Einteilung ${_tplE(c.from.l)} → ${_tplE(c.to.l)}</b><span class="m">${d.moved===0?'Niemand wechselt das Leibchen':d.moved+' von '+d.total+' '+(d.moved===1?'wechselt':'wechseln')+' das Leibchen'}</span></div>
       <div class="tpl-wxg">${d.cols.map((l,j)=>box(l,j)).join('')}${d.gk.length?box(d.gk,-1):''}</div></section>`;
   }).join('')+`</div>`;
@@ -32882,7 +33018,7 @@ function _tplGrpPrint(){
     const nm=x=>{const o=fm[x.p.name];
       return _tplE((x.p.nr!=null&&x.p.nr!==''?x.p.nr+' ':'')+x.p.name)+((o&&!o.stay)?` <span class="fr">← ${o.from==null?'neu':_tplE(_tplGrpColor(o.from).n)}</span>`:'');};
     const box=(G,list)=>`<div class="gb"><div class="gbh" style="background:${G.bg};color:${G.fg};${G.bd?'border-bottom:1px solid '+G.bd:''}">${G.n} · ${list.length}</div><div class="gbl">${list.map(nm).join('<br>')||'–'}</div></div>`;
-    const t=multi?`Einteilung ${_tplE(g.l)} · ${_tplGrpBlocks(g).map(x=>_tplE(x.b.title||'Ohne Titel')).join(', ')}${d?` · ${d.moved} ${d.moved===1?'wechselt':'wechseln'} das Leibchen (← = vorher)`:''}`:'Gruppen';
+    const t=multi?`Einteilung ${_tplE(g.l)} · ${_tplGrpBlocks(g).map(x=>_tplE(_tplBN(x.b))).join(', ')}${d?` · ${d.moved} ${d.moved===1?'wechselt':'wechseln'} das Leibchen (← = vorher)`:''}`:'Gruppen';
     return `<div class="grp"><b class="gt">${t}</b><div class="gbs">${V.groups.map((gr,i)=>box(TPL_GRP[i],gr)).join('')}${V.gk.length?box(TPL_GK,V.gk):''}</div></div>`;
   }).join('');
 }
@@ -33072,7 +33208,7 @@ function _tplPitchRender(){
       <span class="tpp-timer" id="tpTimer"></span>
       <span class="tpp-tsub" id="tpSub"></span>
     </div>
-    <h1 class="tpp-title">${_tplE(b.title||'Ohne Titel')}</h1>
+    <h1 class="tpp-title">${_tplE(_tplBN(b))}</h1>
     <div class="tpp-body">
       ${_dgHas(b.dia)?`<div class="tpp-dia">${_dgSvg(b.dia,'Skizze: '+(b.title||''))}</div>`:''}
       ${coach.length?`<ul class="tpp-coach">${coach.map(c=>'<li>'+_tplE(c)+'</li>').join('')}</ul>`:''}
@@ -33082,7 +33218,7 @@ function _tplPitchRender(){
       ${b.desc?`<details class="tpp-desc"${coach.length||_dgHas(b.dia)?'':' open'}><summary>Ablauf</summary><p>${_tplE(b.desc)}</p></details>`:''}
     </div>
     <div class="tpp-foot">
-      <span class="tpp-next">${nx?`Danach: ${_tplE(nx.title||'Ohne Titel')} · ${+nx.min||0}′`:'Letzter Block'}${st&&st.clock?` · Plan ${st.clock}–${st.clockEnd}`:''}</span>
+      <span class="tpp-next">${nx?`Danach: ${_tplE(_tplBN(nx))} · ${+nx.min||0}′`:'Letzter Block'}${st&&st.clock?` · Plan ${st.clock}–${st.clockEnd}`:''}</span>
       <div class="tpp-btns">
         <button type="button" class="tpp-b tpp-prev" onclick="tplPitchGo(${bi-1})" aria-label="Vorheriger Block"${bi===0?' disabled':''}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
         <button type="button" class="tpp-b tpp-b2" id="tpPause" onclick="tplPitchToggle()">${!r?'Start':running?'Pause':'Weiter'}</button>
@@ -33123,7 +33259,7 @@ function _tplPitchListHtml(r){
     <div class="tpp-prog">${_tplPitchProg(r,bi)}</div>
     <div class="tpp-body">${bl.map((b,i)=>`<button type="button" class="tpp-card${i===bi?' cur':''}" onclick="tplPitchGo(${i})">
         ${_dgHas(b.dia)?`<span class="tpp-th">${_dgSvg(b.dia)}</span>`:`<span class="tpp-th none" style="background:${_tplCatColor(b.cat)}"></span>`}
-        <span class="tpp-ct"><span class="k"><i style="background:${_tplCatColor(b.cat)}"></i>${st[i].clock?st[i].clock+' · ':''}${_tplE(b.cat)}</span><b>${_tplE(b.title||'Ohne Titel')}</b>
+        <span class="tpp-ct"><span class="k"><i style="background:${_tplCatColor(b.cat)}"></i>${st[i].clock?st[i].clock+' · ':''}${_tplE(b.cat)}</span><b>${_tplE(_tplBN(b))}</b>
         ${r&&_tplRunSec(r,i)>0?`<span class="k">${_tplMMSS(_tplRunSec(r,i))} gelaufen</span>`:''}</span>
         <span class="tpp-cm">${+b.min||0}′</span></button>`).join('')}
     </div>
@@ -33134,7 +33270,7 @@ function _tplPitchListHtml(r){
 function _tplPitchEndHtml(r){
   const bl=TPL.plan.blocks;
   const rows=bl.map((b,i)=>{const s=r?_tplRunSec(r,i):0;const d=Math.round(s/60)-(+b.min||0);
-    return `<div class="tpp-er"><span class="t">${_tplE(b.title||'Ohne Titel')}</span><span class="p">${+b.min||0}′</span><span class="a${!s?'':d>2?' over':d<-2?' under':''}">${s?Math.round(s/60)+'′':'–'}</span></div>`;}).join('');
+    return `<div class="tpp-er"><span class="t">${_tplE(_tplBN(b))}</span><span class="p">${+b.min||0}′</span><span class="a${!s?'':d>2?' over':d<-2?' under':''}">${s?Math.round(s/60)+'′':'–'}</span></div>`;}).join('');
   const tot=r?bl.reduce((a,b,i)=>a+_tplRunSec(r,i),0):0;
   return `<div class="tpp-in tpp-end">
     <div class="tpp-top"><button type="button" class="tpp-ib" onclick="tplPitchView('blk')" aria-label="Zurück"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><span class="tpp-pos">Training beenden</span><span style="width:44px"></span></div>
@@ -33399,7 +33535,8 @@ function tplMoreDo(fn){const m=document.getElementById('tplMoreMenu');if(m)m.hid
    'tplLibEdit','tplLibSave','tplLibDel','tplToLib','tplSaveTplDlg','tplSaveTpl','tplLoadTplDlg','tplApplyTpl','tplTplDel','tplCopyDlg','tplApplyCopy',
    'tplUndo','dgTool','dgSet','dgStraight','dgRotate','dgDel','dgDup','dgSetBg','dgClear','dgUndo','dgRedo',
    'tplGrpToggle','tplGrpMove','tplGrpN','tplGrpOpt','tplGrpShuffle','tplGrpFor','tplBlockGrp','tplGrpDrag','tplGrpDrop','tplPitchSave',
-   'tplGrpNew','tplGrpDel','tplGrpAssign','tplBlockGrpSet'
+   'tplGrpNew','tplGrpDel','tplGrpAssign','tplBlockGrpSet',
+   'tplStdDlg','tplStdSave','tplStdClear','tplStdAdd','tplStdMove','tplStdDel','tplStdFromPlan'
   ].forEach(n=>{
     const f=window[n];if(typeof f!=='function')return;
     window[n]=function(){
