@@ -743,9 +743,9 @@ function renderPlayerStats(d){
     const exOnly=t=>t.pct===0&&t.e>0&&t.e===t.t;
     const anyEx=tr.some(exOnly),anyFree=tr.some(t=>t.pct==null);
     html+=`<div class="ps-h">Die letzten ${tr.length} Wochen</div><div class="ps-box"><div class="ps-bars">${tr.map(t=>t.pct==null
-      ?`<div class="free" title="KW ${esc(t.kw)}: keine Termine"><i><em>\u2013</em></i><small>${esc(t.kw)}</small></div>`
+      ?`<div class="free" title="KW ${esc(t.kw)}: keine Termine oder Pause"><i><em>\u2013</em></i><small>${esc(t.kw)}</small></div>`
       :`<div title="KW ${esc(t.kw)}: ${t.t?esc(t.a)+' von '+esc(t.t):esc(t.pct)+' %'}"><i><em class="${exOnly(t)?'ex':''}">${esc(t.pct)}</em><s class="${t.pct>=100?'hi':exOnly(t)?'ex':''}" style="height:${Math.max(3,Math.round(t.pct*0.8))}px"></s></i><small>${esc(t.kw)}</small></div>`).join('')}</div>
-      <div class="ps-legend">Anwesenheit in %. Gelb: bei allen Terminen dabei.${anyEx?' Orange: nur entschuldigt gefehlt.':''}${anyFree?' \u201e\u2013\u201c: keine Termine.':''}</div></div>`;
+      <div class="ps-legend">Anwesenheit in %. Gelb: bei allen Terminen dabei.${anyEx?' Orange: nur entschuldigt gefehlt.':''}${anyFree?' \u201e\u2013\u201c: keine Termine oder Pause.':''}</div></div>`;
   }
   // 1.2.48: only days with enough sessions to say something; a single
   // Saturday in the season is not a 0-% weekday. The rest in one line.

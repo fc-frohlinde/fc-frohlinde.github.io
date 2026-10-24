@@ -2248,6 +2248,13 @@ tr.mx-former-h td{padding:10px 8px 6px;background:transparent;border:0;text-alig
 .mob label.ap-trial input{width:17px;height:17px;margin:1px 0 0;padding:0;flex:none;accent-color:#7C3AED;}
 #stBox .setting-label label{font:inherit;text-transform:none;letter-spacing:normal;margin:0;color:inherit;}
 body.player-mode .fl .hub-news.fl-pause{border-left-color:#8FA3C8;}
+/* In Pause at the roll call / in the session window (1.2.52) */
+.rc-pz-h{margin:18px 4px 8px;font-size:.78rem;font-weight:700;color:rgba(255,255,255,.6);}
+.rc-row.rc-pz{opacity:.8;}
+.rc-pzb{margin-left:auto;flex:none;border:1px solid rgba(255,255,255,.35);background:none;color:#fff;border-radius:10px;padding:8px 12px;font:inherit;font-size:.82rem;font-weight:700;cursor:pointer;}
+.rc-pzb:hover{background:rgba(255,255,255,.1);}
+.ssx-pz .ssx-chip{opacity:.85;}
+.ssx-pzt{margin-left:6px;font-size:.72rem;font-weight:600;color:var(--hx-blue,var(--bm));}
 /* Balanced tile rows (1.2.49, _balTiles): flex instead of an auto-fit grid */
 [data-bal]{display:flex !important;flex-wrap:wrap;}
 [data-bal]>*{box-sizing:border-box;}
@@ -7077,13 +7084,17 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.51'; // v1.2.51: Spielerstatus
-const APP_VERSION_LABEL='1.2.51';
+const APP_VERSION='1.2.52'; // v1.2.52: Zurück aus der Pause
+const APP_VERSION_LABEL='1.2.52';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792853038148; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792855634999; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.52',date:'24.10.2026',title:'Zurück aus der Pause',items:[
+    {icon:'⏯',title:'„Ist da“ bei der Anwesenheit',desc:'Wer in Pause ist, steht nicht in der Liste. Kommt er trotzdem, steht er unten unter „In Pause“: ein Tippen auf „Ist da“ beendet die Pause ab diesem Termin und trägt ihn als anwesend ein. Genauso im Fenster des Termins („Wer war da?“ / „Wer kommt?“).'},
+    {icon:'📊',title:'Statistik: „–“ heißt auch Pause',desc:'In „Die letzten Wochen“ steht „–“ für eine Woche ohne Termine oder in der Pause.'},
+  ]},
   {version:'1.2.51',date:'24.10.2026',title:'Spielerstatus: Probetraining, Pause, nicht mehr dabei',items:[
     {icon:'🧑\u200d🤝\u200d🧑',title:'Status mit Datum',desc:'Im Spielerprofil: „Probetraining“, „Pause“ (von – bis, „bis“ darf offen bleiben) und „Nicht mehr dabei“ (seit). Die Daten machen die Geschichte richtig: was davor war, zählt weiter, die Zeit danach nicht – nichts wird umgeschrieben, alles lässt sich zurücknehmen.'},
     {icon:'🧪',title:'Probetraining',desc:'Wird in der Anwesenheit erfasst wie jeder andere (Markierung „Probe“), zählt aber in keiner Quote – weder der Mannschaft noch seiner eigenen. Kein automatisches „M“, keine Erinnerungen, nicht bei „Rest anwesend“. Nach 3 Terminen fragt die Übersicht: aufnehmen? Ab „Aufnehmen“ zählt er; die Probetrainings bleiben in der Tabelle, zählen aber nicht.'},
@@ -7791,7 +7802,7 @@ function _pstAfter(p,pi,what){
   try{_ayApplyAll();}catch(e){}
   saveG();
   logAudit('Spielerstatus',p.name||'?',what);
-  closeM('moPSt');
+  {const mo=document.getElementById('moPSt');if(mo&&mo.classList.contains('open'))closeM('moPSt');}
   try{render();}catch(e){}
   try{const mp=document.getElementById('moPlayer');if(mp&&mp.classList.contains('open')&&window._psCurrentPi===pi)openPlayerStats(pi);}catch(e){}
   try{const tm=document.getElementById('moTeamMgr');if(tm&&tm.classList.contains('open'))renderMgrPlayers();}catch(e){}
@@ -7837,6 +7848,33 @@ function pstQuick(pi,act){
   else if(act==='return'){snap();_pstReturn(p,today);what='wieder dabei ab '+_isoDE(today);}
   else return;
   _pstAfter(p,pi,what);
+}
+// In a pause at this session (not gone): for "Ist da" (1.2.52)
+function _pzAt(D,s,season){
+  const k=season?_dbSortKey(s.date,season):dispToSortKey(s.date);
+  return (D&&D.players||[]).map((p,pi)=>({p,pi})).filter(({p})=>p&&_pOffAt(p,k)==='pause'
+    &&(!p.joinDate||k>=isoToSortKey(p.joinDate)));
+}
+function _pzTxt(p,s,season){
+  const k=season?_dbSortKey(s.date,season):dispToSortKey(s.date);
+  const z=_pPauseAt(p,k);
+  return z?('Pause seit '+_isoDE(z.f)+(z.t?' bis '+_isoDE(z.t):'')):'Pause';
+}
+// He is here: the pause ends with this session; at roll-call time he is present
+function pzBack(pi,si){
+  if(!canEdit())return;
+  const D=cd(),p=D&&D.players&&D.players[pi],s=D&&D.sessions&&D.sessions[si];
+  if(!p||!s)return;
+  const nm=(typeof getDisplayName==='function'?getDisplayName(p):p.name)||'';
+  const d=dispToISO(s.date);
+  const roll=typeof _isSessRollCallTime==='function'&&_isSessRollCallTime(si);
+  if(!confirm(nm+' ist wieder dabei?\n\nDie Pause endet am '+_isoDE(_isoAdd(d,-1))+(roll?', und er wird f\u00fcr diesen Termin als anwesend eingetragen.':'.')))return;
+  snap();
+  _pstEndPause(p,d);
+  _pstAfter(p,pi,'Pause beendet, wieder dabei ab '+_isoDE(d));
+  if(roll)setSessPlayerStatus(pi,si,1);
+  try{if(_rcSi===si)rcRender();}catch(e){}
+  try{_ssHxAttRender(si);}catch(e){}
 }
 // "18 Spieler": the team today — not on trial, not gone
 function _pTeamCount(players){return (players||[]).filter(p=>p&&!p.trial&&!_pGone(p)).length;}
@@ -25250,7 +25288,7 @@ function rcRender(){
       const v=st(p);
       const marked=isMarked(v);
       if(_rcOnlyOpen&&marked)return;
-      html+='<div class="rc-row'+(marked?' done':'')+'">'+avatar(p)+who(p,_rcHint(p,si,s))
+      html+='<div class="rc-row'+(marked?' done':'')+'">'+avatar(p)+who(p,_rcHint(p,si,s)||(p.trial?{t:'Probetraining \u2013 nicht bei \u201eRest anwesend\u201c',c:''}:null))
         +'<div class="rc-btns">'
           +'<button class="rc-b'+(v===1?' sel-a':'')+'" onclick="rcSet('+pi+',1)" title="Anwesend" aria-label="Anwesend">✓</button>'
           +'<button class="rc-b'+(v===0?' sel-f':'')+'" onclick="rcSet('+pi+',0)" title="Fehlend" aria-label="Fehlend">✕</button>'
@@ -25259,6 +25297,14 @@ function rcRender(){
         +'</div></div>';
     });
     if(!html)html='<div class="rc-empty">✅ Alle Spieler erfasst.</div>';
+    // In Pause on this day (1.2.52): not in the list — if he came anyway, one
+    // tap ends the pause from this session and marks him present
+    if(canEdit()){
+      const pz=_pzAt(D,s,season);
+      const past=sessTookPlace(s,season)&&_dbSortKey(s.date,season)<todaySK();
+      if(pz.length)html+='<div class="rc-pz-h">In Pause</div>'+pz.map(({p,pi})=>'<div class="rc-row rc-pz">'+avatar(p)+who(p,{t:_pzTxt(p,s,season),c:''})
+        +'<button type="button" class="rc-pzb" onclick="pzBack('+pi+','+si+')">'+(past?'War da':'Ist da')+'</button></div>').join('');
+    }
   }
   listEl.innerHTML=html;
 }
@@ -25747,6 +25793,10 @@ function _ssHxAttRender(si){
     }else body=`<div class="ssx-chips">${list.map(x=>chip(x)).join('')}</div>`;
     h+=`<div class="ssx-grp" data-st="${v}"><div class="ssx-gh"><i class="s-${cls}"></i>${label} <b>${list.length}</b>${remind}</div>${body}</div>`;
   });
+  // In Pause on this day (1.2.52): back with one tap
+  {const pz=ed?_pzAt(D,s,season):[];
+   if(pz.length)h+=`<div class="ssx-grp ssx-pz"><div class="ssx-gh"><i class="s-nk"></i>In Pause <b>${pz.length}</b></div><div class="ssx-chips">${pz.map(({p,pi})=>
+     `<button type="button" class="ssx-chip" onclick="pzBack(${pi},${si})" title="${e(_pzTxt(p,s,season))} – antippen: ${roll?'war da':'ist wieder dabei'}"><b>${e(String(p.nr||'–'))}</b>${e((getDisplayName?getDisplayName(p):p.name)||'')}<span class="ssx-pzt">${roll?'war da?':'wieder dabei?'}</span></button>`).join('')}</div></div>`;}
   if(roll&&s.type==='match'&&ed&&(typeof sessTookPlace!=='function'||sessTookPlace(s,season)))
     h+=`<button type="button" class="ssx-more" onclick="ssAttOpen(${si},1)">Tore und Vorlagen eintragen</button>`;
   el.innerHTML=h;
