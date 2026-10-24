@@ -87,7 +87,7 @@ export function rollCall(b, now) {
       if (!p || !afterJoin(p, s, b.season)) return;
       const v = st(p, si);
       if (v === 1) there++;
-      else if (v === 3 || v === 4) open++;
+      else if ((v === 3 || v === 4) && !p.trial) open++;   // Probetraining: no entry = not there (1.2.53)
     });
     if (!open) return;
     out.push({ key: metaKey(s), title: 'Anwesenheit fehlt',
@@ -136,7 +136,7 @@ export function lineup(b, now) {
     (b.players || []).forEach(p => {
       if (!p || !afterJoin(p, s, b.season)) return;
       const v = st(p, si);
-      if (v === 4 || v === 1) yes++; else if (v === 0 || v === 2) no++; else open++;
+      if (v === 4 || v === 1) yes++; else if (v === 0 || v === 2) no++; else if (!p.trial) open++;
     });
     out.push({ key: metaKey(s), title: what(s) + ' heute ' + s.time,
       body: yes + ' dabei, ' + no + ' abgesagt, ' + open + ' offen', url: go('sess&gi=' + si, b), ttl: Math.max(600, u * 60) });

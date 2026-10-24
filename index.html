@@ -2248,6 +2248,12 @@ tr.mx-former-h td{padding:10px 8px 6px;background:transparent;border:0;text-alig
 .mob label.ap-trial input{width:17px;height:17px;margin:1px 0 0;padding:0;flex:none;accent-color:#7C3AED;}
 #stBox .setting-label label{font:inherit;text-transform:none;letter-spacing:normal;margin:0;color:inherit;}
 body.player-mode .fl .hub-news.fl-pause{border-left-color:#8FA3C8;}
+/* every pause of a player, in the status dialog (1.2.53) */
+#moPSt .pst-list{margin:12px 2px 0;padding-top:10px;border-top:1px solid var(--hx-line,var(--gl));}
+#moPSt .pst-lh{font-size:.78rem;font-weight:700;color:var(--hx-muted,var(--gm));margin-bottom:4px;}
+#moPSt .pst-li{display:flex;align-items:center;justify-content:space-between;padding:4px 0;font-size:.88rem;}
+#moPSt .pst-x{border:0;background:none;color:var(--hx-muted,var(--gm));font-size:.9rem;padding:4px 8px;cursor:pointer;border-radius:8px;}
+#moPSt .pst-x:hover{background:rgba(0,0,0,.05);color:#C9373E;}
 /* In Pause at the roll call / in the session window (1.2.52) */
 .rc-pz-h{margin:18px 4px 8px;font-size:.78rem;font-weight:700;color:rgba(255,255,255,.6);}
 .rc-row.rc-pz{opacity:.8;}
@@ -7084,13 +7090,17 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.52'; // v1.2.52: Zurück aus der Pause
-const APP_VERSION_LABEL='1.2.52';
+const APP_VERSION='1.2.53'; // v1.2.53: Frühere Pausen
+const APP_VERSION_LABEL='1.2.53';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792855634999; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792856225346; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.53',date:'24.10.2026',title:'Frühere Pausen',items:[
+    {icon:'🗓',title:'Pausen auch nachträglich',desc:'Eine Pause lässt sich auch für die Vergangenheit eintragen (z. B. verletzt im August): Status → „Pause“, von – bis. Die Termine darin zählen dann nicht mehr – ein „E“ aus dieser Zeit verbraucht auch nicht mehr das „entschuldigt ohne Abzug“ auf der Karte. Ein Spieler kann mehrere Pausen haben; im Status-Fenster stehen alle, jede lässt sich wieder entfernen.'},
+    {icon:'🧪',title:'Probetraining hält die Anwesenheit nicht offen',desc:'Ein Probespieler ohne Eintrag gilt als nicht da: der Termin erscheint deshalb nicht mehr unter „Anwesenheit fehlt“, und „x von y erfasst“ wartet nicht auf ihn.'},
+  ]},
   {version:'1.2.52',date:'24.10.2026',title:'Zurück aus der Pause',items:[
     {icon:'⏯',title:'„Ist da“ bei der Anwesenheit',desc:'Wer in Pause ist, steht nicht in der Liste. Kommt er trotzdem, steht er unten unter „In Pause“: ein Tippen auf „Ist da“ beendet die Pause ab diesem Termin und trägt ihn als anwesend ein. Genauso im Fenster des Termins („Wer war da?“ / „Wer kommt?“).'},
     {icon:'📊',title:'Statistik: „–“ heißt auch Pause',desc:'In „Die letzten Wochen“ steht „–“ für eine Woche ohne Termine oder in der Pause.'},
@@ -7755,9 +7765,10 @@ function pstOpen(pi,pre){
   document.getElementById('pst-body').innerHTML=
     opt('active',aL,aS,aF)
     +opt('trial','Probetraining','Wird erfasst wie jeder andere, zählt aber in keiner Quote. Kein automatisches „M“, keine Erinnerungen.',date('pst-t',p.trial||today,'seit'))
-    +opt('pause','Pause','Termine in der Pause zählen nicht – weder für ihn noch für die Mannschaft. Keine Erinnerungen, nicht im Kader. Sein Link bleibt.',
+    +opt('pause','Pause','Termine in der Pause zählen nicht – weder für ihn noch für die Mannschaft. Keine Erinnerungen, nicht im Kader. Sein Link bleibt. Geht auch nachträglich, z.\u00a0B. für eine Verletzung im August.',
       date('pst-pf',curPause?curPause.f:today,'von')+date('pst-pt',curPause?curPause.t:'','bis (leer = offen)'))
-    +opt('gone',st.k==='trial'?'Nicht aufnehmen':'Nicht mehr dabei','Ab diesem Tag zählt nichts mehr; er steht unten unter „Nicht mehr dabei“. Alles davor bleibt. Sein Link wird abgeschaltet.',date('pst-g',goneDef,'seit'));
+    +opt('gone',st.k==='trial'?'Nicht aufnehmen':'Nicht mehr dabei','Ab diesem Tag zählt nichts mehr; er steht unten unter „Nicht mehr dabei“. Alles davor bleibt. Sein Link wird abgeschaltet.',date('pst-g',goneDef,'seit'))
+    +((Array.isArray(p.pauses)&&p.pauses.length)?`<div class="pst-list"><div class="pst-lh">Seine Pausen</div>${p.pauses.map((z,i)=>z?`<div class="pst-li"><span>${_isoDE(z.f)}${z.t?' – '+_isoDE(z.t):' – offen'}</span><button type="button" class="pst-x" onclick="pstDelPause(${i})" aria-label="Pause entfernen" title="Pause entfernen">\u2715</button></div>`:'').join('')}</div>`:'');
   openM('moPSt');
 }
 function pstPick(m){
@@ -7783,11 +7794,22 @@ function _pstReturn(p,d){
 }
 function _pstSetPause(p,f,t,st){
   if(!Array.isArray(p.pauses))p.pauses=[];
-  const cur=st.k==='pause'?st.pause:(st.k==='active'&&st.next)?st.next:null;
   const x={f,t:t||''};
-  const i=cur?p.pauses.indexOf(cur):-1;
-  if(i>=0)p.pauses[i]=x;else p.pauses.push(x);
+  // A pause entered for the past (1.2.53) stands beside the others; one that
+  // overlaps an existing pause replaces it
+  const END='9999-12-31',over=a=>a&&a.f<=(x.t||END)&&x.f<=(a.t||END);
+  p.pauses=p.pauses.filter(a=>!over(a));
+  p.pauses.push(x);
   p.pauses.sort((a,b)=>String(a.f).localeCompare(String(b.f)));
+}
+function pstDelPause(i){
+  const pi=_pstPi,D=cd(),p=D&&D.players&&D.players[pi];
+  if(!p||!canEdit()||!Array.isArray(p.pauses)||!p.pauses[i])return;
+  const z=p.pauses[i],txt=_isoDE(z.f)+(z.t?'–'+_isoDE(z.t):' (offen)');
+  if(!confirm('Pause '+txt+' entfernen?\n\nDie Termine darin zählen dann wieder.'))return;
+  snap();
+  p.pauses.splice(i,1);if(!p.pauses.length)delete p.pauses;
+  _pstAfter(p,pi,'Pause '+txt+' entfernt');
 }
 // Automatic "M" where he no longer counts goes back to open
 function _pstTidy(p){
@@ -24416,7 +24438,11 @@ function openPlayerStats(pi,opts){
       if(_nb)info.push(_row('Gesperrt',escapeHtml(sbBanText(_nb,_D).replace(/^gesperrt /,''))+' \u2013 fehlt am '+escapeHtml(_D.sessions[_nb.ti].date)));
     }
     // Status (1.2.51): "Aktiv" as a row here; anything else stands at the top
-    if(canEdit()){const _st=_pState(p);if(_st.k==='active')info.push(_row('Status','Aktiv'+(_st.next?' <span class="tp-note">(Pause ab '+_isoDE(_st.next.f)+')</span>':'')+' <button type="button" class="pst-link" onclick="pstOpen('+pi+')">ändern</button>'));}
+    if(canEdit()){const _st=_pState(p);if(_st.k==='active'){
+      const _tk=todaySK(),_past=(Array.isArray(p.pauses)?p.pauses:[]).filter(z=>z&&z.t&&isoToSortKey(z.t)<_tk);
+      info.push(_row('Status','Aktiv'+(_st.next?' <span class="tp-note">(Pause ab '+_isoDE(_st.next.f)+')</span>':'')
+        +(_past.length?' <span class="tp-note">· '+(_past.length===1?'Pause '+_isoDE(_past[0].f)+'–'+_isoDE(_past[0].t):_past.length+' frühere Pausen')+'</span>':'')
+        +' <button type="button" class="pst-link" onclick="pstOpen('+pi+')">ändern</button>'));}}
     const personSec=document.getElementById('ps-sec-person');
     noteEl.innerHTML=info.join('');
     if(personSec)personSec.style.display=info.length?'':'none';
@@ -25281,8 +25307,10 @@ function rcRender(){
     if(!here.length)html='<div class="rc-empty">Noch niemand als anwesend erfasst.</div>';
   }else{
     const done=rows.filter(x=>isMarked(st(x.p))).length;
-    if(bar)bar.style.width=(rows.length?Math.round(done/rows.length*100):0)+'%';
-    if(prog)prog.textContent=done+' von '+rows.length+' erfasst';
+    // Probetraining (1.2.53): only counted here once he has an entry
+    const need=rows.filter(x=>!x.p.trial||isMarked(st(x.p))).length;
+    if(bar)bar.style.width=(need?Math.round(done/need*100):0)+'%';
+    if(prog)prog.textContent=done+' von '+need+' erfasst';
     if(filt)filt.textContent='Nur offene';
     rows.forEach(({p,pi})=>{
       const v=st(p);
@@ -28043,7 +28071,7 @@ function _rcMissing(D,season){
     (D.players||[]).forEach(p=>{
       if(!p||(typeof _sessAfterJoin==='function'&&!_sessAfterJoin(p,s,season)))return;
       const v=(Array.isArray(p.s)&&si<p.s.length&&p.s[si]!=null)?p.s[si]:3;
-      if(v===1)there++;else if(v===3||v===4)open++;
+      if(v===1)there++;else if((v===3||v===4)&&!p.trial)open++;   // Probetraining: no entry = not there (1.2.53)
     });
     if(open)out.push({si,s,open,there,start});
   });
