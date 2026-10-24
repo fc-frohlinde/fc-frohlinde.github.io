@@ -2200,6 +2200,10 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
      the second or third swipe on, once Edge's toolbar animated. Same flat
      colour as the rest of the player screens. */
   background:#080f22;}
+/* The overview scrolls as a page (1.2.48): the wrap must not be a scroll
+   container there, or a few pixels of overflow catch the mouse wheel and,
+   with overscroll-behavior:none, the page never moves. */
+body.player-mode.hub-mode.hub-home #playerModeWrap{height:auto;overflow:visible;overscroll-behavior:auto;}
 /* ═══════════ PLAYER MODE — Athlete-app redesign ═══════════ */
 .pm-wrap{max-width:560px;margin:0 auto;padding:0 0 32px;color:var(--gd);}
 
@@ -7021,13 +7025,19 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.47'; // v1.2.47: Flutlicht für Spieler
-const APP_VERSION_LABEL='1.2.47';
+const APP_VERSION='1.2.48'; // v1.2.48: Übersicht zuerst, Statistik ehrlicher
+const APP_VERSION_LABEL='1.2.48';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792839321002; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792842984374; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.48',date:'24.10.2026',title:'Spieler: erst die Übersicht',items:[
+    {icon:'🧭',title:'Öffnen zeigt die Übersicht',desc:'Bisher sprang die App beim ersten Öffnen sofort in die erste offene Frage (auch in deiner Vorschau: gleich die Physio-Frage). Jetzt kommt immer zuerst die Übersicht, was offen ist, steht dort oben unter „Jetzt dran“. Eine Benachrichtigung führt weiter direkt zu ihrer Frage, und innerhalb eines Themas geht es weiter wie bisher: Belastung → Spieler des Spiels, Anmeldung → Physio. „Zur Übersicht“ nach dem Danke führt jetzt wirklich zur Übersicht.'},
+    {icon:'🖱️',title:'Mausrad auf der Übersicht',desc:'Am PC scrollte das Mausrad die Spieler-Übersicht nicht (nur über die Leiste rechts). Behoben.'},
+    {icon:'📊',title:'Statistik: Wochentage und Wochen',desc:'„Nach Wochentag“ zeigt nur Tage mit mindestens 3 Terminen, jeweils mit „x von y“; seltene Tage stehen in einer Zeile darunter – ein einzelner Samstag ist kein 0-%-Wochentag mehr. „Die letzten Wochen“ zeigt die Kalenderwochen lückenlos: eine Woche ohne Termine als „–“, über jedem Balken die Zahl, eine Woche nur mit entschuldigten Fehltagen in Orange.'},
+    {icon:'✅',title:'Entschuldigt-Marke im Menü vergangener Termine',desc:'Wer einen vergangenen Termin über das Menü in der Tabelle ändert, setzt jetzt auch die Marke „von Trainern entschuldigt“ richtig (wie schon beim Durchklicken).'},
+  ]},
   {version:'1.2.47',date:'24.10.2026',title:'Flutlicht für die Spieler',items:[
     {icon:'🌙',title:'Ein Look für alle Spieler-Screens',desc:'Übersicht, „Meine Woche“, Belastung, Spieler des Spiels, Physio, Statistik und der Gruppen-Link sehen jetzt gleich aus: Nacht mit Licht von oben wie beim Anmelden, dunkle Karten, Zahlen in der Schrift der Trainer-App, Gelb nur da, wo etwas zu tun ist, schlichte Symbole statt Emoji.'},
     {icon:'🧭',title:'Die Übersicht der Spieler neu geordnet',desc:'„Jetzt dran“ (was auf eine Antwort wartet), „Diese Woche“ (jeder Termin mit seinem Stand: eingeplant, offen, im Kader …), „Letztes Spiel“ und „Für dich“ (Karte, Statistik, Wochenbericht). Ein offener Termin heißt direkt „Kommst du am Donnerstag?“.'},
@@ -13454,7 +13464,7 @@ function setCellStatus(pi,si,val){
   const oldVal=D.players[pi].s[si];
   if(oldVal===val)return;
   snap();
-  D.players[pi].s[si]=val;
+  D.players[pi].s[si]=val;_noteExcuse(D.players[pi],si);
   saveG();
   // Update cell in DOM directly
   const cell=document.querySelector(`[data-pi="${pi}"][data-si="${si}"]`);
@@ -19719,12 +19729,11 @@ function tryPlayerUrlAuth(){
   if(hubToken){
     window._hubMode=true;
     window._hubAction=params.get('do')||'';
-    // No explicit destination: decide once the data is in, in _hubAutoRoute.
-    // Only on the first arrival in this browser session — a reload should land
-    // on the overview, not re-enter a chain the player already walked.
-    let _walked=false;
-    try{_walked=sessionStorage.getItem('fcf_hub_walked')===hubToken;}catch(e){}
-    if(!window._hubAction&&!_walked)window._hubDecide=true;
+    // No destination: the overview (1.2.48). What is waiting stands at its
+    // top under „Jetzt dran“. Until 1.2.48 the first open of a browser session
+    // jumped straight into the first open question (rating → vote → week →
+    // physio) — surprising for someone who only wanted to look, and no longer
+    // needed: every push carries its own do=.
     const hs=parseInt(params.get('s'),10);
     window._hubSi=isNaN(hs)?null:hs;
     if(window._hubAction==='rpe'){
@@ -20749,25 +20758,10 @@ function _hubOpenCounts(){
 // Remembered on entry: the thank-you belongs to someone who arrived with work
 // to do and finished it, not to someone changing an answer he already gave.
 let _hubEntry={week:null,rpe:null,physio:null};
-function _hubAutoRoute(){
-  if(!window._hubDecide)return;
-  window._hubDecide=false;
-  // Remember that the chain ran, so a reload stays on the overview
-  try{
-    const t=(CU&&CU.playerToken)||'';
-    if(t)sessionStorage.setItem('fcf_hub_walked',t);
-  }catch(e){}
-  const c=_hubOpenCounts();
-  _hubNoteOffered();
-  if(c.rpe>0){window._hubAction='rpe';window._rpeOnly=true;window._rpeOnlySi=c.rpeLast;_hubEntry.rpe=c.rpe;}
-  else if(c.vote>0){window._hubAction='vote';window._mvpSi=c.voteLast;}
-  else if(c.week>0){window._hubAction='week';_hubEntry.week=c.week;}
-  else if(c.physio>0){window._hubAction='physio';_hubEntry.physio=c.physio;}
-}
-// Ratings the player has already been taken to (or saw due when the hub
-// opened). A rating that becomes due later — the app left open in the
-// background since the morning — opens by itself when he comes back; one he
-// already walked away from does not chase him.
+// Ratings already due when the overview was drawn. One that becomes due later
+// — the app left open in the background since the morning — redraws the
+// overview when he comes back, so it shows under „Jetzt dran“. No jump into
+// it (until 1.2.48 there was one): the push for it opens the rating itself.
 const _hubOffered=new Set();
 function _hubDueRpe(){
   const D=cd();const pi=_pmValidateIdx();const p=(pi!=null&&D)?D.players[pi]:null;
@@ -20781,14 +20775,9 @@ function _hubOnResume(){
   if(!isPlayerMode()||!window._hubMode)return;
   try{_pmSeenDone=false;_pmMarkSeen();}catch(e){}
   if(document.getElementById('hubThanks')||document.querySelector('.mo.open'))return;
-  if(window._hubAction==='rpe')return;   // already on a rating
+  if(window._hubAction)return;   // on a screen: leave him there
   const fresh=_hubDueRpe().filter(si=>!_hubOffered.has(si));
   if(!fresh.length)return;
-  _hubNoteOffered();
-  const c=_hubOpenCounts();
-  window._hubAction='rpe';window._rpeOnly=true;window._rpeOnlySi=c.rpeLast;
-  if(!_hubEntry.rpe)_hubEntry.rpe=c.rpe;
-  _hubSyncUrl();
   try{renderPlayerMode();}catch(e){}
 }
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')_hubOnResume();});
@@ -20865,8 +20854,11 @@ function _hubSyncUrl(){
     if(location.href!==want)history.replaceState(null,'',want);
   }catch(e){}
 }
-function _hubGoNext(){
+// only: the topics the chain may continue in (1.2.48) — a registration does
+// not run on into a rating, a rating not into the week.
+function _hubGoNext(only){
   const c=_hubOpenCounts();
+  if(only)['rpe','vote','week','physio'].forEach(k=>{if(!only.includes(k))c[k]=0;});
   if(c.rpe>0){
     window._hubAction='rpe';window._rpeOnly=true;window._rpeOnlySi=c.rpeLast;
     if(!_hubEntry.rpe)_hubEntry.rpe=c.rpe;
@@ -20891,9 +20883,9 @@ function _hubCheckDone(kind){
   if(window._thanksDebug)console.log('[Danke]',kind,'offen:',JSON.stringify(c),'| Start:',JSON.stringify(_hubEntry));
   // Load block: thanks as soon as every rating is in.
   if(kind==='rpe'){
-    if(c.rpe>0)return _hubGoNext();
+    if(c.rpe>0)return _hubGoNext(['rpe','vote']);
     // Rated a match: the vote comes next, the thanks after it
-    if(c.vote>0)return _hubGoNext();
+    if(c.vote>0)return _hubGoNext(['rpe','vote']);
     // Whether he came through the chain or opened the card to revise, the
     // rating is in — say so and return to the overview.
     _hubEntry.rpe=0;
@@ -20909,7 +20901,7 @@ function _hubCheckDone(kind){
     // Revising a registration: stay where he is, the screen already shows it.
     return;
   }
-  if(c.week>0||c.physio>0)return _hubGoNext();
+  if(c.week>0||c.physio>0)return _hubGoNext(['week','physio']);
   _hubEntry.week=0;_hubEntry.physio=0;
   // The block covers registration and physio together, so it closes with the
   // general thank-you — naming only the physio would describe the last tap
@@ -20953,7 +20945,13 @@ function _hubThanksClose(){
   const el=document.getElementById('hubThanks');
   if(el){el.style.opacity='0';setTimeout(()=>el.remove(),260);}
   if(!window._hubMode)return;
-  _hubGoNext();
+  // The button says „Zur Übersicht“, so the overview — whatever else is still
+  // open is listed there under „Jetzt dran“. Until 1.2.48 it went on to the
+  // next open question instead.
+  window._hubAction='';window._rpeOnly=false;
+  _hubSyncUrl();
+  try{window.scrollTo(0,0);}catch(e){}
+  try{renderPlayerMode();}catch(e){}
 }
 function hubBack(){
   const tok=(CU&&CU.playerToken)||'';
@@ -20967,7 +20965,7 @@ function renderPlayerMode(){
   // Once per visit: is reminders set up, is this phone subscribed
   if(!window._pushChecked){window._pushChecked=true;try{pushCheck();}catch(e){}}
   if(typeof _a2hsArm==='function')_a2hsArm('player');
-  if(window._hubDecide)_hubAutoRoute();
+  if(window._hubMode&&!window._hubAction)_hubNoteOffered();
   // Entering a screen records what was outstanding, so the thank-you can tell
   // "finished the task" from "changed an answer".
   if(window._hubAction&&window._hubAction!=='card'){
@@ -21916,8 +21914,14 @@ function buildHubLink(token,action,sessIdx){
     +(sessIdx!=null?('&s='+sessIdx):'');
 }
 // Weekly attendance series for the trend chart (last N weeks, held sessions)
+// The last calendar weeks in a row (1.2.48). A week without anything that
+// counts is there as pct:null ("–"), not left out — until 1.2.48 the bars
+// skipped it, so a holiday simply vanished between two weeks. e = excused.
+// Starts no earlier than his first counted week; the current week only once
+// something in it counts.
 function _psWeekSeries(p,block,season,weeks){
-  const buckets={};
+  const n=weeks||10;
+  const buckets={};let first=null;
   (block.sessions||[]).forEach((s,si)=>{
     if(!s||!s.date||!sessTookPlace(s,season))return;
     if(!_sessAfterJoin(p,s,season))return; // before he was on the team 
@@ -21927,14 +21931,26 @@ function _psWeekSeries(p,block,season,weeks){
     const key=isoWeekKey(new Date(y,m-1,d));
     const v=p.s&&p.s[si];
     if(!_stFact(v))return;
-    if(!buckets[key])buckets[key]={a:0,t:0,sk};
+    if(!buckets[key])buckets[key]={a:0,t:0,e:0};
     buckets[key].t++;
     if(v===1)buckets[key].a++;
+    if(v===2)buckets[key].e++;
+    if(first===null||sk<first)first=sk;
   });
-  return Object.entries(buckets)
-    .sort((a,b)=>a[1].sk-b[1].sk)
-    .slice(-(weeks||10))
-    .map(([k,v])=>({kw:parseInt(k.split('-W')[1],10),pct:Math.round(v.a/v.t*100),a:v.a,t:v.t}));
+  if(first===null)return [];
+  const ysk=x=>x.getFullYear()*10000+(x.getMonth()+1)*100+x.getDate();
+  let end=new Date(_dbWeekBounds(0).monday);
+  if(!buckets[isoWeekKey(end)])end.setDate(end.getDate()-7);
+  const out=[];
+  for(let i=n-1;i>=0;i--){
+    const mon=new Date(end);mon.setDate(end.getDate()-7*i);
+    const sun=new Date(mon);sun.setDate(mon.getDate()+6);
+    if(ysk(sun)<first)continue;   // before his first counted week
+    const key=isoWeekKey(mon),v=buckets[key];
+    const kw=parseInt(key.split('-W')[1],10);
+    out.push(v?{kw,pct:Math.round(v.a/v.t*100),a:v.a,t:v.t,e:v.e}:{kw,pct:null,a:0,t:0,e:0});
+  }
+  return out;
 }
 // Current streak, most recent backwards (rule in _streakOf).
 function _playerStreak(p,block,season){
@@ -22022,7 +22038,7 @@ function dbBuildPlayerStatsSnapshot(data,pi,offset,includePhoto){
     detail:{
       tPct:ov.tPct,mPct:ov.mPct,cA:ov.cA,cF:ov.cF,cE:ov.cE,
       streak,rank,ranked,
-      weekday:wd.map(x=>({day:x.day,pct:x.pct,total:x.total})),
+      weekday:wd.map(x=>({day:x.day,pct:x.pct,a:x.a,total:x.total})),
       trend:_psWeekSeries(p,block,season,10),
       // Load deliberately not published: it is a coaching instrument, and the
     // player page no longer shows it.

@@ -227,11 +227,18 @@
   .ps-mode .ps-tally{display:flex;gap:6px 14px;flex-wrap:wrap;margin-top:12px;font-size:13.5px;color:var(--fl-ink2);font-weight:600;}
   .ps-mode .ps-tally.ink{color:var(--fl-ink);}
   .ps-mode .ps-tally i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;}
-  .ps-mode .ps-bars{display:flex;align-items:flex-end;gap:7px;height:110px;}
-  .ps-mode .ps-bars>div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:5px;height:100%;min-width:0;}
+  .ps-mode .ps-bars{display:flex;gap:6px;}
+  .ps-mode .ps-bars>div{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;}
+  .ps-mode .ps-bars i{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;width:100%;height:104px;}
   .ps-mode .ps-bars s{display:block;width:100%;max-width:30px;border-radius:5px 5px 2px 2px;background:#2E4A86;min-height:3px;}
   .ps-mode .ps-bars s.hi{background:var(--fl-lamp);}
+  .ps-mode .ps-bars s.ex{background:var(--fl-exc);min-height:6px;}
+  .ps-mode .ps-bars em.ex{color:var(--fl-exc);}
+  .ps-mode .ps-bars em{font-style:normal;font-size:11.5px;font-weight:700;color:var(--fl-ink2);font-variant-numeric:tabular-nums;line-height:1;}
+  .ps-mode .ps-bars .free em{color:var(--fl-muted);font-size:15px;}
   .ps-mode .ps-bars small{font-size:11px;color:var(--fl-muted);font-weight:600;}
+  .ps-mode .ps-two.one{grid-template-columns:1fr;}
+  .ps-mode .ps-of{display:block;font-size:12.5px;color:var(--fl-muted);font-weight:600;margin-top:3px;}
   .ps-mode .ps-legend{font-size:12.5px;color:var(--fl-muted);margin-top:8px;}
   .ps-mode .ps-foot{font-size:12.5px;color:var(--fl-muted);margin-top:20px;}
   .ps-foot{font-size:.66rem;color:rgba(255,255,255,.35);text-align:center;margin-top:18px;}
@@ -685,8 +692,6 @@ function renderPlayerStats(d){
   const pctCls=v=>v==null?'':(v>=80?'good':v>=50?'mid':'bad');
   const av=p.photo?`<img class="ps-av" src="${p.photo}" alt="">`
     :`<div class="ps-av ps-av-ph">${esc((p.name||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase())}</div>`;
-  const wdMax=Math.max(1,...(det.weekday||[]).map(w=>w.pct||0));
-  const trMax=Math.max(1,...(det.trend||[]).map(t=>t.pct||0));
   // 1.2.47: the player's night look; no place in the team (as on the card since 1.2.5)
   const pct=v=>v==null?'\u2013':v+' %';
   const n=(v,one,many)=>(v||0)+' '+((v||0)===1?one:many);
@@ -710,15 +715,30 @@ function renderPlayerStats(d){
     ${(d.scorer&&(d.scorer.apps||d.scorer.goals||d.scorer.assists))?`<div class="ps-tally ink"><span>${n(d.scorer.apps,'Spiel','Spiele')}</span>${d.scorer.goals?`<span>${n(d.scorer.goals,'Tor','Tore')}</span>`:''}${d.scorer.assists?`<span>${n(d.scorer.assists,'Vorlage','Vorlagen')}</span>`:''}</div>`:''}
     <div class="ps-tally"><span><i style="background:var(--fl-yes)"></i>${det.cA||0} dabei</span><span><i style="background:var(--fl-no)"></i>${det.cF||0} gefehlt</span><span><i style="background:var(--fl-exc)"></i>${det.cE||0} entschuldigt</span></div>
   </div>`;
-  if(det.trend&&det.trend.length>1){
-    html+=`<div class="ps-h">Die letzten ${det.trend.length} Wochen</div><div class="ps-box"><div class="ps-bars">${det.trend.map(t=>
-      `<div title="KW${t.kw}: ${t.pct} %"><s class="${t.pct>=100?'hi':''}" style="height:${Math.max(3,Math.round((t.pct/100)*100))}%"></s><small>${t.kw}</small></div>`).join('')}</div>
-      <div class="ps-legend">Kalenderwochen. Gelb: bei allen Terminen der Woche dabei.</div></div>`;
+  // 1.2.48: calendar weeks in a row — a week without sessions is "–", not
+  // left out; the number above each bar; a week missed only with an excuse
+  // in orange, not like a plain absence. Older snapshots have no gaps and no e.
+  const tr=(det.trend||[]).filter(t=>t&&t.kw!=null);
+  if(tr.filter(t=>t.pct!=null).length>1){
+    const exOnly=t=>t.pct===0&&t.e>0&&t.e===t.t;
+    const anyEx=tr.some(exOnly),anyFree=tr.some(t=>t.pct==null);
+    html+=`<div class="ps-h">Die letzten ${tr.length} Wochen</div><div class="ps-box"><div class="ps-bars">${tr.map(t=>t.pct==null
+      ?`<div class="free" title="KW ${esc(t.kw)}: keine Termine"><i><em>\u2013</em></i><small>${esc(t.kw)}</small></div>`
+      :`<div title="KW ${esc(t.kw)}: ${t.t?esc(t.a)+' von '+esc(t.t):esc(t.pct)+' %'}"><i><em class="${exOnly(t)?'ex':''}">${esc(t.pct)}</em><s class="${t.pct>=100?'hi':exOnly(t)?'ex':''}" style="height:${Math.max(3,Math.round(t.pct*0.8))}px"></s></i><small>${esc(t.kw)}</small></div>`).join('')}</div>
+      <div class="ps-legend">Anwesenheit in %. Gelb: bei allen Terminen dabei.${anyEx?' Orange: nur entschuldigt gefehlt.':''}${anyFree?' \u201e\u2013\u201c: keine Termine.':''}</div></div>`;
   }
+  // 1.2.48: only days with enough sessions to say something; a single
+  // Saturday in the season is not a 0-% weekday. The rest in one line.
   if(det.weekday&&det.weekday.length){
     const WD={Mo:'Montag',Di:'Dienstag',Mi:'Mittwoch',Do:'Donnerstag',Fr:'Freitag',Sa:'Samstag',So:'Sonntag'};
-    html+=`<div class="ps-h">Nach Wochentag</div><div class="ps-box"><div class="ps-two${det.weekday.length>=3?' three':''}">${det.weekday.map(w=>
-      `<div><b>${pct(w.pct)}</b><small>${esc(WD[w.day]||w.day)}</small></div>`).join('')}</div></div>`;
+    const MIN=3;
+    const rows=det.weekday.filter(w=>w&&w.total>0).map(w=>Object.assign({},w,{a:w.a!=null?w.a:Math.round((w.pct||0)*w.total/100)}));
+    const reg=rows.filter(w=>w.total>=MIN),rare=rows.filter(w=>w.total<MIN);
+    if(reg.length){
+      html+=`<div class="ps-h">Nach Wochentag</div><div class="ps-box"><div class="ps-two${reg.length===1?' one':reg.length>=3?' three':''}">${reg.map(w=>
+        `<div><b>${pct(w.pct)}</b><small>${esc(WD[w.day]||w.day)}</small><span class="ps-of">${esc(w.a)} von ${esc(w.total)}</span></div>`).join('')}</div>
+        ${rare.length?`<div class="ps-legend">Andere Tage: ${rare.map(w=>esc(WD[w.day]||w.day)+' '+esc(w.a)+' von '+esc(w.total)).join(', ')}</div>`:''}</div>`;
+    }
   }
   html+=`<div class="ps-foot">Stand: ${new Date(d.publishedAt).toLocaleDateString('de-DE')} \u00b7 ${esc(d.club||'')}</div>`;
   const root=document.getElementById('app')||document.body;
