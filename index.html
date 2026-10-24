@@ -2248,6 +2248,12 @@ tr.mx-former-h td{padding:10px 8px 6px;background:transparent;border:0;text-alig
 .mob label.ap-trial input{width:17px;height:17px;margin:1px 0 0;padding:0;flex:none;accent-color:#7C3AED;}
 #stBox .setting-label label{font:inherit;text-transform:none;letter-spacing:normal;margin:0;color:inherit;}
 body.player-mode .fl .hub-news.fl-pause{border-left-color:#8FA3C8;}
+/* "Alle Spieler" by status (1.2.57) */
+.full-table tr.st-grp td{background:transparent;border:0;text-align:left;padding:12px 8px 4px;font-size:.78rem;font-weight:700;color:var(--hx-muted,var(--gm));cursor:default;}
+.full-table tr.st-grp td span{font-weight:500;}
+.st-grp-b{border:0;background:none;padding:0;font:inherit;color:inherit;cursor:pointer;}
+.st-grp-b:hover{color:var(--hx-ink,var(--gd));}
+.full-table tr.st-former td{color:var(--hx-muted,var(--gm));}
 /* every pause of a player, in the status dialog (1.2.53) */
 #moPSt .pst-list{margin:12px 2px 0;padding-top:10px;border-top:1px solid var(--hx-line,var(--gl));}
 #moPSt .pst-lh{font-size:.78rem;font-weight:700;color:var(--hx-muted,var(--gm));margin-bottom:4px;}
@@ -7090,13 +7096,17 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.56'; // v1.2.56: Pause im Alltag
-const APP_VERSION_LABEL='1.2.56';
+const APP_VERSION='1.2.57'; // v1.2.57: Statistik nach Status
+const APP_VERSION_LABEL='1.2.57';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792862901805; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792864382748; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.57',date:'24.10.2026',title:'Statistik nach Status',items:[
+    {icon:'🏆',title:'„Alle Spieler“: die Mannschaft zuerst',desc:'Wer nicht mehr dabei ist, stand mitten in der Liste. Jetzt: zuerst die Mannschaft (wer in Pause ist, mit „Pause“), darunter „Probetraining“, ganz unten „Nicht mehr dabei“ – eingeklappt, ihre Zahlen bis zum Weggang bleiben abrufbar.'},
+    {icon:'📋',title:'Ranglisten, Wochenbericht, Belastung',desc:'Wer nicht mehr dabei ist oder im Probetraining, steht in keiner Rangliste der Statistik. Im Wochenbericht und in der Belastungstabelle erscheint nur, wer in der Woche zur Mannschaft gehörte; „x von y“ zählt nur seine Termine (eine Pause mitten in der Woche zählt nicht mit).'},
+  ]},
   {version:'1.2.56',date:'24.10.2026',title:'Pause im Alltag',items:[
     {icon:'⏸',title:'„Pause ab hier …“ direkt beim Termin',desc:'Sagt ein Spieler beim Training, dass er ab dem nächsten Mal weg ist: im Fenster des nächsten Termins auf ihn tippen → „Pause ab hier …“. Das Datum ist schon eingetragen, es fehlt nur „bis“.'},
     {icon:'💡',title:'Wann Pause, wann E',desc:'Im Status-Fenster steht die Regel: Pause für längere, abgesprochene Abwesenheit – Verletzung, Prüfungen, angekündigter Urlaub, Training bei den Herren. Für einzelne Termine: E.'},
@@ -18216,6 +18226,7 @@ function computeLoadMatrix(data,weeks){
       });
       return {load:Math.round(load),rated,possible};
     });
+    if((_pGone(p)||p.trial)&&row.every(c=>!c.possible))return;   // 1.2.57
     perPlayer[pi]={name:getDisplayName?getDisplayName(p):p.name,row};
   });
   return {weeks:shown.map(k=>parseInt(k.split('-W')[1],10)),perPlayer};
@@ -22001,7 +22012,7 @@ function dbRankPlayers(data){
       if(v===1)att++;
     });
     return {pi,p,attended:att,total:taken,pct:taken?(att/taken)*100:null};
-  }).filter(r=>r&&r.total>=3); // need at least 3 sessions to be ranked
+  }).filter(r=>r&&r.total>=3&&!_pGone(r.p)&&!r.p.trial); // at least 3 sessions; the team of today only (1.2.57)
   return ranked.sort((a,b)=>(b.pct||0)-(a.pct||0));
 }
 // Dashboard date helpers — season-aware (replaces dispToSortKey usage that locked to UI.currentSeason)
@@ -22328,7 +22339,11 @@ function dbComputeWeekReport(data,offsetWeeks){
   const playerRows=[];
   players.forEach((p,pi)=>{
     if(!p)return;
+    // Only who belonged to the team that week (1.2.57): not before he joined,
+    // not a whole week of pause, not after he left, not a Probetraining
+    if(weekSess.length&&!weekSess.some(({s})=>_sessCounts(p,s,season)))return;
     let present=0,marked=0;
+    const _own=weekSess.filter(({s})=>_sessCounts(p,s,season)).length;
     const cells=weekSess.map(({s,i})=>{
       if(!_sessCounts(p,s,season))return 3; // not on the team yet
       const v=p.s&&p.s[i];
@@ -22339,7 +22354,7 @@ function dbComputeWeekReport(data,offsetWeeks){
     });
     playerRows.push({
       pi,name:(typeof getDisplayName==='function'?getDisplayName(p):p.name)||p.name||'?',
-      nr:+p.nr||99,cells,present,marked,total:weekSess.length
+      nr:+p.nr||99,cells,present,marked,total:weekSess.length?_own:0
     });
   });
   // Sort: present count desc, then marked count desc, then jersey number
@@ -29417,6 +29432,13 @@ function _statsPlayerTable(D,opts){
   // Equal shares: the one who was there more often first (18/18 before 2/2)
   rows.sort((a,b)=>{const v=statsSort.col;let r=typeof a[v]==='string'?a[v].localeCompare(b[v]):a[v]-b[v];
     if(!r&&v==='tPct')r=a.tA-b.tA;if(!r&&v==='mPct')r=a.mA-b.mA;return statsSort.asc?r:-r;});
+  // Status (1.2.57): the team first; Probetraining and who left below, each
+  // sorted the same way — who left folded, his figures up to then stay
+  const _grp=r=>{const p=D.players[r.pi];return _pGone(p)?2:(p&&p.trial)?1:0;};
+  const _gN=rows.filter(r=>_grp(r)===2).length,_tN=rows.filter(r=>_grp(r)===1).length;
+  const _rowsAll=rows.filter(r=>_grp(r)===0).concat(rows.filter(r=>_grp(r)===1),window._statsFormer?rows.filter(r=>_grp(r)===2):[]);
+  const _gHead=g=>g===1?`<tr class="st-grp"><td colspan="99">Probetraining <span>(${_tN}) · zählt nicht</span></td></tr>`
+    :`<tr class="st-grp"><td colspan="99"><button type="button" class="st-grp-b" aria-expanded="${!!window._statsFormer}" onclick="event.stopPropagation();window._statsFormer=!window._statsFormer;try{renderStatsAgain()}catch(e){}">${window._statsFormer?'\u25be':'\u25b8'} Nicht mehr dabei (${_gN})</button></td></tr>`;
   const sa=c=>statsSort.col===c?(statsSort.asc?'↑':'↓'):'';
   const th=(c,l)=>`<th onclick="sortStats('${c}')">${l} ${sa(c)}</th>`;
   const wrap=opts.wrap||'max-height:240px;overflow-y:auto;border:1px solid var(--gl);border-radius:8px;';
@@ -29426,12 +29448,13 @@ function _statsPlayerTable(D,opts){
     <table class="full-table"><thead><tr>
       ${th('nr','#')}${th('name','Spieler')}${th('pos','Pos.')}${th('tPct','Training')}${mS?th('mPct','Spiele'):''}${hasL?th('stSort','Startelf'):''}${hasS?th('subN','Eingew.'):''}${hasMin?th('minT','Min.'):''}${hasG?th('gSort','Tore · Vorl.'):''}${hasC?th('cSort','Karten'):''}${hasM?`<th onclick="sortStats('mvp')" title="Spieler des Spiels">🏅 ${sa('mvp')}</th>`:''}${th('perfAvgSort','⭐ Einsatz')}
     </tr></thead><tbody>
-    ${rows.map(r=>{const bc=pctColor(r.tPct);
+    ${_rowsAll.map((r,ix)=>{const bc=pctColor(r.tPct);
+      const _g=_grp(r),_hd=(_g&&(ix===0||_grp(_rowsAll[ix-1])!==_g))?_gHead(_g):'';
       const openHandler=open(r.pi);
       const perfColor=r.perfAvg==null?'var(--gm)':r.perfAvg<=1.5?'#1a7a40':r.perfAvg<=2.5?'#0d3d80':'#a56a0a';
-      return`<tr style="cursor:pointer;" onclick="${openHandler}">
+      return _hd+`<tr style="cursor:pointer;"${_g===2?' class="st-former"':''} onclick="${openHandler}">
       <td>${r.nr}</td>
-      <td style="text-align:left;">${getDisplayName(r)}</td>
+      <td style="text-align:left;">${getDisplayName(r)}${_g===0?_pChip(D.players[r.pi]):''}</td>
       <td class="pos-td"><div class="pos-wrap">${pbHtml(r)}</div></td>
       ${_stPc(r.tA,r.tPl,r.tPct,'Trainings')}
       ${mS?_stPc(r.mA,r.mPl,r.mPct,'Spielen'):''}
@@ -29442,8 +29465,13 @@ function _statsPlayerTable(D,opts){
       ${hasC?`<td class="st-cards" title="${r.cy} Gelb, ${r.cgr} Gelb-Rot, ${r.cr} Rot">${r.cSort?[['y',r.cy],['gr',r.cgr],['r',r.cr]].filter(x=>x[1]).map(x=>_cardIc(x[0])+(x[1]>1?'<b>'+x[1]+'</b>':'')).join(' '):'–'}</td>`:''}
       ${hasM?`<td title="${r.mvp}× Spieler des Spiels">${r.mvp||'–'}</td>`:''}
       <td style="font-weight:700;color:${perfColor};" title="${r.perfCount} bewertete Termine">${r.perfAvg!=null?r.perfAvg.toFixed(1).replace('.',','):'–'}</td>
-    </tr>`;}).join('')}
+    </tr>`;}).join('')}${(_gN&&!window._statsFormer)?_gHead(2):''}
     </tbody></table></div>`;
+}
+// Redraw whichever page shows "Alle Spieler" (the fold above)
+function renderStatsAgain(){
+  const db=document.getElementById('moDashboard');
+  if(db&&db.classList.contains('open'))renderDashboard();
 }
 function sortTable(col){
   if(tableSort.col===col)tableSort.asc=!tableSort.asc;
