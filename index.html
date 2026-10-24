@@ -7090,13 +7090,17 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.53'; // v1.2.53: Frühere Pausen
-const APP_VERSION_LABEL='1.2.53';
+const APP_VERSION='1.2.54'; // v1.2.54: Pause über Anwesenheit fragt nach
+const APP_VERSION_LABEL='1.2.54';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792856225346; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792857126082; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.54',date:'24.10.2026',title:'Pause über Anwesenheit fragt nach',items:[
+    {icon:'⚠️',title:'Pause über Tage, an denen er da war',desc:'Liegt eine Pause über Terminen, an denen er als anwesend eingetragen ist, fragt das Fenster vorher nach („3× als anwesend eingetragen – zählen dann nicht mehr“). So geht keine Anwesenheit durch ein falsches Datum verloren.'},
+    {icon:'📊',title:'„Ø im Training“ im Wochenbericht',desc:'Zählt jetzt wie die Statistik nur, wer in der Mannschaft zählt (ohne Probetraining).'},
+  ]},
   {version:'1.2.53',date:'24.10.2026',title:'Frühere Pausen',items:[
     {icon:'🗓',title:'Pausen auch nachträglich',desc:'Eine Pause lässt sich auch für die Vergangenheit eintragen (z. B. verletzt im August): Status → „Pause“, von – bis. Die Termine darin zählen dann nicht mehr – ein „E“ aus dieser Zeit verbraucht auch nicht mehr das „entschuldigt ohne Abzug“ auf der Karte. Ein Spieler kann mehrere Pausen haben; im Status-Fenster stehen alle, jede lässt sich wieder entfernen.'},
     {icon:'🧪',title:'Probetraining hält die Anwesenheit nicht offen',desc:'Ein Probespieler ohne Eintrag gilt als nicht da: der Termin erscheint deshalb nicht mehr unter „Anwesenheit fehlt“, und „x von y erfasst“ wartet nicht auf ihn.'},
@@ -7837,7 +7841,12 @@ function pstSave(){
   if(!m){alert('Bitte einen Status wählen.');return;}
   const v=id=>((document.getElementById(id)||{}).value||'').trim();
   const today=_todayISO(),st=_pState(p);
-  if(m==='pause'){const f=v('pst-pf')||today,t=v('pst-pt');if(t&&t<f){alert('„bis“ liegt vor „von“.');return;}}
+  if(m==='pause'){const f=v('pst-pf')||today,t=v('pst-pt');if(t&&t<f){alert('„bis“ liegt vor „von“.');return;}
+    // he was there on some of these days: those entries would stop counting (1.2.54)
+    const fk=isoToSortKey(f),tk=t?isoToSortKey(t):todaySK();let n=0;
+    (D.sessions||[]).forEach((s,si)=>{if(!s||!s.date||!sessTookPlace(s))return;const k=dispToSortKey(s.date);
+      if(k>=fk&&k<=tk&&p.s&&p.s[si]===1&&_sessAfterJoin(p,s))n++;});
+    if(n&&!confirm('In diesem Zeitraum ist er '+n+'\u00d7 als anwesend eingetragen. Diese Einträge zählen dann nicht mehr.\n\nTrotzdem als Pause eintragen?'))return;}
   let what='';
   snap();
   if(m==='active'){
@@ -22717,7 +22726,7 @@ function dbRenderWeekReportSection(data){
   const avgPresent=list=>{
     const tr=list.filter(x=>x.s.type!=='match');
     if(!tr.length)return null;
-    return Math.round(tr.reduce((n,{si})=>n+players.filter(p=>p&&stat(p,si)===1).length,0)/tr.length);
+    return Math.round(tr.reduce((n,{s,si})=>n+players.filter(p=>p&&stat(p,si)===1&&_sessCounts(p,s,season)).length,0)/tr.length);
   };
   const tNow=teamPct(held,'training'),tPrev=teamPct(prevHeld,'training');
   const mNow=teamPct(held,'match');
