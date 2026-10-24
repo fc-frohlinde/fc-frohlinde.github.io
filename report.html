@@ -237,7 +237,9 @@
   .ps-mode .ps-bars em{font-style:normal;font-size:11.5px;font-weight:700;color:var(--fl-ink2);font-variant-numeric:tabular-nums;line-height:1;}
   .ps-mode .ps-bars .free em{color:var(--fl-muted);font-size:15px;}
   .ps-mode .ps-bars small{font-size:11px;color:var(--fl-muted);font-weight:600;}
-  .ps-mode .ps-two.one{grid-template-columns:1fr;}
+  /* 1.2.49: tiles fill their rows evenly (balTiles), as in the app */
+  .ps-mode [data-bal]{display:flex;flex-wrap:wrap;}
+  .ps-mode .ps-two.wd b{font-size:28px;}
   .ps-mode .ps-of{display:block;font-size:12.5px;color:var(--fl-muted);font-weight:600;margin-top:3px;}
   .ps-mode .ps-legend{font-size:12.5px;color:var(--fl-muted);margin-top:8px;}
   .ps-mode .ps-foot{font-size:12.5px;color:var(--fl-muted);margin-top:20px;}
@@ -685,6 +687,24 @@ function renderReport(r){
 // ── PERSONAL STATISTICS PAGE ──────────────────────────────
 // Contains one player only. Deliberately no trainer grades and no team
 // ranking: this page belongs to the player, not to a comparison.
+// Tiles fill their rows evenly (1.2.49, same rule as the app's _balTiles):
+// as few rows as fit, the tiles spread evenly (4 → 2 + 2, 5 → 3 + 2), a
+// shorter row stretches to the full width. data-bal = smallest tile width.
+function balTiles(el){
+  const w=el.clientWidth;if(!w)return;
+  const kids=[...el.children],n=kids.length;if(!n)return;
+  const gap=parseFloat(getComputedStyle(el).columnGap)||0;
+  const min=parseFloat(el.dataset.bal)||100;
+  const fit=Math.max(1,Math.floor((w+gap)/(min+gap)));
+  const rows=Math.ceil(n/fit),base=Math.floor(n/rows),extra=n%rows;
+  let i=0;
+  for(let r=0;r<rows;r++){
+    const k=base+(r<extra?1:0);
+    for(let j=0;j<k;j++,i++){kids[i].style.flex=`1 0 calc((100% - ${(k-1)*gap}px) / ${k} - .5px)`;kids[i].style.minWidth='0';}
+  }
+}
+const _balRO=(typeof ResizeObserver==='function')?new ResizeObserver(es=>es.forEach(e=>balTiles(e.target))):null;
+function balAll(root){(root||document).querySelectorAll('[data-bal]').forEach(el=>{balTiles(el);if(_balRO)_balRO.observe(el);});}
 function renderPlayerStats(d){
   const p=(d.players&&d.players[0])||{};
   const det=d.detail||{};
@@ -735,7 +755,7 @@ function renderPlayerStats(d){
     const rows=det.weekday.filter(w=>w&&w.total>0).map(w=>Object.assign({},w,{a:w.a!=null?w.a:Math.round((w.pct||0)*w.total/100)}));
     const reg=rows.filter(w=>w.total>=MIN),rare=rows.filter(w=>w.total<MIN);
     if(reg.length){
-      html+=`<div class="ps-h">Nach Wochentag</div><div class="ps-box"><div class="ps-two${reg.length===1?' one':reg.length>=3?' three':''}">${reg.map(w=>
+      html+=`<div class="ps-h">Nach Wochentag</div><div class="ps-box"><div class="ps-two wd" data-bal="96">${reg.map(w=>
         `<div><b>${pct(w.pct)}</b><small>${esc(WD[w.day]||w.day)}</small><span class="ps-of">${esc(w.a)} von ${esc(w.total)}</span></div>`).join('')}</div>
         ${rare.length?`<div class="ps-legend">Andere Tage: ${rare.map(w=>esc(WD[w.day]||w.day)+' '+esc(w.a)+' von '+esc(w.total)).join(', ')}</div>`:''}</div>`;
     }
@@ -743,6 +763,7 @@ function renderPlayerStats(d){
   html+=`<div class="ps-foot">Stand: ${new Date(d.publishedAt).toLocaleDateString('de-DE')} \u00b7 ${esc(d.club||'')}</div>`;
   const root=document.getElementById('app')||document.body;
   root.innerHTML='<div class="ps-wrap">'+html+'</div>';
+  balAll(root);
   document.body.classList.add('ps-mode');
 }
 
