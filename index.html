@@ -2453,6 +2453,188 @@ button.pm-tel{border:none;font-family:'Barlow',sans-serif;cursor:pointer;}
 #absBox .setting-label label{font:inherit;text-transform:none;letter-spacing:normal;margin:0;color:inherit;}
 #absBox .abs-h select{width:auto;height:36px;margin:0;border-radius:8px;}
 #absBox label.abs-opt input:focus-visible{outline:3px solid #1659B8;outline-offset:2px;}
+/* ══ Flutlicht für Spieler (1.2.47) ══
+   One night look for every player screen: the light from the mast falls on
+   the top of the page (as on the login), dark cards framed in the colour of
+   the floodlight's frame, numbers in the trainers' face, yellow only where
+   something waits for him. Tokens on body.player-mode, so nothing of it
+   reaches the trainers' app. */
+body.player-mode{--fl-night:#0A1328;--fl-surface:#111D3A;--fl-surface2:#172750;--fl-line:#22386B;
+  --fl-ink:#F3F5FA;--fl-ink2:#B6C4DE;--fl-muted:#8796B8;--fl-lamp:#F2C230;--fl-lamp-hi:#FFF3C4;--fl-lamp-tint:rgba(242,194,48,.13);
+  --fl-yes:#3CC27E;--fl-yes-tint:rgba(60,194,126,.14);--fl-no:#EF6A5A;--fl-no-tint:rgba(239,106,90,.14);--fl-exc:#E9B65A;
+  --fl-num:'Big Shoulders Display','Bebas Neue',sans-serif;
+  --hb0:var(--fl-night);--hb1:var(--fl-surface);--hbr:var(--fl-line);--htx:var(--fl-ink);--hdim:var(--fl-ink2);--hacc:var(--fl-lamp);
+  --p-txt:var(--fl-ink);--p-dim:var(--fl-ink2);}
+body.player-mode,body.player-mode.hub-mode{background:var(--fl-night) !important;}
+body.player-mode #playerModeWrap{background:radial-gradient(70% 360px at 50% 0,rgba(255,206,92,.17),rgba(255,206,92,.05) 55%,transparent 80%) no-repeat,var(--fl-night) !important;
+  background-attachment:local,scroll !important;color:var(--fl-ink);}
+body.player-mode .pm-ic{display:inline-block;vertical-align:-.14em;flex-shrink:0;}
+body.player-mode .fl-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:52px;padding-top:calc(4px + env(safe-area-inset-top,0px));}
+body.player-mode .fl-bar .hub-back{margin:0;padding:6px 0;color:var(--fl-ink2);font-size:15px;font-weight:600;}
+body.player-mode .fl-team{font-size:13px;font-weight:600;color:var(--fl-ink2);text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+body.player-mode .fl-title{font-family:var(--fl-num);font-weight:800;font-size:36px;line-height:1;letter-spacing:.2px;color:var(--fl-ink);margin:6px 0 6px;}
+body.player-mode .fl-kick{font-size:14px;font-weight:600;color:var(--fl-ink2);margin-top:4px;}
+/* ── Übersicht ── */
+body.player-mode .hub.fl{max-width:520px;margin:0 auto;padding:0 16px 30px;}
+body.player-mode .fl-brand{display:inline-flex;align-items:center;gap:8px;font-family:var(--fl-num);font-weight:800;font-size:19px;letter-spacing:.3px;color:var(--fl-ink);}
+body.player-mode .fl-lamps{display:inline-grid;grid-template-columns:repeat(3,5px);gap:2.5px;padding:3px 4px;border-radius:4px;background:var(--fl-line);}
+body.player-mode .fl-lamps i{width:5px;height:5px;border-radius:50%;background:var(--fl-lamp);box-shadow:0 0 4px rgba(242,194,48,.8);}
+body.player-mode .fl-who{display:flex;align-items:center;gap:14px;margin:12px 0 20px;}
+body.player-mode .fl .hub-av{width:62px;height:62px;margin:0;border:0;flex-shrink:0;box-shadow:0 0 0 3px var(--fl-night),0 0 0 4.5px rgba(242,194,48,.55);}
+body.player-mode .fl .hub-av-ph{font-family:var(--fl-num);font-weight:800;font-size:24px;background:#2C5BA8;color:#fff;}
+body.player-mode .fl .hub-name{font-family:var(--fl-num);font-weight:800;font-size:38px;line-height:.95;letter-spacing:.2px;margin:0;color:var(--fl-ink);}
+body.player-mode .fl .hub-sub{font-size:14px;color:var(--fl-ink2);margin-top:4px;}
+body.player-mode .fl-sec{display:flex;align-items:baseline;justify-content:space-between;margin:22px 2px 9px;font-size:15px;font-weight:700;color:var(--fl-ink2);}
+body.player-mode .fl-sec-a{font-size:13px;font-weight:600;color:var(--fl-muted);text-decoration:none;}
+body.player-mode .fl-list{background:var(--fl-surface);border:1px solid var(--fl-line);border-radius:16px;overflow:hidden;}
+body.player-mode .fl .hub-card.fl-row,body.player-mode .fl .fl-row{display:flex;align-items:center;gap:12px;width:auto;max-width:none;margin:0;padding:12px 14px;min-height:62px;
+  border:0;border-radius:0;background:none;box-shadow:none;color:var(--fl-ink);text-decoration:none;transform:none;}
+body.player-mode .fl .fl-list>*+*{border-top:1px solid var(--fl-line);}
+body.player-mode .fl a.fl-row:active{background:var(--fl-surface2);}
+body.player-mode .fl .fl-tile{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--fl-surface2);color:var(--fl-ink2);flex-shrink:0;}
+body.player-mode .fl .fl-tile.go{background:var(--fl-lamp-tint);color:var(--fl-lamp);}
+body.player-mode .fl .fl-tile.ok{background:var(--fl-yes-tint);color:var(--fl-yes);}
+body.player-mode .fl .hub-txt b{font-size:16px;font-weight:700;line-height:1.2;color:var(--fl-ink);}
+body.player-mode .fl .hub-txt span{font-size:13.5px;color:var(--fl-ink2);line-height:1.3;}
+body.player-mode .fl .hub-badge,body.player-mode .fl .hub-badge.hub-badge-new{min-width:26px;height:26px;padding:0 8px;border-radius:13px;background:var(--fl-lamp);color:#0E2350;font-size:14px;font-weight:800;}
+body.player-mode .fl .hub-chev{color:var(--fl-muted);font-size:18px;opacity:1;}
+body.player-mode .fl-day{width:40px;text-align:center;flex-shrink:0;line-height:1;}
+body.player-mode .fl-day small{display:block;font-size:12px;font-weight:700;color:var(--fl-ink2);}
+body.player-mode .fl-day b{display:block;font-family:var(--fl-num);font-weight:800;font-size:26px;margin-top:1px;color:var(--fl-ink);}
+body.player-mode .fl-chip{font-size:13px;font-weight:700;padding:5px 10px;border-radius:999px;white-space:nowrap;flex-shrink:0;}
+body.player-mode .fl-chip.yes{color:var(--fl-yes);background:var(--fl-yes-tint);}
+body.player-mode .fl-chip.open{color:var(--fl-lamp);background:var(--fl-lamp-tint);}
+body.player-mode .fl-chip.no{color:var(--fl-no);background:var(--fl-no-tint);}
+body.player-mode .fl-chip.exc{color:var(--fl-exc);background:rgba(233,182,90,.14);}
+body.player-mode .fl-chip.nk{color:var(--fl-ink2);background:var(--fl-surface2);}
+body.player-mode .fl .hub-res .hub-score{width:58px;min-width:58px;height:46px;font-family:var(--fl-num);font-weight:800;font-size:28px;color:#08251A;}
+body.player-mode .fl .hub-res-w .hub-score{background:var(--fl-yes);}
+body.player-mode .fl .hub-res-d .hub-score{background:var(--fl-exc);color:#2A1D02;}
+body.player-mode .fl .hub-res-l .hub-score{background:var(--fl-no);color:#2A0B06;}
+body.player-mode .fl .hub-res .hub-txt span.hub-res-me{color:var(--fl-lamp-hi);font-weight:600;font-size:13.5px;}
+body.player-mode .fl .hub-news{display:flex;gap:12px;align-items:flex-start;margin:0 0 4px;padding:13px 14px;border-radius:16px;background:var(--fl-surface);border:1px solid var(--fl-line);border-left:3px solid var(--fl-lamp);}
+body.player-mode .fl .hub-news .hub-ic{font-size:20px;}
+body.player-mode .fl .hub-news .hub-txt span{color:var(--fl-ink);opacity:.9;font-size:14px;line-height:1.45;}
+body.player-mode .fl .hub-push{display:flex;gap:12px;margin:12px 0 0;padding:13px 14px;border-radius:16px;background:var(--fl-surface);border:1px solid var(--fl-line);max-width:none;width:auto;}
+body.player-mode .fl .hub-push .hub-ic{font-size:20px;}
+body.player-mode .hub-switch{color:var(--fl-muted);font-size:13px;}
+body.player-mode .fl .hub-switch{margin-top:20px;}
+body.player-mode .fl .mk-mini{margin:0;}
+/* ── Meine Woche ── */
+body.player-mode .pm-wrap{max-width:520px;margin:0 auto;padding:0 0 30px;color:var(--fl-ink);}
+body.player-mode .pm-top.fl-bar{padding-left:16px;padding-right:16px;max-width:none;}
+body.player-mode .pm-wrap>.fl-title,body.player-mode .pm-wrap>.fl-answered,body.player-mode .pm-wrap>.pm-rule{margin-left:16px;margin-right:16px;}
+body.player-mode .fl-answered{display:flex;align-items:center;gap:10px;margin:4px 16px 12px;font-size:14px;font-weight:600;color:var(--fl-ink2);}
+body.player-mode .fl-bulbs{display:inline-flex;gap:5px;}
+body.player-mode .fl-bulbs i{width:11px;height:11px;border-radius:50%;background:var(--fl-line);}
+body.player-mode .fl-bulbs i.on{background:var(--fl-lamp);box-shadow:0 0 8px rgba(242,194,48,.75);}
+body.player-mode .pm-rule{margin:0 16px 14px;font-size:14.5px;line-height:1.45;color:var(--fl-ink2);}
+body.player-mode .pm-rule b{color:var(--fl-ink);}
+body.player-mode .pm-news{margin:0 16px 14px;background:var(--fl-surface);border:1px solid var(--fl-line);border-left:3px solid var(--fl-lamp);box-shadow:none;color:var(--fl-ink);border-radius:14px;}
+body.player-mode .pm-news-txt span{color:var(--fl-ink2);}
+body.player-mode .pm-list{gap:12px;}
+body.player-mode .pm-list .pm-card{background:var(--fl-surface);border:1px solid var(--fl-line);border-radius:18px;box-shadow:none;padding:14px;}
+body.player-mode .pm-list .pm-card:active{transform:none;}
+body.player-mode .pm-list .pm-card-date{background:none;padding:3px 0 0;width:46px;}
+body.player-mode .pm-list .pm-card-date .pm-dow{color:var(--fl-ink2);font-size:12px;}
+body.player-mode .pm-list .pm-day{font-family:var(--fl-num);font-weight:800;font-size:32px;color:var(--fl-ink);}
+body.player-mode .pm-list .pm-card.pm-match .pm-day{color:var(--fl-ink);}
+body.player-mode .pm-list .pm-mo{color:var(--fl-muted);text-transform:none;letter-spacing:0;font-size:12px;}
+body.player-mode .pm-list .pm-when{color:var(--fl-ink);}
+body.player-mode .pm-list .pm-when b{font-family:var(--fl-num);font-weight:800;font-size:34px;letter-spacing:.2px;}
+body.player-mode .pm-list .pm-card.pm-match .pm-when b{color:var(--fl-lamp);}
+body.player-mode .pm-list .pm-when span{font-size:17px;}
+body.player-mode .pm-list .pm-where{gap:4px 12px;margin:7px 0 2px;}
+body.player-mode .pm-list .pm-chip{background:none;padding:0;color:var(--fl-ink2);font-size:13.5px;}
+body.player-mode .pm-list .pm-chip a{color:var(--fl-ink2);}
+body.player-mode .pm-list .pm-deadline{background:none;padding:0;margin:6px 0 2px;color:var(--fl-lamp);font-size:13.5px;}
+body.player-mode .pm-list .pm-deadline.locked{color:var(--fl-ink2);}
+body.player-mode .pm-list .pm-squad{color:var(--fl-ink2);font-size:13.5px;margin:6px 0 0;}
+body.player-mode .pm-list .pm-squad.in{color:var(--fl-yes);}
+body.player-mode .pm-list .pm-btn{background:transparent;border:1.5px solid var(--fl-line);color:var(--fl-ink);box-shadow:none;min-height:48px;border-radius:12px;}
+body.player-mode .pm-list .pm-btn.pm-yes{border-color:rgba(60,194,126,.45);color:var(--fl-yes);}
+body.player-mode .pm-list .pm-btn.pm-yes.plan{background:var(--fl-yes-tint);}
+body.player-mode .pm-list .pm-btn.pm-yes.active{background:var(--fl-yes);border-color:var(--fl-yes);color:#08251A;}
+body.player-mode .pm-list .pm-btn.pm-no{border-color:rgba(239,106,90,.4);color:var(--fl-no);}
+body.player-mode .pm-list .pm-btn.pm-no.active{background:var(--fl-no);border-color:var(--fl-no);color:#2A0B06;}
+body.player-mode .pm-list .pm-btn:hover{transform:none;}
+body.player-mode .pm-list .pm-btn:disabled{opacity:.4;}
+body.player-mode .pm-list .pm-state{background:none;padding:0;margin-top:10px;font-size:13.5px;}
+body.player-mode .pm-list .pm-state.ok{color:var(--fl-yes);}
+body.player-mode .pm-list .pm-state.exc{color:var(--fl-exc);}
+body.player-mode .pm-list .pm-state.nk,body.player-mode .pm-list .pm-state.late{color:var(--fl-ink2);font-weight:600;}
+body.player-mode .pm-list .pm-call{background:var(--fl-no-tint);border:1px solid rgba(239,106,90,.35);color:var(--fl-ink);}
+body.player-mode .pm-list .pm-call-t{color:#FFB3A8;}
+body.player-mode .pm-list .pm-call-b{color:var(--fl-ink2);}
+body.player-mode .pm-list .pm-tel{background:var(--fl-no);color:#2A0B06;}
+body.player-mode .pm-list .pm-call.ok{background:var(--fl-lamp-tint);border-color:rgba(242,194,48,.38);}
+body.player-mode .pm-list .pm-call.ok .pm-call-t{color:var(--fl-lamp);}
+body.player-mode .pm-list .pm-tel.pm-confirm{background:var(--fl-lamp);color:#0E2350;}
+body.player-mode .pm-list .pm-physio-ro{background:var(--fl-yes-tint);border-color:rgba(60,194,126,.35);color:var(--fl-yes);margin-top:10px;}
+body.player-mode .pm-empty{margin:14px 16px;background:var(--fl-surface);border:1px solid var(--fl-line);color:var(--fl-ink2);}
+body.player-mode .pm-card-focused{box-shadow:0 0 0 2px var(--fl-lamp) !important;}
+/* ── single-task screens: Belastung, Spieler des Spiels, Physio, group link ── */
+body.player-mode .rpo-wrap{color:var(--fl-ink);}
+body.player-mode .rpo-wrap.fl-scr{display:block;min-height:100dvh;max-width:480px;margin:0 auto;padding:0 16px 28px;text-align:left;}
+body.player-mode .rpo-card{background:var(--fl-surface);border:1px solid var(--fl-line);box-shadow:none;color:var(--fl-ink);}
+body.player-mode .fl-scr .rpo-card{background:none;border:0;padding:0;max-width:none;text-align:left;border-radius:0;}
+body.player-mode .rpo-h{font-family:var(--fl-num);font-weight:800;font-size:26px;letter-spacing:.2px;color:var(--fl-ink);}
+body.player-mode .rpo-hi{color:var(--fl-ink2);}
+body.player-mode .rpo-q{font-size:21px;font-weight:700;line-height:1.25;color:var(--fl-ink);margin:12px 0 4px;}
+body.player-mode .rpo-q+.rpo-q-sub,body.player-mode .rpo-q-sub{margin:0 0 14px;font-size:14px;color:var(--fl-ink2);}
+body.player-mode .rpo-sub{color:var(--fl-ink2);font-size:14px;}
+body.player-mode .rpo-ok{color:var(--fl-lamp);font-size:44px;margin-top:14px;}
+body.player-mode .rpo-foot{color:var(--fl-muted);font-size:13px;margin-top:14px;text-align:center;}
+body.player-mode .rpo-prev{max-width:none;margin:4px 0 8px;}
+body.player-mode .rpo-list{background:var(--fl-surface);border:1px solid var(--fl-line);border-radius:16px;padding:6px;gap:2px;}
+body.player-mode .rpo-opt{border:0;background:none;color:var(--fl-ink2);min-height:44px;padding:4px 10px 4px 4px;border-radius:11px;}
+body.player-mode .rpo-opt:hover{background:var(--fl-surface2);}
+body.player-mode .rpo-opt.on{background:var(--fl-surface2);box-shadow:inset 0 0 0 1.5px var(--fl-lamp);color:var(--fl-ink);}
+body.player-mode .rpo-num{font-family:var(--fl-num);font-weight:800;font-size:21px;width:40px;height:34px;border:0;}
+body.player-mode .rpo-num.rpe-low{background:rgba(60,194,126,.16);color:#86E2B0;}
+body.player-mode .rpo-num.rpe-mid{background:rgba(92,160,240,.16);color:#9CC8F0;}
+body.player-mode .rpo-num.rpe-high{background:rgba(242,170,48,.16);color:#F5C26B;}
+body.player-mode .rpo-num.rpe-max{background:rgba(239,106,90,.18);color:#FFA597;}
+body.player-mode .rpo-opt.on .rpo-num.rpe-low{background:var(--fl-yes);color:#08251A;}
+body.player-mode .rpo-opt.on .rpo-num.rpe-mid{background:#5CA0F0;color:#071A33;}
+body.player-mode .rpo-opt.on .rpo-num.rpe-high{background:#F2AA30;color:#2A1A02;}
+body.player-mode .rpo-opt.on .rpo-num.rpe-max{background:var(--fl-no);color:#2A0B06;}
+body.player-mode .rpo-lbl{font-size:15.5px;font-weight:600;}
+body.player-mode .rpo-tick{color:var(--fl-lamp);}
+body.player-mode .rpo-nd{border:1.5px dashed var(--fl-line);background:none;color:var(--fl-ink2);border-radius:12px;font-weight:600;}
+body.player-mode .rpo-nd.on{border-style:solid;border-color:var(--fl-lamp);background:var(--fl-surface2);color:var(--fl-ink);}
+body.player-mode .rpo-next{display:flex;align-items:center;gap:7px;color:var(--fl-ink2);font-size:14px;}
+body.player-mode .rpo-next .pm-ic{color:var(--fl-lamp);}
+body.player-mode .mvp-list{background:var(--fl-surface);border:1px solid var(--fl-line);border-radius:16px;margin:0;padding:0;gap:0;max-height:none;overflow:visible;}
+body.player-mode .mvp-opt{border:0;border-radius:0;background:none;color:var(--fl-ink);min-height:52px;padding:0 14px;}
+body.player-mode .mvp-opt+.mvp-opt{border-top:1px solid var(--fl-line);}
+body.player-mode .mvp-opt:hover{background:var(--fl-surface2);}
+body.player-mode .mvp-opt.on{background:var(--fl-surface2);}
+body.player-mode .mvp-nr{font-family:var(--fl-num);font-weight:800;font-size:20px;color:var(--fl-muted);}
+body.player-mode .mvp-opt.on .mvp-nr{color:var(--fl-lamp);}
+body.player-mode .mvp-nm{font-size:16px;}
+body.player-mode .mvp-dot{border-color:#3A4E7E;width:22px;height:22px;}
+body.player-mode .mvp-opt.on .mvp-dot{border-color:var(--fl-lamp);background:radial-gradient(circle,var(--fl-lamp) 0 5px,transparent 6px);}
+body.player-mode .mvp-go{height:52px;border-radius:14px;font-size:17px;font-weight:800;margin-top:16px;}
+body.player-mode .mvp-go:disabled{background:var(--fl-surface2);color:var(--fl-muted);}
+body.player-mode .phy-btns{gap:10px;}
+body.player-mode .phy-b{display:flex;align-items:center;justify-content:center;gap:7px;background:transparent;border:1.5px solid var(--fl-line);color:var(--fl-ink);min-height:52px;font-size:16px;}
+body.player-mode .phy-b.phy-yes:not(.on){border-color:rgba(60,194,126,.45);color:var(--fl-yes);}
+body.player-mode .phy-yes.on{background:var(--fl-yes);border-color:var(--fl-yes);color:#08251A;}
+body.player-mode .phy-no.on{background:var(--fl-surface2);border-color:var(--fl-ink2);color:var(--fl-ink);}
+body.player-mode .phy-state{color:var(--fl-ink2);font-size:14px;}
+body.player-mode .rpo-who-b{background:var(--fl-surface2);border:1px solid var(--fl-line);color:var(--fl-ink);}
+body.player-mode .rpo-who-b:active{background:var(--fl-surface);border-color:var(--fl-lamp);}
+body.player-mode .rpo-who-nr{font-family:var(--fl-num);font-weight:800;font-size:18px;color:var(--fl-muted);}
+body.player-mode .rpo-verify{background:var(--fl-surface2);border:1px solid var(--fl-line);}
+body.player-mode .rpo-verify-h{color:var(--fl-ink);}
+body.player-mode .rpo-verify-s{color:var(--fl-ink2);}
+body.player-mode #rpo-verify-in{background:var(--fl-night);border-color:var(--fl-line);color:var(--fl-ink);color-scheme:dark;}
+body.player-mode .rpo-verify-ok{background:var(--fl-lamp);color:#0E2350;}
+body.player-mode .rpo-mbtn,body.player-mode .rpo-full{background:var(--fl-surface2);border-color:var(--fl-line);color:var(--fl-ink);}
+body.player-mode .rpo-verify-b button{font-family:'Barlow',sans-serif;}
+body.player-mode .rpo-mbtn.rpo-verify-ok{background:var(--fl-lamp);border-color:var(--fl-lamp);color:#0E2350;font-weight:800;}
+@media (max-height:700px){body.player-mode .rpo-opt{min-height:38px;}body.player-mode .rpo-num{height:30px;}}
 
 /* RECENT (past sessions, collapsible) */
 /* ── sRPE card ──────────────────────────────────────────────
@@ -6839,13 +7021,18 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.46'; // v1.2.46: Meine Woche ruhiger
-const APP_VERSION_LABEL='1.2.46';
+const APP_VERSION='1.2.47'; // v1.2.47: Flutlicht für Spieler
+const APP_VERSION_LABEL='1.2.47';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792799570936; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792839321002; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.47',date:'24.10.2026',title:'Flutlicht für die Spieler',items:[
+    {icon:'🌙',title:'Ein Look für alle Spieler-Screens',desc:'Übersicht, „Meine Woche“, Belastung, Spieler des Spiels, Physio, Statistik und der Gruppen-Link sehen jetzt gleich aus: Nacht mit Licht von oben wie beim Anmelden, dunkle Karten, Zahlen in der Schrift der Trainer-App, Gelb nur da, wo etwas zu tun ist, schlichte Symbole statt Emoji.'},
+    {icon:'🧭',title:'Die Übersicht der Spieler neu geordnet',desc:'„Jetzt dran“ (was auf eine Antwort wartet), „Diese Woche“ (jeder Termin mit seinem Stand: eingeplant, offen, im Kader …), „Letztes Spiel“ und „Für dich“ (Karte, Statistik, Wochenbericht). Ein offener Termin heißt direkt „Kommst du am Donnerstag?“.'},
+    {icon:'📊',title:'Statistik ohne Platz',desc:'Die persönliche Statistik zeigt keinen Platz in der Mannschaft mehr – wie die Karte seit 1.2.5: die Seite gehört dem Spieler, nicht dem Vergleich.'},
+  ]},
   {version:'1.2.46',date:'24.10.2026',title:'„Meine Woche“ ruhiger',items:[
     {icon:'🎨',title:'Weniger Signale pro Termin',desc:'Bei den Spielern: keine farbigen Streifen mehr am Rand, Knöpfe in normaler Schrift statt in Großbuchstaben, schlichte Symbole statt Emoji (das Kalender-Emoji zeigte auf dem iPhone „17. Juli“). „Eingeplant“ ist ein ruhiger hellgrüner Knopf. Steht die Mannschaft auf „Immer per Anruf“, sieht der Spieler nach einer Absage auch, warum ein Anruf nötig ist.'},
   ]},
@@ -17222,7 +17409,7 @@ function _resHubHtml(x,p,mvpWho){
   const g=n(p.goals),a=n(p.assists);
   const mine=[g?g+(g===1?' Tor':' Tore'):'',a?a+(a===1?' Vorlage':' Vorlagen'):''].filter(Boolean).join(' und ');
   const where=s.homeAway==='home'?' (Heim)':s.homeAway==='away'?' (auswärts)':'';
-  return `<div class="hub-card hub-mvp hub-res hub-res-${r.k}">`
+  return `<div class="hub-card hub-mvp hub-res hub-res-${r.k} fl-row">`
     +`<span class="hub-score">${r.f}:${r.a}</span>`
     +`<span class="hub-txt"><b>${r.word}${s.label?' gegen '+e(s.label):''}</b>`
     +`<span>${e(s.date)}${e(where)}</span>`
@@ -19095,13 +19282,12 @@ function renderMvpVote(){
     const c=_hubOpenCounts();si=c.voteLast!=null?c.voteLast:null;
   }
   const s=(si!=null)?D.sessions[si]:null;
-  const back=window._hubMode?'<button class="hub-back" onclick="hubBack()">‹ Übersicht</button>':'';
   const prev=RPE_IS_PREVIEW?'<div class="rpo-prev">👁 Vorschau · Eingaben werden <b>nicht</b> gespeichert</div>':'';
-  const head=s?`<div class="rpo-h">⚽ ${escapeHtml(s.date)}${s.label?' – '+escapeHtml(s.label):''}</div>`:'';
-  const card=inner=>`<div class="rpo-wrap">${back}${prev}<div class="rpo-card">${inner}</div><div class="rpo-foot">Abstimmung ist anonym — niemand sieht, wen du gewählt hast.</div></div>`;
-  if(!p||!s){wrap.innerHTML=card('<div class="rpo-h">Gerade keine Abstimmung</div>');return;}
+  const head=s?`<div class="fl-kick">${_flWhat(s)}</div><h1 class="fl-title">Spieler des Spiels</h1>`:'<h1 class="fl-title">Spieler des Spiels</h1>';
+  const card=inner=>`<div class="rpo-wrap fl-scr">${_flBar(p)}${prev}<div class="rpo-card">${inner}</div><div class="rpo-foot">Anonym – niemand sieht, wen du gewählt hast.</div></div>`;
+  if(!p||!s){wrap.innerHTML=card('<h1 class="fl-title">Spieler des Spiels</h1><div class="rpo-sub">Gerade keine Abstimmung.</div>');return;}
   if(mvpVoted(p,s)){
-    wrap.innerHTML=card(`${head}<div class="rpo-ok">🏆</div><div class="rpo-h" style="margin-top:4px;">Stimme abgegeben</div>
+    wrap.innerHTML=card(`${head}<div class="rpo-ok">${FL_IC.trophy}</div><div class="rpo-h" style="margin-top:4px;">Stimme abgegeben</div>
       <div class="rpo-sub">Das Ergebnis siehst du in deiner Übersicht ab ${escapeHtml(mvpEndsLabel(s))}.</div>`);
     return;
   }
@@ -19122,7 +19308,7 @@ function renderMvpVote(){
       <span class="mvp-nr">${escapeHtml(String((_pmRoster.nr||{})[n]||''))}</span><span class="mvp-nm">${escapeHtml(_mvpName(n))}</span>
       <span class="mvp-dot" aria-hidden="true"></span></button>`).join('');
   window._mvpNames=names;
-  wrap.innerHTML=card(`<div class="rpo-hi">Hi ${escapeHtml((getDisplayName?getDisplayName(p):p.name)||'')}!</div>${head}
+  wrap.innerHTML=card(`${head}
     <div class="rpo-q">Wer war für dich der Spieler des Spiels?</div>
     <div class="rpo-q-sub">Eine Stimme, bis ${escapeHtml(mvpEndsLabel(s))}. Danach siehst du, wer gewonnen hat.</div>
     ${names.length?`<div class="mvp-list" role="radiogroup" aria-label="Spieler des Spiels">${rows}</div>
@@ -20223,14 +20409,15 @@ function renderPhysioAsk(){
   if(!p||!s){window._hubAction='';return renderPlayerMode();}
   const cur=_physioState(p,si);
   const left=Math.max(0,c.physio-1);
-  wrap.innerHTML=`<div class="rpo-wrap">
+  wrap.innerHTML=`<div class="rpo-wrap fl-scr">
+    ${_flBar(p)}
     ${RPE_IS_PREVIEW?'<div class="rpo-prev">\ud83d\udc41 Vorschau \u00b7 Eingaben werden <b>nicht</b> gespeichert</div>':''}
     <div class="rpo-card">
-      <div class="rpo-hi">\ud83e\uddd1\u200d\u2695\ufe0f Physiotherapie</div>
-      <div class="rpo-h">${escapeHtml(s.date)}</div>
+      <div class="fl-kick">${_flWhat(s)}${s.time?' \u00b7 '+escapeHtml(s.time):''}</div>
+      <h1 class="fl-title">Physiotherapie</h1>
       <div class="rpo-q">An diesem Tag ist der Physio beim Training dabei.<br>M\u00f6chtest du einen Termin?</div>
       <div class="phy-btns">
-        <button class="phy-b phy-yes${cur==='ja'?' on':''}" onclick="pmAnswerPhysio(${si},true)">\u2713 Ja, bitte</button>
+        <button class="phy-b phy-yes${cur==='ja'?' on':''}" onclick="pmAnswerPhysio(${si},true)">${FL_IC.check} Ja, bitte</button>
         <button class="phy-b phy-no${cur==='nein'?' on':''}" onclick="pmAnswerPhysio(${si},false)">Nein, danke</button>
       </div>
       ${cur!=='offen'?`<div class="phy-state">${cur==='ja'
@@ -20276,7 +20463,7 @@ function renderRpeOnly(){
   }
   const s=(si!=null)?D.sessions[si]:null;
   if(!s){
-    wrap.innerHTML=`<div class="rpo-wrap"><div class="rpo-card">
+    wrap.innerHTML=`<div class="rpo-wrap fl-scr">${_flBar(p)}<div class="rpo-card">
       <div class="rpo-ok">\u2713</div>
       <div class="rpo-h">Gerade nichts zu bewerten</div>
       <div class="rpo-sub">Nach dem n\u00e4chsten Training oder Spiel bekommst du wieder einen Link.</div>
@@ -20288,8 +20475,8 @@ function renderRpeOnly(){
   const isMatch=s.type==='match';
   const nm=(getDisplayName?getDisplayName(p):p.name)||'';
   if(!open){
-    wrap.innerHTML=`<div class="rpo-wrap"><div class="rpo-card">
-      <div class="rpo-h">${escapeHtml(s.date)}</div>
+    wrap.innerHTML=`<div class="rpo-wrap fl-scr">${_flBar(p)}<div class="rpo-card">
+      <div class="fl-kick">${_flWhat(s)}</div><h1 class="fl-title">Belastung</h1>
       <div class="rpo-sub">Die Bewertung f\u00fcr diesen Termin ist abgeschlossen.</div>
     </div></div>`;
     return;
@@ -20301,21 +20488,31 @@ function renderRpeOnly(){
     `<button class="rpo-opt${n===cur?' on':''}" data-v="${n}" aria-pressed="${n===cur}" onclick="rpoSet(${si},${n})">
       <span class="rpo-num ${_rpeBand(n)}">${n}</span><span class="rpo-lbl">${lbl}</span>
       ${n===cur?'<span class="rpo-tick" aria-hidden="true">\u2713</span>':''}</button>`).join('');
-  wrap.innerHTML=`<div class="rpo-wrap">
-    ${window._hubMode?'<button class="hub-back" onclick="hubBack()">\u2039 \u00dcbersicht</button>':''}
+  wrap.innerHTML=`<div class="rpo-wrap fl-scr">
+    ${_flBar(p)}
     ${RPE_IS_PREVIEW?'<div class="rpo-prev">\ud83d\udc41 Vorschau \u00b7 Eingaben werden <b>nicht</b> gespeichert</div>':''}
     <div class="rpo-card">
-      <div class="rpo-hi">Hi ${escapeHtml(nm)}!</div>
-      <div class="rpo-h">${isMatch?'\u26bd':'\ud83c\udfc3'} ${escapeHtml(s.date)}${isMatch&&s.label?' \u2013 '+escapeHtml(s.label):''}</div>
+      <div class="fl-kick">${_flWhat(s)}</div>
+      <h1 class="fl-title">Belastung</h1>
       <div class="rpo-q">Wie anstrengend war ${isMatch?'das Spiel':'das Training'} f\u00fcr dich?</div>
       <div class="rpo-q-sub">Die ganze Einheit z\u00e4hlt, nicht nur das Ende.</div>
       <div class="rpo-list" role="group" aria-label="Anstrengung von 0 bis 10">${opts}</div>
       <button class="rpo-nd${nd?' on':''}" aria-pressed="${nd}" onclick="rpoNotThere(${si})">${nd?'\u2713 ':''}Ich war nicht dabei</button>
-      ${isMatch&&window._hubMode&&mvpIsOpen(s,UI.currentSeason)&&!mvpVoted(p,s)?'<div class="rpo-next">Danach: \ud83c\udfc6 Spieler des Spiels w\u00e4hlen</div>':''}
+      ${isMatch&&window._hubMode&&mvpIsOpen(s,UI.currentSeason)&&!mvpVoted(p,s)?'<div class="rpo-next">'+FL_IC.trophy+' Danach: Spieler des Spiels w\u00e4hlen</div>':''}
 
     </div>
     <div class="rpo-foot">Deine Angabe sehen nur die Trainer.</div>
   </div>`;
+}
+// Top bar of the single-task screens (1.2.47): the way back and who he is
+function _flBar(p){
+  const nm=p?((getDisplayName?getDisplayName(p):p.name)||''):'';
+  return '<div class="fl-bar">'+(window._hubMode?'<button class="hub-back" onclick="hubBack()">\u2039 \u00dcbersicht</button>':'<span></span>')
+    +'<span class="fl-team">'+escapeHtml(nm)+(p&&p.nr?' \u00b7 Nr. '+escapeHtml(String(p.nr)):'')+'</span></div>';
+}
+// "So 25.10 · gegen SV Brackel" / "Di 27.10 · Training"
+function _flWhat(s){
+  return escapeHtml(s.date)+' \u00b7 '+(s.type==='match'?(s.label?'gegen '+escapeHtml(s.label):'Spiel'):'Training');
 }
 function rpoSet(si,n){
   pmSetRpe(si,n);
@@ -20344,14 +20541,14 @@ function renderHub(){
   const weekStart=(typeof _pmWeekStart==='function')?_pmWeekStart():today;
   const horizon=(typeof _pmWeekHorizon==='function')?_pmWeekHorizon():today;
   // Open registrations this week
-  let weekOpen=0,weekTotal=0;
+  let weekOpen=0,weekTotal=0,openOne=null;
   (D.sessions||[]).forEach((s,si)=>{
     if(!s||!s.date)return;
     const sk=dispToSortKey(s.date);
     if(sk<weekStart||sk>horizon)return;
     weekTotal++;
     const v=(p.s&&si<p.s.length)?p.s[si]:3;
-    if(v===3)weekOpen++;
+    if(v===3){weekOpen++;if(!openOne)openOne=s;}
   });
   // Sessions still awaiting a load rating
   const rpeDue=[];
@@ -20374,33 +20571,71 @@ function renderHub(){
     if(nb!==inner)return `<a class="hub-card" href="${href}">${nb}</a>`;
     return `<a class="hub-card" href="${href}">${inner}</a>`;
   };
-  const tok=p.confirmToken||'';
-  let cards=_newsHtml('hub')+_squadHubHtml(D,p);
-  if(weekTotal){
-    cards+=card('\ud83d\udcc5','Meine Woche',
-      weekOpen?(weekOpen+' von '+weekTotal+' offen'):('alle '+weekTotal+' beantwortet'),
-      weekOpen||'', buildHubLink(tok,'week'));
-  }
-  // Shown for as long as the rating window is open, so a player can revise a
-  // value he already gave — it disappeared the moment he answered before.
+  const tok=p.confirmToken||'',e=escapeHtml;
+  // 1.2.47: sections instead of a column of equal cards — what waits for him,
+  // his week at a glance, the last match, and what is his to look at
+  const ln=href=>(RPE_IS_PREVIEW&&href.indexOf('javascript:')!==0)?href+'&preview=1':href;
+  const row=o=>`<a class="hub-card fl-row" href="${ln(o.href)}"><span class="hub-ic fl-tile${o.go?' go':''}${o.ok?' ok':''}">${o.ic}</span>`
+    +`<span class="hub-txt"><b>${o.title}</b>${o.sub?`<span>${o.sub}</span>`:''}</span>`
+    +`${o.badge?`<span class="hub-badge${o.badge==='Neu'?' hub-badge-new':''}">${o.badge}</span>`:''}<span class="hub-chev">\u203a</span></a>`;
+  const sec=(t,right)=>`<div class="fl-sec"><span>${t}</span>${right||''}</div>`;
+  const list=a=>`<div class="fl-list">${a.join('')}</div>`;
   const cnt=_hubOpenCounts();
+  // ── Jetzt dran ──
+  const now=[];
   if(cnt.rpeTotal){
-    const si2=cnt.rpeLast;
-    const s2=D.sessions[si2];
-    cards+=card('\ud83d\udcaa','Belastung bewerten',
-      escapeHtml(s2.date)+(cnt.rpe?' \u00b7 noch offen':' \u00b7 beantwortet'),
-      cnt.rpe||'',buildHubLink(tok,'rpe',si2));
+    const s2=D.sessions[cnt.rpeLast];
+    const what=(s2.type==='match'?'Spiel ':'Training ')+e(s2.date)+(s2.type==='match'&&s2.label?' gegen '+e(s2.label):'');
+    now.push(row({ic:FL_IC.pulse,go:!!cnt.rpe,ok:!cnt.rpe,title:cnt.rpe?'Belastung bewerten':'Belastung bewertet',
+      sub:what+(cnt.rpe?' \u00b7 noch offen':' \u00b7 noch \u00e4nderbar'),badge:cnt.rpe||'',href:buildHubLink(tok,'rpe',cnt.rpeLast)}));
   }
   if(cnt.vote>0){
     const sv=D.sessions[cnt.voteLast];
-    cards+=card('\ud83c\udfc6','Spieler des Spiels w\u00e4hlen',
-      (sv.label?'gegen '+escapeHtml(sv.label)+' \u00b7 ':'')+'bis '+escapeHtml(mvpEndsLabel(sv)),
-      cnt.vote,buildHubLink(tok,'vote',cnt.voteLast));
+    now.push(row({ic:FL_IC.trophy,go:true,title:'Spieler des Spiels w\u00e4hlen',
+      sub:(sv.label?'gegen '+e(sv.label)+' \u00b7 ':'')+'bis '+e(mvpEndsLabel(sv)),badge:cnt.vote,href:buildHubLink(tok,'vote',cnt.voteLast)}));
   }
-  // The latest match result, for a week (1.2.44): the score, and what he
-  // scored or set up himself. Its Spieler des Spiels joins the same card.
+  if(weekOpen){
+    const one=weekOpen===1&&openOne;
+    now.push(row({ic:FL_IC.cal,go:true,
+      title:one?'Kommst du '+_flDayWord(openOne)+'?':weekOpen+' Termine ohne Antwort',
+      sub:one?(openOne.type==='match'?'Spiel gegen '+e(openOne.label||'')+', ':'Training, ')+e(openOne.time||'')+' \u00b7 noch keine Antwort':'Diese Woche',
+      badge:weekOpen,href:buildHubLink(tok,'week')}));
+  }
+  // Visible while the offer stands, so a booking can be cancelled or added
+  if(cnt.physioTotal>0){
+    now.push(row({ic:FL_IC.physio,go:!!cnt.physio,ok:!cnt.physio,title:'Physiotherapie',
+      sub:cnt.physio?(cnt.physio===1?'1 Termin offen':cnt.physio+' Termine offen'):'beantwortet \u00b7 noch \u00e4nderbar',
+      badge:cnt.physio||'',href:buildHubLink(tok,'physio')}));
+  }
+  // ── Diese Woche: every date with where he stands ──
+  const wk=[];
+  (D.sessions||[]).forEach((s,si)=>{
+    if(!s||!s.date)return;
+    const k=dispToSortKey(s.date);
+    if(k>=weekStart&&k<=horizon)wk.push({s,si,k});
+  });
+  // the next match with a squad that concerns him, even when it lies beyond the week
+  const sqn=_sqPmNext(D,p);
+  if(sqn&&!wk.some(x=>x.si===sqn.si))wk.push({s:sqn.s,si:sqn.si,k:dispToSortKey(sqn.s.date)});
+  wk.sort((a,b)=>a.k-b.k);
+  const wkRows=wk.map(({s,si,k})=>{
+    const f=_pmFmtUpcoming(s,k);
+    const v=(p.s&&si<p.s.length)?p.s[si]:3;
+    const auto=v===4&&Array.isArray(p.ay)&&p.ay[si]===1;
+    const q=s.type==='match'?_sqPm(s):null;
+    let chip='offen',cls='open',sub=s.location?e(s.location):(s.homeAway==='home'?'Heim':s.homeAway==='away'?'Ausw\u00e4rts':'');
+    if(v===1){chip='dabei';cls='yes';}
+    else if(v===0){chip='abgesagt';cls='no';}
+    else if(v===2){chip='entschuldigt';cls='exc';}
+    else if(v===5||(q&&!q.in&&v===4)){chip='nicht im Kader';cls='nk';if(q&&!q.in)sub='Diesmal bist du nicht dabei';}
+    else if(q&&q.in){chip='im Kader';cls='yes';sub='Treffpunkt '+e(q.meet||'')+(q.where?' \u00b7 '+e(q.where):'');}
+    else if(v===4){chip=auto?'eingeplant':'zugesagt';cls='yes';}
+    return `<a class="hub-card fl-row fl-ev" href="${ln(buildHubLink(tok,'week'))}"><span class="fl-day"><small>${f.dow}</small><b>${f.day}</b></span>`
+      +`<span class="hub-txt"><b>${e(f.time)} ${f.isMatch?'gegen '+e(f.title):'Training'}</b>${sub?`<span>${sub}</span>`:''}</span><span class="fl-chip ${cls}">${chip}</span></a>`;
+  });
+  // ── Letztes Spiel: the score, his part, and its Spieler des Spiels ──
   const res=_resHubPick(D);
-  // The latest result, for a week: the winner only
+  let last='';
   {
     let best=null;
     (D.sessions||[]).forEach((sx,six)=>{
@@ -20413,46 +20648,45 @@ function renderHub(){
     let who=null;
     if(best){
       const me=best.winners.includes(p.name);
-      const others=best.winners.filter(n=>n!==p.name).map(n=>escapeHtml(_mvpName(n)));
+      const others=best.winners.filter(n=>n!==p.name).map(n=>e(_mvpName(n)));
       who=me?(others.length?'Du und '+others.join(' & ')+' \ud83c\udf89':'Du! \ud83c\udf89'):others.join(' & ');
     }
-    if(res)cards+=_resHubHtml(res,p,(best&&best.sx===res.s)?who:null);
+    if(res)last+=_resHubHtml(res,p,(best&&best.sx===res.s)?who:null);
     if(best&&!(res&&best.sx===res.s)){
-      cards+=`<div class="hub-card hub-mvp"><span class="hub-ic">\ud83c\udfc6</span>
-        <span class="hub-txt"><b>Spieler des Spiels: ${who}</b><span>${best.sx.label?'gegen '+escapeHtml(best.sx.label)+' \u00b7 ':''}${escapeHtml(best.sx.date)}</span></span></div>`;
+      last+=`<div class="hub-card hub-mvp fl-row"><span class="hub-ic fl-tile go">${FL_IC.trophy}</span>
+        <span class="hub-txt"><b>Spieler des Spiels: ${who}</b><span>${best.sx.label?'gegen '+e(best.sx.label)+' \u00b7 ':''}${e(best.sx.date)}</span></span></div>`;
     }
   }
-  // Visible while the offer stands, so a booking can be cancelled or added —
-  // it used to disappear the moment he answered.
-  if(cnt.physioTotal>0){
-    cards+=card('\ud83e\uddd1\u200d\u2695\ufe0f','Physiotherapie',
-      cnt.physio?(cnt.physio+' offen'):'beantwortet',
-      cnt.physio||'',buildHubLink(tok,'physio'));
-  }
-  cards+=_hubPushCard();
+  // ── Für dich ──
+  const mine=[];
   {
     const cdx=cardData(p,D,UI.currentSeason);
     if(cdx){
       const T=CARD_TIERS[cdx.ti],seen=_mkSeenGet(tok);
       const isNew=seen==null||cdx.ti>seen;
-      cards+=card(`<span class="mk-mini mk-t-${T.k}" aria-hidden="true"></span>`,'Meine Karte',
-        T.name+' \u00b7 '+cdx.pct+' % Anwesenheit',isNew?'Neu':'',buildHubLink(tok,'card'));
+      mine.push(row({ic:`<span class="mk-mini mk-t-${T.k}" aria-hidden="true"></span>`,title:'Meine Karte',
+        sub:T.name+' \u00b7 '+cdx.pct+' % dabei',badge:isNew?'Neu':'',href:buildHubLink(tok,'card')}));
     }
   }
-  if(live.stats)cards+=card('\ud83d\udcca','Meine Statistik','Anwesenheit, Serie, Verlauf','',"javascript:hubOpenLive('stats')");
-  if(rep)cards+=card('\ud83d\udccb','Wochenbericht','KW '+((rep.week&&rep.week.kw)||'')+' \u00b7 die ganze Mannschaft','',"javascript:hubOpenLive('report')");
+  if(live.stats)mine.push(row({ic:FL_IC.chart,title:'Meine Statistik',sub:'Anwesenheit, Serie, Verlauf',href:"javascript:hubOpenLive('stats')"}));
+  if(rep)mine.push(row({ic:FL_IC.doc,title:'Wochenbericht',sub:'KW '+((rep.week&&rep.week.kw)||'')+' \u00b7 die ganze Mannschaft',href:"javascript:hubOpenLive('report')"}));
+  const nm=getDisplayName?getDisplayName(p):p.name;
   const av=p.photo
     ? `<img class="hub-av" src="${p.photo}" alt="">`
-    : `<div class="hub-av hub-av-ph">${escapeHtml(String(p.name||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase())}</div>`;
-  wrap.innerHTML=`<div class="hub">
-    <div class="hub-hero">
-      ${av}
-      <div class="hub-name">${escapeHtml(getDisplayName?getDisplayName(p):p.name)}</div>
-      <div class="hub-sub">${escapeHtml(UI.currentTeam||'')} \u00b7 ${escapeHtml(UI.currentSeason||'')}</div>
-    </div>
-    ${cards||'<div class="hub-empty">\u2713<span>Gerade nichts zu tun</span></div>'}
+    : `<div class="hub-av hub-av-ph">${e(String(p.name||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase())}</div>`;
+  const meta=[p.nr?'Nr. '+e(p.nr):'',p.pos&&!p.hidePos?e(p.pos):'','Saison '+e(UI.currentSeason||'')].filter(Boolean).join(' \u00b7 ');
+  const club=[G&&G.clubName?e(G.clubName):'',e(UI.currentTeam||'')].filter(Boolean).join(' \u00b7 ');
+  wrap.innerHTML=`<div class="hub fl">
+    <div class="fl-bar"><span class="fl-brand"><span class="fl-lamps" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span>Flutlicht</span><span class="fl-team">${club}</span></div>
+    <div class="fl-who">${av}<div class="fl-who-t"><div class="hub-name">${e(nm)}</div><div class="hub-sub">${meta}</div></div></div>
+    ${_newsHtml('hub')}
+    ${sec('Jetzt dran')}${now.length?list(now):list([`<div class="hub-mvp fl-row fl-calm"><span class="hub-ic fl-tile ok">${FL_IC.check}</span><span class="hub-txt"><b>Alles beantwortet</b><span>Danke – gerade wartet nichts auf dich.</span></span></div>`])}
+    ${_hubPushCard()}
+    ${wkRows.length?sec(wk.length===1?'Dein n\u00e4chster Termin':'Diese Woche',`<a class="fl-sec-a" href="${ln(buildHubLink(tok,'week'))}">alle Termine \u203a</a>`)+list(wkRows):''}
+    ${last?sec('Letztes Spiel')+list([last]):''}
+    ${mine.length?sec('F\u00fcr dich')+list(mine):''}
     ${_hubPushLine()}
-    ${RPE_IS_PREVIEW?'':'<button class="hub-switch" onclick="hubSwitchPlayer()">Nicht '+escapeHtml(getDisplayName?getDisplayName(p):p.name)+'? Anderen Spieler w\u00e4hlen</button>'}
+    ${RPE_IS_PREVIEW?'':'<button class="hub-switch" onclick="hubSwitchPlayer()">Nicht '+e(nm)+'? Anderen Spieler w\u00e4hlen</button>'}
   </div>`;
 }
 // Each card opens a tab, so a deep-linked screen has no history behind it —
@@ -20577,19 +20811,19 @@ function _hubThanks(kind){
   el.setAttribute('style',
     'position:fixed;top:0;left:0;right:0;bottom:0;width:100%;height:100%;'
     +'z-index:2147483600;display:flex;align-items:center;justify-content:center;'
-    +'background:rgba(8,15,34,.94);padding:20px;box-sizing:border-box;'
+    +'background:rgba(10,19,40,.96);padding:20px;box-sizing:border-box;'
     +'opacity:0;transition:opacity .25s;');
   el.innerHTML=
     '<div style="text-align:center;max-width:340px;">'
     +'<div style="width:78px;height:78px;margin:0 auto;border-radius:50%;'
     +'background:#3ddc84;color:#08210f;font-size:2.6rem;display:flex;'
     +'align-items:center;justify-content:center;">'+icon+'</div>'
-    +'<div style="font-family:\'Bebas Neue\',sans-serif;font-size:2.1rem;'
-    +'letter-spacing:1.2px;color:#eef2fb;margin-top:16px;">'+head+'</div>'
+    +'<div style="font-family:\'Big Shoulders Display\',\'Bebas Neue\',sans-serif;font-weight:800;font-size:2.4rem;'
+    +'letter-spacing:.3px;line-height:1;color:#F3F5FA;margin-top:16px;">'+head+'</div>'
     +'<div style="font-size:.88rem;color:#9aa8c8;margin-top:4px;">'+sub+'</div>'
     +_hubThanksCard(kind,nd,onHub)
     +'<button id="hubThanksBtn" style="margin-top:24px;padding:13px 32px;'
-    +'border-radius:12px;border:none;background:#2e7de4;color:#fff;'
+    +'border-radius:12px;border:none;background:#F2C230;color:#0E2350;'
     +'font-family:\'Barlow\',sans-serif;font-size:.94rem;font-weight:700;'
     +'cursor:pointer;">'+(onHub?'Zur \u00dcbersicht':'Schlie\u00dfen')+'</button>'
     +_hubThanksPush(kind,nd,onHub)
@@ -20792,12 +21026,9 @@ function renderPlayerMode(){
   // share, series) lives on the overview and the statistics.
   const _R=teamRules(UI.currentTeam),_rule=pvAbsRule(_R);
   let html='<div class="pm-wrap">';
-  html+='<div class="pm-top">';
-  if(window._hubMode)html+='<button class="hub-back pm-top-back" onclick="hubBack()">\u2039 \u00dcbersicht</button>';
-  html+=`<div class="pm-top-row"><div class="pm-top-av">${_pmAvatar(p)}</div><div class="pm-top-txt">`
-    +`<div class="pm-top-name">${_amEscapeText(nm)}</div>`
-    +`<div class="pm-top-sub">${p.nr?'#'+_amEscapeText(p.nr)+' \u00b7 ':''}${posLine&&!p.hidePos?_amEscapeText(posLine)+' \u00b7 ':''}${_amEscapeText(UI.currentTeam)}</div>`
-    +'</div></div></div>';
+  // 1.2.47: the way back, who he is in one line, then the week itself
+  html+='<div class="pm-top fl-bar">'+(window._hubMode?'<button class="hub-back pm-top-back" onclick="hubBack()">\u2039 \u00dcbersicht</button>':'<span></span>')
+    +`<span class="fl-team">${_amEscapeText(nm)}${p.nr?' \u00b7 Nr. '+_amEscapeText(p.nr):''}</span></div>`;
   // ── CARD HELPER ──
   const _trs=(G.trainers||[]).filter(t=>t&&t.phone);
   const _trNames=()=>{const n=_trs.map(t=>String(t.name||'').split(' ')[0]).filter(Boolean);
@@ -20933,7 +21164,6 @@ function renderPlayerMode(){
       +`<div class="pm-focus-hint">Danach siehst du deine Termine f\u00fcr die Woche.</div></div></div>`;
     return;
   }
-  html+=_newsHtml('pm');
   // ── THIS WEEK'S DATES ──
   // One flat list, every entry equal. Singling out the next session made the
   // rest look optional, while the weekly survey needs an answer for ALL of
@@ -20943,21 +21173,22 @@ function renderPlayerMode(){
       const v=(p.s&&si<p.s.length)?p.s[si]:3;
       return v===3;
     }).length;
-    html+=`<div class="pm-section-h pm-week-h">${PM_IC.cal} Deine Termine`
-      +(openCount?`<span class="pm-count pm-count-open">${openCount} offen</span>`
-                 :`<span class="pm-count">alle beantwortet</span>`)
-      +`</div>`;
+    // One lamp per date, lit when answered
+    const bulbs=upcoming.map(({si})=>{const v=(p.s&&si<p.s.length)?p.s[si]:3;return v===3?'<i></i>':'<i class="on"></i>';}).join('');
+    html+=`<h1 class="fl-title">Deine Woche</h1><div class="fl-answered"><span class="fl-bulbs" aria-hidden="true">${bulbs}</span>`
+      +`<span>${upcoming.length-openCount} von ${upcoming.length} beantwortet</span></div>`;
     // The rule in one place instead of a sentence under every card
     const planned=upcoming.some(({si})=>p.s&&p.s[si]===4&&Array.isArray(p.ay)&&p.ay[si]===1);
     const ruleTxt=_rule.m==='app'?'Wenn du nicht kannst, sag hier ab.'
       :_rule.m==='anruf'?'Wenn du nicht kannst, sag hier ab und ruf einen Trainer an.'
       :`Wenn du nicht kannst, sag hier ab. Bis ${_rule.h} Std. vor Beginn ist das entschuldigt, danach nur per Anruf.`;
     html+=`<div class="pm-rule">${planned?'<b>Du bist eingeplant.</b> ':''}${ruleTxt}</div>`;
+    html+=_newsHtml('pm');
     html+='<div class="pm-list">';
     upcoming.forEach(({s,si,sk})=>{html+=renderCard(s,si,sk);});
     html+='</div>';
   } else {
-    html+='<div class="pm-empty">\ud83d\udcc5 Diese Woche sind keine Termine mehr geplant.</div>';
+    html+='<h1 class="fl-title">Deine Woche</h1>'+_newsHtml('pm')+'<div class="pm-empty">Diese Woche sind keine Termine mehr geplant.</div>';
   }
   // "Letzte Termine" removed: the player's screen exists to collect answers
   // for the coming week. His own history is available on the personal
@@ -21018,6 +21249,27 @@ const PM_IC=(()=>{
     no:sv('<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>'),
   };
 })();
+// Overview icons (1.2.47)
+const FL_IC=(()=>{
+  const sv=d=>`<svg class="pm-ic" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+  return {
+    trophy:sv('<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/>'),
+    cal:PM_IC.cal,
+    pulse:sv('<path d="M3 12h4l3-7 4 14 3-7h4"/>'),
+    physio:sv('<rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M12 8v8M8 12h8"/>'),
+    check:sv('<path d="M5 12.5l4.5 4.5L19 7.5"/>'),
+    card:sv('<rect x="5" y="2.5" width="14" height="19" rx="2.5"/><circle cx="12" cy="10" r="3"/><path d="M8.5 17h7"/>'),
+    chart:sv('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'),
+    doc:sv('<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/>'),
+  };
+})();
+// "heute" · "morgen" · "am Donnerstag"
+function _flDayWord(s){
+  const k=dispToSortKey(s.date),t=todaySK();
+  const d=new Date(Math.floor(k/10000),Math.floor(k/100)%100-1,k%100),n=new Date(Math.floor(t/10000),Math.floor(t/100)%100-1,t%100);
+  const diff=Math.round((d-n)/864e5);
+  return diff===0?'heute':diff===1?'morgen':'am '+SQUAD_WD[d.getDay()];
+}
 // "heute, 12:00" · "morgen, 12:00" · "Mo, 12:00" · "27.10., 12:00"
 function _pmRelTime(ts){
   if(typeof ts!=='number')return '';

@@ -10,7 +10,7 @@
 <meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700&family=Big+Shoulders+Display:wght@800&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg0:#080f22; --bg1:#0c1733; --bg2:#102047;
@@ -198,6 +198,42 @@
     .ps-col-l{font-size:.58rem;color:rgba(255,255,255,.45);margin-top:4px;}
   .ps-col-v{font-size:.6rem;color:rgba(255,255,255,.75);font-weight:700;}
   .ps-note{font-size:.66rem;color:rgba(255,255,255,.45);margin-top:8px;line-height:1.4;}
+  /* ── 1.2.47: Flutlicht für Spieler — as the player's other screens ── */
+  body.ps-mode{--fl-night:#0A1328;--fl-surface:#111D3A;--fl-surface2:#172750;--fl-line:#22386B;--fl-ink:#F3F5FA;--fl-ink2:#B6C4DE;--fl-muted:#8796B8;
+    --fl-lamp:#F2C230;--fl-yes:#3CC27E;--fl-no:#EF6A5A;--fl-exc:#E9B65A;--fl-num:'Big Shoulders Display','Bebas Neue',sans-serif;
+    background:radial-gradient(70% 360px at 50% 0,rgba(255,206,92,.17),rgba(255,206,92,.05) 55%,transparent 80%) no-repeat,#0A1328;background-attachment:scroll;}
+  html:has(body.ps-mode){background:#0A1328;}
+  .ps-mode .ps-wrap{max-width:480px;padding:0 16px 34px;}
+  .ps-mode .fl-bar{display:flex;align-items:center;justify-content:flex-end;min-height:52px;padding-top:calc(4px + env(safe-area-inset-top,0px));font-size:13px;font-weight:600;color:var(--fl-ink2);}
+  .ps-mode .ps-hero{gap:14px;margin:4px 0 16px;}
+  .ps-mode .ps-av{width:44px;height:44px;border:0;box-shadow:0 0 0 2px #0A1328,0 0 0 3.5px rgba(242,194,48,.55);}
+  .ps-mode .ps-av-ph{background:#2C5BA8;font-family:var(--fl-num);font-weight:800;font-size:17px;}
+  .ps-mode .ps-name{font-family:var(--fl-num);font-weight:800;font-size:32px;letter-spacing:.2px;line-height:1;color:var(--fl-ink);}
+  .ps-mode .ps-meta{font-size:14px;color:var(--fl-ink2);margin-top:4px;}
+  .ps-mode .ps-kpis{grid-template-columns:1.25fr 1fr 1fr;gap:8px;margin-bottom:6px;}
+  .ps-mode .ps-kpis .ps-kpi,.ps-mode .ps-kpi{background:var(--fl-surface);border:1px solid var(--fl-line);border-radius:14px;padding:12px 12px 10px;text-align:left;}
+  .ps-mode .ps-kpi-v{font-family:var(--fl-num);font-weight:800;font-size:34px;line-height:1;color:var(--fl-ink);}
+  .ps-mode .ps-kpi.big .ps-kpi-v{font-size:44px;color:var(--fl-lamp);}
+  .ps-mode .ps-kpi-l{font-size:13px;letter-spacing:0;text-transform:none;color:var(--fl-ink2);font-weight:600;margin-top:4px;}
+  .ps-mode .ps-kpi-s{font-size:12.5px;color:var(--fl-muted);}
+  .ps-mode .ps-h{font-family:'Barlow',sans-serif;font-size:15px;font-weight:700;letter-spacing:0;text-transform:none;color:var(--fl-ink2);margin:20px 2px 9px;}
+  .ps-mode .ps-box{background:var(--fl-surface);border:1px solid var(--fl-line);border-radius:16px;padding:14px;}
+  .ps-mode .ps-two{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .ps-mode .ps-two.three{grid-template-columns:1fr 1fr 1fr;}
+  .ps-mode .ps-two>div{background:var(--fl-surface2);border-radius:12px;padding:12px;min-width:0;}
+  .ps-mode .ps-two b{display:block;font-family:var(--fl-num);font-weight:800;font-size:32px;line-height:1;color:var(--fl-ink);}
+  .ps-mode .ps-two.three b{font-size:27px;}
+  .ps-mode .ps-two small{font-size:13px;color:var(--fl-ink2);font-weight:600;}
+  .ps-mode .ps-tally{display:flex;gap:6px 14px;flex-wrap:wrap;margin-top:12px;font-size:13.5px;color:var(--fl-ink2);font-weight:600;}
+  .ps-mode .ps-tally.ink{color:var(--fl-ink);}
+  .ps-mode .ps-tally i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;}
+  .ps-mode .ps-bars{display:flex;align-items:flex-end;gap:7px;height:110px;}
+  .ps-mode .ps-bars>div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:5px;height:100%;min-width:0;}
+  .ps-mode .ps-bars s{display:block;width:100%;max-width:30px;border-radius:5px 5px 2px 2px;background:#2E4A86;min-height:3px;}
+  .ps-mode .ps-bars s.hi{background:var(--fl-lamp);}
+  .ps-mode .ps-bars small{font-size:11px;color:var(--fl-muted);font-weight:600;}
+  .ps-mode .ps-legend{font-size:12.5px;color:var(--fl-muted);margin-top:8px;}
+  .ps-mode .ps-foot{font-size:12.5px;color:var(--fl-muted);margin-top:20px;}
   .ps-foot{font-size:.66rem;color:rgba(255,255,255,.35);text-align:center;margin-top:18px;}
   .rank-row{
     display:flex;align-items:center;gap:12px;
@@ -651,48 +687,38 @@ function renderPlayerStats(d){
     :`<div class="ps-av ps-av-ph">${esc((p.name||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase())}</div>`;
   const wdMax=Math.max(1,...(det.weekday||[]).map(w=>w.pct||0));
   const trMax=Math.max(1,...(det.trend||[]).map(t=>t.pct||0));
-  let html=`<div class="ps-hero">
+  // 1.2.47: the player's night look; no place in the team (as on the card since 1.2.5)
+  const pct=v=>v==null?'\u2013':v+' %';
+  const n=(v,one,many)=>(v||0)+' '+((v||0)===1?one:many);
+  let html=`<div class="fl-bar">KW ${esc(d.week&&d.week.kw)} \u00b7 ${esc(d.week&&d.week.from)}\u2013${esc(d.week&&d.week.to)}</div>
+  <div class="ps-hero">
     ${av}
     <div class="ps-hero-txt">
-      <div class="ps-name">${esc(p.name)}</div>
-      <div class="ps-meta">${p.nr?'#'+esc(p.nr)+' \u00b7 ':''}${esc(p.pos||'')}${p.pos?' \u00b7 ':''}${esc(d.team||'')} \u00b7 ${esc(d.season||'')}</div>
+      <div class="ps-name">Meine Statistik</div>
+      <div class="ps-meta">${esc(p.name)}${p.nr?' \u00b7 Nr. '+esc(p.nr):''}${p.pos?' \u00b7 '+esc(p.pos):''} \u00b7 Saison ${esc(d.season||'')}</div>
     </div>
   </div>
-  <div class="ps-kw">KW ${esc(d.week&&d.week.kw)} \u00b7 ${esc(d.week&&d.week.from)}\u2013${esc(d.week&&d.week.to)}</div>
   <div class="ps-kpis">
-    <div class="ps-kpi"><div class="ps-kpi-v ${pctCls(p.sPct)}">${p.sPct==null?'\u2013':p.sPct+'%'}</div><div class="ps-kpi-l">Saison</div><div class="ps-kpi-s">${p.sPresent}/${p.sTotal}</div></div>
-    <div class="ps-kpi"><div class="ps-kpi-v ${pctCls(p.wPct)}">${p.wPct==null?'\u2013':p.wPct+'%'}</div><div class="ps-kpi-l">Diese Woche</div><div class="ps-kpi-s">${p.wPresent}/${p.wTotal}</div></div>
+    <div class="ps-kpi big"><div class="ps-kpi-v">${pct(p.sPct)}</div><div class="ps-kpi-l">Saison</div><div class="ps-kpi-s">${p.sPresent} von ${p.sTotal}</div></div>
+    <div class="ps-kpi"><div class="ps-kpi-v">${p.wPresent}/${p.wTotal}</div><div class="ps-kpi-l">Diese Woche</div><div class="ps-kpi-s">${pct(p.wPct)}</div></div>
     <div class="ps-kpi"><div class="ps-kpi-v">${det.streak||0}</div><div class="ps-kpi-l">Serie</div><div class="ps-kpi-s">in Folge</div></div>
-    ${det.rank?`<div class="ps-kpi"><div class="ps-kpi-v">#${det.rank}</div><div class="ps-kpi-l">Platz</div><div class="ps-kpi-s">von ${det.ranked}</div></div>`:''}
   </div>
-  ${(d.scorer&&(d.scorer.apps||d.scorer.goals||d.scorer.assists))?`
-  <div class="ps-sec">
-    <div class="ps-h">Deine Scorer-Bilanz</div>
-    <div class="ps-split">
-      <div class="ps-split-item"><span class="ps-split-ic">\ud83d\udc5f</span><span class="ps-split-v">${d.scorer.apps||0}</span><span class="ps-split-l">${d.scorer.apps===1?'Spiel':'Spiele'}</span></div>
-      ${d.scorer.goals?`<div class="ps-split-item"><span class="ps-split-ic">\u26bd</span><span class="ps-split-v">${d.scorer.goals}</span><span class="ps-split-l">${d.scorer.goals===1?'Tor':'Tore'}</span></div>`:''}
-      ${d.scorer.assists?`<div class="ps-split-item"><span class="ps-split-ic">\ud83c\udfaf</span><span class="ps-split-v">${d.scorer.assists}</span><span class="ps-split-l">${d.scorer.assists===1?'Vorlage':'Vorlagen'}</span></div>`:''}
-    </div>
-  </div>`:''}
-  <div class="ps-sec">
-    <div class="ps-h">Training &amp; Spiele</div>
-    <div class="ps-split">
-      <div class="ps-split-item"><span class="ps-split-ic">\ud83c\udfc3</span><span class="ps-split-v ${pctCls(det.tPct)}">${det.tPct==null?'\u2013':det.tPct+'%'}</span><span class="ps-split-l">Training</span></div>
-      <div class="ps-split-item"><span class="ps-split-ic">\u26bd</span><span class="ps-split-v ${pctCls(det.mPct)}">${det.mPct==null?'\u2013':det.mPct+'%'}</span><span class="ps-split-l">Spiele</span></div>
-    </div>
-    <div class="ps-counts">\u2705 ${det.cA||0} anwesend \u00b7 \u274c ${det.cF||0} gefehlt \u00b7 \ud83d\udccb ${det.cE||0} entschuldigt</div>
+  <div class="ps-h">Training und Spiele</div>
+  <div class="ps-box"><div class="ps-two">
+      <div><b>${pct(det.tPct)}</b><small>Training</small></div>
+      <div><b>${pct(det.mPct)}</b><small>Spiele</small></div></div>
+    ${(d.scorer&&(d.scorer.apps||d.scorer.goals||d.scorer.assists))?`<div class="ps-tally ink"><span>${n(d.scorer.apps,'Spiel','Spiele')}</span>${d.scorer.goals?`<span>${n(d.scorer.goals,'Tor','Tore')}</span>`:''}${d.scorer.assists?`<span>${n(d.scorer.assists,'Vorlage','Vorlagen')}</span>`:''}</div>`:''}
+    <div class="ps-tally"><span><i style="background:var(--fl-yes)"></i>${det.cA||0} dabei</span><span><i style="background:var(--fl-no)"></i>${det.cF||0} gefehlt</span><span><i style="background:var(--fl-exc)"></i>${det.cE||0} entschuldigt</span></div>
   </div>`;
   if(det.trend&&det.trend.length>1){
-    html+=`<div class="ps-sec"><div class="ps-h">Verlauf der letzten Wochen</div>
-      <div class="ps-chart">${det.trend.map(t=>
-        `<div class="ps-col"><div class="ps-bar-wrap"><div class="ps-bar" style="height:${Math.round((t.pct/trMax)*100)}%"></div></div>
-         <div class="ps-col-l">KW${t.kw}</div><div class="ps-col-v">${t.pct}%</div></div>`).join('')}</div></div>`;
+    html+=`<div class="ps-h">Die letzten ${det.trend.length} Wochen</div><div class="ps-box"><div class="ps-bars">${det.trend.map(t=>
+      `<div title="KW${t.kw}: ${t.pct} %"><s class="${t.pct>=100?'hi':''}" style="height:${Math.max(3,Math.round((t.pct/100)*100))}%"></s><small>${t.kw}</small></div>`).join('')}</div>
+      <div class="ps-legend">Kalenderwochen. Gelb: bei allen Terminen der Woche dabei.</div></div>`;
   }
   if(det.weekday&&det.weekday.length){
-    html+=`<div class="ps-sec"><div class="ps-h">Nach Wochentag</div>
-      <div class="ps-chart">${det.weekday.map(w=>
-        `<div class="ps-col"><div class="ps-bar-wrap"><div class="ps-bar ps-bar-alt" style="height:${Math.round(((w.pct||0)/wdMax)*100)}%"></div></div>
-         <div class="ps-col-l">${esc(w.day)}</div><div class="ps-col-v">${w.pct==null?'\u2013':w.pct+'%'}</div></div>`).join('')}</div></div>`;
+    const WD={Mo:'Montag',Di:'Dienstag',Mi:'Mittwoch',Do:'Donnerstag',Fr:'Freitag',Sa:'Samstag',So:'Sonntag'};
+    html+=`<div class="ps-h">Nach Wochentag</div><div class="ps-box"><div class="ps-two${det.weekday.length>=3?' three':''}">${det.weekday.map(w=>
+      `<div><b>${pct(w.pct)}</b><small>${esc(WD[w.day]||w.day)}</small></div>`).join('')}</div></div>`;
   }
   html+=`<div class="ps-foot">Stand: ${new Date(d.publishedAt).toLocaleDateString('de-DE')} \u00b7 ${esc(d.club||'')}</div>`;
   const root=document.getElementById('app')||document.body;
