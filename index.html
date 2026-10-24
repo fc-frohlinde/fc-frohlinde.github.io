@@ -7090,13 +7090,18 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.55'; // v1.2.55: Physio in der Pause
-const APP_VERSION_LABEL='1.2.55';
+const APP_VERSION='1.2.56'; // v1.2.56: Pause im Alltag
+const APP_VERSION_LABEL='1.2.56';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792861674820; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792862901805; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.56',date:'24.10.2026',title:'Pause im Alltag',items:[
+    {icon:'⏸',title:'„Pause ab hier …“ direkt beim Termin',desc:'Sagt ein Spieler beim Training, dass er ab dem nächsten Mal weg ist: im Fenster des nächsten Termins auf ihn tippen → „Pause ab hier …“. Das Datum ist schon eingetragen, es fehlt nur „bis“.'},
+    {icon:'💡',title:'Wann Pause, wann E',desc:'Im Status-Fenster steht die Regel: Pause für längere, abgesprochene Abwesenheit – Verletzung, Prüfungen, angekündigter Urlaub, Training bei den Herren. Für einzelne Termine: E.'},
+    {icon:'🔔',title:'Offene Pausen',desc:'Läuft eine Pause ohne Enddatum seit 6 Wochen, fragt „Im Blick behalten“: noch aktuell? Die Wochen lassen sich unter Einstellungen → Mannschaft → „Spielerstatus“ ändern.'},
+  ]},
   {version:'1.2.55',date:'24.10.2026',title:'Physio in der Pause',items:[
     {icon:'🧑\u200d⚕️',title:'Physio auch in der Pause',desc:'Wer verletzt in Pause ist, kann den Physio-Termin an einem Trainingstag trotzdem in der App buchen – ohne „Komme“, denn er kommt nur zur Behandlung. Die Trainer sehen ihn wie bisher unter „Physiotherapie“; an seiner Pause und seiner Statistik ändert das nichts.'},
   ]},
@@ -7752,7 +7757,7 @@ function renderPlayerStatus(p,pi){
 }
 // ── Changing the status ──
 let _pstPi=null;
-function pstOpen(pi,pre){
+function pstOpen(pi,pre,from){
   if(!canEdit())return;
   const D=cd(),p=D&&D.players&&D.players[pi];if(!p)return;
   _pstPi=pi;
@@ -7772,8 +7777,8 @@ function pstOpen(pi,pre){
   document.getElementById('pst-body').innerHTML=
     opt('active',aL,aS,aF)
     +opt('trial','Probetraining','Wird erfasst wie jeder andere, zählt aber in keiner Quote. Kein automatisches „M“, keine Erinnerungen.',date('pst-t',p.trial||today,'seit'))
-    +opt('pause','Pause','Termine in der Pause zählen nicht – weder für ihn noch für die Mannschaft. Keine Erinnerungen, nicht im Kader. Sein Link bleibt. Geht auch nachträglich, z.\u00a0B. für eine Verletzung im August.',
-      date('pst-pf',curPause?curPause.f:today,'von')+date('pst-pt',curPause?curPause.t:'','bis (leer = offen)'))
+    +opt('pause','Pause','Für längere, abgesprochene Abwesenheit – Verletzung, Prüfungen, angekündigter Urlaub, Training bei den Herren. Für einzelne Termine: E. In der Pause zählt nichts, keine Erinnerungen, nicht im Kader; Physio bleibt buchbar. Geht auch nachträglich.',
+      date('pst-pf',from||(curPause?curPause.f:today),'von')+date('pst-pt',from?'':(curPause?curPause.t:''),'bis (leer = offen)'))
     +opt('gone',st.k==='trial'?'Nicht aufnehmen':'Nicht mehr dabei','Ab diesem Tag zählt nichts mehr; er steht unten unter „Nicht mehr dabei“. Alles davor bleibt. Sein Link wird abgeschaltet.',date('pst-g',goneDef,'seit'))
     +((Array.isArray(p.pauses)&&p.pauses.length)?`<div class="pst-list"><div class="pst-lh">Seine Pausen</div>${p.pauses.map((z,i)=>z?`<div class="pst-li"><span>${_isoDE(z.f)}${z.t?' – '+_isoDE(z.t):' – offen'}</span><button type="button" class="pst-x" onclick="pstDelPause(${i})" aria-label="Pause entfernen" title="Pause entfernen">\u2715</button></div>`:'').join('')}</div>`:'');
   openM('moPSt');
@@ -7835,6 +7840,7 @@ function _pstAfter(p,pi,what){
   try{render();}catch(e){}
   try{const mp=document.getElementById('moPlayer');if(mp&&mp.classList.contains('open')&&window._psCurrentPi===pi)openPlayerStats(pi);}catch(e){}
   try{const tm=document.getElementById('moTeamMgr');if(tm&&tm.classList.contains('open'))renderMgrPlayers();}catch(e){}
+  try{if(typeof _currentSessIdx==='number'&&document.getElementById('ss-hx-att'))_ssHxAttRender(_currentSessIdx);}catch(e){}
   if(typeof showSaveFlash==='function')showSaveFlash('\u2713 '+(p.name||'')+': '+what);
 }
 function pstSave(){
@@ -13644,7 +13650,8 @@ function ayRender(){
 // Spielerstatus (1.2.51): when "Im Blick behalten" asks. rules.st = {probe, weg}
 function _stRule(t){
   const r=teamRules(t),x=(r&&r.st&&typeof r.st==='object')?r.st:{};
-  return {probe:[2,3,4,5,6,8].includes(+x.probe)?+x.probe:3,weg:[2,3,4,6,8].includes(+x.weg)?+x.weg:4};
+  return {probe:[2,3,4,5,6,8].includes(+x.probe)?+x.probe:3,weg:[2,3,4,6,8].includes(+x.weg)?+x.weg:4,
+    offen:[2,4,6,8,12].includes(+x.offen)?+x.offen:6};
 }
 function stRender(){
   const box=document.getElementById('stBox');if(!box)return;
@@ -13656,7 +13663,9 @@ function stRender(){
     <div class="setting-row"><div><div class="setting-label"><label for="st-probe">Probetraining</label></div><div class="setting-sub">nach so vielen Terminen fragen: aufnehmen?</div></div>
       <div class="setting-control">${sel('probe',[[2,'2'],[3,'3'],[4,'4'],[5,'5'],[6,'6'],[8,'8']])}</div></div>
     <div class="setting-row"><div><div class="setting-label"><label for="st-weg">Bei keinem Termin</label></div><div class="setting-sub">nach so vielen Wochen fragen: Pause oder nicht mehr dabei?</div></div>
-      <div class="setting-control">${sel('weg',[[2,'2 Wochen'],[3,'3 Wochen'],[4,'4 Wochen'],[6,'6 Wochen'],[8,'8 Wochen']])}</div></div>`;
+      <div class="setting-control">${sel('weg',[[2,'2 Wochen'],[3,'3 Wochen'],[4,'4 Wochen'],[6,'6 Wochen'],[8,'8 Wochen']])}</div></div>
+    <div class="setting-row"><div><div class="setting-label"><label for="st-offen">Pause ohne Enddatum</label></div><div class="setting-sub">nach so vielen Wochen fragen: noch aktuell?</div></div>
+      <div class="setting-control">${sel('offen',[[2,'2 Wochen'],[4,'4 Wochen'],[6,'6 Wochen'],[8,'8 Wochen'],[12,'12 Wochen']])}</div></div>`;
 }
 function stSet(k,val){
   if(!(typeof canEdit==='function'&&canEdit()))return;
@@ -13666,7 +13675,7 @@ function stSet(k,val){
   const c=Object.assign({},_stRule(t));c[k]=v;
   G.db[t+'__rules'].st=c;
   saveG();
-  logAudit('Spielerstatus',t,'Probetraining: nach '+c.probe+' Terminen fragen · ohne Termin: nach '+c.weg+' Wochen');
+  logAudit('Spielerstatus',t,'Probetraining: nach '+c.probe+' Terminen fragen · ohne Termin: nach '+c.weg+' Wochen · offene Pause: nach '+c.offen+' Wochen');
   if(typeof showSaveFlash==='function')showSaveFlash('\u2713 Gespeichert');
   stRender();
 }
@@ -25888,7 +25897,8 @@ function _ssxMenu(ev,si,pi){
   m.innerHTML=`<div class="ssx-menu-h">${escapeHtml((getDisplayName?getDisplayName(p):p.name)||'')}</div>`+opts.map(v=>{
     const mt=SS_ATT_META[v]||SS_ATT_META[3];
     return `<button type="button" class="ssx-menu-i${v===cur?' on':''}" onclick="_ssxSet(${si},${pi},${v})"><span class="ssa-st ${mt.cls}">${mt.i}</span>${L[v]||mt.n}</button>`;
-  }).join('')+`<button type="button" class="ssx-menu-i ssx-menu-pl" onclick="document.getElementById('ssx-menu').classList.remove('open');openPlayerFromSession(${si},${pi})">Spielerprofil</button>`;
+  }).join('')+`<button type="button" class="ssx-menu-i ssx-menu-pl" onclick="document.getElementById('ssx-menu').classList.remove('open');pstOpen(${pi},'pause','${dispToISO(D.sessions[si].date)}')">Pause ab hier …</button>`
+    +`<button type="button" class="ssx-menu-i ssx-menu-pl" onclick="document.getElementById('ssx-menu').classList.remove('open');openPlayerFromSession(${si},${pi})">Spielerprofil</button>`;
   m.classList.add('open');
   const r=ev.currentTarget.getBoundingClientRect();
   _placePopup(m,r,{align:'left',gap:6});
@@ -28027,7 +28037,7 @@ function hxRender(){
     if(miss>=2)flags.push({dot:'#C9373E',who:nm(p),what:miss+'× unentschuldigt gefehlt (4 Wochen)',on:`openPlayerFromMain(${pi})`});
     let now=0,prev=0;
     S.forEach((s,si)=>{
-      if(!s||!s.date||!sessTookPlace(s,season))return;
+      if(!s||!s.date||!sessTookPlace(s,season)||!_sessCounts(p,s,season))return;   // not in a pause / Probetraining (1.2.56)
       const l=(typeof rpeLoad==='function')?rpeLoad(s,p,si):null;if(typeof l!=='number')return;
       if(inDays(s,-6,0))now+=l;else if(inDays(s,-13,-7))prev+=l;
     });
@@ -28046,6 +28056,13 @@ function hxRender(){
       if(st.k==='trial'){
         const c=_pTrialCount(p);
         if(c.n>=R.probe)flags.push({dot:'#7C3AED',who:nm(p),what:'Probetraining: '+c.n+' Termine, '+c.a+'× dabei – aufnehmen?',on:`pstOpen(${pi},'decide')`});
+        return;
+      }
+      // an open-ended pause running for weeks: still right? (1.2.56)
+      if(st.k==='pause'&&!st.pause.t){
+        const d1=new Date();d1.setDate(d1.getDate()-R.offen*7);
+        const ok1=d1.getFullYear()*10000+(d1.getMonth()+1)*100+d1.getDate();
+        if(isoToSortKey(st.pause.f)<=ok1)flags.push({dot:'#7C8AA3',who:nm(p),what:'Pause seit '+_isoDE(st.pause.f)+' ohne Enddatum – noch aktuell?',on:`pstOpen(${pi},'pause')`});
         return;
       }
       if(st.k!=='active'||(p.joinDate&&isoToSortKey(p.joinDate)>wsK))return;
