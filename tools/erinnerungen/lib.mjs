@@ -81,7 +81,17 @@ export function metaKey(s) {
   return 'k' + String(+m[2]).padStart(2, '0') + String(+m[1]).padStart(2, '0') + '-' + hm + (s.type === 'match' ? 'm' : 't');
 }
 const st = (p, si) => (Array.isArray(p.s) && si < p.s.length && p.s[si] != null) ? p.s[si] : 3;
-const afterJoin = (p, s, season) => !p.joinDate || sortKey(s.date, season) >= isoKey(p.joinDate);
+// In the team at this session (1.2.51, the app's _sessAfterJoin): after "Dabei
+// seit" and the start of a Probetraining, not in a pause, not after he left
+export const offAt = (p, k) => (p.gone && k >= isoKey(p.gone))
+  || (Array.isArray(p.pauses) && p.pauses.some(x => x && x.f && k >= isoKey(x.f) && (!x.t || k <= isoKey(x.t))));
+export const inTeam = (p, s, season) => {
+  const k = sortKey(s.date, season);
+  if (p.joinDate && k < isoKey(p.joinDate)) return false;
+  if (p.trial && k < isoKey(p.trial)) return false;
+  return !offAt(p, k);
+};
+const afterJoin = inTeam;
 const rated = (p, si) => Array.isArray(p.rpe) && typeof p.rpe[si] === 'number';
 const notThere = (p, s) => { const k = metaKey(s); const m = k && p.rpeMeta && p.rpeMeta[k]; return !!(m && m.nd); };
 const voted = (p, s) => { const k = metaKey(s); return !!(k && p.mvpV && p.mvpV[k]); };
@@ -121,7 +131,8 @@ export function plan({ sessions, players, season, team, now, cfg, owners, sent }
   const today = now.day, yest = addDays(today, -1), tom = addDays(today, 1);
   const was = (kind, key, owner) => !!(sent && sent[kind + '-' + key] && sent[kind + '-' + key][owner]);
   (players || []).forEach((p, pi) => {
-    if (!p || !p.confirmToken) return;
+    // Probetraining (1.2.51): no reminders
+    if (!p || !p.confirmToken || p.trial) return;
     const owner = ownerOf(p.confirmToken);
     if (!owners.has(owner)) return;
     const link = (q) => SITE + '?p=' + encodeURIComponent(p.confirmToken) + q;
@@ -185,7 +196,8 @@ export function planNews({ news, players, now, owners, log, logY }) {
   const was = owner => [log, logY].some(l => !!(l && l['news-' + key] && l['news-' + key][owner]));
   const seen = new Set();
   (players || []).forEach((p, pi) => {
-    if (!p || !p.confirmToken) return;
+    // Nicht mehr dabei (1.2.51): no more news
+    if (!p || !p.confirmToken || (p.gone && now.day >= isoKey(p.gone))) return;
     const owner = ownerOf(p.confirmToken);
     if (!owners.has(owner) || seen.has(owner) || was(owner)) return;
     seen.add(owner);
@@ -255,7 +267,7 @@ export function planSquad({ sessions, players, season, now, owners, told }) {
     const ttl = Math.max(600, (dayDiff(k, now.day) * 1440 + (sm != null ? sm : 24 * 60) - now.min) * 60);
     const inSet = new Set(q.p), was = (told && told[key]) || {};
     (players || []).forEach((p, pi) => {
-      if (!p || !p.confirmToken || !afterJoin(p, s, season)) return;
+      if (!p || !p.confirmToken || p.trial || !afterJoin(p, s, season)) return;
       const owner = ownerOf(p.confirmToken);
       if (!owners.has(owner)) return;
       const v = st(p, si);

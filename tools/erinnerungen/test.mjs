@@ -212,6 +212,28 @@ function world() {
   await round({ db: db3, push, ts: Date.UTC(2026, 9, 22, 6, 7), log: q });
   ok(push.calls.length === 2 && push.calls[0].p.title === 'Training heute, 18:30', 'pressed at night: the next morning, "heute": ' + push.calls.map(c => c.p.title).join());
 }
+// ── player status (1.2.51): pause, Probetraining, nicht mehr dabei ──
+{
+  const { sess, players } = data();
+  const ti = sess.findIndex(s => s.date === 'Do 22.10');
+  players[1].pauses = [{ f: '2026-10-20', t: '' }];          // Ali: pause, open-ended
+  players[2].trial = '2026-10-13';                            // Tom: Probetraining
+  players[3].gone = '2026-10-01';                             // Jonas: nicht mehr dabei
+  players[4].pauses = [{ f: '2026-09-01', t: '2026-09-30' }]; // Luca: pause over
+  const subs = {}; [0, 1, 2, 3, 4].forEach(i => { subs[ownerOf('tok' + i)] = { a: dev('d' + i) }; });
+  let db = makeDb({ fcf_data: { db: { 'U19__2026__SL__27': { sessions: enc(sess), players: enc(players) } } }, fcf_push: { subs } });
+  let push = makePush();
+  await round({ db, push, ts: Date.UTC(2026, 9, 21, 16, 5), log: q });                 // Wed 18:05, Thursday open for all
+  const to = push.calls.filter(c => /^rsvp-/.test(c.p.tag || '')).map(c => c.ep.split('/').pop()).sort().join();
+  ok(to === 'd0,d4', 'status: the answer reminder skips pause, Probetraining and who left: ' + to);
+  const at = Date.UTC(2026, 9, 21, 8, 0);
+  const news = { t: at, title: 'Trainingspause', body: 'Herbstferien.', by: 'Artem' };
+  db = makeDb({ fcf_data: { db: { 'U19__2026__SL__27': { sessions: enc(sess), players: enc(players) }, U19__news: news } }, fcf_push: { subs, config: { U19: { rsvp: false, rpe: false, vote: false } } } });
+  push = makePush();
+  await round({ db, push, ts: at + 22 * 60e3, log: q });
+  const tn = push.calls.map(c => c.ep.split('/').pop()).sort().join();
+  ok(tn === 'd0,d1,d2,d4', 'status: news to the team, pause and Probetraining included, not to who left: ' + tn);
+}
 // ── a notice from the trainers ("Neue Trainingszeiten", "Trainingspause") ──
 {
   const { sess, players } = data();

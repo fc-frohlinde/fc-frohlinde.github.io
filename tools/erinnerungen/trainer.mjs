@@ -7,7 +7,7 @@
 // fcf_data/userAutomation/<name>/push (missing = default below). Players never
 // get any of these. Never between 22:30 and 8:00; what falls in that time
 // comes with the first round after 8:00 if it still matters.
-import { SITE, sortKey, metaKey, addDays, ttlToMidnight, sha } from './lib.mjs';
+import { SITE, sortKey, metaKey, addDays, ttlToMidnight, sha, inTeam } from './lib.mjs';
 
 export const TKINDS = { bday: true, msg: true, att: true, late: false, lineup: false, tech: true };
 export const BDAY_DAY = 8 * 60;      // the day itself, from 8:00
@@ -35,7 +35,7 @@ export function allowed(name, team, trainers) {
 
 const st = (p, si) => (Array.isArray(p.s) && si < p.s.length && p.s[si] != null) ? p.s[si] : 3;
 const isoKey = iso => { const m = String(iso || '').match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? +m[1] * 10000 + +m[2] * 100 + +m[3] : 0; };
-const afterJoin = (p, s, season) => !p.joinDate || sortKey(s.date, season) >= isoKey(p.joinDate);
+const afterJoin = inTeam;   // 1.2.51: also pause and "nicht mehr dabei" (lib.mjs)
 const startMin = s => { const t = String(s.time || '').split(':').map(Number); return (t.length === 2 && !isNaN(t[0])) ? t[0] * 60 + (t[1] || 0) : null; };
 const dayNum = k => Date.UTC(Math.floor(k / 10000), Math.floor(k / 100) % 100 - 1, k % 100) / 864e5;
 // minutes from now until the start of a session (negative: started)

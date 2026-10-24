@@ -1166,7 +1166,8 @@ body.design-heute.hxk-dk .lg-c.lg-wk{background:color-mix(in srgb,#2FA36B 46%,va
 
 #moPlayer .ps-head-mid{flex:1;min-width:0;overflow:hidden;}
 #moPlayer #ps-edit-toggle{align-self:center;}
-#moPlayer #ps-card-view>.tp-sec:first-child,#moPlayer #ps-edit .tp-sec:first-child{
+#moPlayer #ps-card-view>.tp-sec:first-child,#moPlayer #ps-edit .tp-sec:first-child,
+#moPlayer #ps-card-view>.pst-sec[hidden]+.tp-sec{
   border-top:none;margin-top:0;padding-top:0;}
 /* Nothing inside may exceed the modal width */
 #moPlayer .mob{overflow-x:hidden;}
@@ -1180,7 +1181,8 @@ body.design-heute.hxk-dk .lg-c.lg-wk{background:color-mix(in srgb,#2FA36B 46%,va
 /* Split on purpose: the trainer profile keeps its own 9px rhythm and must not
    be changed by edits aimed at the player card. */
 #moTrainerProfile .tp-head+.tp-sec{border-top:none;margin-top:0;padding-top:9px;}
-#ps-card-view>.tp-sec:first-child{border-top:none;margin-top:0;padding-top:9px;}
+#ps-card-view>.tp-sec:first-child,#ps-card-view>.pst-sec[hidden]+.tp-sec{border-top:none;margin-top:0;padding-top:9px;}
+.pst-sec[hidden]{display:none;}
 
 /* The position and foot pickers are custom dropdowns rendered into a div, so
    they need the same slot the plain inputs occupy. */
@@ -2204,6 +2206,48 @@ body.player-mode #playerModeWrap{flex:1;width:100%;height:100vh;overflow-y:auto;
    container there, or a few pixels of overflow catch the mouse wheel and,
    with overscroll-behavior:none, the page never moves. */
 body.player-mode.hub-mode.hub-home #playerModeWrap{height:auto;overflow:visible;overscroll-behavior:auto;}
+/* Player status (1.2.51) */
+.pst-chip{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;font-size:.66rem;font-weight:700;line-height:1.5;vertical-align:1px;letter-spacing:0;text-transform:none;white-space:nowrap;}
+.pst-chip.trial{background:#EDE7FB;color:#5B32B8;}
+.pst-chip.pause{background:#E8EDF5;color:#46546E;}
+.pst-chip.gone{background:#EEF0F3;color:#6B7486;}
+.cs.cs-probe{background-image:repeating-linear-gradient(135deg,transparent 0 5px,rgba(91,50,184,.12) 5px 7px);}
+/* sticky columns keep their ground — dim the content, not the cell */
+tr.mx-former td{color:var(--hx-muted,var(--gm));}
+tr.mx-former td>*,tr.mx-former .cs,tr.mx-former .mx-wc{opacity:.5;}
+tr.mx-former .pst-chip{display:none;}
+tr.mx-former-h td{padding:10px 8px 6px;background:transparent;border:0;text-align:left;}
+.mx-former-b,.pl-former-h{position:sticky;left:8px;border:0;background:none;padding:4px 2px;font:inherit;font-size:.8rem;font-weight:700;color:var(--hx-muted,var(--gm));cursor:pointer;}
+.mx-former-b:hover,.pl-former-h:hover{color:var(--hx-ink,var(--gd));}
+.pl-former-h{display:block;width:100%;text-align:left;padding:12px 10px 6px;}
+.pl-row.pl-former{opacity:.6;}
+.pst-sec .pst-line{font-size:.9rem;line-height:1.45;color:var(--hx-ink,var(--gd));}
+.pst-sec .pst-line b{font-weight:700;}
+.pst-sec .pst-line small{display:block;font-size:.78rem;color:var(--hx-muted,var(--gm));margin-top:2px;}
+.pst-sec .pst-trial{color:#4A2A99;}
+.pst-btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.pst-btn{border:1px solid var(--hx-line,var(--gl));background:var(--hx-card,#fff);color:var(--hx-ink,var(--gd));border-radius:10px;padding:8px 13px;font:inherit;font-size:.84rem;font-weight:600;cursor:pointer;}
+.pst-btn.pri{background:var(--hx-nav,#0E2350);border-color:var(--hx-nav,#0E2350);color:#fff;}
+.pst-btn.ghost{border-color:transparent;background:none;color:var(--hx-blue,var(--bm));padding-left:6px;padding-right:6px;}
+.pst-link{border:0;background:none;padding:0 0 0 6px;font:inherit;font-size:.82rem;font-weight:600;color:var(--hx-blue,var(--bm));cursor:pointer;}
+#moPSt .pst-h{margin:0 0 10px;font-size:1.05rem;}
+#moPSt label.pst-opt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;margin:6px 0;border-radius:12px;border:1px solid var(--hx-line,var(--gl));cursor:pointer;
+  font-size:inherit;font-weight:400;text-transform:none;letter-spacing:normal;color:inherit;line-height:1.35;}
+#moPSt label.pst-opt.on{border-color:var(--hx-blue,var(--bm));background:var(--hx-card2,rgba(22,89,184,.05));}
+#moPSt label.pst-opt input[type=radio]{width:18px;height:18px;flex:none;margin:1px 0 0;padding:0;accent-color:var(--hx-blue,var(--bm));}
+#moPSt .pst-txt{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;}
+#moPSt .pst-txt>b{font-size:.92rem;}
+#moPSt .pst-txt>span{font-size:.8rem;color:var(--hx-muted,var(--gm));line-height:1.4;}
+#moPSt .pst-f{display:flex;flex-wrap:wrap;gap:8px 12px;margin-top:8px;color:inherit;}
+#moPSt .pst-f[hidden]{display:none;}
+#moPSt .pst-d{display:flex;flex-direction:column;gap:3px;}
+#moPSt .pst-dl{font-size:.74rem;font-weight:600;color:var(--hx-muted,var(--gm));}
+#moPSt .pst-d input{width:auto;min-width:150px;margin:0;}
+.mob label.ap-trial{display:flex;align-items:flex-start;gap:9px;margin:2px 0 12px;padding:9px 11px;border-radius:10px;background:rgba(124,58,237,.06);
+  font-size:.8rem;font-weight:400;text-transform:none;letter-spacing:normal;color:inherit;cursor:pointer;line-height:1.4;}
+.mob label.ap-trial input{width:17px;height:17px;margin:1px 0 0;padding:0;flex:none;accent-color:#7C3AED;}
+#stBox .setting-label label{font:inherit;text-transform:none;letter-spacing:normal;margin:0;color:inherit;}
+body.player-mode .fl .hub-news.fl-pause{border-left-color:#8FA3C8;}
 /* Balanced tile rows (1.2.49, _balTiles): flex instead of an auto-fit grid */
 [data-bal]{display:flex !important;flex-wrap:wrap;}
 [data-bal]>*{box-sizing:border-box;}
@@ -6510,6 +6554,10 @@ if(window._fbBlocked){
   </div>
   </div><!-- /ps-sticky -->
   <div id="ps-card-view">
+  <div class="tp-sec pst-sec" id="ps-sec-status" hidden>
+    <div class="tp-sec-h">Status</div>
+    <div id="ps-status"></div>
+  </div>
   <div class="tp-sec" id="ps-sec-kontakt">
     <div class="tp-sec-h">Kontakt</div>
     <div id="ps-contact" class="tp-quick"></div>
@@ -6772,6 +6820,7 @@ if(window._fbBlocked){
     </div>
     <div style="font-size:.68rem;color:var(--mu,#8a93a6);line-height:1.3;padding-bottom:6px;">Einheiten vor diesem Datum zählen nicht in seine Statistik.</div>
   </div>
+  <label class="ap-trial"><input type="checkbox" id="newTrial"><span><b>Probetraining</b> – wird erfasst, zählt aber erst nach „Aufnehmen“</span></label>
   <label>📝 Kommentar</label>
   <textarea id="newNote" rows="2" placeholder="z.B. Verletzt bis KW 20, Schulnoten, ..." style="width:100%;padding:7px;border:1.5px solid var(--gl);border-radius:7px;font-family:'Barlow',sans-serif;font-size:.8rem;resize:vertical;margin-bottom:8px;"></textarea>
   <div class="mob-btns">
@@ -7028,13 +7077,19 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.50'; // v1.2.50: Aufstellung: Wechsel und Suche
-const APP_VERSION_LABEL='1.2.50';
+const APP_VERSION='1.2.51'; // v1.2.51: Spielerstatus
+const APP_VERSION_LABEL='1.2.51';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792847146710; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792853038148; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.51',date:'24.10.2026',title:'Spielerstatus: Probetraining, Pause, nicht mehr dabei',items:[
+    {icon:'🧑\u200d🤝\u200d🧑',title:'Status mit Datum',desc:'Im Spielerprofil: „Probetraining“, „Pause“ (von – bis, „bis“ darf offen bleiben) und „Nicht mehr dabei“ (seit). Die Daten machen die Geschichte richtig: was davor war, zählt weiter, die Zeit danach nicht – nichts wird umgeschrieben, alles lässt sich zurücknehmen.'},
+    {icon:'🧪',title:'Probetraining',desc:'Wird in der Anwesenheit erfasst wie jeder andere (Markierung „Probe“), zählt aber in keiner Quote – weder der Mannschaft noch seiner eigenen. Kein automatisches „M“, keine Erinnerungen, nicht bei „Rest anwesend“. Nach 3 Terminen fragt die Übersicht: aufnehmen? Ab „Aufnehmen“ zählt er; die Probetrainings bleiben in der Tabelle, zählen aber nicht.'},
+    {icon:'⏸',title:'Pause und nicht mehr dabei',desc:'In der Pause stehen seine Termine als „–“ und zählen nicht – weder für ihn noch für die Mannschaft; kein „M“, keine Erinnerungen, nicht in Kader, Aufstellung und „Rest anwesend“. Sein Link bleibt und zeigt „Pause bis …“. Wer nicht mehr dabei ist, steht in der Anwesenheit und im Kader unten unter „Nicht mehr dabei“, sein Link und seine Benachrichtigungen sind aus.'},
+    {icon:'🔔',title:'Die Übersicht fragt nach',desc:'„Im Blick behalten“ fragt, wenn ein Probetraining entschieden werden kann, und wenn jemand seit 4 Wochen bei keinem Termin war: „Pause oder nicht mehr dabei?“ – geändert wird nichts von selbst. Beide Schwellen unter Einstellungen → Mannschaft → „Spielerstatus“.'},
+  ]},
   {version:'1.2.50',date:'24.10.2026',title:'Aufstellung: Wechsel und Suche',items:[
     {icon:'🔁',title:'Mannschaft oder Saison wechseln in der Aufstellung',desc:'Bei offener Aufstellung schloss schon der Klick auf Mannschaft oder Saison links die Aufstellung, und man landete auf einer anderen Seite. Jetzt öffnet sich das Menü über der Aufstellung; erst wenn du wirklich wechselst, wird sie (mit der Frage nach dem Speichern) geschlossen und für die neue Mannschaft oder Saison gleich wieder geöffnet. Menü zugeklickt: nichts ändert sich.'},
     {icon:'🔍',title:'Suche über der Aufstellung',desc:'Die Suche (Strg K) öffnete sich bei offener Aufstellung unsichtbar dahinter. Jetzt liegt sie darüber; wählst du einen Treffer, schließt sich die Aufstellung (mit der Frage nach dem Speichern) und der Treffer öffnet sich. Außerdem: Enter auf einem Spieler in der Suche öffnete zusätzlich „Alle Statistiken“ – jetzt nur das Profil.'},
@@ -7553,12 +7608,238 @@ function getSeasonYears(){
   const y1=parseInt(m[1]);
   return{y1,y2:y1+1};
 }
-// Player joined mid-season: sessions before p.joinDate (ISO) don't count anywhere.
+// Is he part of the team at this session — listed, to be marked? Before
+// p.joinDate he is not; since 1.2.51 also not before his Probetraining, in a
+// pause or after he left (see the player status below).
 function _sessAfterJoin(p,s,season){
-  if(!p||!p.joinDate||!s||!s.date)return true;
+  if(!p||!s||!s.date)return true;
+  if(!p.joinDate&&!p.trial&&!p.gone&&!(Array.isArray(p.pauses)&&p.pauses.length))return true;
   const k=season?_dbSortKey(s.date,season):dispToSortKey(s.date);
-  return k>=isoToSortKey(p.joinDate);
+  if(p.joinDate&&k<isoToSortKey(p.joinDate))return false;
+  if(p.trial&&k<isoToSortKey(p.trial))return false;
+  return !_pOffAt(p,k);
 }
+// Does it count — in his statistics and in the team's (1.2.51)? Listed, and
+// not a Probetraining: neither the running one (p.trial) nor the one before
+// "Aufnehmen" (p.probe). A player counts from the day he was taken on.
+function _sessCounts(p,s,season){
+  if(!_sessAfterJoin(p,s,season))return false;
+  if(!p||!s||!s.date||(!p.trial&&!p.probe))return true;
+  if(p.trial)return false;
+  const k=season?_dbSortKey(s.date,season):dispToSortKey(s.date);
+  const f=isoToSortKey(p.probe.f),t=p.probe.t?isoToSortKey(p.probe.t):99999999;
+  return !(k>=f&&k<=t);
+}
+// ── Player status (1.2.51) ───────────────────────────────────
+// Kept on the player as dates, so the history stays right: September counts,
+// the weeks after he left do not — and nothing is rewritten.
+//   p.trial  'YYYY-MM-DD'  Probetraining since: listed and marked like anyone,
+//                          counted nowhere, no automatic "M", no reminders
+//   p.probe  {f,t}         the Probetraining before "Aufnehmen": stays uncounted
+//   p.pauses [{f,t}]       pauses (t '' = open): neither listed nor counted
+//   p.gone   'YYYY-MM-DD'  nicht mehr dabei from that day: idem, and his link
+//                          is switched off; everything before stays
+function _pPauseAt(p,k){
+  if(!p||!Array.isArray(p.pauses))return null;
+  for(const x of p.pauses){if(x&&x.f&&k>=isoToSortKey(x.f)&&(!x.t||k<=isoToSortKey(x.t)))return x;}
+  return null;
+}
+function _pOffAt(p,k){
+  if(!p)return null;
+  if(p.gone&&k>=isoToSortKey(p.gone))return 'gone';
+  return _pPauseAt(p,k)?'pause':null;
+}
+function _pGone(p,k){return !!(p&&p.gone&&(k==null?todaySK():k)>=isoToSortKey(p.gone));}
+// Today: {k:'gone'|'pause'|'trial'|'active', …}
+function _pState(p){
+  const k=todaySK();
+  if(!p)return {k:'active'};
+  if(_pGone(p,k))return {k:'gone',since:p.gone};
+  const pz=_pPauseAt(p,k);if(pz)return {k:'pause',pause:pz};
+  if(p.trial)return {k:'trial',since:p.trial};
+  const nx=(Array.isArray(p.pauses)?p.pauses:[]).filter(x=>x&&x.f&&isoToSortKey(x.f)>k)
+    .sort((a,b)=>isoToSortKey(a.f)-isoToSortKey(b.f))[0];
+  return {k:'active',next:nx||null};
+}
+function _isoDE(iso){const m=String(iso||'').match(/^(\d{4})-(\d{2})-(\d{2})/);return m?m[3]+'.'+m[2]+'.':'';}
+function _isoAdd(iso,n){const[y,m,d]=String(iso).split('-').map(Number);const x=new Date(y,m-1,d+n);
+  return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');}
+// The small label after a name
+function _pChip(p){
+  const st=_pState(p);
+  if(st.k==='trial')return '<span class="pst-chip trial" title="Probetraining seit '+_isoDE(st.since)+' – zählt in keiner Quote">Probe</span>';
+  if(st.k==='pause')return '<span class="pst-chip pause" title="Pause'+(st.pause.t?' bis '+_isoDE(st.pause.t):'')+'">Pause</span>';
+  if(st.k==='gone')return '<span class="pst-chip gone" title="Nicht mehr dabei seit '+_isoDE(st.since)+'">ehemalig</span>';
+  return '';
+}
+// Why a cell is "–"
+function _pOffTitle(p,s,season){
+  const k=season?_dbSortKey(s.date,season):dispToSortKey(s.date);
+  const off=_pOffAt(p,k);
+  if(off==='gone')return 'Nicht mehr dabei (seit '+_isoDE(p.gone)+')';
+  if(off==='pause'){const z=_pPauseAt(p,k);return 'Pause'+(z&&z.t?' bis '+_isoDE(z.t):'');}
+  if(p&&p.trial&&k<isoToSortKey(p.trial))return 'Noch nicht im Team (Probetraining ab '+_isoDE(p.trial)+')';
+  return 'Noch nicht im Team (dabei seit '+String((p&&p.joinDate)||'').split('-').reverse().join('.')+')';
+}
+// Probetraining so far: held sessions since it began, and how often he was there
+function _pTrialCount(p){
+  const D=cd();let n=0,a=0;
+  if(!p||!p.trial||!D)return {n,a};
+  const f=isoToSortKey(p.trial);
+  (D.sessions||[]).forEach((s,si)=>{
+    if(!s||!s.date||!sessTookPlace(s)||dispToSortKey(s.date)<f||!_sessAfterJoin(p,s))return;
+    n++;if(p.s&&p.s[si]===1)a++;
+  });
+  return {n,a};
+}
+// The last day he was there (ISO), for "nicht mehr dabei seit"
+function _pLastThere(p){
+  const D=cd();let best=null;
+  (D&&D.sessions||[]).forEach((s,si)=>{
+    if(!s||!s.date||!sessTookPlace(s)||!(p.s&&p.s[si]===1))return;
+    const k=dispToSortKey(s.date);if(!best||k>best.k)best={k,iso:dispToISO(s.date)};
+  });
+  return best?best.iso:null;
+}
+function renderPlayerStatus(p,pi){
+  const sec=document.getElementById('ps-sec-status'),el=document.getElementById('ps-status');
+  if(!sec||!el)return;
+  const st=_pState(p),ed=canEdit();
+  if(st.k==='active'){sec.hidden=true;el.innerHTML='';return;}
+  const b=(lbl,on,cls)=>`<button type="button" class="pst-btn${cls?' '+cls:''}" onclick="${on}">${lbl}</button>`;
+  let txt='',btns='';
+  if(st.k==='trial'){
+    const c=_pTrialCount(p);
+    txt=`<b>Probetraining</b> seit ${_isoDE(st.since)} · ${c.n} ${c.n===1?'Termin':'Termine'}, ${c.a}× dabei<small>Wird erfasst, zählt aber in keiner Quote.</small>`;
+    if(ed)btns=b('Aufnehmen',`pstQuick(${pi},'take')`,'pri')+b('Nicht aufnehmen',`pstOpen(${pi},'gone')`)+b('Ändern',`pstOpen(${pi})`,'ghost');
+  }else if(st.k==='pause'){
+    txt=`<b>Pause</b> seit ${_isoDE(st.pause.f)}${st.pause.t?' bis '+_isoDE(st.pause.t):' · ohne Enddatum'}<small>Termine in dieser Zeit zählen nicht.</small>`;
+    if(ed)btns=b('Pause beenden',`pstQuick(${pi},'back')`,'pri')+b('Ändern',`pstOpen(${pi},'pause')`,'ghost');
+  }else{
+    txt=`<b>Nicht mehr dabei</b> seit ${_isoDE(st.since)}<small>Alles davor bleibt in der Statistik. Sein Link ist abgeschaltet.</small>`;
+    if(ed)btns=b('Wieder dabei',`pstQuick(${pi},'return')`,'pri')+b('Ändern',`pstOpen(${pi},'gone')`,'ghost');
+  }
+  el.innerHTML=`<div class="pst-line pst-${st.k}">${txt}</div>${btns?`<div class="pst-btns">${btns}</div>`:''}`;
+  sec.hidden=false;
+}
+// ── Changing the status ──
+let _pstPi=null;
+function pstOpen(pi,pre){
+  if(!canEdit())return;
+  const D=cd(),p=D&&D.players&&D.players[pi];if(!p)return;
+  _pstPi=pi;
+  const st=_pState(p),today=_todayISO();
+  const sel=(pre==='decide'||pre==='ask')?'':(pre||st.k);
+  const curPause=st.k==='pause'?st.pause:(st.k==='active'&&st.next)?st.next:null;
+  const lastA=_pLastThere(p);
+  const goneDef=p.gone||(lastA?_isoAdd(lastA,1):today);
+  const nm=(typeof getDisplayName==='function'?getDisplayName(p):p.name)||'';
+  document.getElementById('pst-title').textContent='Status: '+nm;
+  const opt=(m,label,sub,fields)=>`<label class="pst-opt${sel===m?' on':''}"><input type="radio" name="pst-m" value="${m}"${sel===m?' checked':''} onchange="pstPick(this.value)"><span class="pst-txt"><b>${label}</b><span>${sub}</span>${fields?`<span class="pst-f" data-m="${m}"${sel===m?'':' hidden'}>${fields}</span>`:''}</span></label>`;
+  const date=(id,v,lbl)=>`<span class="pst-d"><span class="pst-dl">${lbl}</span><input type="date" id="${id}" value="${v||''}" aria-label="${lbl}"></span>`;
+  let aL='Aktiv',aS='Zählt normal – für ihn und für die Mannschaft.',aF='';
+  if(st.k==='trial'){aL='Aufnehmen';aS='Ab diesem Tag zählt er. Die Probetrainings davor bleiben in der Tabelle, zählen aber nicht.';aF=date('pst-a',today,'ab');}
+  else if(st.k==='pause'){aL='Aktiv – Pause beenden';aS='Ab diesem Tag ist er wieder dabei.';aF=date('pst-a',today,'wieder dabei ab');}
+  else if(st.k==='gone'){aL='Wieder dabei';aS='Die Zeit dazwischen gilt als Pause und zählt nicht.';aF=date('pst-a',today,'ab');}
+  document.getElementById('pst-body').innerHTML=
+    opt('active',aL,aS,aF)
+    +opt('trial','Probetraining','Wird erfasst wie jeder andere, zählt aber in keiner Quote. Kein automatisches „M“, keine Erinnerungen.',date('pst-t',p.trial||today,'seit'))
+    +opt('pause','Pause','Termine in der Pause zählen nicht – weder für ihn noch für die Mannschaft. Keine Erinnerungen, nicht im Kader. Sein Link bleibt.',
+      date('pst-pf',curPause?curPause.f:today,'von')+date('pst-pt',curPause?curPause.t:'','bis (leer = offen)'))
+    +opt('gone',st.k==='trial'?'Nicht aufnehmen':'Nicht mehr dabei','Ab diesem Tag zählt nichts mehr; er steht unten unter „Nicht mehr dabei“. Alles davor bleibt. Sein Link wird abgeschaltet.',date('pst-g',goneDef,'seit'));
+  openM('moPSt');
+}
+function pstPick(m){
+  document.querySelectorAll('#moPSt .pst-opt').forEach(l=>{const on=l.querySelector('input').value===m;l.classList.toggle('on',on);const f=l.querySelector('.pst-f');if(f)f.hidden=!on;});
+}
+function _pstTake(p,d){
+  const f=p.trial;
+  if(f&&f<d)p.probe={f,t:_isoAdd(d,-1)};
+  if(f&&(!p.joinDate||p.joinDate>f))p.joinDate=f;
+  delete p.trial;
+}
+function _pstEndPause(p,d){
+  const z=_pPauseAt(p,isoToSortKey(d))||_pPauseAt(p,todaySK());
+  if(!z||!Array.isArray(p.pauses))return;
+  if(z.f>=d)p.pauses.splice(p.pauses.indexOf(z),1);
+  else z.t=_isoAdd(d,-1);
+  if(!p.pauses.length)delete p.pauses;
+}
+function _pstReturn(p,d){
+  if(!p.gone)return;
+  if(p.gone<d){if(!Array.isArray(p.pauses))p.pauses=[];p.pauses.push({f:p.gone,t:_isoAdd(d,-1)});}
+  delete p.gone;
+}
+function _pstSetPause(p,f,t,st){
+  if(!Array.isArray(p.pauses))p.pauses=[];
+  const cur=st.k==='pause'?st.pause:(st.k==='active'&&st.next)?st.next:null;
+  const x={f,t:t||''};
+  const i=cur?p.pauses.indexOf(cur):-1;
+  if(i>=0)p.pauses[i]=x;else p.pauses.push(x);
+  p.pauses.sort((a,b)=>String(a.f).localeCompare(String(b.f)));
+}
+// Automatic "M" where he no longer counts goes back to open
+function _pstTidy(p){
+  const D=cd();if(!D||!Array.isArray(D.sessions)||!Array.isArray(p.s))return;
+  D.sessions.forEach((s,si)=>{
+    if(!s||!s.date||sessTookPlace(s)||_sessCounts(p,s))return;
+    if(Array.isArray(p.ay)&&p.ay[si]===1&&p.s[si]===4){p.s[si]=3;p.ay[si]=null;}
+  });
+}
+function _pstAfter(p,pi,what){
+  _pstTidy(p);
+  try{_ayApplyAll();}catch(e){}
+  saveG();
+  logAudit('Spielerstatus',p.name||'?',what);
+  closeM('moPSt');
+  try{render();}catch(e){}
+  try{const mp=document.getElementById('moPlayer');if(mp&&mp.classList.contains('open')&&window._psCurrentPi===pi)openPlayerStats(pi);}catch(e){}
+  try{const tm=document.getElementById('moTeamMgr');if(tm&&tm.classList.contains('open'))renderMgrPlayers();}catch(e){}
+  if(typeof showSaveFlash==='function')showSaveFlash('\u2713 '+(p.name||'')+': '+what);
+}
+function pstSave(){
+  const pi=_pstPi,D=cd(),p=D&&D.players&&D.players[pi];
+  if(!p||!canEdit())return;
+  const m=(document.querySelector('#moPSt input[name="pst-m"]:checked')||{}).value;
+  if(!m){alert('Bitte einen Status wählen.');return;}
+  const v=id=>((document.getElementById(id)||{}).value||'').trim();
+  const today=_todayISO(),st=_pState(p);
+  if(m==='pause'){const f=v('pst-pf')||today,t=v('pst-pt');if(t&&t<f){alert('„bis“ liegt vor „von“.');return;}}
+  let what='';
+  snap();
+  if(m==='active'){
+    const d=v('pst-a')||today;
+    if(st.k==='trial'){_pstTake(p,d);what='aufgenommen ab '+_isoDE(d);}
+    else if(st.k==='pause'){_pstEndPause(p,d);what='Pause beendet, wieder dabei ab '+_isoDE(d);}
+    else if(st.k==='gone'){_pstReturn(p,d);what='wieder dabei ab '+_isoDE(d);}
+    else{closeM('moPSt');return;}
+  }else if(m==='trial'){
+    const d=v('pst-t')||today;
+    if(st.k==='gone')_pstReturn(p,d);
+    p.trial=d;what='Probetraining seit '+_isoDE(d);
+  }else if(m==='pause'){
+    const f=v('pst-pf')||today,t=v('pst-pt');
+    _pstSetPause(p,f,t,st);what='Pause ab '+_isoDE(f)+(t?' bis '+_isoDE(t):' (offen)');
+  }else if(m==='gone'){
+    const d=v('pst-g')||today;
+    p.gone=d;what=(st.k==='trial'?'nicht aufgenommen':'nicht mehr dabei')+' seit '+_isoDE(d);
+  }
+  _pstAfter(p,pi,what);
+}
+function pstQuick(pi,act){
+  const D=cd(),p=D&&D.players&&D.players[pi];if(!p||!canEdit())return;
+  const today=_todayISO(),nm=(typeof getDisplayName==='function'?getDisplayName(p):p.name)||'';
+  let what='';
+  if(act==='take'){
+    if(!confirm(nm+' aufnehmen?\n\nAb heute zählt er in der Mannschaft. Die Probetrainings davor bleiben in der Tabelle, zählen aber nicht.'))return;
+    snap();_pstTake(p,today);what='aufgenommen ab '+_isoDE(today);
+  }else if(act==='back'){snap();_pstEndPause(p,today);what='Pause beendet';}
+  else if(act==='return'){snap();_pstReturn(p,today);what='wieder dabei ab '+_isoDE(today);}
+  else return;
+  _pstAfter(p,pi,what);
+}
+// "18 Spieler": the team today — not on trial, not gone
+function _pTeamCount(players){return (players||[]).filter(p=>p&&!p.trial&&!_pGone(p)).length;}
 function _todayISO(){const n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');}
 function dispToSortKey(s){
   if(!s||typeof s!=='string')return 99999999;
@@ -12629,9 +12910,8 @@ function renderBody(){
       const isNext=realSi===nextIdx;
       const isPast=isSessPast(realSi);
       if(!_sessAfterJoin(p,ss[si])){
-        // Not on the team yet — nothing to mark, nothing that counts.
-        const jd=String(p.joinDate).split('-').reverse().join('.');
-        cells+=`<td class="cs cs-prejoin${isNext?' next-col':''}" data-pi="${origPi}" data-si="${realSi}" title="Noch nicht im Team (dabei seit ${jd})">–</td>`;
+        // Not on the team then — nothing to mark, nothing that counts.
+        cells+=`<td class="cs cs-prejoin${isNext?' next-col':''}" data-pi="${origPi}" data-si="${realSi}" title="${escapeHtml(_pOffTitle(p,ss[si]))}">–</td>`;
         continue;
       }
       const cls=`cs ${CLS[sVal]}${isNext?' next-col':''}${ro?' ro':''}${isPast?' past-locked':''}`;
@@ -12646,7 +12926,7 @@ function renderBody(){
     rows.push(`<tr>
       <td class="tdl c0">${!ro?`<input class="nri" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="${p.nr||''}" onclick="event.stopPropagation();this.select();" onchange="updNr(${origPi},this.value)" onblur="updNr(${origPi},this.value)" onkeydown="if(event.key==='Enter'){this.blur();event.preventDefault();}" title="Trikotnummer bearbeiten"/>`:`<span style="font-weight:700;color:var(--bm);">${p.nr||''}</span>`}</td>
       <td class="tdl c1" onclick="openPlayerFromMain(${origPi})" style="cursor:pointer;">
-        <div class="ncell">${p.photo?`<img class="nm-av" src="${p.photo}" alt="" loading="lazy">`:`<span class="nm-av nm-av-ph" aria-hidden="true">${_avIni(p)}</span>`}<span class="nm">${getDisplayName(p)||''}</span><span class="ni">›</span></div>
+        <div class="ncell">${p.photo?`<img class="nm-av" src="${p.photo}" alt="" loading="lazy">`:`<span class="nm-av nm-av-ph" aria-hidden="true">${_avIni(p)}</span>`}<span class="nm">${getDisplayName(p)||''}</span>${_pChip(p)}<span class="ni">›</span></div>
       </td>
       <td class="c2" style="padding:4px;cursor:pointer;" onclick="openPlayerFromMain(${origPi})" title="Profil öffnen">${pcHtml(p)}</td>
       ${cells}
@@ -12676,7 +12956,7 @@ function renderTfoot(){
     p.s.forEach((v,si)=>{
       const s2=D.sessions[si];
       if(!s2||!sessTookPlace(s2))return; // held sessions only (incl. today's started)
-      if(!_sessAfterJoin(p,s2))return; // before he was on the team
+      if(!_sessCounts(p,s2))return; // before he was on the team, on trial, in a pause
       if(v===1){totA++;totPl++;}
       else if(v===0||v===2){totPl++;}
     });
@@ -12700,7 +12980,7 @@ function renderTfoot(){
 
   tFoot.innerHTML=`<tr>
     <td class="tdl c0" style="font-family:'Bebas Neue';letter-spacing:1px;font-size:.9rem;">∑</td>
-    <td class="tdl c1" style="font-size:.8rem;font-weight:500;">${D.players.length} Spieler &nbsp;·&nbsp; Ø ${avg}%</td>
+    <td class="tdl c1" style="font-size:.8rem;font-weight:500;">${_pTeamCount(D.players)} Spieler &nbsp;·&nbsp; Ø ${avg}%</td>
     <td class="c2"></td>
     ${cells}
     <td></td>
@@ -12752,7 +13032,7 @@ function _mxHeld(D){
 function _mxRate(p,held){
   let a=0,n=0;
   held.forEach(x=>{
-    if(!_sessAfterJoin(p,x.s))return;
+    if(!_sessCounts(p,x.s))return;
     const v=p.s&&p.s[x.si];
     if(v===1){a++;n++;}else if(v===0||v===2)n++;
   });
@@ -12894,10 +13174,11 @@ function _mxCell(p,pi,c,ro){
   const sVal=(p.s&&si<p.s.length)?p.s[si]:3;
   const isNext=si===nextIdx,isPast=isSessPast(si);
   if(!_sessAfterJoin(p,s)){
-    const jd=String(p.joinDate).split('-').reverse().join('.');
-    return `<td class="cs cs-prejoin${isNext?' next-col':''}" data-pi="${pi}" data-si="${si}"${dma} title="Noch nicht im Team (dabei seit ${jd})">–</td>`;
+    return `<td class="cs cs-prejoin${isNext?' next-col':''}" data-pi="${pi}" data-si="${si}"${dma} title="${escapeHtml(_pOffTitle(p,s))}">–</td>`;
   }
-  const cls=`cs ${CLS[sVal]}${isNext?' next-col':''}${ro?' ro':''}${isPast?' past-locked':''}`;
+  // Probetraining (1.2.51): marked like any other, hatched — it counts nowhere
+  const _prb=!_sessCounts(p,s);
+  const cls=`cs ${CLS[sVal]}${isNext?' next-col':''}${ro?' ro':''}${isPast?' past-locked':''}${_prb?' cs-probe':''}`;
   let title='';
   if(sVal===4)title=' title="Vom Spieler angemeldet — noch nicht überprüft"';
   else if(sVal===5)title=' title="'+escapeHtml(_nkTitle(pi,si))+'"';
@@ -12914,7 +13195,7 @@ function _mxWeekCell(p,c){
     if(v===1)a++;else if(v===0)f++;else if(v===2)x++;else if(v===5)nk++;
   });
   const k=a+f+x,head=`KW ${w.kw} (${_mxSpan(w.wk)})`;
-  if(!n)return `<td class="mx-wc mx-wc-pre" data-mx="${dm}" title="${head}: noch nicht im Team">–</td>`;
+  if(!n)return `<td class="mx-wc mx-wc-pre" data-mx="${dm}" title="${head}: ${escapeHtml(w.items.length?_pOffTitle(p,w.items[0].s):'nicht im Team')}">–</td>`;
   if(!k)return `<td class="mx-wc mx-wc-q" data-mx="${dm}" onclick="mxWeek(${w.wk})" title="${head}: ${nk&&nk===n?'nicht im Kader':'nichts erfasst'}">${nk&&nk===n?'N':'?'}</td>`;
   const r=a/k,h=r>=.999?3:r>=.6?2:r>=.34?1:0;
   const tip=[`${a} anwesend`,x?`${x} entschuldigt`:'',f?`${f} fehlend`:'',nk?`${nk} nicht im Kader`:'',n>k+nk?`${n-k-nk} nicht erfasst`:''].filter(Boolean).join(' · ');
@@ -12946,20 +13227,25 @@ function mxBody(){
   }else list=sortPlayers(D.players);
   const q=_mxNorm(MX.q);
   if(q)list=list.filter(p=>p&&_mxMatch(p,q));
-  if(!list.length){
+  // Nicht mehr dabei (1.2.51): below the others, folded — their history stays
+  const _gone=list.filter(p=>p&&_pGone(p));
+  list=list.filter(p=>p&&!_pGone(p));
+  const _goneRow=()=>`<tr class="mx-former-h"><td colspan="${span}"><button type="button" class="mx-former-b" aria-expanded="${!!MX.former}" onclick="MX.former=!MX.former;renderBody();">${MX.former?'\u25be':'\u25b8'} Nicht mehr dabei (${_gone.length})</button></td></tr>`;
+  if(!list.length&&!_gone.length){
     tbody.innerHTML=`<tr><td colspan="${span}" class="mx-none"><span>Kein Spieler gefunden für „${escapeHtml(MX.q.trim())}“.</span></td></tr>`;
     return;
   }
   const rows=[];
-  list.forEach(p=>{
+  [...list,...(MX.former?_gone:[])].forEach(p=>{
     if(!p)return;
+    if(_pGone(p)&&!rows._gh){rows._gh=1;rows.push(_goneRow());}
     const origPi=D.players.indexOf(p);
     const r=rate.get(p);
     const cells=M.cols.map(c=>c.kind==='week'?_mxWeekCell(p,c):_mxCell(p,origPi,c,ro)).join('');
-    rows.push(`<tr>
+    rows.push(`<tr${_pGone(p)?' class="mx-former"':''}>
       <td class="tdl c0">${!ro?`<input class="nri" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="${p.nr||''}" onclick="event.stopPropagation();this.select();" onchange="updNr(${origPi},this.value)" onblur="updNr(${origPi},this.value)" onkeydown="if(event.key==='Enter'){this.blur();event.preventDefault();}" title="Trikotnummer bearbeiten"/>`:`<span style="font-weight:700;color:var(--bm);">${p.nr||''}</span>`}</td>
       <td class="tdl c1" onclick="openPlayerFromMain(${origPi})" style="cursor:pointer;">
-        <div class="ncell">${p.photo?`<img class="nm-av" src="${p.photo}" alt="" loading="lazy">`:`<span class="nm-av nm-av-ph" aria-hidden="true">${_avIni(p)}</span>`}<span class="nm">${getDisplayName(p)||''}</span><span class="ni">›</span></div>
+        <div class="ncell">${p.photo?`<img class="nm-av" src="${p.photo}" alt="" loading="lazy">`:`<span class="nm-av nm-av-ph" aria-hidden="true">${_avIni(p)}</span>`}<span class="nm">${getDisplayName(p)||''}</span>${_pChip(p)}<span class="ni">›</span></div>
       </td>
       <td class="c2" style="padding:4px;cursor:pointer;" onclick="openPlayerFromMain(${origPi})" title="Profil öffnen">${pcHtml(p)}</td>
       <td class="c3 mx-pct" data-mxp="${origPi}" style="color:${_mxPctCol(r)};">${r==null?'–':r+'%'}</td>
@@ -12967,6 +13253,7 @@ function mxBody(){
       <td>${!ro?`<button class="drb" onclick="delPlayer(${origPi})">✕</button>`:''}</td>
     </tr>`);
   });
+  if(_gone.length&&!rows._gh)rows.push(_goneRow());
   tbody.innerHTML=rows.join('');
 }
 function mxFoot(){
@@ -12978,7 +13265,7 @@ function mxFoot(){
   D.players.forEach(p=>{
     if(!p)return;
     held.forEach(x=>{
-      if(!_sessAfterJoin(p,x.s))return;
+      if(!_sessCounts(p,x.s))return;
       const v=p.s&&p.s[x.si];
       if(v===1){A++;N++;}else if(v===0||v===2)N++;
     });
@@ -13007,7 +13294,7 @@ function mxFoot(){
   }).join('');
   tf.innerHTML=`<tr>
     <td class="tdl c0" style="font-family:'Bebas Neue';letter-spacing:1px;font-size:.9rem;">∑</td>
-    <td class="tdl c1" style="font-size:.8rem;font-weight:500;">${D.players.length} Spieler</td>
+    <td class="tdl c1" style="font-size:.8rem;font-weight:500;">${_pTeamCount(D.players)} Spieler</td>
     <td class="c2"></td>
     <td class="c3 mx-pct" style="color:${_mxPctCol(avg)};" title="Ø der Mannschaft in der Saison">${avg==null?'–':'<small class="mx-avg">Ø</small>'+avg+'%'}</td>
     ${cells}
@@ -13085,7 +13372,7 @@ function mxpRender(){
   if(!last.length){host.innerHTML=`<div class="mxp-empty">Noch keine ${kind} gelaufen.</div>`;return;}
   const q=_mxNorm(MX.q);
   let rows=D.players.map((p,pi)=>{
-    if(!p||!_mxMatch(p,q))return null;
+    if(!p||_pGone(p)||!_mxMatch(p,q))return null;   // nicht mehr dabei: not here (1.2.51)
     let a=0,k=0;
     const bars=last.map(x=>{
       if(!_sessAfterJoin(p,x.s))return 'x';
@@ -13100,13 +13387,13 @@ function mxpRender(){
   if(!rows.length){host.innerHTML=`<div class="mxp-empty">Kein Spieler gefunden für „${e(MX.q.trim())}“.</div>`;return;}
   const nr=x=>(+x.p.nr||999);
   const byNr=(x,y)=>nr(x)-nr(y)||String(x.p.name||'').localeCompare(String(y.p.name||''));
-  const LB={a:'anwesend',f:'fehlend',e:'entschuldigt',q:'nicht erfasst',x:'noch nicht im Team'};
+  const LB={a:'anwesend',f:'fehlend',e:'entschuldigt',q:'nicht erfasst',x:'nicht im Team'};
   const row=x=>{
     const nm=(typeof getDisplayName==='function'?getDisplayName(x.p):'')||x.p.name||'';
     const lbl=`${e(nm)}: ${x.k?`${x.a} von ${x.k} erfasst anwesend`:'nichts erfasst'}`;
     return `<button type="button" class="mxp-row" onclick="openPlayerFromMain(${x.pi})">
       <span class="mxp-nr">${e(String(x.p.nr!=null&&x.p.nr!==''?x.p.nr:'–'))}</span>
-      <span class="mxp-mid"><b class="mxp-nm">${e(nm)}</b><span class="mxp-bars" role="img" aria-label="${lbl}">${x.bars.map((b,i)=>`<i class="${b}" title="${e(last[i].s.date)}: ${LB[b]}"></i>`).join('')}</span></span>
+      <span class="mxp-mid"><b class="mxp-nm">${e(nm)}${_pChip(x.p)}</b><span class="mxp-bars" role="img" aria-label="${lbl}">${x.bars.map((b,i)=>`<i class="${b}" title="${e(last[i].s.date)}: ${LB[b]}"></i>`).join('')}</span></span>
       <span class="mxp-r"><b style="color:${_mxPctCol(x.r)};">${x.r==null?'–':x.r+'%'}</b><small>Saison ${x.rs==null?'–':x.rs+'%'}</small></span>
     </button>`;
   };
@@ -13206,7 +13493,7 @@ function _ayWalk(t,type,fn,dry){
       if(typeof sessTookPlace==='function'&&sessTookPlace(s,season))return;
       D.players.forEach(p=>{
         if(!p)return;
-        if(typeof _sessAfterJoin==='function'&&!_sessAfterJoin(p,s,season))return;
+        if(typeof _sessAfterJoin==='function'&&!_sessCounts(p,s,season))return;
         const v=(Array.isArray(p.s)&&si<p.s.length&&p.s[si]!=null)?p.s[si]:3;
         const a=(Array.isArray(p.ay)&&si<p.ay.length)?p.ay[si]:null;
         if(fn==='apply'&&v===3&&a!==0){
@@ -13282,6 +13569,35 @@ function ayRender(){
 }
 // ── Absage-Regel (1.2.45): Einstellungen → Mannschaft → „Absagen“ ──
 // G.db[team+'__rules'].abs = {m:'frist'|'anruf'|'app', h:hours}; see pvAbsRule
+// Spielerstatus (1.2.51): when "Im Blick behalten" asks. rules.st = {probe, weg}
+function _stRule(t){
+  const r=teamRules(t),x=(r&&r.st&&typeof r.st==='object')?r.st:{};
+  return {probe:[2,3,4,5,6,8].includes(+x.probe)?+x.probe:3,weg:[2,3,4,6,8].includes(+x.weg)?+x.weg:4};
+}
+function stRender(){
+  const box=document.getElementById('stBox');if(!box)return;
+  if(!CU||!(typeof canEdit==='function'&&canEdit())){box.innerHTML='';return;}
+  const t=UI.currentTeam||'',R=_stRule(t),e=escapeHtml;
+  const sel=(k,opts)=>`<select id="st-${k}" onchange="stSet('${k}',this.value)">${opts.map(([v,l])=>`<option value="${v}"${R[k]===v?' selected':''}>${l}</option>`).join('')}</select>`;
+  box.innerHTML=`<div class="setting-label ay-h">👥 Spielerstatus <span>${e(t)}</span></div>
+    <p class="ay-note">Wann „Im Blick behalten“ nachfragt. Von selbst ändert sich nichts – den Status setzt ihr im Spielerprofil.</p>
+    <div class="setting-row"><div><div class="setting-label"><label for="st-probe">Probetraining</label></div><div class="setting-sub">nach so vielen Terminen fragen: aufnehmen?</div></div>
+      <div class="setting-control">${sel('probe',[[2,'2'],[3,'3'],[4,'4'],[5,'5'],[6,'6'],[8,'8']])}</div></div>
+    <div class="setting-row"><div><div class="setting-label"><label for="st-weg">Bei keinem Termin</label></div><div class="setting-sub">nach so vielen Wochen fragen: Pause oder nicht mehr dabei?</div></div>
+      <div class="setting-control">${sel('weg',[[2,'2 Wochen'],[3,'3 Wochen'],[4,'4 Wochen'],[6,'6 Wochen'],[8,'8 Wochen']])}</div></div>`;
+}
+function stSet(k,val){
+  if(!(typeof canEdit==='function'&&canEdit()))return;
+  const t=UI.currentTeam,v=Math.round(+val);if(!isFinite(v))return;
+  snap();
+  if(!G.db[t+'__rules']||typeof G.db[t+'__rules']!=='object')G.db[t+'__rules']={};
+  const c=Object.assign({},_stRule(t));c[k]=v;
+  G.db[t+'__rules'].st=c;
+  saveG();
+  logAudit('Spielerstatus',t,'Probetraining: nach '+c.probe+' Terminen fragen · ohne Termin: nach '+c.weg+' Wochen');
+  if(typeof showSaveFlash==='function')showSaveFlash('\u2713 Gespeichert');
+  stRender();
+}
 function absRender(){
   const box=document.getElementById('absBox');if(!box)return;
   if(!CU||!(typeof canEdit==='function'&&canEdit())){box.innerHTML='';return;}
@@ -13783,7 +14099,7 @@ function renderPlayerFront(p,pi){
     const past=[];
     ss.forEach((s,si)=>{
       if(!s||!sessTookPlace(s,UI.currentSeason))return;
-      if(!_sessAfterJoin(p,s))return; // before he was on the team
+      if(!_sessCounts(p,s))return; // before he was on the team
       past.push({s,si,sk:dispToSortKey(s.date)});
     });
     past.sort((a,b)=>a.sk-b.sk);
@@ -14498,6 +14814,7 @@ function _setFill(){
   if(typeof updateAppearanceUI==='function')updateAppearanceUI();
   if(typeof ayRender==='function')ayRender();
   if(typeof absRender==='function')absRender();
+  if(typeof stRender==='function')stRender();
   if(typeof meetRender==='function')meetRender();
   if(typeof cardRulesRender==='function')cardRulesRender();
   if(typeof fdbRender==='function')fdbRender();
@@ -15634,7 +15951,7 @@ function _pmComputeRank(p,D){
       // different set of sessions is what makes equal percentages look
       // unequally ranked.
       if(typeof sessTookPlace==='function'&&!sessTookPlace(s,D.season||UI.currentSeason))return;
-      if(!_sessAfterJoin(pp,s))return; // before he was on the team
+      if(!_sessCounts(pp,s))return; // before he was on the team
       const v=si<pp.s.length?pp.s[si]:3;
       if(v===1||v===0||v===2){mk++;if(v===1)pr++;}
     });
@@ -16046,7 +16363,7 @@ async function pvWriteAll(){
 }
 // What each player's screens read of his own record — nothing else leaves
 // (no note, phone, birthdate, Einsatz, Spielberechtigung …)
-const PV_ME=['name','shortname','nr','pos','hidePos','confirmToken','joinDate','s','rpe','rpeMin','rpeMeta',
+const PV_ME=['name','shortname','nr','pos','hidePos','confirmToken','joinDate','trial','probe','pauses','s','rpe','rpeMin','rpeMeta',
   'physio','ay','excOK','preconfReason','mvpV','goals','assists','seen','push'];
 // The part of a session a player sees (as _pmSanitizeG)
 function _pvSess(s){
@@ -16096,16 +16413,18 @@ function _pvBuildSync(team,season){
     const tp=_reportForPlayers(r,null);
     shared.rep[w.wk]=Object.assign({},tp,{me:null,players:[]});
   });
-  const people=[];
+  const people=[],gone=[];
   players.forEach((p,pi)=>{
     if(!p||!p.name||!p.confirmToken)return;
+    // Nicht mehr dabei (1.2.51): no part — his link stops working
+    if(_pGone(p)){gone.push(p.confirmToken);return;}
     const me={};
     PV_ME.forEach(f=>{if(p[f]!==undefined)me[f]=JSON.parse(JSON.stringify(p[f]));});
     const squad={};
     sessions.forEach((s,si)=>{const q=_sqOf(s);if(q)squad[si]={in:q.p.includes(p.name),meet:q.meet||'',where:q.where||'',t:q.t};});
     let rank=null;try{rank=_pmComputeRank(p,block);}catch(e){}
     const size=players.filter(pp=>pp&&Array.isArray(pp.s)&&sessions.some((s,si)=>{
-      if(!s||!sessTookPlace(s,season)||!_sessAfterJoin(pp,s))return false;
+      if(!s||!sessTookPlace(s,season)||!_sessCounts(pp,s))return false;
       const v=si<pp.s.length?pp.s[si]:3;return v===1||v===0||v===2;})).length;
     const stats={},rep={};
     weeks.forEach(w=>{
@@ -16116,7 +16435,7 @@ function _pvBuildSync(team,season){
     people.push({pi,tok:p.confirmToken,name:p.name,nr:p.nr||'',bd:_pvBd(p.birthdate),photo:p.photo||null,
       obj:{v:PV_V,team,season,pi,n:players.length,me,squad,rank,size,stats,rep}});
   });
-  return {shared,people};
+  return {shared,people,gone};
 }
 const _pvThumbs=new Map();
 function _pvThumb(src,n){
@@ -16138,7 +16457,7 @@ async function _pvWriteBlock(b){
   try{built=_pvBuildSync(team,season);}
   finally{UI.currentTeam=prevT;UI.currentSeason=prevS;}
   const now=Date.now(),tk=await pvTeamKeyOf(lk);
-  const {shared,people}=built;
+  const {shared,people,gone}=built;
   // Thumbnails: 20+ portraits must stay small (made once per photo and page)
   const th=_pvThumb;
   for(const r of Object.values(shared.rep)){
@@ -16163,6 +16482,10 @@ async function _pvWriteBlock(b){
     const text=JSON.stringify(x.obj),h=(await _pvHex(_pvHashText(x.obj))).slice(0,24);
     if(await _pvChanged('fcf_pv/'+pk,h))upd['fcf_pv/'+pk]={t:now,h,j:text};
   }
+  for(const tok of (gone||[])){
+    const pk=await pvKeyOf(tok);
+    if(await _pvChanged('fcf_pv/'+pk,''))upd['fcf_pv/'+pk]=null;
+  }
   shared.names.sort((a,b2)=>a.n.localeCompare(b2.n,'de'));
   const st=JSON.stringify(shared),sh=(await _pvHex(_pvHashText(shared))).slice(0,24);
   // t, h and j separately: the job's mvp next to them stays
@@ -16174,7 +16497,7 @@ async function _pvWriteBlock(b){
     _fbCount('tx','Ausschnitte',JSON.stringify(upd).length);
     await fbDb.ref().update(upd);
     Object.keys(upd).forEach(p=>{
-      if(p.indexOf('fcf_pv/')===0)_pvLast[p]=upd[p].h;
+      if(p.indexOf('fcf_pv/')===0)_pvLast[p]=upd[p]?upd[p].h:'';
       else if(/\/h$/.test(p))_pvLast[p.slice(0,-2)]=upd[p];
     });
     _pvLast['fcf_pk/'+tk]=ph;
@@ -17802,7 +18125,7 @@ function computeLoadMatrix(data,weeks){
     const row=shown.map(k=>{
       let load=0,rated=0,possible=0;
       (sessOf[k]?sessOf[k].list:[]).forEach(si=>{
-        if(!_sessAfterJoin(p,block.sessions[si],season))return; // before he was on the team
+        if(!_sessCounts(p,block.sessions[si],season))return; // before he was on the team
         possible++;
         const r=Array.isArray(p.rpe)?p.rpe[si]:null;
         if(typeof r==='number'){
@@ -18508,7 +18831,7 @@ function cardData(p,D,season){
   let apps=0,goals=0,assists=0,mvp=0,rq=0,ra=0;
   D.sessions.forEach((s,si)=>{
     if(!s||!s.date)return;
-    if(typeof _sessAfterJoin==='function'&&!_sessAfterJoin(p,s,season))return;
+    if(typeof _sessAfterJoin==='function'&&!_sessCounts(p,s,season))return;
     const v=(p.s&&si<p.s.length)?p.s[si]:3;
     const held=sessTookPlace(s,season);
     if(s.type==='match'){
@@ -18568,7 +18891,7 @@ function _cardWeek(p,D,season){
     if(!s||!s.date)return;
     const sk=_dbSortKey(s.date,season);
     if(sk<a||sk>b)return;
-    if(typeof _sessAfterJoin==='function'&&!_sessAfterJoin(p,s,season))return;
+    if(typeof _sessAfterJoin==='function'&&!_sessCounts(p,s,season))return;
     const v=(p.s&&si<p.s.length)?p.s[si]:3;
     let st;
     if(sessTookPlace(s,season))st=v===1?'ok':(v===0||v===2)?'no':'wait';
@@ -19825,7 +20148,9 @@ function tryPlayerUrlAuth(){
   const tryFinalize=()=>{
     attempts++;
     if(_fbInitialLoaded||attempts>50){
-      const found=findPlayerByToken(token);
+      const _f0=findPlayerByToken(token);
+      // Nicht mehr dabei (1.2.51): his link is off — the trainers' preview still opens
+      const found=(_f0&&!RPE_IS_PREVIEW&&_pGone(_f0.player))?null:_f0;
       if(found){
         CU={role:'player',name:found.player.name||'Spieler',teams:[found.team],playerToken:token,playerIdx:found.pi};
         UI.currentTeam=found.team;
@@ -20244,7 +20569,7 @@ function _pmCalcStats(p,D){
   sessions.forEach((s,si)=>{
     if(!s)return;
     if(typeof sessTookPlace==='function'&&!sessTookPlace(s,UI.currentSeason))return;
-    if(!_sessAfterJoin(p,s))return; // before he was on the team
+    if(!_sessCounts(p,s))return; // before he was on the team
     const v=(p.s&&si<p.s.length)?p.s[si]:3;
     if(v===1||v===0||v===2){marked++;if(v===1)present++;}
   });
@@ -20255,7 +20580,7 @@ function _pmCalcStats(p,D){
   sessions.forEach((s,si)=>{
     if(!s||!s.date)return;
     const sk=dispToSortKey(s.date);
-    if(sk<today&&_sessAfterJoin(p,s))pastIdxs.push({si,sk});
+    if(sk<today&&_sessCounts(p,s))pastIdxs.push({si,sk});
   });
   pastIdxs.sort((a,b)=>a.sk-b.sk);
   // STREAK: consecutive Anwesend from the most recent backwards; not yet
@@ -20619,6 +20944,7 @@ function renderHub(){
     if(!s||!s.date)return;
     const sk=dispToSortKey(s.date);
     if(sk<weekStart||sk>horizon)return;
+    if(!_sessAfterJoin(p,s))return;   // in his pause (1.2.51)
     weekTotal++;
     const v=(p.s&&si<p.s.length)?p.s[si]:3;
     if(v===3){weekOpen++;if(!openOne)openOne=s;}
@@ -20685,11 +21011,11 @@ function renderHub(){
   (D.sessions||[]).forEach((s,si)=>{
     if(!s||!s.date)return;
     const k=dispToSortKey(s.date);
-    if(k>=weekStart&&k<=horizon)wk.push({s,si,k});
+    if(k>=weekStart&&k<=horizon&&_sessAfterJoin(p,s))wk.push({s,si,k});
   });
   // the next match with a squad that concerns him, even when it lies beyond the week
   const sqn=_sqPmNext(D,p);
-  if(sqn&&!wk.some(x=>x.si===sqn.si))wk.push({s:sqn.s,si:sqn.si,k:dispToSortKey(sqn.s.date)});
+  if(sqn&&!wk.some(x=>x.si===sqn.si)&&_sessAfterJoin(p,sqn.s))wk.push({s:sqn.s,si:sqn.si,k:dispToSortKey(sqn.s.date)});
   wk.sort((a,b)=>a.k-b.k);
   const wkRows=wk.map(({s,si,k})=>{
     const f=_pmFmtUpcoming(s,k);
@@ -20753,6 +21079,7 @@ function renderHub(){
     <div class="fl-bar"><span class="fl-brand"><span class="fl-lamps" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span>Flutlicht</span><span class="fl-team">${club}</span></div>
     <div class="fl-who">${av}<div class="fl-who-t"><div class="hub-name">${e(nm)}</div><div class="hub-sub">${meta}</div></div></div>
     ${_newsHtml('hub')}
+    ${_pmPauseHtml(p)}
     ${sec('Jetzt dran')}${now.length?list(now):list([`<div class="hub-mvp fl-row fl-calm"><span class="hub-ic fl-tile ok">${FL_IC.check}</span><span class="hub-txt"><b>Alles beantwortet</b><span>Danke – gerade wartet nichts auf dich.</span></span></div>`])}
     ${_hubPushCard()}
     ${wkRows.length?sec(wk.length===1?'Dein n\u00e4chster Termin':'Diese Woche',`<a class="fl-sec-a" href="${ln(buildHubLink(tok,'week'))}">alle Termine \u203a</a>`)+list(wkRows):''}
@@ -20785,6 +21112,7 @@ function _hubOpenCounts(){
   const horizon=(typeof _pmWeekHorizon==='function')?_pmWeekHorizon():todaySK();
   (D.sessions||[]).forEach((s,si)=>{
     if(!s)return;
+    if(!_sessAfterJoin(p,s))return;   // in his pause: nothing to answer (1.2.51)
     if(s.date){
       const sk=dispToSortKey(s.date);
       if(sk>=weekStart&&sk<=horizon){
@@ -21072,7 +21400,7 @@ function renderPlayerMode(){
     D.sessions.forEach((s,si)=>{
       if(!s||!s.date)return;
       const sk=dispToSortKey(s.date);
-      if(sk>=weekStart&&sk<=horizon)upcoming.push({s,si,sk});
+      if(sk>=weekStart&&sk<=horizon){if(_sessAfterJoin(p,s))upcoming.push({s,si,sk});}   // not in his pause (1.2.51)
       else if(sk<weekStart)recent.push({s,si,sk});
     });
   }
@@ -21332,6 +21660,16 @@ function _flDayWord(s){
   const diff=Math.round((d-n)/864e5);
   return diff===0?'heute':diff===1?'morgen':'am '+SQUAD_WD[d.getDay()];
 }
+// His pause, on the overview and his week (1.2.51)
+function _pmPauseHtml(p){
+  const st=_pState(p),e=escapeHtml;
+  let z=null,now=false;
+  if(st.k==='pause'){z=st.pause;now=true;}
+  else if(st.k==='active'&&st.next&&isoToSortKey(st.next.f)<=isoToSortKey(_isoAdd(_todayISO(),7)))z=st.next;
+  if(!z)return '';
+  const t=now?(z.t?'Pause bis '+_isoDE(z.t):'Pause'):'Pause ab '+_isoDE(z.f)+(z.t?' bis '+_isoDE(z.t):'');
+  return `<div class="hub-card hub-news fl-pause"><span class="hub-ic" aria-hidden="true">\u23f8</span><span class="hub-txt"><b>${e(t)}</b><span>Termine in dieser Zeit zählen nicht${now?'':' und du wirst nicht gefragt'}. Wenn du früher wieder kannst, sag deinem Trainer Bescheid.</span></span></div>`;
+}
 // "heute, 12:00" · "morgen, 12:00" · "Mo, 12:00" · "27.10., 12:00"
 function _pmRelTime(ts){
   if(typeof ts!=='number')return '';
@@ -21529,13 +21867,13 @@ function dbComputeMetrics(data){
   let tA=0,tT=0,mA=0,mT=0,oA=0,oT=0;
   players.forEach(p=>{
     if(!p)return;
-    tPastIdx.forEach(i=>{if(!_sessAfterJoin(p,sessions[i],season))return;const v=p.s&&p.s[i];if(!_stFact(v))return;tT++;oT++;if(v===1){tA++;oA++;}});
-    mPastIdx.forEach(i=>{if(!_sessAfterJoin(p,sessions[i],season))return;const v=p.s&&p.s[i];if(!_stFact(v))return;mT++;oT++;if(v===1){mA++;oA++;}});
+    tPastIdx.forEach(i=>{if(!_sessCounts(p,sessions[i],season))return;const v=p.s&&p.s[i];if(!_stFact(v))return;tT++;oT++;if(v===1){tA++;oA++;}});
+    mPastIdx.forEach(i=>{if(!_sessCounts(p,sessions[i],season))return;const v=p.s&&p.s[i];if(!_stFact(v))return;mT++;oT++;if(v===1){mA++;oA++;}});
   });
   // Avg group size — ONLY past sessions (otherwise future "0 anwesend" drags it down)
   const sessionPresent=sessions.map((s,i)=>{
     if(!s)return 0;
-    return players.filter(p=>p&&p.s&&p.s[i]===1&&_sessAfterJoin(p,s,season)).length;
+    return players.filter(p=>p&&p.s&&p.s[i]===1&&_sessCounts(p,s,season)).length;
   });
   const tGroup=tPastIdx.length?tPastIdx.map(i=>sessionPresent[i]).reduce((a,b)=>a+b,0)/tPastIdx.length:null;
   const mGroup=mPastIdx.length?mPastIdx.map(i=>sessionPresent[i]).reduce((a,b)=>a+b,0)/mPastIdx.length:null;
@@ -21555,7 +21893,7 @@ function dbComputeMetrics(data){
       matches:mIdx.length,           // all planned
       trainingsDone:tPastIdx.length, // only completed
       matchesDone:mPastIdx.length,   // only completed
-      players:players.filter(p=>p).length
+      players:_pTeamCount(players)
     }
   };
 }
@@ -21567,7 +21905,7 @@ function dbRankPlayers(data){
     sessions.forEach((s,i)=>{
       if(!s)return;
       if(!sessTookPlace(s,season))return; // future sessions are not facts
-      if(!_sessAfterJoin(p,s,season))return; // before he was on the team
+      if(!_sessCounts(p,s,season))return; // before he was on the team
       const v=p.s&&p.s[i];
       if(!_stFact(v))return; // only A/F/E are facts: ? and M not yet, N never
       taken++;
@@ -21607,7 +21945,7 @@ function dbComputeStatusBreakdown(data){
     const isMatch=s.type==='match';
     players.forEach(p=>{
       if(!p)return;
-      if(!_sessAfterJoin(p,s,season))return; // before he was on the team
+      if(!_sessCounts(p,s,season))return; // before he was on the team
       const v=p.s&&p.s[si];
       if(v===1){a++;if(isMatch)aM++;else aT++;}
       else if(v===0){f++;if(isMatch)fM++;else fT++;}
@@ -21663,7 +22001,7 @@ function dbComputeWeekday(data){
     wd[dow].sess++;
     players.forEach(p=>{
       if(!p)return;
-      if(!_sessAfterJoin(p,s,season))return; // before he was on the team
+      if(!_sessCounts(p,s,season))return; // before he was on the team
       const v=p.s&&p.s[si];
       if(!_stFact(v))return;
       wd[dow].t++;
@@ -21727,7 +22065,7 @@ function dbComputeMonthlyTrend(data){
     if(s.type==='match')monthly[key].matches++;else monthly[key].trains++;
     players.forEach(p=>{
       if(!p)return;
-      if(!_sessAfterJoin(p,s,season))return; // before he was on the team
+      if(!_sessCounts(p,s,season))return; // before he was on the team
       const v=p.s&&p.s[si];
       if(!_stFact(v))return;
       monthly[key].taken++;
@@ -21903,7 +22241,7 @@ function dbComputeWeekReport(data,offsetWeeks){
     if(!p)return;
     let present=0,marked=0;
     const cells=weekSess.map(({s,i})=>{
-      if(!_sessAfterJoin(p,s,season))return 3; // not on the team yet
+      if(!_sessCounts(p,s,season))return 3; // not on the team yet
       const v=p.s&&p.s[i];
       if(v===1){present++;marked++;return 1;}
       if(v===0){marked++;return 0;}
@@ -21923,7 +22261,7 @@ function dbComputeWeekReport(data,offsetWeeks){
     const isMatch=s.type==='match';
     players.forEach(p=>{
       if(!p)return;
-      if(!_sessAfterJoin(p,s,season))return; // before he was on the team
+      if(!_sessCounts(p,s,season))return; // before he was on the team
       const v=p.s&&p.s[i];
       if(!_stFact(v))return; // only A/F/E are facts: ? and M not yet, N never
       if(isMatch){mT++;if(v===1)mA++;}else{tT++;if(v===1)tA++;}
@@ -21941,7 +22279,7 @@ function dbComputeWeekReport(data,offsetWeeks){
       mPct:mT?Math.round(mA/mT*100):null,
       overallPct:(tT+mT)?Math.round((tA+mA)/(tT+mT)*100):null
     },
-    rosterSize:players.filter(p=>p).length
+    rosterSize:_pTeamCount(players)
   };
 }
 function _dbComputeSeasonStats(data){
@@ -21955,7 +22293,7 @@ function _dbComputeSeasonStats(data){
     sessions.forEach((s,si)=>{
       if(!s)return;
       if(!sessTookPlace(s,season))return; // future sessions are not facts
-      if(!_sessAfterJoin(p,s,season))return; // before he was on the team
+      if(!_sessCounts(p,s,season))return; // before he was on the team
       const v=p.s&&p.s[si];
       if(!_stFact(v))return; // only A/F/E are facts: ? and M not yet, N never
       tot++;teamT++;
@@ -21988,7 +22326,7 @@ function _psWeekSeries(p,block,season,weeks){
   const buckets={};let first=null;
   (block.sessions||[]).forEach((s,si)=>{
     if(!s||!s.date||!sessTookPlace(s,season))return;
-    if(!_sessAfterJoin(p,s,season))return; // before he was on the team 
+    if(!_sessCounts(p,s,season))return; // before he was on the team 
     const sk=_dbSortKey(s.date,season);
     if(!sk||sk===99999999)return;
     const y=Math.floor(sk/10000),m=Math.floor(sk/100)%100,d=sk%100;
@@ -22020,7 +22358,7 @@ function _psWeekSeries(p,block,season,weeks){
 function _playerStreak(p,block,season){
   const held=[];
   (block.sessions||[]).forEach((s,si)=>{
-    if(s&&sessTookPlace(s,season)&&_sessAfterJoin(p,s,season))held.push({si,sk:_dbSortKey(s.date,season)});
+    if(s&&sessTookPlace(s,season)&&_sessCounts(p,s,season))held.push({si,sk:_dbSortKey(s.date,season)});
   });
   held.sort((a,b)=>a.sk-b.sk);
   return _streakOf(p,held.map(h=>h.si));
@@ -22041,7 +22379,7 @@ function dbBuildPlayerStatsSnapshot(data,pi,offset,includePhoto){
     let a=0,t=0;
     (block.sessions||[]).forEach((s,si)=>{
       if(!s||!sessTookPlace(s,season))return;
-      if(!_sessAfterJoin(pp,s,season))return; // before he was on the team
+      if(!_sessCounts(pp,s,season))return; // before he was on the team
       const v=pp.s[si];
       if(v===1||v===0||v===2){t++;if(v===1)a++;}
     });
@@ -22067,7 +22405,7 @@ function dbBuildPlayerStatsSnapshot(data,pi,offset,includePhoto){
   let _goals=0,_assists=0,_apps=0;
   (block.sessions||[]).forEach((s,si)=>{
     if(!s||s.type!=='match')return;
-    if(!_sessAfterJoin(p,s,season))return; // before he was on the team
+    if(!_sessCounts(p,s,season))return; // before he was on the team
     // Matches he was actually there for — a squad list would count games he
     // never played.
     const v=(p.s&&si<p.s.length)?p.s[si]:3;
@@ -22284,7 +22622,7 @@ function dbRenderWeekReportSection(data){
   const pctOf=(p,list)=>{
     let a=0,t=0;
     list.forEach(({s,si})=>{
-      if(!_sessAfterJoin(p,s,season))return;
+      if(!_sessCounts(p,s,season))return;
       const v=stat(p,si);
       if(v===1||v===0||v===2){t++;if(v===1)a++;}
     });
@@ -22292,7 +22630,7 @@ function dbRenderWeekReportSection(data){
   };
   const loadOf=(p,list)=>{
     let l=0;
-    list.forEach(({s,si})=>{if(!_sessAfterJoin(p,s,season))return;const x=rpeLoad(s,p,si);if(typeof x==='number')l+=x;});
+    list.forEach(({s,si})=>{if(!_sessCounts(p,s,season))return;const x=rpeLoad(s,p,si);if(typeof x==='number')l+=x;});
     return l;
   };
   let html='<div class="wr2">';
@@ -22309,7 +22647,7 @@ function dbRenderWeekReportSection(data){
     let a=0,t=0;
     list.filter(x=>!type||(type==='match')===(x.s.type==='match')).forEach(({s,si})=>{
       players.forEach(p=>{
-        if(!p||!_sessAfterJoin(p,s,season))return;
+        if(!p||!_sessCounts(p,s,season))return;
         const v=stat(p,si);
         if(v===1||v===0||v===2){t++;if(v===1)a++;}
       });
@@ -22343,7 +22681,7 @@ function dbRenderWeekReportSection(data){
   const flags=[];
   players.forEach((p,pi)=>{
     if(!p)return;
-    const own=wk.filter(x=>_sessAfterJoin(p,x.s,season));
+    const own=wk.filter(x=>_sessCounts(p,x.s,season));
     const miss=own.filter(x=>x.held&&stat(p,x.si)===0).length;
     if(miss>=2)flags.push({pi,p,cls:'bad',ic:'❌',t:miss+'× unentschuldigt gefehlt'});
     const unans=own.filter(x=>!x.held&&stat(p,x.si)===3).length;
@@ -22377,7 +22715,7 @@ function dbRenderWeekReportSection(data){
   rows.forEach(({p,pi,now,pr})=>{
     html+=`<tr><td class="wr2-nm" ${open(pi)}><span class="wr2-nr">${esc(String(p.nr||''))}</span>${esc(nm(p))}</td>`;
     wk.forEach(({s,si,held:h})=>{
-      if(!_sessAfterJoin(p,s,season)){html+='<td><span class="wr2-st wr2-pre">–</span></td>';return;}
+      if(!_sessCounts(p,s,season)){html+='<td><span class="wr2-st wr2-pre">–</span></td>';return;}
       const m=sym[stat(p,si)]||sym[3];
       html+=`<td class="${h?'':'wr2-fut'}"><span class="ssa-st wr2-st ${m[1]}">${m[0]}</span></td>`;
     });
@@ -22411,7 +22749,7 @@ function dbRenderWeekReportSection(data){
   });
   // ── 5. Load ──
   const loads=players.map((p,pi)=>({p,pi})).filter(x=>x.p).map(x=>{
-    const present=held.filter(h=>_sessAfterJoin(x.p,h.s,season)&&stat(x.p,h.si)===1);
+    const present=held.filter(h=>_sessCounts(x.p,h.s,season)&&stat(x.p,h.si)===1);
     const rated=present.filter(h=>Array.isArray(x.p.rpe)&&typeof x.p.rpe[h.si]==='number').length;
     return Object.assign(x,{now:loadOf(x.p,held),pr:loadOf(x.p,prevHeld),present:present.length,rated});
   }).filter(x=>x.present);
@@ -23031,7 +23369,7 @@ function computeMonthlyAttendance(occurrences){
       const mo=+m[2];
       const year=_psYearForMonth(mo,season);
       const key=year+'-'+String(mo).padStart(2,'0');
-      if(!_sessAfterJoin(p,s,season))return; // before he was on the team
+      if(!_sessCounts(p,s,season))return; // before he was on the team
       const status=(p.s&&si<p.s.length)?p.s[si]:3;
       if(status===3||status==null)return; // pending or empty — exclude
       if(!monthly[key])monthly[key]={tA:0,tT:0,mA:0,mT:0};
@@ -23118,7 +23456,7 @@ function computePlayerOverallStats(occurrences){
     block.sessions.forEach((s,si)=>{
       if(!s)return;
       if(!sessTookPlace(s,season))return; // held sessions only
-      if(!_sessAfterJoin(p,s,season))return; // before he was on the team
+      if(!_sessCounts(p,s,season))return; // before he was on the team
       const v=p.s&&p.s[si];
       const isMatch=s.type==='match';
       if(v===1){cA++;if(isMatch){mA++;mT++;}else{tA++;tT++;}}
@@ -23208,7 +23546,7 @@ function computePlayerWeekday(occurrences){
       if(!sessTookPlace(s,season))return; // held sessions only
       const dow=s.date.split(' ')[0];
       if(!wd[dow])return;
-      if(!_sessAfterJoin(p,s,season))return; // before he was on the team
+      if(!_sessCounts(p,s,season))return; // before he was on the team
       const v=p.s&&p.s[si];
       if(!_stFact(v))return; // only A/F/E are facts
       wd[dow].t++;
@@ -23271,7 +23609,7 @@ function computeTeamComparison(occurrences){
     const mIdx=sessions.map((s,i)=>s.type==='match'&&_xsPast(i)?i:-1).filter(i=>i>=0);
     function pct(idxs,p){
       if(!p)return null;
-      const own=idxs.filter(i=>_sessAfterJoin(p,sessions[i],o.season)); // before he was on the team
+      const own=idxs.filter(i=>_sessCounts(p,sessions[i],o.season)); // before he was on the team
       const taken=own.filter(i=>p.s&&_xsFact(p.s[i])).length;
       const att=own.filter(i=>p.s&&p.s[i]===1).length;
       return taken?(att/taken)*100:null;
@@ -24039,10 +24377,13 @@ function openPlayerStats(pi,opts){
       const _nb=sbNextBan(p,_D,UI.currentSeason);
       if(_nb)info.push(_row('Gesperrt',escapeHtml(sbBanText(_nb,_D).replace(/^gesperrt /,''))+' \u2013 fehlt am '+escapeHtml(_D.sessions[_nb.ti].date)));
     }
+    // Status (1.2.51): "Aktiv" as a row here; anything else stands at the top
+    if(canEdit()){const _st=_pState(p);if(_st.k==='active')info.push(_row('Status','Aktiv'+(_st.next?' <span class="tp-note">(Pause ab '+_isoDE(_st.next.f)+')</span>':'')+' <button type="button" class="pst-link" onclick="pstOpen('+pi+')">ändern</button>'));}
     const personSec=document.getElementById('ps-sec-person');
     noteEl.innerHTML=info.join('');
     if(personSec)personSec.style.display=info.length?'':'none';
   }
+  try{renderPlayerStatus(p,pi);}catch(e){console.error('[Status]',e);}
   // Reset edit section
   // Every open starts on the card, unless the caller asked for the form
   try{_psShowCard();}catch(e){const editBox=document.getElementById('ps-edit');if(editBox)editBox.style.display='none';}
@@ -24077,7 +24418,7 @@ function openPlayerStats(pi,opts){
   // Stats — only past sessions, only factual statuses (1/0/2). Future intentions
   // (Angemeldet, Entschuldigt vorab) and missing data (Ausstehend) excluded so the
   // percentage reflects actual attendance, not planned.
-  const _isPast=i=>{const s=ss[i];return s&&sessTookPlace(s);}; // held incl. today's started
+  const _isPast=i=>{const s=ss[i];return s&&sessTookPlace(s)&&_sessCounts(p,s);}; // held incl. today's started; counted for him (1.2.51)
   const _isFact=v=>(v===1||v===0||v===2);
   const tIdx=ss.map((s,i)=>s.type==='training'&&_isPast(i)?i:-1).filter(i=>i>=0);
   const mIdx=ss.map((s,i)=>s.type==='match'&&_isPast(i)?i:-1).filter(i=>i>=0);
@@ -25001,6 +25342,7 @@ function rcMarkRest(){
   const si=_rcSi;
   const D=cd();const sess=D.sessions[si];
   const unset=_rcSorted(D,sess,UI.currentSeason).filter(({p})=>{
+    if(p&&p.trial)return false;   // Probetraining (1.2.51): one by one, never in passing
     const v=p&&p.s?p.s[si]:3;
     return !(v===1||v===0||v===2||v===5);
   });
@@ -25471,7 +25813,7 @@ function ssRemindOpen(si){
   if(!canEdit())return;
   const D=cd();const s=D&&D.sessions&&D.sessions[si];if(!s)return;
   const season=UI.currentSeason;
-  const open=(D.players||[]).filter(p=>p&&(typeof _sessAfterJoin!=='function'||_sessAfterJoin(p,s,season))&&(((p.s&&si<p.s.length)?p.s[si]:3)===3));
+  const open=(D.players||[]).filter(p=>p&&(typeof _sessAfterJoin!=='function'||_sessCounts(p,s,season))&&(((p.s&&si<p.s.length)?p.s[si]:3)===3));
   if(!open.length){alert('Alle haben geantwortet.');return;}
   const push=open.filter(p=>p.push&&p.push.t).length,rest=open.length-push;
   const what=s.type==='match'?('das Spiel'+(s.label?' gegen '+s.label:'')):'das Training';
@@ -27566,7 +27908,7 @@ function hxRender(){
     if(typeof rpeIsOpen==='function')S.forEach((s,si)=>{
       if(!s||!s.date||!inDays(s,-1,0))return;
       let n=0;
-      D.players.forEach(p=>{if(p&&_sessAfterJoin(p,s,season)&&rpeIsOpen(s,si,p,season)&&!rpeAnswered(p,si,s))n++;});
+      D.players.forEach(p=>{if(p&&_sessCounts(p,s,season)&&rpeIsOpen(s,si,p,season)&&!rpeAnswered(p,si,s))n++;});
       if(n)flags.push({dot:'#E0912F',who:n+' Spieler',what:'Belastung '+(sk(s)===today?'von heute':'vom '+s.date)+' noch nicht bewertet · bis 24\u00a0Uhr',on:`rpeOpenFromHome(${si})`});
     });
   }catch(e){}
@@ -27583,7 +27925,7 @@ function hxRender(){
   D.players.forEach((p,pi)=>{
     if(!p)return;
     let miss=0;
-    S.forEach((s,si)=>{if(s&&s.date&&inDays(s,-28,-1)&&sessTookPlace(s,season)&&_sessAfterJoin(p,s,season)&&p.s&&p.s[si]===0)miss++;});
+    S.forEach((s,si)=>{if(s&&s.date&&inDays(s,-28,-1)&&sessTookPlace(s,season)&&_sessCounts(p,s,season)&&p.s&&p.s[si]===0)miss++;});
     if(miss>=2)flags.push({dot:'#C9373E',who:nm(p),what:miss+'× unentschuldigt gefehlt (4 Wochen)',on:`openPlayerFromMain(${pi})`});
     let now=0,prev=0;
     S.forEach((s,si)=>{
@@ -27594,8 +27936,31 @@ function hxRender(){
     if(prev>0&&now>prev*(1+LOAD_SPIKE_PCT/100))flags.push({dot:'#E0912F',who:nm(p),what:'Belastung +'+Math.round((now/prev-1)*100)+' % zur Vorwoche',on:`openPlayerFromMain(${pi})`});
     S.forEach((s,si)=>{if(s&&s.date&&inDays(s,0,7)&&Array.isArray(p.physio)&&p.physio[si]===true)flags.push({dot:'#1659B8',who:nm(p),what:'Physio '+_hxWhen(sk(s)),on:`openPlayerFromMain(${pi})`});});
   });
+  // Player status (1.2.51): a Probetraining ready to decide, and whoever has
+  // not been at anything for weeks — a question; nothing changes by itself
   try{
-    dbComputeBirthdays({players:D.players}).filter(x=>x.days<=7).forEach(x=>flags.push({dot:'#F2C230',who:nm(x.p),what:(x.days===0?'hat heute Geburtstag':'Geburtstag am '+x.date)+' ('+x.turns+')',on:`openPlayerFromMain(${x.pi})`}));
+    const R=_stRule(UI.currentTeam);
+    const d0=new Date();d0.setDate(d0.getDate()-R.weg*7);
+    const wsK=d0.getFullYear()*10000+(d0.getMonth()+1)*100+d0.getDate();
+    D.players.forEach((p,pi)=>{
+      if(!p)return;
+      const st=_pState(p);
+      if(st.k==='trial'){
+        const c=_pTrialCount(p);
+        if(c.n>=R.probe)flags.push({dot:'#7C3AED',who:nm(p),what:'Probetraining: '+c.n+' Termine, '+c.a+'× dabei – aufnehmen?',on:`pstOpen(${pi},'decide')`});
+        return;
+      }
+      if(st.k!=='active'||(p.joinDate&&isoToSortKey(p.joinDate)>wsK))return;
+      let n=0,a=0;
+      S.forEach((s,si)=>{
+        if(!s||!s.date||!sessTookPlace(s,season)||sk(s)<wsK||!_sessAfterJoin(p,s,season))return;
+        n++;if(p.s&&p.s[si]===1)a++;
+      });
+      if(n>=3&&!a)flags.push({dot:'#7C8AA3',who:nm(p),what:'seit '+R.weg+' Wochen bei keinem Termin – Pause oder nicht mehr dabei?',on:`pstOpen(${pi},'ask')`});
+    });
+  }catch(e){console.error('[Status]',e);}
+  try{
+    dbComputeBirthdays({players:D.players}).filter(x=>x.days<=7&&!_pGone(x.p)).forEach(x=>flags.push({dot:'#F2C230',who:nm(x.p),what:(x.days===0?'hat heute Geburtstag':'Geburtstag am '+x.date)+' ('+x.turns+')',on:`openPlayerFromMain(${x.pi})`}));
   }catch(e){}
   html+=`<section class="hx-card hx-a-flags" aria-label="Im Blick behalten"><h3 class="hx-h2">Im Blick behalten</h3>`;
   if(!flags.length)html+=`<div class="hx-ok">Alles im grünen Bereich.</div>`;
@@ -28284,7 +28649,11 @@ function renderMgrPlayers(){
   // another team or season: the selection belongs to the old list
   if(_multiSelMode&&(_multiSelCtx!==ck()||!canEdit())){_multiSelMode=false;_multiSelIds.clear();_multiSelIdentities.clear();_multiSelCtx='';}
   const sm=_multiSelMode;
-  const sortedP=sortMgrPlayers(D.players||[]);
+  const _all=sortMgrPlayers(D.players||[]);
+  // Nicht mehr dabei (1.2.51): at the end, folded
+  const _gP=_all.filter(p=>p&&_pGone(p));
+  const sortedP=_all.filter(p=>!(p&&_pGone(p))).concat(window._mgrFormer?_gP:[]);
+  const _gHdr=()=>`<button type="button" class="pl-former-h" aria-expanded="${!!window._mgrFormer}" onclick="window._mgrFormer=!window._mgrFormer;renderMgrPlayers();">${window._mgrFormer?'\u25be':'\u25b8'} Nicht mehr dabei (${_gP.length})</button>`;
   // Add sort buttons to header
   // Sticky: the sort header stays visible while the list scrolls
   const sortHdr=`<div class="pl-sort-hdr" style="display:flex;align-items:center;gap:7px;padding:4px 10px;background:var(--bd);border-radius:7px 7px 0 0;position:sticky;top:0;z-index:2;">${_multiSelMode?'<div class="pl-ck-sp" aria-hidden="true"></div>':''}
@@ -28296,8 +28665,8 @@ function renderMgrPlayers(){
     <div style="width:60px;"></div>
     ${canEdit()?`<button type="button" class="pl-sel-tg" id="mgrSelToggle" onclick="toggleMultiSelectMode()">${_multiSelMode?'Fertig':'Auswählen'}</button>`:''}
   </div>`;
-  document.getElementById('tmgr-pl-list').innerHTML=(sortedP.length)?
-    sortHdr+sortedP.map((p)=>{const i=D.players.indexOf(p);
+  document.getElementById('tmgr-pl-list').innerHTML=(sortedP.length||_gP.length)?
+    sortHdr+sortedP.map((p)=>{const i=D.players.indexOf(p);const _gh=(p===_gP[0])?_gHdr():'';
       // All non-functional zones of the row (nr/avatar/name/pos) open the profile.
       // Functional buttons (✎ / ✕) keep their own onclick + stopPropagation.
       // In selection mode a tap selects instead of opening the profile
@@ -28305,18 +28674,18 @@ function renderMgrPlayers(){
       const on=sm&&_multiSelIds.has(i);
       // The whole row opens the profile — gaps between the cells used to be
       // dead spots although the row lit up on hover. ✎ / ✕ stop propagation.
-      return`<div class="pl-row${sm?' pl-selmode':''}${on?' pl-sel':''}" data-pi="${i}" style="cursor:pointer;" onclick="${openHandler}"${sm?` role="checkbox" aria-checked="${on}" tabindex="0" onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();multiSelectToggle(${i});}"`:` title="Profil \u00f6ffnen"`}>
+      return _gh+`<div class="pl-row${_pGone(p)?' pl-former':''}${sm?' pl-selmode':''}${on?' pl-sel':''}" data-pi="${i}" style="cursor:pointer;" onclick="${openHandler}"${sm?` role="checkbox" aria-checked="${on}" tabindex="0" onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();multiSelectToggle(${i});}"`:` title="Profil \u00f6ffnen"`}>
       ${sm?'<span class="pl-ck" aria-hidden="true"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"/></svg></span>':''}
       <div class="pl-nr">${p.nr||''}</div>
       <div style="flex-shrink:0;">${renderPlayerAvatar(p,32)}</div>
-      ${(()=>{const si=canEdit()?playerSeenInfo(p):null;return `<div class="pl-name">${p.name||''}${si?`<span class="pl-app-sub ${si.state}">${si.app?'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></svg>':''}App: ${si.state==='never'?'nicht ge\u00f6ffnet':escapeHtml(si.short)}${pushBell(p)}</span>`:''}</div>`;})()}
+      ${(()=>{const si=canEdit()?playerSeenInfo(p):null;return `<div class="pl-name">${p.name||''}${_pChip(p)}${si?`<span class="pl-app-sub ${si.state}">${si.app?'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></svg>':''}App: ${si.state==='never'?'nicht ge\u00f6ffnet':escapeHtml(si.short)}${pushBell(p)}</span>`:''}</div>`;})()}
       <div class="pl-pos">${pbHtml(p)}</div>
       ${canEdit()?(()=>{const si=playerSeenInfo(p);return `<div class="pl-app ${si.state}" title="${escapeHtml(si.text)}">${si.app?'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></svg>':''}<span>${escapeHtml(si.short)}</span>${pushBell(p)}</div>`;})():''}
       <div class="pl-btns"${sm?' aria-hidden="true"':''}>
         <button class="pl-btn pl-btn-e" title="Bearbeiten"${sm?' tabindex="-1"':''} onclick="event.stopPropagation();_tmLeave('spieler');openPlayerStats(${i},{edit:true});">✎</button>
         ${canEdit()?`<button class="pl-btn pl-btn-d"${sm?' tabindex="-1"':''} onclick="event.stopPropagation();mgrDelPl(${i})">✕</button>`:''}
       </div>
-    </div>`;}).join('')
+    </div>`;}).join('')+((!window._mgrFormer&&_gP.length)?_gHdr():'')
     :'<p style="padding:14px;font-size:.76rem;color:var(--gm);">Keine Spieler.</p>';
   document.getElementById('btn-mgr-addpl').style.display=canEdit()?'':'none';
   {const tl=document.getElementById('btn-mgr-teamlink');if(tl)tl.style.display=canEdit()?'':'none';}
@@ -28903,7 +29272,7 @@ function _statsPlayerTable(D,opts){
   });
   // Per player — same: only past sessions, factual statuses for denominator
   const rows=(D.players||[]).map(p=>{
-    const ownIdx=i=>_isPast(i)&&_sessAfterJoin(p,ss[i]); // before he was on the team → out
+    const ownIdx=i=>_isPast(i)&&_sessCounts(p,ss[i]); // before he was on the team → out
     const tIdx=ss.map((s,i)=>s.type==='training'&&ownIdx(i)?i:-1).filter(i=>i>=0);
     const mIdx=ss.map((s,i)=>s.type==='match'&&ownIdx(i)?i:-1).filter(i=>i>=0);
     const isFact=v=>(v===1||v===0||v===2);
@@ -30700,12 +31069,16 @@ function addPlayer(){
   if(phone)newP.phone=phone;
   if(email)newP.email=email;
   if(note)newP.note=note;
-  if(joinDate)newP.joinDate=joinDate;
+  // Probetraining (1.2.51): from the date given, else today; "Dabei seit" comes with "Aufnehmen"
+  const trial=!!(document.getElementById('newTrial')||{}).checked;
+  if(trial)newP.trial=joinDate||_todayISO();
+  else if(joinDate)newP.joinDate=joinDate;
   if(foot)newP.foot=foot;
   if(_addPhoto)newP.photo=_addPhoto;
   ensureCd().players.push(newP);
   saveG();render();closeM('moAddPlayer');
-  logAudit('Spieler hinzugefügt',name,'#'+nr+' · '+(selP1||'8er')+(joinDate?' · dabei seit '+joinDate.split('-').reverse().join('.'):''));
+  logAudit('Spieler hinzugefügt',name,'#'+nr+' · '+(selP1||'8er')+(trial?' · Probetraining seit '+_isoDE(newP.trial):joinDate?' · dabei seit '+joinDate.split('-').reverse().join('.'):''));
+  {const tr=document.getElementById('newTrial');if(tr)tr.checked=false;}
   // Clear form fields for next add
   ['newNr','newName','newShortname','newPassnr','newBirthdate','newPhone','newEmail','newNote'].forEach(id=>{
     const el=document.getElementById(id);
@@ -36501,6 +36874,12 @@ function _lpLastWeekAttendance(pi){
   return `<span style="display:inline-flex;align-items:center;gap:3px;font-size:.66rem;color:rgba(255,255,255,.55);margin-right:6px;" title="7 Tage vor dem Spiel">${dots}${ratio?'<span style="font-weight:600;margin-left:2px;">'+ratio+'</span>':''}</span>`;
 }
 
+// Off at this match (pause, nicht mehr dabei) — or, without a match, gone (1.2.51)
+function _lpOff(p,si){
+  if(!p)return false;
+  const D=cd(),s=(si!=null&&D&&Array.isArray(D.sessions))?D.sessions[si]:null;
+  return s?!_sessAfterJoin(p,s):_pGone(p);
+}
 function lpRender(){
   const D=cd();
   const slots=fmtSlots(lpState.formation,lpState.customSlots);
@@ -36607,6 +36986,7 @@ function lpRender(){
   const placed=Object.values(lpState.slots).filter(v=>v!==undefined).length+lpState.subs.filter(s=>s!==undefined).length;
   const sessIdxStat=lpState.sessIdx;
   const isUnavailStat=(pi)=>{
+    if(_lpOff(players[pi],sessIdxStat))return true;
     if(sessIdxStat===null||sessIdxStat===undefined)return false;
     const pp=players[pi];if(!pp||!pp.s)return false;
     const st=pp.s[sessIdxStat];return st===0||st===2;
@@ -36659,6 +37039,7 @@ function lpRenderPopup(slotId){
   const sessIdx=lpState.sessIdx;
   const D2=cd();
   const isUnavailable=(pi)=>{
+    if(D2&&_lpOff(D2.players[pi],sessIdx))return true;
     if(sessIdx===null||sessIdx===undefined||!D2)return false;
     const p2=D2.players[pi];if(!p2||!p2.s)return false;
     const st=p2.s[sessIdx];
@@ -36948,6 +37329,7 @@ function lpRenderSubs(){
     const sessIdx=lpState.sessIdx;
     const sqSet=_lpSqSet();
     const isUnavail=(pi)=>{
+      if(_lpOff(players[pi],sessIdx))return true;
       if(sessIdx===null||sessIdx===undefined)return false;
       const pp=players[pi];if(!pp||!pp.s)return false;
       const st=pp.s[sessIdx];return st===0||st===2;
@@ -37060,6 +37442,7 @@ function lpRenderSubPopup(subIdx){
   const sessIdx2=lpState.sessIdx;
   const D3=cd();
   const isUnavail=(pi)=>{
+    if(D3&&_lpOff(D3.players[pi],sessIdx2))return true;
     if(sessIdx2===null||sessIdx2===undefined||!D3)return false;
     const p2=D3.players[pi];if(!p2||!p2.s)return false;
     const st=p2.s[sessIdx2];
@@ -38100,7 +38483,7 @@ function slpRenderPopup(slotId){
   if(pickerEl){
     const suitable=[];const other=[];
     [...players.keys()].forEach(i=>{
-      const p=players[i];if(!p)return;
+      const p=players[i];if(!p||_pGone(p))return;
       if(assigned.includes(i))return;// already assigned to this slot
       const isAssignedElsewhere=allAssigned.has(i)&&!assigned.includes(i);
       const isBest=slot.pos[0]===p.pos;
@@ -38187,7 +38570,7 @@ function slpRenderRoster(){
       assignedMap[pi].push(slotId);
     });
   });
-  let indexed=players.map((p,pi)=>({p,pi})).filter(x=>x.p);
+  let indexed=players.map((p,pi)=>({p,pi})).filter(x=>x.p&&!_pGone(x.p));   // nicht mehr dabei: not here (1.2.51)
   // Apply filter
   if(_slpRosterFilter==='unassigned')indexed=indexed.filter(x=>!assignedMap[x.pi]);
   else if(_slpRosterFilter==='assigned')indexed=indexed.filter(x=>!!assignedMap[x.pi]);
@@ -38724,6 +39107,7 @@ _pubCleanupSchedule();
       </div>
       <div id="ayBox" class="ay-box"></div>
       <div id="absBox" class="ay-box"></div>
+      <div id="stBox" class="ay-box"></div>
       <div id="meetBox" class="ay-box"></div>
       <div id="cardBox" class="ay-box"></div>
       <div id="fdbBox" class="ay-box"></div>
@@ -39155,6 +39539,14 @@ _pubCleanupSchedule();
 </div></div>
 
 <!-- Global Search / Command Palette (Cmd+K / Ctrl+K) -->
+<div class="mo" id="moPSt"><div class="mob pst-mob" style="width:460px;max-width:96vw;">
+  <h3 class="pst-h" id="pst-title">Status</h3>
+  <div id="pst-body"></div>
+  <div class="mob-btns">
+    <button type="button" class="btn bp" onclick="pstSave()">Speichern</button>
+    <button type="button" class="btn bs" onclick="closeM('moPSt')">Abbrechen</button>
+  </div>
+</div></div>
 <div class="mo" id="moSearch" style="z-index:900;align-items:flex-start;padding-top:7vh;"><div class="mob" style="width:560px;max-width:96vw;max-height:80vh;display:flex;flex-direction:column;position:relative;padding:0;overflow:hidden;">
   <button class="mob-close-x" onclick="closeSearch()" aria-label="Schließen" style="z-index:2;">✕</button>
   <div style="display:flex;align-items:center;gap:10px;padding:14px 50px 14px 18px;border-bottom:1px solid var(--gl);">
