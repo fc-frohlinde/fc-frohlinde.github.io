@@ -7090,13 +7090,16 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.54'; // v1.2.54: Pause über Anwesenheit fragt nach
-const APP_VERSION_LABEL='1.2.54';
+const APP_VERSION='1.2.55'; // v1.2.55: Physio in der Pause
+const APP_VERSION_LABEL='1.2.55';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792857126082; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792861674820; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.55',date:'24.10.2026',title:'Physio in der Pause',items:[
+    {icon:'🧑\u200d⚕️',title:'Physio auch in der Pause',desc:'Wer verletzt in Pause ist, kann den Physio-Termin an einem Trainingstag trotzdem in der App buchen – ohne „Komme“, denn er kommt nur zur Behandlung. Die Trainer sehen ihn wie bisher unter „Physiotherapie“; an seiner Pause und seiner Statistik ändert das nichts.'},
+  ]},
   {version:'1.2.54',date:'24.10.2026',title:'Pause über Anwesenheit fragt nach',items:[
     {icon:'⚠️',title:'Pause über Tage, an denen er da war',desc:'Liegt eine Pause über Terminen, an denen er als anwesend eingetragen ist, fragt das Fenster vorher nach („3× als anwesend eingetragen – zählen dann nicht mehr“). So geht keine Anwesenheit durch ein falsches Datum verloren.'},
     {icon:'📊',title:'„Ø im Training“ im Wochenbericht',desc:'Zählt jetzt wie die Statistik nur, wer in der Mannschaft zählt (ohne Probetraining).'},
@@ -20869,7 +20872,7 @@ function renderPhysioAsk(){
       const k=dispToSortKey(s2.date);
       if(k<weekStart||k>horizon)return;
       const st=(p.s&&i2<p.s.length)?p.s[i2]:3;
-      if(st===4||st===1)si=i2;
+      if(st===4||st===1||_pOffAt(p,k)==='pause')si=i2;
     });
   }
   const s=(si!=null)?D.sessions[si]:null;
@@ -21181,7 +21184,15 @@ function _hubOpenCounts(){
   const horizon=(typeof _pmWeekHorizon==='function')?_pmWeekHorizon():todaySK();
   (D.sessions||[]).forEach((s,si)=>{
     if(!s)return;
-    if(!_sessAfterJoin(p,s))return;   // in his pause: nothing to answer (1.2.51)
+    // In his pause: nothing to answer (1.2.51) — but the physio stays open to
+    // him (1.2.55): injured, he comes for the treatment only
+    if(!_sessAfterJoin(p,s)){
+      if(s.date&&_pOffAt(p,dispToSortKey(s.date))==='pause'&&typeof sessPhysioOn==='function'&&sessPhysioOn(s)&&!_amRsvpLocked(si)){
+        const sk3=dispToSortKey(s.date);
+        if(sk3>=weekStart&&sk3<=horizon){out.physioTotal++;if(_physioState(p,si)==='offen'){out.physio++;out.physioList.push(si);}}
+      }
+      return;
+    }
     if(s.date){
       const sk=dispToSortKey(s.date);
       if(sk>=weekStart&&sk<=horizon){
