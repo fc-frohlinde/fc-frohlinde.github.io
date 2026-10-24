@@ -560,7 +560,7 @@ body.compact .toolbar{padding:3px 14px !important;}
 
 /* The list itself is a popup, so team count changes its height, never the
    width of the toolbar. */
-.team-tabs{display:none;position:fixed;z-index:600;flex-direction:column;gap:2px;
+.team-tabs{display:none;position:fixed;z-index:900;flex-direction:column;gap:2px;
   background:var(--surface-mid);border:1px solid rgba(255,255,255,.14);border-radius:10px;
   padding:5px;box-shadow:0 10px 30px rgba(0,0,0,.4);min-width:170px;max-height:60vh;overflow-y:auto;}
 .team-tabs.open{display:flex;}
@@ -7028,13 +7028,17 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.49'; // v1.2.49: Kacheln gleichmäßig, Spieleransicht für Trainer
-const APP_VERSION_LABEL='1.2.49';
+const APP_VERSION='1.2.50'; // v1.2.50: Aufstellung: Wechsel und Suche
+const APP_VERSION_LABEL='1.2.50';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792844863982; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1792847146710; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.50',date:'24.10.2026',title:'Aufstellung: Wechsel und Suche',items:[
+    {icon:'🔁',title:'Mannschaft oder Saison wechseln in der Aufstellung',desc:'Bei offener Aufstellung schloss schon der Klick auf Mannschaft oder Saison links die Aufstellung, und man landete auf einer anderen Seite. Jetzt öffnet sich das Menü über der Aufstellung; erst wenn du wirklich wechselst, wird sie (mit der Frage nach dem Speichern) geschlossen und für die neue Mannschaft oder Saison gleich wieder geöffnet. Menü zugeklickt: nichts ändert sich.'},
+    {icon:'🔍',title:'Suche über der Aufstellung',desc:'Die Suche (Strg K) öffnete sich bei offener Aufstellung unsichtbar dahinter. Jetzt liegt sie darüber; wählst du einen Treffer, schließt sich die Aufstellung (mit der Frage nach dem Speichern) und der Treffer öffnet sich. Außerdem: Enter auf einem Spieler in der Suche öffnete zusätzlich „Alle Statistiken“ – jetzt nur das Profil.'},
+  ]},
   {version:'1.2.49',date:'24.10.2026',title:'Kacheln gleichmäßig, Spieleransicht für Trainer',items:[
     {icon:'👁',title:'Spieleransicht für alle Trainer',desc:'Im Spielerprofil öffnet „Spieleransicht“ das Spieler-Menü so, wie dieser Spieler es sieht – bisher nur für den Admin, jetzt für jeden Trainer der Mannschaft. Es ist eine Vorschau: dort wird nichts gespeichert.'},
     {icon:'🔲',title:'Kacheln ohne Lücken',desc:'Reihen mit Zahlen-Kacheln verteilen sich gleichmäßig: vier Kacheln, die nicht in eine Reihe passen, stehen 2 + 2 statt 3 + 1, fünf stehen 3 + 2 und die untere Reihe füllt die Breite. Gilt im Spielerprofil, in der Detailstatistik, in der Statistik, im Wochenbericht und bei den Spielern unter „Nach Wochentag“.'},
@@ -11949,6 +11953,13 @@ function activateSearchItemByIdx(idx){
 }
 function activateSearchItem(item){
   if(!item||typeof item.action!=='function')return;
+  // Over an open lineup (1.2.50): leave it through its save check first —
+  // what the hit opens would otherwise sit underneath it
+  if(typeof _hxToolOpen==='function'&&_hxToolOpen()){
+    closeSearch();
+    _hxCloseTools().then(ok=>{if(!ok)return;try{item.action();}catch(e){console.error('search action:',e);}if(typeof hxSyncNav==='function')hxSyncNav();});
+    return;
+  }
   try{item.action();}catch(e){console.error('search action:',e);}
 }
 // ── KEYBOARD SHORTCUTS ────────────────────────────────────
@@ -27271,8 +27282,8 @@ function closeUserMenuIfOpen(){
 }
 function hxTeamMenu(btn,e){
   if(e)e.stopPropagation();
-  // Switching the team under an open lineup would mix two teams' data
-  if(_hxToolOpen()){_hxCloseTools().then(ok=>{if(ok)hxTeamMenu(btn);});return;}
+  // Opens over an open lineup (1.2.50); only an actual switch closes it,
+  // see switchTeam. Before, opening the menu already closed the lineup.
   const m=document.getElementById('teamTabs');if(!m)return;
   if(typeof closeSeasonMenu==='function')closeSeasonMenu();
   const open=m.classList.toggle('open');
@@ -27283,7 +27294,6 @@ function hxTeamMenu(btn,e){
 }
 function hxSeasonMenu(btn,e){
   if(e)e.stopPropagation();
-  if(_hxToolOpen()){_hxCloseTools().then(ok=>{if(ok)hxSeasonMenu(btn);});return;}
   const m=document.getElementById('seasonTabs');if(!m)return;
   closeTeamMenu();
   const open=m.classList.toggle('open');
@@ -29002,8 +29012,27 @@ function sortStats(col){if(statsSort.col===col)statsSort.asc=!statsSort.asc;else
 // ══════════════════════════════
 //  TEAM / SEASON
 // ══════════════════════════════
-function switchTeam(t){UI.currentTeam=t;saveUI();slpState.currentId=null;slpState.slots={};render();if(typeof _updateAppTitle==='function')_updateAppTitle();if(typeof writePresenceEntry==='function')writePresenceEntry();}
-function switchSeason(s){UI.currentSeason=s;saveUI();slpState.currentId=null;slpState.slots={};render();if(typeof writePresenceEntry==='function')writePresenceEntry();}
+// Switching under an open lineup (1.2.50): the lineup closes through its own
+// save check (it would otherwise mix two teams' data), then opens again for
+// the new team or season — the trainer stays in "Aufstellung".
+function _hxSwitchInTool(same,fn){
+  const tool=(typeof _hxToolOpen==='function')?_hxToolOpen():'';
+  if(!tool)return false;
+  if(same)return true;
+  _hxCloseTools().then(ok=>{
+    if(!ok)return;
+    fn();
+    try{
+      if(tool==='moSeasonLineup'&&typeof openSeasonLineup==='function'&&canEdit()){
+        openSeasonLineup();document.getElementById('moSeasonLineup')?.classList.add('hx-vianav');
+      }else hxOpenLineup();
+    }catch(e){console.error('[switch lineup]',e);}
+    if(typeof hxSyncNav==='function')hxSyncNav();
+  });
+  return true;
+}
+function switchTeam(t){if(_hxSwitchInTool(t===UI.currentTeam,()=>switchTeam(t)))return;UI.currentTeam=t;saveUI();slpState.currentId=null;slpState.slots={};render();if(typeof _updateAppTitle==='function')_updateAppTitle();if(typeof writePresenceEntry==='function')writePresenceEntry();}
+function switchSeason(s){if(_hxSwitchInTool(s===UI.currentSeason,()=>switchSeason(s)))return;UI.currentSeason=s;saveUI();slpState.currentId=null;slpState.slots={};render();if(typeof writePresenceEntry==='function')writePresenceEntry();}
 
 async function addSeason(){
   if(!isAdmin())return;
@@ -31602,7 +31631,11 @@ document.querySelectorAll('#dowMa .dow-btn').forEach(b=>b.addEventListener('clic
 // Enter key support for modal inputs
 document.addEventListener('keydown',e=>{
   if(e.key!=='Enter')return;
-  const open=document.querySelector('.mo.open');if(!open)return;
+  // Already handled (the search's Enter opens its hit — that hit, e.g. a
+  // player profile, must not then get its primary button clicked: Enter on
+  // a player in the search also opened "Alle Statistiken", until 1.2.50)
+  if(e.defaultPrevented)return;
+  const open=(e.target&&e.target.closest&&e.target.closest('.mo.open'))||document.querySelector('.mo.open');if(!open)return;
   // Find primary button (btn bp) in open modal
   const pb=open.querySelector('.btn.bp');
   if(pb&&!e.target.classList.contains('mob-btns')){
@@ -39122,7 +39155,7 @@ _pubCleanupSchedule();
 </div></div>
 
 <!-- Global Search / Command Palette (Cmd+K / Ctrl+K) -->
-<div class="mo" id="moSearch" style="z-index:600;align-items:flex-start;padding-top:7vh;"><div class="mob" style="width:560px;max-width:96vw;max-height:80vh;display:flex;flex-direction:column;position:relative;padding:0;overflow:hidden;">
+<div class="mo" id="moSearch" style="z-index:900;align-items:flex-start;padding-top:7vh;"><div class="mob" style="width:560px;max-width:96vw;max-height:80vh;display:flex;flex-direction:column;position:relative;padding:0;overflow:hidden;">
   <button class="mob-close-x" onclick="closeSearch()" aria-label="Schließen" style="z-index:2;">✕</button>
   <div style="display:flex;align-items:center;gap:10px;padding:14px 50px 14px 18px;border-bottom:1px solid var(--gl);">
     <span style="font-size:1.1rem;color:var(--gm);">🔎</span>
