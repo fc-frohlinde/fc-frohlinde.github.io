@@ -2267,6 +2267,12 @@ body.player-mode .fl .hub-news.fl-pause{border-left-color:#8FA3C8;}
 .nw-all{border:0;background:none;font:inherit;font-size:.8rem;font-weight:600;color:var(--hx-blue,#1659B8);cursor:pointer;padding:4px 0;}
 .nw-load{font-size:.85rem;color:var(--hx-muted,var(--gm));margin:10px 0;}
 /* Alle Versionen */
+.av-head{display:flex;align-items:center;gap:12px;margin:0 0 14px;}
+.av-head .about-brand-ic{flex:none;border-radius:10px;box-shadow:0 4px 12px -5px rgba(5,12,30,.45);}
+.av-ht{flex:1;min-width:0;}
+.av-ht h3{margin:0;font-size:1.1rem;line-height:1.2;}
+.av-ht div{font-size:.78rem;font-weight:600;color:var(--hx-muted,var(--gm));margin-top:2px;}
+.av-head .av-x{flex:none;}
 .av-e{border:1px solid var(--hx-line,var(--gl));border-radius:10px;margin-bottom:8px;overflow:hidden;}
 .av-e>summary{cursor:pointer;list-style:none;display:flex;align-items:baseline;gap:10px;padding:10px 14px;font-weight:700;font-size:.88rem;color:var(--hx-ink,var(--bd));background:var(--hx-card2,#F4F6FA);}
 .av-e>summary::-webkit-details-marker{display:none;}
@@ -7258,12 +7264,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below — only what changes in
 // their work, one or two sentences. The full history of every version is
 // versionen.json next to this page (1.2.63).
-const APP_VERSION='1.2.63'; // v1.2.63: Neu in Flutlicht
-const APP_VERSION_LABEL='1.2.63';
+const APP_VERSION='1.2.64'; // v1.2.64: Alle Versionen mit Titel
+const APP_VERSION_LABEL='1.2.64';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1793139395860; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1793140485796; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27.10.): written for the
 // other trainers, not for the admin; what changes for you and where to find
@@ -11308,7 +11314,7 @@ function _finalizeAuth(auth,u,remember){
 function openAbout(){
   const el=document.getElementById('moAbout-changelog');
   const verEl=document.getElementById('moAbout-version');
-  if(verEl)verEl.textContent='Version '+APP_VERSION_LABEL;
+  if(verEl)verEl.textContent='Flutlicht · jetzt Version '+APP_VERSION_LABEL;
   if(el&&!APP_CHANGELOG)el.innerHTML='<p class="nw-load">Wird geladen …</p>';
   openM('moAbout');
   _loadChangelog().then(()=>_renderChangelog()).catch(()=>{
@@ -40098,12 +40104,9 @@ _pubCleanupSchedule();
   <div class="mob-btns"><button type="button" class="btn bp" onclick="closeM('moNews')">Schließen</button></div>
 </div></div>
 <div class="mo" id="moAbout" style="z-index:99997;"><div class="mob" style="width:560px;max-width:96vw;max-height:88vh;overflow-y:auto;position:relative;">
-  <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;">
-    <div style="flex:1;text-align:center;">
-      <div class="about-brand"><svg class="about-brand-ic" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="52" height="52" aria-hidden="true"><rect width="64" height="64" fill="#0E2350"/><defs><radialGradient id="flAa17" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".38" stop-color="#FFF3C4"/><stop offset=".8" stop-color="#F2C230"/><stop offset="1" stop-color="#E3AC1A"/></radialGradient><radialGradient id="flAab18"><stop offset="0" stop-color="#FFE9A0" stop-opacity="0.5"/><stop offset=".5" stop-color="#FFE9A0" stop-opacity="0.175"/><stop offset="1" stop-color="#FFE9A0" stop-opacity="0"/></radialGradient></defs><ellipse cx="32" cy="24" rx="34" ry="28" fill="url(#flAab18)"/><g><path d="M30.2 36h3.6l1.7 28h-7z" fill="#1F3466"/><path d="M30.72 39.00L33.56 43.60L30.16 48.20L34.12 52.80L29.60 57.40L34.68 62.00" fill="none" stroke="#30508F" stroke-width=".8" stroke-linejoin="round"/></g><g><rect x="9" y="9" width="46" height="29" rx="6" fill="#22386B"/><circle cx="19" cy="18" r="5.1" fill="url(#flAa17)"/><circle cx="32" cy="18" r="5.1" fill="url(#flAa17)"/><circle cx="45" cy="18" r="5.1" fill="url(#flAa17)"/><circle cx="19" cy="29" r="5.1" fill="url(#flAa17)"/><circle cx="32" cy="29" r="5.1" fill="url(#flAa17)"/><circle cx="45" cy="29" r="5.1" fill="url(#flAa17)"/></g></svg><svg class="about-brand-wm" xmlns="http://www.w3.org/2000/svg" viewBox="86 0 5969 1620" width="106.9" height="29" role="img" aria-label="Flutlicht"><path fill="currentColor" d="M86 1600V0H718V228H345V674H698V902H345V1600ZM845 1600V0H1103V1600ZM1526 1618Q1410 1618 1341.5 1545.5Q1273 1473 1273 1305V400H1531V1327Q1531 1380 1554.5 1404.5Q1578 1429 1626 1429Q1669 1429 1714.0 1403.5Q1759 1378 1777 1334V400H2036V1600H1777V1476H1741Q1700 1552 1649.0 1585.0Q1598 1618 1526 1618ZM2647 1618Q2441 1618 2352.5 1542.0Q2264 1466 2264 1291V596H2158V400H2266V60H2526V400H2722V596H2522V1319Q2522 1378 2546.0 1402.0Q2570 1426 2648 1426Q2672 1426 2693.5 1425.0Q2715 1424 2742 1423V1608Q2721 1614 2697.5 1616.0Q2674 1618 2647 1618ZM2857 1600V0H3115V1600ZM3284 209V0H3561V209ZM3294 1600V400H3552V1600ZM4183 849Q4184 827 4184.5 792.0Q4185 757 4184.5 724.0Q4184 691 4183 674Q4181 620 4157.0 598.0Q4133 576 4079 576Q4024 576 3999.5 598.0Q3975 620 3973 674Q3971 754 3970.0 835.0Q3969 916 3969.0 997.0Q3969 1078 3970.0 1158.0Q3971 1238 3973 1318Q3975 1376 4000.5 1400.0Q4026 1424 4082 1424Q4134 1424 4157.5 1400.0Q4181 1376 4183 1318Q4185 1290 4185.0 1245.5Q4185 1201 4183 1148H4434Q4436 1166 4437.0 1211.0Q4438 1256 4436 1291Q4428 1466 4346.0 1542.0Q4264 1618 4082 1618Q3895 1618 3810.0 1542.0Q3725 1466 3715 1291Q3713 1245 3712.0 1168.5Q3711 1092 3711.0 1005.0Q3711 918 3712.0 839.5Q3713 761 3715 713Q3727 534 3811.0 458.0Q3895 382 4079 382Q4263 382 4346.0 456.5Q4429 531 4436 703Q4438 737 4437.0 783.0Q4436 829 4434 849ZM4587 1600V0H4845V524H4891Q4930 455 4974.0 418.5Q5018 382 5106 382Q5223 382 5288.0 454.0Q5353 526 5353 694V1600H5095V673Q5095 620 5070.5 595.5Q5046 571 4997 571Q4953 571 4908.0 596.0Q4863 621 4845 666V1600ZM5960 1618Q5754 1618 5665.5 1542.0Q5577 1466 5577 1291V596H5471V400H5579V60H5839V400H6035V596H5835V1319Q5835 1378 5859.0 1402.0Q5883 1426 5961 1426Q5985 1426 6006.5 1425.0Q6028 1424 6055 1423V1608Q6034 1614 6010.5 1616.0Q5987 1618 5960 1618Z"/></svg></div>
-      <div style="font-size:.82rem;color:var(--gm);font-weight:600;" id="moAbout-version">Version –</div>
-    </div>
-    <button class="btn bs" onclick="closeM('moAbout')" style="position:absolute;top:12px;right:12px;">✕</button>
+  <div class="av-head"><svg class="about-brand-ic" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="40" height="40" aria-hidden="true"><rect width="64" height="64" fill="#0E2350"/><defs><radialGradient id="flAa17" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".38" stop-color="#FFF3C4"/><stop offset=".8" stop-color="#F2C230"/><stop offset="1" stop-color="#E3AC1A"/></radialGradient><radialGradient id="flAab18"><stop offset="0" stop-color="#FFE9A0" stop-opacity="0.5"/><stop offset=".5" stop-color="#FFE9A0" stop-opacity="0.175"/><stop offset="1" stop-color="#FFE9A0" stop-opacity="0"/></radialGradient></defs><ellipse cx="32" cy="24" rx="34" ry="28" fill="url(#flAab18)"/><g><path d="M30.2 36h3.6l1.7 28h-7z" fill="#1F3466"/><path d="M30.72 39.00L33.56 43.60L30.16 48.20L34.12 52.80L29.60 57.40L34.68 62.00" fill="none" stroke="#30508F" stroke-width=".8" stroke-linejoin="round"/></g><g><rect x="9" y="9" width="46" height="29" rx="6" fill="#22386B"/><circle cx="19" cy="18" r="5.1" fill="url(#flAa17)"/><circle cx="32" cy="18" r="5.1" fill="url(#flAa17)"/><circle cx="45" cy="18" r="5.1" fill="url(#flAa17)"/><circle cx="19" cy="29" r="5.1" fill="url(#flAa17)"/><circle cx="32" cy="29" r="5.1" fill="url(#flAa17)"/><circle cx="45" cy="29" r="5.1" fill="url(#flAa17)"/></g></svg>
+    <div class="av-ht"><h3>Alle Versionen</h3><div id="moAbout-version">Flutlicht</div></div>
+    <button class="btn bs av-x" onclick="closeM('moAbout')" aria-label="Schließen">✕</button>
   </div>
   <div id="moAbout-changelog"></div>
   <div class="mob-btns" style="margin-top:18px;">
