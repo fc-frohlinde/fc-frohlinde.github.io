@@ -7224,18 +7224,18 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.61'; // v1.2.61: Trainingsplaner nur mit Freigabe
-const APP_VERSION_LABEL='1.2.61';
+const APP_VERSION='1.2.62'; // v1.2.62: Freigabe nur für den Admin sichtbar
+const APP_VERSION_LABEL='1.2.62';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1793122197699; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1793138153441; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
-  {version:'1.2.61',date:'27.10.2026',title:'Trainingsplaner nur mit Freigabe',tpl:1,items:[
-    {icon:'🔑',title:'Freigabe durch den Admin',desc:'Den Trainingsplaner sehen vorerst nur der Admin und die Trainer, die er freigeschaltet hat: Kader → Trainer → Profil → „Rechte“ → „Trainingsplaner“. Freigeschaltete Trainer erstellen und ändern Pläne, Übungen, Vorlagen und den Standardablauf. Für alle anderen gibt es keine Plan-Knöpfe, und auch diese Neuerung sehen sie nicht.'},
+  {version:'1.2.62',date:'27.10.2026',title:'Trainingspläne: Freigabe',items:[
+    {icon:'🔑',admin:true,title:'Nur du siehst, wer mitplant',desc:'Die Trainer sehen die Trainingspläne wieder wie vorher (ansehen, Gruppen, Auf dem Platz, Drucken). Wer Pläne erstellen und ändern darf, stellst du im Trainerprofil unter „Rechte“ ein; „plant mit“ in der Trainerliste, „Rechte“ und diese Neuigkeit sieht nur der Admin.'},
   ]},
-  {version:'1.2.60',date:'27.10.2026',title:'Trainingspläne freigeben',tpl:1,items:[
-    {icon:'🔑',title:'Weitere Trainer planen mit',desc:'Der Admin gibt einzelnen Trainern den Trainingsplaner frei: Kader → Trainer → Profil → „Rechte“. In der Trainerliste sieht er bei ihnen „plant mit“.'},
+  {version:'1.2.60',date:'27.10.2026',title:'Trainingspläne freigeben',items:[
+    {icon:'🔑',admin:true,title:'Weitere Trainer planen mit',desc:'Der Admin gibt einzelnen Trainern frei, Trainingspläne zu erstellen und zu ändern: Kader → Trainer → Profil → „Rechte“. Dazu gehören auch Übungen, Vorlagen und der Standardablauf. In der Trainerliste steht bei ihnen „plant mit“.'},
   ]},
   {version:'1.2.59',date:'27.10.2026',title:'Entwicklungsziele',items:[
     {icon:'🎯',title:'Ziele für jeden Spieler',desc:'Im Spielerprofil unter „Ziele“: 1–3 Ziele bis zur Winterpause oder bis zum Saisonende, jeweils mit Bereich (Technik, Taktik, Athletik, Persönlichkeit) und auf Wunsch „Woran wir es sehen“ und „Was du tun kannst“. Am besten im Gespräch mit ihm vereinbart.'},
@@ -7340,40 +7340,40 @@ const APP_CHANGELOG=[
     {icon:'🛠',title:'„Deine Woche“ wieder da',desc:'Öffneten Spieler den Wochenbericht aus ihrer Übersicht, fehlte seit 22.10. ihre eigene Woche – der Weg mit Fotos baute den Bericht ohne die Spieler-Fassung. Jetzt bekommen sie wieder genau diese: eigene Woche, Mannschaft, „Immer dabei“.'},
     {icon:'⚽',title:'Mannschaft ohne Lücke',desc:'Gab es in der Woche nur Training oder nur ein Spiel, blieb neben der Kachel ein leerer Platz. Jetzt nimmt sie die ganze Zeile ein.'},
   ]},
-  {version:'1.2.34',date:'23.10.2026',title:'Intensität einschätzen',tpl:1,items:[
+  {version:'1.2.34',date:'23.10.2026',title:'Intensität einschätzen',items:[
     {icon:'❓',title:'Hilfe zur Intensität',desc:'Das „?“ neben „Intensität“ zeigt Anhaltspunkte auf der Skala der Spieler: von Auslaufen bis Sprint, Spielformen nach Größe (1 gegen 1 bis 11 gegen 11, Überzahl) und was die Belastung erhöht oder senkt.'},
     {icon:'⚽',title:'„auto“ kennt Spielformen',desc:'Steht in einer Spielform das Format im Namen – „3 gegen 3“, „4v4“, „5:5“ –, schlägt „auto“ den Wert dafür vor: 1 gegen 1 → 9, 2 gegen 2 → 8, 3 gegen 3 und 4 gegen 4 → 7, größer → 6.'},
     {icon:'📋',title:'Beispiele in der Auswahl',desc:'Jede Stufe nennt ein Beispiel („7 · Sehr anstrengend – z. B. 3 gegen 3, 4 gegen 4“). Neue Übungen in der Bibliothek haben jetzt auch das Feld „Intensität“.'},
   ]},
-  {version:'1.2.33',date:'23.10.2026',title:'Zeichenbrett: zeichnen und gleich ändern',tpl:1,items:[
+  {version:'1.2.33',date:'23.10.2026',title:'Zeichenbrett: zeichnen und gleich ändern',items:[
     {icon:'✏️',title:'Gezeichnetes direkt anpassen',desc:'Mit einem Linien-Werkzeug lässt sich ein vorhandener Pfeil packen und verschieben, an seinen Punkten Ende und Bogen ändern – ohne Werkzeugwechsel. Ein Druck auf freies Feld, einen Spieler oder ein Hütchen zeichnet weiter neue Pfeile. Genauso verschieben Spieler- und Material-Werkzeuge das, was schon steht.'},
     {icon:'🎨',title:'Farbe bleibt',desc:'Die zuletzt gewählte Farbe gilt für die nächsten Hütchen, Markierungen, Hürden, Ringe, Dummys und Reihen – jede Art für sich, gemerkt auf diesem Gerät. Bei aktivem Werkzeug lässt sie sich unter dem Feld auch vorher wählen.'},
     {icon:'⚽',title:'Neuer Ball',desc:'Der Ball sieht jetzt wie ein Fußball aus: Fünfecke, Nähte, ein leichter Schatten – im Feld, im Druck und im Bild.'},
     {icon:'⌨️',title:'Tastenkürzel ohne Umweg',desc:'Strg+C / Strg+V, Entf, Pfeiltasten usw. wirken jetzt gleich nach einem Klick ins Feld – vorher blieben sie im zuletzt benutzten Textfeld (z. B. Name der Übung) hängen, bis das Menü einmal offen war.'},
     {icon:'🖱',title:'Zeichnen beenden',desc:'Rechtsklick legt das Werkzeug weg (ohne Menü), ebenso ein zweiter Klick auf das Werkzeug, Esc oder „Fertig“ unter dem Feld. Das zuletzt Gezeichnete bleibt ausgewählt.'},
   ]},
-  {version:'1.2.32',date:'23.10.2026',title:'Zeichenbrett, Teil 2',tpl:1,items:[
+  {version:'1.2.32',date:'23.10.2026',title:'Zeichenbrett, Teil 2',items:[
     {icon:'↗',title:'Torschuss und Linie',desc:'Zwei neue Linien: Torschuss (kräftig, rot) und eine Linie ohne Pfeil, z. B. für Grenzen oder Gassen.'},
     {icon:'⬭',title:'Zonen: oval, farbig, mit Maßen',desc:'Eine Zone kann rechteckig oder oval sein, eine Füllfarbe haben (Weiß, Gelb, Blau, Rot) und ihre Maße zeigen, z. B. „20 × 15 m“.'},
     {icon:'↻',title:'Frei drehen',desc:'Tore, Leiter und Hürde haben einen gelben Drehpunkt: daran ziehen dreht in 15°-Schritten, mit Shift ganz frei. „Drehen“ dreht weiter um 90°.'},
     {icon:'🥅',title:'Neue Untergründe',desc:'„Strafraum“ (16er groß) und „Rasen mit Raster“ zum Abmessen.'},
     {icon:'🖼',title:'Skizze als Bild',desc:'Das Bild-Symbol über dem Feld speichert die Skizze als PNG – am Handy direkt zum Teilen, z. B. an einen Co-Trainer. Auch in der Ansicht für Trainer.'},
   ]},
-  {version:'1.2.31',date:'23.10.2026',title:'Zeichenbrett',tpl:1,items:[
+  {version:'1.2.31',date:'23.10.2026',title:'Zeichenbrett',items:[
     {icon:'🖱',title:'Menü mit Rechtsklick',desc:'Rechtsklick auf ein Element (am Handy: lange drücken): Farbe, Nummer, Drehen, Kopie, Kopieren, Ausschneiden, nach vorne/hinten, Löschen. Auf freiem Feld: Einfügen und Spieler, Hütchen, Ball, Minitor, Stange direkt an diese Stelle.'},
     {icon:'⬚',title:'Mehrere auf einmal',desc:'Rahmen über das Feld ziehen oder Shift + Klick: mehrere Elemente auswählen und zusammen verschieben, drehen, kopieren oder löschen. Pfeiltasten schieben fein (mit Shift in großen Schritten), Strg+A wählt alles.'},
     {icon:'📋',title:'Kopieren und Einfügen',desc:'Strg+C / Strg+V – auch in eine andere Übung oder einen anderen Plan, z. B. denselben Aufbau mit anderen Laufwegen.'},
     {icon:'🔺',title:'Reihe',desc:'Neues Werkzeug: von der ersten zur letzten Position ziehen, und Hütchen, Markierungen, Stangen, Hürden, Ringe oder Dummys stehen in gleichem Abstand – für Slalom, Gassen und Mauern. Anzahl und Art lassen sich danach ändern, „Einzeln“ löst die Reihe auf.'},
     {icon:'🧰',title:'Mehr Material',desc:'Flache Markierung, Hürde, Ring, Dummy und eine dritte Mannschaft (orange – grün ginge auf dem Rasen unter).'},
   ]},
-  {version:'1.2.30',date:'23.10.2026',title:'Standardablauf repariert',tpl:1,items:[
+  {version:'1.2.30',date:'23.10.2026',title:'Standardablauf repariert',items:[
     {icon:'🛠',title:'Auch in leeren Plänen',desc:'Wer einmal den Reiter „Gruppen“ geöffnet hatte, bekam einen leeren gespeicherten Plan – und dort erschien der Standardablauf nicht. Jetzt bekommt jeder Plan ohne Blöcke den Standardablauf, und „Gruppen“ speichert erst, wenn du dort etwas änderst.'},
     {icon:'📋',title:'Standard in jeden Plan laden',desc:'„Vorlage laden“ bietet den Standardablauf als erste Vorlage an – ersetzen oder hinten anhängen. Nach dem Speichern des Standards steht jetzt, ob er in den offenen Plan übernommen wurde.'},
   ]},
-  {version:'1.2.29',date:'23.10.2026',title:'Trainingsplaner: Abschnitt füllen',tpl:1,items:[
+  {version:'1.2.29',date:'23.10.2026',title:'Trainingsplaner: Abschnitt füllen',items:[
     {icon:'👆',title:'Abschnitt antippen, Übung eintragen',desc:'Der Hinweis über dem Standardablauf sagt jetzt genau, was zu tun ist. Ist die Bibliothek leer, trägst du die Übung direkt in den Abschnitt ein. Gibt es Übungen, steht im Abschnitt „Aus der Bibliothek wählen“: Liste öffnen, Übung antippen, fertig.'},
   ]},
-  {version:'1.2.28',date:'23.10.2026',title:'Trainingsplaner: Standardablauf',tpl:1,items:[
+  {version:'1.2.28',date:'23.10.2026',title:'Trainingsplaner: Standardablauf',items:[
     {icon:'📝',title:'Neuer Plan mit festem Aufbau',desc:'Ein neuer Trainingsplan beginnt mit dem Standardablauf der Mannschaft: Aktivierung 1 und 2 (je 10 Min.), Hauptteil 1 und 2 (je 20 Min.), Schlussteil (30 Min.). In der Bibliothek auf + tippen: Die Übung landet im ausgewählten Abschnitt, danach ist der nächste dran. Gespeichert wird der Plan erst, wenn du etwas einträgst.'},
     {icon:'⚙️',title:'Standard ändern',desc:'„Standardablauf für neue Pläne“ unter dem Ablauf: Abschnitte, Kategorie und Minuten festlegen oder „Wie dieser Plan“ übernehmen. Ohne Abschnitte beginnen neue Pläne leer. Gespeicherte Pläne ändern sich nicht.'},
   ]},
@@ -7511,7 +7511,7 @@ const APP_CHANGELOG=[
     {icon:'⏰',title:'Erinnerung nach dem Training',desc:'„Im Blick behalten“ führt direkt zur Liste, wer noch nicht bewertet hat. Dort gibt es „Erinnerung in die WhatsApp-Gruppe“ — ohne Namen.'},
   ]},
   {version:'1.1.4',date:'17.10.2026',title:'Belastung',items:[
-    {icon:'💪',title:'Eine Skala von 0 bis 10',desc:'Spieler sehen die Skala jetzt als Liste mit den Worten der Original-Skala (0 Ruhe … 10 Maximal). Dieselbe Skala gilt im Trainer-Fenster.'},
+    {icon:'💪',title:'Eine Skala von 0 bis 10',desc:'Spieler sehen die Skala jetzt als Liste mit den Worten der Original-Skala (0 Ruhe … 10 Maximal). Dieselbe Skala gilt im Trainer-Fenster und im Trainingsplaner.'},
     {icon:'🙋',title:'„Ich war nicht dabei“',desc:'Wer zugesagt hatte und nicht da war, kann das statt einer Zahl angeben. Unter „Belastung“ im Termin steht er dann mit „Als fehlend eintragen“.'},
     {icon:'📋',title:'Wer noch fehlt',desc:'Unter „Belastung“ im Termin stehen jetzt auch alle, die noch nicht bewertet haben. Nennt dir einer seinen Wert, Namen antippen und eintragen; solche Werte sind mit ✎ markiert.'},
     {icon:'🔧',title:'Termin löschen oder verschieben',desc:'Bewertungen, Einsatzminuten, Physio, Tore und Vorlagen bleiben jetzt beim richtigen Termin. Bisher rutschten sie dabei auf den Nachbartermin.'},
@@ -7526,7 +7526,7 @@ const APP_CHANGELOG=[
     {icon:'📱',title:'Handy: Ansicht „Spieler“',desc:'In der Anwesenheit oben „Termine | Spieler“: jeder Spieler mit seinen letzten 10 Terminen als Balken, sortierbar nach „Schwächste zuerst“, Position oder Nummer.'},
     {icon:'🏠',title:'Übersicht',desc:'„Diese Woche“ zeigt am Computer alle sieben Tage mit Kalenderwoche, freie Tage in einer schmalen Zeile. Als Titel steht das Thema des Trainings bzw. der Gegner, darunter die Uhrzeit; vergangene Termine haben ein Häkchen und die Zahl der Anwesenden, „–/18“ heißt: noch nicht erfasst. Von Freitag bis Sonntag zeigt die Karte daneben die laufende Woche („KW … bisher“). Steht am Wochenende das Spiel oben, zeigt die Karte darunter das nächste Training hell (dunkel bleibt dem Spiel), mit „Wer kommt?“ und dem Trainingsplan. Neu unter „Im Blick“: wer die Belastung heute noch nicht bewertet hat.'},
     {icon:'↔️',title:'Navigation einklappen',desc:'Am Computer lässt sich die Seitennavigation mit dem Doppelpfeil unten neben dem eigenen Namen auf Symbole verkleinern; so hat die Tabelle mehr Platz.'},
-    {icon:'🔀',tpl:1,title:'Trainingsplaner: Gruppen pro Übung',desc:'Im Reiter „Gruppen“ kann ein Training mehrere Einteilungen haben (A, B, C …), z. B. vier Gruppen fürs Rondo und zwei Teams für die Spielform. Unter „Gruppen im Ablauf“ bekommt jede Übung ihre Einteilung. Eine neue Einteilung entsteht aus der vorigen mit möglichst wenigen Leibchenwechseln. „Wechsel“ zeigt vor jeder Übung mit neuer Einteilung, wer in welche Gruppe geht und aus welcher Farbe er kommt — auch „Auf dem Platz“ und auf dem Ausdruck.',admin:true},
+    {icon:'🔀',title:'Trainingsplaner: Gruppen pro Übung',desc:'Im Reiter „Gruppen“ kann ein Training mehrere Einteilungen haben (A, B, C …), z. B. vier Gruppen fürs Rondo und zwei Teams für die Spielform. Unter „Gruppen im Ablauf“ bekommt jede Übung ihre Einteilung. Eine neue Einteilung entsteht aus der vorigen mit möglichst wenigen Leibchenwechseln. „Wechsel“ zeigt vor jeder Übung mit neuer Einteilung, wer in welche Gruppe geht und aus welcher Farbe er kommt — auch „Auf dem Platz“ und auf dem Ausdruck.',admin:true},
     {icon:'📅',title:'Kalender neu',desc:'Am Computer: Monat mit Kalenderwochen, diese Woche hervorgehoben, heute gelb. Jeder Eintrag zeigt Uhrzeit und Thema bzw. Gegner, Spiele dunkelblau, vergangene Termine mit Anwesenheit. Monat wechseln, „+ Training“, „+ Spiel“, „+ Termin“ oben in der Kopfzeile; Saisonplan und Export unter „⋯“. Ein Klick auf einen Tag legt dort etwas an. Am Handy: die Saison als Liste nach Wochen wie „Diese Woche“ auf der Übersicht, frühere Wochen auf Knopfdruck, oben „+“ und „⋯“.'},
     {icon:'🧑‍💼',title:'Navigation und Menü unter dem Namen',desc:'Am Computer steht die Suche (Strg K) jetzt direkt in der Seitennavigation, die Glocke oben neben dem Vereinsnamen; Statistik und Wochenbericht sind etwas abgesetzt. Ein Klick auf den eigenen Namen öffnet Konto, die Darstellung (Standard, Ruhig, Nacht, Auto) zum direkten Umschalten, Tastaturkürzel und Abmelden. Am Handy hat „Mehr“ dieselben Symbole und Namen wie am Computer, unten das eigene Konto und „Abmelden“; den Saisonkader erreicht man über Aufstellung → Saison. Gibt es kein kommendes Spiel, öffnet Aufstellung direkt den Saisonkader.'},
     {icon:'🎨',title:'Aussehen: Standard, Ruhig, Nacht, Automatisch',desc:'Einstellungen → Darstellung bietet jetzt vier fertige Ansichten: Standard (hell; der Hintergrund ist etwas dunkler, damit sich die Karten abheben), Ruhig (graublaue Karten, weniger Weiß), Nacht (alles dunkel in Vereinsblau, für abends) und Automatisch (hell, wechselt zu Nacht, wenn das Handy oder der Computer auf dunkel steht). Gilt nur für dieses Gerät. Alle Menüs sind einheitlich dunkel. Das Menü beim Antippen einer vergangenen Zelle in der Anwesenheit ist neu gestaltet.'},
@@ -7544,8 +7544,8 @@ const APP_CHANGELOG=[
     {icon:'🧭',title:'Neues Design für alle',desc:'Die Übersicht zeigt den nächsten Termin, das nächste Spiel, diese und letzte Woche. Die Navigation sitzt an der Seite (auf dem Handy unten), Bereiche öffnen als Seiten statt als Fenster. Das alte Design gibt es nicht mehr.'},
     {icon:'👋',title:'Begrüßung',desc:'Auf der Übersicht begrüßt dich die App mit deinem Vornamen, je nach Tageszeit.'},
     {icon:'🙋',title:'„Wer kommt?“ mit Namen',desc:'Im Training- und Spielfenster stehen die Namen statt Zahlen, nach Position sortiert und eine Zeile pro Position. Ein Tipp auf einen Namen ändert den Status, „Erinnern“ schreibt allen, die noch nicht geantwortet haben.'},
-    {icon:'📝',tpl:1,title:'Trainingsplaner',desc:'Trainer können vorhandene Trainingspläne ansehen und auf dem Platz nutzen: Ablauf, Skizzen, Gruppen und der Modus „Auf dem Platz“ mit Timer. Pläne erstellen und ändern vorerst nur der Admin.'},
-    {icon:'⚽',title:'Aufstellung',desc:'Aufstellung und Saisonkader nutzen dasselbe Spielfeld und liegen zusammen unter „Aufstellung“ (Reiter „Spiel“ und „Saisonkader“).'},
+    {icon:'📝',title:'Trainingsplaner',desc:'Trainer können vorhandene Trainingspläne ansehen und auf dem Platz nutzen: Ablauf, Skizzen, Gruppen und der Modus „Auf dem Platz“ mit Timer. Pläne erstellen und ändern vorerst nur der Admin.'},
+    {icon:'⚽',title:'Aufstellung',desc:'Aufstellung und Saisonkader nutzen dasselbe Spielfeld wie der Trainingsplaner und liegen zusammen unter „Aufstellung“ (Reiter „Spiel“ und „Saisonkader“).'},
     {icon:'🎨',title:'Farbschemata',desc:'Unter Einstellungen → Darstellung: Hell, Stahl, Himmel, Rasen oder Schiefer.'},
     {icon:'📱',title:'App-Symbol auf dem Handy',desc:'Die App fragt einmal, ob sie auf den Startbildschirm soll; bei „Später“ nach einer Woche noch einmal. Die Statusleiste oben hat jetzt die Farbe der Kopfleiste.'},
     {icon:'🖼',title:'Titelbild und Vereinslogo',desc:'Beides wird jetzt nur noch in Einstellungen → Mannschaft geändert.'},
@@ -10913,12 +10913,12 @@ function _tpRightsHtml(gi){
   if(!(typeof isAdmin==='function'&&isAdmin()))return '';
   const t=G.trainers&&G.trainers[gi];if(!t)return '';
   const e=escapeHtml,first=String(t.name||'').split(' ')[0]||'Er',on=t.plan===true;
-  const sub=on?e(first)+' plant Trainings: Pläne, Übungen, Vorlagen und den Standardablauf.'
+  const sub=on?e(first)+' erstellt und ändert Trainingspläne, Übungen, Vorlagen und den Standardablauf.'
     :(TPL_VIEW_ALL?'Ohne Freigabe öffnet '+e(first)+' Pläne nur zum Ansehen: Ablauf, Gruppen, Auf dem Platz, Drucken.'
       :'Ohne Freigabe sieht '+e(first)+' den Trainingsplaner nicht.');
   return `<div class="tp-sec tp-rights"><div class="tp-sec-h">Rechte</div>
-    <div class="tpr-row"><div class="tpr-t"><b>Trainingsplaner</b><small>${sub}</small></div>
-    <label class="setting-switch"><input type="checkbox"${on?' checked':''} onchange="tpPlanSet(${gi},this.checked)" aria-label="Trainingsplaner freigeben"><span class="setting-slider"></span></label></div></div>`;
+    <div class="tpr-row"><div class="tpr-t"><b>Trainingspläne erstellen und ändern</b><small>${sub}</small></div>
+    <label class="setting-switch"><input type="checkbox"${on?' checked':''} onchange="tpPlanSet(${gi},this.checked)" aria-label="Trainingspläne erstellen und ändern"><span class="setting-slider"></span></label></div></div>`;
 }
 function tpPlanSet(gi,on){
   if(!(typeof isAdmin==='function'&&isAdmin()))return;
@@ -10927,9 +10927,9 @@ function tpPlanSet(gi,on){
   snap();
   if(on)t.plan=true;else delete t.plan;
   saveG();
-  logAudit('Trainingspläne',t.name||'?',on?'Trainingsplaner freigegeben':(TPL_VIEW_ALL?'Pläne nur ansehen':'Trainingsplaner nicht mehr freigegeben'));
+  logAudit('Trainingspläne',t.name||'?',on?'darf Pläne erstellen und ändern':(TPL_VIEW_ALL?'Pläne nur ansehen':'Trainingsplaner nicht mehr freigegeben'));
   const first=String(t.name||'').split(' ')[0];
-  if(typeof showSaveFlash==='function')showSaveFlash('✓ '+first+(on?': Trainingsplaner freigegeben':(TPL_VIEW_ALL?' sieht Trainingspläne jetzt nur an':': Trainingsplaner nicht mehr freigegeben')));
+  if(typeof showSaveFlash==='function')showSaveFlash('✓ '+first+(on?' darf jetzt Trainingspläne erstellen und ändern':(TPL_VIEW_ALL?' sieht Trainingspläne jetzt nur an':': Trainingsplaner nicht mehr freigegeben')));
   try{const m=document.getElementById('moTrainerProfile');if(m&&m.classList.contains('open')&&!_tpEditing)renderTrainerProfile();}catch(e){}
   try{const l=document.getElementById('mgr-tr-list');if(l&&l.offsetParent)renderMgrTrainers();}catch(e){}
 }
@@ -12007,8 +12007,7 @@ function _renderChangelog(highlightNew,lastSeen){
   el.innerHTML=banner+entries.map((entry,idx)=>{
     const isCurrent=entry.version===APP_VERSION;
     const headerBg=isCurrent?'linear-gradient(135deg,#1659b8,#1d70d8)':'linear-gradient(135deg,#3a3a3a,#5a5a5a)';
-    const _tplOk=typeof _tplMayPlan==='function'&&_tplMayPlan();
-    const visibleItems=entry.items.filter(it=>(!it.admin||_viewerIsAdmin)&&(!(it.tpl||entry.tpl)||_tplOk));
+    const visibleItems=entry.items.filter(it=>!it.admin||_viewerIsAdmin);
     if(!visibleItems.length)return ''; // skip entire entry if everything was admin-only
     const itemsHtml=visibleItems.map(it=>`
       <div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--gl);">
@@ -34361,9 +34360,9 @@ function _tplE(s){return escapeHtml(s==null?'':String(s));}
 // Players and "Nur ansehen" never get it.
 const TPL_ADMIN_ONLY=false;
 // Trainers without clearance: true = they open existing plans read-only
-// (1.2.60), false = they do not see the planner at all (Artem 27.10.: "пока
-// что" — for now only the admin and the trainers he cleared).
-const TPL_VIEW_ALL=false;
+// (1.2.60 and again since 1.2.62), false = they do not see the planner at all
+// (1.2.61 — a misunderstanding: Artem meant only "plant mit")
+const TPL_VIEW_ALL=true;
 function _tplAllowed(){
   if(typeof isPlayerMode==='function'&&isPlayerMode())return false;
   if(typeof RPE_IS_PREVIEW!=='undefined'&&RPE_IS_PREVIEW)return false;
