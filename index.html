@@ -2248,6 +2248,13 @@ tr.mx-former-h td{padding:10px 8px 6px;background:transparent;border:0;text-alig
 .mob label.ap-trial input{width:17px;height:17px;margin:1px 0 0;padding:0;flex:none;accent-color:#7C3AED;}
 #stBox .setting-label label{font:inherit;text-transform:none;letter-spacing:normal;margin:0;color:inherit;}
 body.player-mode .fl .hub-news.fl-pause{border-left-color:#8FA3C8;}
+/* Rechte in the trainer profile (1.2.60) */
+.tpr-row{display:flex;align-items:center;gap:14px;padding:4px 0;}
+.tpr-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;}
+.tpr-t b{font-size:.9rem;color:var(--hx-ink,var(--bd));}
+.tpr-t small{font-size:.78rem;line-height:1.4;color:var(--hx-muted,var(--gm));}
+.tpr-row .setting-switch{flex:none;}
+.acc-chip.tpr-chip{color:var(--hx-blue,#1659B8);}
 /* Entwicklungsziele (1.2.59) */
 .zl-lamps{display:inline-flex;gap:3px;align-items:center;flex:none;}
 .zl-lamps i{width:8px;height:8px;border-radius:50%;background:var(--hx-line,#D9DFEA);box-shadow:inset 0 0 0 1px rgba(14,35,80,.12);}
@@ -7217,13 +7224,16 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.59'; // v1.2.59: Entwicklungsziele
-const APP_VERSION_LABEL='1.2.59';
+const APP_VERSION='1.2.60'; // v1.2.60: Trainingspläne freigeben
+const APP_VERSION_LABEL='1.2.60';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1793114739777; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1793119326715; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.60',date:'27.10.2026',title:'Trainingspläne freigeben',items:[
+    {icon:'🔑',title:'Weitere Trainer planen mit',desc:'Der Admin gibt einzelnen Trainern frei, Trainingspläne zu erstellen und zu ändern: Kader → Trainer → Profil → „Rechte“ → „Trainingspläne erstellen und ändern“. Dazu gehören auch Übungen, Vorlagen und der Standardablauf der Mannschaft. Ohne Freigabe öffnen Trainer die Pläne wie bisher nur zum Ansehen. In der Trainerliste steht bei ihnen „plant mit“.'},
+  ]},
   {version:'1.2.59',date:'27.10.2026',title:'Entwicklungsziele',items:[
     {icon:'🎯',title:'Ziele für jeden Spieler',desc:'Im Spielerprofil unter „Ziele“: 1–3 Ziele bis zur Winterpause oder bis zum Saisonende, jeweils mit Bereich (Technik, Taktik, Athletik, Persönlichkeit) und auf Wunsch „Woran wir es sehen“ und „Was du tun kannst“. Am besten im Gespräch mit ihm vereinbart.'},
     {icon:'💬',title:'Rückmeldung',desc:'„Rückmeldung“ am Ziel: Noch am Anfang, Auf dem Weg oder Geschafft, dazu ein Satz für ihn. Alle Rückmeldungen bleiben mit Datum stehen.'},
@@ -10895,6 +10905,31 @@ function _acctChip(t){
   if(s.st==='open')return '<span class="acc-chip" title="Einladungslink wartet"><i class="acc-dot wait"></i>eingeladen</span>';
   return '';
 }
+// "Rechte" in the trainer profile (1.2.60): admin only
+function _tpRightsHtml(gi){
+  if(!(typeof isAdmin==='function'&&isAdmin()))return '';
+  const t=G.trainers&&G.trainers[gi];if(!t)return '';
+  const e=escapeHtml,first=String(t.name||'').split(' ')[0]||'Er',on=t.plan===true;
+  const sub=on?e(first)+' erstellt und ändert Trainingspläne, Übungen, Vorlagen und den Standardablauf.'
+    :'Ohne Freigabe öffnet '+e(first)+' Pläne nur zum Ansehen: Ablauf, Gruppen, Auf dem Platz, Drucken.';
+  return `<div class="tp-sec tp-rights"><div class="tp-sec-h">Rechte</div>
+    <div class="tpr-row"><div class="tpr-t"><b>Trainingspläne erstellen und ändern</b><small>${sub}</small></div>
+    <label class="setting-switch"><input type="checkbox"${on?' checked':''} onchange="tpPlanSet(${gi},this.checked)" aria-label="Trainingspläne erstellen und ändern"><span class="setting-slider"></span></label></div></div>`;
+}
+function tpPlanSet(gi,on){
+  if(!(typeof isAdmin==='function'&&isAdmin()))return;
+  const t=G.trainers&&G.trainers[gi];if(!t)return;
+  if(!!on===(t.plan===true))return;
+  snap();
+  if(on)t.plan=true;else delete t.plan;
+  saveG();
+  logAudit('Trainingspläne',t.name||'?',on?'darf Pläne erstellen und ändern':'Pläne nur ansehen');
+  const first=String(t.name||'').split(' ')[0];
+  if(typeof showSaveFlash==='function')showSaveFlash('✓ '+first+(on?' darf jetzt Trainingspläne erstellen und ändern':' sieht Trainingspläne jetzt nur an'));
+  try{const m=document.getElementById('moTrainerProfile');if(m&&m.classList.contains('open')&&!_tpEditing)renderTrainerProfile();}catch(e){}
+  try{const l=document.getElementById('mgr-tr-list');if(l&&l.offsetParent)renderMgrTrainers();}catch(e){}
+}
+function _tpPlanChip(t){return (t&&t.plan===true)?'<span class="acc-chip tpr-chip" title="Darf Trainingspläne erstellen und ändern">plant mit</span>':'';}
 function _acctSecHtml(gi){
   if(!(typeof isAdmin==='function'&&isAdmin()))return '';
   const t=G.trainers&&G.trainers[gi];if(!t)return '';
@@ -29456,6 +29491,7 @@ function renderTrainerProfile(){
       else if(days<90)html+='<div class="tp-warn">\u23f3 Lizenz l\u00e4uft in '+days+' Tagen ab</div>';
     }
   }
+  if(!ed)html+=_tpRightsHtml(_tpIdx);
   if(!ed)html+=_acctSecHtml(_tpIdx);
   box.innerHTML=html;
 }
@@ -29645,7 +29681,7 @@ function renderMgrTrainers(){
         :`<div class="tr-av tr-av-ph">${escapeHtml((t.name||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase())}</div>`;
       const sub=[t.role?trainerRoleLabel(t):'',t.teams.join(', ')].filter(Boolean).join(' \u00b7 ');
       const handle=isAdmin()?`<span class="tr-grip" title="Ziehen zum Sortieren" onpointerdown="trDragStart(event,${gi})">\u283f</span>`:'';
-      return _headBefore(t)+`<div class="tr-row" data-gi="${gi}">${handle}<div class="tr-main" onclick="openTrainerProfile(${gi})" title="Profil öffnen">${av}<div><div class="tr-nm">${escapeHtml(t.name)}${lockIcon}${_acctChip(t)}</div><div class="tr-teams">${escapeHtml(sub)}</div></div></div>${resetBtn}${isAdmin()?`<button class="tr-del" onclick="delTrainer(${gi})">✕</button>`:''}</div>`;
+      return _headBefore(t)+`<div class="tr-row" data-gi="${gi}">${handle}<div class="tr-main" onclick="openTrainerProfile(${gi})" title="Profil öffnen">${av}<div><div class="tr-nm">${escapeHtml(t.name)}${lockIcon}${_acctChip(t)}${_tpPlanChip(t)}</div><div class="tr-teams">${escapeHtml(sub)}</div></div></div>${resetBtn}${isAdmin()?`<button class="tr-del" onclick="delTrainer(${gi})">✕</button>`:''}</div>`;
     }).join('')
     :'<p style="font-size:.76rem;color:var(--gm);">Kein Trainer für dieses Team.</p>';
 }
@@ -34324,11 +34360,21 @@ function _tplAllowed(){
   if(TPL_ADMIN_ONLY&&!(typeof isAdmin==='function'&&isAdmin()))return false;
   return typeof canEdit==='function'&&canEdit();
 }
-// Creating and changing plans: admins only for now. Trainers open existing
-// plans and use them (Ablauf, Gruppen, Auf dem Platz, Drucken) — read-only.
-const TPL_EDIT_ADMIN_ONLY=true;
-function _tplEditor(){return _tplAllowed()&&(!TPL_EDIT_ADMIN_ONLY||(typeof isAdmin==='function'&&isAdmin()));}
-function _tplRoHint(){if(typeof _tplToast==='function')_tplToast('Pläne erstellen und ändern kann nur der Admin.');}
+// Creating and changing plans (1.2.60): the admin, and every trainer he has
+// cleared for it (trainer record: plan = true; Kader → Trainer → Profil →
+// Rechte). The others open existing plans and use them (Ablauf, Gruppen,
+// Auf dem Platz, Drucken) — read-only.
+function _myTrainer(){
+  if(!CU||CU.role!=='trainer'||!G||!Array.isArray(G.trainers))return null;
+  const lc=x=>String(x||'').trim().toLowerCase();
+  return G.trainers.find(t=>t&&lc(t.name)===lc(CU.name))||null;
+}
+function _tplMayPlan(){
+  if(typeof isAdmin==='function'&&isAdmin())return true;
+  const t=_myTrainer();return !!(t&&t.plan===true);
+}
+function _tplEditor(){return _tplAllowed()&&_tplMayPlan();}
+function _tplRoHint(){if(typeof _tplToast==='function')_tplToast('Pläne erstellen und ändern: nur mit Freigabe vom Admin.');}
 function _tplIsOpen(){const o=document.getElementById('tplOverlay');return !!(o&&o.classList.contains('open'));}
 function _tplPlayersTxt(p){p=String(p||'').trim();return /^[\d–\-\s]+$/.test(p)?p+' Spieler':p;}
 
