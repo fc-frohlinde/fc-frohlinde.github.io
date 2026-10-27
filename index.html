@@ -2248,6 +2248,23 @@ tr.mx-former-h td{padding:10px 8px 6px;background:transparent;border:0;text-alig
 .mob label.ap-trial input{width:17px;height:17px;margin:1px 0 0;padding:0;flex:none;accent-color:#7C3AED;}
 #stBox .setting-label label{font:inherit;text-transform:none;letter-spacing:normal;margin:0;color:inherit;}
 body.player-mode .fl .hub-news.fl-pause{border-left-color:#8FA3C8;}
+/* Spielzeit (1.2.58) */
+.pt-list{display:flex;flex-direction:column;gap:2px;}
+.pt-row{display:grid;grid-template-columns:minmax(120px,1.1fr) minmax(80px,2fr) 54px minmax(70px,auto);grid-template-areas:"nm bar pct last" "nm sub sub last";align-items:center;column-gap:12px;row-gap:2px;
+  width:100%;text-align:left;border:0;background:none;padding:8px 6px;border-radius:10px;font:inherit;color:inherit;cursor:pointer;}
+.pt-row:disabled{cursor:default;}
+.pt-row:not(:disabled):hover{background:var(--hx-card2,rgba(0,0,0,.03));}
+.pt-nm{grid-area:nm;font-weight:600;font-size:.9rem;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pt-nm i{font-style:normal;display:inline-block;min-width:22px;color:var(--hx-muted,var(--gm));font-size:.78rem;font-weight:700;}
+.pt-bar{grid-area:bar;height:8px;border-radius:99px;background:var(--hx-line,#E3E8F0);overflow:hidden;}
+.pt-bar s{display:block;height:100%;border-radius:99px;background:var(--hx-blue,#1659B8);}
+.pt-pct{grid-area:pct;text-align:right;font-variant-numeric:tabular-nums;font-size:.92rem;}
+.pt-sub{grid-area:sub;font-size:.76rem;color:var(--hx-muted,var(--gm));}
+.pt-last{grid-area:last;text-align:right;font-size:.8rem;font-variant-numeric:tabular-nums;color:var(--hx-muted,var(--gm));white-space:nowrap;}
+.pt-row.low .pt-bar s{background:#E0912F;}
+.pt-row.low .pt-pct,.pt-row.low .pt-last{color:#B4690E;}
+.pt-legend{margin-top:10px;font-size:.74rem;line-height:1.45;color:var(--hx-muted,var(--gm));}
+@media (max-width:560px){.pt-row{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"nm pct" "bar bar" "sub last";column-gap:10px;}}
 /* "Alle Spieler" by status (1.2.57) */
 .full-table tr.st-grp td{background:transparent;border:0;text-align:left;padding:12px 8px 4px;font-size:.78rem;font-weight:700;color:var(--hx-muted,var(--gm));cursor:default;}
 .full-table tr.st-grp td span{font-weight:500;}
@@ -7096,13 +7113,17 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // Bump APP_VERSION when shipping user-visible changes. The changelog modal
 // auto-shows once per user per new version on first login.
-const APP_VERSION='1.2.57'; // v1.2.57: Statistik nach Status
-const APP_VERSION_LABEL='1.2.57';
+const APP_VERSION='1.2.58'; // v1.2.58: Spielzeit
+const APP_VERSION_LABEL='1.2.58';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1792864382748; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1793110027433; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 const APP_CHANGELOG=[
+  {version:'1.2.58',date:'27.10.2026',title:'Spielzeit',items:[
+    {icon:'⏱',title:'Wer wie viel spielt',desc:'Neu in der Statistik: „Spielzeit“. Für jeden Spieler der Anteil der Minuten in den Spielen, für die er zur Verfügung stand (da, oder zugesagt und nicht im Kader), dazu Startelf, eingewechselt, ohne Einsatz und die Minuten der letzten 3 Spiele. Wer am wenigsten spielt, steht oben. Die Minuten kommen aus dem Spielbericht (Startelf und Wechsel) – ohne Spielbericht zählt ein Spiel hier nicht.'},
+    {icon:'🔔',title:'Früh merken',desc:'War ein Spieler bei den letzten 3 Spielen dabei und hat zusammen weniger als ein Drittel der Minuten gespielt, steht er unter „Im Blick behalten“. Im Spielerprofil steht seine Spielzeit unter „Person“. Nur für Trainer – die Spieler sehen ihre Minuten nicht.'},
+  ]},
   {version:'1.2.57',date:'24.10.2026',title:'Statistik nach Status',items:[
     {icon:'🏆',title:'„Alle Spieler“: die Mannschaft zuerst',desc:'Wer nicht mehr dabei ist, stand mitten in der Liste. Jetzt: zuerst die Mannschaft (wer in Pause ist, mit „Pause“), darunter „Probetraining“, ganz unten „Nicht mehr dabei“ – eingeklappt, ihre Zahlen bis zum Weggang bleiben abrufbar.'},
     {icon:'📋',title:'Ranglisten, Wochenbericht, Belastung',desc:'Wer nicht mehr dabei ist oder im Probetraining, steht in keiner Rangliste der Statistik. Im Wochenbericht und in der Belastungstabelle erscheint nur, wer in der Woche zur Mannschaft gehörte; „x von y“ zählt nur seine Termine (eine Pause mitten in der Woche zählt nicht mit).'},
@@ -16930,6 +16951,67 @@ function rpePlayedMin(s,p,si){
   if(p&&s&&s.type==='match'){const m=sbMinutes(s);if(m)return m[p.name]||0;}
   return rpeSessionMinutes(s,null,si);
 }
+// ── Spielzeit (1.2.58) ───────────────────────────────────────
+// Who plays how much. Minutes come from the match report (Startelf and
+// changes, sbMinutes); a match without one does not count here. A match
+// counts for a player when he was available for it: present (A), said yes
+// and not picked (N), or named in the report. Share = his minutes ÷ the
+// minutes of those matches. Trainers only: players do not see minutes
+// (decided 23.10.). The team of today only (no Probetraining, nobody gone).
+function computePlayTime(block,season){
+  const S=(block&&block.sessions)||[],P=(block&&block.players)||[];
+  const reps=[];
+  S.forEach((s,si)=>{
+    if(!s||s.type!=='match'||!s.date||!sessTookPlace(s,season))return;
+    const min=sbMinutes(s);if(!min)return;
+    reps.push({s,si,min,dur:_sbDur(s),st:new Set((_sbRep(s).st)||[]),k:_dbSortKey(s.date,season)});
+  });
+  reps.sort((a,b)=>a.k-b.k);
+  const rows=[];
+  P.forEach((p,pi)=>{
+    if(!p||p.trial||_pGone(p))return;
+    let poss=0,mins=0,starts=0,subs=0,bench=0,nk=0;const seq=[];
+    reps.forEach(x=>{
+      if(!_sessCounts(p,x.s,season))return;
+      const v=p.s&&p.s[x.si],inRep=Object.prototype.hasOwnProperty.call(x.min,p.name);
+      if(!inRep&&v!==1&&v!==5)return;          // not available: absent, excused, no entry
+      const m=inRep?(+x.min[p.name]||0):0;
+      poss+=x.dur;mins+=m;
+      if(x.st.has(p.name))starts++;else if(m>0)subs++;else if(v===5)nk++;else bench++;
+      seq.push({m,dur:x.dur,k:x.k,date:x.s.date});
+    });
+    if(!poss)return;
+    const last=seq.slice(-3),lm=last.reduce((a,b)=>a+b.m,0),lp=last.reduce((a,b)=>a+b.dur,0);
+    rows.push({p,pi,poss,mins,share:Math.round(mins/poss*100),starts,subs,bench,nk,last,lm,lp,
+      low:last.length===3&&lm*3<lp});
+  });
+  rows.sort((a,b)=>a.share-b.share||a.mins-b.mins);
+  return {n:reps.length,rows,lastK:reps.length?reps[reps.length-1].k:0};
+}
+function _ptParts(r){
+  return [r.starts?r.starts+'× Startelf':'',r.subs?r.subs+'× eingewechselt':'',r.bench?r.bench+'× ohne Einsatz':'',r.nk?r.nk+'× nicht im Kader':''].filter(Boolean).join(', ');
+}
+function dbRenderPlayTimeCard(data){
+  const t=computePlayTime(data.block,data.season),e=escapeHtml;
+  const cur=data.team===UI.currentTeam&&data.season===UI.currentSeason;
+  let h='<div class="db-section db-pt"><div class="db-h">\u23f1 Spielzeit'
+    +(t.n?'<span class="db-h-sub">aus '+t.n+' Spielbericht'+(t.n===1?'':'en')+' \u00b7 wer am wenigsten spielt, steht oben</span>':'')+'</div>';
+  if(!t.n)return h+'<div class="u-empty"><div class="u-empty-icon">\u23f1</div><div class="u-empty-txt">Noch kein Spielbericht. Tragt nach dem Spiel Startelf und Wechsel ein (im Spiel → „Spielbericht“) – dann rechnet die App die Minuten jedes Spielers selbst.</div></div></div>';
+  if(!t.rows.length)return h+'<div class="u-empty"><div class="u-empty-txt">Noch kein Spieler mit Spielbericht.</div></div></div>';
+  h+='<div class="pt-list">'+t.rows.map(r=>{
+    const nm=(typeof getDisplayName==='function'?getDisplayName(r.p):r.p.name)||'';
+    const go=cur?` onclick="jumpToPlayer(${r.pi},_hxLeave('moDashboard'))"`:'';
+    return `<button type="button" class="pt-row${r.low?' low':''}"${go}${cur?'':' disabled'}>`
+      +`<span class="pt-nm"><i>${e(String(r.p.nr||'–'))}</i>${e(nm)}</span>`
+      +`<span class="pt-bar" aria-hidden="true"><s style="width:${Math.max(r.share?2:0,r.share)}%"></s></span>`
+      +`<b class="pt-pct">${r.share}\u00a0%</b>`
+      +`<span class="pt-sub">${r.mins} von ${r.poss} Min.${_ptParts(r)?' – '+_ptParts(r):''}</span>`
+      +`<span class="pt-last" title="Minuten der letzten ${r.last.length} Spiele: ${r.last.map(x=>x.date+' '+x.m).join(', ')}">${r.last.map(x=>x.m).join(' · ')}</span>`
+      +`</button>`;
+  }).join('')+'</div>'
+    +'<div class="pt-legend">Anteil: seine Minuten in den Spielen, für die er zur Verfügung stand (da, oder zugesagt und nicht im Kader). Rechts: die letzten 3 Spiele. Orange: zusammen weniger als ein Drittel.</div></div>';
+  return h;
+}
 function sbResult(s){
   // players get only the score (s.res), never the report itself
   const r=_sbRep(s)||(s&&s.res&&typeof s.res==='object'?s.res:null);
@@ -23018,6 +23100,8 @@ function renderDashboard(){
     el.innerHTML=html;
     return;
   }
+  // Spielzeit (1.2.58)
+  try{html+=dbRenderPlayTimeCard(data);}catch(e){console.error('playTime:',e);}
   // Belastung: weekly sRPE sums, spikes and under-loaded players
   try{const loadCard=dbRenderLoadCard(data);if(loadCard)html+=loadCard;}
   catch(e){console.error('loadCard:',e);}
@@ -24478,6 +24562,9 @@ function openPlayerStats(pi,opts){
     if(canEdit()){
       const _D=cd(),_cc=sbCardCounts(p,_D,UI.currentSeason);
       if(_cc.y+_cc.gr+_cc.r)info.push(_row('Karten',['y','gr','r'].filter(k=>_cc[k]).map(k=>_cardIc(k)+' '+_cc[k]+' '+CARD_NAMES[k]).join(' \u00b7 ')));
+      // Spielzeit (1.2.58)
+      try{const _pt=computePlayTime(_D,UI.currentSeason).rows.find(r=>r.pi===pi);
+        if(_pt)info.push(_row('Spielzeit',_pt.share+'\u00a0% <span class="tp-note">('+_pt.mins+' von '+_pt.poss+' Min.'+(_pt.last.length?' · zuletzt '+_pt.last.map(x=>x.m).join(' · '):'')+')</span>'));}catch(e){}
       const _nb=sbNextBan(p,_D,UI.currentSeason);
       if(_nb)info.push(_row('Gesperrt',escapeHtml(sbBanText(_nb,_D).replace(/^gesperrt /,''))+' \u2013 fehlt am '+escapeHtml(_D.sessions[_nb.ti].date)));
     }
@@ -28059,6 +28146,14 @@ function hxRender(){
     if(prev>0&&now>prev*(1+LOAD_SPIKE_PCT/100))flags.push({dot:'#E0912F',who:nm(p),what:'Belastung +'+Math.round((now/prev-1)*100)+' % zur Vorwoche',on:`openPlayerFromMain(${pi})`});
     S.forEach((s,si)=>{if(s&&s.date&&inDays(s,0,7)&&Array.isArray(p.physio)&&p.physio[si]===true)flags.push({dot:'#1659B8',who:nm(p),what:'Physio '+_hxWhen(sk(s)),on:`openPlayerFromMain(${pi})`});});
   });
+  // Spielzeit (1.2.58): there for the last 3 matches, under a third of the
+  // minutes — as long as the last of them is recent
+  try{
+    const pt=computePlayTime(D,season);
+    const d2=new Date();d2.setDate(d2.getDate()-21);
+    const rk=d2.getFullYear()*10000+(d2.getMonth()+1)*100+d2.getDate();
+    pt.rows.forEach(r=>{if(r.low&&r.last[2].k>=rk)flags.push({dot:'#E0912F',who:nm(r.p),what:'die letzten 3 Spiele dabei, zusammen '+r.lm+' von '+r.lp+' Min. gespielt',on:`openPlayerFromMain(${r.pi})`});});
+  }catch(e){console.error('[Spielzeit]',e);}
   // Player status (1.2.51): a Probetraining ready to decide, and whoever has
   // not been at anything for weeks — a question; nothing changes by itself
   try{
