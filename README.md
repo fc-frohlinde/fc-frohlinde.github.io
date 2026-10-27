@@ -1,8 +1,8 @@
 # Flutlicht (ehemals footy.ai)
 
-> Die digitale Plattform für Fußballtrainer.
+> Die Team-App für Trainer und Spieler im Amateurfußball.
 
-Eine vollständige App für die tägliche Arbeit eines Vereinstrainers — Anwesenheits­verwaltung, Aufstellungen, Saisonplanung, Statistiken und Kommunikation in einer einzigen Anwendung.
+Eine App für die tägliche Arbeit von Trainern und ihren Mannschaften — Anwesenheits­verwaltung, Aufstellungen, Saisonplanung, Statistiken und Kommunikation in einer einzigen Anwendung.
 
 🔗 **Live**: [fc-frohlinde.github.io](https://fc-frohlinde.github.io)
 
@@ -25,7 +25,7 @@ Die App wird kontinuierlich weiterentwickelt. Eine vollständige Versionshistori
 
 ## Aktueller Einsatz
 
-Genutzt vom **FC Frohlinde 1949 e.V.** für die Mannschaftsverwaltung.
+Pilotverein: **FC Frohlinde 1949 e.V.** Name, Logo und Datenschutz-Kontakt sind Einstellungen des Vereins (Einstellungen → Verein) – die App selbst ist nicht an einen Verein gebunden.
 
 ## Technik
 

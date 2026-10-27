@@ -50,14 +50,14 @@ if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostnam
 </script>
 <link rel="manifest" id="appManifest" href="manifest.webmanifest">
 <title>Flutlicht</title>
-<meta name="description" content="Die Team-App des FC Frohlinde: Termine, Zu- und Absagen, Belastung und Spieler des Spiels.">
+<meta name="description" content="Flutlicht – die Team-App für Trainer und Spieler: Termine, Zu- und Absagen, Belastung und Spieler des Spiels.">
 <!-- Link preview in WhatsApp, Telegram, iMessage: the same for every link, personal links included.
      Image 1200x630, everything in the middle square so a small thumbnail still shows lamp and name.
      A new image needs a new ?v= (messengers keep old previews). -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Flutlicht">
 <meta property="og:locale" content="de_DE">
-<meta property="og:title" content="Flutlicht – Team-App des FC Frohlinde">
+<meta property="og:title" content="Flutlicht – die Team-App">
 <meta property="og:description" content="Termine, Zu- und Absagen, Belastung und Spieler des Spiels.">
 <meta property="og:image" content="https://fc-frohlinde.github.io/icons/flutlicht-vorschau.jpg?v=1">
 <meta property="og:image:type" content="image/jpeg">
@@ -65,7 +65,7 @@ if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostnam
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Flutlicht: leuchtender Lampenkopf eines Flutlichtmasts über dem Schriftzug">
 <meta name="twitter:card" content="summary_large_image">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Big+Shoulders+Display:wght@500;700;800&display=swap" rel="stylesheet">
+<link href="fonts/fonts.css" rel="stylesheet">
 <style>
 :root{
   --bd:#0d3b7c;--bm:#1659b8;--bl:#2e7de4;
@@ -2248,6 +2248,35 @@ tr.mx-former-h td{padding:10px 8px 6px;background:transparent;border:0;text-alig
 .mob label.ap-trial input{width:17px;height:17px;margin:1px 0 0;padding:0;flex:none;accent-color:#7C3AED;}
 #stBox .setting-label label{font:inherit;text-transform:none;letter-spacing:normal;margin:0;color:inherit;}
 body.player-mode .fl .hub-news.fl-pause{border-left-color:#8FA3C8;}
+/* Verein und Datenschutz (1.2.65) */
+.club-box{display:flex;flex-direction:column;gap:12px;margin-top:6px;}
+.club-f{display:flex;flex-direction:column;gap:3px;}
+.club-f label{font-size:.86rem;font-weight:700;color:var(--hx-ink,var(--bd));text-transform:none;letter-spacing:0;margin:0;}
+.club-f small{font-size:.76rem;color:var(--hx-muted,var(--gm));}
+.club-f input,.club-f textarea{margin:3px 0 0;width:100%;box-sizing:border-box;}
+.club-v{font-size:.88rem;color:var(--hx-ink,var(--bd));}
+.club-priv{margin-top:4px;}
+.club-priv p{font-size:.76rem;line-height:1.45;color:var(--hx-muted,var(--gm));margin:8px 0 0;}
+.mob.pv-mob{max-height:90vh;display:flex;flex-direction:column;}
+.pv-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:none;margin-bottom:6px;}
+.pv-head h3{margin:0;font-size:1.15rem;}
+.pv-body{flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-right:4px;}
+.pv-body h3,.fl-priv h3{font-size:.98rem;margin:18px 0 6px;font-family:'Barlow',sans-serif !important;font-weight:700 !important;letter-spacing:0 !important;text-transform:none !important;color:var(--hx-ink,var(--bd));}
+.pv-body a{color:var(--hx-blue,#1659B8);}
+.pv-body p,.pv-body li,.fl-priv p,.fl-priv li{font-size:.86rem;line-height:1.55;}
+.pv-body p,.fl-priv p{margin:0 0 8px;}
+.pv-body ul,.fl-priv ul{margin:0 0 8px;padding-left:20px;}
+.pv-body li,.fl-priv li{margin-bottom:4px;}
+.pv-body .pv-lead{font-size:.92rem;}
+.pv-stand{font-size:.76rem !important;color:var(--hx-muted,var(--gm));margin-top:14px !important;}
+.auth-priv{display:block;margin:14px auto 0;border:0;background:none;font:inherit;font-size:.78rem;color:rgba(255,255,255,.55);cursor:pointer;text-decoration:underline;text-underline-offset:3px;}
+body.player-mode .fl .fl-priv{padding:0 2px 30px;color:var(--fl-ink);}
+body.player-mode .fl .fl-priv h3{font-size:16px;color:var(--fl-ink);margin:22px 0 6px;}
+body.player-mode .fl .fl-priv p,body.player-mode .fl .fl-priv li{font-size:14.5px;line-height:1.55;color:var(--fl-ink2);}
+body.player-mode .fl .fl-priv a{color:var(--fl-lamp);}
+body.player-mode .fl .fl-priv .pv-lead{color:var(--fl-ink);font-size:15.5px;}
+body.player-mode .fl .fl-priv .pv-stand{color:var(--fl-muted);}
+body.player-mode .fl .hub-priv{margin-top:2px;font-size:13px;opacity:.8;}
 /* Neu in Flutlicht (1.2.63) */
 .hx-card .hx-tp-ic.hx-nw-ic{display:flex;align-items:center;justify-content:center;gap:4px;background:var(--hx-nav,#0E2350);}
 .hx-card .hx-nw-ic i{width:7px;height:7px;border-radius:50%;background:#F2C230;box-shadow:0 0 6px rgba(242,194,48,.9);}
@@ -6562,6 +6591,7 @@ if(window._fbBlocked){
     <div class="auth-err" id="acctErr" role="alert"></div>
     <div class="auth-note" id="acctNote" role="status"></div>
   </div>
+  <button type="button" class="auth-priv" onclick="openPriv()">Datenschutz</button>
   <details id="authAdvanced" class="auth-adv">
     <summary>Mit Passkey anmelden</summary>
     <div class="auth-adv-in"><button class="auth-btn auth-pk" id="authPasskeyBtn" type="button" onclick="doAuthPasskey()" style="display:none;">Passkey verwenden</button></div>
@@ -6571,7 +6601,7 @@ if(window._fbBlocked){
 
 <!-- Design "Heute": side navigation (hidden unless body.design-heute) -->
 <nav id="hxNav" aria-label="Hauptnavigation">
-  <div class="hx-club"><img class="hx-crest" id="hxCrest" alt=""><span class="hx-club-nm" id="hxClub">FC Frohlinde</span><button type="button" class="hx-bell hx-club-bell" title="Benachrichtigungen" aria-label="Benachrichtigungen" onclick="hxNotif(this,event)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span class="hx-bell-dot" id="hxBellDot"></span></button></div>
+  <div class="hx-club"><img class="hx-crest" id="hxCrest" alt=""><span class="hx-club-nm" id="hxClub"></span><button type="button" class="hx-bell hx-club-bell" title="Benachrichtigungen" aria-label="Benachrichtigungen" onclick="hxNotif(this,event)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span class="hx-bell-dot" id="hxBellDot"></span></button></div>
   <div class="hx-ctx"><button type="button" onclick="hxTeamMenu(this,event)" title="Mannschaft wechseln"><span id="hxTeamLbl">–</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><button type="button" onclick="hxSeasonMenu(this,event)" title="Saison wechseln"><span id="hxSeasonLbl">–</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button></div>
   <button type="button" class="hx-nsearch" id="hxSearchBtn" onclick="openSearch()" title="Suchen (Strg K)" aria-label="Suchen" aria-keyshortcuts="Control+K"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><span>Suchen</span><kbd>Strg K</kbd></button>
   <button type="button" class="hx-item" data-hx="home" onclick="hxGo('home')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3z"/></svg><span>Übersicht</span></button>
@@ -6815,7 +6845,7 @@ if(window._fbBlocked){
       </div>
       <div class="tp-sec">
         <div class="tp-sec-h">Notiz</div>
-        <textarea class="tp-in" id="pe-note" rows="3" placeholder="z.B. Verletzt bis KW 20, Schulnoten, ..."></textarea>
+        <textarea class="tp-in" id="pe-note" rows="3" placeholder="z. B. Absprachen, Stärken, woran er arbeitet"></textarea>
       </div>
     </div>
   </div>
@@ -7005,7 +7035,7 @@ if(window._fbBlocked){
   </div>
   <label class="ap-trial"><input type="checkbox" id="newTrial"><span><b>Probetraining</b> – wird erfasst, zählt aber erst nach „Aufnehmen“</span></label>
   <label>📝 Kommentar</label>
-  <textarea id="newNote" rows="2" placeholder="z.B. Verletzt bis KW 20, Schulnoten, ..." style="width:100%;padding:7px;border:1.5px solid var(--gl);border-radius:7px;font-family:'Barlow',sans-serif;font-size:.8rem;resize:vertical;margin-bottom:8px;"></textarea>
+  <textarea id="newNote" rows="2" placeholder="z. B. Absprachen, Stärken, woran er arbeitet" style="width:100%;padding:7px;border:1.5px solid var(--gl);border-radius:7px;font-family:'Barlow',sans-serif;font-size:.8rem;resize:vertical;margin-bottom:8px;"></textarea>
   <div class="mob-btns">
     <button class="btn bp" onclick="addPlayer()">＋ Hinzufügen</button>
     <button class="btn bs" onclick="closeM('moAddPlayer')">Abbrechen</button>
@@ -7264,19 +7294,28 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below — only what changes in
 // their work, one or two sentences. The full history of every version is
 // versionen.json next to this page (1.2.63).
-const APP_VERSION='1.2.64'; // v1.2.64: Alle Versionen mit Titel
-const APP_VERSION_LABEL='1.2.64';
+const APP_VERSION='1.2.65'; // v1.2.65: Verein und Datenschutz
+const APP_VERSION_LABEL='1.2.65';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1793140485796; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1793145107098; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27.10.): written for the
 // other trainers, not for the admin; what changes for you and where to find
 // it, one or two sentences, "du"; fixes and internal changes get no news.
 // id: YYYYMMDD-n, increasing (the "seen" mark is the newest id read).
 // admin: only for the admin. go: [button label, action].
+// The club this installation was set up for: only the default for
+// Einstellungen → Verein (1.2.65). Name, logo and the data-protection contact
+// are the club's settings — the app itself is not tied to a club.
+const INSTALL_CLUB='FC Frohlinde';
+function _clubName(){return (G&&typeof G.clubName==='string'&&G.clubName.trim())||INSTALL_CLUB||'';}
+function _clubSlug(){return (_clubName()||'Flutlicht').replace(/[^A-Za-z0-9ÄÖÜäöüß]+/g,'-').replace(/^-|-$/g,'')||'Flutlicht';}
+function _clubInfo(){const c=(G&&G.club&&typeof G.club==='object')?G.club:{};return {name:_clubName(),addr:String(c.addr||''),mail:String(c.mail||''),dsb:String(c.dsb||'')};}
 const APP_NEWS=[
+  {id:'20261028-2',d:'28.10.',admin:true,t:'Verein eintragen',x:'Unter Einstellungen → Verein stehen jetzt Name, Anschrift und der Kontakt für Datenschutzfragen. Bitte Anschrift und Kontakt eintragen – sie stehen in den Datenschutzhinweisen.',go:['Zu den Einstellungen',"openSettings('verein')"]},
+  {id:'20261028-1',d:'28.10.',t:'Datenschutz',x:'Was die App über Spieler und Trainer speichert und wer es sieht, steht jetzt unter „Datenschutz“ – für dich unter Einstellungen → Verein, für die Spieler unten in ihrer Übersicht.',go:['Ansehen','openPriv()']},
   {id:'20261027-3',d:'27.10.',admin:true,t:'Trainingspläne freigeben',x:'Im Trainerprofil unter „Rechte“ gibst du einzelnen Trainern frei, Trainingspläne zu erstellen und zu ändern. „plant mit“ und „Rechte“ siehst nur du.',go:['Zu den Trainern',"hxGo('team');switchTab('trainer')"]},
   {id:'20261027-2',d:'27.10.',t:'Entwicklungsziele',x:'Im Spielerprofil unter „Ziele“ vereinbart ihr mit jedem Spieler 1–3 Ziele und gebt ab und zu Rückmeldung. Er sieht sie in seiner App, alle zusammen stehen unter Kader → Ziele.',go:['Zu den Zielen','zlOpenTab()']},
   {id:'20261027-1',d:'27.10.',t:'Spielzeit',x:'In der Statistik siehst du, wer wie viel spielt – wer am wenigsten spielt, steht oben. Dafür nach jedem Spiel den Spielbericht ausfüllen.',go:['Zur Statistik',"hxGo('stats')"]},
@@ -7755,6 +7794,100 @@ function _zlHubHtml(p,tok,sec){
       +`</div></details>`;
   });
   return sec('Deine Ziele',bs.length===1?`<span class="fl-sec-a">${ZL_BIS[bs[0]]}</span>`:'')+`<div class="fl-list">${rows.join('')}</div>`;
+}
+// ── Datenschutz (1.2.65) ───────────────────────────────────────
+// One text for players and trainers, the club's details from Einstellungen →
+// Verein. A draft by Flutlicht: the club (responsible for the data) should
+// check it. Keep it true to what the app does — when something changes
+// (health data, new services), change this text with it.
+const PRIV_STAND='28.10.2026';
+function _privHtml(){
+  const c=_clubInfo(),e=escapeHtml;
+  const who=e(c.name||'der Verein');
+  const contact=c.mail?`<a href="mailto:${e(c.mail)}">${e(c.mail)}</a>`:'';
+  const ask=contact?'an '+contact:'an deine Trainer';
+  const li=a=>'<ul>'+a.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
+  return `<p class="pv-lead">Flutlicht ist die App, mit der ${who} den Trainings- und Spielbetrieb seiner Mannschaften organisiert. Hier steht, welche Daten dabei gespeichert werden, wer sie sieht und welche Rechte du hast.</p>
+    <h3>Verantwortlich</h3>
+    <p>${who}${c.addr?'<br>'+e(c.addr).replace(/\n/g,'<br>'):''}${contact?'<br>Fragen zum Datenschutz: '+contact:'<br>Fragen zum Datenschutz beantworten dir deine Trainer.'}${c.dsb?'<br>Datenschutzbeauftragte(r): '+e(c.dsb):''}</p>
+    <h3>Welche Daten</h3>
+    <p>Über Spieler:</p>
+    ${li(['Name, Rückennummer, Position und – wenn eingetragen – Geburtsdatum, Telefonnummer, E-Mail, Passnummer und Foto',
+      'Zu- und Absagen und die Anwesenheit bei Training und Spiel',
+      'die eigene Einschätzung der Belastung nach Training und Spiel; die Anmeldung zur Physiotherapie (nur ja oder nein, ohne Grund)',
+      'Spielberichte: Startelf, Wechsel, Minuten, Tore, Vorlagen und Karten; die Stimme bei „Spieler des Spiels“ – geheim, niemand sieht, wen du gewählt hast',
+      'Entwicklungsziele und Rückmeldungen, Einschätzungen und Notizen der Trainer',
+      'Status wie Probetraining, Pause oder nicht mehr dabei – ohne Grund',
+      'wann du die App zuletzt geöffnet hast und, wenn du Benachrichtigungen einschaltest, die Adresse deines Geräts dafür'])}
+    <p>Über Trainer: Name, Kontaktdaten, Funktion und Lizenz, die E-Mail-Adresse des Kontos und ein Protokoll, wer wann was geändert hat.</p>
+    <p>Gesundheitsdaten wie Verletzungen oder Krankheiten fragt die App nicht ab.</p>
+    <h3>Wofür und auf welcher Grundlage</h3>
+    <p>Um Trainings und Spiele zu planen, Kader und Aufstellungen festzulegen, an Termine zu erinnern und die Entwicklung der Spieler zu begleiten. Grundlage ist die Teilnahme am Trainings- und Spielbetrieb des Vereins (Art. 6 Abs. 1 lit. b DSGVO) und sein berechtigtes Interesse an einer geordneten Mannschaftsorganisation (lit. f). Foto und Benachrichtigungen nur, wenn du einverstanden bist (lit. a) – das kannst du jederzeit zurücknehmen.</p>
+    <h3>Wer was sieht</h3>
+    ${li(['Die Trainer der Mannschaft und der Admin des Vereins sehen alle Daten der Mannschaft.',
+      'Jeder Spieler sieht nur seine eigenen Daten. Mitspieler sehen von dir nur deinen Namen – etwa bei der Wahl zum Spieler des Spiels – und, wenn du in einer Woche bei allen Terminen warst, Namen und Foto unter „Immer dabei“ im Wochenbericht.',
+      'Notizen, Einschätzungen, Telefonnummer und Geburtsdatum sehen andere Spieler nicht.'])}
+    <h3>Wo die Daten liegen</h3>
+    ${li(['Gespeichert werden sie bei Google Firebase (Google Ireland Ltd.) in einem Rechenzentrum in Belgien. Die Anmeldung der Trainer mit eigenem Konto läuft über Firebase Authentication in den USA.',
+      'Die App selbst kommt von GitHub Pages (GitHub Inc., USA). Dort laufen auch die automatischen Erinnerungen und die tägliche Sicherung.',
+      'Google und GitHub verarbeiten die Daten im Auftrag. Für Übertragungen in die USA gilt das EU-US Data Privacy Framework.',
+      'Benachrichtigungen laufen verschlüsselt über den Dienst deines Browsers (zum Beispiel Google, Apple oder Mozilla).',
+      'Keine Werbung, kein Tracking, keine Analysedienste. Schriften und Programmteile der App kommen von dieser Seite; nur die Datenbank-Bibliothek lädt die App von Google.'])}
+    <h3>Wie lange</h3>
+    <p>Solange du zur Mannschaft gehörst und danach für die Statistik der Saison. Auf Wunsch löscht der Verein deine Daten. Sicherungskopien werden nach spätestens 90 Tagen gelöscht. Auf deinem Gerät merkt sich die App deine Anmeldung und ein paar Einstellungen – keine Werbe-Cookies.</p>
+    <h3>Deine Rechte</h3>
+    <p>Du kannst Auskunft über deine Daten verlangen, sie berichtigen, löschen oder einschränken lassen und der Verarbeitung widersprechen. Wende dich dafür ${ask}. Du kannst dich auch bei der Datenschutz-Aufsichtsbehörde deines Bundeslandes beschweren. Bist du noch nicht 18, können sich auch deine Eltern an den Verein wenden.</p>
+    <p class="pv-stand">Stand: ${PRIV_STAND}</p>`;
+}
+// Trainers and the login page: a window
+function openPriv(){
+  const b=document.getElementById('pv-body');if(!b)return;
+  b.innerHTML=_privHtml();
+  openM('moPriv');
+  try{b.scrollTop=0;}catch(e){}
+}
+// His app: a screen in the Flutlicht look, back to the overview
+function hubPriv(){
+  const wrap=document.getElementById('playerModeWrap');if(!wrap)return;
+  const e=escapeHtml;
+  wrap.innerHTML=`<div class="hub fl"><div class="fl-bar"><button class="hub-back" onclick="renderPlayerMode()">‹ Übersicht</button><span class="fl-team">${e(_clubName())}</span></div>
+    <h1 class="fl-title">Datenschutz</h1><div class="fl-priv">${_privHtml()}</div></div>`;
+  try{wrap.scrollTop=0;window.scrollTo(0,0);}catch(e){}
+}
+// Einstellungen → Verein
+function clubRender(){
+  const box=document.getElementById('clubBox');if(!box)return;
+  const c=_clubInfo(),e=escapeHtml,adm=typeof isAdmin==='function'&&isAdmin();
+  const row=(id,lbl,sub,val,ph,area)=>`<div class="club-f"><label for="${id}">${lbl}</label>${sub?`<small>${sub}</small>`:''}${adm
+      ?(area?`<textarea id="${id}" rows="2" placeholder="${ph}" onchange="clubSet(this.id)">${e(val)}</textarea>`:`<input type="text" id="${id}" value="${e(val)}" placeholder="${ph}" onchange="clubSet(this.id)">`)
+      :`<div class="club-v">${val?e(val).replace(/\n/g,'<br>'):'–'}</div>`}</div>`;
+  box.innerHTML=row('club-name','Name des Vereins','So heißt der Verein überall in der App.',c.name,'z. B. SV Musterstadt 1920 e. V.')
+    +row('club-addr','Anschrift','Für die Datenschutzhinweise.',c.addr,'Straße, PLZ Ort',1)
+    +row('club-mail','Kontakt für Datenschutzfragen','E-Mail-Adresse – an sie wenden sich Spieler und Eltern.',c.mail,'z. B. vorstand@verein.de')
+    +row('club-dsb','Datenschutzbeauftragte(r)','Nur wenn der Verein eine(n) hat.',c.dsb,'Name, ggf. E-Mail')
+    +`<div class="club-priv"><button type="button" class="btn bp" onclick="openPriv()">Datenschutzhinweise ansehen</button>${adm?'<p>Der Text ist ein Entwurf von Flutlicht. Bitte lasst ihn im Verein prüfen (Vorstand oder Datenschutzbeauftragte/r).</p>':''}</div>`;
+}
+function clubSet(changed){
+  if(!(typeof isAdmin==='function'&&isAdmin()))return;
+  const v=id=>((document.getElementById(id)||{}).value||'').trim();
+  const name=v('club-name').slice(0,80),addr=v('club-addr').slice(0,200),dsb=v('club-dsb').slice(0,120);
+  let mail=v('club-mail').slice(0,120);
+  // an unfinished address: asked about once, when that field is left; the
+  // other fields save anyway and the stored address stays
+  if(mail&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)){
+    if(changed==='club-mail'||!changed){alert('Bitte eine gültige E-Mail-Adresse eintragen.');return;}
+    mail=_clubInfo().mail;
+  }
+  snap();
+  if(name)G.clubName=name;
+  const c={};if(addr)c.addr=addr;if(mail)c.mail=mail;if(dsb)c.dsb=dsb;
+  if(Object.keys(c).length)G.club=c;else delete G.club;
+  saveG();
+  logAudit('Verein','',(name||'')+(mail?' · '+mail:''));
+  if(typeof showSaveFlash==='function')showSaveFlash('✓ Gespeichert');
+  try{hxApplyDesign();}catch(e){}
+  try{_updateAppTitle();}catch(e){}
+  // no re-render here: it would take the focus out of the next field
 }
 function renderPlayerStatus(p,pi){
   const sec=document.getElementById('ps-sec-status'),el=document.getElementById('ps-status');
@@ -9272,6 +9405,8 @@ function sanitizeG(data){
   _migrateRegModelIn(data);
   // One-time migration: Spielberechtigung replaces the registration tick (1.2.16)
   _migrateSbIn(data);
+  // The club's name is data now (1.2.65): the installation's club until changed
+  if(data&&(typeof data.clubName!=='string'||!data.clubName.trim())&&typeof INSTALL_CLUB==='string'&&INSTALL_CLUB)data.clubName=INSTALL_CLUB;
   // Migration: preconf field → status 4 (Angemeldet) in p.s[]
   _migratePreconfToS(data);
   // Defensive: clean stale player indices in seasonLineups (refs to deleted players)
@@ -10360,7 +10495,7 @@ function _invRender(){
   if(!box||!I)return;
   const esc=escapeHtml,v=I.v||{};
   const first=String(v.name||'').split(' ')[0];
-  const club=(G&&G.clubName)||'FC Frohlinde';
+  const club=_clubName();
   const toLogin='<button type="button" class="auth-btn auth-navy" onclick="invToLogin()">Zur Anmeldung</button>';
   const page=(h,p,rest)=>`<h2 class="inv-h">${h}</h2>${p?`<p class="inv-p">${p}</p>`:''}${rest||''}<div class="auth-err" id="invErr" role="alert"></div><div class="auth-note" id="invNote"></div>`;
   let html;
@@ -10607,7 +10742,7 @@ let _invShare=null;
 function acctShare(gi,code){
   const t=G.trainers&&G.trainers[gi],v=_acctAdm.inv&&_acctAdm.inv[code];
   if(!t||!v)return;
-  const esc=escapeHtml,first=String(t.name||'').split(' ')[0],link=_inviteLink(code),club=(G&&G.clubName)||'FC Frohlinde';
+  const esc=escapeHtml,first=String(t.name||'').split(' ')[0],link=_inviteLink(code),club=_clubName();
   _invShare={link,first,text:'Hallo '+first+', hier ist dein Zugang zu Flutlicht ('+club+'): '+link+'\nDamit legst du dein eigenes Konto an – mit Google oder E-Mail. Gültig bis '+_invDate(v.exp)+', nur einmal nutzbar.'};
   document.getElementById('inv-sh-title').textContent='Einladung für '+t.name;
   document.getElementById('inv-sh-body').innerHTML=`<p class="inv-sh-p">Schick ${esc(first)} diesen Link. Damit legt ${t.gender==='w'?'sie':'er'} ${t.gender==='w'?'ihr':'sein'} eigenes Konto an und ist dabei. Gültig bis ${esc(_invDate(v.exp))}, nur einmal nutzbar.</p>
@@ -11513,11 +11648,10 @@ function _checkRemoteAppVersion(){
 }
 // ── DYNAMIC BROWSER TAB TITLE ────────────────────────────────
 // On login screen: "Flutlicht"
-// In app: "Flutlicht · <club> <team>"   e.g. "Flutlicht · FC Frohlinde U19"
+// In app: "Flutlicht · <club> <team>"   e.g. "Flutlicht · FC Musterstadt U19"
 function _updateAppTitle(){
   if(!CU){document.title='Flutlicht';return;}
-  // Try G.clubName (future SaaS multi-tenancy), fallback to hardcoded
-  const club=(G&&G.clubName)||'FC Frohlinde';
+  const club=_clubName();
   const team=UI&&UI.currentTeam?UI.currentTeam:'';
   document.title=team?`Flutlicht · ${club} ${team}`:`Flutlicht · ${club}`;
 }
@@ -14971,7 +15105,7 @@ function _setVisible(sec){
   const role=CU&&CU.role;
   if(sec==='konto')return !!CU&&role!=='player';
   if(sec==='daten'||sec==='backup'||sec==='trash'||sec==='audit')return typeof isAdmin==='function'&&isAdmin();
-  if(sec==='team')return typeof canEdit==='function'&&canEdit();
+  if(sec==='team'||sec==='verein')return typeof canEdit==='function'&&canEdit();
   return true;
 }
 function _setFill(){
@@ -14980,6 +15114,7 @@ function _setFill(){
   if(typeof ayRender==='function')ayRender();
   if(typeof absRender==='function')absRender();
   if(typeof stRender==='function')stRender();
+  if(typeof clubRender==='function')clubRender();
   if(typeof zlRuleRender==='function')zlRuleRender();
   if(typeof meetRender==='function')meetRender();
   if(typeof cardRulesRender==='function')cardRulesRender();
@@ -15560,7 +15695,7 @@ function downloadICS(){
   a.href=url;
   const safeTeam=(UI.currentTeam||'Team').replace(/[^a-zA-Z0-9]/g,'_');
   const safeSeason=(UI.currentSeason||'').replace(/\//g,'-');
-  a.download=`FC-Frohlinde-${safeTeam}-${safeSeason}.ics`;
+  a.download=`${_clubSlug()}-${safeTeam}-${safeSeason}.ics`;
   document.body.appendChild(a);
   a.click();
   setTimeout(()=>{
@@ -16573,7 +16708,7 @@ function _pvBuildSync(team,season){
   const news=(nw&&typeof nw==='object'&&typeof nw.t==='number'&&nw.title)?{t:nw.t,title:nw.title,body:nw.body||'',off:nw.off||undefined}:null;
   const loc={},la=(G.locationAddr&&typeof G.locationAddr==='object')?G.locationAddr:{};
   sessions.forEach(s=>{if(s&&s.location&&la[s.location])loc[s.location]=la[s.location];});
-  const shared={v:PV_V,team,season,club:G.clubName||'',sessions:sessions.map(_pvSess),news,trainers,loc,
+  const shared={v:PV_V,team,season,club:_clubName(),cinfo:(G.club&&typeof G.club==='object')?{addr:G.club.addr||'',mail:G.club.mail||'',dsb:G.club.dsb||''}:null,sessions:sessions.map(_pvSess),news,trainers,loc,
     roster:{disp,nr,elig},names:[],rep:{},abs:pvAbsRule(teamRules(team))};
   weeks.forEach(w=>{
     const r=reps[w.wk];if(!r)return;
@@ -16782,7 +16917,7 @@ function _pvAdopt(x,token){
   const db={[key]:{sessions,players}};
   if(T.news)db[P.team+'__news']=T.news;
   if(T.abs)db[P.team+'__rules']={abs:T.abs};
-  G={version:20,db,teamList:[P.team],seasonList:[P.season],trainers:T.trainers||[],clubName:T.club||'',
+  G={version:20,db,teamList:[P.team],seasonList:[P.season],trainers:T.trainers||[],clubName:T.club||'',club:T.cinfo||null,
     locationAddr:T.loc||{},auditLog:[],trash:[],backups:[],matchLineups:{},seasonLineups:{},
     sessionTemplates:[],exerciseLibrary:[],calEvents:[]};
   try{Object.defineProperty(G,'__sanitized',{value:true,enumerable:false,configurable:true,writable:true});}
@@ -19097,7 +19232,7 @@ function cardData(p,D,season){
     streak:_playerStreak(p,D,season),
     name,ini:name.split(/\s+/).map(x=>x[0]||'').join('').slice(0,2).toUpperCase()||'?',
     nr:(p.nr!=null&&p.nr!=='')?String(p.nr):'',pos:typeof p.pos==='string'?p.pos:'',
-    season:season||'',team:UI.currentTeam||'',club:(G&&G.clubName)||'FC Frohlinde'};
+    season:season||'',team:UI.currentTeam||'',club:_clubName()};
 }
 // What it takes to reach the next colour, assuming he is there every time
 function _cardNext(d){
@@ -21317,6 +21452,7 @@ function renderHub(){
     ${mine.length?sec('F\u00fcr dich')+list(mine):''}
     ${_hubPushLine()}
     ${RPE_IS_PREVIEW?'':'<button class="hub-switch" onclick="hubSwitchPlayer()">Nicht '+e(nm)+'? Anderen Spieler w\u00e4hlen</button>'}
+    <button class="hub-switch hub-priv" onclick="hubPriv()">Datenschutz</button>
   </div>`;
 }
 // Each card opens a tab, so a deep-linked screen has no history behind it —
@@ -22661,7 +22797,7 @@ function dbBuildPlayerStatsSnapshot(data,pi,offset,includePhoto){
     v:2,kind:'player',
     publishedAt:Date.now(),
     scorer:{goals:_goals,assists:_assists,apps:_apps},
-    club:(G&&G.clubName)||'FC Frohlinde',
+    club:_clubName(),
     clubLogo:(G&&G.clubLogo)||null,
     team,season,
     week:{kw:r.kw,from:_dbFmtDMY(r.bounds.monday),to:_dbFmtDMY(r.bounds.sunday),
@@ -22726,7 +22862,7 @@ function dbBuildReportSnapshot(data,offset,includePhotos){
   return {
     v:1,
     publishedAt:Date.now(),
-    club:(G&&G.clubName)||'FC Frohlinde',
+    club:_clubName(),
     clubLogo:(G&&G.clubLogo)||null,
     team:r.team,season:r.season,
     week:{
@@ -23333,7 +23469,7 @@ function dbExportPdf(){
   // Use browser print on the modal content
   const data=dbGetData();
   const content=document.getElementById('db-content')?.innerHTML||'';
-  const title=`FC Frohlinde · ${data.team} · ${data.season}`;
+  const title=`${_clubName()} · ${data.team} · ${data.season}`;
   const printWindow=window.open('','_blank');
   if(!printWindow){alert('Pop-up blockiert. Bitte erlauben.');return;}
   printWindow.document.write(`<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8"><title>${title}</title>
@@ -23379,7 +23515,7 @@ function dbExportCsv(){
   const m=dbComputeMetrics(data);
   const ranked=dbRankPlayers(data);
   const lines=[];
-  lines.push(`"FC Frohlinde — ${data.team} · ${data.season}"`);
+  lines.push(`"${_clubName()} — ${data.team} · ${data.season}"`);
   lines.push(`"Stand: ${new Date().toLocaleDateString('de-DE')}"`);
   lines.push('');
   lines.push('"KENNZAHLEN"');
@@ -23421,7 +23557,7 @@ function dbExportCsv(){
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
   a.href=url;
-  a.download=`FC-Frohlinde-Dashboard-${data.team}-${data.season.replace('/','-')}.csv`;
+  a.download=`${_clubSlug()}-Dashboard-${data.team}-${data.season.replace('/','-')}.csv`;
   document.body.appendChild(a);a.click();
   setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url);},100);
   if(typeof showSaveFlash==='function')showSaveFlash('📊 CSV exportiert');
@@ -23435,7 +23571,7 @@ function dbExportPng(){
   const w=Math.min(target.scrollWidth,1200);
   const h=Math.min(target.scrollHeight,3500);
   const html=`<div xmlns="http://www.w3.org/1999/xhtml" style="width:${w}px;font-family:Arial,sans-serif;background:#fff;color:#222;padding:18px;box-sizing:border-box;">
-    <h2 style="font-size:18px;margin:0 0 4px;color:#0d3b7c;">📊 FC Frohlinde · ${data.team} · ${data.season}</h2>
+    <h2 style="font-size:18px;margin:0 0 4px;color:#0d3b7c;">📊 ${escapeHtml(_clubName())} · ${data.team} · ${data.season}</h2>
     <div style="color:#666;font-size:11px;margin-bottom:14px;">Stand: ${new Date().toLocaleDateString('de-DE')}</div>
     ${target.innerHTML.replace(/<button[^>]*>[\s\S]*?<\/button>/gi,'').replace(/onclick="[^"]*"/g,'').replace(/cursor:\s*pointer/g,'')}
   </div>`;
@@ -23456,7 +23592,7 @@ function dbExportPng(){
       const u=URL.createObjectURL(b);
       const a=document.createElement('a');
       a.href=u;
-      a.download=`FC-Frohlinde-Dashboard-${data.team}-${data.season.replace('/','-')}.png`;
+      a.download=`${_clubSlug()}-Dashboard-${data.team}-${data.season.replace('/','-')}.png`;
       document.body.appendChild(a);a.click();
       setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(u);},100);
       if(typeof showSaveFlash==='function')showSaveFlash('🖼️ Bild exportiert');
@@ -27759,7 +27895,7 @@ function hxRenderNav(){
   const crest=document.getElementById('hxCrest'),src=_clubLogoSrc();
   if(crest&&crest.src!==src)crest.src=src;
   const set=(id,v)=>{const e=document.getElementById(id);if(e&&e.textContent!==v)e.textContent=v;};
-  set('hxClub',(G&&G.clubName)||'FC Frohlinde');
+  set('hxClub',_clubName());
   set('hxTeamLbl',UI.currentTeam||'–');
   set('hxSeasonLbl',UI.currentSeason||'–');
   const nm=(CU&&CU.name)||'';
@@ -35037,7 +35173,7 @@ function _tplPrintHtml(s){
   const date=_tplDateLong(s.date,TPL.season,'year');
   return `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Trainingsplan ${E(date)}</title>
-<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<link href="${E(new URL('fonts/fonts.css',location.href).href)}" rel="stylesheet">
 <style>
 @page{size:A4;margin:14mm 14mm 16mm}
 *{box-sizing:border-box}
@@ -39131,7 +39267,7 @@ _pubCleanupSchedule();
 <div class="lp-overlay" id="moLineup">
   <!-- Topbar -->
   <div class="lp-topbar">
-    <div class="lp-title"><div class="hx-lptabs" role="tablist" aria-label="Aufstellung"><button type="button" role="tab" class="on" aria-selected="true">Spiel</button><button type="button" role="tab" aria-selected="false" onclick="hxLineupSwitch('season')">Saisonkader</button></div><div class="lp-logo">⚽ Aufstellungsplaner <span id="lp-presence-inline" class="inline-presence"></span></div><div class="lp-sub" id="lp-context-info">FC Frohlinde 1949</div></div>
+    <div class="lp-title"><div class="hx-lptabs" role="tablist" aria-label="Aufstellung"><button type="button" role="tab" class="on" aria-selected="true">Spiel</button><button type="button" role="tab" aria-selected="false" onclick="hxLineupSwitch('season')">Saisonkader</button></div><div class="lp-logo">⚽ Aufstellungsplaner <span id="lp-presence-inline" class="inline-presence"></span></div><div class="lp-sub" id="lp-context-info"></div></div>
     <div id="lp-fmt-btns" style="display:flex;gap:5px;flex-wrap:wrap;margin-left:8px;"></div>
     <div class="lp-kind-wrap" style="display:flex;gap:4px;margin-left:10px;align-items:center;" title="Spieltyp bestimmt die Bankgröße">
       <button class="lp-fmt-btn active" id="lp-kind-ms" onclick="lpSetMatchKind('meisterschaft')" title="Meisterschaftsspiel: 7 Bankplätze"><span class="lk-long">Meisterschaft</span><span class="lk-short">M</span> · 7</button>
@@ -39265,7 +39401,8 @@ _pubCleanupSchedule();
       <button type="button" class="set-nav-it" data-sec="konto" onclick="settingsShow('konto')"><span class="set-nav-ic">👤</span><span class="set-nav-tx"><b>Konto</b><small>Passwort, PIN, Passkey, Sitzung</small></span></button>
       <button type="button" class="set-nav-it" data-sec="darstellung" onclick="settingsShow('darstellung')"><span class="set-nav-ic">🎨</span><span class="set-nav-tx"><b>Darstellung</b><small>Aussehen, Schrift</small></span></button>
       <button type="button" class="set-nav-it" data-sec="benach" onclick="settingsShow('benach')"><span class="set-nav-ic">🔔</span><span class="set-nav-tx"><b>Benachrichtigungen</b><small>Push, Erinnerungen</small></span></button>
-      <button type="button" class="set-nav-it" data-sec="team" onclick="settingsShow('team')"><span class="set-nav-ic">👥</span><span class="set-nav-tx"><b>Mannschaft</b><small>Vereinslogo, Titelbild, Anzeige der Spieler</small></span></button>
+      <button type="button" class="set-nav-it" data-sec="verein" onclick="settingsShow('verein')"><span class="set-nav-ic">🛡</span><span class="set-nav-tx"><b>Verein</b><small>Name, Logo, Datenschutz</small></span></button>
+      <button type="button" class="set-nav-it" data-sec="team" onclick="settingsShow('team')"><span class="set-nav-ic">👥</span><span class="set-nav-tx"><b>Mannschaft</b><small>Titelbild, Regeln, Anzeige der Spieler</small></span></button>
       <button type="button" class="set-nav-it" data-sec="daten" onclick="settingsShow('daten')"><span class="set-nav-ic">💾</span><span class="set-nav-tx"><b>Daten</b><small>Backups, Papierkorb, Verlauf</small></span></button>
     </nav>
     <div class="set-pane" id="set-pane">
@@ -39399,9 +39536,9 @@ _pubCleanupSchedule();
 
     </section>
 
-    <section class="set-sec" data-sec="team">
-      <h4 class="set-sec-h">👥 Mannschaft</h4>
-      <p class="set-sec-sub">Gilt für die ganze Mannschaft.</p>
+    <section class="set-sec" data-sec="verein">
+      <h4 class="set-sec-h">🛡 Verein</h4>
+      <p class="set-sec-sub">Gilt für alle Mannschaften des Vereins.</p>
       <div class="setting-row">
         <img id="setLogoPrev" class="set-logo-prev" alt=""/>
         <div style="flex:1;min-width:0;">
@@ -39413,6 +39550,12 @@ _pubCleanupSchedule();
           <button type="button" class="btn" id="setLogoDel" onclick="removeClubLogo()" style="background:rgba(231,76,60,.1);color:#c0392b;border:1px solid rgba(231,76,60,.3);">Entfernen</button>
         </div>
       </div>
+      <div id="clubBox" class="club-box"></div>
+    </section>
+
+    <section class="set-sec" data-sec="team">
+      <h4 class="set-sec-h">👥 Mannschaft</h4>
+      <p class="set-sec-sub">Gilt für die ganze Mannschaft.</p>
       <div class="setting-row">
         <span id="setHeroPrev" class="set-hero-prev" aria-hidden="true"></span>
         <div style="flex:1;min-width:0;">
@@ -40097,6 +40240,10 @@ _pubCleanupSchedule();
 
 <!-- Saisonkader Confirmation List -->
 <!-- About / Changelog -->
+<div class="mo" id="moPriv" style="z-index:99998;"><div class="mob pv-mob" style="width:600px;max-width:96vw;">
+  <div class="pv-head"><h3>Datenschutz</h3><button class="btn bs" onclick="closeM('moPriv')" aria-label="Schließen">✕</button></div>
+  <div id="pv-body" class="pv-body"></div>
+</div></div>
 <div class="mo" id="moNews"><div class="mob nw-mob" style="width:520px;max-width:96vw;">
   <h3 class="nw-h">Neu in Flutlicht</h3>
   <div id="nw-list"></div>
