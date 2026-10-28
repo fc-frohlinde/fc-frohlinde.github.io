@@ -7283,12 +7283,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.74'; // v1.2.74: Rückblick nach dem Training
-const APP_VERSION_LABEL='1.2.74';
+const APP_VERSION='1.2.75'; // v1.2.75: Wochenbericht ohne leere Woche
+const APP_VERSION_LABEL='1.2.75';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1793206258791; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1793206726615; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -16294,15 +16294,17 @@ function _pvAdopt(x,token){
   try{
     const me=P.me;Object.keys(_pvVotes()).forEach(k=>{if(!me.mvpV||typeof me.mvpV!=='object')me.mvpV={};me.mvpV[k]=1;});
   }catch(e){}
-  // Weekly report and statistics of the week shown now
-  const off=_dbCompletedWeekOffset(),wk=_dbWeekBounds(off).mondayYSK;
+  // Weekly report and statistics of the week shown now: Mon–Thu the week
+  // before — unless nothing took place in it; then this week so far (1.2.75)
+  const off=_repPickOff(o=>{const r=T.rep&&T.rep[_dbWeekBounds(o).mondayYSK];return r?((r.week&&Array.isArray(r.week.sessions))?r.week.sessions.length:0):null;});
+  const wk=_dbWeekBounds(off).mondayYSK;
   const tr=T.rep&&T.rep[wk],mr=P.rep&&P.rep[wk],ph=P.me.photo||null,logo=T.logo||null;
   if(mr&&Array.isArray(mr.players))mr.players.forEach(r=>{if(r)r.photo=ph;});
   if(tr)tr.clubLogo=logo;
   const stx=(P.stats&&P.stats[wk])||null;
   if(stx){stx.clubLogo=logo;(stx.players||[]).forEach(r=>{if(r)r.photo=ph;});}
   if(logo)G.clubLogo=logo;
-  _hubLive={report:tr?Object.assign({},tr,mr||{}):null,stats:stx,data:null,off,pi:P.pi};
+  _hubLive={report:tr?Object.assign({},tr,mr||{}):null,stats:stx,data:null,off,pi:P.pi,soFar:off===0&&_dbCompletedWeekOffset()===-1};
   // A player's device keeps no copy of the team's data: an older version
   // stored the whole database here. Not on a trainer's device (a trainer
   // may look at a player's link) — his session stays.
@@ -20051,11 +20053,11 @@ function _hubBuildLive(found){
   const block=G.db&&G.db[found.team+'__'+found.season];
   if(!block||!Array.isArray(block.players)||!Array.isArray(block.sessions))return;
   const data={team:found.team,season:found.season,block,sessions:block.sessions,players:block.players};
-  const off=(typeof _dbCompletedWeekOffset==='function')?_dbCompletedWeekOffset():-1;
+  const off=_repPickOff(o=>{try{return dbComputeWeekReport(data,o).weekSess.length;}catch(e){return null;}});
   let report=null,stats=null;
   try{report=_reportForPlayers(dbBuildReportSnapshot(data,off,false),found.pi);}catch(e){console.error('[HubLive report]',e);}
   try{stats=dbBuildPlayerStatsSnapshot(data,found.pi,off,true);}catch(e){console.error('[HubLive stats]',e);}
-  _hubLive={report,stats,data,off,pi:found.pi};
+  _hubLive={report,stats,data,off,pi:found.pi,soFar:off===0&&_dbCompletedWeekOffset()===-1};
 }
 // Hands a live snapshot to report.html in the same tab (sessionStorage is
 // per tab and origin, so it never leaves this device).
@@ -20862,7 +20864,7 @@ function renderHub(){
     }
   }
   if(live.stats)mine.push(row({ic:FL_IC.chart,title:'Meine Statistik',sub:'Anwesenheit, Serie, Verlauf',href:"javascript:hubOpenLive('stats')"}));
-  if(rep)mine.push(row({ic:FL_IC.doc,title:'Wochenbericht',sub:'KW '+((rep.week&&rep.week.kw)||'')+' \u00b7 die ganze Mannschaft',href:"javascript:hubOpenLive('report')"}));
+  if(rep)mine.push(row({ic:FL_IC.doc,title:'Wochenbericht',sub:'KW '+((rep.week&&rep.week.kw)||'')+(live.soFar?' bisher':'')+' \u00b7 die ganze Mannschaft',href:"javascript:hubOpenLive('report')"}));
   const nm=getDisplayName?getDisplayName(p):p.name;
   const av=p.photo
     ? `<img class="hub-av" src="${p.photo}" alt="">`
@@ -22002,6 +22004,15 @@ function _dbCompletedWeekOffset(now){
   // tomorrow, so that week is the one worth reporting. Mon–Thu still look
   // back, because the current week has barely started.
   return (dow===0||dow>=5)?0:-1;
+}
+// The players' weekly report (1.2.75): the usual week — unless it is the week
+// before and nothing took place in it, while this week is there; then this
+// week so far. held(off) = sessions held that week, null = not available.
+function _repPickOff(held){
+  const off=_dbCompletedWeekOffset();
+  if(off!==-1)return off;
+  try{const a=held(-1),b=held(0);if(a===0&&b!=null)return 0;}catch(e){}
+  return off;
 }
 function _dbIsoWeek(d){
   const date=new Date(d.getTime());date.setHours(0,0,0,0);
