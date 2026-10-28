@@ -2371,7 +2371,29 @@ body.player-mode .fl .hub-priv{margin-top:2px;font-size:13px;opacity:.8;}
 .opp-res.o{font-family:inherit;font-size:.76rem;letter-spacing:0;color:var(--hx-muted,var(--gm));}
 .opp-c{margin:5px 0 0;padding:6px 9px;border-radius:8px;background:var(--hx-card2,#F4F6FA);font-size:.8rem;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--hx-ink,var(--bd));}
 .opp-c small{display:block;margin-top:2px;font-size:.7rem;color:var(--hx-muted,var(--gm));white-space:normal;}
-.opp-card .rpe-card-txt span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.opp-card .rpe-card-txt span,.rv-card .rpe-card-txt span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+/* Rückblick (1.2.74) */
+.rv-mob{max-height:90vh;display:flex;flex-direction:column;}
+.rv-mob #rv-body{overflow-y:auto;min-height:0;flex:1;margin:0 -4px;padding:0 4px;}
+.rv-facts{display:flex;flex-direction:column;gap:3px;font-size:.8rem;line-height:1.4;color:var(--hx-muted,var(--gm));margin:0 0 14px;padding:9px 11px;border-radius:12px;background:var(--hx-card2,#F4F6FA);}
+.rv-facts b{color:var(--hx-ink,var(--bd));}
+.rv-hard{color:#b8322a;font-weight:700;}.rv-easy{color:#1f6ea8;font-weight:700;}
+.rv-bl{display:flex;flex-direction:column;gap:6px;padding:9px 0;border-top:1px solid var(--hx-line,var(--gl));}
+.zl-hh+.rv-bl,.zl-hh+.opp-g{border-top:0;}
+.rv-bh{display:flex;align-items:center;gap:8px;font-size:.84rem;color:var(--hx-ink,var(--bd));}
+.rv-bt{flex:1;min-width:0;line-height:1.3;}
+.rv-bt small{display:block;font-size:.72rem;color:var(--hx-muted,var(--gm));}
+.rv-tg{display:flex;gap:4px;flex:none;}
+.rv-tg button{border:1px solid var(--hx-line,var(--gl));background:var(--hx-card,#fff);border-radius:999px;padding:6px 11px;font:inherit;font-size:.78rem;font-weight:600;color:var(--hx-ink,var(--bd));cursor:pointer;}
+.rv-tg button.ok[aria-pressed="true"]{background:#1a7a40;border-color:#1a7a40;color:#fff;}
+.rv-tg button.adj[aria-pressed="true"]{background:#a56a0a;border-color:#a56a0a;color:#fff;}
+.rv-tg button:focus-visible{outline:2px solid var(--hx-blue,#1659B8);outline-offset:2px;}
+.rv-bl input{margin:0;width:100%;box-sizing:border-box;}
+.rv-ask{display:block;margin:12px auto 0;border:0;background:none;font:inherit;font-size:.76rem;color:var(--hx-muted,var(--gm));text-decoration:underline;text-underline-offset:3px;cursor:pointer;}
+.tpl-rv{display:block;font-size:.72rem;line-height:1.35;margin-top:2px;color:#8a5a08;white-space:normal;}
+.tpl-rv.ok{color:#1a7a40;}
+.tpl-rvl{display:block;margin:8px 0 0;font-size:.78rem;line-height:1.4;color:#8a5a08;}
+.tpl-rvl.ok{color:#1a7a40;}
 .zl-hh{font-size:.78rem;font-weight:700;color:var(--hx-muted,var(--gm));margin-bottom:4px;}
 .zl-hi{display:flex;align-items:baseline;gap:8px;padding:4px 0;font-size:.82rem;line-height:1.4;}
 .zl-hi i{font-style:normal;color:var(--hx-muted,var(--gm));}
@@ -6904,6 +6926,7 @@ if(window._fbBlocked){
       <div id="ss-opp-wrap" style="display:none;"></div>
       <div id="ss-rpe-wrap" style="display:none;"></div>
       <div id="ss-mvp-wrap" style="display:none;"></div>
+      <div id="ss-rv-wrap" style="display:none;"></div>
       <div id="ss-physio-wrap" style="display:none;"></div>
       <div style="margin-top:8px;">
       </div>
@@ -7260,12 +7283,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.73'; // v1.2.73: Verein nur aus den Einstellungen
-const APP_VERSION_LABEL='1.2.73';
+const APP_VERSION='1.2.74'; // v1.2.74: Rückblick nach dem Training
+const APP_VERSION_LABEL='1.2.74';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1793204377032; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1793206258791; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -7285,6 +7308,7 @@ const FL_MARK='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F
 function _clubSlug(){return (_clubName()||'Flutlicht').replace(/[^A-Za-z0-9ÄÖÜäöüß]+/g,'-').replace(/^-|-$/g,'')||'Flutlicht';}
 function _clubInfo(){const c=(G&&G.club&&typeof G.club==='object')?G.club:{};return {name:_clubName(),resp:String(c.resp||''),addr:String(c.addr||''),mail:String(c.mail||''),dsb:String(c.dsb||'')};}
 const APP_NEWS=[
+  {id:'20261028-2',d:'28.10.',t:'Rückblick nach dem Training',x:'Nach „Anwesenheit erfassen“ fragt die App kurz: Wie lief’s, was lief gut, was ändern wir? Mit Plan auch, ob jede Übung gepasst hat. „Was ändern wir?“ steht beim nächsten Training wieder da, „anpassen“ bei der Übung im Trainingsplaner.',go:['Zum letzten Training','rvGoLast()']},
   {id:'20261028-1',d:'28.10.',t:'Notizen zum Gegner',x:'Im Spiel-Fenster unter „Notizen zum Gegner“ haltet ihr fest, wie ein Gegner spielt, worauf ihr achten müsst und was beim Platz wichtig ist. Vor dem nächsten Spiel gegen ihn steht alles wieder da – mit den Ergebnissen und Notizen der bisherigen Spiele.',go:['Zum nächsten Spiel','oppGoNext()']},
   {id:'20261027-2',d:'27.10.',t:'Entwicklungsziele',x:'Im Spielerprofil unter „Ziele“ vereinbart ihr mit jedem Spieler 1–3 Ziele und gebt ab und zu Rückmeldung. Der Spieler sieht sie in seiner App.',go:['Zu den Zielen','zlOpenTab()']},
   {id:'20261027-1',d:'27.10.',t:'Spielbericht und Spielzeit',x:'Nach jedem Spiel im Spiel-Fenster den Spielbericht ausfüllen: Startelf, Wechsel, Tore, Karten. Daraus rechnet die App Minuten und Sperren – und zeigt in der Statistik, wer wenig spielt.',go:['Zur Statistik',"hxGo('stats')"]},
@@ -16754,6 +16778,203 @@ function oppSave(){
   if(typeof showSaveFlash==='function')showSaveFlash(has?'✓ Notizen zu '+_opp.lbl+' gespeichert':'✓ Notizen zu '+_opp.lbl+' gelöscht');
   if(typeof _currentSessIdx!=='undefined'&&_currentSessIdx===_opp.si&&UI.currentSeason===_opp.season)renderSessOpp(_opp.si);
 }
+// ══ Rückblick nach dem Training (1.2.74) ══════════════════════════
+// Trainers only, on the session: s.rv = {g:1|2|3, gut, anders,
+// b:{<block id>:{v:'ok'|'adj', c, n, l}}, t, by} (l = the exercise in the
+// library). The players' slices list their fields, so none of it reaches
+// them. "Was ändern wir?" comes back at the next training (window, planner);
+// "anpassen" stands at the exercise in the planner's library.
+const RV_G=[[1,'Holprig'],[2,'Solide'],[3,'Richtig gut']];
+function _rvOf(s){const r=s&&s.rv;return (r&&typeof r==='object'&&(r.g||r.gut||r.anders||(r.b&&typeof r.b==='object'&&Object.keys(r.b).length)))?r:null;}
+const _rvNum=n=>(Math.round(n*10)/10).toLocaleString('de-DE');
+const _rvGl=g=>{const x=RV_G.find(y=>y[0]===g);return x?x[1]:'';};
+// Over, or in its last quarter of an hour (the attendance is often taken then)
+function _rvEndK(s,season){
+  if(!s||!s.date)return false;
+  const k=_dbSortKey(s.date,season),tk=todaySK();
+  if(k<tk)return true;if(k>tk)return false;
+  const tp=String(s.time||'').split(':').map(Number);
+  if(isNaN(tp[0]))return sessTookPlace(s,season);
+  const end=tp[0]*60+(tp[1]||0)+((typeof rpeSessionMinutes==='function'&&rpeSessionMinutes(s,null,null))||90);
+  const n=new Date();return n.getHours()*60+n.getMinutes()>=end-15;
+}
+// The latest training before si with something to change
+function _rvLast(D,si,season){
+  const S=(D&&D.sessions)||[],k0=_dbSortKey(S[si]&&S[si].date,season);let best=null;
+  S.forEach((s,i)=>{
+    if(i===si||!s||s.type==='match')return;
+    const r=_rvOf(s);if(!r||!String(r.anders||'').trim())return;
+    const k=_dbSortKey(s.date,season);
+    if(k>=k0)return;
+    if(!best||k>best.k)best={s,si:i,k,r};
+  });
+  return best;
+}
+// The last verdict on each exercise of the library, all seasons of the team
+function _rvLibIdx(team){
+  const out={};team=team||UI.currentTeam;
+  (G&&G.seasonList||[]).forEach(season=>{
+    const b=G.db&&G.db[team+'__'+season];if(!b||!Array.isArray(b.sessions))return;
+    b.sessions.forEach(s=>{
+      const r=_rvOf(s);if(!r||!r.b)return;
+      const k=_dbSortKey(s.date,season);
+      Object.values(r.b).forEach(x=>{if(!x||!x.l||(x.v!=='ok'&&x.v!=='adj'))return;const cur=out[x.l];if(!cur||k>cur.k)out[x.l]={v:x.v,c:String(x.c||''),k};});
+    });
+  });
+  return out;
+}
+function _rvLibLine(libId,cls,idx){
+  const x=libId&&(idx||_rvLibIdx())[libId];if(!x)return '';
+  return x.v==='adj'?`<span class="${cls}">Rückblick ${_skDM(x.k)}: anpassen${x.c?' – '+escapeHtml(x.c):''}</span>`
+    :`<span class="${cls} ok">Rückblick ${_skDM(x.k)}: hat gepasst</span>`;
+}
+// the card in the training window: after it — the review; before it — what to change from last time
+function renderSessRv(si){
+  const box=document.getElementById('ss-rv-wrap');if(!box)return;
+  const D=cd(),s=D&&D.sessions&&D.sessions[si],season=UI.currentSeason;
+  const hide=()=>{box.style.display='none';box.innerHTML='';};
+  if(!s||s.type==='match'||!canEdit())return hide();
+  const e=escapeHtml;
+  if(sessTookPlace(s,season)){
+    const r=_rvOf(s);
+    const sub=r?[_rvGl(r.g),r.anders?'Ändern: '+r.anders:(r.gut?'Gut: '+r.gut:'')].filter(Boolean).join(' · ')||'gespeichert'
+      :'Wie lief’s? In einer Minute festhalten, was bleibt.';
+    box.style.display='block';
+    box.innerHTML=`<button type="button" class="rpe-card sb-card rv-card${r?'':' rpe-none'}" onclick="rvOpen(${si})">
+      <span class="rpe-card-ic">📝</span><span class="rpe-card-txt"><b>Rückblick</b><span>${e(sub)}</span></span><span class="rpe-card-chev">›</span></button>`;
+    return;
+  }
+  const L=_rvLast(D,si,season);
+  if(!L)return hide();
+  box.style.display='block';
+  box.innerHTML=`<button type="button" class="rpe-card sb-card rv-card rv-prev" onclick="rvOpen(${L.si})">
+    <span class="rpe-card-ic">↩️</span><span class="rpe-card-txt"><b>Vom letzten Mal (${e(L.s.date)})</b><span>${e(L.r.anders)}</span></span><span class="rpe-card-chev">›</span></button>`;
+}
+// After "Anwesenheit erfassen" of a training that is (nearly) over and has no review yet
+function _rvMaybeAsk(si){
+  if(!canEdit()||getUserPref('rvAsk',true)===false)return;
+  const D=cd(),s=D&&D.sessions&&D.sessions[si];
+  if(!s||s.type==='match'||_rvOf(s)||!_rvEndK(s,UI.currentSeason))return;
+  setTimeout(()=>{try{rvOpen(si,{ask:1});}catch(e){}},250);
+}
+let _rv=null;
+async function rvOpen(si,opts){
+  if(!canEdit())return;
+  const D=cd(),s=D&&D.sessions&&D.sessions[si];if(!s||s.type==='match')return;
+  const v=JSON.parse(JSON.stringify(_rvOf(s)||{}));if(!v.b||typeof v.b!=='object')v.b={};
+  const R=_rv={si,season:UI.currentSeason,team:UI.currentTeam,ask:!!(opts&&opts.ask),blocks:null,sum:null,v};
+  _rvRender();
+  openM('moRv');
+  // With a plan: its exercises and the planned figures
+  if(s.pid&&typeof _tplRead==='function'&&_tplAllowed()&&_fbReady()){
+    try{
+      const pl=_tplNorm(await _tplRead(_tplBase(R.team)+'/plans/'+s.pid));
+      if(_rv!==R||!pl)return;
+      R.blocks=_tplArr(pl.blocks).filter(b=>b&&b.id&&(String(b.title||'').trim()||b.libId));
+      R.sum=_tplIdxSum(pl);
+      _rvRender();
+    }catch(e){console.warn('[Rückblick] Plan',e);}
+  }
+}
+function _rvRender(){
+  const b=document.getElementById('rv-body');if(!b||!_rv)return;
+  const D=cd(),s=D&&D.sessions&&D.sessions[_rv.si];if(!s)return;
+  const e=escapeHtml,v=_rv.v,season=_rv.season;
+  document.getElementById('rv-title').textContent='Rückblick · '+s.date;
+  const later=document.getElementById('rv-later');if(later)later.textContent=_rv.ask?'Später':'Schließen';
+  const f=[];
+  try{const c=_hxCounts(D,_rv.si,season);if(c.present)f.push(`<span><b>${c.present}</b> von ${c.total} da${s.focus?' · '+e(s.focus):''}</span>`);}catch(x){}
+  let felt=null;
+  try{const g=_rpeSessGroups(D,s,_rv.si,season);if(g.rated.length){felt=g.rated.reduce((a,x)=>a+x.r,0)/g.rated.length;
+    f.push(`<span>Belastung der Spieler Ø <b>${_rvNum(felt)}</b> (${g.rated.length} ${g.rated.length===1?'Antwort':'Antworten'})</span>`);}}catch(x){}
+  const P=_rv.sum;
+  if(P&&P.m){
+    f.push(`<span>Plan <b>${P.m}</b> Min.${P.dn?` · auf dem Platz <b>${P.dn}</b> Min.`:''}</span>`);
+    if(typeof P.pi==='number'){
+      let w='';
+      if(felt!=null){const d=felt-P.pi;w=d>=1?' – <span class="rv-hard">härter als geplant</span>':d<=-1?' – <span class="rv-easy">leichter als geplant</span>':' – wie geplant';}
+      f.push(`<span>Intensität geplant <b>${_rvNum(P.pi)}</b>${felt!=null?`, gefühlt <b>${_rvNum(felt)}</b>`:''}${w}</span>`);
+    }
+  }
+  const chips=RV_G.map(([g,l])=>`<label class="zl-chip"><input type="radio" name="rv-g" value="${g}"${v.g===g?' checked':''} onchange="_rv.v.g=${g}"><span>${l}</span></label>`).join('');
+  const blocks=(_rv.blocks||[]).map(bl=>{
+    const x=v.b[bl.id]||{},id=e(bl.id);
+    return `<div class="rv-bl"><div class="rv-bh"><span class="tpl-catdot" style="background:${_tplCatColor(bl.cat)}"></span>
+      <span class="rv-bt">${e(String(bl.title||'').trim()||bl.ph||'Übung')}<small>${e(bl.cat||'')}${+bl.min?' · '+(+bl.min)+' Min.':''}</small></span>
+      <span class="rv-tg"><button type="button" class="ok" aria-pressed="${x.v==='ok'}" onclick="rvBlk('${id}','ok')">passt</button><button type="button" class="adj" aria-pressed="${x.v==='adj'}" onclick="rvBlk('${id}','adj')">anpassen</button></span></div>
+      ${x.v==='adj'?`<input type="text" id="rv-c-${id}" maxlength="200" placeholder="Was anpassen? z. B. Feld größer, weniger pro Gruppe" value="${e(x.c||'')}" oninput="rvBlkC('${id}',this.value)">`:''}</div>`;
+  }).join('');
+  const ask=_rv.ask?`<button type="button" class="rv-ask" onclick="rvAsk(false)">Nicht nach jedem Training fragen</button>`
+    :(getUserPref('rvAsk',true)===false?`<button type="button" class="rv-ask" onclick="rvAsk(true)">Nach „Anwesenheit erfassen“ wieder fragen</button>`:'');
+  b.innerHTML=(f.length?`<div class="rv-facts">${f.join('')}</div>`:'')
+    +`<div class="zl-f"><span class="zl-fl">Wie lief’s?</span><div class="zl-chips">${chips}</div></div>`
+    +`<label class="zl-f"><span class="zl-fl">Was lief gut?</span><textarea rows="2" maxlength="600" oninput="_rv.v.gut=this.value" placeholder="z. B. Pressing nach Ballverlust, gute Stimmung">${e(v.gut||'')}</textarea></label>`
+    +`<label class="zl-f"><span class="zl-fl">Was ändern wir? <i>· steht beim nächsten Training wieder da</i></span><textarea rows="2" maxlength="600" oninput="_rv.v.anders=this.value" placeholder="z. B. weniger Wartezeit beim Torschuss">${e(v.anders||'')}</textarea></label>`
+    +(blocks?`<div class="zl-hist"><div class="zl-hh">Übungen aus dem Plan</div>${blocks}</div>`:'')
+    +ask;
+}
+function rvBlk(id,val){
+  if(!_rv)return;
+  const bl=(_rv.blocks||[]).find(x=>x.id===id),cur=_rv.v.b[id]||{};
+  if(cur.v===val)delete _rv.v.b[id];
+  else _rv.v.b[id]=Object.assign({},cur,{v:val,n:bl?String(bl.title||'').trim():'',l:bl&&bl.libId?bl.libId:''});
+  _rvRender();
+  if(val==='adj'&&_rv.v.b[id]){const i=document.getElementById('rv-c-'+id);if(i)try{i.focus();}catch(e){}}
+}
+function rvBlkC(id,t){if(_rv&&_rv.v.b[id])_rv.v.b[id].c=t;}
+function rvAsk(on){
+  setUserPref('rvAsk',!!on);
+  if(!on){closeM('moRv');if(typeof showSaveFlash==='function')showSaveFlash('Rückblick: nur noch im Trainings-Fenster');}
+  else{_rvRender();if(typeof showSaveFlash==='function')showSaveFlash('✓ Nach „Anwesenheit erfassen“ wird wieder gefragt');}
+}
+// What is stored, without who and when
+function _rvClean(v){
+  const out={};v=v||{};
+  if(v.g>=1&&v.g<=3)out.g=+v.g;
+  const gut=String(v.gut||'').trim().slice(0,600),an=String(v.anders||'').trim().slice(0,600);
+  if(gut)out.gut=gut;if(an)out.anders=an;
+  const b={};
+  Object.entries(v.b&&typeof v.b==='object'?v.b:{}).forEach(([id,x])=>{
+    if(!x||(x.v!=='ok'&&x.v!=='adj'))return;
+    const o={v:x.v};
+    if(x.v==='adj'&&String(x.c||'').trim())o.c=String(x.c).trim().slice(0,200);
+    if(x.n)o.n=String(x.n).slice(0,80);
+    if(x.l)o.l=String(x.l).slice(0,40);
+    b[id]=o;
+  });
+  if(Object.keys(b).length)out.b=b;
+  return out;
+}
+function rvSave(){
+  if(!_rv||!canEdit())return;
+  const D=cd(),s=D&&D.sessions&&D.sessions[_rv.si];if(!s)return;
+  const out=_rvClean(_rv.v),has=Object.keys(out).length>0;
+  if(JSON.stringify(out)===JSON.stringify(_rvClean(s.rv))){closeM('moRv');return;}
+  snap();
+  if(has){out.t=Date.now();out.by=(CU&&CU.name)||'';s.rv=out;}
+  else delete s.rv;
+  saveG();
+  logAudit('Rückblick',s.date||'?',has?(_rvGl(out.g)||'gespeichert'):'gelöscht');
+  closeM('moRv');
+  if(typeof showSaveFlash==='function')showSaveFlash(has?'✓ Rückblick gespeichert':'✓ Rückblick gelöscht');
+  if(typeof _currentSessIdx!=='undefined'&&_currentSessIdx===_rv.si&&UI.currentSeason===_rv.season)renderSessRv(_rv.si);
+}
+// From the news card: the last training that took place
+function rvGoLast(){
+  const D=cd(),S=(D&&D.sessions)||[];let best=-1,bk=-1;
+  S.forEach((s,si)=>{if(!s||s.type==='match'||!sessTookPlace(s,UI.currentSeason))return;const k=_dbSortKey(s.date,UI.currentSeason);if(k>bk){bk=k;best=si;}});
+  if(best>=0)openSessFromMain(best);else if(typeof hxGo==='function')hxGo('cal');
+}
+// The planner: what to change from last time, above the plan of a coming training
+function _rvPlanHint(){
+  try{
+    const D=_tplD(),s=_tplSess();
+    if(!D||!s||typeof TPL.si!=='number'||sessTookPlace(s,TPL.season))return '';
+    const L=_rvLast(D,TPL.si,TPL.season);
+    if(!L)return '';
+    return `<div class="tpl-hint tpl-rvh"><b>Vom letzten Mal (${escapeHtml(L.s.date)}):</b> ${escapeHtml(L.r.anders)}</div>`;
+  }catch(e){return '';}
+}
 // From the news card: the next match of the team on screen
 function oppGoNext(){
   const D=cd(),S=(D&&D.sessions)||[],t=todaySK();
@@ -24935,7 +25156,9 @@ function rcDone(){
       logAudit('Einsatz bewertet',(s&&s.date)||'?',fill.length+' Spieler normal');
     }
   }
+  const _rvSi=_rcSi;
   rcClose();
+  if(_rvSi!=null)try{_rvMaybeAsk(_rvSi);}catch(e){console.error('[Rückblick]',e);}
 }
 function rcGrade(pi,val){
   if(_rcSi==null)return;
@@ -25021,6 +25244,7 @@ function openSessStats(si){
   try{renderSessMvp(si);}catch(e){console.error('sessMvp:',e);}
   try{renderSessReport(si);}catch(e){console.error('sessReport:',e);}
   try{renderSessOpp(si);}catch(e){console.error('sessOpp:',e);}
+  try{renderSessRv(si);}catch(e){console.error('sessRv:',e);}
   try{_ssSyncMore();}catch(e){}
   const rcw=document.getElementById('ss-rollcall-wrap');
   if(rcw)rcw.style.display=(canEdit()&&typeof _isSessRollCallTime==='function'&&_isSessRollCallTime(si))?'block':'none';
@@ -33784,7 +34008,7 @@ function _tplRenderList(){
   const stdNote=(ed&&TPL.draft&&bl.length)?`<div class="tpl-stdn"><span><b>Standardablauf</b> – tippe auf einen Abschnitt und trag die Übung ein${_tplLibItems().length?' oder wähle sie aus der Bibliothek':''}.</span>
       <span class="tpl-stdn-a"><button type="button" class="tpl-lnk" onclick="tplStdClear()">Leer beginnen</button><button type="button" class="tpl-lnk" onclick="tplStdDlg()">Standard ändern</button></span></div>`:'';
   el.innerHTML=`<div class="tpl-row"><h3 class="tpl-h3">Ablauf</h3><span class="tpl-tot"><span class="${cls}">${tot}</span> / ${dur} Min.</span></div>
-    <div class="tpl-bar" role="img" aria-label="Zeitaufteilung: ${tot} von ${dur} Minuten verplant">${bar}</div>${stdNote}${msg}${doneTxt}
+    <div class="tpl-bar" role="img" aria-label="Zeitaufteilung: ${tot} von ${dur} Minuten verplant">${bar}</div>${stdNote}${msg}${doneTxt}${_rvPlanHint()}
     ${bl.length?`<div class="tpl-blocks">${rows}</div>`:''}
     ${ed?`<button type="button" class="tpl-add" ondragover="tplDragOver(event,-1)" ondragleave="tplDragLeave(event)" ondrop="tplDrop(event)" onclick="tplAddBlock()">+ Block hinzufügen</button>
     <div class="tpl-links">
@@ -33854,6 +34078,7 @@ function _tplRenderEd(){
         <label class="tpl-chip"><span>Feld</span><input class="w-txt" value="${_tplE(b.area)}" placeholder="z. B. 15 × 15 m" oninput="tplSetF('area',this.value)"></label>
         <span class="tpl-chip tpl-ichip"><label title="Geplante Intensität auf der Skala der Spieler (0–10). Ohne Angabe gilt „auto“: der Wert der Kategorie, bei Spielformen nach dem Format im Namen."><span>Intensität</span><select id="tplIntSel" aria-label="Geplante Intensität" onchange="tplSetF('int',this.value?+this.value:'')">${_tplIntOpts(b.int,_tplAutoInt(b))}</select></label><button type="button" class="tpl-ihelp" onclick="tplIntHelp()" title="So schätzt du die Intensität" aria-label="Intensität einschätzen – Hilfe">?</button></span>
       </div>
+      ${b.libId?_rvLibLine(b.libId,'tpl-rvl',_rvLibIdx(TPL.team)):''}
     </div>
     <div class="tpl-acts">
       ${(_tplIsSlot(b)&&_tplLibItems().length)?`<button type="button" class="tpl-ab acc" onclick="tplPickLib()">Aus der Bibliothek wählen</button>`:''}
@@ -33909,6 +34134,7 @@ function _tplRenderLibList(){
   const items=_tplLibItems().filter(x=>(TPL.libCat==='Alle'||x.cat===TPL.libCat)
     &&(!q||(x.title+' '+x.cat+' '+(x.desc||'')+' '+(x.coach||'')).toLowerCase().indexOf(q)>=0))
     .sort((a,b)=>_tplCatIdx(a.cat)-_tplCatIdx(b.cat)||String(a.title).localeCompare(String(b.title),'de'));
+  const RV=_rvLibIdx(TPL.team);
   if(!items.length){el.innerHTML=`<div class="tpl-none">${q?'Keine Übung gefunden.'
     :(_tplLibItems().length?'Noch keine Übungen in dieser Kategorie.'
     :'Die Bibliothek ist noch leer. Lege mit „+ Neue Übung“ eine an oder speichere einen fertigen Block über „In Bibliothek speichern“.')}</div>`;return;}
@@ -33919,7 +34145,7 @@ function _tplRenderLibList(){
     return `<div class="tpl-li${open?' open':''}">
       <div class="tpl-li-h" draggable="true" ondragstart="tplLibDragStart(event,'${x.id}')" ondragend="tplDragEnd()" onclick="tplLibToggle('${x.id}')" title="Klicken für Details, ziehen in den Ablauf">
         <span class="tpl-stripe" style="background:${_tplCatColor(x.cat)};align-self:stretch"></span>${open?'':_dgThumb(x.dia)}
-        <span class="tpl-li-t"><b>${_tplE(x.title)}</b><span>${_tplE(meta)}</span></span>
+        <span class="tpl-li-t"><b>${_tplE(x.title)}</b><span>${_tplE(meta)}</span>${_rvLibLine(x.id,'tpl-rv',RV)}</span>
         <button type="button" class="tpl-li-plus" title="In den Ablauf übernehmen" aria-label="${_tplE(x.title)} in den Ablauf übernehmen" onclick="event.stopPropagation();tplAddLib('${x.id}')">+</button>
       </div>
       ${open?`<div class="tpl-li-b">${_dgHas(x.dia)?`<div class="tpl-li-prev">${_dgSvg(x.dia,'Skizze: '+x.title)}</div>`:''}${x.area?`<span><b>Feld:</b> ${_tplE(x.area)}</span>`:''}${x.desc?`<p>${_tplE(x.desc)}</p>`:''}
@@ -39138,6 +39364,14 @@ _pubCleanupSchedule();
     <button type="button" class="btn bp" onclick="zlSave()">Speichern</button>
     <button type="button" class="btn bs" onclick="closeM('moZl')">Abbrechen</button>
     <button type="button" class="zl-del" id="zl-del" onclick="zlDel()" hidden>Ziel löschen</button>
+  </div>
+</div></div>
+<div class="mo" id="moRv"><div class="mob zl-mob rv-mob" style="width:520px;max-width:96vw;">
+  <h3 class="zl-h" id="rv-title">Rückblick</h3>
+  <div id="rv-body"></div>
+  <div class="mob-btns">
+    <button type="button" class="btn bp" onclick="rvSave()">Speichern</button>
+    <button type="button" class="btn bs" id="rv-later" onclick="closeM('moRv')">Später</button>
   </div>
 </div></div>
 <div class="mo" id="moGegner"><div class="mob zl-mob opp-mob" style="width:520px;max-width:96vw;">
