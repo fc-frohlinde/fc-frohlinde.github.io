@@ -32,6 +32,10 @@ REDEEM_USED = ("(auth != null && !data.exists() && newData.val() === auth.uid"
                " && !data.parent().child('revoked').exists()"
                " && newData.parent().parent().parent().child('fcf_members/'+auth.uid+'/code').val() === $code)")
 STR = lambda n: "newData.isString() && newData.val().length <= %d" % n
+# ── Schritt B, Teil 3 (1.2.71): the team's data for members only ──
+# A trainer may change the training plans when the admin cleared him: the app
+# copies that onto his account (fcf_members/<uid>/plan, the admin writes it).
+CAN_PLAN = "(" + IS_ADMIN + " || (" + IS_MEMBER + " && root.child('fcf_members/'+auth.uid+'/plan').val() === true))"
 # A slice (1.2.36): {t: built at, h: hash, j: JSON text}; t, h and j may be
 # written one by one (the job's mvp beside them stays)
 SLICE = {
@@ -45,8 +49,8 @@ SLICE = {
 rules = {
   "rules": {
     "fcf_data": {
-      ".read": True,
-      ".write": "newData.exists() && newData.hasChild('version') && newData.child('version').val() >= 14",
+      ".read": IS_MEMBER,
+      ".write": IS_MEMBER + " && newData.exists() && newData.hasChild('version') && newData.child('version').val() >= 14",
       "version": {".validate": "newData.isNumber() && newData.val() >= 14 && newData.val() <= 999"},
       "teamList": {".validate": "newData.exists()"},
       "seasonList": {".validate": "newData.exists()"},
@@ -58,22 +62,22 @@ rules = {
       "$other": {".validate": True}
     },
     "fcf_media": {
-      ".read": True, ".write": True,
+      ".read": IS_MEMBER, ".write": IS_MEMBER,
       "photos": {"$id": {".validate": "newData.isString() && newData.val().beginsWith('data:image') && newData.val().length <= 500000"}},
       "rev": {"$id": {".validate": "newData.isNumber() && newData.val() <= (now + 3600000)"}},
       "$other": {".validate": False}
     },
     "__backups": {
-      ".read": True, ".write": True,
+      ".read": IS_MEMBER, ".write": IS_MEMBER,
       "$index": {".validate": "newData.hasChildren(['ts','data'])"}
     },
     "__backups_meta": {
-      ".read": True, ".write": True,
+      ".read": IS_MEMBER, ".write": IS_MEMBER,
       "lastAutoDay": {".validate": "newData.isString() && newData.val().length <= 40"},
       "$other": {".validate": False}
     },
     "__presence": {
-      ".read": True, ".write": True,
+      ".read": IS_MEMBER, ".write": IS_MEMBER,
       "$sessionId": {
         ".validate": "newData.exists()",
         "lastSeen": {".validate": "newData.isNumber() && newData.val() <= (now + 3600000)"},
@@ -81,7 +85,7 @@ rules = {
       }
     },
     "__trainerActivity": {
-      ".read": True, ".write": True,
+      ".read": IS_MEMBER, ".write": IS_MEMBER,
       "$trainerKey": {
         ".validate": "newData.hasChildren(['name','lastSeen'])",
         "name": {".validate": "newData.isString() && newData.val().length <= 100"},
@@ -96,7 +100,7 @@ rules = {
       }
     },
     "fcf_plans": {
-      ".read": True, ".write": True,
+      ".read": IS_MEMBER, ".write": CAN_PLAN,
       "$team": {
         "plans": {"$pid": {".validate": "newData.hasChild('upd')"}},
         "idx": {"$pid": {".validate": "newData.hasChild('upd')"}},
@@ -114,7 +118,7 @@ rules = {
       "config": {
         ".read": True,
         "$team": {
-          ".write": True,
+          ".write": IS_MEMBER,
           "$kind": {".validate": "($kind === 'rpe' || $kind === 'vote' || $kind === 'rsvp') && newData.isBoolean()"}
         }
       },
@@ -163,6 +167,9 @@ rules = {
         "t": {".validate": "newData.isNumber() && newData.val() <= now + 60000"},
         "email": {".validate": STR(120)},
         "name": {".validate": STR(120)},
+        # the planner clearance (Teil 3): only the admin sets it, never the
+        # trainer himself, not even when redeeming his invite
+        "plan": {".validate": "newData.isBoolean() && " + IS_ADMIN},
         "$other": {".validate": False}
       }
     },
@@ -175,19 +182,18 @@ rules = {
     # ── Schritt B, Teil 2 (1.2.36): Ausschnitte für Spieler ──
     # Read by key only, never as a list: the key is a hash of the player's
     # link (fcf_pv, fcf_in, fcf_vote) or of the team's group-link secret
-    # (fcf_pt, fcf_pk). Written by the trainers' app — until Teil 3 by any
-    # client, like fcf_data; Teil 3 makes it members only.
+    # (fcf_pt, fcf_pk). Written by the trainers' app: members only (Teil 3).
     "fcf_pv": {
-      "$pk": dict(SLICE, **{".validate": SLICE[".validate"].replace("$KEY", "$pk"), ".read": True, ".write": True})
+      "$pk": dict(SLICE, **{".validate": SLICE[".validate"].replace("$KEY", "$pk"), ".read": True, ".write": IS_MEMBER})
     },
     "fcf_pt": {
-      "$tk": dict(SLICE, **{".validate": SLICE[".validate"].replace("$KEY", "$tk"), ".read": True, ".write": True,
+      "$tk": dict(SLICE, **{".validate": SLICE[".validate"].replace("$KEY", "$tk"), ".read": True, ".write": IS_MEMBER,
         # the job's winners of a closed vote
         "mvp": {"$k": {".validate": "newData.hasChildren()"}}})
     },
     "fcf_pk": {
       "$tk": {
-        ".write": True, ".validate": "$tk.matches(/^[0-9a-f]{64}$/)",
+        ".write": IS_MEMBER, ".validate": "$tk.matches(/^[0-9a-f]{64}$/)",
         "$h": {".read": True, ".validate": "$h.matches(/^[0-9a-f]{64}$/) && newData.isString() && newData.val().length <= 40"}
       }
     },
