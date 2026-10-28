@@ -7276,12 +7276,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.69'; // v1.2.69: Im Blick als Fenster
-const APP_VERSION_LABEL='1.2.69';
+const APP_VERSION='1.2.70'; // v1.2.70: Im Blick pro Spieler
+const APP_VERSION_LABEL='1.2.70';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1793149594513; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1793150381969; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -28363,6 +28363,8 @@ function hxRender(){
   try{
     dbComputeBirthdays({players:D.players}).filter(x=>x.days<=7&&!_pGone(x.p)).forEach(x=>flags.push({dot:'#F2C230',who:nm(x.p),what:(x.days===0?'hat heute Geburtstag':'Geburtstag am '+x.date)+' ('+x.turns+')',on:`openPlayerFromMain(${x.pi})`}));
   }catch(e){}
+  // One row per player (1.2.70): "Max · 2× unentschuldigt · Belastung +68 %"
+  try{const g=_hxGroupFlags(flags,D);flags.length=0;g.forEach(f=>flags.push(f));}catch(e){console.error('[Im Blick]',e);}
   html+=`<section class="hx-card hx-a-flags" aria-label="Im Blick behalten"><h3 class="hx-h2">Im Blick behalten</h3>`;
   if(!flags.length)html+=`<div class="hx-ok">Alles im grünen Bereich.</div>`;
   else{
@@ -28403,6 +28405,32 @@ function _rcMissing(D,season){
   return out.sort((a,b)=>b.start-a.start).slice(0,3);
 }
 // "Im Blick": three rows on tablets and short windows, four otherwise
+// Rows about the same player become one: the reasons joined, the most
+// urgent colour, and the row opens his profile (or the one action they share).
+// A player is recognised by his name in "who" (only names that are unique).
+const HX_DOT_RANK=['#C9373E','#E0912F','#7C3AED','#0E8A7E','#1659B8','#7C8AA3','#8A96AD','#F2C230'];
+function _hxGroupFlags(flags,D){
+  const nm=p=>(typeof getDisplayName==='function'?getDisplayName(p):p.name)||p.name||'';
+  const byName=new Map(),dup=new Set();
+  (D&&D.players||[]).forEach((p,pi)=>{if(!p)return;const n=nm(p);if(!n)return;if(byName.has(n))dup.add(n);else byName.set(n,pi);});
+  const out=[],grp=new Map();
+  flags.forEach(f=>{
+    const pi=(f&&!dup.has(f.who))?byName.get(f.who):undefined;
+    if(pi===undefined){out.push(f);return;}
+    const g=grp.get(pi);
+    if(!g){const x={dot:f.dot,who:f.who,what:f.what,on:f.on,_pi:pi,_items:[f]};grp.set(pi,x);out.push(x);return;}
+    g._items.push(f);
+  });
+  out.forEach(x=>{
+    if(!x._items||x._items.length<2)return;
+    const it=x._items.slice().sort((a,b)=>{const r=c=>{const i=HX_DOT_RANK.indexOf(c);return i<0?99:i;};return r(a.dot)-r(b.dot);});
+    x.dot=it[0].dot;
+    x.what=it.map(f=>f.what).join(' · ');
+    const ons=new Set(it.map(f=>f.on));
+    x.on=ons.size===1?it[0].on:`openPlayerFromMain(${x._pi})`;
+  });
+  return out;
+}
 function hxFlagsOpen(){
   const L=window._hxFlagsList||[],box=document.getElementById('flg-list');if(!box)return;
   const esc=escapeHtml;
