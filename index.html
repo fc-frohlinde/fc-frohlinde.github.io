@@ -2256,6 +2256,7 @@ body.player-mode .fl .hub-news.fl-pause{border-left-color:#8FA3C8;}
 .club-f input,.club-f textarea{margin:3px 0 0;width:100%;box-sizing:border-box;}
 .club-v{font-size:.88rem;color:var(--hx-ink,var(--bd));}
 .club-priv{margin-top:4px;}
+.club-h{margin:10px 0 -4px;padding-top:12px;border-top:1px solid var(--hx-line,var(--gl));font-size:.8rem;font-weight:700;color:var(--hx-muted,var(--gm));}
 .club-priv p{font-size:.76rem;line-height:1.45;color:var(--hx-muted,var(--gm));margin:8px 0 0;}
 .mob.pv-mob{max-height:90vh;display:flex;flex-direction:column;}
 .pv-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:none;margin-bottom:6px;}
@@ -7294,12 +7295,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below — only what changes in
 // their work, one or two sentences. The full history of every version is
 // versionen.json next to this page (1.2.63).
-const APP_VERSION='1.2.65'; // v1.2.65: Verein und Datenschutz
-const APP_VERSION_LABEL='1.2.65';
+const APP_VERSION='1.2.66'; // v1.2.66: Name und Logo in den Vereinsdaten
+const APP_VERSION_LABEL='1.2.66';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1793145107098; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1793146959147; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27.10.): written for the
 // other trainers, not for the admin; what changes for you and where to find
@@ -7311,10 +7312,29 @@ const APP_RELEASE_TS=1793145107098; // v1.0.9.7: Firebase traffic — diff write
 // are the club's settings — the app itself is not tied to a club.
 const INSTALL_CLUB='FC Frohlinde';
 function _clubName(){return (G&&typeof G.clubName==='string'&&G.clubName.trim())||INSTALL_CLUB||'';}
+// A club without its own logo shows the Flutlicht mark
+const FL_MARK='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%20width%3D%2264%22%20height%3D%2264%22%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20fill%3D%22%230E2350%22%2F%3E%3Cdefs%3E%3CradialGradient%20id%3D%22flAa17%22%20cx%3D%22.5%22%20cy%3D%22.5%22%20r%3D%22.5%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23FFFFFF%22%2F%3E%3Cstop%20offset%3D%22.38%22%20stop-color%3D%22%23FFF3C4%22%2F%3E%3Cstop%20offset%3D%22.8%22%20stop-color%3D%22%23F2C230%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23E3AC1A%22%2F%3E%3C%2FradialGradient%3E%3CradialGradient%20id%3D%22flAab18%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%23FFE9A0%22%20stop-opacity%3D%220.5%22%2F%3E%3Cstop%20offset%3D%22.5%22%20stop-color%3D%22%23FFE9A0%22%20stop-opacity%3D%220.175%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23FFE9A0%22%20stop-opacity%3D%220%22%2F%3E%3C%2FradialGradient%3E%3C%2Fdefs%3E%3Cellipse%20cx%3D%2232%22%20cy%3D%2224%22%20rx%3D%2234%22%20ry%3D%2228%22%20fill%3D%22url%28%23flAab18%29%22%2F%3E%3Cg%3E%3Cpath%20d%3D%22M30.2%2036h3.6l1.7%2028h-7z%22%20fill%3D%22%231F3466%22%2F%3E%3Cpath%20d%3D%22M30.72%2039.00L33.56%2043.60L30.16%2048.20L34.12%2052.80L29.60%2057.40L34.68%2062.00%22%20fill%3D%22none%22%20stroke%3D%22%2330508F%22%20stroke-width%3D%22.8%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fg%3E%3Cg%3E%3Crect%20x%3D%229%22%20y%3D%229%22%20width%3D%2246%22%20height%3D%2229%22%20rx%3D%226%22%20fill%3D%22%2322386B%22%2F%3E%3Ccircle%20cx%3D%2219%22%20cy%3D%2218%22%20r%3D%225.1%22%20fill%3D%22url%28%23flAa17%29%22%2F%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2218%22%20r%3D%225.1%22%20fill%3D%22url%28%23flAa17%29%22%2F%3E%3Ccircle%20cx%3D%2245%22%20cy%3D%2218%22%20r%3D%225.1%22%20fill%3D%22url%28%23flAa17%29%22%2F%3E%3Ccircle%20cx%3D%2219%22%20cy%3D%2229%22%20r%3D%225.1%22%20fill%3D%22url%28%23flAa17%29%22%2F%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2229%22%20r%3D%225.1%22%20fill%3D%22url%28%23flAa17%29%22%2F%3E%3Ccircle%20cx%3D%2245%22%20cy%3D%2229%22%20r%3D%225.1%22%20fill%3D%22url%28%23flAa17%29%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E';
+// The logo this installation shipped with (LB64) — only until it is in the
+// club's data (1.2.66), then it goes from the code
+function _installLogo(){return (typeof LB64==='string'&&LB64)?'data:image/jpeg;base64,'+LB64:'';}
+// Once per session, by someone who may edit: name and logo of this
+// installation into the club's data, where they belong (1.2.66)
+let _clubMoved=false;
+function _clubMigrate(){
+  if(_clubMoved||!G||G.__sanitized||!CU||!(typeof canEdit==='function'&&canEdit())||(typeof isPlayerMode==='function'&&isPlayerMode()))return;
+  if(typeof _fbInitialLoaded!=='undefined'&&!_fbInitialLoaded)return;
+  _clubMoved=true;
+  let ch=false;
+  const srvName=_fbShadow&&typeof _fbShadow.clubName==='string'&&_fbShadow.clubName.trim();
+  if(!srvName&&INSTALL_CLUB){if(!(typeof G.clubName==='string'&&G.clubName.trim()))G.clubName=INSTALL_CLUB;ch=true;}
+  if(!G.clubLogo&&_installLogo()){G.clubLogo=_installLogo();ch=true;}
+  if(!ch)return;
+  _systemWrite=true;try{saveG(false);}finally{_systemWrite=false;}
+}
 function _clubSlug(){return (_clubName()||'Flutlicht').replace(/[^A-Za-z0-9ÄÖÜäöüß]+/g,'-').replace(/^-|-$/g,'')||'Flutlicht';}
-function _clubInfo(){const c=(G&&G.club&&typeof G.club==='object')?G.club:{};return {name:_clubName(),addr:String(c.addr||''),mail:String(c.mail||''),dsb:String(c.dsb||'')};}
+function _clubInfo(){const c=(G&&G.club&&typeof G.club==='object')?G.club:{};return {name:_clubName(),resp:String(c.resp||''),addr:String(c.addr||''),mail:String(c.mail||''),dsb:String(c.dsb||'')};}
 const APP_NEWS=[
-  {id:'20261028-2',d:'28.10.',admin:true,t:'Verein eintragen',x:'Unter Einstellungen → Verein stehen jetzt Name, Anschrift und der Kontakt für Datenschutzfragen. Bitte Anschrift und Kontakt eintragen – sie stehen in den Datenschutzhinweisen.',go:['Zu den Einstellungen',"openSettings('verein')"]},
+  {id:'20261028-2',d:'28.10.',admin:true,t:'Datenschutz: wer verantwortlich ist',x:'Unter Einstellungen → Verein trägst du ein, wer für die Daten verantwortlich ist und wie man ihn erreicht – das steht in den Datenschutzhinweisen.',go:['Zu den Einstellungen',"openSettings('verein')"]},
   {id:'20261028-1',d:'28.10.',t:'Datenschutz',x:'Was die App über Spieler und Trainer speichert und wer es sieht, steht jetzt unter „Datenschutz“ – für dich unter Einstellungen → Verein, für die Spieler unten in ihrer Übersicht.',go:['Ansehen','openPriv()']},
   {id:'20261027-3',d:'27.10.',admin:true,t:'Trainingspläne freigeben',x:'Im Trainerprofil unter „Rechte“ gibst du einzelnen Trainern frei, Trainingspläne zu erstellen und zu ändern. „plant mit“ und „Rechte“ siehst nur du.',go:['Zu den Trainern',"hxGo('team');switchTab('trainer')"]},
   {id:'20261027-2',d:'27.10.',t:'Entwicklungsziele',x:'Im Spielerprofil unter „Ziele“ vereinbart ihr mit jedem Spieler 1–3 Ziele und gebt ab und zu Rückmeldung. Er sieht sie in seiner App, alle zusammen stehen unter Kader → Ziele.',go:['Zu den Zielen','zlOpenTab()']},
@@ -7803,13 +7823,13 @@ function _zlHubHtml(p,tok,sec){
 const PRIV_STAND='28.10.2026';
 function _privHtml(){
   const c=_clubInfo(),e=escapeHtml;
-  const who=e(c.name||'der Verein');
+  const resp=c.resp?e(c.resp):'Die Trainer deiner Mannschaft';
   const contact=c.mail?`<a href="mailto:${e(c.mail)}">${e(c.mail)}</a>`:'';
   const ask=contact?'an '+contact:'an deine Trainer';
   const li=a=>'<ul>'+a.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
-  return `<p class="pv-lead">Flutlicht ist die App, mit der ${who} den Trainings- und Spielbetrieb seiner Mannschaften organisiert. Hier steht, welche Daten dabei gespeichert werden, wer sie sieht und welche Rechte du hast.</p>
+  return `<p class="pv-lead">Flutlicht ist die App, mit der die Trainer deiner Mannschaft Termine, Zu- und Absagen, Kader und Training organisieren. Hier steht, welche Daten dabei gespeichert werden, wer sie sieht und welche Rechte du hast.</p>
     <h3>Verantwortlich</h3>
-    <p>${who}${c.addr?'<br>'+e(c.addr).replace(/\n/g,'<br>'):''}${contact?'<br>Fragen zum Datenschutz: '+contact:'<br>Fragen zum Datenschutz beantworten dir deine Trainer.'}${c.dsb?'<br>Datenschutzbeauftragte(r): '+e(c.dsb):''}</p>
+    <p>${resp}${c.addr?'<br>'+e(c.addr).replace(/\n/g,'<br>'):''}${contact?'<br>Fragen zum Datenschutz: '+contact:'<br>Fragen zum Datenschutz beantworten dir deine Trainer.'}${c.dsb?'<br>Datenschutzbeauftragte(r): '+e(c.dsb):''}</p>
     <h3>Welche Daten</h3>
     <p>Über Spieler:</p>
     ${li(['Name, Rückennummer, Position und – wenn eingetragen – Geburtsdatum, Telefonnummer, E-Mail, Passnummer und Foto',
@@ -7822,9 +7842,9 @@ function _privHtml(){
     <p>Über Trainer: Name, Kontaktdaten, Funktion und Lizenz, die E-Mail-Adresse des Kontos und ein Protokoll, wer wann was geändert hat.</p>
     <p>Gesundheitsdaten wie Verletzungen oder Krankheiten fragt die App nicht ab.</p>
     <h3>Wofür und auf welcher Grundlage</h3>
-    <p>Um Trainings und Spiele zu planen, Kader und Aufstellungen festzulegen, an Termine zu erinnern und die Entwicklung der Spieler zu begleiten. Grundlage ist die Teilnahme am Trainings- und Spielbetrieb des Vereins (Art. 6 Abs. 1 lit. b DSGVO) und sein berechtigtes Interesse an einer geordneten Mannschaftsorganisation (lit. f). Foto und Benachrichtigungen nur, wenn du einverstanden bist (lit. a) – das kannst du jederzeit zurücknehmen.</p>
+    <p>Um Trainings und Spiele zu planen, Kader und Aufstellungen festzulegen, an Termine zu erinnern und die Entwicklung der Spieler zu begleiten. Grundlage ist das berechtigte Interesse an einer geordneten Organisation von Training und Spielbetrieb (Art. 6 Abs. 1 lit. f DSGVO). Foto und Benachrichtigungen nur, wenn du einverstanden bist (lit. a) – das kannst du jederzeit zurücknehmen.</p>
     <h3>Wer was sieht</h3>
-    ${li(['Die Trainer der Mannschaft und der Admin des Vereins sehen alle Daten der Mannschaft.',
+    ${li(['Die Trainer der Mannschaft und der Admin der App sehen alle Daten der Mannschaft.',
       'Jeder Spieler sieht nur seine eigenen Daten. Mitspieler sehen von dir nur deinen Namen – etwa bei der Wahl zum Spieler des Spiels – und, wenn du in einer Woche bei allen Terminen warst, Namen und Foto unter „Immer dabei“ im Wochenbericht.',
       'Notizen, Einschätzungen, Telefonnummer und Geburtsdatum sehen andere Spieler nicht.'])}
     <h3>Wo die Daten liegen</h3>
@@ -7834,9 +7854,9 @@ function _privHtml(){
       'Benachrichtigungen laufen verschlüsselt über den Dienst deines Browsers (zum Beispiel Google, Apple oder Mozilla).',
       'Keine Werbung, kein Tracking, keine Analysedienste. Schriften und Programmteile der App kommen von dieser Seite; nur die Datenbank-Bibliothek lädt die App von Google.'])}
     <h3>Wie lange</h3>
-    <p>Solange du zur Mannschaft gehörst und danach für die Statistik der Saison. Auf Wunsch löscht der Verein deine Daten. Sicherungskopien werden nach spätestens 90 Tagen gelöscht. Auf deinem Gerät merkt sich die App deine Anmeldung und ein paar Einstellungen – keine Werbe-Cookies.</p>
+    <p>Solange du zur Mannschaft gehörst und danach für die Statistik der Saison. Auf Wunsch werden deine Daten gelöscht. Sicherungskopien werden nach spätestens 90 Tagen gelöscht. Auf deinem Gerät merkt sich die App deine Anmeldung und ein paar Einstellungen – keine Werbe-Cookies.</p>
     <h3>Deine Rechte</h3>
-    <p>Du kannst Auskunft über deine Daten verlangen, sie berichtigen, löschen oder einschränken lassen und der Verarbeitung widersprechen. Wende dich dafür ${ask}. Du kannst dich auch bei der Datenschutz-Aufsichtsbehörde deines Bundeslandes beschweren. Bist du noch nicht 18, können sich auch deine Eltern an den Verein wenden.</p>
+    <p>Du kannst Auskunft über deine Daten verlangen, sie berichtigen, löschen oder einschränken lassen und der Verarbeitung widersprechen. Wende dich dafür ${ask}. Du kannst dich auch bei der Datenschutz-Aufsichtsbehörde deines Bundeslandes beschweren. Bist du noch nicht 18, können sich auch deine Eltern dorthin wenden.</p>
     <p class="pv-stand">Stand: ${PRIV_STAND}</p>`;
 }
 // Trainers and the login page: a window
@@ -7862,15 +7882,17 @@ function clubRender(){
       ?(area?`<textarea id="${id}" rows="2" placeholder="${ph}" onchange="clubSet(this.id)">${e(val)}</textarea>`:`<input type="text" id="${id}" value="${e(val)}" placeholder="${ph}" onchange="clubSet(this.id)">`)
       :`<div class="club-v">${val?e(val).replace(/\n/g,'<br>'):'–'}</div>`}</div>`;
   box.innerHTML=row('club-name','Name des Vereins','So heißt der Verein überall in der App.',c.name,'z. B. SV Musterstadt 1920 e. V.')
-    +row('club-addr','Anschrift','Für die Datenschutzhinweise.',c.addr,'Straße, PLZ Ort',1)
-    +row('club-mail','Kontakt für Datenschutzfragen','E-Mail-Adresse – an sie wenden sich Spieler und Eltern.',c.mail,'z. B. vorstand@verein.de')
-    +row('club-dsb','Datenschutzbeauftragte(r)','Nur wenn der Verein eine(n) hat.',c.dsb,'Name, ggf. E-Mail')
-    +`<div class="club-priv"><button type="button" class="btn bp" onclick="openPriv()">Datenschutzhinweise ansehen</button>${adm?'<p>Der Text ist ein Entwurf von Flutlicht. Bitte lasst ihn im Verein prüfen (Vorstand oder Datenschutzbeauftragte/r).</p>':''}</div>`;
+    +`<div class="club-h">Datenschutz</div>`
+    +row('club-resp','Verantwortlich für die Daten','Wer über die Nutzung der App entscheidet – eine Person (z. B. der Trainer, der sie betreibt) oder der Verein, wenn er sie offiziell nutzt. Leer: „die Trainer deiner Mannschaft“.',c.resp,'z. B. Max Muster, Trainer U19')
+    +row('club-mail','Kontakt (E-Mail)','An sie wenden sich Spieler und Eltern mit Fragen zu ihren Daten.',c.mail,'z. B. name@beispiel.de')
+    +row('club-addr','Anschrift','Optional.',c.addr,'Straße, PLZ Ort',1)
+    +row('club-dsb','Datenschutzbeauftragte(r)','Nur wenn es eine(n) gibt, z. B. beim Verein.',c.dsb,'Name, ggf. E-Mail')
+    +`<div class="club-priv"><button type="button" class="btn bp" onclick="openPriv()">Datenschutzhinweise ansehen</button>${adm?'<p>Der Text ist ein Entwurf von Flutlicht, keine Rechtsberatung. Wer verantwortlich ist, hängt davon ab, wer die App betreibt: solange der Verein nicht beteiligt ist, die Person, die sie nutzt.</p>':''}</div>`;
 }
 function clubSet(changed){
   if(!(typeof isAdmin==='function'&&isAdmin()))return;
   const v=id=>((document.getElementById(id)||{}).value||'').trim();
-  const name=v('club-name').slice(0,80),addr=v('club-addr').slice(0,200),dsb=v('club-dsb').slice(0,120);
+  const name=v('club-name').slice(0,80),resp=v('club-resp').slice(0,120),addr=v('club-addr').slice(0,200),dsb=v('club-dsb').slice(0,120);
   let mail=v('club-mail').slice(0,120);
   // an unfinished address: asked about once, when that field is left; the
   // other fields save anyway and the stored address stays
@@ -7880,7 +7902,7 @@ function clubSet(changed){
   }
   snap();
   if(name)G.clubName=name;
-  const c={};if(addr)c.addr=addr;if(mail)c.mail=mail;if(dsb)c.dsb=dsb;
+  const c={};if(resp)c.resp=resp;if(addr)c.addr=addr;if(mail)c.mail=mail;if(dsb)c.dsb=dsb;
   if(Object.keys(c).length)G.club=c;else delete G.club;
   saveG();
   logAudit('Verein','',(name||'')+(mail?' · '+mail:''));
@@ -13037,6 +13059,7 @@ function render(){
   }
   try{
     autoConvertPast();
+    try{_clubMigrate();}catch(e){console.error('[Verein]',e);}
     if(typeof applyClubLogo==='function')applyClubLogo();
     if(typeof _updateAppTitle==='function')_updateAppTitle();
     if(typeof refreshNotifBadge==='function')refreshNotifBadge();
@@ -16708,7 +16731,7 @@ function _pvBuildSync(team,season){
   const news=(nw&&typeof nw==='object'&&typeof nw.t==='number'&&nw.title)?{t:nw.t,title:nw.title,body:nw.body||'',off:nw.off||undefined}:null;
   const loc={},la=(G.locationAddr&&typeof G.locationAddr==='object')?G.locationAddr:{};
   sessions.forEach(s=>{if(s&&s.location&&la[s.location])loc[s.location]=la[s.location];});
-  const shared={v:PV_V,team,season,club:_clubName(),cinfo:(G.club&&typeof G.club==='object')?{addr:G.club.addr||'',mail:G.club.mail||'',dsb:G.club.dsb||''}:null,sessions:sessions.map(_pvSess),news,trainers,loc,
+  const shared={v:PV_V,team,season,club:_clubName(),cinfo:(G.club&&typeof G.club==='object')?{resp:G.club.resp||'',addr:G.club.addr||'',mail:G.club.mail||'',dsb:G.club.dsb||''}:null,sessions:sessions.map(_pvSess),news,trainers,loc,
     roster:{disp,nr,elig},names:[],rep:{},abs:pvAbsRule(teamRules(team))};
   weeks.forEach(w=>{
     const r=reps[w.wk];if(!r)return;
@@ -24684,7 +24707,7 @@ function autoFixLineups(){
 
 
 // The club crest: the uploaded logo, else the built-in one
-function _clubLogoSrc(){return (G&&G.clubLogo)||('data:image/jpeg;base64,'+LB64);}
+function _clubLogoSrc(){return (G&&G.clubLogo)||_installLogo()||FL_MARK;}
 function applyClubLogo(){
   // Crest in the side navigation and on the start screen;
   // Einstellungen → Mannschaft shows a preview.
@@ -27895,7 +27918,7 @@ function hxRenderNav(){
   const crest=document.getElementById('hxCrest'),src=_clubLogoSrc();
   if(crest&&crest.src!==src)crest.src=src;
   const set=(id,v)=>{const e=document.getElementById(id);if(e&&e.textContent!==v)e.textContent=v;};
-  set('hxClub',_clubName());
+  set('hxClub',_clubName()||'Flutlicht');
   set('hxTeamLbl',UI.currentTeam||'–');
   set('hxSeasonLbl',UI.currentSeason||'–');
   const nm=(CU&&CU.name)||'';
@@ -28347,6 +28370,16 @@ function hxRender(){
     const rk=d2.getFullYear()*10000+(d2.getMonth()+1)*100+d2.getDate();
     pt.rows.forEach(r=>{if(r.low&&r.last[2].k>=rk)flags.push({dot:'#E0912F',who:nm(r.p),what:'die letzten 3 Spiele dabei, zusammen '+r.lm+' von '+r.lp+' Min. gespielt',on:`openPlayerFromMain(${r.pi})`});});
   }catch(e){console.error('[Spielzeit]',e);}
+  // Verein (1.2.66): name, and the contact the data-protection page names
+  try{
+    if(typeof isAdmin==='function'&&isAdmin()){
+      const ci=_clubInfo(),miss=[];
+      if(!ci.name)miss.push('Name des Vereins');
+      if(!ci.resp)miss.push('wer verantwortlich ist');
+      if(!ci.mail)miss.push('Kontakt');
+      if(miss.length)flags.push({dot:'#1659B8',who:'Datenschutz',what:'Noch offen: '+miss.join(', ')+' – in Einstellungen → Verein',on:"openSettings('verein')"});
+    }
+  }catch(e){}
   // Entwicklungsziele (1.2.59): goals waiting for feedback
   try{
     const R=_zlRule(UI.currentTeam);
