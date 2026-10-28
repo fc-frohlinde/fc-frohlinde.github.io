@@ -2294,28 +2294,7 @@ body.player-mode .fl .hub-priv{margin-top:2px;font-size:13px;opacity:.8;}
 .nw-go{margin-top:8px;border:0;background:none;padding:2px 0;font:inherit;font-size:.84rem;font-weight:700;color:var(--hx-blue,#1659B8);cursor:pointer;}
 .nw-go:hover{text-decoration:underline;}
 .nw-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;padding-top:10px;border-top:1px solid var(--hx-line,var(--gl));font-size:.76rem;color:var(--hx-muted,var(--gm));}
-.nw-all{border:0;background:none;font:inherit;font-size:.8rem;font-weight:600;color:var(--hx-blue,#1659B8);cursor:pointer;padding:4px 0;}
 .nw-load{font-size:.85rem;color:var(--hx-muted,var(--gm));margin:10px 0;}
-/* Alle Versionen */
-.av-head{display:flex;align-items:center;gap:12px;margin:0 0 14px;}
-.av-head .about-brand-ic{flex:none;border-radius:10px;box-shadow:0 4px 12px -5px rgba(5,12,30,.45);}
-.av-ht{flex:1;min-width:0;}
-.av-ht h3{margin:0;font-size:1.1rem;line-height:1.2;}
-.av-ht div{font-size:.78rem;font-weight:600;color:var(--hx-muted,var(--gm));margin-top:2px;}
-.av-head .av-x{flex:none;}
-.av-e{border:1px solid var(--hx-line,var(--gl));border-radius:10px;margin-bottom:8px;overflow:hidden;}
-.av-e>summary{cursor:pointer;list-style:none;display:flex;align-items:baseline;gap:10px;padding:10px 14px;font-weight:700;font-size:.88rem;color:var(--hx-ink,var(--bd));background:var(--hx-card2,#F4F6FA);}
-.av-e>summary::-webkit-details-marker{display:none;}
-.av-e>summary span{flex:1;min-width:0;}
-.av-e>summary small{flex:none;font-weight:500;font-size:.72rem;color:var(--hx-muted,var(--gm));}
-.av-b{padding:4px 14px 8px;}
-.av-i{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--hx-line,var(--gl));}
-.av-i:last-child{border-bottom:0;}
-.av-i>span{flex:none;width:24px;text-align:center;font-size:1.1rem;line-height:1.2;}
-.av-i b{display:block;font-size:.84rem;color:var(--hx-ink,var(--bd));}
-.av-i p{margin:2px 0 0;font-size:.78rem;line-height:1.45;color:var(--hx-muted,var(--gd));}
-.av-old .av-b{padding:8px;}
-.av-old .av-e{margin-bottom:6px;}
 /* Rechte in the trainer profile (1.2.60) */
 .tpr-row{display:flex;align-items:center;gap:14px;padding:4px 0;}
 .tpr-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;}
@@ -5372,9 +5351,6 @@ body.design-heute .user-dropdown .ud-meta:hover{color:var(--hx-ink);}
 .ud-meta{display:flex;align-items:center;gap:8px;}
 .ud-brand{display:inline-flex;align-items:center;gap:5px;color:var(--hx-ink,#fff);}
 .ud-brand-ic,.ud-brand-wm{display:block;flex:none;}
-.about-brand{display:flex;align-items:center;justify-content:center;gap:12px;margin:4px 0 8px;color:var(--hx-ink,#0E2350);}
-.about-brand-ic{display:block;border-radius:12px;box-shadow:0 6px 16px -6px rgba(5,12,30,.5);}
-.about-brand-wm{display:block;}
 body.design-heute .notif-panel{overflow:hidden;width:392px;}
 body.design-heute .notif-hdr h4{min-width:0;white-space:nowrap;}
 body.design-heute :is(.notif-compose,.notif-mark-all){white-space:nowrap;flex-shrink:0;}
@@ -7292,15 +7268,15 @@ const LB64='/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABt
 const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // ══ APP VERSION & CHANGELOG ══════════════════════════════════
 // APP_VERSION: every release (the update banner and debugging need it).
-// What trainers should know goes to APP_NEWS below — only what changes in
-// their work, one or two sentences. The full history of every version is
-// versionen.json next to this page (1.2.63).
-const APP_VERSION='1.2.67'; // v1.2.67: weniger Neuigkeiten
-const APP_VERSION_LABEL='1.2.67';
+// What trainers should know goes to APP_NEWS below. There is no technical
+// changelog in the app any more (1.2.68): the news are the history trainers
+// read; every release is described in the commit and in the project docs.
+const APP_VERSION='1.2.68'; // v1.2.68: ohne Alle Versionen
+const APP_VERSION_LABEL='1.2.68';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1793148390939; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1793149010593; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -7342,14 +7318,6 @@ const APP_NEWS=[
   {id:'20261024-2',d:'24.10.',t:'Probetraining, Pause, nicht mehr dabei',x:'Den Status stellst du im Spielerprofil ein. Wer pausiert oder nicht mehr dabei ist, zählt nicht in die Quote und bekommt keine Erinnerungen.'},
   {id:'20261023-1',d:'23.10.',t:'Kader und Treffpunkt',x:'Im Spiel-Fenster legst du Kader und Treffpunkt fest. Die Spieler bekommen beides aufs Handy, für die WhatsApp-Gruppe gibt es den fertigen Text dazu.'},
 ];
-// The technical history: versionen.json, loaded only for "Alle Versionen" —
-// the app and the players' links do not carry it any more
-let APP_CHANGELOG=null;
-function _loadChangelog(){
-  if(APP_CHANGELOG)return Promise.resolve(APP_CHANGELOG);
-  return fetch('versionen.json?v='+encodeURIComponent(APP_VERSION)).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
-    .then(a=>{APP_CHANGELOG=Array.isArray(a)?a:[];return APP_CHANGELOG;});
-}
 
 const POS=['TW','RV','IV','LV','6er','8er','10er','RF','LF','ST'];
 const POS_ORDER=POS; // sorted goalkeeper→forward
@@ -11463,17 +11431,8 @@ function _finalizeAuth(auth,u,remember){
   setTimeout(()=>_maybeShowChangelogOnLogin(),1200);
 }
 // ── ABOUT / CHANGELOG ────────────────────────────────────────
-// "Alle Versionen": the technical history from versionen.json
-function openAbout(){
-  const el=document.getElementById('moAbout-changelog');
-  const verEl=document.getElementById('moAbout-version');
-  if(verEl)verEl.textContent='Flutlicht · jetzt Version '+APP_VERSION_LABEL;
-  if(el&&!APP_CHANGELOG)el.innerHTML='<p class="nw-load">Wird geladen …</p>';
-  openM('moAbout');
-  _loadChangelog().then(()=>_renderChangelog()).catch(()=>{
-    if(el)el.innerHTML='<p class="nw-load">Die Liste der Versionen lässt sich gerade nicht laden – ohne Verbindung? Später noch einmal versuchen.</p>';
-  });
-}
+// Old entry point (the version line opened the changelog): all news now
+function openAbout(){openNews(1);}
 // Until 1.2.63 the changelog opened after a login. The news card in the
 // Übersicht replaces it (most trainers stay signed in for 90 days and never
 // saw it); kept as a no-op for the callers.
@@ -11808,23 +11767,6 @@ function _showStuckUpdateBanner(remoteVer){
   const x=document.getElementById('_updStuckX');
   if(x)x.addEventListener('click',()=>b.remove());
   console.warn('[UpdateBanner] Stale-version loop guard active — remote reports '+(remoteVer||'?')+' but reloads did not deliver it.');
-}
-function _renderChangelog(){
-  const el=document.getElementById('moAbout-changelog');
-  if(!el||!Array.isArray(APP_CHANGELOG))return;
-  // Hide admin-only items from non-admin trainers — they don't see those features anyway
-  const adm=(typeof isAdmin==='function')?isAdmin():false;
-  const card=(entry,open)=>{
-    const vis=(entry.items||[]).filter(it=>!it.admin||adm);
-    if(!vis.length)return '';
-    return `<details class="av-e"${open?' open':''}><summary><span>v${escapeHtml(entry.version)} – ${escapeHtml(entry.title)}</span><small>${escapeHtml(entry.date)}</small></summary>
-      <div class="av-b">${vis.map(it=>`<div class="av-i"><span aria-hidden="true">${it.icon||''}</span><div><b>${escapeHtml(it.title)}</b><p>${escapeHtml(it.desc)}</p></div></div>`).join('')}</div></details>`;
-  };
-  // From the start of Flutlicht (1.1); the footy.ai versions folded together
-  const isOld=v=>/^(0\.|1\.0)/.test(String(v||''));
-  const now=APP_CHANGELOG.filter(x=>!isOld(x.version)),old=APP_CHANGELOG.filter(x=>isOld(x.version));
-  el.innerHTML=now.map((x,k)=>card(x,k===0)).join('')
-    +(old.length?`<details class="av-e av-old"><summary><span>Frühere Versionen (footy.ai, ${old.length})</span></summary><div class="av-b">${old.map(x=>card(x,false)).join('')}</div></details>`:'');
 }
 document.getElementById('authInput').addEventListener('keydown',e=>{if(e.key==='Enter')doAuth();});
 
@@ -40276,20 +40218,9 @@ _pubCleanupSchedule();
 <div class="mo" id="moNews"><div class="mob nw-mob" style="width:520px;max-width:96vw;">
   <h3 class="nw-h">Neu in Flutlicht</h3>
   <div id="nw-list"></div>
-  <div class="nw-foot"><span id="nw-ver"></span><button type="button" class="nw-all" onclick="closeM('moNews');openAbout();">Alle Versionen</button></div>
+  <div class="nw-foot"><span id="nw-ver"></span></div>
   <div class="mob-btns"><button type="button" class="btn bp" onclick="closeM('moNews')">Schließen</button></div>
 </div></div>
-<div class="mo" id="moAbout" style="z-index:99997;"><div class="mob" style="width:560px;max-width:96vw;max-height:88vh;overflow-y:auto;position:relative;">
-  <div class="av-head"><svg class="about-brand-ic" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="40" height="40" aria-hidden="true"><rect width="64" height="64" fill="#0E2350"/><defs><radialGradient id="flAa17" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".38" stop-color="#FFF3C4"/><stop offset=".8" stop-color="#F2C230"/><stop offset="1" stop-color="#E3AC1A"/></radialGradient><radialGradient id="flAab18"><stop offset="0" stop-color="#FFE9A0" stop-opacity="0.5"/><stop offset=".5" stop-color="#FFE9A0" stop-opacity="0.175"/><stop offset="1" stop-color="#FFE9A0" stop-opacity="0"/></radialGradient></defs><ellipse cx="32" cy="24" rx="34" ry="28" fill="url(#flAab18)"/><g><path d="M30.2 36h3.6l1.7 28h-7z" fill="#1F3466"/><path d="M30.72 39.00L33.56 43.60L30.16 48.20L34.12 52.80L29.60 57.40L34.68 62.00" fill="none" stroke="#30508F" stroke-width=".8" stroke-linejoin="round"/></g><g><rect x="9" y="9" width="46" height="29" rx="6" fill="#22386B"/><circle cx="19" cy="18" r="5.1" fill="url(#flAa17)"/><circle cx="32" cy="18" r="5.1" fill="url(#flAa17)"/><circle cx="45" cy="18" r="5.1" fill="url(#flAa17)"/><circle cx="19" cy="29" r="5.1" fill="url(#flAa17)"/><circle cx="32" cy="29" r="5.1" fill="url(#flAa17)"/><circle cx="45" cy="29" r="5.1" fill="url(#flAa17)"/></g></svg>
-    <div class="av-ht"><h3>Alle Versionen</h3><div id="moAbout-version">Flutlicht</div></div>
-    <button class="btn bs av-x" onclick="closeM('moAbout')" aria-label="Schließen">✕</button>
-  </div>
-  <div id="moAbout-changelog"></div>
-  <div class="mob-btns" style="margin-top:18px;">
-    
-  </div>
-</div></div>
-
 <!-- Saisonkader Status (Bestätigung + Anmeldung combined) -->
 <div class="mo" id="moSlpStatus" style="z-index:850;"><div class="mob" style="width:560px;max-width:95vw;">
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
