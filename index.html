@@ -360,24 +360,17 @@ html:has(body.player-mode){background:#080f22;}
 .auth-input:focus{border-color:#1659B8;box-shadow:0 0 0 3px rgba(22,89,184,.16);}
 .auth-input:disabled{background:#F4F7FB;}
 .auth-input::placeholder{color:#8A97B0;}
-.auth-remember{display:flex;align-items:center;gap:9px;font-size:.9rem;color:#3A4A6B;margin:2px 0 18px;cursor:pointer;}
-.auth-remember input{width:18px;height:18px;margin:0;cursor:pointer;accent-color:#0E2350;}
 .auth-btn{display:block;width:100%;height:50px;border:none;border-radius:12px;background:#F2C230;color:#0E2350;font:700 1.02rem 'Barlow',sans-serif;cursor:pointer;transition:filter .15s,transform .08s;}
 .auth-btn:hover{filter:brightness(1.05);}
 .auth-btn:active{transform:scale(.99);}
-.auth-btn:focus-visible,.auth-adv summary:focus-visible{outline:3px solid #1659B8;outline-offset:2px;}
-.auth-back{height:44px;margin-top:8px;background:transparent;color:#3A4A6B;font-weight:600;font-size:.94rem;}
-.auth-back:hover{background:#F2F4F8;filter:none;}
-.auth-adv{margin-top:16px;padding-top:14px;border-top:1px solid #E6EBF2;font-size:.9rem;}
-.auth-adv summary{cursor:pointer;list-style:none;color:#1659B8;font-weight:600;user-select:none;width:max-content;border-radius:6px;}
-.auth-adv summary::-webkit-details-marker{display:none;}
-.auth-adv-in{margin-top:10px;}
-.auth-pk{height:44px;background:#0E2350;color:#fff;font-size:.94rem;}
+.auth-btn:focus-visible{outline:3px solid #1659B8;outline-offset:2px;}
 .auth-err{color:#A52F35;font-size:.88rem;font-weight:500;margin-top:10px;text-align:center;}
 .auth-err:empty{min-height:0;margin:0;}
-/* Konten (1.2.12): the second way in, under the old form; the invite page */
-.auth-or{display:flex;align-items:center;gap:12px;margin:22px 0 14px;font-size:.86rem;color:#5E6E8E;}
-.auth-or::before,.auth-or::after{content:'';flex:1;height:1px;background:#E1E7F0;}
+/* Konten (1.2.12): the way in (only one since 1.2.71); the invite page */
+.auth-h{margin:0 0 16px;font:700 1.18rem 'Barlow',sans-serif !important;letter-spacing:0 !important;text-transform:none !important;color:#0E2350;}
+.auth-foot{margin:14px 0 0;font-size:.84rem;line-height:1.45;color:#5E6E8E;}
+.auth-foot+.auth-foot{margin-top:8px;padding-top:0;}
+.auth-acct+.auth-foot{margin-top:18px;padding-top:16px;border-top:1px solid #E6EBF2;}
 .auth-alt{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:48px;margin:0 0 10px;padding:0 14px;box-sizing:border-box;
   border:1.5px solid #D5DEEC;border-radius:12px;background:#fff;color:#0E2350;font:600 .98rem 'Barlow',sans-serif;cursor:pointer;transition:border-color .15s,background .15s;}
 .auth-alt:hover{border-color:#A9B9D3;background:#F7F9FC;}
@@ -396,6 +389,7 @@ html:has(body.player-mode){background:#080f22;}
 .auth-who small.auth-uid{font-size:.76rem;color:#6B7A99;user-select:all;}
 .auth-note{color:#1F6B45;font-size:.88rem;margin-top:10px;text-align:center;line-height:1.4;}
 .auth-note:empty{display:none;}
+.auth-note.info{color:#3A4A6B;}
 .auth-hint{font-weight:500;color:#6B7A99;margin-left:6px;}
 .inv-box{text-align:left;color:#0E2350;}
 .inv-h{margin:0 0 8px;font:700 1.5rem/1.15 'Barlow',sans-serif;color:#0E2350;}
@@ -6555,30 +6549,16 @@ if(window._fbBlocked){
 <div id="authOverlay">
 <div id="authLogo" class="auth-brand"><svg class="auth-brand-ic" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="72" height="72" aria-hidden="true"><rect width="64" height="64" fill="#0E2350"/><defs><radialGradient id="flLa13" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".38" stop-color="#FFF3C4"/><stop offset=".8" stop-color="#F2C230"/><stop offset="1" stop-color="#E3AC1A"/></radialGradient><radialGradient id="flLab14"><stop offset="0" stop-color="#FFE9A0" stop-opacity="0.5"/><stop offset=".5" stop-color="#FFE9A0" stop-opacity="0.175"/><stop offset="1" stop-color="#FFE9A0" stop-opacity="0"/></radialGradient></defs><ellipse cx="32" cy="24" rx="34" ry="28" fill="url(#flLab14)"/><g><path d="M30.2 36h3.6l1.7 28h-7z" fill="#1F3466"/><path d="M30.72 39.00L33.56 43.60L30.16 48.20L34.12 52.80L29.60 57.40L34.68 62.00" fill="none" stroke="#30508F" stroke-width=".8" stroke-linejoin="round"/></g><g><rect x="9" y="9" width="46" height="29" rx="6" fill="#22386B"/><circle cx="19" cy="18" r="5.1" fill="url(#flLa13)"/><circle cx="32" cy="18" r="5.1" fill="url(#flLa13)"/><circle cx="45" cy="18" r="5.1" fill="url(#flLa13)"/><circle cx="19" cy="29" r="5.1" fill="url(#flLa13)"/><circle cx="32" cy="29" r="5.1" fill="url(#flLa13)"/><circle cx="45" cy="29" r="5.1" fill="url(#flLa13)"/></g></svg><svg class="auth-brand-wm" xmlns="http://www.w3.org/2000/svg" viewBox="86 0 5969 1620" width="125.3" height="34" role="img" aria-label="Flutlicht"><path fill="currentColor" d="M86 1600V0H718V228H345V674H698V902H345V1600ZM845 1600V0H1103V1600ZM1526 1618Q1410 1618 1341.5 1545.5Q1273 1473 1273 1305V400H1531V1327Q1531 1380 1554.5 1404.5Q1578 1429 1626 1429Q1669 1429 1714.0 1403.5Q1759 1378 1777 1334V400H2036V1600H1777V1476H1741Q1700 1552 1649.0 1585.0Q1598 1618 1526 1618ZM2647 1618Q2441 1618 2352.5 1542.0Q2264 1466 2264 1291V596H2158V400H2266V60H2526V400H2722V596H2522V1319Q2522 1378 2546.0 1402.0Q2570 1426 2648 1426Q2672 1426 2693.5 1425.0Q2715 1424 2742 1423V1608Q2721 1614 2697.5 1616.0Q2674 1618 2647 1618ZM2857 1600V0H3115V1600ZM3284 209V0H3561V209ZM3294 1600V400H3552V1600ZM4183 849Q4184 827 4184.5 792.0Q4185 757 4184.5 724.0Q4184 691 4183 674Q4181 620 4157.0 598.0Q4133 576 4079 576Q4024 576 3999.5 598.0Q3975 620 3973 674Q3971 754 3970.0 835.0Q3969 916 3969.0 997.0Q3969 1078 3970.0 1158.0Q3971 1238 3973 1318Q3975 1376 4000.5 1400.0Q4026 1424 4082 1424Q4134 1424 4157.5 1400.0Q4181 1376 4183 1318Q4185 1290 4185.0 1245.5Q4185 1201 4183 1148H4434Q4436 1166 4437.0 1211.0Q4438 1256 4436 1291Q4428 1466 4346.0 1542.0Q4264 1618 4082 1618Q3895 1618 3810.0 1542.0Q3725 1466 3715 1291Q3713 1245 3712.0 1168.5Q3711 1092 3711.0 1005.0Q3711 918 3712.0 839.5Q3713 761 3715 713Q3727 534 3811.0 458.0Q3895 382 4079 382Q4263 382 4346.0 456.5Q4429 531 4436 703Q4438 737 4437.0 783.0Q4436 829 4434 849ZM4587 1600V0H4845V524H4891Q4930 455 4974.0 418.5Q5018 382 5106 382Q5223 382 5288.0 454.0Q5353 526 5353 694V1600H5095V673Q5095 620 5070.5 595.5Q5046 571 4997 571Q4953 571 4908.0 596.0Q4863 621 4845 666V1600ZM5960 1618Q5754 1618 5665.5 1542.0Q5577 1466 5577 1291V596H5471V400H5579V60H5839V400H6035V596H5835V1319Q5835 1378 5859.0 1402.0Q5883 1426 5961 1426Q5985 1426 6006.5 1425.0Q6028 1424 6055 1423V1608Q6034 1614 6010.5 1616.0Q5987 1618 5960 1618Z"/></svg><span class="auth-brand-was">ehemals footy.ai</span></div>
 <div class="auth-box auth-form">
-  <label class="auth-label" for="authInput">Name</label>
-  <input class="auth-input" id="authInput" type="text" autocomplete="username" autocapitalize="words" spellcheck="false" onkeydown="if(event.key==='Enter')_authFocusNext()"/>
-  <label class="auth-label" for="authPwInput">Passwort</label>
-  <input class="auth-input" id="authPwInput" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')_authFocusNext()"/>
-  <div id="authPinWrap" style="display:none;">
-    <label class="auth-label" for="authPinInput">PIN-Code</label>
-    <input class="auth-input" id="authPinInput" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="4–6 Ziffern" autocomplete="one-time-code" onkeydown="if(event.key==='Enter')doAuth()"/>
-  </div>
-  <label class="auth-remember"><input type="checkbox" id="rememberMe" checked/> Angemeldet bleiben</label>
-  <button class="auth-btn" id="authSubmitBtn" onclick="doAuth()">Anmelden</button>
-  <button class="auth-btn auth-back" id="authBackBtn" onclick="_resetAuthStage()" type="button" style="display:none;">Zurück</button>
-  <div class="auth-err" id="authErr" role="alert"></div>
   <div class="auth-acct" id="authAcct">
-    <div class="auth-or"><span>oder mit eigenem Konto</span></div>
+    <h2 class="auth-h">Anmelden</h2>
     <div id="authAcctIn"></div>
     <div class="auth-err" id="acctErr" role="alert"></div>
     <div class="auth-note" id="acctNote" role="status"></div>
   </div>
-  <button type="button" class="auth-priv" onclick="openPriv()">Datenschutz</button>
-  <details id="authAdvanced" class="auth-adv">
-    <summary>Mit Passkey anmelden</summary>
-    <div class="auth-adv-in"><button class="auth-btn auth-pk" id="authPasskeyBtn" type="button" onclick="doAuthPasskey()" style="display:none;">Passkey verwenden</button></div>
-  </details>
+  <p class="auth-foot">Noch kein Konto? Den Zugang bekommst du mit einem Einladungslink vom Admin.</p>
+  <p class="auth-foot">Du bist Spieler? Öffne den Link, den dein Trainer in die Gruppe geschickt hat.</p>
 </div>
+<button type="button" class="auth-priv" onclick="openPriv()">Datenschutz</button>
 </div>
 
 <!-- Design "Heute": side navigation (hidden unless body.design-heute) -->
@@ -7151,10 +7131,6 @@ if(window._fbBlocked){
       <label>Name</label><input type="text" id="tNewName" placeholder="Vorname Nachname"/>
       <label>Mannschaft(en)</label>
       <div class="tchecks" id="tTeamChecks"></div>
-      <label style="display:flex;align-items:center;gap:7px;margin-top:8px;font-size:.86rem;cursor:pointer;user-select:none;">
-        <input type="checkbox" id="tNewWithTempPw" checked style="width:16px;height:16px;cursor:pointer;"/>
-        <span>🔑 Temporäres Passwort generieren</span>
-      </label>
       <div class="mob-btns">
         <button class="btn bp" onclick="addTrainer()">Hinzufügen</button>
         
@@ -7192,10 +7168,6 @@ if(window._fbBlocked){
     <label>Name</label><input type="text" id="atNewName" placeholder="Vorname Nachname"/>
     <label>Mannschaft(en)</label>
     <div class="tchecks" id="atTeamChecks"></div>
-    <label style="display:flex;align-items:center;gap:7px;margin-top:8px;font-size:.86rem;cursor:pointer;user-select:none;">
-      <input type="checkbox" id="atNewWithTempPw" checked style="width:16px;height:16px;cursor:pointer;"/>
-      <span>🔑 Temporäres Passwort generieren</span>
-    </label>
     <div class="mob-btns">
       <button class="btn bp" onclick="addTrainerGlobal()">Hinzufügen</button>
       
@@ -7276,12 +7248,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.70'; // v1.2.70: Im Blick pro Spieler
-const APP_VERSION_LABEL='1.2.70';
+const APP_VERSION='1.2.71'; // v1.2.71: Anmeldung nur mit Konto
+const APP_VERSION_LABEL='1.2.71';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1793150381969; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1793201504858; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -9585,15 +9557,42 @@ function stopFbListener(){
   fbListening=false;
   console.info('[FB] Listener angehalten (autoSync OFF)');
 }
+// Teil 3 (1.2.71): trainers read the team data only with their account signed
+// in. A listener started before Firebase knows the account would be refused
+// and stay dead — so it waits for the account (offline: no answer → it tries;
+// the cached copy stays on screen meanwhile).
+let _fbAuthOk=false,_fbAuthWaiting=false;
+function _fbNeedsAcct(){return !!(CU&&CU.role!=='player'&&!(typeof isPlayerMode==='function'&&isPlayerMode()));}
+function _fbReady(){return !_fbNeedsAcct()||_fbAuthOk;}
+async function _fbAwaitAcct(){
+  if(_fbAuthWaiting)return;
+  _fbAuthWaiting=true;
+  let user;
+  try{await _acctReady();user=await _acctCurrent(15000);}catch(e){user=undefined;}
+  _fbAuthWaiting=false;
+  if(!_fbNeedsAcct()||_fbAuthOk)return;
+  // Another account or none: _acctVerify ends the session with the reason
+  if(user===undefined||(user&&CU&&CU.acct&&user.uid===CU.acct.uid)){_fbAuthOk=true;startFbListener();}
+}
 function startFbListener(){
-  if(!fbRef||fbListening||!getUserPref('autoSync',true))return;
+  if(!fbRef||fbListening)return;
+  if(_fbNeedsAcct()&&!_fbAuthOk){_fbAwaitAcct();return;}
+  if(!getUserPref('autoSync',true))return;
   fbListening=true;
   // Player mode reads ONCE. A live listener re-downloads the entire fcf_data
   // for every change anyone makes anywhere — with the weekly links out, that
   // is 27 devices streaming the full database all evening. Players do not
   // need live updates: they open the link, answer, and leave.
   const _isPlayer=(typeof CU!=='undefined'&&CU&&CU.role==='player');
-  const _attach=_isPlayer?((cb)=>fbRef.once('value',cb)):((cb)=>fbRef.on('value',cb));
+  // Refused (the rules: no account, or not yet known to the database): say so,
+  // and once more a little later — the account may just have been slow
+  const _onErr=e=>{
+    fbListening=false;
+    console.warn('[FB] Daten abgelehnt:',(e&&(e.code||e.message))||e);
+    try{setFbStatus('error');}catch(_){}
+    if(_fbNeedsAcct()&&!window._fbRetried){window._fbRetried=true;setTimeout(()=>{try{startFbListener();}catch(_){}},4000);}
+  };
+  const _attach=_isPlayer?((cb)=>fbRef.once('value',cb,_onErr)):((cb)=>fbRef.on('value',cb,_onErr));
   _attach((snap)=>{
     // DEFENSE-IN-DEPTH: if autoSync was turned off but stopFbListener was forgotten
     // (or hasn't run yet), bail out. Otherwise remote changes would silently
@@ -10005,41 +10004,9 @@ function initAuth(){
       fbApp=firebase.initializeApp(fbCfg,'fcf');
       fbDb=firebase.database(fbApp);
       fbRef=fbDb.ref('fcf_data');
-      // Try to get latest data from Firebase for auth (one-time fetch).
-      // Not for a player's link or a group link with the team's secret: they
-      // read only their slice (1.2.36); the old way calls it if there is none.
-      const _first=()=>fbRef.once('value').then(snap=>{
-        const raw=snap.val();
-        const data=raw?fbDecode(raw):null;
-        // Track whether the fetch actually returned data (for diagnostics
-        // by team-auth flow which has no other way to know if Firebase
-        // works on this device — Edge tracking prevention can break
-        // storage access silently while leaving the SDK "loaded").
-        window._fbFetchResult=data?'ok':'empty';
-        if(data&&data.version>=14){
-          // Only adopt remote if user hasn't made local changes yet
-          if(!_pendingSave){
-            _adoptData(data);
-            _persistLocal();
-            // Check remote app version (compare to local APP_RELEASE_TS)
-            if(typeof _checkRemoteAppVersion==='function')_checkRemoteAppVersion();
-            // Initial fetch completed — data is fresh from Firebase
-            if(typeof _markSynced==='function')_markSynced();
-            // If app is already showing, re-render with fresh data
-            if(CU&&typeof render==='function')render();
-          }
-        }
-        // Allow saves to flow
-        _fbInitialLoaded=true;
-        if(_pendingSave){_pendingSave=false;setTimeout(()=>saveG(false),50);}
-      }).catch((e)=>{
-        // Even on error, unblock saves so the UI doesn't lock up forever
-        window._fbFetchResult='error';
-        window._fbFetchError=(e&&e.message)||String(e||'unknown');
-        _fbInitialLoaded=true;
-        if(_pendingSave){_pendingSave=false;setTimeout(()=>saveG(false),50);}
-      });
-      if(_pvDefer())window._pvFirst=_first;else _first();
+      // Teil 3 (1.2.71): nothing is read before the sign-in. Trainers get the
+      // team data once their account is signed in (startFbListener); players
+      // read only their slice (1.2.36).
     }catch(e){_fbInitialLoaded=true;}
   } else if(!fbCfg){
     // No Firebase configured - saves are local only
@@ -10134,11 +10101,10 @@ function initAuth(){
       _unpark(sessionStorage);
     }
   }catch(e){}
-  // localStorage = persistent (remember me), sessionStorage = tab-only (survives F5 but not new tab)
-  // We use a page-reload flag to detect actual reload vs tab restore
-  const reloaded=sessionStorage.getItem('fcf_reloaded');
+  // A trainer session counts only with its account (Teil 3, 1.2.71). Sessions
+  // of the old login (name and password) end here, once, with a word why.
+  let _oldLogin=false;
   const stored=localStorage.getItem(AUTH_SK);
-  // Check localStorage (remember me checked)
   if(stored){
     try{
       const u=JSON.parse(stored);
@@ -10146,29 +10112,21 @@ function initAuth(){
         if(_sessionExpired(u)){
           localStorage.removeItem(AUTH_SK);
           if(u.acct)_acctSignOutQuiet();
-        } else if(u.role==='trainer'){const t=G.trainers.find(x=>x.name.toLowerCase()===u.name.toLowerCase());if(!t&&!u.acct){localStorage.removeItem(AUTH_SK);}else{if(t)u.teams=[...t.teams];CU=u;sessionStorage.setItem('fcf_reloaded','1');showApp();return;}}
-        else if(u.role==='player'&&!u.playerToken){localStorage.removeItem(AUTH_SK);}
-        else{CU=u;sessionStorage.setItem('fcf_reloaded','1');showApp();return;}
+        } else if((u.role==='trainer'||u.role==='admin')&&u.acct&&u.acct.uid){
+          if(u.role==='trainer'){
+            const t=(G.trainers||[]).find(x=>x&&String(x.name||'').toLowerCase()===String(u.name||'').toLowerCase());
+            if(t)u.teams=[...(t.teams||[])];
+          }
+          CU=u;sessionStorage.setItem('fcf_reloaded','1');showApp();return;
+        } else if(u.role!=='player')_oldLogin=true;
       }
     }catch(e){}
     localStorage.removeItem(AUTH_SK);
   }
-  // sessionStorage auth (no remember = only current tab session, lost on page reload)
-  const sessStored=sessionStorage.getItem(AUTH_SK);
-  if(sessStored&&reloaded){
-    try{
-      const u=JSON.parse(sessStored);
-      if(u&&u.role){
-        if(_sessionExpired(u)){
-          sessionStorage.removeItem(AUTH_SK);
-        } else if(u.role==='trainer'){const t=G.trainers.find(x=>x.name.toLowerCase()===u.name.toLowerCase());if(t){u.teams=[...t.teams];CU=u;sessionStorage.setItem('fcf_reloaded','1');showApp();return;}}
-        else{CU=u;sessionStorage.setItem('fcf_reloaded','1');showApp();return;}
-      }
-    }catch(e){}
-    sessionStorage.removeItem(AUTH_SK);
-  }
+  // Without "Angemeldet bleiben" the old login kept the session in the tab
+  try{if(sessionStorage.getItem(AUTH_SK)){_oldLogin=true;sessionStorage.removeItem(AUTH_SK);}}catch(e){}
+  if(_oldLogin)try{sessionStorage.setItem('fcf_acct_info','Die Anmeldung mit Name und Passwort gibt es nicht mehr. Bitte melde dich mit deinem Konto an.');}catch(e){}
   sessionStorage.setItem('fcf_reloaded','1');
-  if(typeof _initAuthUI==='function')_initAuthUI();
   document.getElementById('authOverlay').classList.add('open');
   if(typeof _bootVeilHide==='function')_bootVeilHide();
   _acctLoginOpen();
@@ -10181,7 +10139,7 @@ function initAuth(){
 // account alone opens nothing: access comes from an invite the admin makes in
 // the app (fcf_invites/<code>), redeemed once by that account
 // (fcf_members/<uid>). The database rules check the same chain, so nobody can
-// write himself a role. Until Teil 3 the old login keeps working beside it.
+// write himself a role. Since Teil 3 (1.2.71) it is the only way in.
 // Players never sign in: the SDK is loaded only on trainer pages.
 const FB_AUTH_SDK='https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js';
 const INVITE_DAYS=7;
@@ -10241,10 +10199,21 @@ async function _acctMember(uid){
   if(!inv||inv.used!==uid||inv.revoked)return null;
   return {code:m.code,role:inv.role,name:inv.name||'',trainerId:inv.trainerId||''};
 }
+// The trainer list to match an account against (Teil 3, 1.2.71): before the
+// sign-in the app has no team data; the list alone is small. Members may read it.
+async function _acctTrainersLoad(){
+  if(_fbInitialLoaded&&G&&Array.isArray(G.trainers)&&G.trainers.length)return G.trainers;
+  try{
+    const raw=(await fbDb.ref('fcf_data/trainers').once('value')).val();
+    const ts=raw?fbDecodeValue(raw):null;
+    if(Array.isArray(ts))return ts.filter(Boolean);
+  }catch(e){console.warn('[Konto] Trainerliste:',e&&(e.code||e.message));}
+  return (G&&Array.isArray(G.trainers))?G.trainers:[];
+}
 // The trainer an invite was made for: by id (survives a rename), the
 // first admin (made by the setup job) by name
-function _acctTrainer(mem){
-  const ts=(G&&Array.isArray(G.trainers))?G.trainers:[];
+function _acctTrainer(mem,list){
+  const ts=Array.isArray(list)?list:((G&&Array.isArray(G.trainers))?G.trainers:[]);
   const lc=s=>String(s||'').toLowerCase();
   if(mem.trainerId)return ts.find(t=>t&&t.id===mem.trainerId)||null;
   return ts.find(t=>t&&lc(t.name)===lc(mem.name))||null;
@@ -10254,10 +10223,10 @@ function _acctVia(u){
 }
 // Admins stay "Admin" as with the old login (hidden from presence, the
 // trainers' notifications and the job key off that name)
-function _acctCU(mem,user){
+function _acctCU(mem,user,list){
   const acct={uid:user.uid,email:String(user.email||''),via:_acctVia(user)};
   if(mem.role==='admin')return {name:'Admin',role:'admin',teams:[],acct,loginAt:Date.now()};
-  const t=_acctTrainer(mem);
+  const t=_acctTrainer(mem,list);
   if(!t)return null;
   return {name:t.name,role:'trainer',teams:[...(t.teams||[])],acct,loginAt:Date.now()};
 }
@@ -10322,15 +10291,17 @@ function _acctErrText(e){
 }
 const _GOOGLE_G='<svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.6-.4-3.9z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.6-.4-3.9z"/></svg>';
 const _MAIL_IC='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>';
-function _acctSet(id,txt){const el=document.getElementById(id);if(el)el.textContent=txt||'';}
+function _acctSet(id,txt){const el=document.getElementById(id);if(el){el.textContent=txt||'';el.classList.remove('info');}}
 function _acctVal(id){const el=document.getElementById(id);return el?String(el.value||'').trim():'';}
 
 // ── Login screen: "oder mit eigenem Konto" ──
 function _acctLoginOpen(){
-  let msg='';
-  try{msg=sessionStorage.getItem('fcf_acct_msg')||'';sessionStorage.removeItem('fcf_acct_msg');}catch(e){}
+  let msg='',info='';
+  try{msg=sessionStorage.getItem('fcf_acct_msg')||'';sessionStorage.removeItem('fcf_acct_msg');
+    info=sessionStorage.getItem('fcf_acct_info')||'';sessionStorage.removeItem('fcf_acct_info');}catch(e){}
   _acctRenderLogin();
   if(msg)_acctSet('acctErr',msg);
+  if(info){_acctSet('acctNote',info);const n=document.getElementById('acctNote');if(n)n.classList.add('info');}
   _acctReady().catch(()=>{});
 }
 function _acctOnState(){
@@ -10384,8 +10355,7 @@ async function _acctLoginWith(user){
   try{mem=await _acctMember(user.uid);}catch(e){_acctMem[user.uid]={err:_acctErrText(e)};_acctRenderLogin();return;}
   _acctMem[user.uid]=mem;
   if(!mem){_acctRenderLogin();return;}
-  await _acctData();
-  const cu=_acctCU(mem,user);
+  const cu=_acctCU(mem,user,mem.role==='admin'?null:await _acctTrainersLoad());
   if(!cu){_acctSet('acctErr','Dein Zugang passt zu keinem Trainer mehr. Bitte wende dich an den Admin.');_acctRenderLogin();return;}
   _acctEnter(cu,'login');
 }
@@ -10529,7 +10499,6 @@ function invMode(m){if(!_inv)return;_inv.mode=m;_invRender();setTimeout(()=>{con
 function invRetry(){if(!_inv)return;_inv.state='load';_invRender();_invLoad().then(_invRender);}
 function invToLogin(){
   _invDropParam();_invClose();
-  if(typeof _initAuthUI==='function')_initAuthUI();
   _acctLoginOpen();
 }
 async function invOther(){
@@ -10590,8 +10559,7 @@ async function invAccept(user){
     if(_inv&&_inv.state==='open')_acctSet('invErr',_acctErrText(e));
     return;
   }
-  await _acctData();
-  const cu=_acctCU({code:I.code,role:v.role,name:v.name,trainerId:v.trainerId||''},user);
+  const cu=_acctCU({code:I.code,role:v.role,name:v.name,trainerId:v.trainerId||''},user,v.role==='admin'?null:await _acctTrainersLoad());
   if(!cu){_acctSet('invErr','Dein Konto ist verbunden, aber der Trainer dazu fehlt in der App. Bitte melde dich beim Admin.');return;}
   _invDropParam();
   const first=String(v.role==='admin'?((G&&G.adminAuth&&G.adminAuth.firstName)||v.name):cu.name).split(' ')[0];
@@ -10601,7 +10569,7 @@ async function invAccept(user){
 
 // ── Admin: access per trainer (Kader → Trainer → Profil → Zugang) ──
 let _acctAdm={t:0,inv:null,mem:null,err:'',busy:false};
-function _acctAdmOn(){return !!(typeof isAdmin==='function'&&isAdmin()&&CU&&CU.acct&&fbDb);}
+function _acctAdmOn(){return !!(typeof isAdmin==='function'&&isAdmin()&&CU&&CU.acct&&fbDb&&_fbReady());}
 async function _acctAdmLoad(force){
   if(!_acctAdmOn()||_acctAdm.busy)return _acctAdm;
   if(!force&&_acctAdm.t&&Date.now()-_acctAdm.t<60000)return _acctAdm;
@@ -10668,6 +10636,32 @@ function tpPlanSet(gi,on){
   if(typeof showSaveFlash==='function')showSaveFlash('✓ '+first+(on?' darf jetzt Trainingspläne erstellen und ändern':(TPL_VIEW_ALL?' sieht Trainingspläne jetzt nur an':': Trainingsplaner nicht mehr freigegeben')));
   try{const m=document.getElementById('moTrainerProfile');if(m&&m.classList.contains('open')&&!_tpEditing)renderTrainerProfile();}catch(e){}
   try{const l=document.getElementById('mgr-tr-list');if(l&&l.offsetParent)renderMgrTrainers();}catch(e){}
+  _planMirror(true);
+}
+// The database rule for the plans (Teil 3) cannot look into the trainer list,
+// so the clearance is copied onto the trainer's account: fcf_members/<uid>/plan,
+// written by the admin only. After every change, and once per admin session
+// (a trainer who gets his account after the clearance).
+let _planMirrorAt=0;
+async function _planMirror(force){
+  if(!_acctAdmOn())return;
+  if(!force&&_planMirrorAt)return;
+  _planMirrorAt=Date.now();
+  const A=await _acctAdmLoad(true);
+  if(!A||!A.mem||!A.inv)return;
+  const upd={};
+  (G.trainers||[]).forEach(t=>{
+    if(!t)return;
+    const st=_acctStateOf(t);
+    if(st.st!=='linked')return;
+    const uid=st.v.used,want=t.plan===true,have=!!(A.mem[uid]&&A.mem[uid].plan===true);
+    if(want!==have)upd['fcf_members/'+uid+'/plan']=want?true:null;
+  });
+  if(!Object.keys(upd).length)return;
+  try{
+    await fbDb.ref().update(upd);
+    Object.entries(upd).forEach(([p,v])=>{const m=A.mem[p.split('/')[1]];if(m){if(v)m.plan=true;else delete m.plan;}});
+  }catch(e){console.warn('[Planer-Freigabe]',e&&(e.code||e.message));}
 }
 function _tpPlanChip(t){return (t&&t.plan===true&&typeof isAdmin==='function'&&isAdmin())?'<span class="acc-chip tpr-chip" title="Darf Trainingspläne erstellen und ändern">plant mit</span>':'';}
 function _acctSecHtml(gi){
@@ -10772,15 +10766,10 @@ async function acctRevoke(gi,code){
 }
 // Einstellungen → Konto: how this person signs in
 function _acctKontoHtml(){
-  if(!CU)return '';
+  if(!CU||!CU.acct)return '';
   const esc=escapeHtml;
-  if(CU.acct){
-    return `<div class="acc-row"><span class="acc-dot ok"></span><div class="acc-txt"><b>Eigenes Konto</b><small>Angemeldet als ${esc(CU.acct.email||'Konto ohne E-Mail')} (${CU.acct.via==='google'?'Google':'E-Mail und Passwort'}).</small></div></div>`
-      +(CU.acct.via==='mail'?`<div class="acc-acts"><button type="button" class="btn bs acc-b" onclick="acctMailReset('','kontoAcctErr','kontoAcctNote')">Passwort ändern</button></div><div class="acc-msg" id="kontoAcctErr"></div><div class="acc-msg ok" id="kontoAcctNote"></div>`:'');
-  }
-  return `<div class="acc-row"><span class="acc-dot"></span><div class="acc-txt"><b>Noch mit Name und Passwort</b><small>${isAdmin()
-    ?'Melde dich einmal mit Google oder E-Mail an (Abmelden → „oder mit eigenem Konto“). Mit der Konto-ID, die dann erscheint, wird dein Admin-Zugang eingerichtet (GitHub → Actions → Zugang). Danach lädst du die anderen Trainer per Link ein.'
-    :'Bald meldest du dich mit deinem eigenen Konto an (Google oder E-Mail). Den Link dafür schickt dir der Admin.'}</small></div></div>`;
+  return `<div class="acc-row"><span class="acc-dot ok"></span><div class="acc-txt"><b>Eigenes Konto</b><small>Angemeldet als ${esc(CU.acct.email||'Konto ohne E-Mail')} (${CU.acct.via==='google'?'Google':'E-Mail und Passwort'}).</small></div></div>`
+    +(CU.acct.via==='mail'?`<div class="acc-acts"><button type="button" class="btn bs acc-b" onclick="acctMailReset('','kontoAcctErr','kontoAcctNote')">Passwort ändern</button></div><div class="acc-msg" id="kontoAcctErr"></div><div class="acc-msg ok" id="kontoAcctNote"></div>`:'');
 }
 
 // Open password+PIN management modal for current user
@@ -10800,641 +10789,20 @@ function saveAdminFirstName(){
 function _kontoFill(){
   if(!CU)return false;
   {const ab=document.getElementById('konto-acct-box');if(ab)ab.innerHTML=_acctKontoHtml();}
-  const auth=_findAuthRecord(CU.name);
-  if(!auth)return false;
   const nb=document.getElementById('konto-name-box');
   if(nb){
     nb.style.display=CU.role==='admin'?'':'none';
     const fi=document.getElementById('konto-firstname');
     if(fi)fi.value=(G&&G.adminAuth&&G.adminAuth.firstName)||'';
   }
-  // ── Password section ──
-  const has=_hasPassword(auth.rec);
-  document.getElementById('moPassword-status').textContent=has
-    ?`Du hast aktuell ein Passwort gesetzt.`
-    :`Bisher kein Passwort gesetzt — du kannst eines festlegen.`;
-  document.getElementById('moPassword-cur-wrap').style.display=has?'block':'none';
-  document.getElementById('moPassword-clear').style.display=has?'':'none';
-  document.getElementById('moPassword-cur').value='';
-  document.getElementById('moPassword-new').value='';
-  document.getElementById('moPassword-confirm').value='';
-  document.getElementById('moPassword-err').textContent='';
-  // ── PIN section ──
-  const hasPin=_hasPin(auth.rec);
-  document.getElementById('moPin-status').textContent=hasPin
-    ?`PIN-Code aktiviert. Wird beim Login zusätzlich gefordert.`
-    :`Kein PIN-Code. Aktiviere für 2-Faktor-Authentifizierung.`;
-  document.getElementById('moPin-cur-wrap').style.display=hasPin?'block':'none';
-  document.getElementById('moPin-clear').style.display=hasPin?'':'none';
-  document.getElementById('moPin-cur').value='';
-  document.getElementById('moPin-new').value='';
-  document.getElementById('moPin-confirm').value='';
-  document.getElementById('moPin-err').textContent='';
-  // ── Passkey section ──
-  const hasPk=_hasPasskey(auth.rec);
-  const supported=_passkeySupported();
-  const ps=document.getElementById('moPasskey-status');
-  const addBtn=document.getElementById('moPasskey-add');
-  const clearBtn=document.getElementById('moPasskey-clear');
-  if(ps){
-    if(!supported)ps.textContent='⚠ Passkey wird vom Browser nicht unterstützt.';
-    else if(hasPk){
-      const created=auth.rec.passkeyCreatedAt?new Date(auth.rec.passkeyCreatedAt).toLocaleDateString('de-DE'):'?';
-      ps.textContent=`Passkey aktiviert (eingerichtet am ${created}). Schnelle Anmeldung mit Touch ID, Face ID, Windows Hello oder Sicherheitsschlüssel.`;
-    } else ps.textContent='Kein Passkey. Aktiviere für schnelle Anmeldung mit Biometrie auf diesem Gerät.';
-  }
-  if(addBtn){addBtn.disabled=!supported;addBtn.style.display=hasPk?'none':'';}
-  if(clearBtn)clearBtn.style.display=hasPk?'':'none';
-  document.getElementById('moPasskey-err').textContent='';
   // ── Sitzungsdauer section ──
   const sesSel=document.getElementById('moSessionExpiry');
   if(sesSel)sesSel.value=String(getUserPref('sessionExpiryDays',90));
   return true;
 }
-async function submitPassword(){
-  if(!CU)return;
-  const auth=_findAuthRecord(CU.name);
-  if(!auth)return;
-  const errEl=document.getElementById('moPassword-err');
-  const has=_hasPassword(auth.rec);
-  const cur=document.getElementById('moPassword-cur').value;
-  const nw=document.getElementById('moPassword-new').value;
-  const cf=document.getElementById('moPassword-confirm').value;
-  if(has){
-    if(!cur){errEl.textContent='Aktuelles Passwort eingeben.';return;}
-    const ok=await _verifyPw(auth.rec,cur);
-    if(!ok){errEl.textContent='Aktuelles Passwort falsch.';return;}
-  }
-  if(!nw){errEl.textContent='Neues Passwort eingeben.';return;}
-  if(nw.length<4){errEl.textContent='Passwort zu kurz (min. 4 Zeichen).';return;}
-  if(nw!==cf){errEl.textContent='Passwörter stimmen nicht überein.';return;}
-  await _setPw(auth.rec,nw);
-  // User has set their own password — admin-set flag no longer applies
-  delete auth.rec.passwordSetByAdmin;
-  saveG();
-  _kontoFill();
-  if(typeof showSaveFlash==='function')showSaveFlash('🔑 Passwort '+(has?'geändert':'gesetzt'));
-  logAudit('Passwort '+(has?'geändert':'gesetzt'),CU.name,'');
-}
-async function submitClearPassword(){
-  if(!CU)return;
-  const auth=_findAuthRecord(CU.name);
-  if(!auth||!_hasPassword(auth.rec))return;
-  const errEl=document.getElementById('moPassword-err');
-  const cur=document.getElementById('moPassword-cur').value;
-  if(!cur){errEl.textContent='Zur Bestätigung aktuelles Passwort eingeben.';return;}
-  const ok=await _verifyPw(auth.rec,cur);
-  if(!ok){errEl.textContent='Aktuelles Passwort falsch.';return;}
-  if(!confirm('Passwort wirklich entfernen? Du kannst dich danach ohne Passwort anmelden.'))return;
-  _clearPw(auth.rec);
-  saveG();
-  _kontoFill();
-  if(typeof showSaveFlash==='function')showSaveFlash('🗑 Passwort entfernt');
-  logAudit('Passwort entfernt',CU.name,'');
-}
-async function submitPin(){
-  if(!CU)return;
-  const auth=_findAuthRecord(CU.name);
-  if(!auth)return;
-  const errEl=document.getElementById('moPin-err');
-  const has=_hasPin(auth.rec);
-  const cur=document.getElementById('moPin-cur').value;
-  const nw=document.getElementById('moPin-new').value;
-  const cf=document.getElementById('moPin-confirm').value;
-  if(has){
-    if(!cur){errEl.textContent='Aktuellen PIN eingeben.';return;}
-    const ok=await _verifyPin(auth.rec,cur);
-    if(!ok){errEl.textContent='Aktueller PIN falsch.';return;}
-  }
-  if(!_isValidPin(nw)){errEl.textContent='PIN muss 4–6 Ziffern enthalten.';return;}
-  if(nw!==cf){errEl.textContent='PINs stimmen nicht überein.';return;}
-  await _setPin(auth.rec,nw);
-  saveG();
-  _kontoFill();
-  if(typeof showSaveFlash==='function')showSaveFlash('🔢 PIN '+(has?'geändert':'gesetzt'));
-  logAudit('PIN '+(has?'geändert':'gesetzt'),CU.name,'');
-}
-async function submitClearPin(){
-  if(!CU)return;
-  const auth=_findAuthRecord(CU.name);
-  if(!auth||!_hasPin(auth.rec))return;
-  const errEl=document.getElementById('moPin-err');
-  const cur=document.getElementById('moPin-cur').value;
-  if(!cur){errEl.textContent='Zur Bestätigung aktuellen PIN eingeben.';return;}
-  const ok=await _verifyPin(auth.rec,cur);
-  if(!ok){errEl.textContent='Aktueller PIN falsch.';return;}
-  if(!confirm('PIN entfernen? 2-Faktor-Authentifizierung wird deaktiviert.'))return;
-  _clearPin(auth.rec);
-  saveG();
-  _kontoFill();
-  if(typeof showSaveFlash==='function')showSaveFlash('🗑 PIN entfernt');
-  logAudit('PIN entfernt',CU.name,'');
-}
-async function submitRegisterPasskey(){
-  if(!CU)return;
-  const auth=_findAuthRecord(CU.name);
-  if(!auth)return;
-  const errEl=document.getElementById('moPasskey-err');
-  errEl.textContent='';
-  if(!_passkeySupported()){errEl.textContent='Passkey wird vom Browser nicht unterstützt.';return;}
-  try{
-    await _registerPasskey(auth.rec,CU.name);
-    saveG();
-    if(typeof showSaveFlash==='function')showSaveFlash('🔐 Passkey registriert');
-    logAudit('Passkey registriert',CU.name,'');
-    // Refresh the section in place
-    _kontoFill();
-  }catch(e){
-    if(e&&e.name==='NotAllowedError')errEl.textContent='Abgebrochen.';
-    else errEl.textContent='Fehler: '+(e.message||e);
-  }
-}
-async function submitClearPasskey(){
-  if(!CU)return;
-  const auth=_findAuthRecord(CU.name);
-  if(!auth||!_hasPasskey(auth.rec))return;
-  if(!confirm('Passkey entfernen? Du kannst dich danach nicht mehr per Biometrie anmelden — nur mit Passwort.'))return;
-  _clearPasskey(auth.rec);
-  saveG();
-  if(typeof showSaveFlash==='function')showSaveFlash('🗑 Passkey entfernt');
-  logAudit('Passkey entfernt',CU.name,'');
-  _kontoFill();
-}
-// Admin: reset another user's Passkey
-async function adminResetPasskey(name){
-  if(!isAdmin())return;
-  const auth=_findAuthRecord(name);
-  if(!auth){alert('Benutzer nicht gefunden.');return;}
-  if(!_hasPasskey(auth.rec)){alert('Dieser Benutzer hat keinen Passkey.');return;}
-  if(!confirm(`Passkey von „${name}" entfernen?\n\n${name} muss sich danach per Passwort anmelden und kann einen neuen Passkey registrieren.`))return;
-  const reauthOk=await requireReauth(`Bestätige mit deinem Passwort das Zurücksetzen des Passkeys von „${name}".`);
-  if(!reauthOk)return;
-  _clearPasskey(auth.rec);
-  saveG();
-  if(typeof showSaveFlash==='function')showSaveFlash('🔓 Passkey zurückgesetzt');
-  logAudit('Passkey zurückgesetzt',name,'durch Admin');
-  if(typeof renderAllTr==='function')renderAllTr();
-}
-function adminResetPasskeyByIdx(gi){
-  const t=G.trainers&&G.trainers[gi];
-  if(!t)return;
-  adminResetPasskey(t.name);
-}
-
-// Admin: reset another user's PIN
-async function adminResetPin(name){
-  if(!isAdmin())return;
-  const auth=_findAuthRecord(name);
-  if(!auth){alert('Benutzer nicht gefunden.');return;}
-  if(!_hasPin(auth.rec)){alert('Dieser Benutzer hat keinen PIN gesetzt.');return;}
-  if(!confirm(`PIN von „${name}" zurücksetzen?\n\n${name} kann sich danach ohne PIN anmelden.`))return;
-  const reauthOk=await requireReauth(`Bestätige mit deinem Passwort das Zurücksetzen des PINs von „${name}".`);
-  if(!reauthOk)return;
-  _clearPin(auth.rec);
-  saveG();
-  if(typeof showSaveFlash==='function')showSaveFlash('🔓 PIN zurückgesetzt');
-  logAudit('PIN zurückgesetzt',name,'durch Admin');
-  if(typeof renderMgrTrainers==='function')renderMgrTrainers();
-  if(typeof renderAllTr==='function')renderAllTr();
-}
-function adminResetPinByIdx(gi){
-  const t=G.trainers&&G.trainers[gi];
-  if(!t)return;
-  adminResetPin(t.name);
-}
-
-// Admin: reset another user's password (clears it, they'll be prompted to set a new one)
-async function adminResetPassword(name){
-  if(!isAdmin())return;
-  const auth=_findAuthRecord(name);
-  if(!auth){alert('Benutzer nicht gefunden.');return;}
-  if(!_hasPassword(auth.rec)){alert('Dieser Benutzer hat kein Passwort gesetzt.');return;}
-  if(!confirm(`Passwort von „${name}" zurücksetzen?\n\n${name} kann sich danach ohne Passwort anmelden und ein neues festlegen.`))return;
-  const reauthOk=await requireReauth(`Bestätige mit deinem Passwort das Zurücksetzen des Passworts von „${name}".`);
-  if(!reauthOk)return;
-  _clearPw(auth.rec);
-  saveG();
-  if(typeof showSaveFlash==='function')showSaveFlash('🔓 Passwort zurückgesetzt');
-  logAudit('Passwort zurückgesetzt',name,'durch Admin');
-  // Re-render trainer list if visible
-  if(typeof renderTrainersList==='function')renderTrainersList();
-}
-
-// ── PASSWORD AUTH HELPERS ──────────────────────────────────
-// Hash a password with given salt using SHA-256 (Web Crypto)
-async function _pwHash(password,salt){
-  if(!password||!salt)return null;
-  const encoder=new TextEncoder();
-  const data=encoder.encode(salt+'|'+password);
-  const hashBuf=await crypto.subtle.digest('SHA-256',data);
-  return Array.from(new Uint8Array(hashBuf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
-function _pwGenSalt(){
-  // 16 bytes random hex
-  const arr=new Uint8Array(16);
-  crypto.getRandomValues(arr);
-  return Array.from(arr).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
-// Find a user record's auth fields (from G.trainers or, for Admin, G.adminAuth)
-function _findAuthRecord(name){
-  if(!name)return null;
-  const nl=name.toLowerCase();
-  if(nl==='admin'){
-    if(!G.adminAuth)G.adminAuth={};
-    return {kind:'admin',rec:G.adminAuth};
-  }
-  const t=Array.isArray(G.trainers)?G.trainers.find(x=>x.name.toLowerCase()===nl):null;
-  if(!t)return null;
-  return {kind:'trainer',rec:t};
-}
-function _hasPassword(rec){
-  return !!(rec&&rec.passwordHash&&rec.passwordSalt);
-}
-async function _verifyPw(rec,password){
-  if(!_hasPassword(rec))return false;
-  const h=await _pwHash(password,rec.passwordSalt);
-  return h===rec.passwordHash;
-}
-// ── BRUTE-FORCE LOCKOUT (client-side) ─────────────────────────────
-// Per-name attempt tracking in localStorage. Not bulletproof (user can clear
-// localStorage) but raises the bar significantly against automated guessing.
-function _lockoutKey(name){return 'fcf_lockout_'+(name||'').toLowerCase();}
-function _getLockout(name){
-  try{return JSON.parse(localStorage.getItem(_lockoutKey(name))||'null');}catch(e){return null;}
-}
-function _setLockout(name,data){
-  const k=_lockoutKey(name);
-  if(data)localStorage.setItem(k,JSON.stringify(data));
-  else localStorage.removeItem(k);
-}
-// Returns remaining lockout seconds (0 if not locked)
-function _isLocked(name){
-  const lo=_getLockout(name);
-  if(!lo||!lo.lockUntil)return 0;
-  const left=lo.lockUntil-Date.now();
-  return left>0?Math.ceil(left/1000):0;
-}
-function _registerFailedAuth(name){
-  if(!name)return;
-  const lo=_getLockout(name)||{attempts:0,lockUntil:0};
-  lo.attempts=(lo.attempts||0)+1;
-  // Exponential backoff
-  if(lo.attempts>=10)lo.lockUntil=Date.now()+60*60*1000;        // 1 hour
-  else if(lo.attempts>=6)lo.lockUntil=Date.now()+5*60*1000;     // 5 minutes
-  else if(lo.attempts>=3)lo.lockUntil=Date.now()+30*1000;       // 30 seconds
-  _setLockout(name,lo);
-}
-function _clearFailedAuth(name){_setLockout(name,null);}
-// Friendly time-left formatter
-function _formatLockoutTime(sec){
-  if(sec<60)return sec+' Sekunden';
-  if(sec<3600)return Math.ceil(sec/60)+' Minuten';
-  return Math.ceil(sec/3600)+' Stunden';
-}
-// Reminder shown after login when the password was set by an admin (temp-pw).
-// Encourages user to set their own password. Persistent — appears on EVERY active
-// login (not session-restore) until the user actually changes their password.
-function _showTempPwReminderModal(){
-  let backdrop=document.getElementById('_tempPwReminder');
-  if(backdrop)backdrop.remove();
-  backdrop=document.createElement('div');
-  backdrop.id='_tempPwReminder';
-  backdrop.style.cssText='position:fixed;inset:0;z-index:2050;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;';
-  backdrop.innerHTML=`
-    <div style="background:#fff;border-radius:12px;padding:24px;max-width:440px;width:92%;box-shadow:0 18px 60px rgba(0,0,0,.4);">
-      <h3 style="margin:0 0 8px;color:var(--bd);font-size:1.1rem;">🔑 Bitte Passwort ändern</h3>
-      <p style="margin:0 0 16px;color:var(--gd);font-size:.84rem;line-height:1.45;">Dein aktuelles Passwort wurde von einem Administrator gesetzt. Aus Sicherheitsgründen empfehlen wir, dein eigenes Passwort zu wählen — nur du solltest es kennen.</p>
-      <div style="display:flex;gap:8px;justify-content:flex-end;">
-        <button class="btn bs" id="_tempPwRemLater" style="font-size:.78rem;">Später</button>
-        <button class="btn bp" id="_tempPwRemNow" style="font-size:.78rem;">🔑 Jetzt ändern</button>
-      </div>
-    </div>`;
-  document.body.appendChild(backdrop);
-  document.getElementById('_tempPwRemLater').onclick=()=>backdrop.remove();
-  document.getElementById('_tempPwRemNow').onclick=()=>{
-    backdrop.remove();
-    if(typeof openPasswordModal==='function')openPasswordModal();
-  };
-}
-// ── RE-AUTH FOR CRITICAL OPERATIONS ───────────────────────────────
-// Shows a password prompt that verifies the CURRENT user's password.
-// Use before destructive admin actions (delete team, reset data, modify other trainers).
-// Resolves true on correct password, false on cancel or wrong password.
-async function requireReauth(reason){
-  if(!CU)return false;
-  const auth=_findAuthRecord(CU.name);
-  // No password set on current account → skip re-auth (legacy)
-  if(!auth||!_hasPassword(auth.rec))return true;
-  return new Promise(resolve=>{
-    let backdrop=document.getElementById('_reauthModal');
-    if(backdrop)backdrop.remove();
-    backdrop=document.createElement('div');
-    backdrop.id='_reauthModal';
-    backdrop.style.cssText='position:fixed;inset:0;z-index:2100;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;';
-    backdrop.innerHTML=`
-      <div style="background:#fff;border-radius:12px;padding:24px;max-width:420px;width:92%;box-shadow:0 18px 60px rgba(0,0,0,.45);">
-        <h3 style="margin:0 0 8px;color:var(--bd);font-size:1.05rem;">🔒 Passwort bestätigen</h3>
-        <p style="margin:0 0 14px;color:var(--gd);font-size:.84rem;line-height:1.4;">${escapeHtml(reason||'Diese Aktion erfordert eine Bestätigung mit deinem Passwort.')}</p>
-        <input id="_reauthPw" type="password" placeholder="Dein Passwort" autocomplete="current-password" style="width:100%;padding:11px 14px;border:1.5px solid var(--gl);border-radius:7px;font-size:.95rem;outline:none;box-sizing:border-box;"/>
-        <div id="_reauthErr" style="color:#a02525;font-size:.78rem;margin-top:8px;min-height:1em;"></div>
-        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px;">
-          <button class="btn bs" id="_reauthCancel">Abbrechen</button>
-          <button class="btn bp" id="_reauthOk">✓ Bestätigen</button>
-        </div>
-      </div>`;
-    document.body.appendChild(backdrop);
-    const pwIn=document.getElementById('_reauthPw');
-    const errEl=document.getElementById('_reauthErr');
-    setTimeout(()=>pwIn&&pwIn.focus(),50);
-    const finish=(ok)=>{backdrop.remove();resolve(ok);};
-    document.getElementById('_reauthCancel').onclick=()=>finish(false);
-    const submit=async()=>{
-      const pw=pwIn.value;
-      if(!pw){errEl.textContent='Bitte Passwort eingeben.';return;}
-      // Rate-limit re-auth attempts too (use same lockout system)
-      const lockSec=_isLocked(CU.name);
-      if(lockSec>0){errEl.textContent=`Zu viele Versuche. Bitte ${_formatLockoutTime(lockSec)} warten.`;return;}
-      const ok=await _verifyPw(auth.rec,pw);
-      if(!ok){_registerFailedAuth(CU.name);errEl.textContent='Falsches Passwort.';pwIn.value='';pwIn.focus();return;}
-      _clearFailedAuth(CU.name);
-      finish(true);
-    };
-    document.getElementById('_reauthOk').onclick=submit;
-    pwIn.addEventListener('keydown',e=>{if(e.key==='Enter')submit();else if(e.key==='Escape')finish(false);});
-    backdrop.addEventListener('click',e=>{if(e.target===backdrop)finish(false);});
-  });
-}
-async function _setPw(rec,password){
-  if(!password)return false;
-  const salt=_pwGenSalt();
-  const hash=await _pwHash(password,salt);
-  rec.passwordSalt=salt;
-  rec.passwordHash=hash;
-  return true;
-}
-function _clearPw(rec){
-  if(!rec)return;
-  delete rec.passwordHash;
-  delete rec.passwordSalt;
-}
-// ── PIN code (4–6 digits) — second factor / alternative ──
-function _hasPin(rec){
-  return !!(rec&&rec.pinHash&&rec.pinSalt);
-}
-function _isValidPin(pin){
-  return /^\d{4,6}$/.test(pin||'');
-}
-async function _verifyPin(rec,pin){
-  if(!_hasPin(rec))return false;
-  const h=await _pwHash(pin,rec.pinSalt);
-  return h===rec.pinHash;
-}
-async function _setPin(rec,pin){
-  if(!_isValidPin(pin))return false;
-  const salt=_pwGenSalt();
-  const hash=await _pwHash(pin,salt);
-  rec.pinSalt=salt;
-  rec.pinHash=hash;
-  return true;
-}
-function _clearPin(rec){
-  if(!rec)return;
-  delete rec.pinHash;
-  delete rec.pinSalt;
-}
-// ── PASSKEY / WebAuthn (device-bound login) ──
-function _hasPasskey(rec){return !!(rec&&rec.passkeyId);}
-function _passkeySupported(){return !!(window.PublicKeyCredential&&navigator.credentials);}
-function _b64encode(bytes){
-  return btoa(String.fromCharCode.apply(null,new Uint8Array(bytes)));
-}
-function _b64decode(str){
-  return Uint8Array.from(atob(str),c=>c.charCodeAt(0));
-}
-async function _registerPasskey(rec,userLabel){
-  if(!_passkeySupported())throw new Error('Passkey wird vom Browser nicht unterstützt.');
-  const challenge=new Uint8Array(32);
-  crypto.getRandomValues(challenge);
-  // User ID: deterministic from label
-  const userId=new TextEncoder().encode(userLabel||'user');
-  const credential=await navigator.credentials.create({
-    publicKey:{
-      challenge:challenge,
-      rp:{name:'Flutlicht · Anwesenheit'},
-      user:{id:userId,name:userLabel||'user',displayName:userLabel||'user'},
-      pubKeyCredParams:[
-        {type:'public-key',alg:-7},   // ES256
-        {type:'public-key',alg:-257}, // RS256
-      ],
-      authenticatorSelection:{userVerification:'preferred'},
-      timeout:60000,
-      attestation:'none',
-    },
-  });
-  if(!credential)throw new Error('Keine Bestätigung erhalten.');
-  rec.passkeyId=_b64encode(credential.rawId);
-  rec.passkeyCreatedAt=Date.now();
-  return true;
-}
-async function _verifyPasskey(rec){
-  if(!_hasPasskey(rec)||!_passkeySupported())return false;
-  const challenge=new Uint8Array(32);
-  crypto.getRandomValues(challenge);
-  let rawId;
-  try{rawId=_b64decode(rec.passkeyId);}catch(e){return false;}
-  try{
-    const assertion=await navigator.credentials.get({
-      publicKey:{
-        challenge:challenge,
-        allowCredentials:[{type:'public-key',id:rawId}],
-        userVerification:'preferred',
-        timeout:60000,
-      },
-    });
-    // Browser+authenticator handled the verification. If we got an assertion, login is good.
-    return !!assertion;
-  }catch(e){
-    if(e&&e.name==='NotAllowedError')return false; // cancelled or rejected
-    console.error('Passkey verify:',e);
-    return false;
-  }
-}
-function _clearPasskey(rec){
-  if(!rec)return;
-  delete rec.passkeyId;
-  delete rec.passkeyCreatedAt;
-}
-// Initialize static auth UI: show Passkey button only based on browser capability
-// (this leaks NO user-specific info). PIN field stays in collapsed "Weitere Optionen".
-function _initAuthUI(){
-  const pkBtn=document.getElementById('authPasskeyBtn');
-  if(pkBtn)pkBtn.style.display=_passkeySupported()?'':'none';
-  const adv=document.getElementById('authAdvanced');
-  if(adv)adv.style.display=_passkeySupported()?'':'none';
-}
-// Enter on name → focus password; Enter on password → submit (PIN stage is separate)
-function _authFocusNext(){
-  const active=document.activeElement;
-  const pw=document.getElementById('authPwInput');
-  if(active&&active.id==='authInput'&&pw){pw.focus();return;}
-  doAuth();
-}
-async function doAuthPasskey(){
-  const name=document.getElementById('authInput').value.trim();
-  const errEl=document.getElementById('authErr');
-  const GENERIC_ERR='Passkey-Anmeldung fehlgeschlagen.';
-  if(!name){errEl.textContent='Bitte Namen eingeben.';return;}
-  // Lockout check (shared with password path)
-  const lockSec=_isLocked(name);
-  if(lockSec>0){
-    errEl.textContent=`Zu viele Versuche. Bitte ${_formatLockoutTime(lockSec)} warten.`;
-    return;
-  }
-  const auth=_findAuthRecord(name);
-  if(!auth){_registerFailedAuth(name);errEl.textContent=GENERIC_ERR;return;}
-  if(!_hasPasskey(auth.rec)){_registerFailedAuth(name);errEl.textContent=GENERIC_ERR;return;}
-  const ok=await _verifyPasskey(auth.rec);
-  if(!ok){_registerFailedAuth(name);errEl.textContent=GENERIC_ERR;return;}
-  _clearFailedAuth(name);
-  // Build CU
-  let u;
-  if(name.toLowerCase()==='admin')u={name:'Admin',role:'admin',teams:[]};
-  else u={name:auth.rec.name,role:'trainer',teams:[...(auth.rec.teams||[])]};
-  const remember=document.getElementById('rememberMe').checked;
-  errEl.textContent='';
-  CU=u;
-  CU.loginAt=Date.now();
-  if(remember)localStorage.setItem(AUTH_SK,JSON.stringify(CU));
-  else sessionStorage.setItem(AUTH_SK,JSON.stringify(CU));
-  // Clear inputs
-  const pwI=document.getElementById('authPwInput');if(pwI)pwI.value='';
-  const pinI=document.getElementById('authPinInput');if(pinI)pinI.value='';
-  document.getElementById('authOverlay').classList.remove('open');
-  showApp();
-  setTimeout(()=>{logAudit('Anmeldung (Passkey)','',CU.role==='admin'?'Admin':'Trainer');if(typeof saveG==='function')saveG();},2000);
-}
-
-// Two-stage auth state — stage 2 (PIN) is active when this is non-null
-let _pendingAuth=null;
-function _resetAuthStage(){
-  _pendingAuth=null;
-  const errEl=document.getElementById('authErr');
-  if(errEl)errEl.textContent='';
-  const nameI=document.getElementById('authInput');
-  const pwI=document.getElementById('authPwInput');
-  const pinI=document.getElementById('authPinInput');
-  const pinWrap=document.getElementById('authPinWrap');
-  const submitBtn=document.getElementById('authSubmitBtn');
-  const backBtn=document.getElementById('authBackBtn');
-  if(nameI){nameI.disabled=false;nameI.style.opacity='';}
-  if(pwI){pwI.disabled=false;pwI.style.opacity='';pwI.value='';}
-  if(pinI)pinI.value='';
-  if(pinWrap)pinWrap.style.display='none';
-  if(submitBtn)submitBtn.textContent='Anmelden';
-  if(backBtn)backBtn.style.display='none';
-  setTimeout(()=>{if(nameI)nameI.focus();},50);
-}
-async function doAuth(){
-  const errEl=document.getElementById('authErr');
-  const GENERIC_ERR='Anmeldung fehlgeschlagen. Bitte Name und Passwort prüfen.';
-  // ── STAGE 2: PIN verification ────────────────────────────────
-  if(_pendingAuth){
-    const pinInput=document.getElementById('authPinInput');
-    const pin=pinInput?pinInput.value:'';
-    if(!pin){errEl.textContent='Bitte PIN eingeben.';return;}
-    const lockSec=_isLocked(_pendingAuth.u.name);
-    if(lockSec>0){
-      errEl.textContent=`Zu viele Versuche. Bitte ${_formatLockoutTime(lockSec)} warten.`;
-      return;
-    }
-    const ok=await _verifyPin(_pendingAuth.auth.rec,pin);
-    if(!ok){
-      _registerFailedAuth(_pendingAuth.u.name);
-      errEl.textContent='Falscher PIN.';
-      if(pinInput){pinInput.value='';pinInput.focus();}
-      return;
-    }
-    // PIN OK — finalize login
-    const {auth,u,remember}=_pendingAuth;
-    _pendingAuth=null;
-    _clearFailedAuth(u.name);
-    _finalizeAuth(auth,u,remember);
-    return;
-  }
-  // ── STAGE 1: Name + Password ────────────────────────────────
-  const name=document.getElementById('authInput').value.trim();
-  const remember=document.getElementById('rememberMe').checked;
-  const pwInput=document.getElementById('authPwInput');
-  const pw=pwInput?pwInput.value:'';
-  if(!name){errEl.textContent='Bitte Namen eingeben.';return;}
-  // Lockout check
-  const lockSec=_isLocked(name);
-  if(lockSec>0){
-    errEl.textContent=`Zu viele Versuche. Bitte ${_formatLockoutTime(lockSec)} warten.`;
-    return;
-  }
-  // Find auth record
-  const auth=_findAuthRecord(name);
-  if(!auth){_registerFailedAuth(name);errEl.textContent=GENERIC_ERR;return;}
-  let u;
-  if(auth.kind==='admin')u={name:'Admin',role:'admin',teams:[]};
-  else u={name:auth.rec.name,role:'trainer',teams:[...(auth.rec.teams||[])]};
-  // Password handling
-  if(_hasPassword(auth.rec)){
-    if(!pw){_registerFailedAuth(name);errEl.textContent=GENERIC_ERR;return;}
-    const ok=await _verifyPw(auth.rec,pw);
-    if(!ok){_registerFailedAuth(name);errEl.textContent=GENERIC_ERR;return;}
-  } else if(pw){
-    // Legacy first-time setup: user has no password yet, but typed one → set it
-    if(pw.length<4){_registerFailedAuth(name);errEl.textContent=GENERIC_ERR;return;}
-    await _setPw(auth.rec,pw);
-    if(typeof saveG==='function')saveG(false);
-    if(typeof showSaveFlash==='function')setTimeout(()=>showSaveFlash('🔑 Passwort festgelegt'),2000);
-  }
-  // ── If PIN is required, switch to Stage 2 ───────────────────
-  if(_hasPin(auth.rec)){
-    _pendingAuth={auth,u,remember};
-    errEl.textContent='';
-    // Disable name/pw fields, reveal PIN field, change button label
-    const nameI=document.getElementById('authInput');
-    if(nameI){nameI.disabled=true;nameI.style.opacity='.5';}
-    if(pwInput){pwInput.disabled=true;pwInput.style.opacity='.5';}
-    const pinWrap=document.getElementById('authPinWrap');
-    if(pinWrap)pinWrap.style.display='';
-    const pinI=document.getElementById('authPinInput');
-    if(pinI){pinI.value='';setTimeout(()=>pinI.focus(),50);}
-    const submitBtn=document.getElementById('authSubmitBtn');
-    if(submitBtn)submitBtn.textContent='PIN bestätigen';
-    const backBtn=document.getElementById('authBackBtn');
-    if(backBtn)backBtn.style.display='';
-    return;
-  }
-  // No PIN required — finalize directly
-  _clearFailedAuth(name);
-  _finalizeAuth(auth,u,remember);
-}
-// Common finalization after successful auth (Stage 1 no-PIN or Stage 2 PIN OK)
-function _finalizeAuth(auth,u,remember){
-  const errEl=document.getElementById('authErr');
-  errEl.textContent='';
-  CU=u;
-  CU.loginAt=Date.now();
-  if(remember){localStorage.setItem(AUTH_SK,JSON.stringify(CU));}
-  else{sessionStorage.setItem(AUTH_SK,JSON.stringify(CU));}
-  // Clear sensitive inputs + reset stage UI
-  const pwI=document.getElementById('authPwInput');if(pwI)pwI.value='';
-  const pinI=document.getElementById('authPinInput');if(pinI)pinI.value='';
-  _resetAuthStage();
-  document.getElementById('authOverlay').classList.remove('open');
-  showApp();
-  setTimeout(()=>{logAudit('Anmeldung','',CU.role==='admin'?'Admin':(CU.role==='trainer'?'Trainer':'Viewer'));if(typeof saveG==='function')saveG();},2000);
-  // Temp-pw reminder
-  if(auth.rec.passwordSetByAdmin){
-    setTimeout(()=>_showTempPwReminderModal(),700);
-  }
-  // Changelog: show on first login of a new app version (per-user)
-  setTimeout(()=>_maybeShowChangelogOnLogin(),1200);
-}
+// Destructive admin actions asked for the old login's password once more.
+// With accounts there is none; each of them asks for confirmation itself.
+async function requireReauth(){return true;}
 // ── ABOUT / CHANGELOG ────────────────────────────────────────
 // Old entry point (the version line opened the changelog): all news now
 function openAbout(){openNews(1);}
@@ -11773,7 +11141,6 @@ function _showStuckUpdateBanner(remoteVer){
   if(x)x.addEventListener('click',()=>b.remove());
   console.warn('[UpdateBanner] Stale-version loop guard active — remote reports '+(remoteVer||'?')+' but reloads did not deliver it.');
 }
-document.getElementById('authInput').addEventListener('keydown',e=>{if(e.key==='Enter')doAuth();});
 
 // ══ ANDROID BACK BUTTON ══════════════════════════════════════
 // Goal: "back" walks the app (close modal → return to the start view →
@@ -12067,20 +11434,9 @@ function confirmLogout(){
   if(fbAuth)fbAuth.signOut().catch(()=>{});
   {const ab=document.getElementById('authAcctIn');if(ab)ab.dataset.st='';}
   if(typeof _updateAppTitle==='function')_updateAppTitle();
-  document.getElementById('authInput').value='';
-  document.getElementById('authErr').textContent='';
-  // Clear sensitive inputs
-  const pwInp=document.getElementById('authPwInput');
-  if(pwInp)pwInp.value='';
-  const pinInp=document.getElementById('authPinInput');
-  if(pinInp)pinInp.value='';
-  // Reset two-stage flow to stage 1
-  if(typeof _resetAuthStage==='function')_resetAuthStage();
-  // Collapse "Weitere Optionen" details by default
-  const detailsEl=document.getElementById('authAdvanced');
-  if(detailsEl)detailsEl.open=false;
-  // Initialize static auth UI (Passkey button visibility based on browser support only)
-  if(typeof _initAuthUI==='function')_initAuthUI();
+  // The team data only with an account: the listener stops, the next sign-in waits again
+  try{stopFbListener();}catch(e){}
+  _fbAuthOk=false;
   document.getElementById('authOverlay').classList.add('open');
   if(typeof _bootVeilHide==='function')_bootVeilHide();
   _acctLoginOpen();
@@ -12142,6 +11498,13 @@ function showApp(){
   setTimeout(()=>{try{tpushCheck();}catch(e){}},4000);
   // Signed in with an account: check it is still valid (removed, revoked, other account)
   if(CU&&CU.acct)setTimeout(()=>{try{_acctVerify();}catch(e){}},1500);
+  if(CU&&CU.acct&&CU.role==='admin'){
+    let n=0;const t=setInterval(()=>{n++;
+      if(n>60||!CU||CU.role!=='admin'){clearInterval(t);return;}
+      if(!_fbInitialLoaded||!_fbReady())return;
+      clearInterval(t);try{_planMirror();}catch(e){}
+    },3000);
+  }
   if(!(typeof isPlayerMode==='function'&&isPlayerMode()))_a2hsArm('trainer');
   // Startseite: trainer-facing entry screen. Players go straight to their
   // usual flow. Data may still be syncing from Firebase at this point —
@@ -12403,7 +11766,7 @@ function buildSearchCorpus(){
   cmds.push({label:'⌨️ Tastatur-Kürzel',meta:'Hotkeys-Übersicht',fn:()=>typeof openShortcutsHelp==='function'&&openShortcutsHelp()});
   cmds.push({label:'⚙️ Einstellungen',meta:'Konto, Darstellung, Benachrichtigungen',fn:()=>typeof openSettings==='function'&&openSettings()});
   cmds.push({label:'🎨 Darstellung',meta:'Aussehen, Schrift',fn:()=>typeof openSettings==='function'&&openSettings('darstellung')});
-  cmds.push({label:'👤 Konto',meta:'Passwort, PIN, Passkey',fn:()=>typeof openSettings==='function'&&openSettings('konto')});
+  cmds.push({label:'👤 Konto',meta:'Anmeldung, Sitzung',fn:()=>typeof openSettings==='function'&&openSettings('konto')});
   cmds.push({label:'🚪 Abmelden',meta:'Logout',fn:()=>typeof confirmLogout==='function'&&confirmLogout()});
   cmds.forEach(c=>{
     items.push({
@@ -19711,8 +19074,8 @@ function _hubPushCard(){
     const ios=ps==='ios';
     return `<div class="hub-card hub-push"><span class="hub-ic">🔔</span>
       <span class="hub-txt"><b>Erinnerungen aufs Handy</b><span>${ios
-        ?'Nach Training und Spiel, wenn du noch nicht bewertet hast. Auf dem iPhone nur in der installierten App.'
-        :'Nach Training und Spiel, wenn du noch nicht bewertet hast. Ein Mal, nie nachts.'}</span>
+        ?'Nach Training und Spiel, wenn du noch nicht eingetragen hast, wie anstrengend es war. Auf dem iPhone nur in der installierten App.'
+        :'Nach Training und Spiel, wenn du noch nicht eingetragen hast, wie anstrengend es war. Ein Mal, nie nachts.'}</span>
         <span class="hub-push-btns"><button class="hub-push-on" onclick="${ios?'pushIosHelp()':"pushEnable('hub')"}">${ios?'So geht’s':'Einschalten'}</button><button class="hub-push-later" onclick="pushLater()">Später</button></span>
       </span></div>`;
   }
@@ -20530,20 +19893,37 @@ function tryPlayerUrlAuth(){
     }
     setTimeout(tryFinalize,200);
   };
-  // His slice first (1.2.36); the old way only when there is none — trainers
-  // still on an older app have not laid it out yet
-  const legacy=()=>{
-    window._pvLegacy=true;
-    if(window._pvFirst){const f=window._pvFirst;window._pvFirst=null;f();}
-    tryFinalize();
-  };
+  // His slice (1.2.36). Without one there is no other way since Teil 3
+  // (1.2.71): the old way read the whole team data.
   if(!fbDb){tryFinalize();return true;}
   _pvLoad(token).then(x=>{
-    if(!x){legacy();return;}
+    if(!x){
+      // The remembered choice no longer exists (link renewed, player moved):
+      // forget it, so the group link offers the list again
+      try{const mt=localStorage.getItem('fcf_me_team');if(mt&&localStorage.getItem('fcf_me__'+mt)===token)_meClear(mt);}catch(e){}
+      _pvOldLink('old');return;
+    }
     _pvAdopt(x,token);
     _pmEnterSlice(token);
-  }).catch(e=>{console.warn('[Ausschnitt]',e);legacy();});
+  }).catch(e=>{console.warn('[Ausschnitt]',e);_pvOldLink('err');});
   return true;
+}
+// Teil 3 (1.2.71): what a link of the old way gets — or a link whose player is
+// gone. The same card as the group link that is no longer valid.
+function _pvOldLink(kind,team){
+  const ov=document.getElementById('authOverlay');
+  if(ov){ov.classList.remove('open');ov.innerHTML='';}
+  document.body.classList.add('player-mode','hub-mode');
+  let wrap=document.getElementById('playerModeWrap');
+  if(!wrap){wrap=document.createElement('div');wrap.id='playerModeWrap';document.body.appendChild(wrap);}
+  wrap.style.display='';
+  if(typeof _bootVeilHide==='function')try{_bootVeilHide();}catch(e){}
+  const err=kind==='err';
+  wrap.innerHTML=`<div class="rpo-wrap"><div class="rpo-card">${team?`<div class="rpo-h">${escapeHtml(team)}</div>`:''}
+    <div class="rpo-sub"${team?' style="margin-top:12px;"':''}>${err
+      ?'Das hat gerade nicht geklappt. Prüf dein Internet und versuch es gleich noch einmal.'
+      :'Dieser Link gilt nicht mehr. Öffne den Link, den dein Trainer in die Gruppe geschickt hat.'}</div>
+    ${err?'<button type="button" class="rpo-mbtn" style="margin-top:14px;" onclick="location.reload()">Nochmal versuchen</button>':''}</div></div>`;
 }
 function _pmEnterSlice(token){
   try{
@@ -20663,230 +20043,11 @@ function tryTeamUrlAuth(){
     _pvTeamLink(teamParam,lk,overlay);
     return true;
   }
-  overlay.innerHTML='<div class="auth-box"><div style="text-align:center;padding:30px 16px;color:var(--gd);"><div style="font-size:1.4rem;margin-bottom:12px;">⏳</div><div style="font-size:1rem;font-weight:600;color:var(--bd);">Lade Mannschaft...</div></div></div>';
-  overlay.classList.add('open');
-  // Self-sufficient fetch — we don't trust _fbInitialLoaded (it can be set by
-  // many code paths before our .then ran, leaving _fbFetchResult undefined).
-  // Direct fetch + decode → use locally without depending on G.
-  let dataPromise=null;
-  if(fbRef){
-    dataPromise=fbRef.once('value').then(snap=>{
-      const raw=snap.val();
-      return raw?fbDecode(raw):null;
-    }).catch(e=>{
-      console.error('[TeamAuth] Direct fetch failed',e);
-      throw e;
-    });
-  }
-  const renderResult=async()=>{
-    let data=null;
-    let fetchOk=false;
-    if(dataPromise){
-      try{
-        data=await dataPromise;
-        fetchOk=true;
-      }catch(e){
-        overlay.innerHTML=`<div class="auth-box" style="padding:28px 28px;">
-          <div style="text-align:center;color:var(--gd);">
-            <div style="font-size:2.4rem;margin-bottom:12px;">🌐</div>
-            <div style="font-size:1.05rem;margin-bottom:10px;font-weight:700;color:var(--bd);">Verbindung fehlgeschlagen</div>
-            <div style="font-size:.84rem;line-height:1.55;color:var(--gd);text-align:left;background:rgba(255,200,100,.12);padding:12px 14px;border-radius:8px;margin-bottom:12px;">
-              Die App kann sich nicht mit der Datenbank verbinden.<br><br>
-              <b>Häufige Ursachen:</b><br>
-              • Tracking-Schutz im Browser blockiert<br>
-              • Schlechte Internetverbindung<br>
-              • Werbe-/Skript-Blocker aktiv
-            </div>
-            <div style="font-size:.78rem;color:var(--gd);line-height:1.5;">
-              <b>Lösung:</b> Anderen Browser probieren (Chrome / Firefox) oder Tracking-Schutz für diese Seite ausschalten.
-            </div>
-            <div style="margin-top:10px;font-size:.66rem;color:var(--gm);font-family:monospace;">Code: ${escapeHtml(((e&&e.message)||String(e||'unknown')).slice(0,100))}</div>
-          </div>
-        </div>`;
-        return;
-      }
-    }
-    if(!fetchOk||!data){
-      overlay.innerHTML=`<div class="auth-box" style="padding:28px 28px;">
-        <div style="text-align:center;color:var(--gd);">
-          <div style="font-size:2.4rem;margin-bottom:12px;">🔒</div>
-          <div style="font-size:1.05rem;margin-bottom:10px;font-weight:700;color:var(--bd);">Datenbank antwortet leer</div>
-          <div style="font-size:.84rem;line-height:1.55;color:var(--gd);text-align:left;background:rgba(255,200,100,.12);padding:12px 14px;border-radius:8px;margin-bottom:12px;">
-            Die Datenbank ist erreichbar, gibt aber keine Daten zurück.<br><br>
-            <b>Mögliche Ursachen:</b><br>
-            • Datenbank-Regeln erlauben keinen Lesezugriff<br>
-            • API-Schlüssel ist auf bestimmte Domains beschränkt
-          </div>
-          <div style="font-size:.78rem;color:var(--gd);line-height:1.5;">
-            <b>An den Trainer:</b> Firebase Console → Realtime Database → Rules prüfen (<code style="background:rgba(0,0,0,.08);padding:1px 4px;border-radius:3px;">.read: true</code> nötig).
-          </div>
-        </div>
-      </div>`;
-      return;
-    }
-    // We have fresh data — find team. Don't rely on global G (might be stale local copy).
-    // Season selection priority:
-    //   1. Explicit ?s=YYYY/YY param in URL (or ?season=)
-    //   2. The active season based on today's date (Jul–Jun cycle)
-    //   3. Highest-numbered season as fallback
-    const seasonParam=params.get('s')||params.get('season')||'';
-    const today=new Date();
-    const mo=today.getMonth()+1; // 1-12
-    const yr=today.getFullYear();
-    const activeStartYr=mo>=7?yr:yr-1;
-    const activeSeason=activeStartYr+'/'+(activeStartYr+1).toString().slice(-2);
-    const candidates=[];
-    if(data.db&&typeof data.db==='object'){
-      Object.entries(data.db).forEach(([key,block])=>{
-        if(!block||!Array.isArray(block.players))return;
-        const [team,season]=key.split('__');
-        if(team!==teamParam)return;
-        if(!season||season==='focuses'||season==='schedule')return;
-        candidates.push({team,season,block});
-      });
-    }
-    let chosen=null;
-    if(seasonParam){
-      chosen=candidates.find(c=>c.season===seasonParam)||null;
-    }
-    if(!chosen){
-      chosen=candidates.find(c=>c.season===activeSeason)||null;
-    }
-    if(!chosen){
-      // Fallback: highest season alphabetically
-      candidates.sort((a,b)=>(a.season<b.season?1:-1));
-      chosen=candidates[0]||null;
-    }
-    if(!chosen){
-      overlay.innerHTML=`<div class="auth-box" style="padding:28px 28px;">
-        <div style="text-align:center;color:var(--gd);">
-          <div style="font-size:2rem;margin-bottom:14px;">⚠️</div>
-          <div style="font-size:1.05rem;margin-bottom:8px;font-weight:700;color:var(--bd);">Mannschaft nicht gefunden</div>
-          <div style="font-size:.82rem;line-height:1.5;color:var(--gd);text-align:left;background:rgba(0,80,180,.06);padding:12px 14px;border-radius:8px;">Die Mannschaft „${escapeHtml(teamParam)}" existiert nicht in der Datenbank. Vielleicht ist der Link veraltet — frage deinen Trainer nach einem aktuellen Link.</div>
-        </div>
-      </div>`;
-      return;
-    }
-    _renderTeamAuthForm(overlay,chosen);
-  };
-  renderResult();
+  // Without the team's secret: the old group link, which read the whole team
+  // data (Teil 3, 1.2.71)
+  _pvOldLink('old',teamParam);
   return true;
 }
-function _renderTeamAuthForm(overlay,chosen){
-  // Same dark surface as the hub the player lands in afterwards.
-  if(overlay){overlay.classList.remove('open');overlay.innerHTML='';}
-  document.body.classList.add('player-mode','hub-mode');
-  let wrap=document.getElementById('playerModeWrap');
-  if(!wrap){wrap=document.createElement('div');wrap.id='playerModeWrap';document.body.appendChild(wrap);}
-  wrap.style.display='';
-  if(typeof _bootVeilHide==='function')try{_bootVeilHide();}catch(e){}
-  const all=(chosen.block.players||[]).map((p,idx)=>({p,idx})).filter(x=>x.p&&x.p.name);
-  // Full name: short names repeat in a squad (two "Max"), and the list is
-  // the one place where that would make someone tap the wrong player.
-  const nm=p=>String(p.name||'');
-  // Without a birthdate there is nothing to check against — the trainer has to
-  // add it first, otherwise anyone could answer for that player.
-  const eligible=all.filter(x=>x.p.birthdate).sort((a,b)=>nm(a.p).localeCompare(nm(b.p)));
-  const missing=all.length-eligible.length;
-  if(!eligible.length){
-    wrap.innerHTML=`<div class="rpo-wrap"><div class="rpo-card">
-      <div class="rpo-h">${escapeHtml(chosen.team)}</div>
-      <div class="rpo-sub" style="margin-top:12px;">${all.length?'Noch nicht eingerichtet: bei allen Spielern fehlt das Geburtsdatum. Bitte den Trainer fragen.':'Diese Mannschaft hat keine Spieler.'}</div>
-    </div></div>`;
-    return;
-  }
-  let pending=null,attempts=0;
-  wrap.innerHTML=`<div class="rpo-wrap"><div class="rpo-card">
-    <div class="rpo-h">${escapeHtml(chosen.team)}</div>
-    <div class="rpo-q">Wer bist du?</div>
-    <div id="tau-verify" class="rpo-verify" style="display:none;">
-      <div class="rpo-verify-h">Bist du <b id="tau-verify-name"></b>?</div>
-      <div class="rpo-verify-s">Einmalig zur Sicherheit: dein Geburtsdatum</div>
-      <input id="rpo-verify-in" type="date">
-      <div id="tau-verify-err" class="rpo-verify-e"></div>
-      <div class="rpo-verify-b">
-        <button class="rpo-mbtn rpo-verify-ok" id="tau-ok">Weiter</button>
-        <button class="rpo-full" id="tau-cancel">Abbrechen</button>
-      </div>
-    </div>
-    <div class="rpo-who" id="tau-who">${eligible.map((x,i)=>
-      `<button class="rpo-who-b" data-i="${i}"><span class="rpo-who-nr">${escapeHtml(String(x.p.nr||''))}</span>${escapeHtml(nm(x.p))}</button>`).join('')}</div>
-    ${missing?`<div class="rpo-sub" style="margin-top:10px;">Nicht in der Liste? Dann fehlt noch dein Geburtsdatum — sag deinem Trainer Bescheid.</div>`:''}
-  </div>
-  <div class="rpo-foot">Nur beim ersten Mal — danach erkennt dich dieses Gerät.</div></div>`;
-  const box=document.getElementById('tau-verify');
-  const inp=document.getElementById('rpo-verify-in');
-  const err=document.getElementById('tau-verify-err');
-  const okBtn=document.getElementById('tau-ok');
-  document.getElementById('tau-who').addEventListener('click',e=>{
-    const b=e.target.closest('.rpo-who-b');if(!b)return;
-    pending=eligible[+b.dataset.i];
-    document.getElementById('tau-verify-name').textContent=nm(pending.p);
-    box.style.display='';inp.value='';err.textContent='';
-    window.scrollTo({top:0,behavior:'smooth'});
-    setTimeout(()=>inp.focus(),60);
-  });
-  document.getElementById('tau-cancel').addEventListener('click',()=>{pending=null;box.style.display='none';});
-  const submit=async()=>{
-    if(!pending)return;
-    if(!inp.value){err.textContent='Bitte dein Geburtsdatum eingeben.';return;}
-    if(!_bdayEq(inp.value,pending.p.birthdate)){
-      attempts++;
-      if(attempts>=5){
-        err.textContent='Zu viele Fehlversuche. Bitte 60 Sekunden warten.';
-        okBtn.disabled=true;
-        setTimeout(()=>{attempts=0;err.textContent='';okBtn.disabled=false;},60000);
-        return;
-      }
-      err.textContent='Das Geburtsdatum stimmt nicht.';
-      return;
-    }
-    const x=pending;
-    let token=x.p.confirmToken;
-    if(!token){
-      okBtn.disabled=true;okBtn.textContent='…';
-      try{
-        token=(typeof generatePlayerToken==='function')
-          ? generatePlayerToken()
-          : ('tok_'+Date.now()+'_'+Math.random().toString(36).slice(2,10));
-        if(!fbDb)throw new Error('Keine Datenbank-Verbindung.');
-        // Targeted write of the token only. Path accounts for fbEncode's
-        // array wrap: players → {__arr:1, v:[...]}.
-        const teamKey=String(chosen.team+'__'+chosen.season)
-          .replace(/\//g,'__SL__').replace(/\./g,'__DOT__')
-          .replace(/#/g,'__HASH__').replace(/\[/g,'__LB__').replace(/\]/g,'__RB__');
-        // The index comes from the list rendered a moment ago. If the roster
-        // changed on another device meanwhile, re-find the slot by name so the
-        // token cannot land on someone else.
-        const _base='fcf_data/db/'+teamKey+'/players/v/';
-        let _idx=x.idx;
-        const _atIdx=await fbDb.ref(_base+_idx+'/name').once('value');
-        if(String(_atIdx.val()||'')!==String(x.p.name||'')){
-          const _all=await fbDb.ref(_base).once('value');
-          const _list=_all.val()||[];
-          _idx=-1;
-          Object.entries(_list).forEach(([k,p])=>{
-            if(p&&String(p.name||'')===String(x.p.name||''))_idx=k;
-          });
-          if(_idx===-1)throw new Error('Spieler nicht mehr in der Mannschaft.');
-        }
-        await fbDb.ref(_base+_idx+'/confirmToken').set(token);
-      }catch(e){
-        console.error('[TeamAuth] Token generation failed',e);
-        err.textContent='Anmeldung fehlgeschlagen. Bitte später erneut versuchen.';
-        okBtn.disabled=false;okBtn.textContent='Weiter';
-        return;
-      }
-    }
-    _meSet(chosen.team,token);
-    allowLeaveOnce();
-    location.replace(buildHubLink(token));
-  };
-  okBtn.addEventListener('click',submit);
-  inp.addEventListener('keydown',e=>{if(e.key==='Enter')submit();});
-}
-
-
 function _pmCalcStats(p,D){
   // Compute player's season attendance %, streak, and rank among teammates.
   if(!p||!D||!Array.isArray(D.sessions))return null;
@@ -20953,32 +20114,12 @@ function _pmFmtUpcoming(s,sk){
 // Group mode: no personal token, so the app cannot log anyone in. It waits for
 // the data, then shows the name picker followed by the same rating screen.
 function _rpeTeamStart(){
-  const overlay=document.getElementById('authOverlay');
-  if(overlay){
-    overlay.innerHTML='<div class="auth-box"><div style="text-align:center;padding:34px 16px;color:#fff;">Lade \u2026</div></div>';
-    overlay.classList.add('open');
-  }
-  let tries=0;
-  const go=()=>{
-    tries++;
-    if(!_fbInitialLoaded&&tries<=50){setTimeout(go,200);return;}
-    const tm=window._rpeTeamMode;
-    UI.currentTeam=tm.team;
-    if(tm.season)UI.currentSeason=tm.season;
-    CU={role:'player',name:'',teams:[tm.team],playerToken:null,playerIdx:null};
-    try{_pmSanitizeGTeam();}catch(e){console.error('[RpeTeam]',e);}
-    if(overlay){overlay.classList.remove('open');overlay.innerHTML='';}
-    document.body.classList.add('player-mode','rpe-only');
-    let wrap=document.getElementById('playerModeWrap');
-    if(!wrap){
-      wrap=document.createElement('div');
-      wrap.id='playerModeWrap';
-      document.body.appendChild(wrap);
-    }
-    wrap.style.display='';
-    renderRpeTeam();
-  };
-  go();
+  // Teil 3 (1.2.71): the old rating link for the whole team listed the names
+  // from the team data. Who chose himself on this phone before goes straight
+  // to his own rating; everyone else is told to use the group link.
+  const tm=window._rpeTeamMode||{},tok=window._rpeTeamPick;
+  if(tok&&/^[A-Za-z0-9_-]{6,64}$/.test(tok)){allowLeaveOnce();location.replace(buildHubLink(tok,'rpe',window._rpeOnlySi));return true;}
+  _pvOldLink('old',tm.team);
   return true;
 }
 // Strips everything the rating screen does not need. Names and shirt numbers
@@ -29474,97 +28615,35 @@ function renderMgrTrainers(){
   document.getElementById('mgr-tr-list').innerHTML=myT.length?
     myT.map(t=>{
       const gi=G.trainers.indexOf(t);
-      const hasPw=!!(t.passwordHash&&t.passwordSalt);
-      // Lock icon visible only to admin — reveals security state, others don't need to see it
-      const lockIcon=showLock?(hasPw?'<span title="Passwort gesetzt" style="margin-left:5px;color:#27ae60;">🔒</span>':'<span title="Kein Passwort" style="margin-left:5px;color:#aaa;opacity:.5;">🔓</span>'):'';
-      const resetBtn=isAdmin()&&hasPw?`<button class="tr-del tr-reset" style="background:rgba(241,196,15,.15);color:#9a6e00;margin-right:4px;font-size:.66rem;padding:3px 7px;" onclick="adminResetPasswordByIdx(${gi})" title="Passwort zurücksetzen">🔓 Reset</button>`:'';
       const av=t.photo
         ?`<img class="tr-av" src="${t.photo}" alt="">`
         :`<div class="tr-av tr-av-ph">${escapeHtml((t.name||'?').split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase())}</div>`;
       const sub=[t.role?trainerRoleLabel(t):'',t.teams.join(', ')].filter(Boolean).join(' \u00b7 ');
       const handle=isAdmin()?`<span class="tr-grip" title="Ziehen zum Sortieren" onpointerdown="trDragStart(event,${gi})">\u283f</span>`:'';
-      return _headBefore(t)+`<div class="tr-row" data-gi="${gi}">${handle}<div class="tr-main" onclick="openTrainerProfile(${gi})" title="Profil öffnen">${av}<div><div class="tr-nm">${escapeHtml(t.name)}${lockIcon}${_acctChip(t)}${_tpPlanChip(t)}</div><div class="tr-teams">${escapeHtml(sub)}</div></div></div>${resetBtn}${isAdmin()?`<button class="tr-del" onclick="delTrainer(${gi})">✕</button>`:''}</div>`;
+      return _headBefore(t)+`<div class="tr-row" data-gi="${gi}">${handle}<div class="tr-main" onclick="openTrainerProfile(${gi})" title="Profil öffnen">${av}<div><div class="tr-nm">${escapeHtml(t.name)}${_acctChip(t)}${_tpPlanChip(t)}</div><div class="tr-teams">${escapeHtml(sub)}</div></div></div>${isAdmin()?`<button class="tr-del" onclick="delTrainer(${gi})">✕</button>`:''}</div>`;
     }).join('')
     :'<p style="font-size:.76rem;color:var(--gm);">Kein Trainer für dieses Team.</p>';
-}
-function adminResetPasswordByIdx(gi){
-  const t=G.trainers&&G.trainers[gi];
-  if(!t){alert('Trainer nicht gefunden.');return;}
-  adminResetPassword(t.name);
-}
-// Generate a temporary password for an existing trainer who doesn't have one yet (legacy).
-// Useful for onboarding trainers that pre-date the password requirement.
-async function adminGenerateTempPwByIdx(gi){
-  if(!isAdmin())return;
-  const t=G.trainers&&G.trainers[gi];
-  if(!t){alert('Trainer nicht gefunden.');return;}
-  if(_hasPassword(t)){alert('Dieser Trainer hat bereits ein Passwort. Nutze stattdessen „Passwort zurücksetzen".');return;}
-  const reauthOk=await requireReauth(`Generiere ein temporäres Passwort für „${t.name}". Bitte mit deinem Passwort bestätigen.`);
-  if(!reauthOk)return;
-  const tempPw=_genTempPassword();
-  await _setPw(t,tempPw);
-  t.passwordSetByAdmin=true;
-  saveG();
-  logAudit('Temp-Passwort gesetzt',t.name||'?','durch Admin');
-  if(typeof renderAllTr==='function')renderAllTr();
-  _showTempPwModal(t.name,tempPw);
 }
 function buildTeamChecks(cid){
   const c=document.getElementById(cid);if(!c)return;
   c.innerHTML=G.teamList.map(t=>`<div class="tcheck${t===UI.currentTeam?' sel':''}" data-t="${t}" onclick="this.classList.toggle('sel')">${t}</div>`).join('');
 }
 function getChecked(cid){return[...document.querySelectorAll('#'+cid+' .tcheck.sel')].map(c=>c.dataset.t);}
-// Generates a friendly random password: 4 chars + dash + 4 chars (e.g. "X4kt-9zPp")
-// Avoids ambiguous chars (0/O, 1/l/I). Length-8 + dash is a good usability/security balance.
-function _genTempPassword(){
-  const chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let pw='';
-  for(let i=0;i<8;i++){
-    if(i===4)pw+='-';
-    pw+=chars[Math.floor(Math.random()*chars.length)];
-  }
-  return pw;
-}
-// Show modal with the generated temp password — admin copies and shares with new trainer
-function _showTempPwModal(trainerName,tempPw){
-  let backdrop=document.getElementById('_tempPwModal');
-  if(backdrop)backdrop.remove();
-  backdrop=document.createElement('div');
-  backdrop.id='_tempPwModal';
-  backdrop.style.cssText='position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;';
-  backdrop.innerHTML=`
-    <div style="background:#fff;border-radius:12px;padding:24px;max-width:440px;width:92%;box-shadow:0 18px 60px rgba(0,0,0,.4);">
-      <h3 style="margin:0 0 8px;color:var(--bd);font-size:1.1rem;">🔑 Temporäres Passwort für „${escapeHtml(trainerName)}"</h3>
-      <p style="margin:0 0 14px;color:var(--gd);font-size:.84rem;line-height:1.4;">Teile dieses Passwort dem Trainer persönlich oder über einen sicheren Kanal mit. Der Trainer kann es nach der ersten Anmeldung in den Einstellungen ändern.</p>
-      <div style="display:flex;gap:8px;align-items:stretch;">
-        <input id="_tempPwField" readonly value="${tempPw}" style="flex:1;font-family:monospace;font-size:1.3rem;font-weight:700;padding:12px 14px;border:2px solid var(--bd);border-radius:8px;background:#f4f8ff;color:var(--bd);letter-spacing:1px;text-align:center;"/>
-        <button class="btn bp" onclick="(()=>{const f=document.getElementById('_tempPwField');f.select();document.execCommand('copy');this.textContent='✓ Kopiert';setTimeout(()=>{this.textContent='📋 Kopieren';},2000);})()" style="white-space:nowrap;">📋 Kopieren</button>
-      </div>
-      <p style="margin:14px 0 0;font-size:.76rem;color:var(--gm);">⚠ Dieses Passwort wird nach dem Schließen nicht mehr angezeigt.</p>
-      <div style="display:flex;justify-content:flex-end;margin-top:14px;">
-        <button class="btn bp" onclick="document.getElementById('_tempPwModal').remove()">Verstanden</button>
-      </div>
-    </div>`;
-  document.body.appendChild(backdrop);
-  setTimeout(()=>{const f=document.getElementById('_tempPwField');if(f)f.focus();f&&f.select();},100);
+// A new trainer signs in with his own account: the invite is in his profile
+function _trAddedFlash(name){
+  const first=String(name||'').split(' ')[0];
+  if(typeof showSaveFlash==='function')showSaveFlash('✓ '+first+' hinzugefügt'+(typeof isAdmin==='function'&&isAdmin()?' – einladen im Profil unter „Zugang“':''));
 }
 async function addTrainer(){
   if(!canEdit())return;
   const name=document.getElementById('tNewName').value.trim(),teams=getChecked('tTeamChecks');
   if(!name)return alert('Name eingeben.');
-  const withTempPw=document.getElementById('tNewWithTempPw')?.checked!==false;
-  let tempPw=null;
   snap();
   const rec={id:'t'+Date.now(),name,teams};
-  if(withTempPw){
-    tempPw=_genTempPassword();
-    await _setPw(rec,tempPw);
-    rec.passwordSetByAdmin=true;
-  }
   G.trainers.push(rec);saveG();renderMgrTrainers();renderTeamBar();
   document.getElementById('tNewName').value='';
-  logAudit('Trainer hinzugefügt',name,teams.join(', ')+(withTempPw?' (mit temp. Passwort)':''));
-  if(tempPw)_showTempPwModal(name,tempPw);
+  logAudit('Trainer hinzugefügt',name,teams.join(', '));
+  _trAddedFlash(name);
 }
 async function delTrainer(i){
   if(!canEdit())return;
@@ -31981,37 +31060,19 @@ function switchAdminTab(t){
 }
 function renderAllTr(){
   document.getElementById('all-tr-list').innerHTML=G.trainers.length?
-    G.trainers.map((t,i)=>{
-      const hasPw=!!(t.passwordHash&&t.passwordSalt);
-      const hasPin=!!(t.pinHash&&t.pinSalt);
-      const hasPk=!!t.passkeyId;
-      const lockIcon=hasPw?'<span title="Passwort gesetzt" style="margin-left:5px;color:#27ae60;">🔒</span>':'<span title="Kein Passwort" style="margin-left:5px;color:#aaa;opacity:.5;">🔓</span>';
-      const pinIcon=hasPin?'<span title="PIN aktiviert (2FA)" style="margin-left:3px;color:#27ae60;">🔢</span>':'';
-      const pkIcon=hasPk?'<span title="Passkey registriert" style="margin-left:3px;color:#1659b8;">🔐</span>':'';
-      const resetPwBtn=hasPw?`<button class="tr-del" style="background:rgba(241,196,15,.15);color:#9a6e00;margin-right:4px;font-size:.66rem;padding:3px 7px;" onclick="adminResetPasswordByIdx(${i});renderAllTr();" title="Passwort zurücksetzen">🔓 PW</button>`:`<button class="tr-del" style="background:rgba(39,174,96,.18);color:#1f6e30;margin-right:4px;font-size:.66rem;padding:3px 7px;" onclick="adminGenerateTempPwByIdx(${i})" title="Temporäres Passwort generieren">🔑 Temp-PW</button>`;
-      const resetPinBtn=hasPin?`<button class="tr-del" style="background:rgba(241,196,15,.15);color:#9a6e00;margin-right:4px;font-size:.66rem;padding:3px 7px;" onclick="adminResetPinByIdx(${i});renderAllTr();" title="PIN zurücksetzen">🔓 PIN</button>`:'';
-      const resetPkBtn=hasPk?`<button class="tr-del" style="background:rgba(22,89,184,.15);color:#1659b8;margin-right:4px;font-size:.66rem;padding:3px 7px;" onclick="adminResetPasskeyByIdx(${i});renderAllTr();" title="Passkey zurücksetzen">🔓 PK</button>`:'';
-      return `<div class="tr-row"><div><div class="tr-nm">${escapeHtml(t.name)}${lockIcon}${pinIcon}${pkIcon}</div><div class="tr-teams">${escapeHtml(t.teams.join(', ')||'–')}</div></div>${resetPwBtn}${resetPinBtn}${resetPkBtn}<button class="tr-del" onclick="delTrainer(${i});renderAllTr();">✕</button></div>`;
-    }).join('')
+    G.trainers.map((t,i)=>`<div class="tr-row"><div><div class="tr-nm">${escapeHtml(t.name)}${_acctChip(t)}</div><div class="tr-teams">${escapeHtml(t.teams.join(', ')||'–')}</div></div><button class="tr-del" onclick="delTrainer(${i});renderAllTr();">✕</button></div>`).join('')
     :'<p style="font-size:.76rem;color:var(--gm);">Keine Trainer.</p>';
 }
 async function addTrainerGlobal(){
   if(!isAdmin())return;
   const name=document.getElementById('atNewName').value.trim(),teams=getChecked('atTeamChecks');
   if(!name)return;
-  const withTempPw=document.getElementById('atNewWithTempPw')?.checked!==false;
-  let tempPw=null;
   snap();
   const rec={id:'t'+Date.now(),name,teams};
-  if(withTempPw){
-    tempPw=_genTempPassword();
-    await _setPw(rec,tempPw);
-    rec.passwordSetByAdmin=true;
-  }
   G.trainers.push(rec);saveG();renderAllTr();renderTeamBar();
   document.getElementById('atNewName').value='';
-  logAudit('Trainer hinzugefügt',name,teams.join(', ')+(withTempPw?' (mit temp. Passwort)':''));
-  if(tempPw)_showTempPwModal(name,tempPw);
+  logAudit('Trainer hinzugefügt',name,teams.join(', '));
+  _trAddedFlash(name);
 }
 function renderAdminTeams(){
   document.getElementById('admin-teams-list').innerHTML=G.teamList.map(t=>`
@@ -33460,7 +32521,7 @@ function startPresence(){
   if(!CU){console.warn('[Presence] kein CU');return;}
   if(CU.role==='player'){console.info('[Presence] Spieler — kein Presence-Tracking');return;}
   if(_presenceSessionId)return; // already started
-  if(!fbRef){
+  if(!fbRef||!_fbReady()){
     console.info('[Presence] fbRef noch nicht bereit — versuche in 1s erneut');
     setTimeout(startPresence,1000);
     return;
@@ -33791,6 +32852,12 @@ function checkAutoBackup(){
   // check reads a single date string from __backups_meta/lastAutoDay.
   if(typeof isPlayerMode==='function'&&isPlayerMode())return;
   if(!CU||!(typeof canEdit==='function'&&canEdit()))return;
+  // Teil 3 (1.2.71): only once the data has come with the account
+  if(fbRef&&!_fbInitialLoaded){
+    checkAutoBackup._n=(checkAutoBackup._n||0)+1;
+    if(checkAutoBackup._n<=90)setTimeout(checkAutoBackup,2000);
+    return;
+  }
   const today=new Date().toDateString();
   if(localStorage.getItem('fcf_last_auto_bk')===today)return; // this device already knows
   const _hasAutoToday=(list)=>(list||[]).some(b=>{
@@ -34483,7 +33550,7 @@ function _tplHomeBtn(si){
   const D=cd();const s=D&&D.sessions&&D.sessions[si];
   if(!s||s.type==='match')return '';
   const team=UI.currentTeam,idx=TPL.idxCache[team];
-  if(s.pid&&!idx&&typeof fbDb!=='undefined'&&fbDb&&!TPL.idxCache['__'+team]){
+  if(s.pid&&!idx&&typeof fbDb!=='undefined'&&fbDb&&_fbReady()&&!TPL.idxCache['__'+team]){
     TPL.idxCache['__'+team]=1; // one request per team and page load
     _tplRead(_tplBase(team)+'/idx').then(v=>{
       if(!TPL.idxCache[team])TPL.idxCache[team]=(v&&typeof v==='object')?v:{};
@@ -34520,7 +33587,7 @@ function _tplSyncSessBtn(si){
     ?'📝 Trainingsplan öffnen'+(e&&e.n?` <span style="font-weight:500;opacity:.75">· ${e.n} ${e.n===1?'Block':'Blöcke'} · ${e.m}′</span>`:'')
     :'📝 Trainingsplan erstellen';
   // The summaries are tiny; load them once so the button can say what is planned.
-  if(s.pid&&!idx&&typeof fbDb!=='undefined'&&fbDb&&!TPL.idxCache['__'+team]){
+  if(s.pid&&!idx&&typeof fbDb!=='undefined'&&fbDb&&_fbReady()&&!TPL.idxCache['__'+team]){
     TPL.idxCache['__'+team]=1; // one request per team and page load
     _tplRead(_tplBase(team)+'/idx').then(v=>{
       if(TPL.idxCache[team])return; // the planner loaded it meanwhile
@@ -39413,7 +38480,7 @@ _pubCleanupSchedule();
   </div>
   <div class="set-body">
     <nav class="set-nav" id="set-nav">
-      <button type="button" class="set-nav-it" data-sec="konto" onclick="settingsShow('konto')"><span class="set-nav-ic">👤</span><span class="set-nav-tx"><b>Konto</b><small>Passwort, PIN, Passkey, Sitzung</small></span></button>
+      <button type="button" class="set-nav-it" data-sec="konto" onclick="settingsShow('konto')"><span class="set-nav-ic">👤</span><span class="set-nav-tx"><b>Konto</b><small>Anmeldung, Sitzung</small></span></button>
       <button type="button" class="set-nav-it" data-sec="darstellung" onclick="settingsShow('darstellung')"><span class="set-nav-ic">🎨</span><span class="set-nav-tx"><b>Darstellung</b><small>Aussehen, Schrift</small></span></button>
       <button type="button" class="set-nav-it" data-sec="benach" onclick="settingsShow('benach')"><span class="set-nav-ic">🔔</span><span class="set-nav-tx"><b>Benachrichtigungen</b><small>Push, Erinnerungen</small></span></button>
       <button type="button" class="set-nav-it" data-sec="verein" onclick="settingsShow('verein')"><span class="set-nav-ic">🛡</span><span class="set-nav-tx"><b>Verein</b><small>Name, Logo, Datenschutz</small></span></button>
@@ -39424,8 +38491,8 @@ _pubCleanupSchedule();
 
     <section class="set-sec" data-sec="konto">
       <h4 class="set-sec-h">👤 Konto</h4>
-      <p class="set-sec-sub">Persönliche Sicherheits- und Sitzungseinstellungen.</p>
-  <!-- ─ Anmeldung: eigenes Konto oder noch Name und Passwort ─ -->
+      <p class="set-sec-sub">Dein Konto und wie lange du auf diesem Gerät angemeldet bleibst.</p>
+  <!-- ─ Anmeldung: das eigene Konto ─ -->
   <div class="acc-box" id="konto-acct-box"></div>
   <!-- ─ Vorname (nur Admin-Konto: es hat keinen Personennamen) ─ -->
   <div id="konto-name-box" style="display:none;border:1px solid var(--gl);border-radius:8px;padding:11px 13px;margin-bottom:10px;">
@@ -39434,62 +38501,6 @@ _pubCleanupSchedule();
     <input type="text" id="konto-firstname" maxlength="30" autocomplete="given-name" placeholder="z. B. Artem" style="width:100%;padding:6px 9px;border:1px solid var(--gl);border-radius:6px;font-family:'Barlow',sans-serif;font-size:.86rem;margin-bottom:8px;">
     <button class="btn bp" style="font-size:.74rem;padding:5px 11px;" onclick="saveAdminFirstName()">Speichern</button>
   </div>
-  <!-- ─ Passwort ─ -->
-  <div style="border:1px solid var(--gl);border-radius:8px;padding:11px 13px;margin-bottom:10px;">
-    <div style="font-weight:700;color:var(--bd);margin-bottom:8px;font-size:.86rem;">🔑 Passwort</div>
-    <p id="moPassword-status" style="font-size:.74rem;color:var(--gm);margin:0 0 10px;">–</p>
-    <div id="moPassword-cur-wrap" style="display:none;">
-      <label style="font-size:.7rem;color:var(--gd);font-weight:600;">Aktuelles Passwort</label>
-      <input type="password" id="moPassword-cur" autocomplete="current-password" style="width:100%;padding:6px 9px;border:1px solid var(--gl);border-radius:6px;font-family:'Barlow',sans-serif;font-size:.82rem;margin-bottom:8px;outline:none;" oninput="document.getElementById('moPassword-err').textContent='';"/>
-    </div>
-    <label style="font-size:.7rem;color:var(--gd);font-weight:600;">Neues Passwort</label>
-    <input type="password" id="moPassword-new" autocomplete="new-password" placeholder="Mindestens 4 Zeichen" style="width:100%;padding:6px 9px;border:1px solid var(--gl);border-radius:6px;font-family:'Barlow',sans-serif;font-size:.82rem;margin-bottom:8px;outline:none;" oninput="document.getElementById('moPassword-err').textContent='';"/>
-    <label style="font-size:.7rem;color:var(--gd);font-weight:600;">Wiederholen</label>
-    <input type="password" id="moPassword-confirm" autocomplete="new-password" style="width:100%;padding:6px 9px;border:1px solid var(--gl);border-radius:6px;font-family:'Barlow',sans-serif;font-size:.82rem;margin-bottom:8px;outline:none;" oninput="document.getElementById('moPassword-err').textContent='';"/>
-    <div id="moPassword-err" style="color:#a02525;font-size:.72rem;min-height:1em;margin-bottom:6px;"></div>
-    <div style="display:flex;gap:6px;">
-      <button class="btn bp" style="font-size:.74rem;padding:5px 11px;" onclick="submitPassword()">Speichern</button>
-      <button class="btn bd" id="moPassword-clear" onclick="submitClearPassword()" style="display:none;font-size:.72rem;padding:5px 11px;">🗑 Entfernen</button>
-    </div>
-  </div>
-
-  <!-- ─ PIN-Code ─ -->
-  <div style="border:1px solid var(--gl);border-radius:8px;padding:11px 13px;margin-bottom:10px;">
-    <div style="font-weight:700;color:var(--bd);margin-bottom:8px;font-size:.86rem;">🔢 PIN-Code <span style="font-size:.65rem;color:var(--gm);font-weight:500;">(zusätzlicher Code)</span></div>
-    <p id="moPin-status" style="font-size:.74rem;color:var(--gm);margin:0 0 10px;">–</p>
-    <div style="background:color-mix(in srgb, var(--ac) 10%, transparent);border-left:3px solid var(--ac);border-radius:5px;padding:7px 10px;margin-bottom:10px;font-size:.7rem;color:var(--gd);line-height:1.4;">
-      💡 Der PIN ist ein zusätzlicher Code zum Passwort. Für echte 2-Faktor-Authentifizierung empfehlen wir <b>Passkey</b> (siehe unten) — sicherer und bequemer.
-    </div>
-    <div id="moPin-cur-wrap" style="display:none;">
-      <label style="font-size:.7rem;color:var(--gd);font-weight:600;">Aktueller PIN</label>
-      <input type="password" id="moPin-cur" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" style="width:100%;padding:6px 9px;border:1px solid var(--gl);border-radius:6px;font-family:'Barlow',sans-serif;font-size:.82rem;margin-bottom:8px;outline:none;letter-spacing:4px;" oninput="document.getElementById('moPin-err').textContent='';"/>
-    </div>
-    <label style="font-size:.7rem;color:var(--gd);font-weight:600;">Neuer PIN (4–6 Ziffern)</label>
-    <input type="password" id="moPin-new" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="z.B. 1234" autocomplete="off" style="width:100%;padding:6px 9px;border:1px solid var(--gl);border-radius:6px;font-family:'Barlow',sans-serif;font-size:.82rem;margin-bottom:8px;outline:none;letter-spacing:4px;" oninput="document.getElementById('moPin-err').textContent='';"/>
-    <label style="font-size:.7rem;color:var(--gd);font-weight:600;">Wiederholen</label>
-    <input type="password" id="moPin-confirm" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" style="width:100%;padding:6px 9px;border:1px solid var(--gl);border-radius:6px;font-family:'Barlow',sans-serif;font-size:.82rem;margin-bottom:8px;outline:none;letter-spacing:4px;" oninput="document.getElementById('moPin-err').textContent='';"/>
-    <div id="moPin-err" style="color:#a02525;font-size:.72rem;min-height:1em;margin-bottom:6px;"></div>
-    <div style="display:flex;gap:6px;">
-      <button class="btn bp" style="font-size:.74rem;padding:5px 11px;" onclick="submitPin()">Speichern</button>
-      <button class="btn bd" id="moPin-clear" onclick="submitClearPin()" style="display:none;font-size:.72rem;padding:5px 11px;">🗑 Entfernen</button>
-    </div>
-  </div>
-
-  <!-- ─ Passkey (biometric) ─ -->
-  <div style="border:2px solid #27ae60;border-radius:8px;padding:11px 13px;margin-bottom:10px;background:linear-gradient(135deg,rgba(39,174,96,.04),rgba(39,174,96,.01));">
-    <div style="font-weight:700;color:var(--bd);margin-bottom:6px;font-size:.86rem;display:flex;align-items:center;gap:7px;flex-wrap:wrap;">
-      <span>🔐 Passkey</span>
-      <span style="font-size:.65rem;color:var(--gm);font-weight:500;">(biometrische Anmeldung)</span>
-      <span style="background:#27ae60;color:#fff;padding:1px 7px;border-radius:3px;font-size:.6rem;font-weight:700;letter-spacing:.3px;">EMPFOHLEN FÜR 2FA</span>
-    </div>
-    <p id="moPasskey-status" style="font-size:.74rem;color:var(--gm);margin:0 0 10px;line-height:1.45;">–</p>
-    <div id="moPasskey-err" style="color:#a02525;font-size:.72rem;min-height:1em;margin-bottom:6px;"></div>
-    <div style="display:flex;gap:6px;flex-wrap:wrap;">
-      <button class="btn bp" id="moPasskey-add" style="font-size:.74rem;padding:5px 11px;" onclick="submitRegisterPasskey()">🔐 Registrieren</button>
-      <button class="btn bd" id="moPasskey-clear" style="display:none;font-size:.72rem;padding:5px 11px;" onclick="submitClearPasskey()">🗑 Entfernen</button>
-    </div>
-  </div>
-
   <!-- ─ Sitzungsdauer ─ -->
   <div style="border:1px solid var(--gl);border-radius:8px;padding:11px 13px;margin-bottom:10px;">
     <div style="font-weight:700;color:var(--bd);margin-bottom:6px;font-size:.86rem;">⏱ Sitzungsdauer</div>
