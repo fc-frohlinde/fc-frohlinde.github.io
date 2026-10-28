@@ -102,18 +102,29 @@ try {
   if (process.env.GITHUB_EVENT_NAME === 'workflow_dispatch') {
     try {
       const st = (await db.get('fcf_push/status')) || {};
+      // 'chk' entries are the job's own markers (owner '_'), not notifications
+      const who = o => o[0] === 'p' ? 'игр.' : o[0] === 't' ? 'трен.' : '?';
       const sum = async day => {
         const o = (await db.get(`fcf_push/sent/${day}`)) || {}, by = {}, owners = new Set();
         let n = 0;
         for (const [k, v] of Object.entries(o)) {
-          const kind = k.split('-')[0], c = Object.keys(v || {}).length;
-          by[kind] = (by[kind] || 0) + c; n += c;
-          Object.keys(v || {}).forEach(x => owners.add(x));
+          const kind = k.split('-')[0];
+          if (kind === 'chk') continue;
+          const os = Object.keys(v || {}).filter(x => x !== '_');
+          if (!os.length) continue;
+          by[kind] = (by[kind] || 0) + os.length; n += os.length;
+          os.forEach(x => owners.add(x));
         }
-        return `${n}` + (n ? ` (${Object.entries(by).map(([k, c]) => k + ' ' + c).join(', ')}; получателей ${owners.size})` : '');
+        const r = {}; for (const x of owners) r[who(x)] = (r[who(x)] || 0) + 1;
+        return `${n}` + (n ? ` (${Object.entries(by).map(([k, c]) => k + ' ' + c).join(', ')}; кому: ${Object.entries(r).map(([k, c]) => c + ' ' + k).join(', ')})` : '');
       };
+      const subs = (await db.get('fcf_push/subs')) || {}, ab = { p: [0, 0], t: [0, 0] };
+      for (const [o, devs] of Object.entries(subs)) {
+        const c = Object.values(devs || {}).filter(x => x && x.e).length;
+        if (c && ab[o[0]]) { ab[o[0]][0]++; ab[o[0]][1] += c; }
+      }
       const d = berlin(Date.now()).day;
-      console.log(`::notice title=Push::вчера: ${await sum(addDays(d, -1))}; сегодня: ${await sum(d)}; устройств: ${st.devices ?? '–'}, ошибок в последнем прогоне: ${st.err ?? 0}, отписались: ${st.gone ?? 0}`);
+      console.log(`::notice title=Push::вчера: ${await sum(addDays(d, -1))}; сегодня: ${await sum(d)}; подписаны: игроков ${ab.p[0]} (устройств ${ab.p[1]}), тренеров ${ab.t[0]} (устройств ${ab.t[1]}); ошибок в последнем прогоне: ${st.err ?? 0}, отписались: ${st.gone ?? 0}`);
     } catch (e) { console.log('::warning title=Push::' + String((e && e.message) || e).slice(0, 160)); }
   }
 } catch (e) {
