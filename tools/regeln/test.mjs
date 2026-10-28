@@ -35,15 +35,24 @@ await req('PUT', '/', {
     TRAINERCODE000000001: inv({ used: 'uTrainer', usedAt: now }),
     OPENCODE000000000001: inv({ name: 'Neu' }),
     OPENCODE000000000002: inv({ name: 'Neu2' }),
+    OPENCODE000000000003: inv({ name: 'Neu3' }),
     EXPIREDCODE000000001: inv({ exp: now - 1000 }),
     REVOKEDCODE000000001: inv({ revoked: now }),
-    REVOKEDUSE0000000001: inv({ used: 'uGone', usedAt: now, revoked: now })
+    REVOKEDUSE0000000001: inv({ used: 'uGone', usedAt: now, revoked: now }),
+    PLANCODE000000000001: inv({ name: 'Ana', trainerId: 't3', used: 'uPlan', usedAt: now })
   },
   fcf_members: {
     uAdmin: { code: 'ADMINCODE00000000001', t: now },
     uTrainer: { code: 'TRAINERCODE000000001', t: now },
-    uGone: { code: 'REVOKEDUSE0000000001', t: now }
-  }
+    uGone: { code: 'REVOKEDUSE0000000001', t: now },
+    uPlan: { code: 'PLANCODE000000000001', t: now, plan: true }
+  },
+  fcf_media: { photos: { m1: 'data:image/png;base64,AAAA' }, rev: { m1: now } },
+  __backups: { 0: { ts: now, data: { version: 20 } } },
+  __backups_meta: { lastAutoDay: 'Wed Oct 28 2026' },
+  __presence: { s1: { name: 'Jimmy', lastSeen: now } },
+  __trainerActivity: { jimmy: { name: 'Jimmy', lastSeen: now } },
+  fcf_plans: { U19: { meta: { seeded: true } } }
 }, 'owner');
 
 // ── reading ──
@@ -86,6 +95,8 @@ const after = JSON.parse((await req('GET', 'fcf_invites/OPENCODE000000000001')).
 ok(after && after.used === 'uNeu' && after.role === 'trainer', 'приглашение после этого: использовано uNeu, роль не изменилась');
 await cannot('при активации дописать чужую роль', req('PATCH', '/', { 'fcf_members/uRole': { code: 'OPENCODE000000000002', t: Date.now() }, 'fcf_invites/OPENCODE000000000002/used': 'uRole', 'fcf_invites/OPENCODE000000000002/role': 'admin' }, 'uRole'));
 await can('после этого обычно активировать второе открытое приглашение', redeem('uRole', 'OPENCODE000000000002'));
+await cannot('при активации дать себе допуск к планам', req('PATCH', '/', { 'fcf_members/uSelf': { code: 'OPENCODE000000000003', t: TS, plan: true }, 'fcf_invites/OPENCODE000000000003/used': 'uSelf', 'fcf_invites/OPENCODE000000000003/usedAt': TS }, 'uSelf'));
+await can('та же активация без допуска проходит', redeem('uSelf', 'OPENCODE000000000003'));
 await cannot('только что приглашённому тренеру создать приглашение', req('PUT', 'fcf_invites/NEUMADE0000000000001', inv({ name: 'X' }), 'uNeu'));
 
 // ── managing ──
@@ -107,24 +118,41 @@ await cannot('чужому аккаунту (не участник) читать
 await cannot('отозванному читать адрес календаря', req('GET', 'fcf_cal/U19', undefined, 'uGone'));
 await cannot('админу записать адрес календаря (только джоб)', req('PUT', 'fcf_cal/U19/url', 'https://evil', 'uAdmin'));
 
-// ── Trainingsplaner: Standardablauf (1.2.28) ──
-await can('записать стандартный ход тренировки', req('PUT', 'fcf_plans/U19/std', { rows: [{ ph: 'Aktivierung 1', cat: 'Aufwärmen', min: 10 }], upd: now, by: 'Artem' }));
-await cannot('стандартный ход без upd', req('PUT', 'fcf_plans/U19/std', { rows: [{ ph: 'Hauptteil', cat: 'Spielform', min: 20 }] }));
-await cannot('неизвестный узел в fcf_plans', req('PUT', 'fcf_plans/U19/xyz', { upd: now }));
+// ── Trainingsplaner: Standardablauf (1.2.28); who writes (Teil 3) ──
+const std = { rows: [{ ph: 'Aktivierung 1', cat: 'Aufwärmen', min: 10 }], upd: now, by: 'Artem' };
+await can('админу записать стандартный ход тренировки', req('PUT', 'fcf_plans/U19/std', std, 'uAdmin'));
+await can('тренеру с допуском (plan) записать план', req('PUT', 'fcf_plans/U19/plans/p1', { upd: now, blocks: [] }, 'uPlan'));
+await cannot('тренеру без допуска записать план', req('PUT', 'fcf_plans/U19/plans/p2', { upd: now, blocks: [] }, 'uTrainer'));
+await can('тренеру без допуска читать планы', req('GET', 'fcf_plans/U19', undefined, 'uTrainer'));
+await cannot('без входа читать планы', req('GET', 'fcf_plans/U19'));
+await cannot('без входа записать план', req('PUT', 'fcf_plans/U19/plans/p3', { upd: now }));
+await cannot('стандартный ход без upd', req('PUT', 'fcf_plans/U19/std', { rows: [{ ph: 'Hauptteil', cat: 'Spielform', min: 20 }] }, 'uAdmin'));
+await cannot('неизвестный узел в fcf_plans', req('PUT', 'fcf_plans/U19/xyz', { upd: now }, 'uAdmin'));
+// the clearance itself: only the admin
+await can('админу дать допуск к планам (plan)', req('PUT', 'fcf_members/uTrainer/plan', true, 'uAdmin'));
+await can('после этого тренер пишет план', req('PUT', 'fcf_plans/U19/plans/p4', { upd: now, blocks: [] }, 'uTrainer'));
+await can('админу забрать допуск', req('DELETE', 'fcf_members/uTrainer/plan', undefined, 'uAdmin'));
+await cannot('после этого тренер план не пишет', req('PUT', 'fcf_plans/U19/plans/p5', { upd: now, blocks: [] }, 'uTrainer'));
+await cannot('тренеру дать себе допуск', req('PUT', 'fcf_members/uTrainer/plan', true, 'uTrainer'));
+await cannot('допуск не логический', req('PUT', 'fcf_members/uPlan/plan', 'ja', 'uAdmin'));
 
 // ── Ausschnitte für Spieler (1.2.36) ──
 const PK = 'a'.repeat(64), PK2 = 'b'.repeat(64), TK = 'c'.repeat(64), H = 'd'.repeat(64);
 const slice = { t: now, h: 'abc123', j: '{"v":1}' };
-await can('записать срез игрока', req('PUT', 'fcf_pv/' + PK, slice));
+await can('тренеру записать срез игрока', req('PUT', 'fcf_pv/' + PK, slice, 'uTrainer'));
+await cannot('без входа записать срез игрока', req('PUT', 'fcf_pv/' + PK2, slice));
+await cannot('чужому аккаунту записать срез', req('PUT', 'fcf_pv/' + PK2, slice, 'uStranger'));
 await can('прочитать свой срез по ключу (без входа)', req('GET', 'fcf_pv/' + PK));
 await cannot('прочитать список срезов', req('GET', 'fcf_pv'));
-await cannot('срез с неверным ключом', req('PUT', 'fcf_pv/abc', slice));
-await cannot('срез без j', req('PUT', 'fcf_pv/' + PK2, { t: now, h: 'x' }));
-await cannot('срез с лишним полем', req('PUT', 'fcf_pv/' + PK2, Object.assign({ x: 1 }, slice)));
-await can('записать общую часть команды по частям (t, h, j)', req('PATCH', '/', { ['fcf_pt/' + TK + '/t']: now, ['fcf_pt/' + TK + '/h']: 'h1', ['fcf_pt/' + TK + '/j']: '{}' }));
+await cannot('срез с неверным ключом', req('PUT', 'fcf_pv/abc', slice, 'uTrainer'));
+await cannot('срез без j', req('PUT', 'fcf_pv/' + PK2, { t: now, h: 'x' }, 'uTrainer'));
+await cannot('срез с лишним полем', req('PUT', 'fcf_pv/' + PK2, Object.assign({ x: 1 }, slice), 'uTrainer'));
+await can('записать общую часть команды по частям (t, h, j)', req('PATCH', '/', { ['fcf_pt/' + TK + '/t']: now, ['fcf_pt/' + TK + '/h']: 'h1', ['fcf_pt/' + TK + '/j']: '{}' }, 'uTrainer'));
+await cannot('без входа записать общую часть', req('PATCH', '/', { ['fcf_pt/' + TK + '/j']: '{"x":1}' }));
 await can('прочитать общую часть по ключу', req('GET', 'fcf_pt/' + TK));
 await cannot('прочитать список общих частей', req('GET', 'fcf_pt'));
-await can('записать коды групповой ссылки', req('PUT', 'fcf_pk/' + TK, { [H]: 'p_0123456789abcdef0123' }));
+await can('записать коды групповой ссылки', req('PUT', 'fcf_pk/' + TK, { [H]: 'p_0123456789abcdef0123' }, 'uTrainer'));
+await cannot('без входа записать коды групповой ссылки', req('PUT', 'fcf_pk/' + TK, { [H]: 'p_x' }));
 await can('прочитать код по ключу дня рождения', req('GET', 'fcf_pk/' + TK + '/' + H));
 await cannot('прочитать все коды команды', req('GET', 'fcf_pk/' + TK));
 const ent = { a: 'rsvp', k: 'k1027-1830t', si: 36, v: 1, t: now };
@@ -152,8 +180,27 @@ await cannot('голос удалить', req('DELETE', 'fcf_vote/' + PK + '/k10
 await cannot('голос прочитать (даже админу)', req('GET', 'fcf_vote/' + PK + '/k1025-1300m', undefined, 'uAdmin'));
 await cannot('голос за тренировку', req('PUT', 'fcf_vote/' + PK + '/k1027-1830t', { n: 'Tom Berg', t: now }));
 
-// ── what stays as it is until the lock (Teil 3) ──
-await can('без входа читать fcf_data (пока открыто)', req('GET', 'fcf_data/version'));
+// ── Teil 3: the team's data for members only ──
+for (const n of ['fcf_data', 'fcf_media', '__backups', '__backups_meta', '__presence', '__trainerActivity']) {
+  await cannot('без входа читать ' + n, req('GET', n));
+  await cannot('чужому аккаунту читать ' + n, req('GET', n, undefined, 'uStranger'));
+  await cannot('отозванному читать ' + n, req('GET', n, undefined, 'uGone'));
+  await can('тренеру читать ' + n, req('GET', n, undefined, 'uTrainer'));
+}
+await can('админу читать fcf_data', req('GET', 'fcf_data', undefined, 'uAdmin'));
+await can('тренеру читать список тренеров (вход)', req('GET', 'fcf_data/version', undefined, 'uTrainer'));
+await can('тренеру записать в fcf_data', req('PATCH', 'fcf_data', { _lastSaveBy: 'Jimmy', _lastSaveTs: now }, 'uTrainer'));
+await cannot('без входа записать в fcf_data', req('PATCH', 'fcf_data', { _lastSaveBy: 'X' }));
+await cannot('чужому аккаунту записать в fcf_data', req('PATCH', 'fcf_data', { _lastSaveBy: 'X' }, 'uStranger'));
+await cannot('без входа удалить копии', req('DELETE', '__backups'));
+await can('тренеру записать копию', req('PUT', '__backups/1', { ts: now, data: { version: 20 } }, 'uTrainer'));
+await cannot('без входа записать фото', req('PUT', 'fcf_media/photos/m2', 'data:image/png;base64,BBBB'));
+await can('тренеру записать фото', req('PUT', 'fcf_media/photos/m2', 'data:image/png;base64,BBBB', 'uTrainer'));
+await cannot('без входа записать присутствие', req('PUT', '__presence/s2', { name: 'X', lastSeen: now }));
+await can('тренеру записать присутствие', req('PUT', '__presence/s2', { name: 'Jimmy', lastSeen: now }, 'uTrainer'));
+await cannot('без входа включить напоминания команды', req('PUT', 'fcf_push/config/U19/rpe', true));
+await can('тренеру включить напоминания команды', req('PUT', 'fcf_push/config/U19/rpe', true, 'uTrainer'));
+await can('игроку записать своё устройство (без входа)', req('PUT', 'fcf_push/subs/p0123/d1', { e: 'https://push.example/x', k: { p256dh: 'a', auth: 'b' }, t: now }));
 await can('читать push-ключ', req('GET', 'fcf_push/pub'));
 await cannot('читать fcf_safe', req('GET', 'fcf_safe'));
 await cannot('писать в неизвестные узлы', req('PUT', 'fremd/x', 1, 'uAdmin'));

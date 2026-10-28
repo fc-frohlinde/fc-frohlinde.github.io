@@ -1,8 +1,8 @@
 {
   "rules": {
     "fcf_data": {
-      ".read": true,
-      ".write": "newData.exists() && newData.hasChild('version') && newData.child('version').val() >= 14",
+      ".read": "(auth != null && root.child('fcf_members/'+auth.uid+'/code').isString() && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists())",
+      ".write": "(auth != null && root.child('fcf_members/'+auth.uid+'/code').isString() && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists()) && newData.exists() && newData.hasChild('version') && newData.child('version').val() >= 14",
       "version": {
         ".validate": "newData.isNumber() && newData.val() >= 14 && newData.val() <= 999"
       },
@@ -36,8 +36,8 @@
       }
     },
     "fcf_media": {
-      ".read": true,
-      ".write": true,
+      ".read": "(auth != null && root.child('fcf_members/'+auth.uid+'/code').isString() && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists())",
+      ".write": "(auth != null && root.child('fcf_members/'+auth.uid+'/code').isString() && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists())",
       "photos": {
         "$id": {
           ".validate": "newData.isString() && newData.val().beginsWith('data:image') && newData.val().length <= 500000"
@@ -53,15 +53,15 @@
       }
     },
     "__backups": {
-      ".read": true,
-      ".write": true,
+      ".read": "(auth != null && root.child('fcf_members/'+auth.uid+'/code').isString() && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists())",
+      ".write": "(auth != null && root.child('fcf_members/'+auth.uid+'/code').isString() && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists())",
       "$index": {
         ".validate": "newData.hasChildren(['ts','data'])"
       }
     },
     "__backups_meta": {
-      ".read": true,
-      ".write": true,
+      ".read": "(auth != null && root.child('fcf_members/'+auth.uid+'/code').isString() && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists())",
+      ".write": "(auth != null && root.child('fcf_members/'+auth.uid+'/code').isString() && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists())",
       "lastAutoDay": {
         ".validate": "newData.isString() && newData.val().length <= 40"
       },
@@ -70,8 +70,8 @@
       }
     },
     "__presence": {
-      ".read": true,
-      ".write": true,
+      ".read": "(auth != null && root.child('fcf_members/'+auth.uid+'/code').isString() && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists())",
+      ".write": "(auth != null && root.child('fcf_members/'+auth.uid+'/code').isString() && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists())",
       "$sessionId": {
         ".validate": "newData.exists()",
         "lastSeen": {
@@ -83,8 +83,8 @@
       }
     },
     "__trainerActivity": {
-      ".read": true,
-      ".write": true,
+      ".read": "(auth != null && root.child('fcf_members/'+auth.uid+'/code').isString() && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists())",
+      ".write": "(auth != null && root.child('fcf_members/'+auth.uid+'/code').isString() && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists())",
       "$trainerKey": {
         ".validate": "newData.hasChildren(['name','lastSeen'])",
         "name": {
@@ -117,8 +117,8 @@
       }
     },
     "fcf_plans": {
-      ".read": true,
-      ".write": true,
+      ".read": "(auth != null && root.child('fcf_members/'+auth.uid+'/code').isString() && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists())",
+      ".write": "(((auth != null && root.child('fcf_members/'+auth.uid+'/code').isString() && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists()) && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('role').val() === 'admin') || ((auth != null && root.child('fcf_members/'+auth.uid+'/code').isString() && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists()) && root.child('fcf_members/'+auth.uid+'/plan').val() === true))",
       "$team": {
         "plans": {
           "$pid": {
@@ -161,7 +161,7 @@
       "config": {
         ".read": true,
         "$team": {
-          ".write": true,
+          ".write": "(auth != null && root.child('fcf_members/'+auth.uid+'/code').isString() && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists())",
           "$kind": {
             ".validate": "($kind === 'rpe' || $kind === 'vote' || $kind === 'rsvp') && newData.isBoolean()"
           }
@@ -238,6 +238,9 @@
         "name": {
           ".validate": "newData.isString() && newData.val().length <= 120"
         },
+        "plan": {
+          ".validate": "newData.isBoolean() && ((auth != null && root.child('fcf_members/'+auth.uid+'/code').isString() && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists()) && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('role').val() === 'admin')"
+        },
         "$other": {
           ".validate": false
         }
@@ -263,7 +266,7 @@
           ".validate": false
         },
         ".read": true,
-        ".write": true
+        ".write": "(auth != null && root.child('fcf_members/'+auth.uid+'/code').isString() && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists())"
       }
     },
     "fcf_pt": {
@@ -282,7 +285,7 @@
           ".validate": false
         },
         ".read": true,
-        ".write": true,
+        ".write": "(auth != null && root.child('fcf_members/'+auth.uid+'/code').isString() && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists())",
         "mvp": {
           "$k": {
             ".validate": "newData.hasChildren()"
@@ -292,7 +295,7 @@
     },
     "fcf_pk": {
       "$tk": {
-        ".write": true,
+        ".write": "(auth != null && root.child('fcf_members/'+auth.uid+'/code').isString() && root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('used').val() === auth.uid && !root.child('fcf_invites/'+root.child('fcf_members/'+auth.uid+'/code').val()).child('revoked').exists())",
         ".validate": "$tk.matches(/^[0-9a-f]{64}$/)",
         "$h": {
           ".read": true,
