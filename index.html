@@ -2248,6 +2248,11 @@ tr.mx-former-h td{padding:10px 8px 6px;background:transparent;border:0;text-alig
 .mob label.ap-trial input{width:17px;height:17px;margin:1px 0 0;padding:0;flex:none;accent-color:#7C3AED;}
 #stBox .setting-label label{font:inherit;text-transform:none;letter-spacing:normal;margin:0;color:inherit;}
 body.player-mode .fl .hub-news.fl-pause{border-left-color:#8FA3C8;}
+/* Im Blick behalten: all of it in a window (1.2.69) */
+.mob.flg-mob{max-height:88vh;display:flex;flex-direction:column;}
+.flg-list{flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;margin:0 -6px;}
+.flg-n{display:inline-block;min-width:24px;padding:0 7px;margin-left:6px;border-radius:999px;background:var(--hx-card2,#EEF2F8);font-size:.8rem;font-weight:700;color:var(--hx-muted,var(--gm));vertical-align:middle;text-align:center;line-height:22px;}
+.flg-list .hx-flag:last-child{border-bottom:none;}
 /* Verein und Datenschutz (1.2.65) */
 .club-box{display:flex;flex-direction:column;gap:12px;margin-top:6px;}
 .club-f{display:flex;flex-direction:column;gap:3px;}
@@ -7271,12 +7276,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.68'; // v1.2.68: ohne Alle Versionen
-const APP_VERSION_LABEL='1.2.68';
+const APP_VERSION='1.2.69'; // v1.2.69: Im Blick als Fenster
+const APP_VERSION_LABEL='1.2.69';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1793149010593; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1793149594513; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -28362,10 +28367,12 @@ function hxRender(){
   if(!flags.length)html+=`<div class="hx-ok">Alles im grünen Bereich.</div>`;
   else{
     // Four rows keep the start screen on one page; the rest on demand
-    const cap=_hxFlagCap();window._hxFlagCapR=cap;
+    // The rest opens in a window (1.2.69): expanded in place, the list made
+    // every tile in its row as tall. (_hxFlagsAll: all in place, for tests.)
+    const cap=_hxFlagCap();window._hxFlagCapR=cap;window._hxFlagsList=flags;
     const lim=window._hxFlagsAll?flags.length:cap;
     html+=flags.slice(0,lim).map(f=>`<button type="button" class="hx-flag" onclick="${f.on}"><span class="hx-dot" style="background:${f.dot}"></span><span class="hx-flag-x"><b>${esc(f.who)}</b><span>${esc(f.what)}</span></span></button>`).join('')
-      +(flags.length>cap?`<button type="button" class="hx-link" style="padding:8px 6px 0;" onclick="window._hxFlagsAll=!window._hxFlagsAll;hxRender();">${window._hxFlagsAll?'Weniger anzeigen':'Alle '+flags.length+' anzeigen'}</button>`:'');
+      +(flags.length>lim?`<button type="button" class="hx-link" style="padding:8px 6px 0;" onclick="hxFlagsOpen()">Alle ${flags.length} anzeigen</button>`:'');
   }
   html+=`</section></div></div>`;
   el.innerHTML=html;
@@ -28396,6 +28403,15 @@ function _rcMissing(D,season){
   return out.sort((a,b)=>b.start-a.start).slice(0,3);
 }
 // "Im Blick": three rows on tablets and short windows, four otherwise
+function hxFlagsOpen(){
+  const L=window._hxFlagsList||[],box=document.getElementById('flg-list');if(!box)return;
+  const esc=escapeHtml;
+  document.getElementById('flg-n').textContent=L.length?String(L.length):'';
+  box.innerHTML=L.length?L.map(f=>`<button type="button" class="hx-flag" onclick="closeM('moFlags');${f.on}"><span class="hx-dot" style="background:${f.dot}"></span><span class="hx-flag-x"><b>${esc(f.who)}</b><span>${esc(f.what)}</span></span></button>`).join('')
+    :'<div class="hx-ok">Alles im grünen Bereich.</div>';
+  openM('moFlags');
+  try{box.scrollTop=0;}catch(e){}
+}
 function _hxFlagCap(){return (innerWidth>=768&&(innerWidth<=1180||innerHeight<=820))?3:4;}
 window.addEventListener('resize',()=>{
   clearTimeout(window._hxCapT);
@@ -40214,6 +40230,10 @@ _pubCleanupSchedule();
 <div class="mo" id="moPriv" style="z-index:99998;"><div class="mob pv-mob" style="width:600px;max-width:96vw;">
   <div class="pv-head"><h3>Datenschutz</h3><button class="btn bs" onclick="closeM('moPriv')" aria-label="Schließen">✕</button></div>
   <div id="pv-body" class="pv-body"></div>
+</div></div>
+<div class="mo" id="moFlags"><div class="mob flg-mob" style="width:540px;max-width:96vw;">
+  <div class="pv-head"><h3>Im Blick behalten <span id="flg-n" class="flg-n"></span></h3><button class="btn bs" onclick="closeM('moFlags')" aria-label="Schließen">✕</button></div>
+  <div id="flg-list" class="flg-list"></div>
 </div></div>
 <div class="mo" id="moNews"><div class="mob nw-mob" style="width:520px;max-width:96vw;">
   <h3 class="nw-h">Neu in Flutlicht</h3>
