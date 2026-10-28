@@ -2356,6 +2356,22 @@ body.player-mode .fl .hub-priv{margin-top:2px;font-size:13px;opacity:.8;}
 .zl-v:has(input:focus-visible){outline:2px solid var(--hx-blue,#1659B8);outline-offset:2px;}
 .zl-v .zl-lamps i{width:10px;height:10px;}
 .zl-hist{margin-top:6px;padding-top:10px;border-top:1px solid var(--hx-line,var(--gl));}
+/* Notizen zum Gegner (1.2.72) */
+.opp-mob{max-height:90vh;display:flex;flex-direction:column;}
+.opp-mob #opp-body{overflow-y:auto;min-height:0;flex:1;margin:0 -4px;padding:0 4px;}
+.opp-rec{font-size:.82rem;line-height:1.4;color:var(--hx-muted,var(--gm));margin:0 0 14px;}
+.opp-rec b{color:var(--hx-ink,var(--bd));}
+.opp-g{padding:9px 0;border-top:1px solid var(--hx-line,var(--gl));}
+.opp-g:first-of-type{border-top:0;}
+.opp-gh{display:flex;align-items:baseline;gap:8px;font-size:.84rem;}
+.opp-gh>span{flex:1;min-width:0;color:var(--hx-ink,var(--bd));}
+.opp-gh small{color:var(--hx-muted,var(--gm));font-size:.76rem;}
+.opp-res{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:.5px;font-weight:400;white-space:nowrap;}
+.opp-res.w{color:#1a7a40;}.opp-res.l{color:#b8322a;}.opp-res.d{color:#a56a0a;}
+.opp-res.o{font-family:inherit;font-size:.76rem;letter-spacing:0;color:var(--hx-muted,var(--gm));}
+.opp-c{margin:5px 0 0;padding:6px 9px;border-radius:8px;background:var(--hx-card2,#F4F6FA);font-size:.8rem;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--hx-ink,var(--bd));}
+.opp-c small{display:block;margin-top:2px;font-size:.7rem;color:var(--hx-muted,var(--gm));white-space:normal;}
+.opp-card .rpe-card-txt span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .zl-hh{font-size:.78rem;font-weight:700;color:var(--hx-muted,var(--gm));margin-bottom:4px;}
 .zl-hi{display:flex;align-items:baseline;gap:8px;padding:4px 0;font-size:.82rem;line-height:1.4;}
 .zl-hi i{font-style:normal;color:var(--hx-muted,var(--gm));}
@@ -6885,6 +6901,7 @@ if(window._fbBlocked){
       </div>
       </div><!-- /ss-actions -->
       <div id="ss-report-wrap" style="display:none;"></div>
+      <div id="ss-opp-wrap" style="display:none;"></div>
       <div id="ss-rpe-wrap" style="display:none;"></div>
       <div id="ss-mvp-wrap" style="display:none;"></div>
       <div id="ss-physio-wrap" style="display:none;"></div>
@@ -7248,12 +7265,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.71'; // v1.2.71: Anmeldung nur mit Konto
-const APP_VERSION_LABEL='1.2.71';
+const APP_VERSION='1.2.72'; // v1.2.72: Notizen zum Gegner
+const APP_VERSION_LABEL='1.2.72';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1793201504858; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1793203974570; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -7290,6 +7307,7 @@ function _clubMigrate(){
 function _clubSlug(){return (_clubName()||'Flutlicht').replace(/[^A-Za-z0-9ÄÖÜäöüß]+/g,'-').replace(/^-|-$/g,'')||'Flutlicht';}
 function _clubInfo(){const c=(G&&G.club&&typeof G.club==='object')?G.club:{};return {name:_clubName(),resp:String(c.resp||''),addr:String(c.addr||''),mail:String(c.mail||''),dsb:String(c.dsb||'')};}
 const APP_NEWS=[
+  {id:'20261028-1',d:'28.10.',t:'Notizen zum Gegner',x:'Im Spiel-Fenster unter „Notizen zum Gegner“ haltet ihr fest, wie ein Gegner spielt, worauf ihr achten müsst und was beim Platz wichtig ist. Vor dem nächsten Spiel gegen ihn steht alles wieder da – mit den Ergebnissen und Notizen der bisherigen Spiele.',go:['Zum nächsten Spiel','oppGoNext()']},
   {id:'20261027-2',d:'27.10.',t:'Entwicklungsziele',x:'Im Spielerprofil unter „Ziele“ vereinbart ihr mit jedem Spieler 1–3 Ziele und gebt ab und zu Rückmeldung. Der Spieler sieht sie in seiner App.',go:['Zu den Zielen','zlOpenTab()']},
   {id:'20261027-1',d:'27.10.',t:'Spielbericht und Spielzeit',x:'Nach jedem Spiel im Spiel-Fenster den Spielbericht ausfüllen: Startelf, Wechsel, Tore, Karten. Daraus rechnet die App Minuten und Sperren – und zeigt in der Statistik, wer wenig spielt.',go:['Zur Statistik',"hxGo('stats')"]},
   {id:'20261024-2',d:'24.10.',t:'Probetraining, Pause, nicht mehr dabei',x:'Den Status stellst du im Spielerprofil ein. Wer pausiert oder nicht mehr dabei ist, zählt nicht in die Quote und bekommt keine Erinnerungen.'},
@@ -16659,6 +16677,115 @@ function renderSessReport(si){
     ${edit?'<span class="rpe-card-chev">›</span>':''}
   </button>`;
 }
+// ══ Notizen zum Gegner (1.2.72) ══════════════════════════════════
+// Trainers only. Per team one card per opponent, found by the match's label
+// (the autocomplete keeps it the same from game to game):
+// G.db[team+'__gegner'] = {o:{<key>:{n, wie, acht, platz, t, by}}}.
+// The players' slices take only what they list, so none of it reaches them.
+const OPP_F=[['wie','Wie sie spielen','z. B. System, Pressing, lange Bälle, Tempo über außen'],
+  ['acht','Worauf achten','z. B. schnelle Nr. 9, starke Standards, Torwart spielt mit'],
+  ['platz','Platz und Anfahrt','z. B. Kunstrasen, Parken hinter der Halle, Kabine 2']];
+function _oppKey(lbl){return String(lbl||'').trim().toLowerCase().replace(/\s+/g,' ').replace(/[.#$\[\]\/]/g,'').trim().replace(/ /g,'-').slice(0,80);}
+function _oppAll(team){const g=G&&G.db&&G.db[(team||UI.currentTeam)+'__gegner'];return (g&&g.o&&typeof g.o==='object')?g.o:{};}
+function _oppGet(lbl,team){const k=_oppKey(lbl);const o=k?_oppAll(team)[k]:null;return (o&&typeof o==='object')?o:null;}
+function _oppFilled(o){return o?OPP_F.filter(([f])=>String(o[f]||'').trim()):[];}
+function _oppBy(by){return by==='Admin'?(String((G&&G.adminAuth&&G.adminAuth.firstName)||'').trim()||'Admin'):String(by||'');}
+// Every match of the team against him, all seasons, newest first
+function _oppGames(lbl,team){
+  team=team||UI.currentTeam;
+  const k=_oppKey(lbl),out=[];
+  if(!k||!G||!G.db)return out;
+  (G.seasonList||[]).forEach(season=>{
+    const b=G.db[team+'__'+season];
+    if(!b||!Array.isArray(b.sessions))return;
+    b.sessions.forEach((s,si)=>{
+      if(!s||s.type!=='match'||_oppKey(s.label)!==k)return;
+      out.push({s,si,season,sk:_dbSortKey(s.date,season),held:sessTookPlace(s,season),res:sbResult(s)});
+    });
+  });
+  return out.sort((a,b)=>(b.sk||0)-(a.sk||0));
+}
+const _oppDay=g=>String(g.s.date||'').split(' ')[0]+' '+_skDM(g.sk)+String(g.sk).slice(2,4);
+// the card in the match window
+function renderSessOpp(si){
+  const box=document.getElementById('ss-opp-wrap');if(!box)return;
+  const D=cd(),s=D&&D.sessions&&D.sessions[si];
+  if(!s||s.type!=='match'||!canEdit()||!_oppKey(s.label)){box.style.display='none';box.innerHTML='';return;}
+  const o=_oppGet(s.label),f=_oppFilled(o);
+  const last=_oppGames(s.label).find(g=>g.held&&!(g.season===UI.currentSeason&&g.si===si)&&(g.res||(g.s.comments&&g.s.comments.length)));
+  const bits=[];
+  if(f.length)bits.push(f.map(([,l])=>l).join(' · '));
+  if(last)bits.push(last.res?'zuletzt '+last.res.txt+' '+last.res.word+' ('+_oppDay(last)+')':'zuletzt am '+_oppDay(last));
+  box.style.display='block';
+  box.innerHTML=`<button type="button" class="rpe-card sb-card opp-card${f.length||last?'':' rpe-none'}" onclick="oppOpen(${si})">
+    <span class="rpe-card-ic">⚔️</span>
+    <span class="rpe-card-txt"><b>Notizen zum Gegner</b>
+      <span>${escapeHtml(bits.join(' · ')||'Wie spielen sie, worauf achten? Für das nächste Spiel festhalten.')}</span></span>
+    <span class="rpe-card-chev">›</span>
+  </button>`;
+}
+let _opp=null;
+function oppOpen(si){
+  if(!canEdit())return;
+  const D=cd(),s=D&&D.sessions&&D.sessions[si];
+  if(!s||s.type!=='match'||!_oppKey(s.label))return;
+  _opp={lbl:String(s.label).trim(),si,season:UI.currentSeason,team:UI.currentTeam};
+  _oppRender();
+  openM('moGegner');
+}
+function _oppRender(){
+  const b=document.getElementById('opp-body');if(!b||!_opp)return;
+  const e=escapeHtml,o=_oppGet(_opp.lbl,_opp.team)||{};
+  document.getElementById('opp-title').textContent=_opp.lbl;
+  const games=_oppGames(_opp.lbl,_opp.team),played=games.filter(g=>g.res);
+  let rec='';
+  if(played.length){
+    const c={w:0,d:0,l:0};let gf=0,ga=0;
+    played.forEach(g=>{c[g.res.k]++;gf+=g.res.f;ga+=g.res.a;});
+    rec=`<p class="opp-rec"><b>${played.length} ${played.length===1?'Spiel':'Spiele'}:</b> ${[c.w&&c.w+'× gewonnen',c.d&&c.d+'× unentschieden',c.l&&c.l+'× verloren'].filter(Boolean).join(', ')} · Tore ${gf}:${ga}</p>`;
+  }
+  const fields=OPP_F.map(([f,l,ph])=>`<label class="zl-f"><span class="zl-fl">${l}</span><textarea id="opp-${f}" rows="3" maxlength="1000" placeholder="${e(ph)}">${e(o[f]||'')}</textarea></label>`).join('');
+  const who=o.t?`<p class="zl-note">Zuletzt geändert${o.by?' von '+e(_oppBy(o.by)):''} am ${new Date(o.t).toLocaleDateString('de-DE')}</p>`:'';
+  // this game and the ones already played (later ones have nothing to tell yet)
+  const rows=games.filter(g=>g.held||(g.season===_opp.season&&g.si===_opp.si)).map(g=>{
+    const me=g.season===_opp.season&&g.si===_opp.si;
+    const where=g.s.homeAway==='home'?'Heim':g.s.homeAway==='away'?'Auswärts':'';
+    const r=g.res?`<b class="opp-res ${g.res.k}">${e(g.res.txt)}</b>`
+      :`<b class="opp-res o">${me&&!g.held?'dieses Spiel':'ohne Ergebnis'}</b>`;
+    const cm=(Array.isArray(g.s.comments)?g.s.comments:[]).filter(c=>c&&c.text).sort((a,b2)=>(a.ts||0)-(b2.ts||0)).slice(-3)
+      .map(c=>`<div class="opp-c">${e(String(c.text).slice(0,400))}<small>${e(_oppBy(c.author))}</small></div>`).join('');
+    return `<div class="opp-g"><div class="opp-gh"><span>${e(_oppDay(g))}${where?' · '+where:''}${me&&g.res?' · dieses Spiel':''}${g.season!==_opp.season?' <small>('+e(g.season)+')</small>':''}</span>${r}</div>${cm}</div>`;
+  }).join('');
+  b.innerHTML=rec+fields+who
+    +`<div class="zl-hist"><div class="zl-hh">Spiele gegen ${e(_opp.lbl)}</div>${rows||'<p class="zl-note">Noch keine.</p>'}
+      <p class="zl-hint">Ergebnis aus dem Spielbericht, darunter die Notizen des Spiels.</p></div>`;
+}
+function oppSave(){
+  if(!_opp||!canEdit())return;
+  const k=_oppKey(_opp.lbl);if(!k)return;
+  const v={};
+  OPP_F.forEach(([f])=>{const x=String((document.getElementById('opp-'+f)||{}).value||'').trim().slice(0,1000);if(x)v[f]=x;});
+  const key=_opp.team+'__gegner',cur=_oppGet(_opp.lbl,_opp.team);
+  if(OPP_F.every(([f])=>(v[f]||'')===String((cur&&cur[f])||''))){closeM('moGegner');return;}
+  snap();
+  if(!G.db[key]||typeof G.db[key]!=='object'||Array.isArray(G.db[key]))G.db[key]={};
+  if(!G.db[key].o||typeof G.db[key].o!=='object')G.db[key].o={};
+  const has=Object.keys(v).length>0;
+  if(has)G.db[key].o[k]=Object.assign({n:_opp.lbl},v,{t:Date.now(),by:(CU&&CU.name)||''});
+  else delete G.db[key].o[k];
+  saveG();
+  logAudit('Notizen zum Gegner',_opp.lbl,has?'gespeichert':'gelöscht');
+  closeM('moGegner');
+  if(typeof showSaveFlash==='function')showSaveFlash(has?'✓ Notizen zu '+_opp.lbl+' gespeichert':'✓ Notizen zu '+_opp.lbl+' gelöscht');
+  if(typeof _currentSessIdx!=='undefined'&&_currentSessIdx===_opp.si&&UI.currentSeason===_opp.season)renderSessOpp(_opp.si);
+}
+// From the news card: the next match of the team on screen
+function oppGoNext(){
+  const D=cd(),S=(D&&D.sessions)||[],t=todaySK();
+  let best=-1,bk=Infinity;
+  S.forEach((s,si)=>{if(!s||s.type!=='match')return;const k=_dbSortKey(s.date,UI.currentSeason);if(k>=t&&k<bk){bk=k;best=si;}});
+  if(best>=0)openSessFromMain(best);else if(typeof hxGo==='function')hxGo('cal');
+}
 // ── the report itself (full screen, like "Anwesenheit erfassen") ──
 let _sbSi=null,_sbOpenPl=null,_sbMore=false,_sbSubDraft=null;
 function sbOpen(si){
@@ -24918,6 +25045,7 @@ function openSessStats(si){
   try{renderSessRpe(si);}catch(e){console.error('sessRpe:',e);}
   try{renderSessMvp(si);}catch(e){console.error('sessMvp:',e);}
   try{renderSessReport(si);}catch(e){console.error('sessReport:',e);}
+  try{renderSessOpp(si);}catch(e){console.error('sessOpp:',e);}
   try{_ssSyncMore();}catch(e){}
   const rcw=document.getElementById('ss-rollcall-wrap');
   if(rcw)rcw.style.display=(canEdit()&&typeof _isSessRollCallTime==='function'&&_isSessRollCallTime(si))?'block':'none';
@@ -30033,7 +30161,7 @@ function doGen(){
 // timetable) and there are breaks. Both used to mean editing session after
 // session. Only trainings that have not taken place are touched, matches never.
 // Team-wide entries in G.db besides __focuses: they move and go with the team.
-const TEAM_WIDE_KEYS=['schedule','rules','news'];
+const TEAM_WIDE_KEYS=['schedule','rules','news','gegner'];
 const _rsDate=k=>new Date(Math.floor(k/10000),Math.floor(k/100)%100-1,k%100);
 const _rsK=d=>d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
 const _rsIso=k=>Math.floor(k/10000)+'-'+String(Math.floor(k/100)%100).padStart(2,'0')+'-'+String(k%100).padStart(2,'0');
@@ -39035,6 +39163,14 @@ _pubCleanupSchedule();
     <button type="button" class="btn bp" onclick="zlSave()">Speichern</button>
     <button type="button" class="btn bs" onclick="closeM('moZl')">Abbrechen</button>
     <button type="button" class="zl-del" id="zl-del" onclick="zlDel()" hidden>Ziel löschen</button>
+  </div>
+</div></div>
+<div class="mo" id="moGegner"><div class="mob zl-mob opp-mob" style="width:520px;max-width:96vw;">
+  <h3 class="zl-h" id="opp-title">Gegner</h3>
+  <div id="opp-body"></div>
+  <div class="mob-btns">
+    <button type="button" class="btn bp" onclick="oppSave()">Speichern</button>
+    <button type="button" class="btn bs" onclick="closeM('moGegner')">Schließen</button>
   </div>
 </div></div>
 <div class="mo" id="moZlFb"><div class="mob zl-mob" style="width:480px;max-width:96vw;">
