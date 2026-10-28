@@ -6,7 +6,7 @@
 import admin from 'firebase-admin';
 import webpush from 'web-push';
 import { round } from './round.mjs';
-import { decode, pathKey, berlin } from './lib.mjs';
+import { decode, pathKey, berlin, addDays } from './lib.mjs';
 import { seasonOf } from './kalender.mjs';
 import { inbox, loadApply } from './eingang.mjs';
 
@@ -94,12 +94,27 @@ try {
       const n = async x => Object.keys((await db.get(`fcf_plans/${k}/${x}`)) || {}).length;
       const std = await db.get(`fcf_plans/${k}/std`);
       console.log(`::notice title=Планировщик ${t}::упражнений в библиотеке: ${await n('lib')}, планов: ${await n('plans')}, шаблонов: ${await n('tpl')}, свой стандарт: ${std ? 'да' : 'нет'}`);
-      const arr = x => Array.isArray(x) ? x.filter(Boolean) : (x && typeof x === 'object' ? Object.values(x).filter(Boolean) : []);
-      const plans = (await db.get(`fcf_plans/${k}/plans`)) || {}, idx = (await db.get(`fcf_plans/${k}/idx`)) || {};
-      const pb = Object.values(plans).map(p => arr(p && p.blocks).length);
-      const sr = std ? arr(std.rows) : [];
-      console.log(`::notice title=Планировщик ${t} подробно::блоков в планах: ${pb.join(', ') || '–'}; в сводках n: ${Object.values(idx).map(x => x && x.n).join(', ') || '–'}; стандарт: строк ${sr.length}, с названием ${sr.filter(r => r && r.ph).length}, минут ${sr.reduce((a, r) => a + (+(r && r.min) || 0), 0)}`);
     }
+  }
+  // Push (28.10.): what went out yesterday and today, by kind — counts only
+  // (the log is public: no names, no addresses). GitHub shows at most 10
+  // annotations per step, so the planner's detailed line made room for this.
+  if (process.env.GITHUB_EVENT_NAME === 'workflow_dispatch') {
+    try {
+      const st = (await db.get('fcf_push/status')) || {};
+      const sum = async day => {
+        const o = (await db.get(`fcf_push/sent/${day}`)) || {}, by = {}, owners = new Set();
+        let n = 0;
+        for (const [k, v] of Object.entries(o)) {
+          const kind = k.split('-')[0], c = Object.keys(v || {}).length;
+          by[kind] = (by[kind] || 0) + c; n += c;
+          Object.keys(v || {}).forEach(x => owners.add(x));
+        }
+        return `${n}` + (n ? ` (${Object.entries(by).map(([k, c]) => k + ' ' + c).join(', ')}; получателей ${owners.size})` : '');
+      };
+      const d = berlin(Date.now()).day;
+      console.log(`::notice title=Push::вчера: ${await sum(addDays(d, -1))}; сегодня: ${await sum(d)}; устройств: ${st.devices ?? '–'}, ошибок в последнем прогоне: ${st.err ?? 0}, отписались: ${st.gone ?? 0}`);
+    } catch (e) { console.log('::warning title=Push::' + String((e && e.message) || e).slice(0, 160)); }
   }
 } catch (e) {
   process.exitCode = 1;
