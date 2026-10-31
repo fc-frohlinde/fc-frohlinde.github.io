@@ -3683,6 +3683,41 @@ label.tp-kind input[type=checkbox]{margin:2px 0 0;padding:0;width:17px;height:17
 
 /* Dashboard — new sections */
 .db-two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.sbi-top{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:14px;margin-bottom:14px;align-items:start;}
+.sbi-top.ro{grid-template-columns:1fr;}
+@media(max-width:1279px){.sbi-top{grid-template-columns:1fr;}}
+.wba-list{display:flex;flex-direction:column;}
+.wba-row{display:flex;align-items:center;gap:12px;padding:10px 6px;border:none;border-bottom:1px solid var(--hx-line,#DCE3EE);background:none;width:100%;
+  text-align:left;font-family:'Barlow',sans-serif;color:var(--hx-ink,#0E2350);min-height:44px;}
+.wba-row:last-child{border-bottom:none;}
+button.wba-row{cursor:pointer;}
+button.wba-row:hover{background:var(--hx-card2,#F4F7FB);}
+.wba-x{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;}
+.wba-x b{font-weight:700;font-size:.94rem;}
+.wba-x span{font-size:.86rem;line-height:1.35;color:var(--hx-muted,#4E5D7C);}
+.wba-strip{display:flex;align-items:center;gap:4px;flex-shrink:0;}
+.wba-s{display:block;width:9px;height:9px;border-radius:50%;}
+.wba-s.a{background:#27ae60;}.wba-s.f{background:#e74c3c;}.wba-s.e{background:#f39c12;}
+.wba-s.o{box-shadow:inset 0 0 0 1.5px var(--hx-track,#D5DEEC);}
+.wba-s.p,.wba-s.n{height:3px;border-radius:2px;background:var(--hx-track,#D5DEEC);}
+.wba-ok{font-size:.92rem;color:var(--hx-ok,#1E6B46);font-weight:600;padding:6px 0 2px;}
+.wba-none{font-size:.88rem;color:var(--hx-muted,#4E5D7C);padding:6px 0;}
+.wba-foot{font-size:.78rem;line-height:1.45;color:var(--hx-muted,#4E5D7C);margin-top:10px;max-width:70ch;}
+@media(max-width:600px){.wba-row{flex-wrap:wrap;row-gap:6px;}.wba-strip{flex-basis:100%;margin-left:22px;}}
+.sbi-big{display:flex;align-items:baseline;gap:8px;margin:2px 0 12px;flex-wrap:wrap;}
+.sbi-big b{font-family:var(--hx-num,'Bebas Neue',sans-serif);font-weight:800;font-size:2.6rem;line-height:1;color:var(--hx-ink,#0E2350);}
+.sbi-big span{font-size:.84rem;color:var(--hx-muted,#4E5D7C);}
+.sbi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:12px 14px;}
+.sbi-r{display:flex;flex-direction:column;gap:1px;min-width:0;}
+.sbi-r span{font-size:.78rem;color:var(--hx-muted,#4E5D7C);}
+.sbi-r b{font-family:var(--hx-num,'Bebas Neue',sans-serif);font-weight:800;font-size:1.4rem;line-height:1.1;color:var(--hx-ink,#0E2350);}
+.sbi-r small{font-size:.74rem;color:var(--hx-muted,#4E5D7C);}
+.sbi-bar{display:flex;height:8px;border-radius:4px;overflow:hidden;margin:16px 0 6px;background:var(--hx-track,#D5DEEC);}
+.sbi-bar i{display:block;height:100%;}
+.sbi-bar .a,.sbi-leg .a{background:#27ae60;}.sbi-bar .e,.sbi-leg .e{background:#f39c12;}.sbi-bar .f,.sbi-leg .f{background:#e74c3c;}
+.sbi-leg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:.76rem;color:var(--hx-muted,#4E5D7C);}
+.sbi-leg span{display:inline-flex;align-items:center;gap:5px;}
+.sbi-leg i{display:inline-block;width:8px;height:8px;border-radius:50%;}
 @media(max-width:680px){.db-two-col{grid-template-columns:1fr;}}
 .db-card{background:#fff;border:1px solid var(--gl);border-radius:10px;padding:12px 14px;}
 .db-sbar{display:flex;height:32px;border-radius:7px;overflow:hidden;border:1px solid var(--gl);margin:6px 0 10px;background:#f7f9fc;}
@@ -7316,12 +7351,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.79'; // v1.2.79: Eindrücke ohne eigene Neuigkeit
-const APP_VERSION_LABEL='1.2.79';
+const APP_VERSION='1.2.80'; // v1.2.80: Statistik – Wer braucht Aufmerksamkeit?
+const APP_VERSION_LABEL='1.2.80';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1793455998002; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1793488373856; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -7341,6 +7376,7 @@ const FL_MARK='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F
 function _clubSlug(){return (_clubName()||'Flutlicht').replace(/[^A-Za-z0-9ÄÖÜäöüß]+/g,'-').replace(/^-|-$/g,'')||'Flutlicht';}
 function _clubInfo(){const c=(G&&G.club&&typeof G.club==='object')?G.club:{};return {name:_clubName(),resp:String(c.resp||''),addr:String(c.addr||''),mail:String(c.mail||''),dsb:String(c.dsb||'')};}
 const APP_NEWS=[
+  {id:'20261101-1',d:'01.11.',t:'Wer braucht Aufmerksamkeit?',x:'Oben in der Statistik: wer gerade in Folge fehlt, seltener kommt als sonst, nach längerer Zeit wieder da ist, wenig spielt oder mehrmals schwachen Einsatz hatte. Jeder wird mit sich selbst und mit der Mannschaft verglichen: Wer in den Ferien wie viele andere fehlt, fällt nicht auf.',go:['Zur Statistik',"hxGo('stats')"]},
   {id:'20261028-2',d:'28.10.',t:'Rückblick nach dem Training',x:'Nach „Anwesenheit erfassen“ fragt die App kurz: Wie lief’s, was lief gut, was ändern wir? Mit Plan auch, ob jede Übung gepasst hat. „Was ändern wir?“ steht beim nächsten Training wieder da, „anpassen“ bei der Übung im Trainingsplaner.',go:['Zum letzten Training','rvGoLast()']},
   {id:'20261028-1',d:'28.10.',t:'Notizen zum Gegner',x:'Im Spiel-Fenster unter „Notizen zum Gegner“ haltet ihr fest, wie ein Gegner spielt, worauf ihr achten müsst und was beim Platz wichtig ist. Vor dem nächsten Spiel gegen ihn steht alles wieder da – mit den Ergebnissen und Notizen der bisherigen Spiele.',go:['Zum nächsten Spiel','oppGoNext()']},
   {id:'20261027-2',d:'27.10.',t:'Entwicklungsziele',x:'Im Spielerprofil unter „Ziele“ vereinbart ihr mit jedem Spieler 1–3 Ziele und gebt ab und zu Rückmeldung. Der Spieler sieht sie in seiner App.',go:['Zu den Zielen','zlOpenTab()']},
@@ -21927,33 +21963,6 @@ function dbComputeStatusBreakdown(data){
   });
   return {a,f,e,total:a+f+e,aT,fT,eT,aM,fM,eM};
 }
-function dbComputeSessionsOverview(data){
-  // Past/upcoming counts, last/next dates — season-aware
-  const {sessions,season}=data;
-  const today=todaySK();
-  let last=null,lastK=null,next=null,nextK=null;
-  let tDone=0,mDone=0,tFuture=0,mFuture=0;
-  sessions.forEach(s=>{
-    if(!s||!s.date)return;
-    const k=_dbSortKey(s.date,season);
-    const isMatch=s.type==='match';
-    if(k<today){
-      if(isMatch)mDone++;else tDone++;
-      if(last===null||k>lastK){last=s;lastK=k;}
-    } else {
-      if(isMatch)mFuture++;else tFuture++;
-      if(next===null||k<nextK){next=s;nextK=k;}
-    }
-  });
-  // sort key encodes YYYYMMDD — diff doesn't equal days, so compute from real Date
-  const realDays=(sortKey)=>{
-    const y=Math.floor(sortKey/10000), m=Math.floor((sortKey%10000)/100), d=sortKey%100;
-    return Math.floor((new Date(y,m-1,d).getTime()-new Date().setHours(0,0,0,0))/86400000);
-  };
-  return {last,next,tDone,mDone,tFuture,mFuture,
-    daysSinceLast:last?Math.max(0,-realDays(lastK)):null,
-    daysToNext:next?Math.max(0,realDays(nextK)):null};
-}
 function dbComputeWeekday(data){
   // Two orthogonal filters: timeMode (past/future), typeMode (all/training/match)
   // Past mode: bar height = attendance %. Future mode: bar height = session count (load).
@@ -22067,35 +22076,6 @@ function dbComputeSeasonComparison(team,currentSeason){
     result.push({season:s,metrics:m});
   });
   return result;
-}
-function dbRenderStatusBar(sb){
-  // Horizontal stacked bar showing A/F/E proportions
-  if(sb.total===0)return '<div class="db-empty">Keine Markierungen</div>';
-  const aP=sb.a/sb.total*100, fP=sb.f/sb.total*100, eP=sb.e/sb.total*100;
-  return `<div class="db-sbar">
-    ${aP>0?`<div class="db-sbar-seg sb-a" style="width:${aP}%" title="Anwesend: ${sb.a} (${Math.round(aP)}%)"><span>${Math.round(aP)}%</span></div>`:''}
-    ${fP>0?`<div class="db-sbar-seg sb-f" style="width:${fP}%" title="Fehlend: ${sb.f} (${Math.round(fP)}%)"><span>${Math.round(fP)}%</span></div>`:''}
-    ${eP>0?`<div class="db-sbar-seg sb-e" style="width:${eP}%" title="Entschuldigt: ${sb.e} (${Math.round(eP)}%)"><span>${Math.round(eP)}%</span></div>`:''}
-  </div>
-  <div class="db-slegend">
-    <span><span class="db-ldot sb-a"></span>Anwesend <b>${sb.a}</b></span>
-    <span><span class="db-ldot sb-f"></span>Fehlend <b>${sb.f}</b></span>
-    <span><span class="db-ldot sb-e"></span>Entschuldigt <b>${sb.e}</b></span>
-  </div>`;
-}
-function dbRenderSessionsOverview(so){
-  const lastTxt=so.last?`${so.last.date}${so.daysSinceLast!==null?' <span class="db-mini">vor '+so.daysSinceLast+' '+(so.daysSinceLast===1?'Tag':'Tagen')+'</span>':''}`:'–';
-  const nextTxt=so.next?`${so.next.date}${so.daysToNext!==null?(so.daysToNext===0?' <span class="db-mini">heute</span>':' <span class="db-mini">in '+so.daysToNext+' '+(so.daysToNext===1?'Tag':'Tagen')+'</span>'):''}`:'–';
-  return `<div class="db-sess-grid">
-    <div class="db-sess-cell"><div class="db-sess-num">${so.tDone}</div><div class="db-sess-lbl">Trainings absolviert</div></div>
-    <div class="db-sess-cell"><div class="db-sess-num">${so.mDone}</div><div class="db-sess-lbl">Spiele absolviert</div></div>
-    <div class="db-sess-cell"><div class="db-sess-num">${so.tFuture}</div><div class="db-sess-lbl">Trainings geplant</div></div>
-    <div class="db-sess-cell"><div class="db-sess-num">${so.mFuture}</div><div class="db-sess-lbl">Spiele geplant</div></div>
-  </div>
-  <div class="db-sess-dates">
-    <div><span class="db-sess-tag">Letzte</span> ${lastTxt}</div>
-    <div><span class="db-sess-tag">Nächste</span> ${nextTxt}</div>
-  </div>`;
 }
 function dbRenderWeekday(wd,timeMode){
   // Past: bar = attendance %, top label = "%". Future: bar = session count, top label = count.
@@ -22839,6 +22819,186 @@ function dbRenderTopicCard(data){
   html+='</div>';
   return html;
 }
+// ── Wer braucht Aufmerksamkeit? (1.2.80) ─────────────────────────
+// The top of Statistik: whom to talk to, from attendance, Einsatz and
+// Spielzeit (the load joins once there are four weeks of ratings). Each
+// player is compared with himself before the last four weeks AND with the
+// team in the same weeks: when many are away (holidays), nobody stands out
+// for that alone. Trainers only (canEdit); nothing of it goes to players.
+const ATT_W=28;   // the recent window, days
+function _attKey(days){const d=new Date();d.setDate(d.getDate()-days);return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();}
+function _attSkDate(k){return new Date(Math.floor(k/10000),Math.floor(k/100)%100-1,k%100);}
+// Only for the running season: "the last four weeks" of an old one say nothing
+function _attShow(data){
+  if(!data||!data.block)return false;
+  const hs=(typeof homeSeason==='function')?homeSeason():null;
+  return !hs||data.season===hs;
+}
+// His held sessions in order: v = 1 / 0 / 2 (dabei, gefehlt, entschuldigt),
+// 'P' = in a pause, anything else = nothing entered or not in the squad.
+function _attSeq(p,held,season){
+  const out=[];
+  held.forEach(h=>{
+    if(_sessCounts(p,h.s,season)){out.push({si:h.si,s:h.s,k:h.k,v:Array.isArray(p.s)?p.s[h.si]:undefined});return;}
+    if(_sessAfterJoin(p,h.s,season))return;          // his Probetraining: listed, never counted
+    if(_pOffAt(p,h.k)==='pause')out.push({si:h.si,s:h.s,k:h.k,v:'P'});
+  });
+  return out;
+}
+function _attCompute(D,season){
+  const S=(D&&D.sessions)||[],P=(D&&D.players)||[];
+  const wk=_attKey(ATT_W),rk=_attKey(14),pk=_attKey(21);
+  const held=[];
+  S.forEach((s,si)=>{if(s&&s.date&&sessTookPlace(s,season))held.push({s,si,k:_dbSortKey(s.date,season)});});
+  held.sort((a,b)=>a.k-b.k);
+  // per player, and the team pooled — "dabei" of dabei + gefehlt: an
+  // excused absence (ill, exam) is no sign of fading
+  const per=[];let bA=0,bN=0,wA=0,wN=0;
+  P.forEach((p,pi)=>{
+    if(!p||p.trial||_pGone(p))return;
+    const seq=_attSeq(p,held,season);
+    const c={aB:0,fB:0,eB:0,aW:0,fW:0,eW:0};
+    seq.forEach(x=>{
+      if(x.v!==0&&x.v!==1&&x.v!==2)return;
+      const w=x.k>=wk?'W':'B';
+      c[(x.v===1?'a':x.v===0?'f':'e')+w]++;
+    });
+    bA+=c.aB;bN+=c.aB+c.fB;wA+=c.aW;wN+=c.aW+c.fW;
+    per.push({p,pi,seq,c,paused:_pState(p).k==='pause'});
+  });
+  const TB=bN?bA/bN:null,TW=wN?wA/wN:null;
+  let pt=null;try{pt=computePlayTime(D,season);}catch(e){}
+  const rows=[],few=[],cand=[],back=[];
+  per.forEach(({p,pi,seq,c,paused})=>{
+    if(paused)return;                 // in a pause: the trainers know
+    const why=[];
+    // 1. missing in a row, up to now
+    let run=0,ex=0,lastA=null;
+    for(let i=seq.length-1;i>=0;i--){
+      const v=seq[i].v;
+      if(v===1){lastA=seq[i];break;}
+      if(v==='P')break;
+      if(v===0||v===2){run++;if(v===2)ex++;}
+    }
+    if(run>=3){
+      const last=lastA?' · zuletzt dabei '+lastA.s.date:'';
+      if(ex===run)why.push({l:1,k:'run',t:run+' Termine in Folge entschuldigt – länger weg? Dann im Profil eine Pause eintragen'+last});
+      else why.push({l:3,k:'run',t:run+' Termine in Folge nicht da'+(ex?' ('+ex+'× entschuldigt)':', unentschuldigt')+last});
+    }
+    // 2. comes less than he used to — more than the team does
+    const nB=c.aB+c.fB,nW=c.aW+c.fW;
+    if(run<3&&TB!=null&&TW!=null&&nB>=6&&nW>=3&&c.fW>=2){
+      const qB=c.aB/nB,qW=c.aW/nW;
+      if((qB-TB)-(qW-TW)>=0.25){
+        const tW=c.aW+c.fW+c.eW,tB=c.aB+c.fB+c.eB;
+        why.push({l:3,k:'drop',t:'Letzte 4 Wochen '+c.aW+' von '+tW+' dabei'+(c.eW?' ('+c.eW+'× entschuldigt)':'')+', davor '+Math.round(c.aB/tB*100)+' %'});
+      }
+    }
+    if(nB<6&&(c.aB+c.fB+c.eB+c.aW+c.fW+c.eW)>0)few.push(p);
+    // 3. back after two weeks or more
+    let prevA=null,gap=0,gapP=false,ret=null;
+    seq.forEach(x=>{
+      if(x.v===1){
+        if(prevA&&gap>=3&&x.k>=rk){const days=Math.round((_attSkDate(x.k)-_attSkDate(prevA.k))/864e5);if(days>=14)ret={x,days,gapP};}
+        prevA=x;gap=0;gapP=false;return;
+      }
+      if(x.v===0||x.v===2||x.v==='P'){gap++;if(x.v==='P')gapP=true;}
+    });
+    if(ret&&run===0)back.push({p,pi,x:ret.x,w:Math.round(ret.days/7),gapP:ret.gapP});
+    // 4. Einsatz: weak twice or more in the four weeks
+    let weak=0;
+    seq.forEach(x=>{if(x.k>=wk&&x.v===1&&Array.isArray(p.perf)&&p.perf[x.si]===3)weak++;});
+    if(weak>=2)why.push({l:2,k:'perf',t:weak+'× schwacher Einsatz in den letzten 4 Wochen'});
+    // 5. Spielzeit: the same rule as Im Blick
+    const r=pt&&pt.rows.find(x=>x.pi===pi);
+    if(r&&r.low&&r.last[2]&&r.last[2].k>=pk)why.push({l:2,k:'play',t:'Die letzten 3 Spiele dabei, zusammen '+r.lm+' von '+r.lp+' Min. gespielt'});
+    cand.push({p,pi,why,seq});
+  });
+  // Back the same day, three or more (after the holidays): one row, not four
+  const byK={},groups=[];
+  back.forEach(b=>{(byK[b.x.k]=byK[b.x.k]||[]).push(b);});
+  Object.keys(byK).sort().forEach(k=>{
+    const g=byK[k];
+    if(g.length>=3){groups.push(g);return;}
+    g.forEach(b=>{cand.find(x=>x.pi===b.pi).why.push({l:1,k:'back',t:'Wieder da seit '+b.x.s.date+', vorher '+b.w+' Wochen '+(b.gapP?'Pause':'nicht dabei')+' – Belastung langsam steigern'});});
+  });
+  // most urgent first: a run before "comes less", then the rest by colour
+  const rank=w=>w.l*10+(w.k==='run'?2:w.k==='drop'?1:0);
+  cand.forEach(c=>{if(c.why.length)rows.push({p:c.p,pi:c.pi,why:c.why,l:Math.max(...c.why.map(w=>w.l)),r:Math.max(...c.why.map(rank)),strip:c.seq.slice(-10)});});
+  const nm=p=>String((typeof getDisplayName==='function'?getDisplayName(p):p.name)||'');
+  rows.sort((a,b)=>b.r-a.r||b.why.length-a.why.length||nm(a.p).localeCompare(nm(b.p)));
+  groups.forEach(g=>{
+    const ws=g.map(b=>b.w),lo=Math.min(...ws),hi=Math.max(...ws);
+    g.sort((a,b)=>nm(a.p).localeCompare(nm(b.p)));
+    rows.push({group:g.map(b=>b.p),l:1,r:10,why:[{l:1,k:'back',t:'Wieder da seit '+g[0].x.s.date+', vorher '+lo+(hi>lo?'–'+hi:'')+' Wochen nicht dabei – Belastung langsam steigern'}],strip:[]});
+  });
+  return {rows,few,TB,TW,per:per.length,held:held.length};
+}
+const ATT_DOT={3:'#C9373E',2:'#E0912F',1:'#1659B8'};
+const ATT_LBL={1:'dabei',0:'gefehlt',2:'entschuldigt',5:'nicht im Kader',P:'Pause'};
+function _attStrip(seq){
+  if(!seq.length)return '';
+  return '<span class="wba-strip" aria-hidden="true">'+seq.map(x=>{
+    const c=x.v===1?'a':x.v===0?'f':x.v===2?'e':x.v==='P'?'p':x.v===5?'n':'o';
+    return '<i class="wba-s '+c+'" title="'+escapeHtml(x.s.date)+': '+(ATT_LBL[x.v]||'nicht eingetragen')+'"></i>';
+  }).join('')+'</span>';
+}
+function _attHtml(data){
+  const A=_attCompute(data.block,data.season);
+  const cur=data.team===UI.currentTeam&&data.season===UI.currentSeason;
+  const nm=p=>escapeHtml((typeof getDisplayName==='function'?getDisplayName(p):p.name)||'');
+  let h='<section class="db-card wba-card" aria-label="Wer braucht Aufmerksamkeit?"><div class="db-h">Wer braucht Aufmerksamkeit?</div>';
+  if(!A.held){h+='<div class="wba-none">Noch keine Termine in dieser Saison.</div></section>';return h;}
+  if(!A.rows.length)h+='<div class="wba-ok">Gerade fällt niemand auf.</div>';
+  else h+='<div class="wba-list">'+A.rows.map(r=>{
+    const inner='<span class="hx-dot" style="background:'+ATT_DOT[r.l]+'"></span><span class="wba-x"><b>'+(r.group?r.group.map(nm).join(', '):nm(r.p))+'</b>'
+      +r.why.map(w=>'<span>'+escapeHtml(w.t)+'</span>').join('')+'</span>'+_attStrip(r.strip);
+    return cur&&!r.group?'<button type="button" class="wba-row" onclick="jumpToPlayer('+r.pi+',_hxLeave(\'moDashboard\'))">'+inner+'</button>'
+      :'<div class="wba-row">'+inner+'</div>';
+  }).join('')+'</div>';
+  let foot='Jeder wird mit sich selbst verglichen – und mit der Mannschaft in denselben Wochen: Fehlen in den Ferien viele, fällt keiner allein deshalb auf.';
+  if(A.few.length&&A.few.length<=Math.max(3,A.per/3))foot+=' Für einen Vergleich noch zu wenige Termine: '+A.few.map(nm).join(', ')+'.';
+  h+='<div class="wba-foot">'+foot+'</div></section>';
+  return h;
+}
+// "Saison bisher": the figures the six tiles had, once each, plus the
+// team's last four weeks — the context for every row on the left.
+function _statSumHtml(data,m,sb){
+  const D=data.block,season=data.season,wk=_attKey(ATT_W);
+  let wA=0,wT=0,bA=0,bT=0;
+  (D.sessions||[]).forEach((s,si)=>{
+    if(!s||!s.date||!sessTookPlace(s,season))return;
+    const w=_dbSortKey(s.date,season)>=wk;
+    (D.players||[]).forEach(p=>{
+      if(!p||!_sessCounts(p,s,season))return;
+      const v=p.s&&p.s[si];if(!_stFact(v))return;
+      if(w){wT++;if(v===1)wA++;}else{bT++;if(v===1)bA++;}
+    });
+  });
+  const pc=(a,t)=>t?Math.round(a/t*100):null;
+  const r=(lbl,val,sub)=>'<div class="sbi-r"><span>'+lbl+'</span> <b>'+(val==null?'–':val)+'</b> <small>'+sub+'</small></div>';
+  let h='<section class="db-card sbi-sum" aria-label="Saison bisher"><div class="db-h">Saison bisher</div>';
+  h+='<div class="sbi-big"><b>'+(m.pct.overall==null?'–':m.pct.overall+' %')+'</b> <span>dabei'+(sb.total?' · '+sb.a+' von '+sb.total+' Einträgen':'')+'</span></div>';
+  h+='<div class="sbi-grid">';
+  h+=r('Training',m.pct.training==null?null:m.pct.training+' %',m.counts.trainingsDone+' von '+m.counts.trainings+' absolviert');
+  h+=r('Spiele',m.pct.match==null?null:m.pct.match+' %',m.counts.matchesDone+' von '+m.counts.matches+' absolviert');
+  if(_attShow(data)&&wT&&bT)h+=r('Letzte 4 Wochen',pc(wA,wT)+' %','davor '+pc(bA,bT)+' %');
+  h+=r('Ø im Training',m.groupSize.training,'von '+m.counts.players+' Spielern');
+  if(m.counts.matchesDone)h+=r('Ø im Spiel',m.groupSize.match,'von '+m.counts.players+' Spielern');
+  {
+    let w=0,dr=0,l=0,gf=0,ga=0;
+    (data.sessions||[]).forEach(x=>{const q=sbResult(x);if(!q)return;gf+=q.f;ga+=q.a;if(q.k==='w')w++;else if(q.k==='l')l++;else dr++;});
+    if(w+dr+l)h+=r('Bilanz',w+'–'+dr+'–'+l,'S–U–N · Tore '+gf+':'+ga);
+  }
+  h+='</div>';
+  if(sb.total){
+    const a=Math.round(sb.a/sb.total*100),e=Math.round(sb.e/sb.total*100),f=Math.max(0,100-a-e);
+    h+='<div class="sbi-bar" role="img" aria-label="'+a+' % dabei, '+e+' % entschuldigt, '+f+' % gefehlt"><i class="a" style="width:'+a+'%"></i><i class="e" style="width:'+e+'%"></i><i class="f" style="width:'+f+'%"></i></div>'
+      +'<div class="sbi-leg"><span><i class="a"></i>dabei '+a+' %</span><span><i class="e"></i>entschuldigt '+e+' %</span><span><i class="f"></i>gefehlt '+f+' %</span></div>';
+  }
+  h+='</section>';
+  return h;
+}
 function renderDashboard(){
   // Header controls are rebuilt here; re-match the close button afterwards
   requestAnimationFrame(()=>{try{_syncCloseHeight(document.getElementById('moDashboard'));}catch(e){}});
@@ -22851,7 +23011,6 @@ function renderDashboard(){
   }
   const m=dbComputeMetrics(data);
   const sb=dbComputeStatusBreakdown(data);
-  const so=dbComputeSessionsOverview(data);
   const wdTime=_dbState.weekdayTime||'past';
   const wdType=_dbState.weekdayType||'all';
   const wd=dbComputeWeekday({...data,timeMode:wdTime,typeMode:wdType});
@@ -22861,28 +23020,15 @@ function renderDashboard(){
   const monthly=dbComputeMonthlyTrend(data);
   const seasonComp=dbComputeSeasonComparison(data.team,data.season);
   let html='';
-  // KPI cards row — clearer with X/Y context, distinguishing done vs planned
-  const tDoneTxt=m.counts.trainingsDone+'/'+m.counts.trainings+' absolviert';
-  const mDoneTxt=m.counts.matchesDone+'/'+m.counts.matches+' absolviert';
-  html+='<div class="db-kpi-row" data-bal="130">';
-  html+=dbKpiCard('Gesamt','%',m.pct.overall,sb.total?sb.a+' von '+sb.total+' markiert':'noch keine Daten');
-  html+=dbKpiCard('Trainings','%',m.pct.training,tDoneTxt);
-  html+=dbKpiCard('Spiele','%',m.pct.match,mDoneTxt);
-  html+=dbKpiCard('Ø Training','Spieler',m.groupSize.training,m.counts.trainingsDone?'von '+m.counts.players+' Spielern':'noch keine');
-  html+=dbKpiCard('Ø Spiel','Spieler',m.groupSize.match,m.counts.matchesDone?'von '+m.counts.players+' Spielern':'noch keine');
+  // The top (1.2.80): who needs attention, and the season in one card —
+  // six tiles used to say the same three times (71 / 71 / 70 %, Ø 13 / 13).
   {
-    // The season's record, once results are entered (Spielbericht); else the squad size
-    let w=0,dr=0,l=0,gf=0,ga=0;
-    (data.sessions||[]).forEach(s=>{const r=sbResult(s);if(!r)return;gf+=r.f;ga+=r.a;if(r.k==='w')w++;else if(r.k==='l')l++;else dr++;});
-    if(w+dr+l)html+=dbKpiCard('Bilanz',null,w+'\u2013'+dr+'\u2013'+l,'S\u2013U\u2013N \u00b7 Tore '+gf+':'+ga);
-    else html+=dbKpiCard('Kader',null,m.counts.players,'Spieler insgesamt');
+    const _att=canEdit()&&_attShow(data);
+    html+='<div class="sbi-top'+(_att?'':' ro')+'">';
+    if(_att){try{html+=_attHtml(data);}catch(e){console.error('[Aufmerksamkeit]',e);}}
+    html+=_statSumHtml(data,m,sb);
+    html+='</div>';
   }
-  html+='</div>';
-  // Row: Status breakdown + Sessions overview
-  html+='<div class="db-two-col">';
-  html+='<div class="db-card"><div class="db-h">📊 Status-Verteilung <span class="db-h-sub">(markiert)</span></div>'+dbRenderStatusBar(sb)+'</div>';
-  html+='<div class="db-card"><div class="db-h">🗓 Termine-Übersicht</div>'+dbRenderSessionsOverview(so)+'</div>';
-  html+='</div>';
   // Read-only (Heute): figures, the player table and the monthly trend only —
   // no Belastung, notes, birthdays or export.
   const _ro=!canEdit();
@@ -22991,15 +23137,6 @@ function renderDashboard(){
     </div>
   </div></div>`;
   el.innerHTML=html;
-}
-function dbKpiCard(label,unit,value,subtitle){
-  const display=value===null||value===undefined?'–':value;
-  const cls=value===null||value===undefined?' db-kpi-empty':'';
-  return `<div class="db-kpi${cls}">
-    <div class="db-kpi-label">${label}</div>
-    <div class="db-kpi-val">${display}<span class="db-kpi-unit">${unit||''}</span></div>
-    <div class="db-kpi-sub">${subtitle}</div>
-  </div>`;
 }
 function dbRankRow(rank,r,isWorst){
   const nm=getDisplayName?getDisplayName(r.p):r.p.name;
