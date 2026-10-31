@@ -7282,12 +7282,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.76'; // v1.2.76: Anmeldung ohne den alten Namen
-const APP_VERSION_LABEL='1.2.76';
+const APP_VERSION='1.2.77'; // v1.2.77: Karte nennt die Pause
+const APP_VERSION_LABEL='1.2.77';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1793440751507; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1793445628002; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -18845,10 +18845,15 @@ function cardData(p,D,season){
   if(!p||!D||!Array.isArray(D.sessions))return null;
   const ov=computePlayerOverallStats([{p,block:D,season}]);
   if(!ov.marked)return null;
-  let apps=0,goals=0,assists=0,mvp=0,rq=0,ra=0;
+  let apps=0,goals=0,assists=0,mvp=0,rq=0,ra=0,pz=0;
   D.sessions.forEach((s,si)=>{
     if(!s||!s.date)return;
-    if(typeof _sessAfterJoin==='function'&&!_sessCounts(p,s,season))return;
+    if(typeof _sessAfterJoin==='function'&&!_sessCounts(p,s,season)){
+      // held while on a pause agreed with the trainers: not counted — said on the card (1.2.77)
+      const k=_dbSortKey(s.date,season);
+      if(sessTookPlace(s,season)&&_pOffAt(p,k)==='pause'&&!(p.joinDate&&k<isoToSortKey(p.joinDate))&&!p.trial)pz++;
+      return;
+    }
     const v=(p.s&&si<p.s.length)?p.s[si]:3;
     const held=sessTookPlace(s,season);
     if(s.type==='match'){
@@ -18881,7 +18886,7 @@ function cardData(p,D,season){
   let ti=pct>=80?2:pct>=60?1:0;
   if(pct>=95&&t>=CARD_FL_MIN&&rateOk)ti=3;
   const name=String(p.name||'').trim();
-  return {ti,pct,a,t,e,nz,rated,rq,rateOk,apps,goals,assists,mvp,
+  return {ti,pct,a,t,e,nz,pz,rated,rq,rateOk,apps,goals,assists,mvp,
     streak:_playerStreak(p,D,season),
     name,ini:name.split(/\s+/).map(x=>x[0]||'').join('').slice(0,2).toUpperCase()||'?',
     nr:(p.nr!=null&&p.nr!=='')?String(p.nr):'',pos:typeof p.pos==='string'?p.pos:'',
@@ -19011,7 +19016,9 @@ function cardDraw(cv,d,o){
   x.font='800 78px '+BS;x.fillText(num,sx,347);
   x.font='700 32px '+BS;x.fillText('%',sx+wn+3,347);
   x.textAlign='center';x.fillStyle='rgba(255,255,255,.6)';
-  const how=d.nz?d.a+' von '+d.t+' dabei · '+d.nz+'× entschuldigt ohne Abzug':'Anwesenheit · '+d.a+' von '+d.t;
+  const pzT=d.pz?'Pause: '+d.pz+(d.pz===1?' Termin':' Termine'):'';
+  const how=d.nz?d.a+' von '+d.t+' dabei · '+d.nz+'× entschuldigt'+(pzT?' · '+pzT:' ohne Abzug')
+    :d.pz?d.a+' von '+d.t+' dabei · '+pzT:'Anwesenheit · '+d.a+' von '+d.t;
   let hs=11.5;
   for(;hs>9;hs-=.5){x.font='600 '+hs+'px '+BA;if(x.measureText(how).width<=304)break;}
   x.fillText(how,180,365);
@@ -19158,7 +19165,7 @@ function renderPlayerCard(){
     return `<span class="mk-chip ${w.st}" title="${tip}">${escapeHtml(w.day)}${w.match?' ⚽':''}${w.st==='ok'?' ✓':''}</span>`;}).join('')}</div>`:'';
   let canShare=false;
   try{canShare=!!(navigator.share&&navigator.canShare&&navigator.canShare({files:[new File([new Uint8Array(1)],'x.jpg',{type:'image/jpeg'})]}));}catch(e){}
-  const aria=`Karte ${T.name}. Anwesenheit ${d.pct} Prozent, ${d.a} von ${d.t}${d.nz?`, ${d.nz} Mal entschuldigt ohne Abzug`:''}. Serie ${d.streak}, Spiele ${d.apps}, Tore ${d.goals}, Vorlagen ${d.assists}, Bewertet ${d.rated==null?'noch nichts':d.rated+' Prozent'}, Spieler des Spiels ${d.mvp}.`;
+  const aria=`Karte ${T.name}. Anwesenheit ${d.pct} Prozent, ${d.a} von ${d.t}${d.nz?`, ${d.nz} Mal entschuldigt ohne Abzug`:''}${d.pz?`, ${d.pz} Termine in der Pause, die nicht zählen`:''}. Serie ${d.streak}, Spiele ${d.apps}, Tore ${d.goals}, Vorlagen ${d.assists}, Bewertet ${d.rated==null?'noch nichts':d.rated+' Prozent'}, Spieler des Spiels ${d.mvp}.`;
   wrap.innerHTML=`<div class="mk mk-t-${T.k}">${back}${prev}
     <div class="mk-stage"><canvas id="mk-cv" class="mk-cv" width="1080" height="1512" role="img" aria-label="${escapeHtml(aria)}"></canvas></div>
     <div class="mk-next">
@@ -19171,7 +19178,7 @@ function renderPlayerCard(){
       ${canShare?'<button class="mk-share" onclick="cardShare()">Karte teilen</button><button class="mk-save" onclick="cardSave()">Als Bild speichern</button>'
         :'<button class="mk-share" onclick="cardSave()">Als Bild speichern</button>'}
     </div>
-    <div class="mk-foot">Zählt die ganze Saison: wie oft du bei Training und Spiel dabei warst. Bist du krank, bleib zu Hause: Termine, die die Trainer als entschuldigt eintragen, kosten dich nichts – bis zu 1 von 10. Silber ab 60 %, Gold ab 80 %, Flutlicht ab 95 % bei mindestens ${CARD_FL_MIN} Terminen – und wenn du die Belastung fast immer bewertest.</div>
+    <div class="mk-foot">Zählt die ganze Saison: wie oft du bei Training und Spiel dabei warst. Bist du krank, bleib zu Hause: Termine, die die Trainer als entschuldigt eintragen, kosten dich nichts – bis zu 1 von 10. Während einer mit den Trainern abgesprochenen Pause (zum Beispiel bei einer Verletzung) zählen die Termine gar nicht. Silber ab 60 %, Gold ab 80 %, Flutlicht ab 95 % bei mindestens ${CARD_FL_MIN} Terminen – und wenn du die Belastung fast immer bewertest.</div>
   </div>`;
   _mkShow();
 }
