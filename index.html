@@ -2393,6 +2393,40 @@ body.player-mode .fl .hub-priv{margin-top:2px;font-size:13px;opacity:.8;}
 .tpl-rv.ok{color:#1a7a40;}
 .tpl-rvl{display:block;margin:8px 0 0;font-size:.78rem;line-height:1.4;color:#8a5a08;}
 .tpl-rvl.ok{color:#1a7a40;}
+/* Probetraining: Eindrücke (1.2.78) */
+.prb-mob{max-height:90vh;display:flex;flex-direction:column;}
+.prb-mob #prb-body{overflow-y:auto;min-height:0;flex:1;margin:0 -4px;padding:0 4px;}
+.prb-sum{margin:10px 0 2px;padding:10px 12px;border-radius:12px;background:var(--hx-card2,#F4F6FA);font-size:.82rem;color:var(--hx-ink,var(--gd));}
+.prb-r{display:grid;grid-template-columns:minmax(0,7.5em) 1fr 2.2em;align-items:center;gap:8px;padding:2px 0;}
+.prb-r>span:first-child{color:var(--hx-muted,var(--gm));white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.prb-r b{text-align:right;font-variant-numeric:tabular-nums;}
+.prb-bar{position:relative;height:6px;border-radius:3px;background:var(--hx-line,#E1E7F0);}
+.prb-bar i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--hx-blue,#1659B8);}
+.prb-bar::after{content:'';position:absolute;left:50%;top:-3px;bottom:-3px;width:2px;margin-left:-1px;background:var(--hx-ink,#0E2350);opacity:.35;}
+.prb-legend{font-size:.72rem;color:var(--hx-muted,var(--gm));margin-top:4px;}
+.prb-votes{margin-top:6px;font-size:.8rem;}
+.prb-votes b{font-weight:700;}
+.prb-list{margin-top:8px;}
+.prb-li{padding:7px 0;border-top:1px solid var(--hx-line,var(--gl));font-size:.8rem;line-height:1.4;}
+.prb-li-h{display:flex;align-items:baseline;gap:8px;}
+.prb-li-h span{flex:1;min-width:0;color:var(--hx-muted,var(--gm));}
+.prb-li-h button{border:0;background:none;color:var(--hx-blue,#1659B8);font:inherit;font-size:.78rem;font-weight:600;cursor:pointer;padding:2px 4px;}
+.prb-li p{margin:3px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--hx-ink,var(--gd));}
+.prb-old{margin:0;}
+.prb-old>summary{cursor:pointer;font-size:.86rem;font-weight:700;color:var(--hx-ink,var(--gd));padding:2px 0;}
+.prb-k{margin:0 0 12px;}
+.prb-kh{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font-size:.84rem;font-weight:700;color:var(--hx-ink,var(--bd));margin-bottom:6px;}
+.prb-kh small{font-weight:500;font-size:.76rem;color:var(--hx-muted,var(--gm));}
+.prb-sc{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;}
+.prb-sc button{border:1px solid var(--hx-line,var(--gl));background:var(--hx-card,#fff);border-radius:10px;padding:8px 0;font:inherit;font-size:.9rem;font-weight:700;color:var(--hx-ink,var(--bd));cursor:pointer;}
+.prb-sc button[aria-pressed="true"]{background:var(--hx-blue,#1659B8);border-color:var(--hx-blue,#1659B8);color:#fff;}
+.prb-sc button.mid{box-shadow:inset 0 -3px 0 rgba(14,35,80,.18);}
+.prb-sc button:focus-visible{outline:2px solid var(--hx-blue,#1659B8);outline-offset:2px;}
+.prb-rv{margin-top:6px;}
+.prb-rv button{display:flex;align-items:center;gap:8px;width:100%;margin-top:6px;border:1px solid var(--hx-line,var(--gl));background:var(--hx-card,#fff);border-radius:12px;padding:9px 12px;font:inherit;font-size:.84rem;color:var(--hx-ink,var(--bd));cursor:pointer;text-align:left;}
+.prb-rv button span{flex:1;}
+.prb-rv button small{color:var(--hx-muted,var(--gm));}
+.prb-rv button.done small{color:#1a7a40;font-weight:600;}
 .zl-hh{font-size:.78rem;font-weight:700;color:var(--hx-muted,var(--gm));margin-bottom:4px;}
 .zl-hi{display:flex;align-items:baseline;gap:8px;padding:4px 0;font-size:.82rem;line-height:1.4;}
 .zl-hi i{font-style:normal;color:var(--hx-muted,var(--gm));}
@@ -7282,12 +7316,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.77'; // v1.2.77: Karte nennt die Pause
-const APP_VERSION_LABEL='1.2.77';
+const APP_VERSION='1.2.78'; // v1.2.78: Probetraining – Eindrücke
+const APP_VERSION_LABEL='1.2.78';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1793445628002; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1793449022928; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -7307,6 +7341,7 @@ const FL_MARK='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F
 function _clubSlug(){return (_clubName()||'Flutlicht').replace(/[^A-Za-z0-9ÄÖÜäöüß]+/g,'-').replace(/^-|-$/g,'')||'Flutlicht';}
 function _clubInfo(){const c=(G&&G.club&&typeof G.club==='object')?G.club:{};return {name:_clubName(),resp:String(c.resp||''),addr:String(c.addr||''),mail:String(c.mail||''),dsb:String(c.dsb||'')};}
 const APP_NEWS=[
+  {id:'20261031-1',d:'31.10.',t:'Probetraining: Eindrücke',x:'Bei Spielern im Probetraining haltet ihr nach dem Training kurz fest, wie er sich schlägt: Technik, Spielverständnis, Athletik und Einstellung im Vergleich zur Mannschaft, dazu „Aufnehmen?“. Die Zusammenfassung steht in seinem Profil und bei der Entscheidung.',go:['Zum Kader',"hxGo('team')"]},
   {id:'20261028-2',d:'28.10.',t:'Rückblick nach dem Training',x:'Nach „Anwesenheit erfassen“ fragt die App kurz: Wie lief’s, was lief gut, was ändern wir? Mit Plan auch, ob jede Übung gepasst hat. „Was ändern wir?“ steht beim nächsten Training wieder da, „anpassen“ bei der Übung im Trainingsplaner.',go:['Zum letzten Training','rvGoLast()']},
   {id:'20261028-1',d:'28.10.',t:'Notizen zum Gegner',x:'Im Spiel-Fenster unter „Notizen zum Gegner“ haltet ihr fest, wie ein Gegner spielt, worauf ihr achten müsst und was beim Platz wichtig ist. Vor dem nächsten Spiel gegen ihn steht alles wieder da – mit den Ergebnissen und Notizen der bisherigen Spiele.',go:['Zum nächsten Spiel','oppGoNext()']},
   {id:'20261027-2',d:'27.10.',t:'Entwicklungsziele',x:'Im Spielerprofil unter „Ziele“ vereinbart ihr mit jedem Spieler 1–3 Ziele und gebt ab und zu Rückmeldung. Der Spieler sieht sie in seiner App.',go:['Zu den Zielen','zlOpenTab()']},
@@ -7875,18 +7910,24 @@ function renderPlayerStatus(p,pi){
   const sec=document.getElementById('ps-sec-status'),el=document.getElementById('ps-status');
   if(!sec||!el)return;
   const st=_pState(p),ed=canEdit();
-  if(st.k==='active'){sec.hidden=true;el.innerHTML='';return;}
+  if(st.k==='active'){
+    // after "Aufnehmen": the impressions of the Probetraining, folded (1.2.78)
+    if(ed&&_prbList(p).length){el.innerHTML=`<details class="prb-old"><summary>Eindrücke aus dem Probetraining (${_prbList(p).length})</summary>${_prbSumHtml(p,pi,true)}</details>`;sec.hidden=false;return;}
+    sec.hidden=true;el.innerHTML='';return;
+  }
   const b=(lbl,on,cls)=>`<button type="button" class="pst-btn${cls?' '+cls:''}" onclick="${on}">${lbl}</button>`;
   let txt='',btns='';
   if(st.k==='trial'){
     const c=_pTrialCount(p);
-    txt=`<b>Probetraining</b> seit ${_isoDE(st.since)} · ${c.n} ${c.n===1?'Termin':'Termine'}, ${c.a}× dabei<small>Wird erfasst, zählt aber in keiner Quote.</small>`;
-    if(ed)btns=b('Aufnehmen',`pstQuick(${pi},'take')`,'pri')+b('Nicht aufnehmen',`pstOpen(${pi},'gone')`)+b('Ändern',`pstOpen(${pi})`,'ghost');
+    txt=`<b>Probetraining</b> seit ${_isoDE(st.since)} · ${c.n} ${c.n===1?'Termin':'Termine'}, ${c.a}× dabei<small>Wird erfasst, zählt aber in keiner Quote.</small>`
+      +(ed?_prbSumHtml(p,pi,true):'');
+    if(ed)btns=b('Eindruck festhalten',`prbOpen(${pi})`,'pri')+b('Aufnehmen',`pstQuick(${pi},'take')`)+b('Nicht aufnehmen',`pstOpen(${pi},'gone')`)+b('Ändern',`pstOpen(${pi})`,'ghost');
   }else if(st.k==='pause'){
     txt=`<b>Pause</b> seit ${_isoDE(st.pause.f)}${st.pause.t?' bis '+_isoDE(st.pause.t):' · ohne Enddatum'}<small>Termine in dieser Zeit zählen nicht.</small>`;
     if(ed)btns=b('Pause beenden',`pstQuick(${pi},'back')`,'pri')+b('Ändern',`pstOpen(${pi},'pause')`,'ghost');
   }else{
-    txt=`<b>Nicht mehr dabei</b> seit ${_isoDE(st.since)}<small>Alles davor bleibt in der Statistik. Sein Link ist abgeschaltet.</small>`;
+    txt=`<b>Nicht mehr dabei</b> seit ${_isoDE(st.since)}<small>Alles davor bleibt in der Statistik. Sein Link ist abgeschaltet.</small>`
+      +(ed&&_prbList(p).length?`<details class="prb-old"><summary>Eindrücke aus dem Probetraining (${_prbList(p).length})</summary>${_prbSumHtml(p,pi,true)}</details>`:'');
     if(ed)btns=b('Wieder dabei',`pstQuick(${pi},'return')`,'pri')+b('Ändern',`pstOpen(${pi},'gone')`,'ghost');
   }
   el.innerHTML=`<div class="pst-line pst-${st.k}">${txt}</div>${btns?`<div class="pst-btns">${btns}</div>`:''}`;
@@ -7912,7 +7953,8 @@ function pstOpen(pi,pre,from){
   else if(st.k==='pause'){aL='Aktiv – Pause beenden';aS='Ab diesem Tag ist er wieder dabei.';aF=date('pst-a',today,'wieder dabei ab');}
   else if(st.k==='gone'){aL='Wieder dabei';aS='Die Zeit dazwischen gilt als Pause und zählt nicht.';aF=date('pst-a',today,'ab');}
   document.getElementById('pst-body').innerHTML=
-    opt('active',aL,aS,aF)
+    (st.k==='trial'?_prbDecideHtml(p,pi):'')
+    +opt('active',aL,aS,aF)
     +opt('trial','Probetraining','Wird erfasst wie jeder andere, zählt aber in keiner Quote. Kein automatisches „M“, keine Erinnerungen.',date('pst-t',p.trial||today,'seit'))
     +opt('pause','Pause','Für längere, abgesprochene Abwesenheit – Verletzung, Prüfungen, angekündigter Urlaub, Training bei den Herren. Für einzelne Termine: E. In der Pause zählt nichts, keine Erinnerungen, nicht im Kader; Physio bleibt buchbar. Geht auch nachträglich.',
       date('pst-pf',from||(curPause?curPause.f:today),'von')+date('pst-pt',from?'':(curPause?curPause.t:''),'bis (leer = offen)'))
@@ -16912,6 +16954,7 @@ function _rvRender(){
     +`<label class="zl-f"><span class="zl-fl">Was lief gut?</span><textarea rows="2" maxlength="600" oninput="_rv.v.gut=this.value" placeholder="z. B. Pressing nach Ballverlust, gute Stimmung">${e(v.gut||'')}</textarea></label>`
     +`<label class="zl-f"><span class="zl-fl">Was ändern wir? <i>· steht beim nächsten Training wieder da</i></span><textarea rows="2" maxlength="600" oninput="_rv.v.anders=this.value" placeholder="z. B. weniger Wartezeit beim Torschuss">${e(v.anders||'')}</textarea></label>`
     +(blocks?`<div class="zl-hist"><div class="zl-hh">Übungen aus dem Plan</div>${blocks}</div>`:'')
+    +_prbRvHtml(D,s,_rv.si)
     +ask;
 }
 function rvBlk(id,val){
@@ -16975,6 +17018,125 @@ function _rvPlanHint(){
     if(!L)return '';
     return `<div class="tpl-hint tpl-rvh"><b>Vom letzten Mal (${escapeHtml(L.s.date)}):</b> ${escapeHtml(L.r.anders)}</div>`;
   }catch(e){return '';}
+}
+// ══ Probetraining: Eindrücke (1.2.78) ═══════════════════════════════
+// Trainers only, on the player: p.prb = [{id, d:'YYYY-MM-DD', v:{tech,takt,ath,
+// einst}, auf:'ja'|'vl'|'nein', n, by, t}]. Each criterion 1–5 against the
+// team's level (3 = like the team). Not in PV_ME, so never in his slice.
+const PRB_K=[['tech','Technik'],['takt','Spielverständnis'],['ath','Athletik'],['einst','Einstellung']];
+const PRB_V=['','deutlich darunter','etwas darunter','wie die Mannschaft','etwas darüber','deutlich darüber'];
+const PRB_A=[['ja','Ja'],['vl','Vielleicht'],['nein','Nein']];
+function _prbList(p){return Array.isArray(p&&p.prb)?p.prb.filter(x=>x&&typeof x==='object'&&x.id):[];}
+const _prbBy=by=>(typeof _oppBy==='function')?_oppBy(by):String(by||'');
+function _prbSum(p){
+  const L=_prbList(p);if(!L.length)return null;
+  const avg={};
+  PRB_K.forEach(([k])=>{const v=L.map(x=>x.v&&+x.v[k]).filter(n=>n>=1&&n<=5);avg[k]=v.length?{a:v.reduce((a,b)=>a+b,0)/v.length,n:v.length}:null;});
+  // each trainer's latest word on "aufnehmen?"
+  const votes={};
+  L.slice().sort((a,b)=>(a.t||0)-(b.t||0)).forEach(x=>{if(x.auf)votes[x.by||'?']=x.auf;});
+  return {n:L.length,avg,votes};
+}
+function _prbSumHtml(p,pi,withList){
+  const S=_prbSum(p),e=escapeHtml;
+  if(!S)return '<div class="prb-sum"><span class="prb-legend">Noch kein Eindruck festgehalten.</span></div>';
+  const rows=PRB_K.map(([k,l])=>{const x=S.avg[k];
+    return `<div class="prb-r"><span>${l}</span><span class="prb-bar" title="Mitte = wie die Mannschaft">${x?`<i style="width:${Math.round((x.a-1)/4*100)}%"></i>`:''}</span><b>${x?_rvNum(x.a):'–'}</b></div>`;}).join('');
+  const vt=Object.entries(S.votes).map(([by,a])=>`${e(_prbBy(by))}: <b>${e((PRB_A.find(y=>y[0]===a)||[0,a])[1])}</b>`).join(' · ');
+  const list=_prbList(p).slice().sort((a,b)=>String(b.d||'').localeCompare(String(a.d||''))||(b.t||0)-(a.t||0)).map(x=>{
+    const sc=PRB_K.map(([k,l])=>x.v&&x.v[k]?l.slice(0,1)+x.v[k]:'').filter(Boolean).join(' ');
+    const mine=CU&&(x.by===CU.name||(typeof isAdmin==='function'&&isAdmin()));
+    return `<div class="prb-li"><div class="prb-li-h"><span>${e(_isoDE(x.d))} · ${e(_prbBy(x.by))}${sc?' · '+e(sc):''}${x.auf?' · Aufnehmen: '+e((PRB_A.find(y=>y[0]===x.auf)||[0,''])[1]):''}</span>${mine?`<button type="button" onclick="prbOpen(${pi},{id:'${e(x.id)}'})">Ändern</button>`:''}</div>${x.n?`<p>${e(x.n)}</p>`:''}</div>`;
+  }).join('');
+  return `<div class="prb-sum"><div>${rows}</div><div class="prb-legend">${S.n} ${S.n===1?'Eindruck':'Eindrücke'} · Mitte = wie die Mannschaft · T Technik, S Spielverständnis, A Athletik, E Einstellung</div>${vt?`<div class="prb-votes">Aufnehmen? ${vt}</div>`:''}${withList?`<div class="prb-list">${list}</div>`:''}</div>`;
+}
+function _prbDecideHtml(p,pi){
+  const S=_prbSum(p);
+  return `<div class="prb-dec"><div class="pst-lh">Eindrücke aus dem Probetraining</div>${S?_prbSumHtml(p,pi,false):'<p class="zl-note">Noch keiner festgehalten. <button type="button" class="tpl-lnk" onclick="closeM(\'moPSt\');prbOpen('+pi+')">Jetzt festhalten</button></p>'}</div>`;
+}
+// The held sessions of his Probetraining (current block), newest first
+function _prbDays(p){
+  const D=cd(),out=[];if(!D||!p||!p.trial)return out;
+  const f=isoToSortKey(p.trial);
+  (D.sessions||[]).forEach((s,si)=>{
+    if(!s||!s.date||!sessTookPlace(s,UI.currentSeason))return;
+    const k=_dbSortKey(s.date,UI.currentSeason);if(k<f)return;
+    out.push({iso:_skISO(k),lbl:s.date+(s.type==='match'?' · Spiel':' · Training'),there:!!(p.s&&p.s[si]===1)});
+  });
+  return out.reverse();
+}
+let _prb=null;
+function prbOpen(pi,o){
+  if(!canEdit())return;
+  const D=cd(),p=D&&D.players&&D.players[pi];if(!p)return;
+  o=o||{};
+  const old=o.id?_prbList(p).find(x=>x.id===o.id):null;
+  if(o.id&&!old)return;
+  const days=_prbDays(p);
+  const d=old?old.d:(o.d||((days.find(x=>x.there)||days[0]||{}).iso)||_todayISO());
+  _prb={pi,id:old?old.id:'',d,v:Object.assign({},old&&old.v),auf:old?old.auf||'':'',n:old?old.n||'':''};
+  const nm=(typeof getDisplayName==='function'?getDisplayName(p):p.name)||'';
+  document.getElementById('prb-title').textContent='Eindruck: '+nm;
+  document.getElementById('prb-del').hidden=!old;
+  _prbRender();
+  openM('moPrb');
+}
+function _prbRender(){
+  const b=document.getElementById('prb-body');if(!b||!_prb)return;
+  const D=cd(),p=D&&D.players&&D.players[_prb.pi];if(!p)return;
+  const e=escapeHtml,days=_prbDays(p);
+  if(_prb.d&&!days.some(x=>x.iso===_prb.d))days.unshift({iso:_prb.d,lbl:_isoDE(_prb.d)});
+  const dsel=`<label class="zl-f"><span class="zl-fl">Termin</span><select onchange="_prb.d=this.value">${days.map(x=>`<option value="${x.iso}"${x.iso===_prb.d?' selected':''}>${e(x.lbl)}${x.there===false?' (nicht da)':''}</option>`).join('')}</select></label>`;
+  const ks=PRB_K.map(([k,l])=>{const v=+_prb.v[k]||0;
+    return `<div class="prb-k" role="group" aria-label="${l}"><div class="prb-kh"><span>${l}</span><small>${v?PRB_V[v]:'im Vergleich zur Mannschaft'}</small></div>
+      <div class="prb-sc">${[1,2,3,4,5].map(n=>`<button type="button" class="${n===3?'mid':''}" aria-pressed="${v===n}" title="${PRB_V[n]}" onclick="prbSet('${k}',${n})">${n}</button>`).join('')}</div></div>`;}).join('');
+  const auf=`<div class="zl-f"><span class="zl-fl">Aufnehmen?</span><div class="zl-chips">${PRB_A.map(([a,l])=>`<label class="zl-chip"><input type="radio" name="prb-auf" value="${a}"${_prb.auf===a?' checked':''} onchange="_prb.auf='${a}'"><span>${l}</span></label>`).join('')}</div></div>`;
+  b.innerHTML=`<p class="zl-note">Probetraining seit ${e(_isoDE(p.trial||''))||'–'} · 3 = wie die Mannschaft</p>`+dsel+ks+auf
+    +`<label class="zl-f"><span class="zl-fl">Notiz</span><textarea rows="2" maxlength="600" oninput="_prb.n=this.value" placeholder="z. B. starker linker Fuß, braucht Zeit im Zweikampf">${e(_prb.n||'')}</textarea></label>`;
+}
+function prbSet(k,n){if(!_prb)return;_prb.v[k]=(+_prb.v[k]===n)?0:n;_prbRender();}
+function prbSave(){
+  if(!_prb||!canEdit())return;
+  const D=cd(),p=D&&D.players&&D.players[_prb.pi];if(!p)return;
+  const v={};PRB_K.forEach(([k])=>{const n=+_prb.v[k];if(n>=1&&n<=5)v[k]=n;});
+  const n=String(_prb.n||'').trim().slice(0,600),auf=PRB_A.some(a=>a[0]===_prb.auf)?_prb.auf:'';
+  if(!Object.keys(v).length&&!auf&&!n){alert('Bitte mindestens eine Einschätzung oder eine Notiz.');return;}
+  snap();
+  if(!Array.isArray(p.prb))p.prb=_prbList(p);
+  const x={id:_prb.id||('e'+Date.now().toString(36)+Math.random().toString(36).slice(2,5)),d:/^\d{4}-\d{2}-\d{2}$/.test(_prb.d)?_prb.d:_todayISO(),v,t:Date.now(),by:(CU&&CU.name)||''};
+  if(auf)x.auf=auf;if(n)x.n=n;
+  const i=p.prb.findIndex(y=>y&&y.id===x.id);
+  if(i>=0){if(p.prb[i].by)x.by=p.prb[i].by;p.prb[i]=x;}else p.prb.push(x);
+  saveG();
+  logAudit('Probetraining: Eindruck',p.name||'?',_isoDE(x.d)+(auf?' · aufnehmen: '+(PRB_A.find(a=>a[0]===auf)||[0,''])[1]:''));
+  closeM('moPrb');
+  if(typeof showSaveFlash==='function')showSaveFlash('✓ Eindruck gespeichert');
+  _prbAfter(_prb.pi);
+}
+function prbDel(){
+  if(!_prb||!_prb.id||!canEdit())return;
+  const D=cd(),p=D&&D.players&&D.players[_prb.pi];if(!p)return;
+  if(!confirm('Diesen Eindruck löschen?'))return;
+  snap();
+  p.prb=_prbList(p).filter(x=>x.id!==_prb.id);if(!p.prb.length)delete p.prb;
+  saveG();logAudit('Probetraining: Eindruck',p.name||'?','gelöscht');
+  closeM('moPrb');_prbAfter(_prb.pi);
+}
+function _prbAfter(pi){
+  try{const mp=document.getElementById('moPlayer');if(mp&&mp.classList.contains('open')&&window._psCurrentPi===pi){const D=cd();renderPlayerStatus(D.players[pi],pi);}}catch(e){}
+  try{if(document.getElementById('moRv').classList.contains('open'))_rvRender();}catch(e){}
+  try{if(document.getElementById('moPSt').classList.contains('open')&&_pstPi===pi)pstOpen(pi,'decide');}catch(e){}
+  try{render();}catch(e){}
+}
+// In the review after training: who was on trial and there today
+function _prbRvHtml(D,s,si){
+  if(!canEdit()||!D||!s)return '';
+  const iso=_skISO(_dbSortKey(s.date,UI.currentSeason)),e=escapeHtml;
+  const L=(D.players||[]).map((p,pi)=>({p,pi})).filter(({p})=>p&&p.trial&&iso>=p.trial&&p.s&&p.s[si]===1);
+  if(!L.length)return '';
+  return `<div class="zl-hist prb-rv"><div class="zl-hh">Probetraining heute</div>${L.map(({p,pi})=>{
+    const done=_prbList(p).some(x=>x.d===iso&&x.by===(CU&&CU.name));
+    return `<button type="button"${done?' class="done"':''} onclick="prbOpen(${pi},{d:'${iso}'})"><span>${e((typeof getDisplayName==='function'?getDisplayName(p):p.name)||'')}</span><small>${done?'✓ festgehalten':'Eindruck festhalten ›'}</small></button>`;}).join('')}</div>`;
 }
 // From the news card: the next match of the team on screen
 function oppGoNext(){
@@ -27826,7 +27988,7 @@ function hxRender(){
       const st=_pState(p);
       if(st.k==='trial'){
         const c=_pTrialCount(p);
-        if(c.n>=R.probe)flags.push({dot:'#7C3AED',who:nm(p),what:'Probetraining: '+c.n+' Termine, '+c.a+'× dabei – aufnehmen?',on:`pstOpen(${pi},'decide')`});
+        if(c.n>=R.probe){const ne=_prbList(p).length;flags.push({dot:'#7C3AED',who:nm(p),what:'Probetraining: '+c.n+' Termine, '+c.a+'× dabei'+(ne?' · '+ne+(ne===1?' Eindruck':' Eindrücke'):'')+' – aufnehmen?',on:`pstOpen(${pi},'decide')`});}
         return;
       }
       // an open-ended pause running for weeks: still right? (1.2.56)
@@ -39389,6 +39551,15 @@ _pubCleanupSchedule();
   <div class="mob-btns">
     <button type="button" class="btn bp" onclick="rvSave()">Speichern</button>
     <button type="button" class="btn bs" id="rv-later" onclick="closeM('moRv')">Später</button>
+  </div>
+</div></div>
+<div class="mo" id="moPrb"><div class="mob zl-mob prb-mob" style="width:520px;max-width:96vw;">
+  <h3 class="zl-h" id="prb-title">Eindruck</h3>
+  <div id="prb-body"></div>
+  <div class="mob-btns">
+    <button type="button" class="btn bp" onclick="prbSave()">Speichern</button>
+    <button type="button" class="btn bs" onclick="closeM('moPrb')">Abbrechen</button>
+    <button type="button" class="zl-del" id="prb-del" onclick="prbDel()" hidden>Löschen</button>
   </div>
 </div></div>
 <div class="mo" id="moGegner"><div class="mob zl-mob opp-mob" style="width:520px;max-width:96vw;">
