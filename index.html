@@ -5076,6 +5076,16 @@ body.design-heute #moTeamMgr .tpanel .note{color:var(--hx-muted);}
   body.design-heute #moTeamMgr .tpanel .mob-btns .btn{flex:1 1 40%;min-height:44px;padding:0 10px;font-size:.82rem;}
   body.design-heute #moTeamMgr #btn-mgr-addpl{order:-1;flex:1 1 100%;}
 }
+/* Kader → Spieler on the phone (1.2.83) */
+.pl-multi-l,.mgr-sel-done{display:none;}
+@media(max-width:767px){
+  #moTeamMgr :is(.pl-sel-tg,.pl-btns-sp,.pl-row .pl-btns){display:none !important;}
+  #moTeamMgr .pl-multi-l{display:block;order:20;flex:1 1 100%;border:none;background:none;padding:10px 6px 2px;
+    font:600 .84rem 'Barlow',sans-serif;color:var(--hx-blue,#1659B8);text-align:center;cursor:pointer;}
+  #moTeamMgr .pl-multi-l:focus-visible{outline:2px solid var(--hx-blue,#1659B8);outline-offset:2px;border-radius:8px;}
+  .mgr-sel-done{display:inline-block;margin-left:auto;}
+}
+@media(max-width:600px){#moTeamMgr .pl-app-h{display:none !important;}}
 #hxNav,#hxHome{display:none;}
 body.design-heute{
   --hx-ink:#0E2350;--hx-ink2:#3A4A6B;--hx-muted:#4E5D7C;--hx-ground:#F2F4F8;--hx-line:#DCE3EE;
@@ -7245,6 +7255,7 @@ if(window._fbBlocked){
       <span class="mgr-sel-n" id="multiSelCount" aria-live="polite"></span>
       <button type="button" class="mgr-sel-l" onclick="multiSelectAll()">Alle</button>
       <button type="button" class="mgr-sel-l" onclick="multiSelectNone()">Keine</button>
+      <button type="button" class="mgr-sel-l mgr-sel-done" onclick="toggleMultiSelectMode()">Fertig</button>
       <span class="mgr-sel-acts">
         <button type="button" class="mgr-sel-b" id="mgrSelMove" onclick="bulkMoveToTeam()">In andere Mannschaft</button>
         <button type="button" class="mgr-sel-b mgr-sel-del" id="mgrSelDel" onclick="bulkDeletePlayers()">Löschen</button>
@@ -7252,6 +7263,7 @@ if(window._fbBlocked){
     </div>
     <div class="mob-btns">
       <button class="btn bp" id="btn-mgr-addpl" onclick="_tmLeave();openM('moAddPlayer');" style="display:none;">＋ Spieler</button>
+      <button type="button" class="pl-multi-l" id="btn-mgr-multi" onclick="toggleMultiSelectMode()" style="display:none;">Mehrere auswählen – andere Mannschaft oder löschen</button>
       <button class="btn" id="btn-mgr-teamlink" onclick="appShareOpen()" style="display:none;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" title="Ein Link für die ganze Mannschaft — einmal in die Gruppe geben, jeder wählt sich selbst aus">Link an die Mannschaft</button>
       
     </div>
@@ -7377,12 +7389,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.82'; // v1.2.82: Feinschliff – Nacht, Kontrast, Statistik
-const APP_VERSION_LABEL='1.2.82';
+const APP_VERSION='1.2.83'; // v1.2.83: Kader → Spieler auf dem Handy
+const APP_VERSION_LABEL='1.2.83';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1793636064443; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1793638665752; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -28951,7 +28963,7 @@ function renderMgrPlayers(){
     <div style="flex:1;font-size:.65rem;font-weight:700;color:rgba(255,255,255,.6);cursor:pointer;" onclick="sortMgr('name')">Spieler${mgrSort.col==='name'?(mgrSort.asc?'▲':'▼'):''}</div>
     <div style="min-width:82px;font-size:.65rem;font-weight:700;color:rgba(255,255,255,.6);cursor:pointer;" onclick="sortMgr('pos')">Pos.${mgrSort.col==='pos'?(mgrSort.asc?'▲':'▼'):''}</div>
     ${canEdit()?`<div class="pl-app-h" onclick="sortMgr('seen')" title="Zuletzt in der Spieler-App (seit ${SEEN_SINCE})">App${mgrSort.col==='seen'?(mgrSort.asc?'▲':'▼'):''}</div>`:''}
-    <div style="width:60px;"></div>
+    <div class="pl-btns-sp" style="width:60px;"></div>
     ${canEdit()?`<button type="button" class="pl-sel-tg" id="mgrSelToggle" onclick="toggleMultiSelectMode()">${_multiSelMode?'Fertig':'Auswählen'}</button>`:''}
   </div>`;
   document.getElementById('tmgr-pl-list').innerHTML=(sortedP.length||_gP.length)?
@@ -28978,6 +28990,7 @@ function renderMgrPlayers(){
     :'<p style="padding:14px;font-size:.76rem;color:var(--gm);">Keine Spieler.</p>';
   document.getElementById('btn-mgr-addpl').style.display=canEdit()?'':'none';
   {const tl=document.getElementById('btn-mgr-teamlink');if(tl)tl.style.display=canEdit()?'':'none';}
+  {const ml=document.getElementById('btn-mgr-multi');if(ml)ml.style.display=canEdit()?'':'none';}
   _updateMultiSelBar();
 }
 async function mgrDelPl(pi){
