@@ -3382,6 +3382,14 @@ body.design-heute .lp-nik-t{color:var(--hx-muted);}
 .mk-lad-l span.l3{left:auto!important;right:0;transform:none;}
 .mk-lad-l span.on{color:var(--mk-ink);font-weight:700;}
 .mk-week{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:16px;}
+.mk-form{margin-top:18px;}
+.mk-form-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
+.mk-form-h b{font-family:'Big Shoulders Display','Bebas Neue',sans-serif;font-weight:800;font-size:1.3rem;line-height:1;color:var(--mk-ink);}
+.mk-form-d{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0 6px;}
+.mk-form-d i{display:block;width:12px;height:12px;border-radius:50%;box-sizing:border-box;border:1.5px solid var(--hbr);}
+.mk-form-d i.ok{background:#F2C230;border-color:#F2C230;}
+.mk-form-d i.ex{border:1.5px dashed rgba(242,194,48,.7);}
+.mk-form-t{font-size:.8rem;line-height:1.4;color:var(--hdim);}
 .mk-wl{font-size:.74rem;color:var(--hdim);margin-right:2px;}
 .mk-chip{font-size:.74rem;font-weight:700;padding:4px 9px;border-radius:999px;border:1px solid var(--hbr);color:var(--htx);}
 .mk-chip.ok{background:rgba(242,194,48,.14);border-color:rgba(242,194,48,.55);color:#F2C230;}
@@ -7351,12 +7359,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.80'; // v1.2.80: Statistik – Wer braucht Aufmerksamkeit?
-const APP_VERSION_LABEL='1.2.80';
+const APP_VERSION='1.2.81'; // v1.2.81: Meine Karte – Form der letzten 4 Wochen
+const APP_VERSION_LABEL='1.2.81';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1793488373856; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1793634402851; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -19119,6 +19127,38 @@ function _cardWeek(p,D,season){
   });
   return out.sort((x,y)=>x.sk-y.sk||String(x.t).localeCompare(String(y.t)));
 }
+// The last four weeks (1.2.81), by the card's own rule: up to one excused
+// in ten costs nothing, a pause does not count. Fewer than three: no form.
+function _cardForm(p,D,season,d){
+  const wk=_attKey(ATT_W),dots=[];let a=0,t=0,e=0;
+  (D.sessions||[]).forEach((s,si)=>{
+    if(!s||!s.date||!sessTookPlace(s,season))return;
+    const k=_dbSortKey(s.date,season);if(k<wk)return;
+    if(typeof _sessAfterJoin==='function'&&!_sessCounts(p,s,season))return;
+    const v=(p.s&&si<p.s.length)?p.s[si]:3;
+    if(!_stFact(v))return;
+    t++;if(v===1)a++;else if(v===2)e++;
+    dots.push({k,tm:s.time||'',date:s.date,st:v===1?'ok':v===2?'ex':'no'});
+  });
+  if(t<3)return null;
+  dots.sort((x,y)=>x.k-y.k||String(x.tm).localeCompare(String(y.tm)));
+  const sc=_cardScore(a,t,e),pct=sc.pct,sp=d?d.pct:null;
+  let cmp='';
+  if(a===t)cmp='mehr geht nicht';
+  else if(sp!=null){
+    if(pct>=sp+5)cmp='Besser als dein Saisonschnitt ('+sp+'\u00a0%).';
+    else if(pct<=sp-5)cmp='Unter deinem Saisonschnitt ('+sp+'\u00a0%).';
+    else cmp='So wie dein Saisonschnitt ('+sp+'\u00a0%).';
+  }
+  return {a,t,e,nz:sc.nz||0,pct,dots,cmp};
+}
+function _cardFormHtml(f){
+  if(!f)return '';
+  const tip={ok:'dabei',ex:'entschuldigt',no:'nicht dabei'};
+  return '<div class="mk-form"><div class="mk-form-h"><span class="mk-wl">Form · letzte 4 Wochen</span><b>'+f.pct+'\u00a0%</b></div>'
+    +'<div class="mk-form-d" aria-hidden="true">'+f.dots.map(x=>'<i class="'+x.st+'" title="'+escapeHtml(x.date)+': '+tip[x.st]+'"></i>').join('')+'</div>'
+    +'<div class="mk-form-t">'+f.a+' von '+f.t+' dabei'+(f.a===f.t?' – '+f.cmp+'.':(f.nz?' · '+f.nz+'× entschuldigt ohne Abzug':'')+'.'+(f.cmp?' '+f.cmp:''))+'</div></div>';
+}
 // canvas letterSpacing is not in every browser yet: letter by letter
 function _mkSpaced(x,t,X,Y,sp,align){
   const ch=[...t];
@@ -19343,7 +19383,8 @@ function renderPlayerCard(){
   d.photo=p.photo||null;
   // Data arriving from the server re-renders the screen; an unchanged card
   // stays as it is instead of going blank and lighting up again.
-  const sig=JSON.stringify(d)+'|'+JSON.stringify(_cardWeek(p,D,UI.currentSeason));
+  const fm=_cardForm(p,D,UI.currentSeason,d);
+  const sig=JSON.stringify(d)+'|'+JSON.stringify(_cardWeek(p,D,UI.currentSeason))+'|'+JSON.stringify(fm);
   if(sig===_mkSig&&document.getElementById('mk-cv'))return;
   _mkSig=sig;
   _mkData=d;_mkFile=null;
@@ -19369,6 +19410,7 @@ function renderPlayerCard(){
       <div class="mk-msg">${escapeHtml(msg)}</div>
       <div class="mk-lad" style="--p:${Math.max(2,d.pct)}%"><div class="mk-lad-fill"></div>${lad}</div>
       <div class="mk-lad-l">${labs}</div>
+      ${_cardFormHtml(fm)}
       ${wkHtml}
     </div>
     <div class="mk-acts">
