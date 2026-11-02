@@ -6535,11 +6535,13 @@ body.design-heute.hxk-dk .hx-day.today::before{content:'';position:absolute;left
 /* 1.2.82: controls standing on the page, not in a card (Kader tabs, the
    Aufstellung bar, the Anwesenheit filters below the band, the planner tabs):
    night fields there too — they used the light ones */
-body.design-heute.hxk-dk :is(.tpl-ov .tpl-tabs,#moTeamMgr .tbar,#lp-fmt-btns,#slp-fmt-btns,.lp-kind-wrap),
+body.design-heute.hxk-dk :is(.tpl-ov .tpl-tabs,#moTeamMgr .tbar,#lp-fmt-btns,#slp-fmt-btns,.lp-kind-wrap,#mxPlayers .mxp-tools,#mxPlayers .mxp-cap,#mxPlayers .mxp-sec,#mxPlayers .mxp-empty),
 body.design-heute.hxk-dk:not(.mx-inband) #mxBar{
   --tp-card:var(--hk-card);--tp-line:var(--hk-line);--tp-ink:var(--hk-ink);--tp-mut:var(--hk-muted);
   --hx-field:var(--hk-field);--hx-card:var(--hk-card);--hx-card2:var(--hk-card2);--hx-line:var(--hk-line);
   --hx-ink:var(--hk-ink);--hx-ink2:var(--hk-ink2);--hx-muted:var(--hk-muted);--hx-solid:var(--hk-solid);--hx-on-solid:var(--hk-on-solid);}
+body.design-heute.hxk-dk #mxPlayers .mxp-chips button.on{background:var(--hk-solid);border-color:var(--hk-solid);color:var(--hk-on-solid);}
+body.design-heute.hxk-dk #mxPlayers .mxp-type{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23CFD8E8' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");color-scheme:dark;}
 @media(max-width:767px){
   /* the page behind phone headers: the night page, not the light inner fill */
   body.design-heute.hxk-dk #moSettings .set-mob{background:var(--hx-page) !important;}
@@ -7389,12 +7391,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.83'; // v1.2.83: Kader → Spieler auf dem Handy
-const APP_VERSION_LABEL='1.2.83';
+const APP_VERSION='1.2.84'; // v1.2.84: Anwesenheit → Spieler in der Nacht
+const APP_VERSION_LABEL='1.2.84';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1793638665752; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1793639586178; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
