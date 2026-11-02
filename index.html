@@ -3691,7 +3691,7 @@ label.tp-kind input[type=checkbox]{margin:2px 0 0;padding:0;width:17px;height:17
 
 /* Dashboard — new sections */
 .db-two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
-.sbi-top{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:14px;margin-bottom:14px;align-items:start;}
+.sbi-top{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:14px;margin-bottom:14px;align-items:stretch;}
 .sbi-top.ro{grid-template-columns:1fr;}
 @media(max-width:1279px){.sbi-top{grid-template-columns:1fr;}}
 .wba-list{display:flex;flex-direction:column;}
@@ -4285,6 +4285,7 @@ body.design-heute .set-hx-only{display:block;}
 body.design-heute #set-foc-host .note{font-size:.74rem;color:var(--hx-muted);margin:0 0 6px;}
 body.design-heute #moDashboard .db-alltab .full-table{width:100%;}
 body.design-heute #moDashboard .db-alltab .full-table thead th{background:var(--hx-ground);color:var(--hx-muted);cursor:pointer;white-space:nowrap;}
+body.design-heute #moDashboard .db-alltab .full-table thead th:is(:nth-child(2),:nth-child(3)){text-align:left;}
 body.design-heute #moDashboard .db-alltab .full-table tbody tr:hover{background:var(--hx-ground);}
 /* ── Einstellungen → Daten: Backups / Papierkorb / Verlauf as sub-pages (Heute) ── */
 .set-sub-back{display:inline-flex;align-items:center;gap:4px;margin:0 0 10px -4px;padding:4px 10px;border:none;border-radius:999px;background:none;color:var(--bm);font:600 .82rem 'Barlow',sans-serif;cursor:pointer;}
@@ -4878,7 +4879,7 @@ body.design-heute .mo.hx-page > .mob{scrollbar-gutter:auto;}
   body.design-heute #moTeamMgr #tmgr-h,body.design-heute #moSettings .set-title,body.design-heute .hx-ltop-t{font-size:1.6rem !important;line-height:38px !important;min-height:38px;margin:0 !important;}
   /* Second row (Statistik, Wochenbericht) on the ground below a 62px bar */
   body.design-heute :is(#moDashboard,#moWeekReport) > .mob > .has-inrow-close{background:linear-gradient(var(--hx-nav),var(--hx-nav)) 0 0/100% calc(62px + env(safe-area-inset-top,0px)) no-repeat,var(--hx-ground) !important;row-gap:12px !important;padding-bottom:4px !important;align-content:flex-start;}
-  body.design-heute #moDashboard .has-inrow-close .db-header-actions{flex:1 1 100%;order:9;}
+  body.design-heute #moDashboard .has-inrow-close .db-header-actions{flex:1 1 100%;order:9;margin-top:10px;}
   body.design-heute #moDashboard .has-inrow-close .db-sel{background:var(--hx-field) !important;border:1px solid var(--hx-line) !important;color:var(--hx-ink) !important;}
   body.design-heute #moWeekReport .has-inrow-close .wr-head-nav{order:9;flex:1 1 auto;}
   body.design-heute #moWeekReport .has-inrow-close .wr-head-meta{order:10;color:var(--hx-og-muted) !important;align-self:center;}
@@ -4934,7 +4935,7 @@ body.design-heute .hxv-item{display:flex !important;}
   body.design-heute .tpl-ov .tpl-ttl h2{order:1;flex:1 1 auto;font-size:1.6rem;line-height:38px;min-width:0;}
   body.design-heute .tpl-ov .tpl-hd-r{order:2;width:auto;flex:0 0 auto;margin-left:0;}
   body.design-heute .tpl-ov .tpl-hd-r .tpl-hb{height:38px;}
-  body.design-heute .tpl-ov .tpl-sub{order:3;flex:1 1 100%;color:var(--tp-mut);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  body.design-heute .tpl-ov .tpl-sub{order:3;flex:1 1 100%;margin-top:10px;color:var(--tp-mut);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   body.design-heute .tpl-ov .tpl-tabs{order:4;flex:1 1 100%;background:none;padding:0;gap:6px;}
   body.design-heute .tpl-ov .tpl-tabs button{flex:1 1 0;justify-content:center;background:var(--tp-card);border:1px solid var(--tp-line);color:var(--tp-ink);border-radius:999px;padding:8px 10px;}
   body.design-heute .tpl-ov .tpl-tabs button.on{background:var(--tp-navy);border-color:var(--tp-navy);color:#fff;}
@@ -5514,7 +5515,7 @@ body.design-heute select.lp-fmt-sel:not([multiple]):not([size]):not(#hxs-none){b
 @media(min-width:768px){
   body.design-heute.mx-inband #toolbarEl.toolbar{flex-wrap:nowrap !important;column-gap:14px !important;}
   body.design-heute #toolbarEl #mxBar{flex:1 1 auto;margin:0;flex-wrap:nowrap;gap:10px;}
-  body.design-heute #toolbarEl #mxBar .mx-q{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.22);color:#C9D6EC;flex:0 1 220px;min-width:168px;}
+  body.design-heute #toolbarEl #mxBar .mx-q{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.22);color:#C9D6EC;flex:0 1 220px;min-width:148px;}
   body.design-heute #toolbarEl #mxBar .mx-q:focus-within{border-color:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.18);}
   body.design-heute #toolbarEl #mxBar .mx-q input{color:#fff;}
   body.design-heute #toolbarEl #mxBar .mx-q input::placeholder{color:#AFC0E0;}
@@ -6447,7 +6448,7 @@ body.design-heute.hxs-flutlicht:not(.mx-inband) #mxBar .mx-seg button:hover:not(
    Standard (Hell with a page ground a step darker than the cards' inner
    fills, so the cards stand out), Ruhig (Stahl), Nacht (Flutlicht + dark
    cards), Automatisch. The single settings sit under "Erweitert". */
-body.design-heute.hxs-hell{--hx-page:#D7DEE9;}
+body.design-heute.hxs-hell{--hx-page:#D7DEE9;--gm:var(--hx-muted);}
 body.design-heute .setting-sub{color:var(--hx-muted);}
 .hxp-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;padding:4px 0 16px;}
 .hxp-sw .hxs-nm{display:flex;flex-direction:column;gap:1px;font-weight:700;}
@@ -6519,7 +6520,24 @@ body.design-heute.hxk-dk .hx-bar.cur i{background:var(--hx-yellow);}
 body.design-heute.hxk-dk .hx-dtile small{color:var(--hx-muted);}
 /* dark cards: colours the shared styles write as constants */
 body.design-heute.hxk-dk .hx-dtile:not(.match){background:color-mix(in srgb,#000 26%,var(--hk-card));color:#fff;}
-body.design-heute.hxk-dk .hx-day.today{box-shadow:inset 3px 0 0 var(--hx-yellow);}
+body.design-heute.hxk-dk .hx-day.today{position:relative;}
+body.design-heute.hxk-dk .hx-day.today::before{content:'';position:absolute;left:3px;top:7px;bottom:7px;width:3px;border-radius:2px;background:var(--hx-yellow);}
+/* 1.2.82: controls standing on the page, not in a card (Kader tabs, the
+   Aufstellung bar, the Anwesenheit filters below the band, the planner tabs):
+   night fields there too — they used the light ones */
+body.design-heute.hxk-dk :is(.tpl-ov .tpl-tabs,#moTeamMgr .tbar,#lp-fmt-btns,#slp-fmt-btns,.lp-kind-wrap),
+body.design-heute.hxk-dk:not(.mx-inband) #mxBar{
+  --tp-card:var(--hk-card);--tp-line:var(--hk-line);--tp-ink:var(--hk-ink);--tp-mut:var(--hk-muted);
+  --hx-field:var(--hk-field);--hx-card:var(--hk-card);--hx-card2:var(--hk-card2);--hx-line:var(--hk-line);
+  --hx-ink:var(--hk-ink);--hx-ink2:var(--hk-ink2);--hx-muted:var(--hk-muted);--hx-solid:var(--hk-solid);--hx-on-solid:var(--hk-on-solid);}
+@media(max-width:767px){
+  /* the page behind phone headers: the night page, not the light inner fill */
+  body.design-heute.hxk-dk #moSettings .set-mob{background:var(--hx-page) !important;}
+  body.design-heute.hxk-dk .tpl-ov .tpl-hd{background:linear-gradient(var(--tp-navy),var(--tp-navy)) 0 0/100% calc(62px + env(safe-area-inset-top,0px)) no-repeat,var(--hx-page);}
+  body.design-heute.hxk-dk .tpl-ov .tpl-sub{color:var(--hx-og-muted);}
+  body.design-heute.hxk-dk .tpl-ov .tpl-tabs button.on{background:var(--hk-solid);border-color:var(--hk-solid);color:var(--hk-on-solid);}
+  body.design-heute.hxk-dk :is(#moDashboard,#moWeekReport) > .mob > .has-inrow-close{background:linear-gradient(var(--hx-nav),var(--hx-nav)) 0 0/100% calc(62px + env(safe-area-inset-top,0px)) no-repeat,var(--hx-page) !important;}
+}
 body.design-heute.hxk-dk .hx-day-s.m,body.design-heute.hxk-dk .kb-day.m i,body.design-heute.hxk-dk .hxl-sess.match span{color:var(--hk-warn);}
 body.design-heute.hxk-dk .ma-btn.ma-5:not(.dim){background:#3D7FE0;}
 body.design-heute.hxk-dk :is(.sr,.att-row,.pl-row):nth-child(even){background:color-mix(in srgb,#fff 3%,var(--hk-card));}
@@ -7359,12 +7377,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.81'; // v1.2.81: Meine Karte – Form der letzten 4 Wochen
-const APP_VERSION_LABEL='1.2.81';
+const APP_VERSION='1.2.82'; // v1.2.82: Feinschliff – Nacht, Kontrast, Statistik
+const APP_VERSION_LABEL='1.2.82';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1793634402851; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1793636064443; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -12433,6 +12451,8 @@ function pcHtml(p){
 // circle next to the name read like a radio button
 function _avIni(p){const n=String((typeof getDisplayName==='function'&&getDisplayName(p))||(p&&p.name)||'').trim();return escapeHtml((n.split(/\s+/).map(x=>x[0]||'').join('').slice(0,2)||'?').toUpperCase());}
 function pctColor(pct){return pct>=80?'var(--cp)':pct>=60?'var(--ce)':'var(--ca)';}
+// as text (1.2.82): #F39C12 on white was 2.2:1
+function pctInk(pct){return pct>=80?'var(--hx-ok,#1E6B46)':pct>=60?'var(--hx-warn,#8A5212)':'var(--hx-bad,#A52F35)';}
 
 // ══════════════════════════════
 //  MAIN RENDER
@@ -16616,7 +16636,7 @@ function _ptParts(r){
 function dbRenderPlayTimeCard(data){
   const t=computePlayTime(data.block,data.season),e=escapeHtml;
   const cur=data.team===UI.currentTeam&&data.season===UI.currentSeason;
-  let h='<div class="db-section db-pt"><div class="db-h">\u23f1 Spielzeit'
+  let h='<div class="db-section db-pt"><div class="db-h">Spielzeit'
     +(t.n?'<span class="db-h-sub">aus '+t.n+' Spielbericht'+(t.n===1?'':'en')+' \u00b7 wer am wenigsten spielt, steht oben</span>':'')+'</div>';
   if(!t.n)return h+'<div class="u-empty"><div class="u-empty-icon">\u23f1</div><div class="u-empty-txt">Noch kein Spielbericht. Tragt nach dem Spiel Startelf und Wechsel ein (im Spiel → „Spielbericht“) – dann rechnet die App die Minuten jedes Spielers selbst.</div></div></div>';
   if(!t.rows.length)return h+'<div class="u-empty"><div class="u-empty-txt">Noch kein Spieler mit Spielbericht.</div></div></div>';
@@ -18428,7 +18448,7 @@ function dbRenderLoadCard(data){
   const rows=Object.entries(m.perPlayer)
     .filter(([,v])=>v.row.some(c=>c.load>0));
   if(!rows.length){
-    return '<div class="db-section"><div class="db-h">\ud83d\udcaa Belastung (sRPE)</div>'
+    return '<div class="db-section"><div class="db-h">Belastung (sRPE)</div>'
       +'<div class="u-empty"><div class="u-empty-icon">\ud83d\udcaa</div>'
       +'<div class="u-empty-txt">Noch keine Belastungs-R\u00fcckmeldungen. Sobald Spieler nach dem Training bewerten, erscheint hier die Wochenauswertung.</div></div></div>';
   }
@@ -18454,7 +18474,7 @@ function dbRenderLoadCard(data){
   });
   const maxLoad=Math.max(1,...rows.flatMap(([,v])=>v.row.map(c=>c.load)));
   let html='<div class="db-section"><div class="db-h" style="display:flex;align-items:center;gap:8px;">'
-    +'<span style="flex:1;">\ud83d\udcaa Belastung (sRPE) \u00b7 Wochensummen</span>'
+    +'<span style="flex:1;">Belastung (sRPE) \u00b7 Wochensummen</span>'
     +'<button class="btn bs" style="font-size:.7rem;padding:4px 10px;" onclick="openRpeOverview()">\ud83d\udccb Alle Bewertungen</button></div>';
   if(spikes.length){
     html+='<div class="load-warn"><div class="load-warn-h">\u26a0\ufe0f Belastungssprung \u00fcber '+LOAD_SPIKE_PCT+'% \u2014 diese Woche dosieren</div>';
@@ -22826,7 +22846,7 @@ function dbRenderTopicCard(data){
   });
   const keys=Object.keys(topics).sort((a,b)=>topics[b].length-topics[a].length);
   if(!keys.length)return '';
-  let html='<div class="db-card"><div class="db-h">\ud83c\udfaf Spiel-Themen <span class="db-h-sub">(Team-\u00d8 Einsatz \u00b7 1 = stark)</span></div>';
+  let html='<div class="db-card"><div class="db-h">Spiel-Themen <span class="db-h-sub">(Team-\u00d8 Einsatz \u00b7 1 = stark)</span></div>';
   keys.forEach(t=>{
     const arr=topics[t].sort((a,b)=>a.k-b.k);
     const overall=arr.reduce((s,e)=>s+e.avg,0)/arr.length;
@@ -22987,6 +23007,7 @@ function _attStrip(seq){
 }
 function _attHtml(data){
   const A=_attCompute(data.block,data.season);
+  _attHtml.n=A.rows.length;
   const cur=data.team===UI.currentTeam&&data.season===UI.currentSeason;
   const nm=p=>escapeHtml((typeof getDisplayName==='function'?getDisplayName(p):p.name)||'');
   let h='<section class="db-card wba-card" aria-label="Wer braucht Aufmerksamkeit?"><div class="db-h">Wer braucht Aufmerksamkeit?</div>';
@@ -23066,8 +23087,8 @@ function renderDashboard(){
   // six tiles used to say the same three times (71 / 71 / 70 %, Ø 13 / 13).
   {
     const _att=canEdit()&&_attShow(data);
-    html+='<div class="sbi-top'+(_att?'':' ro')+'">';
-    if(_att){try{html+=_attHtml(data);}catch(e){console.error('[Aufmerksamkeit]',e);}}
+    let _ah='';if(_att){try{_ah=_attHtml(data);}catch(e){console.error('[Aufmerksamkeit]',e);}}
+    html+='<div class="sbi-top'+(_ah&&_attHtml.n>2?'':' ro')+'">'+_ah;
     html+=_statSumHtml(data,m,sb);
     html+='</div>';
   }
@@ -23078,12 +23099,12 @@ function renderDashboard(){
   // Statistik tab). Rows open the profile only for the team/season on screen.
   if(_hxOn()){
     const _cur=data.team===UI.currentTeam&&data.season===UI.currentSeason;
-    html+='<div class="db-section db-alltab"><div class="db-h">🏆 Alle Spieler <span class="db-h-sub">(antippen zum Sortieren)</span></div>'
+    html+='<div class="db-section db-alltab"><div class="db-h">Alle Spieler <span class="db-h-sub">(antippen zum Sortieren)</span></div>'
       +_statsPlayerTable(data.block,{noHead:true,wrap:'overflow-x:auto;',open:pi=>_cur?`jumpToPlayer(${pi},_hxLeave('moDashboard'));`:''})+'</div>';
   }
   if(_ro){
     const months=Object.keys(monthly).sort();
-    if(months.length)html+='<div class="db-section"><div class="db-h">📈 Anwesenheit pro Monat</div>'+dbRenderTrendChart(monthly,months)+'</div>';
+    if(months.length)html+='<div class="db-section"><div class="db-h">Anwesenheit pro Monat</div>'+dbRenderTrendChart(monthly,months)+'</div>';
     html+=`<div class="db-meta">Datenstand: ${new Date().toLocaleDateString('de-DE')} · ${data.team} · ${data.season}</div>`;
     el.innerHTML=html;
     return;
@@ -23098,7 +23119,7 @@ function renderDashboard(){
   if(topicCard)html+=topicCard;
   // Rankings: side by side
   html+='<div class="db-rank-row">';
-  html+='<div class="db-rank-col"><div class="db-h">🏆 Top 5 Anwesenheit</div>';
+  html+='<div class="db-rank-col"><div class="db-h">Top 5 Anwesenheit</div>';
   if(ranked.length===0){html+='<div class="db-empty">Nicht genug Daten</div>';}
   else{html+='<div class="db-rank-list">';
     ranked.slice(0,5).forEach((r,i)=>{
@@ -23108,7 +23129,7 @@ function renderDashboard(){
     html+='</div>';
   }
   html+='</div>';
-  html+='<div class="db-rank-col"><div class="db-h">⚠ Top 5 Fehlend</div>';
+  html+='<div class="db-rank-col"><div class="db-h">Top 5 Fehlend</div>';
   if(ranked.length===0){html+='<div class="db-empty">Nicht genug Daten</div>';}
   else{
     const worst=ranked.slice().reverse().slice(0,5);
@@ -23119,26 +23140,26 @@ function renderDashboard(){
   html+='</div>';
   html+='</div>';
   // Weekday analysis
-  html+='<div class="db-section"><div class="db-h-flex"><div class="db-h" style="margin-bottom:0;">📅 Anwesenheit pro Wochentag</div>'
+  html+='<div class="db-section"><div class="db-h-flex"><div class="db-h" style="margin-bottom:0;">Anwesenheit pro Wochentag</div>'
 +'<div class="db-wd-controls">'
 +'<div class="db-tog"><button class="'+(wdTime==='past'?'active':'')+'" onclick="setDbWeekdayTime(\'past\')">Absolviert</button><button class="'+(wdTime==='future'?'active':'')+'" onclick="setDbWeekdayTime(\'future\')">Geplant</button></div>'
 +'<div class="db-tog"><button class="'+(wdType==='all'?'active':'')+'" onclick="setDbWeekdayType(\'all\')">Beides</button><button class="'+(wdType==='training'?'active':'')+'" onclick="setDbWeekdayType(\'training\')">Trainings</button><button class="'+(wdType==='match'?'active':'')+'" onclick="setDbWeekdayType(\'match\')">Spiele</button></div>'
 +'</div></div>'+dbRenderWeekday(wd,wdTime)+'</div>';
   // Birthdays + Position coverage side-by-side
   html+='<div class="db-two-col">';
-  html+='<div class="db-card"><div class="db-h">🎂 Geburtstage (nächste 30 Tage)</div>'+dbRenderBirthdays(bday)+'</div>';
-  html+='<div class="db-card"><div class="db-h">🦵 Position-Übersicht</div>'+dbRenderPositions(posD)+'</div>';
+  html+='<div class="db-card"><div class="db-h">Geburtstage (nächste 30 Tage)</div>'+dbRenderBirthdays(bday)+'</div>';
+  html+='<div class="db-card"><div class="db-h">Positionen</div>'+dbRenderPositions(posD)+'</div>';
   html+='</div>';
   // Monthly trend chart
   const months=Object.keys(monthly).sort();
   if(months.length){
-    html+='<div class="db-section"><div class="db-h">📈 Anwesenheit pro Monat</div>';
+    html+='<div class="db-section"><div class="db-h">Anwesenheit pro Monat</div>';
     html+=dbRenderTrendChart(monthly,months);
     html+='</div>';
   }
   // Season comparison
   if(seasonComp.length){
-    html+='<div class="db-section"><div class="db-h">📅 Saisonvergleich</div>';
+    html+='<div class="db-section"><div class="db-h">Saisonvergleich</div>';
     html+='<div class="db-compare-table">';
     html+='<div class="db-compare-row db-compare-head">';
     html+='<div>Saison</div><div>Gesamt</div><div>Training</div><div>Spiele</div><div>Ø Training</div>';
@@ -24600,7 +24621,7 @@ function openPlayerStats(pi,opts){
   const tA=tIdx.filter(i=>p.s&&p.s[i]===1).length,tPl=tIdx.filter(i=>p.s&&_isFact(p.s[i])).length;
   const mA=mIdx.filter(i=>p.s&&p.s[i]===1).length,mPl=mIdx.filter(i=>p.s&&_isFact(p.s[i])).length;
   const tPct=tPl?Math.round((tA/tPl)*100):0,mPct=mPl?Math.round((mA/mPl)*100):0;
-  const tBc=pctColor(tPct),mBc=pctColor(mPct);
+  const tBc=pctInk(tPct),mBc=pctInk(mPct);
   {
     const allA=tA+mA,allPl=tPl+mPl;
     const allPct=allPl?Math.round(allA/allPl*100):null;
@@ -24629,7 +24650,7 @@ function openPlayerStats(pi,opts){
   });
   document.getElementById('ps-months').innerHTML=Object.entries(moMap).map(([mo,st])=>{
     const pct=st.tPl?Math.round((st.tA/st.tPl)*100):null;const bc=pct!==null?pctColor(pct):'#ccc';
-    return `<div class="fr"><div class="fr-nm">${mo}</div><div class="fr-bw"><div class="fr-bar" style="width:${Math.min(pct||0,100)}%;background:${bc};"></div></div><div class="fr-val" style="color:${bc};">${pct!==null?pct+'%':'–'}</div><div style="flex-shrink:0;font-size:.63rem;color:var(--gm);text-align:right;min-width:52px;">${st.tA}/${st.tPl}${st.mPl?' ⚽'+st.mA+'/'+st.mPl:''}</div></div>`;
+    return `<div class="fr"><div class="fr-nm">${mo}</div><div class="fr-bw"><div class="fr-bar" style="width:${Math.min(pct||0,100)}%;background:${bc};"></div></div><div class="fr-val" style="color:${pct!==null?pctInk(pct):'var(--gm)'};">${pct!==null?pct+'%':'–'}</div><div style="flex-shrink:0;font-size:.63rem;color:var(--gm);text-align:right;min-width:52px;">${st.tA}/${st.tPl}${st.mPl?' ⚽'+st.mA+'/'+st.mPl:''}</div></div>`;
   }).join('')||'<p style="font-size:.72rem;color:var(--gm);">Keine Daten.</p>';
   // Focuses
   const focMap={};foc.forEach(f=>focMap[f]={a:0,pl:0});
@@ -27658,7 +27679,9 @@ function _hxBandFit(){
   if(bar.contains(document.activeElement))return;
   if(bar.parentElement!==tb)tb.insertBefore(bar,tb.querySelector('.toolbar-r'));
   document.body.classList.add('mx-inband');
-  if(tb.clientWidth&&(tb.scrollWidth>tb.clientWidth+1||bar.scrollWidth>bar.clientWidth+1))below();
+  const _r=tb.querySelector('.toolbar-r'),_pr=parseFloat(getComputedStyle(tb).paddingRight)||0;
+  const _over=!!_r&&_r.getBoundingClientRect().right>tb.getBoundingClientRect().right-_pr+1;
+  if(tb.clientWidth&&(_over||tb.scrollWidth>tb.clientWidth+1||bar.scrollWidth>bar.clientWidth+1))below();
 }
 window.addEventListener('resize',()=>{clearTimeout(window._hxBandT);window._hxBandT=setTimeout(_hxBandFit,160);});
 try{document.fonts&&document.fonts.ready.then(()=>_hxBandFit());}catch(e){}
@@ -29447,7 +29470,7 @@ let statsSort={col:'pct',asc:false};
 // it rests on 2 sessions or 20, and the counts alone need doing the sum
 function _stPc(a,n,pct,what){
   if(!n)return '<td class="st-pc">–</td>';
-  return `<td class="st-pc" title="${a} von ${n} ${what} da"><b style="color:${pctColor(pct)};">${pct}%</b><small>${a}/${n}</small></td>`;
+  return `<td class="st-pc" title="${a} von ${n} ${what} da"><b style="color:${pctInk(pct)};">${pct}%</b><small>${a}/${n}</small></td>`;
 }
 function _statsPlayerTable(D,opts){
   opts=opts||{};
@@ -39191,7 +39214,7 @@ _pubCleanupSchedule();
   <div style="border:1px solid var(--gl);border-radius:8px;padding:11px 13px;margin-bottom:10px;">
     <div style="font-weight:700;color:var(--bd);margin-bottom:6px;font-size:.86rem;">⏱ Sitzungsdauer</div>
     <p style="font-size:.74rem;color:var(--gm);margin:0 0 10px;line-height:1.4;">Nach wie vielen Tagen ohne Aktivität muss man sich neu anmelden (gilt nur für dich auf diesem Gerät).</p>
-    <select id="moSessionExpiry" onchange="setUserSessionExpiry(this.value)" style="width:100%;padding:7px 9px;border:1px solid var(--gl);border-radius:6px;font-family:'Barlow',sans-serif;font-size:.82rem;background:#fff;outline:none;">
+    <select id="moSessionExpiry" onchange="setUserSessionExpiry(this.value)" style="width:100%;padding:7px 9px;border:1px solid var(--gl);border-radius:6px;font-family:'Barlow',sans-serif;font-size:.82rem;outline:none;">
       <option value="7">7 Tage</option>
       <option value="30">30 Tage</option>
       <option value="90">90 Tage (Standard)</option>
