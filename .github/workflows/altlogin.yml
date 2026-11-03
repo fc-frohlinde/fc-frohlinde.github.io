@@ -1,0 +1,35 @@
+# Flutlicht · Alte Anmeldung entfernen
+# Once, by hand: finds the old login's password/PIN hashes and passkey ids in
+# the data (left as the way back to 1.2.70) and, with "loeschen", removes
+# them. Counts only in the log. Code: tools/zugang/altlogin.mjs.
+name: Alte Anmeldung
+
+on:
+  workflow_dispatch:
+    inputs:
+      loeschen:
+        description: 'Удалить найденное (иначе только посчитать)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  aufraeumen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: tools/zugang
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci --omit=dev --no-audit --no-fund
+        working-directory: tools/zugang
+      - run: node altlogin.mjs
+        working-directory: tools/zugang
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          LOESCHEN: ${{ inputs.loeschen }}
