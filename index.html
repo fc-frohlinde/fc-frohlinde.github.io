@@ -3284,6 +3284,55 @@ body.design-heute .lp-sq-bar{background:#EAF1FB;border-bottom-color:#CFDDF2;colo
 body.design-heute .lp-sq-bar.warn{background:#FFF4E5;border-bottom-color:#F3D9B1;color:#5A3A00;}
 body.design-heute .lp-sq-btn{background:var(--hx-blue);color:#fff;}
 .slp-pick-item.lp-nik,#lp-kader-list>div.lp-nik{opacity:.62;}
+/* Varianten (1.2.89): one strip above the pitch to switch between the trainers'
+   lineups; a second line while another one is shown read-only */
+.lp-var-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:8px 12px;flex-shrink:0;font-size:.78rem;line-height:1.35;color:#fff;background:rgba(0,0,0,.22);border-bottom:1px solid rgba(255,255,255,.12);}
+.lv-h{font-weight:700;font-size:.76rem;color:rgba(255,255,255,.7);}
+.lv-pills{display:flex;gap:6px;min-width:0;overflow-x:auto;scrollbar-width:none;}
+.lv-pills::-webkit-scrollbar{display:none;}
+.lv-pill{display:inline-flex;align-items:center;gap:6px;flex-shrink:0;min-height:36px;padding:0 13px;border-radius:999px;border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;font:700 .82rem 'Barlow',sans-serif;cursor:pointer;white-space:nowrap;}
+.lv-pill.on{background:#fff;border-color:#fff;color:#0E2350;}
+.lv-pill:focus-visible,.lv-b:focus-visible,.lv-fix:focus-visible{outline:2px solid #5B9BFF;outline-offset:2px;}
+.lv-s{font-weight:500;opacity:.72;}
+.lv-gilt{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;background:#DDF3E4;color:#1B6E37;font:800 .68rem 'Barlow',sans-serif;}
+.lv-legend{margin-left:auto;font-size:.72rem;color:rgba(255,255,255,.6);}
+.lv-view{flex:1 1 100%;display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:9px 12px;border-radius:12px;background:rgba(242,194,48,.16);border:1px solid rgba(242,194,48,.45);}
+.lv-vt{flex:1 1 280px;min-width:0;}
+.lv-key{display:inline-flex;align-items:center;gap:5px;white-space:nowrap;opacity:.85;}
+.lv-ring{display:inline-block;width:12px;height:12px;border-radius:50%;border:2px dashed #E0A800;}
+.lv-acts{display:flex;gap:8px;flex-wrap:wrap;}
+.lv-b{min-height:36px;padding:0 15px;border-radius:999px;border:1px solid rgba(255,255,255,.4);background:transparent;color:#fff;font:700 .8rem 'Barlow',sans-serif;cursor:pointer;white-space:nowrap;}
+.lv-b.pri{background:#e8c840;border-color:#e8c840;color:#0e2350;}
+.lv-ok{align-self:center;font-weight:800;color:#7FD49A;white-space:nowrap;}
+.lv-fix{display:block;margin:7px auto 0;border:0;background:none;padding:4px 6px;color:#e8c840;font:700 .76rem 'Barlow',sans-serif;cursor:pointer;text-decoration:underline;text-underline-offset:3px;}
+#moLineup.lp-ro :is(#lp-fmt-btns,.lp-kind-wrap,#lp-save-btn,#lp-hint),#moLineup.lp-ro .lp-sidebar button[onclick="lpClearAll()"]{opacity:.4;pointer-events:none;}
+#moLineup.lp-ro :is(.lp-slot-g,.lp-sub-circle){cursor:default !important;}
+#moLineup.lp-ro .lp-un-chip{pointer-events:none;}
+@media(max-width:600px){.lv-h,.lv-legend{display:none;}.lv-view{padding:9px 10px;}.lv-acts{flex:1 1 100%;}.lv-b{flex:1 1 0;padding:0 10px;}}
+body.design-heute .lp-var-bar{background:var(--hx-card);border-bottom-color:var(--hx-line);color:var(--hx-ink);}
+body.design-heute :is(.lv-h,.lv-legend){color:var(--hx-muted);}
+body.design-heute .lv-pill{background:var(--hx-field);border-color:var(--hx-line);color:var(--hx-ink);}
+body.design-heute .lv-pill.on{background:var(--hx-ink);border-color:var(--hx-ink);color:#fff;}
+body.design-heute .lv-pill:focus-visible,body.design-heute .lv-b:focus-visible,body.design-heute .lv-fix:focus-visible{outline-color:var(--hx-blue);}
+body.design-heute .lv-view{background:#FFF7DC;border-color:#F0D680;color:#3F3000;}
+body.design-heute .lv-b{background:#fff;border-color:#DCC67E;color:#3F3000;}
+body.design-heute .lv-b.pri{background:var(--hx-blue);border-color:var(--hx-blue);color:#fff;}
+body.design-heute .lv-ok{color:#1B6E37;}
+body.design-heute .lv-fix{color:var(--hx-blue);}
+body.design-heute.hxk-dk .lp-var-bar{background:var(--hk-card);border-bottom-color:var(--hk-line);color:var(--hk-ink);}
+body.design-heute.hxk-dk :is(.lv-h,.lv-legend){color:var(--hk-muted);}
+body.design-heute.hxk-dk .lv-pill{background:var(--hk-card2);border-color:var(--hk-line);color:var(--hk-ink);}
+body.design-heute.hxk-dk .lv-pill.on{background:var(--hk-ink);border-color:var(--hk-ink);color:var(--hk-card);}
+body.design-heute.hxk-dk .lv-gilt{background:var(--hk-ok-bg);color:var(--hk-ok);}
+body.design-heute.hxk-dk .lv-view{background:var(--hk-warn-bg);border-color:color-mix(in srgb,var(--hk-warn) 45%,var(--hk-card));color:var(--hk-ink);}
+body.design-heute.hxk-dk .lv-b:not(.pri){background:var(--hk-card2);border-color:var(--hk-line);color:var(--hk-ink);}
+body.design-heute.hxk-dk .lv-ok{color:var(--hk-ok);}
+body.design-heute.hxk-dk .lv-fix{color:var(--hk-blue);}
+/* Nacht, found on the way (1.2.89): a filled bench place was white with white
+   text, and the squad strip stayed light */
+body.design-heute.hxk-dk .lp-sub-circle.filled{background:color-mix(in srgb,var(--surface-mid) 85%,transparent) !important;border-color:rgba(255,255,255,.55) !important;}
+body.design-heute.hxk-dk .lp-sq-bar{background:color-mix(in srgb,var(--hk-blue) 16%,var(--hk-card));border-bottom-color:var(--hk-line);color:var(--hk-ink);}
+body.design-heute.hxk-dk .lp-sq-bar.warn{background:var(--hk-warn-bg);border-bottom-color:color-mix(in srgb,var(--hk-warn) 40%,var(--hk-card));color:var(--hk-ink);}
 .lp-nik-t{margin-left:6px;font-size:.6rem;font-weight:600;color:rgba(255,255,255,.6);white-space:nowrap;}
 body.design-heute .lp-nik-t{color:var(--hx-muted);}
 .sqd-acts{display:flex;align-items:center;flex-wrap:wrap;gap:6px 16px;margin-top:10px;}
@@ -7417,12 +7466,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.88'; // v1.2.88: Einstellungen – wer was ändert
-const APP_VERSION_LABEL='1.2.88';
+const APP_VERSION='1.2.89'; // v1.2.89: Aufstellung – jeder Trainer seine Variante
+const APP_VERSION_LABEL='1.2.89';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1793820914636; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1793825610746; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -7442,6 +7491,7 @@ const FL_MARK='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F
 function _clubSlug(){return (_clubName()||'Flutlicht').replace(/[^A-Za-z0-9ÄÖÜäöüß]+/g,'-').replace(/^-|-$/g,'')||'Flutlicht';}
 function _clubInfo(){const c=(G&&G.club&&typeof G.club==='object')?G.club:{};return {name:_clubName(),resp:String(c.resp||''),addr:String(c.addr||''),mail:String(c.mail||''),dsb:String(c.dsb||'')};}
 const APP_NEWS=[
+  {id:'20261104-2',d:'04.11.',t:'Aufstellung: jeder seine Variante',x:'Jeder Trainer speichert seine eigene Aufstellung fürs Spiel und sieht oben unter „Varianten“ die der anderen. Mit „Für das Spiel festlegen“ bestimmt ihr, welche für Kader und Statistik zählt.',go:['Zur Aufstellung','hxOpenLineup()']},
   {id:'20261101-1',d:'01.11.',t:'Wer braucht Aufmerksamkeit?',x:'Oben in der Statistik: wer gerade in Folge fehlt, seltener kommt als sonst, nach längerer Zeit wieder da ist, wenig spielt oder mehrmals schwachen Einsatz hatte. Jeder wird mit sich selbst und mit der Mannschaft verglichen: Wer in den Ferien wie viele andere fehlt, fällt nicht auf.',go:['Zur Statistik',"hxGo('stats')"]},
   {id:'20261028-2',d:'28.10.',t:'Rückblick nach dem Training',x:'Nach „Anwesenheit erfassen“ fragt die App kurz: Wie lief’s, was lief gut, was ändern wir? Mit Plan auch, ob jede Übung gepasst hat. „Was ändern wir?“ steht beim nächsten Training wieder da, „anpassen“ bei der Übung im Trainingsplaner.',go:['Zum letzten Training','rvGoLast()']},
   {id:'20261028-1',d:'28.10.',t:'Notizen zum Gegner',x:'Im Spiel-Fenster unter „Notizen zum Gegner“ haltet ihr fest, wie ein Gegner spielt, worauf ihr achten müsst und was beim Platz wichtig ist. Vor dem nächsten Spiel gegen ihn steht alles wieder da – mit den Ergebnissen und Notizen der bisherigen Spiele.',go:['Zum nächsten Spiel','oppGoNext()']},
@@ -9563,14 +9613,15 @@ function _sanitizeSeasonLineupRefs(data){
     }
     // Clean matchLineups too (same kind of stale data possible)
     if(data.matchLineups&&typeof data.matchLineups==='object'){
-      Object.entries(data.matchLineups).forEach(([key,lu])=>{
-        if(!lu)return;
+      Object.entries(data.matchLineups).forEach(([key,lu0])=>{
+        if(!lu0)return;
         // key format: "team__season__idx" — extract teamSeason
         const lastSep=key.lastIndexOf('__');
         if(lastSep<0)return;
         const teamSeason=key.slice(0,lastSep);
         const maxPi=teamCounts[teamSeason];
         if(typeof maxPi!=='number')return;
+        _mlParts(lu0).forEach(lu=>{   // 1.2.89: the trainers' variants too
         if(lu.slots&&typeof lu.slots==='object'){
           Object.keys(lu.slots).forEach(slotId=>{
             const v=lu.slots[slotId];
@@ -9580,6 +9631,7 @@ function _sanitizeSeasonLineupRefs(data){
         if(Array.isArray(lu.subs))lu.subs=lu.subs.filter(v=>typeof v!=='number'||(v>=0&&v<maxPi));
         // Guests list — same out-of-bounds cleanup
         if(Array.isArray(lu.guests))lu.guests=lu.guests.filter(v=>typeof v!=='number'||(v>=0&&v<maxPi));
+        });
       });
     }
     // Clean slpConfirmations: confirmed[pi] = true keyed by player index.
@@ -9911,6 +9963,7 @@ function startFbListener(){
       }catch(e){console.warn('[FB drift check]',e);}
       // Mark synced — data is fresh from Firebase right now
       if(typeof _markSynced==='function')_markSynced();
+      try{if(typeof _lvRemote==='function')_lvRemote();}catch(e){}
       // Check remote app version — show update banner if remote is newer
       if(typeof _checkRemoteAppVersion==='function')_checkRemoteAppVersion();
       // If user is actively typing in an input/textarea, skip the render to not steal focus / overwrite their input
@@ -17739,7 +17792,7 @@ function _lpOpenOn(si){const el=document.getElementById('moLineup');return !!(el
 function _sqLuInfo(D,si){
   const s=D&&D.sessions&&D.sessions[si];if(!s)return null;
   let lu;
-  if(_lpOpenOn(si))lu=lpState;
+  if(_lpOpenOn(si))lu=_lvView?_lvView.mine:lpState;
   else{
     lu=G.matchLineups&&G.matchLineups[_mlKey(UI.currentTeam,UI.currentSeason,si)];
     if(!lu||(lu.sessDate&&lu.sessDate!==s.date))return null;   // saved for another date: sessions moved since
@@ -17773,6 +17826,7 @@ function _lpSqSet(){
 // full, who comes without a place
 function _lpSqBar(){
   const el=document.getElementById('lp-sq-bar');if(!el)return;
+  if(_lvView){el.style.display='none';el.innerHTML='';return;}
   const D=cd(),si=lpState.sessIdx,s=(si!=null&&D&&D.sessions)?D.sessions[si]:null,e=escapeHtml;
   let h='',cls='';
   if(s&&s.type==='match'&&typeof canEdit==='function'&&canEdit()&&!_sqStarted(s,UI.currentSeason)){
@@ -31749,8 +31803,9 @@ function cleanPlayerFromLineups(team,deletedPi){
     const seasonPrefix=team+'__'+UI.currentSeason+'__';
     Object.keys(G.matchLineups).forEach(key=>{
       if(!key.startsWith(seasonPrefix))return;
-      const lineup=G.matchLineups[key];
-      if(!lineup)return;
+      const _ml=G.matchLineups[key];
+      if(!_ml)return;
+      _mlParts(_ml).forEach(lineup=>{   // 1.2.89: the trainers' variants too
       if(lineup.slots&&typeof lineup.slots==='object'){
         const newSlots={};
         Object.keys(lineup.slots).forEach(slotId=>{
@@ -31772,6 +31827,7 @@ function cleanPlayerFromLineups(team,deletedPi){
           .filter(v=>!(typeof v==='number'&&v===deletedPi))
           .map(v=>(typeof v==='number'&&v>deletedPi)?v-1:v);
       }
+      });
     });
   }
   // Standalone lineups (G.lineups[]) - team field check + pi shift
@@ -33905,6 +33961,7 @@ function lpUnavailState(playerRef){
 }
 // One tap frees the position so an available player can take it
 function lpClearUnavail(where,key){
+  if(_lvView){_lvRO();return;}
   // _lpSetSlotPlayer handles both pitch slots and bench positions (sub_N),
   // so it is the one path that keeps the state consistent.
   if(where==='slot')_lpSetSlotPlayer(key,null);
@@ -33926,6 +33983,7 @@ function lpUnavailInLineup(){
   return out;
 }
 function lpSetMatchKind(kind){
+  if(_lvView){_lvRO();return;}
   if(kind!=='test'&&kind!=='meisterschaft')return;
   if(lpState.matchKind===kind)return;
   lpState.matchKind=kind;
@@ -37035,6 +37093,7 @@ function openLineupPlanner(sessIdx){
   if(!el)return;
   lpState.openSlot=null;lpState.selectedSlot=null;lpState.selectedBench=null;
   lpState.editing=false;
+  _lvView=null;_lvMarkCache=null;el.classList.remove('lp-ro');
   lpState.sessIdx=(sessIdx!==undefined&&sessIdx!==null)?sessIdx:null;
   // Track session identity so lpSave can detect drift if another trainer
   // deleted/added sessions while planner was open.
@@ -37052,7 +37111,9 @@ function openLineupPlanner(sessIdx){
   if(lpState.sessIdx!==null){
     if(!G.matchLineups)G.matchLineups={};
     const key=_mlKey(UI.currentTeam,UI.currentSeason,lpState.sessIdx);
-    const saved=G.matchLineups[key];
+    // 1.2.89: one's own variant first, else the lineup that counts
+    const _ml0=G.matchLineups[key],_me0=_lvMe();
+    const saved=(_ml0&&_me0&&_ml0.vars&&_ml0.vars[_me0.k])||_ml0;
     if(saved){
       lpState.formation=saved.formation||'4-2-3-1';
       lpState.slots={...(saved.slots||{})};
@@ -37102,11 +37163,12 @@ function openLineupPlanner(sessIdx){
 let _lpOpenSnap=null;
 function _lpSnapshot(){
   try{
+    const o=_lvView?_lvView.mine:lpState;
     return JSON.stringify({
-      f:lpState.formation,
-      s:lpState.slots||{},
-      subs:lpState.subs||[],
-      cs:lpState.customSlots||null
+      f:o.formation,
+      s:o.slots||{},
+      subs:o.subs||[],
+      cs:o.customSlots||null
     });
   }catch(e){return null;}
 }
@@ -37116,6 +37178,7 @@ function _lpIsDirty(){
 }
 function closeLineupPlanner(){
   if(typeof _lpDragCleanup==='function')_lpDragCleanup(); // never leave a ghost on screen
+  if(_lvView)lvBack(true);   // back to one's own before the save check
   if(_lpIsDirty()&&typeof canEdit==='function'&&canEdit()){
     const named=Object.values(lpState.slots||{}).filter(v=>v!=null).length;
     const subs=(lpState.subs||[]).filter(v=>v!=null).length;
@@ -37132,8 +37195,230 @@ function closeLineupPlanner(){
 }
 
 function lpGetLineups(){if(!G.lineups)G.lineups=[];return G.lineups;}
+// ── Varianten (1.2.89) ──────────────────────────────────────────
+// Every trainer keeps his own lineup for a match in G.matchLineups[key].vars
+// (keyed by who saved it). The lineup itself (slots, subs, …) is still the one
+// that counts – for the squad check, the Startelf and the statistics – and
+// follows the variant named in src: the first one saved, or the one a trainer
+// "festlegt". Another trainer's variant opens read-only (_lvView holds one's
+// own working state meanwhile); "In meine übernehmen" makes it one's own.
+var _lvView=null,_lvMarkCache=null;
+function _mlParts(lu){
+  if(!lu||typeof lu!=='object')return [];
+  const v=(lu.vars&&typeof lu.vars==='object')?Object.values(lu.vars).filter(x=>x&&typeof x==='object'):[];
+  return [lu,...v];
+}
+function _lvMe(){
+  if(!CU)return null;
+  if(CU.role==='admin')return {k:'admin',by:'Admin'};
+  if(CU.role!=='trainer')return null;
+  const n=String(CU.name||'').trim();if(!n)return null;
+  return {k:'t_'+(n.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'').slice(0,40)||'x'),by:n.slice(0,60)};
+}
+function _lvName(by){
+  if(by==='Admin')return String((G&&G.adminAuth&&G.adminAuth.firstName)||'').trim()||'Admin';
+  return String(by||'').trim().split(/\s+/)[0]||'?';
+}
+function _lvGen(n){return /[sßxz]$/i.test(n)?n+'’':n+'s';}
+function _lvKey(){return (lpState.sessIdx===null||lpState.sessIdx===undefined)?null:_mlKey(UI.currentTeam,UI.currentSeason,lpState.sessIdx);}
+function _lvMl(){const k=_lvKey();return (k&&G&&G.matchLineups&&G.matchLineups[k])||null;}
+function _lvVars(ml){return (ml&&ml.vars&&typeof ml.vars==='object')?ml.vars:{};}
+function _lvSrc(ml){const v=_lvVars(ml);return (ml&&ml.src&&v[ml.src])?ml.src:null;}
+function _lvOthers(ml){const me=_lvMe(),v=_lvVars(ml);return Object.keys(v).filter(k=>v[k]&&typeof v[k]==='object'&&!(me&&k===me.k)).sort((a,b)=>(v[b].savedAt||0)-(v[a].savedAt||0));}
+function _lvOf(o){
+  return {formation:o.formation||'4-2-3-1',slots:{...(o.slots||{})},subs:[...(o.subs||[])],guests:[...(o.guests||[])],
+    customSlots:o.customSlots?{...o.customSlots}:null,matchKind:o.matchKind||'meisterschaft'};
+}
+function _lvLoad(o){
+  Object.assign(lpState,_lvOf(o));
+  lpSyncKindBtns();
+  renderFmtBtns('lp-fmt-btns',lpState.formation,'lpSetFormation');
+}
+function _lvRO(){
+  if(!_lvView)return false;
+  if(typeof showSaveFlash==='function')showSaveFlash('Nur ansehen – zum Ändern „In meine übernehmen“');
+  return true;
+}
+function _lvWhen(t){
+  if(!t)return '';
+  const d=new Date(t),n=new Date(),hm=d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+  const day=x=>new Date(x.getFullYear(),x.getMonth(),x.getDate()).getTime();
+  const dd=Math.round((day(n)-day(d))/864e5);
+  if(dd===0)return 'heute '+hm;
+  if(dd===1)return 'gestern '+hm;
+  if(dd>1&&dd<7)return ['So','Mo','Di','Mi','Do','Fr','Sa'][d.getDay()]+' '+hm;
+  return d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})+' '+hm;
+}
+function _lvXI(o){return Object.values((o&&o.slots)||{}).filter(v=>v!=null&&v!=='');}
+// a = the variant looked at, b = one's own
+function _lvDiff(a,b){
+  const xa=_lvXI(a),xb=_lvXI(b),sa=new Set(xa),sb=new Set(xb);
+  const add=xa.filter(p=>!sb.has(p)),drop=xb.filter(p=>!sa.has(p));
+  const same=(a.formation||'4-2-3-1')===(b.formation||'4-2-3-1')&&JSON.stringify(a.customSlots||null)===JSON.stringify(b.customSlots||null);
+  const slots=[];
+  if(same){
+    const lbl={};try{fmtSlots(a.formation||'4-2-3-1',a.customSlots||null).forEach(x=>{lbl[x.id]=x.lbl;});}catch(e){}
+    const ids=[...new Set([...Object.keys(a.slots||{}),...Object.keys(b.slots||{})])];
+    ids.forEach(id=>{
+      const pa=a.slots&&a.slots[id],pb=b.slots&&b.slots[id];
+      const na=pa!=null&&pa!=='',nb=pb!=null&&pb!=='';
+      if((!na&&!nb)||(na&&nb&&pa===pb))return;
+      slots.push({id,lbl:lbl[id]||id,pa:na?pa:null,pb:nb?pb:null});
+    });
+  }
+  return {add,drop,same,slots,n:xa.length};
+}
+function _lvNm(pid){const p=lpResolvePlayer(pid);return p?(typeof getDisplayName==='function'?getDisplayName(p):p.name)||'?':'?';}
+function _lvSum(d,a){
+  if(!d.n)return 'noch leer';
+  const out=[];
+  if(!d.same)out.push(a.formation||'4-2-3-1');
+  if(d.add.length)out.push(d.add.length+(d.add.length===1?' anderer Spieler':' andere Spieler'));
+  else if(d.same&&d.slots.length)out.push(d.slots.length===1?'1 Position anders':d.slots.length+' Positionen anders');
+  return out.length?out.join(' · '):'gleiche Startelf';
+}
+function _lvDetail(d,a,b){
+  if(!d.n)return 'Noch keine Spieler gesetzt.';
+  const few=it=>it.length>3?it.slice(0,3).join(', ')+' und '+(it.length-3)+' weitere':it.join(', ');
+  if(d.same){
+    if(!d.slots.length)return 'Gleiche Startelf wie deine.';
+    return 'Anders als deine: '+few(d.slots.map(x=>x.pa!=null&&x.pb!=null?_lvNm(x.pa)+' statt '+_lvNm(x.pb)+' ('+x.lbl+')'
+      :x.pa!=null?_lvNm(x.pa)+' auf '+x.lbl:x.lbl+' frei'))+'.';
+  }
+  let t='Formation '+(a.formation||'4-2-3-1')+' (deine: '+(b.formation||'4-2-3-1')+').';
+  if(d.add.length)t+=' Neu in der Startelf: '+few(d.add.map(_lvNm))+'.';
+  if(d.drop.length)t+=' Nicht dabei: '+few(d.drop.map(_lvNm))+'.';
+  return t;
+}
+// Pitch marks while looking at another variant: places that differ from one's own
+function _lvMarks(){
+  if(!_lvView)return null;
+  const d=_lvDiff(lpState,_lvView.mine);
+  if(d.same)return new Set(d.slots.filter(x=>x.pa!=null).map(x=>x.id));
+  const add=new Set(d.add);
+  return new Set(Object.keys(lpState.slots||{}).filter(id=>add.has(lpState.slots[id])));
+}
+function _lvRing(id,R){
+  return (_lvMarkCache&&_lvMarkCache.has(id))?`<circle r="${R+5}" pointer-events="none" style="fill:none;stroke:#F2C230;stroke-width:2.6;stroke-dasharray:5 3;filter:none"/>`:'';
+}
+function _lvBar(){
+  const el=document.getElementById('lp-var-bar');if(!el)return;
+  const ml=_lvMl(),others=_lvOthers(ml);
+  if(_lvKey()===null||!others.length){el.style.display='none';el.innerHTML='';return;}
+  const e=escapeHtml,me=_lvMe(),vars=_lvVars(ml),src=_lvSrc(ml);
+  const mine=_lvView?_lvView.mine:lpState,cur=_lvView?_lvView.k:(me?me.k:'');
+  const gilt='<span class="lv-gilt" title="Zählt für Kader und Statistik">✓ gilt</span>';
+  const pill=(k,label,sub,title,on)=>`<button type="button" class="lv-pill${on?' on':''}" aria-pressed="${on}" onclick="${on?'':(me&&k===me.k?'lvBack()':`lvView('${k}')`)}"${title?` title="${e(title)}"`:''}><span class="lv-n">${e(label)}</span>${sub?`<span class="lv-s">${e(sub)}</span>`:''}${src===k?gilt:''}</button>`;
+  const mv=me&&vars[me.k];
+  let h='<span class="lv-h">Varianten</span><div class="lv-pills" role="group" aria-label="Varianten">';
+  h+=pill(me?me.k:'',me?'Meine':'Aktuell',_lpIsDirty()?'geändert':(mv?'':'neu'),'',!_lvView);
+  others.forEach(k=>{const v=vars[k];h+=pill(k,_lvName(v.by),_lvWhen(v.savedAt),_lvSum(_lvDiff(v,mine),v),cur===k);});
+  h+='</div><span class="lv-legend">„gilt“ zählt für Kader und Statistik</span>';
+  const v=_lvView&&vars[_lvView.k];
+  if(v){
+    const d=_lvDiff(lpState,_lvView.mine),marks=_lvMarkCache&&_lvMarkCache.size;
+    h+=`<div class="lv-view" role="status"><span class="lv-vt"><b>Nur ansehen:</b> ${e(_lvGen(_lvName(v.by)))} Variante, gespeichert ${e(_lvWhen(v.savedAt))}. ${e(_lvDetail(d,lpState,_lvView.mine))}${marks?' <span class="lv-key"><i class="lv-ring" aria-hidden="true"></i>anders als in deiner</span>':''}</span>
+      <span class="lv-acts"><button type="button" class="lv-b" onclick="lvTake()">In meine übernehmen</button>${src===_lvView.k?'<span class="lv-ok">✓ gilt fürs Spiel</span>':`<button type="button" class="lv-b pri" onclick="lvFix('${_lvView.k}')">Für das Spiel festlegen</button>`}</span></div>`;
+  }
+  el.style.display='flex';
+  el.innerHTML=h;
+}
+// Sidebar: one's own variant – title, save button, state, "festlegen"
+function _lvSide(){
+  const el=document.getElementById('lp-saves-list'),ti=document.getElementById('lp-sb-title'),bt=document.getElementById('lp-save-btn');
+  if(!el)return;
+  const ml=_lvMl(),me=_lvMe(),vars=_lvVars(ml),src=_lvSrc(ml),others=_lvOthers(ml),mv=me&&vars[me.k];
+  if(ti)ti.textContent=others.length?'Meine Variante':'Aufstellung';
+  if(bt)bt.textContent=others.length?'💾 Meine Variante speichern':'💾 Aufstellung speichern';
+  const e=escapeHtml,dirty=_lpIsDirty();
+  let t;
+  if(dirty)t='Geändert – noch nicht gespeichert';
+  else if(mv)t='Gespeichert '+_lvWhen(mv.savedAt);
+  else if(src)t='Noch nicht gespeichert – Start: '+_lvGen(_lvName(vars[src].by))+' Variante';
+  else if(ml&&ml.savedAt)t='Gespeichert '+_lvWhen(ml.savedAt);
+  else t='Noch nicht gespeichert';
+  if(me&&src===me.k&&!dirty)t+=' · gilt fürs Spiel';
+  let h=e(t);
+  if(others.length&&me&&src!==me.k&&(mv||dirty)&&!_lvView)h+=`<button type="button" class="lv-fix" onclick="lvFix('${me.k}')">${dirty?'Speichern und für das Spiel festlegen':'Für das Spiel festlegen'}</button>`;
+  el.style.display='';
+  el.innerHTML=h;
+}
+function _lvSideReset(){
+  const ti=document.getElementById('lp-sb-title'),bt=document.getElementById('lp-save-btn'),bar=document.getElementById('lp-var-bar');
+  if(ti)ti.textContent='Gespeicherte Aufstellungen';
+  if(bt)bt.textContent='💾 Aufstellung speichern';
+  if(bar){bar.style.display='none';bar.innerHTML='';}
+}
+function _lvPaint(){
+  if(_lvKey()===null)return;
+  _lvBar();_lvSide();
+}
+function lvView(k){
+  const me=_lvMe();
+  if(me&&k===me.k){lvBack();return;}
+  const v=_lvVars(_lvMl())[k];if(!v)return;
+  if(typeof _lpDragCleanup==='function')_lpDragCleanup();
+  lpClosePopup();
+  lpState.editing=false;
+  if(!_lvView)_lvView={k,mine:_lvOf(lpState)};else _lvView.k=k;
+  _lvView.at=v.savedAt||0;
+  _lvLoad(v);
+  document.getElementById('moLineup')?.classList.add('lp-ro');
+  lpRender();
+}
+function lvBack(quiet){
+  if(!_lvView)return;
+  const m=_lvView.mine;_lvView=null;_lvMarkCache=null;
+  _lvLoad(m);
+  document.getElementById('moLineup')?.classList.remove('lp-ro');
+  if(!quiet)lpRender();
+}
+function lvTake(){
+  if(!_lvView)return;
+  const v=_lvVars(_lvMl())[_lvView.k],who=v?_lvGen(_lvName(v.by))+' Variante':'Die Variante';
+  // One's own unsaved changes would be lost: ask first
+  const m=_lvView.mine;
+  let mineDirty=false;try{mineDirty=_lpOpenSnap!=null&&JSON.stringify({f:m.formation,s:m.slots||{},subs:m.subs||[],cs:m.customSlots||null})!==_lpOpenSnap;}catch(e){}
+  if(mineDirty&&!confirm('Deine Änderungen sind noch nicht gespeichert und gehen dabei verloren.\n\nTrotzdem übernehmen?'))return;
+  _lvView=null;_lvMarkCache=null;   // lpState holds the variant: it becomes one's own, not saved yet
+  document.getElementById('moLineup')?.classList.remove('lp-ro');
+  lpRender();
+  if(typeof showSaveFlash==='function')showSaveFlash(who+' übernommen – jetzt speichern');
+}
+function lvFix(k){
+  if(!(typeof canEdit==='function'&&canEdit()))return;
+  if(_lvKey()===null)return;
+  const me=_lvMe(),own=!!(me&&k===me.k);
+  if(own){
+    if(_lvView)lvBack(true);
+    if(_lpIsDirty()||!_lvVars(_lvMl())[k])lpSave();
+  }
+  const ml=_lvMl(),v=_lvVars(ml)[k];if(!ml||!v)return;
+  const D=cd(),s=D&&D.sessions&&D.sessions[lpState.sessIdx];
+  snap();
+  Object.assign(ml,_lvOf(v),{savedAt:v.savedAt||Date.now(),sessDate:s?s.date:(ml.sessDate||null),season:UI.currentSeason,
+    src:k,fixedBy:String((CU&&CU.name)||'').slice(0,60),fixedAt:Date.now()});
+  saveG();
+  const who=own?'Deine Variante':_lvGen(_lvName(v.by))+' Variante';
+  try{logAudit('Aufstellung festgelegt',s?(s.date+(s.label?' · '+s.label:'')):'',own?'eigene Variante':_lvGen(_lvName(v.by))+' Variante');}catch(e){}
+  lpRender();
+  try{_sqRefresh(lpState.sessIdx);}catch(e){}
+  if(typeof showSaveFlash==='function')showSaveFlash('✓ '+who+' gilt jetzt fürs Spiel');
+}
+// Another trainer saved meanwhile: refresh the strip, and the variant shown
+function _lvRemote(){
+  const el=document.getElementById('moLineup');
+  if(!el||!el.classList.contains('open')||_lvKey()===null)return;
+  if(_lvView){
+    const v=_lvVars(_lvMl())[_lvView.k];
+    if(!v){lvBack();return;}
+    if((v.savedAt||0)!==_lvView.at){_lvView.at=v.savedAt||0;_lvLoad(v);lpRender();return;}
+  }
+  _lvPaint();
+}
 
 function lpSetFormation(f){
+  if(_lvView){_lvRO();return;}
   const oldSlots=FORMATIONS[lpState.formation]||[];
   const oldAssign={...lpState.slots};
   lpState.formation=f;
@@ -37227,6 +37512,7 @@ function lpRender(){
   const usedInSlots=new Set(Object.values(lpState.slots).filter(v=>v!==undefined));
   const svg=document.getElementById('lp-slots');
   if(!svg)return;
+  _lvMarkCache=_lvView?_lvMarks():null;
   // Heute: the field is drawn smaller, so are the slots (and the name sits
   // closer), which keeps every name clear of the circle below it
   const _hxp=typeof hxOn==='function'&&hxOn();
@@ -37264,8 +37550,9 @@ function lpRender(){
     }
 
     const _un=lpUnavailState(lpState.slots[slot.id]);
-    const _unMark=_un?`<circle r="${R}" fill="none" stroke="${_un==='F'?'#ff5a45':'#f39c12'}" stroke-width="3" opacity=".95"/>
-        <circle cx="${R-3}" cy="${-R+3}" r="7.5" fill="${_un==='F'?'#ff5a45':'#f39c12'}"/>
+    const _unC=_un==='F'?'#ff5a45':'#f39c12';
+    const _unMark=_un?`<circle r="${R}" style="fill:none;stroke:${_unC};stroke-width:3;stroke-dasharray:none;opacity:.95"/>
+        <circle cx="${R-3}" cy="${-R+3}" r="7.5" style="fill:${_unC};stroke:#fff;stroke-width:1.2;stroke-dasharray:none"/>
         <text x="${R-3}" y="${-R+6.5}" text-anchor="middle" font-family="'Barlow',sans-serif" font-size="10" font-weight="700" fill="#fff">!</text>`:'';
     return `<g class="lp-slot-g${player?' filled':''}${isSel?' selected':''}${_un?' lp-unavail':''}"
         ${_un?`data-unavail="${_un}"`:''}
@@ -37277,7 +37564,7 @@ function lpRender(){
         ${gFilter}>
       <circle r="${isSel?R+2:R}" style="fill:${fillColor};stroke:${strokeColor};stroke-width:${strokeW};" ${dashArr}/>
       ${inner}
-      ${_unMark}
+      ${_unMark}${_lvRing(slot.id,R)}
     </g>`;
   }).join('');
 
@@ -37340,6 +37627,7 @@ function lpRender(){
   // Render popup if open
   if(lpState.openSlot)lpRenderPopup(lpState.openSlot);
   lpRenderSubs();
+  try{_lvPaint();}catch(e){console.warn('[Varianten]',e);}
 }
 
 function lpRenderPopup(slotId){
@@ -37423,6 +37711,7 @@ function lpRenderPopup(slotId){
 
 function lpClickSlot(e,slotId){
   e.stopPropagation();
+  if(_lvView){_lvRO();return;}
   if(lpState.editing)return; // edit mode: clicks don't open popup
   const popup=document.getElementById('lp-popup');
   if(!popup)return;
@@ -37461,6 +37750,7 @@ function lpClickSlot(e,slotId){
 }
 
 function lpAssignToSlot(slotId,pi){
+  if(_lvView){_lvRO();return;}
   Object.keys(lpState.slots).forEach(k=>{if(lpState.slots[k]===pi)delete lpState.slots[k];});
   lpState.subs=lpState.subs.filter(s=>s!==pi);
   lpState.slots[slotId]=pi;
@@ -37468,6 +37758,7 @@ function lpAssignToSlot(slotId,pi){
 }
 
 function lpRemoveFromSlot(slotId){
+  if(_lvView){_lvRO();return;}
   const pid=lpState.slots[slotId];
   delete lpState.slots[slotId];
   if(typeof pid==='string')lpRemoveGuest(pid);
@@ -37504,6 +37795,7 @@ function _lpSetSlotPlayer(slotId,pid){
 }
 
 function lpPointerDown(e,slotId){
+  if(_lvView)return;   // the click says why
   // Formation edit mode → drag slot, not player
   if(lpState.editing){
     fmtDragStart(e,'lp',slotId);
@@ -37736,6 +38028,7 @@ function lpRenderSubs(){
 
 function lpClickSubSlot(e,subIdx){
   e.stopPropagation();
+  if(_lvView){_lvRO();return;}
   const slotKey='sub_'+subIdx;
   if(lpState.openSlot===slotKey){lpClosePopup();return;}
   lpState.openSlot=slotKey;
@@ -37813,6 +38106,7 @@ function lpRenderSubPopup(subIdx){
 
 
 function lpAddGuest(slotId){
+  if(_lvView){_lvRO();return;}
   const inp=document.getElementById('lp-guest-input');
   if(!inp)return;
   const name=inp.value.trim();
@@ -37848,6 +38142,7 @@ function lpResolvePlayer(idxOrRef){
   return players[idxOrRef]||null;
 }
 function lpRemoveGuest(ref){
+  if(_lvView){_lvRO();return;}
   if(!ref||typeof ref!=='string'||!ref.startsWith('g_'))return;
   if(!Array.isArray(lpState.guests))return;
   // Check if still in use
@@ -37858,6 +38153,7 @@ function lpRemoveGuest(ref){
 }
 
 function lpAssignToSub(subIdx,pi){
+  if(_lvView){_lvRO();return;}
   // Remove from any slot
   Object.keys(lpState.slots).forEach(k=>{if(lpState.slots[k]===pi)delete lpState.slots[k];});
   // Remove from other sub positions
@@ -37883,6 +38179,7 @@ function lpAssignToSub(subIdx,pi){
 }
 
 function lpRemoveSubAt(subIdx){
+  if(_lvView){_lvRO();return;}
   const pid=lpState.subs[subIdx];
   lpState.subs.splice(subIdx,1);
   if(typeof pid==='string')lpRemoveGuest(pid);
@@ -37891,12 +38188,14 @@ function lpRemoveSubAt(subIdx){
 
 
 function lpClearAll(){
+  if(_lvView){_lvRO();return;}
   if(!confirm('Alle Positionen leeren?'))return;
   lpState.slots={};lpState.subs=[];lpState.selectedSlot=null;lpState.selectedBench=null;lpClosePopup();
   lpRender();
 }
 
 function lpSave(){
+  if(_lvView){_lvRO();return;}
   // DRIFT-SAFE SAVE: if sessions were reordered (another trainer deleted/added
   // a session while planner was open), lpState.sessIdx may point to wrong
   // session. Re-resolve by stored date+type.
@@ -37918,23 +38217,35 @@ function lpSave(){
   }
   snap();
   if(lpState.sessIdx!==null&&lpState.sessIdx!==undefined){
-    // Save per-session lineup
+    // Save per-session lineup. 1.2.89: into one's own variant; the lineup
+    // that counts follows when it is one's own (or none counts yet).
     if(!G.matchLineups)G.matchLineups={};
     const key=_mlKey(UI.currentTeam,UI.currentSeason,lpState.sessIdx);
     const D=cd();
     const sess=D&&D.sessions&&D.sessions[lpState.sessIdx];
-    G.matchLineups[key]={
+    const body={
       formation:lpState.formation,
       slots:{...lpState.slots},
       subs:[...lpState.subs],
-      guests:[...lpState.guests],
+      guests:[...(lpState.guests||[])],
       customSlots:lpState.customSlots?{...lpState.customSlots}:null,
       matchKind:lpState.matchKind||'meisterschaft',
-      savedAt:Date.now(),
-      sessDate:sess?sess.date:null,  // for migration safety
-      season:UI.currentSeason
+      savedAt:Date.now()
     };
-    saveG();lpRenderSaves();_lpOpenSnap=_lpSnapshot();showSaveFlash('✓ Aufstellung gespeichert');
+    let ml=G.matchLineups[key];
+    if(!ml||typeof ml!=='object')ml=G.matchLineups[key]={};
+    const me=_lvMe();
+    if(me){
+      if(!ml.vars||typeof ml.vars!=='object')ml.vars={};
+      ml.vars[me.k]=Object.assign({},body,{by:me.by});
+    }
+    const src0=_lvSrc(ml),lead=!me||!src0||src0===me.k;
+    if(lead){
+      Object.assign(ml,body,{sessDate:sess?sess.date:null,season:UI.currentSeason});  // sessDate: for migration safety
+      if(me)ml.src=me.k;
+    }
+    saveG();_lpOpenSnap=_lpSnapshot();lpRenderSaves();
+    showSaveFlash(lead?'✓ Aufstellung gespeichert':'✓ Deine Variante gespeichert');
     try{_sqRefresh(lpState.sessIdx);}catch(e){}
   } else {
     const name='Aufstellung '+new Date().toLocaleDateString('de-DE');
@@ -37950,6 +38261,9 @@ function lpSave(){
 
 function lpRenderSaves(){
   const el=document.getElementById('lp-saves-list');if(!el)return;
+  // Session mode (1.2.89): every trainer sees the state of his own variant
+  if(lpState.sessIdx!==null&&lpState.sessIdx!==undefined){_lvPaint();return;}
+  _lvSideReset();
   // Only admin sees save timestamp
   if(!isAdmin()){el.innerHTML='';el.style.display='none';return;}
   el.style.display='';
@@ -38658,6 +38972,7 @@ function slpToggleEdit(){
   slpRender();
 }
 function lpToggleEdit(){
+  if(_lvView){_lvRO();return;}
   lpState.editing=!lpState.editing;
   lpClosePopup&&lpClosePopup();
   renderFmtBtns('lp-fmt-btns',lpState.formation,'lpSetFormation');
@@ -39162,6 +39477,7 @@ _pubCleanupSchedule();
     <div class="lp-hint" id="lp-hint">Slot wählen → Spieler klicken</div>
     <button class="lp-close-btn" onclick="closeLineupPlanner()" aria-label="Schließen"><span class="fb-long">✕ Schließen</span><span class="fb-short">✕</span></button>
   </div>
+  <div id="lp-var-bar" class="lp-var-bar" style="display:none;"></div>
   <div id="lp-unavail-bar" class="lp-unavail-bar" style="display:none;"></div>
   <!-- Separate strip: "cannot play today" and "not eligible this week" are
        different facts, and one line for both would hide which is which. -->
@@ -39237,8 +39553,8 @@ _pubCleanupSchedule();
     <!-- Sidebar -->
     <div class="lp-sidebar">
       <div class="lp-sb-top">
-        <div class="lp-sb-label">Gespeicherte Aufstellungen</div>
-        <button class="lp-save-btn" style="width:100%;margin-bottom:8px;padding:7px;" onclick="lpSave()">💾 Aufstellung speichern</button>
+        <div class="lp-sb-label" id="lp-sb-title">Gespeicherte Aufstellungen</div>
+        <button class="lp-save-btn" style="width:100%;margin-bottom:8px;padding:7px;" id="lp-save-btn" onclick="lpSave()">💾 Aufstellung speichern</button>
         <div id="lp-saves-list" style="font-size:.65rem;color:rgba(255,255,255,.7);text-align:center;padding:4px 0;"></div>
       </div>
       <div class="lp-sb-label2">🧑‍🤝‍🧑 Spieler</div>
