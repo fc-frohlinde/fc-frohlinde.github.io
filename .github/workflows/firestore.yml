@@ -1,0 +1,36 @@
+# Flutlicht · Firestore
+# The app does not use Cloud Firestore. By hand: counts what is in the unused
+# "(default)" database and, with "sperren", publishes rules that refuse
+# every request (the expired test-mode rules do that already, but Firebase
+# keeps sending reminder mails). Code: tools/regeln/firestore.mjs.
+name: Firestore
+
+on:
+  workflow_dispatch:
+    inputs:
+      sperren:
+        description: 'Опубликовать правила «никому, никогда» (иначе только проверить)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  firestore:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: tools/regeln
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - run: npm ci --omit=dev --no-audit --no-fund
+        working-directory: tools/regeln
+      - run: node firestore.mjs
+        working-directory: tools/regeln
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          SPERREN: ${{ inputs.sperren }}
