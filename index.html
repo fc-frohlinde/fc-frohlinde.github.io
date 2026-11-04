@@ -3367,7 +3367,7 @@ body.design-heute .lp-nik-t{color:var(--hx-muted);}
 .mk.mk-t-bronze{--mk-ink:#E9B78C;}.mk.mk-t-silber{--mk-ink:#DDE4EF;}.mk.mk-t-gold{--mk-ink:#F2C230;}.mk.mk-t-flutlicht{--mk-ink:#FFF3C4;}
 .mk-prev{font-size:.74rem;color:var(--hdim);text-align:center;margin:0 0 8px;}
 .mk-stage{position:relative;display:flex;justify-content:center;padding:4px 0 2px;}
-.mk-stage::before{content:'';position:absolute;left:50%;top:-40px;width:130%;height:75%;transform:translateX(-50%);
+.mk-stage::before{content:'';position:absolute;left:50%;top:-40px;width:min(130%,100vw);height:75%;transform:translateX(-50%);
   background:radial-gradient(closest-side,rgba(255,226,140,.09),rgba(255,226,140,0));pointer-events:none;}
 .mk-cv{position:relative;width:100%;max-width:340px;height:auto;aspect-ratio:360/504;display:block;
   filter:drop-shadow(0 18px 34px rgba(0,0,0,.55));}
@@ -5549,6 +5549,17 @@ body.design-heute select.lp-fmt-sel:not([multiple]):not([size]):not(#hxs-none){b
   body.design-heute #moWeekReport .wr-head-pv{display:inline-flex;align-items:center;gap:7px;align-self:center;height:38px;padding:0 15px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);color:#fff;font:700 .86rem 'Barlow',sans-serif;cursor:pointer;white-space:nowrap;}
   body.design-heute #moWeekReport .wr-head-pv:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.35);}
   body.design-heute #moWeekReport .wr2-top{display:none;}
+}
+/* 1.2.86: tablets — team and season stand in the navigation already; below
+   900 px "Spieleransicht" as its icon (the title keeps the word) */
+@media(min-width:768px) and (max-width:1180px){
+  body.design-heute #moWeekReport .wr-head-meta{display:none !important;}
+}
+@media(min-width:768px) and (max-width:899px){
+  body.design-heute #moWeekReport .wr-head-pv{padding:0 11px;}
+  body.design-heute #moWeekReport .wr-head-pv .wr-pv-t{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+}
+@media(min-width:768px){
   body.design-heute :is(#toolbarEl,.tm-headrow,.wr-head) :is(button,a,select,input):focus-visible{outline:2px solid var(--hx-yellow);outline-offset:2px;}
 }
 .wr-head-pv{display:none;}
@@ -5580,6 +5591,8 @@ body.design-kabine #mainTable.mx tfoot td.mx-pct{font-size:.95rem;}
 #mainTable.mx thead th.mxg-old,#mainTable.mx thead th.mx-wk{background:var(--d-panel2) !important;}
 #mainTable.mx thead th.mxg-cur{background:#FFEFC2 !important;color:#6B4E00 !important;}
 #mainTable.mx thead tr.mx-r2 th[data-mx~="cur"]{background:#FFF8E1 !important;}
+/* 1.2.86: the label keeps beside the frozen columns while the weeks scroll under them */
+#mainTable.mx thead th.mxg .mxg-l{position:sticky;left:calc(var(--c0) + var(--c1) + var(--c2) + var(--c3) + 8px);display:inline-block;}
 .mxg-b{border:none;background:none;padding:0 4px;margin:0 -4px;height:20px;border-radius:5px;font:inherit;color:var(--hx-blue);cursor:pointer;}
 .mxg-b:hover{background:color-mix(in srgb,var(--hx-blue) 10%,transparent);}
 #mainTable.mx [data-mx~="wb"]{border-left:1px solid var(--d-line);}
@@ -6531,11 +6544,21 @@ body.design-heute.hxk-dk .hx-dtile small{color:var(--hx-muted);}
 /* dark cards: colours the shared styles write as constants */
 body.design-heute.hxk-dk .hx-dtile:not(.match){background:color-mix(in srgb,#000 26%,var(--hk-card));color:#fff;}
 body.design-heute.hxk-dk .hx-day.today{position:relative;}
+@media(max-width:420px){.hx-btns .hx-opt{display:none;}}
+body.design-heute.hxk-dk .tpl-srch input{background-color:transparent !important;border:none !important;}
+body.design-heute.hxk-dk :is(.set-pane,.mob) input:is([type=checkbox],[type=radio]){-webkit-appearance:none;appearance:none;box-sizing:border-box;min-width:16px;min-height:16px;
+  border:1.5px solid var(--hk-line);background:var(--hk-field);border-radius:5px;display:inline-grid;place-content:center;cursor:pointer;flex-shrink:0;}
+body.design-heute.hxk-dk :is(.set-pane,.mob) input[type=radio]{border-radius:50%;}
+body.design-heute.hxk-dk :is(.set-pane,.mob) input:is([type=checkbox],[type=radio]):checked{background:var(--hk-blue);border-color:var(--hk-blue);}
+body.design-heute.hxk-dk :is(.set-pane,.mob) input[type=checkbox]:checked::before{content:'';width:10px;height:10px;background:var(--hx-nav);clip-path:polygon(14% 44%,0 65%,50% 100%,100% 16%,80% 0,43% 62%);}
+body.design-heute.hxk-dk :is(.set-pane,.mob) input[type=radio]:checked::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--hx-nav);}
+body.design-heute.hxk-dk :is(.set-pane,.mob) input:is([type=checkbox],[type=radio]):focus-visible{outline:2px solid var(--hk-blue);outline-offset:2px;}
+body.design-heute.hxk-dk :is(.set-pane,.mob) input:is([type=checkbox],[type=radio]):disabled{opacity:.45;cursor:default;}
 body.design-heute.hxk-dk .hx-day.today::before{content:'';position:absolute;left:3px;top:7px;bottom:7px;width:3px;border-radius:2px;background:var(--hx-yellow);}
 /* 1.2.82: controls standing on the page, not in a card (Kader tabs, the
    Aufstellung bar, the Anwesenheit filters below the band, the planner tabs):
    night fields there too — they used the light ones */
-body.design-heute.hxk-dk :is(.tpl-ov .tpl-tabs,#moTeamMgr .tbar,#lp-fmt-btns,#slp-fmt-btns,.lp-kind-wrap,#mxPlayers .mxp-tools,#mxPlayers .mxp-cap,#mxPlayers .mxp-sec,#mxPlayers .mxp-empty),
+body.design-heute.hxk-dk :is(.tpl-ov .tpl-tabs,#moTeamMgr .tbar:not(.tm-headrow > .tbar),#lp-fmt-btns,#slp-fmt-btns,.lp-kind-wrap,#mxPlayers .mxp-tools,#mxPlayers .mxp-cap,#mxPlayers .mxp-sec,#mxPlayers .mxp-empty),
 body.design-heute.hxk-dk:not(.mx-inband) #mxBar{
   --tp-card:var(--hk-card);--tp-line:var(--hk-line);--tp-ink:var(--hk-ink);--tp-mut:var(--hk-muted);
   --hx-field:var(--hk-field);--hx-card:var(--hk-card);--hx-card2:var(--hk-card2);--hx-line:var(--hk-line);
@@ -7391,12 +7414,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.85'; // v1.2.85: Erinnerungen-Karte am Freitag wieder für alle
-const APP_VERSION_LABEL='1.2.85';
+const APP_VERSION='1.2.86'; // v1.2.86: Feinschliff – Tabelle, Wochenbericht, Kleinigkeiten
+const APP_VERSION_LABEL='1.2.86';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1793759628622; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1793789678123; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -12862,14 +12885,14 @@ function mxHead(){
   r1+=`<th class="c3" rowspan="2" style="${hs}" onclick="sortTable('pct')" title="Anwesenheit in der Saison: anwesend von erfasst, gelaufene ${kind}. Klicken sortiert.">Saison${mark('pct')}</th>`;
   M.groups.forEach(g=>{
     if(g.fold){
-      r1+=`<th class="mxg mxg-old" colspan="${g.n}"${g.wb?' data-mx="wb"':''} title="Je Woche eine Spalte: anwesend von erfasst. Woche anklicken öffnet sie.">${g.n>1?'Ältere Wochen':'Älter'}</th>`;
+      r1+=`<th class="mxg mxg-old" colspan="${g.n}"${g.wb?' data-mx="wb"':''} title="Je Woche eine Spalte: anwesend von erfasst. Woche anklicken öffnet sie."><span class="mxg-l">${g.n>1?'Ältere Wochen':'Älter'}</span></th>`;
       return;
     }
     const w=g.w;
     const lbl=w.cur?(g.n>=3?`KW ${w.kw} · diese Woche`:g.n===2?'Diese Woche':`KW ${w.kw}`):`KW ${w.kw}`;
     const dm=[g.wb?'wb':'',w.cur?'cur':''].filter(Boolean).join(' ');
     r1+=`<th class="mxg${w.cur?' mxg-cur':''}" colspan="${g.n}"${dm?` data-mx="${dm}"`:''} title="${_mxSpan(w.wk)}${w.cur?' · diese Woche':''}">`
-      +(w.reopened?`<button type="button" class="mxg-b" onclick="mxWeek(${w.wk})" title="Woche wieder zusammenfassen">${e(lbl)} <span aria-hidden="true">▴</span></button>`:e(lbl))+`</th>`;
+      +'<span class="mxg-l">'+(w.reopened?`<button type="button" class="mxg-b" onclick="mxWeek(${w.wk})" title="Woche wieder zusammenfassen">${e(lbl)} <span aria-hidden="true">▴</span></button>`:e(lbl))+`</span></th>`;
   });
   if(!M.cols.length)r1+='<th class="mxg"></th>';
   r1+=`<th rowspan="2" style="width:24px;background:var(--bd);"></th></tr>`;
@@ -28045,7 +28068,7 @@ function hxRender(){
     let btns='';
     if(roll)btns+=`<button type="button" class="hx-btn primary" onclick="rcOpen(${fi})">${hxIcon('check')}Anwesenheit erfassen</button>`;
     else btns+=`<button type="button" class="hx-btn primary" onclick="openSessFromMain(${fi})">Wer kommt?</button>`;
-    if(isM)btns+=`<button type="button" class="hx-btn" onclick="openLineupPlanner(${fi})">Aufstellung planen</button>`;
+    if(isM)btns+=`<button type="button" class="hx-btn" onclick="openLineupPlanner(${fi})" title="Aufstellung planen">Aufstellung<span class="hx-opt"> planen</span></button>`;
     else if(s.planLink)btns+=`<a class="hx-btn" href="${esc(s.planLink)}" target="_blank" rel="noopener">Trainingsplan</a>`;
     if(!isM&&typeof _tplHomeBtn==='function')btns+=_tplHomeBtn(fi);
     html+=`<section class="hx-card hx-a-hero" aria-label="Nächster Termin">
@@ -39859,7 +39882,7 @@ _pubCleanupSchedule();
     <h3 class="wr-head-title">Wochenbericht</h3>
     <div id="wr-nav-slot" class="wr-head-nav"></div>
     <div id="wr-team-meta" class="wr-head-meta"></div>
-    <button type="button" class="wr-head-pv" onclick="dbOpenPlayerReport()" title="Genau das, was die Spieler in ihrem Menü sehen"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>Spieleransicht</button>
+    <button type="button" class="wr-head-pv" onclick="dbOpenPlayerReport()" title="Genau das, was die Spieler in ihrem Menü sehen"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><span class="wr-pv-t">Spieleransicht</span></button>
   </div>
   <div id="wr-content" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 2px 6px;min-height:0;"></div>
 </div></div>
