@@ -6,7 +6,7 @@
 import admin from 'firebase-admin';
 import webpush from 'web-push';
 import { round } from './round.mjs';
-import { decode, pathKey, berlin, addDays } from './lib.mjs';
+import { decode, pathKey, berlin, addDays, lastSession } from './lib.mjs';
 import { seasonOf } from './kalender.mjs';
 import { inbox, loadApply } from './eingang.mjs';
 
@@ -126,7 +126,24 @@ try {
       const d = berlin(Date.now()).day;
       console.log(`::notice title=Push::вчера: ${await sum(addDays(d, -1))}; сегодня: ${await sum(d)}; подписаны: игроков ${ab.p[0]} (устройств ${ab.p[1]}), тренеров ${ab.t[0]} (устройств ${ab.t[1]}); ошибок в последнем прогоне: ${st.err ?? 0}, отписались: ${st.gone ?? 0}`);
     } catch (e) { console.log('::warning title=Push::' + String((e && e.message) || e).slice(0, 160)); }
+  }  // Последнее событие (04.11.): the latest started session of each team —
+  // attendance and ratings as counts, so a trainer's question "how did it go"
+  // has an answer without opening the data
+  if (process.env.GITHUB_EVENT_NAME === 'workflow_dispatch') {
+    try {
+      const now = berlin(Date.now()), season = seasonOf(now.day);
+      for (const t of decode(await db.get('fcf_data/teamList')) || []) {
+        if (typeof t !== 'string') continue;
+        const blk = 'fcf_data/db/' + pathKey(t + '__' + season);
+        const sessions = decode(await db.get(blk + '/sessions')) || [];
+        const c0 = lastSession({ sessions, players: [], season, now });
+        if (!c0) continue;
+        const c = lastSession({ sessions, players: decode(await db.get(blk + '/players')) || [], season, now });
+        console.log(`::notice title=Последнее событие ${t}::${c.match ? 'игра' : 'тренировка'} ${c.date} ${c.time}: в команде ${c.n}; был ${c.a}, не был ${c.f}, уваж. ${c.e}, не отмечено ${c.open}; нагрузку поставили ${c.rated} (сами ${c.self}, тренер ${c.coach}), «не был» ${c.nd}; открывали приложение после начала ${c.seen}; с push ${c.push}`);
+      }
+    } catch (e) { console.log('::warning title=Последнее событие::' + String((e && e.message) || e).slice(0, 160)); }
   }
+
 } catch (e) {
   process.exitCode = 1;
 } finally {
