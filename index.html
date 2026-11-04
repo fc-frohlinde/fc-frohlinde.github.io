@@ -5042,6 +5042,9 @@ body.design-heute #moTeamMgr .pl-row.pl-sel{background:color-mix(in srgb,var(--h
 .mgr-sel-l{border:none;background:none;padding:6px 8px;border-radius:8px;color:var(--hx-blue,#1659B8);font:700 .84rem 'Barlow',sans-serif;cursor:pointer;}
 .mgr-sel-l:hover{background:color-mix(in srgb,var(--hx-blue,#1659B8) 10%,transparent);}
 .mgr-sel-acts{display:flex;gap:10px;margin-left:auto;}
+.set-ro-note{margin:-4px 0 12px;padding:9px 12px;border-radius:10px;background:var(--hx-card2,#F4F7FB);color:var(--hx-ink2,#3A4A6B);font-size:.84rem;line-height:1.4;}
+.set-sec.set-ro :is(.setting-control,.ay-box,#set-foc-host){opacity:.62;}
+.set-sec.set-ro :is(#setHeroPick,#setHeroDel,#foc-add-row,.fi-del){display:none !important;}
 .mgr-sel-b{height:40px;padding:0 16px;border-radius:999px;border:1px solid var(--hx-line,#DCE3EE);background:var(--hx-field,#fff);color:var(--hx-ink,#0E2350);font:700 .86rem 'Barlow',sans-serif;cursor:pointer;white-space:nowrap;}
 .mgr-sel-b:hover:not(:disabled){border-color:var(--hx-ink2,#3A4A6B);}
 .mgr-sel-b.mgr-sel-del{border-color:#E4A3A6;color:#B42318;}
@@ -7414,12 +7417,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.87'; // v1.2.87: Aufstellung – leere Positionen lesbar
-const APP_VERSION_LABEL='1.2.87';
+const APP_VERSION='1.2.88'; // v1.2.88: Einstellungen – wer was ändert
+const APP_VERSION_LABEL='1.2.88';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1793805766574; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1793820914636; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -7867,7 +7870,7 @@ function zlRuleRender(){
       <div class="setting-control"><select id="zl-fbw" onchange="zlRuleSet(this.value)">${[[2,'2 Wochen'],[3,'3 Wochen'],[4,'4 Wochen'],[6,'6 Wochen'],[8,'8 Wochen'],[0,'nie erinnern']].map(([v,l])=>`<option value="${v}"${R.fb===v?' selected':''}>${l}</option>`).join('')}</select></div></div>`;
 }
 function zlRuleSet(val){
-  if(!(typeof canEdit==='function'&&canEdit()))return;
+  if(!_teamSetGuard())return;
   const t=UI.currentTeam,v=Math.round(+val);if(!isFinite(v))return;
   snap();
   if(!G.db[t+'__rules']||typeof G.db[t+'__rules']!=='object')G.db[t+'__rules']={};
@@ -10773,13 +10776,30 @@ function _acctChip(t){
 function _tpRightsHtml(gi){
   if(!(typeof isAdmin==='function'&&isAdmin()))return '';
   const t=G.trainers&&G.trainers[gi];if(!t)return '';
-  const e=escapeHtml,first=String(t.name||'').split(' ')[0]||'Er',on=t.plan===true;
+  const e=escapeHtml,first=String(t.name||'').split(' ')[0]||'Er',on=t.plan===true,mg=t.mgr===true;
+  const msub=mg?e(first)+' ändert die Einstellungen der Mannschaft: Zu- und Absagen, Spielerstatus, Ziele, Treffpunkt, Karten, Titelbild, Schwerpunkte.'
+    :e(first)+' sieht die Einstellungen der Mannschaft nur an.';
   const sub=on?e(first)+' erstellt und ändert Trainingspläne, Übungen, Vorlagen und den Standardablauf.'
     :(TPL_VIEW_ALL?'Ohne Freigabe öffnet '+e(first)+' Pläne nur zum Ansehen: Ablauf, Gruppen, Auf dem Platz, Drucken.'
       :'Ohne Freigabe sieht '+e(first)+' den Trainingsplaner nicht.');
   return `<div class="tp-sec tp-rights"><div class="tp-sec-h">Rechte</div>
     <div class="tpr-row"><div class="tpr-t"><b>Trainingspläne erstellen und ändern</b><small>${sub}</small></div>
-    <label class="setting-switch"><input type="checkbox"${on?' checked':''} onchange="tpPlanSet(${gi},this.checked)" aria-label="Trainingspläne erstellen und ändern"><span class="setting-slider"></span></label></div></div>`;
+    <label class="setting-switch"><input type="checkbox"${on?' checked':''} onchange="tpPlanSet(${gi},this.checked)" aria-label="Trainingspläne erstellen und ändern"><span class="setting-slider"></span></label></div>
+    <div class="tpr-row"><div class="tpr-t"><b>Mannschaft verwalten</b><small>${msub}</small></div>
+    <label class="setting-switch"><input type="checkbox"${mg?' checked':''} onchange="tpMgrSet(${gi},this.checked)" aria-label="Mannschaft verwalten"><span class="setting-slider"></span></label></div></div>`;
+}
+function tpMgrSet(gi,on){
+  if(!(typeof isAdmin==='function'&&isAdmin()))return;
+  const t=G.trainers&&G.trainers[gi];if(!t)return;
+  if(!!on===(t.mgr===true))return;
+  snap();
+  if(on)t.mgr=true;else delete t.mgr;
+  saveG();
+  logAudit('Mannschaft verwalten',t.name||'?',on?'darf die Einstellungen der Mannschaft ändern':'sieht die Einstellungen der Mannschaft nur an');
+  const first=String(t.name||'').split(' ')[0];
+  if(typeof showSaveFlash==='function')showSaveFlash('✓ '+first+(on?' verwaltet jetzt die Mannschaft':' sieht die Einstellungen der Mannschaft jetzt nur an'));
+  try{const m=document.getElementById('moTrainerProfile');if(m&&m.classList.contains('open')&&!_tpEditing)renderTrainerProfile();}catch(e){}
+  try{const l=document.getElementById('mgr-tr-list');if(l&&l.offsetParent)renderMgrTrainers();}catch(e){}
 }
 function tpPlanSet(gi,on){
   if(!(typeof isAdmin==='function'&&isAdmin()))return;
@@ -10820,7 +10840,11 @@ async function _planMirror(force){
     Object.entries(upd).forEach(([p,v])=>{const m=A.mem[p.split('/')[1]];if(m){if(v)m.plan=true;else delete m.plan;}});
   }catch(e){console.warn('[Planer-Freigabe]',e&&(e.code||e.message));}
 }
-function _tpPlanChip(t){return (t&&t.plan===true&&typeof isAdmin==='function'&&isAdmin())?'<span class="acc-chip tpr-chip" title="Darf Trainingspläne erstellen und ändern">plant mit</span>':'';}
+function _tpPlanChip(t){
+  if(!(t&&typeof isAdmin==='function'&&isAdmin()))return '';
+  return (t.plan===true?'<span class="acc-chip tpr-chip" title="Darf Trainingspläne erstellen und ändern">plant mit</span>':'')
+    +(t.mgr===true?'<span class="acc-chip tpr-chip" title="Darf die Einstellungen der Mannschaft ändern">verwaltet</span>':'');
+}
 function _acctSecHtml(gi){
   if(!(typeof isAdmin==='function'&&isAdmin()))return '';
   const t=G.trainers&&G.trainers[gi];if(!t)return '';
@@ -13314,7 +13338,7 @@ function _ayStart(){
 }
 // The switch in Einstellungen → Mannschaft
 function aySet(type,on){
-  if(!canEdit())return;
+  if(!_teamSetGuard())return;
   const t=UI.currentTeam,kind=type==='match'?'Spiele':'Trainings',kindD=type==='match'?'Spielen':'Trainings';
   const n=_ayWalk(t,type,on?'apply':'revert',true);
   const msg=on
@@ -13373,7 +13397,7 @@ function stRender(){
       <div class="setting-control">${sel('offen',[[2,'2 Wochen'],[4,'4 Wochen'],[6,'6 Wochen'],[8,'8 Wochen'],[12,'12 Wochen']])}</div></div>`;
 }
 function stSet(k,val){
-  if(!(typeof canEdit==='function'&&canEdit()))return;
+  if(!_teamSetGuard())return;
   const t=UI.currentTeam,v=Math.round(+val);if(!isFinite(v))return;
   snap();
   if(!G.db[t+'__rules']||typeof G.db[t+'__rules']!=='object')G.db[t+'__rules']={};
@@ -13399,7 +13423,7 @@ function absRender(){
     ${opt('app','Die App reicht immer','Jede Absage in der App gilt als entschuldigt.')}`;
 }
 function absSet(k,v){
-  if(!(typeof canEdit==='function'&&canEdit()))return;
+  if(!_teamSetGuard())return;
   const t=UI.currentTeam;
   const a=pvAbsRule(teamRules(t));
   if(k==='m'){if(!['frist','anruf','app'].includes(v))return;a.m=v;}
@@ -13980,7 +14004,7 @@ function removePlayerPhoto(){
 }
 
 function pickClubLogo(){
-  if(!canEdit())return;
+  if(!(typeof isAdmin==='function'&&isAdmin()))return;
   const inp=document.createElement('input');
   inp.type='file';
   inp.accept='image/*';
@@ -14592,7 +14616,8 @@ function _setVisible(sec){
   const role=CU&&CU.role;
   if(sec==='konto')return !!CU&&role!=='player';
   if(sec==='daten'||sec==='backup'||sec==='trash'||sec==='audit')return typeof isAdmin==='function'&&isAdmin();
-  if(sec==='team'||sec==='verein')return typeof canEdit==='function'&&canEdit();
+  if(sec==='verein')return typeof isAdmin==='function'&&isAdmin();
+  if(sec==='team')return typeof canEdit==='function'&&canEdit();
   return true;
 }
 function _setFill(){
@@ -14612,6 +14637,15 @@ function _setFill(){
   document.querySelectorAll('#moSettings [data-sec]').forEach(el=>{
     el.classList.toggle('set-hide',!_setVisible(el.dataset.sec));
   });
+  _teamRoApply();
+}
+// Read-only Mannschaft (1.2.88): the controls stay visible, nothing reacts
+function _teamRoApply(){
+  const sec=document.querySelector('#moSettings .set-sec[data-sec="team"]');if(!sec)return;
+  const ro=!canTeamSet();
+  sec.classList.toggle('set-ro',ro);
+  const n=document.getElementById('setTeamRo');if(n)n.hidden=!ro;
+  sec.querySelectorAll('.setting-control,.ay-box,#set-foc-host').forEach(el=>{el.inert=ro;});
 }
 // Schwerpunkte: in design "Heute" they live in Einstellungen → Mannschaft,
 // in Klassisch in the Kader tab. The same elements move between the two
@@ -17515,7 +17549,7 @@ function cardRulesRender(){
       <div class="setting-control">${sel('r',[[7,'1 Woche'],[14,'2 Wochen'],[21,'3 Wochen'],[28,'4 Wochen']])}</div></div>`;
 }
 function cardRuleSet(k,val){
-  if(!(typeof canEdit==='function'&&canEdit()))return;
+  if(!_teamSetGuard())return;
   const t=UI.currentTeam,v=Math.round(+val);
   if(!isFinite(v))return;
   snap();
@@ -17548,7 +17582,7 @@ function fdbRender(){
     ${u?`<p class="ay-note"><a href="${e(u)}" target="_blank" rel="noopener">Seite öffnen</a></p>`:''}`;
 }
 function fdbSet(val){
-  if(!(typeof canEdit==='function'&&canEdit()))return;
+  if(!_teamSetGuard())return;
   const t=UI.currentTeam,v=String(val||'').trim();
   if(v&&!/^https:\/\/(www\.)?fussball\.de\/\S+$/.test(v)){alert('Bitte die Adresse einer Seite auf fussball.de einfügen (beginnt mit https://www.fussball.de/).');fdbRender();return;}
   snap();
@@ -17595,7 +17629,7 @@ function meetRender(){
       <div class="setting-control"><input type="text" id="meet-aw" maxlength="80" placeholder="z. B. Parkplatz am Sportplatz" value="${e(aw)}" onchange="meetSet('aw',this.value)"></div></div>`;
 }
 function meetSet(k,val){
-  if(!(typeof canEdit==='function'&&canEdit()))return;
+  if(!_teamSetGuard())return;
   const t=UI.currentTeam;
   let v;
   if(k==='aw')v=String(val||'').trim().slice(0,80);
@@ -28530,7 +28564,7 @@ function homeRender(){
 // Changed in Einstellungen → Mannschaft only.
 function homeUploadHeroPhoto(ev){
   if(ev)ev.stopPropagation();
-  if(!canEdit())return;
+  if(!_teamSetGuard())return;
   const inp=document.createElement('input');
   inp.type='file';
   inp.accept='image/*';
@@ -28688,7 +28722,7 @@ function _pwaPlayerManifest(){
 }
 window.addEventListener('orientationchange',()=>setTimeout(_lockPortrait,120));
 function removeClubLogo(){
-  if(!canEdit())return;
+  if(!(typeof isAdmin==='function'&&isAdmin()))return;
   if(!G||!G.clubLogo)return;
   if(!confirm('Vereinslogo entfernen?'))return;
   snap();
@@ -28700,7 +28734,7 @@ function removeClubLogo(){
   logAudit('Vereinslogo entfernt','','');
 }
 function homeRemoveHeroPhoto(){
-  if(!canEdit())return;
+  if(!_teamSetGuard())return;
   if(!G||!G.heroPhoto)return;
   if(!confirm('Titelbild entfernen?'))return;
   snap();
@@ -29461,16 +29495,17 @@ function renderFocList(){
   populateFocSel();
 }
 function addFocus(){
+  if(!_teamSetGuard())return;
   const n=document.getElementById('newFocusName').value.trim();
   if(!n)return;const foc=teamFoc();if(foc.includes(n))return;
   snap();foc.push(n);saveG();renderFocList();
   document.getElementById('newFocusName').value='';
 }
-function delFoc(i){const foc=teamFoc();if(!confirm(`"${foc[i]}" löschen?`))return;snap();foc.splice(i,1);saveG();renderFocList();}
+function delFoc(i){if(!_teamSetGuard())return;const foc=teamFoc();if(!confirm(`"${foc[i]}" löschen?`))return;snap();foc.splice(i,1);saveG();renderFocList();}
 // Rename a Schwerpunkt — propagates the new name to every training session that
 // referenced the old one, so historical data stays linked to the updated label.
 function editFoc(i){
-  if(!canEdit())return;
+  if(!_teamSetGuard())return;
   const foc=teamFoc();
   const oldName=foc[i];
   if(!oldName)return;
@@ -34001,6 +34036,19 @@ function _tplMayPlan(){
   const t=_myTrainer();return !!(t&&t.plan===true);
 }
 function _tplEditor(){return _tplAllowed()&&_tplMayPlan();}
+// Einstellungen → Mannschaft (1.2.88): the admin, and trainers of this team he
+// has cleared for it (trainer record: mgr = true). The others read.
+function canTeamSet(){
+  if(!(typeof canEdit==='function'&&canEdit()))return false;
+  if(typeof isAdmin==='function'&&isAdmin())return true;
+  const t=_myTrainer();return !!(t&&t.mgr===true);
+}
+function _teamSetGuard(){
+  if(canTeamSet())return true;
+  if(typeof showSaveFlash==='function')showSaveFlash('Nur ansehen – ändern können der Admin und Trainer, die die Mannschaft verwalten');
+  try{_setFill();}catch(e){}
+  return false;
+}
 function _tplRoHint(){if(typeof _tplToast==='function')_tplToast('Pläne erstellen und ändern: nur mit Freigabe vom Admin.');}
 function _tplIsOpen(){const o=document.getElementById('tplOverlay');return !!(o&&o.classList.contains('open'));}
 function _tplPlayersTxt(p){p=String(p||'').trim();return /^[\d–\-\s]+$/.test(p)?p+' Spieler':p;}
@@ -39337,6 +39385,7 @@ _pubCleanupSchedule();
     <section class="set-sec" data-sec="team">
       <h4 class="set-sec-h">👥 Mannschaft</h4>
       <p class="set-sec-sub">Gilt für die ganze Mannschaft.</p>
+      <p class="set-ro-note" id="setTeamRo" hidden>Nur ansehen: Ändern können der Admin und Trainer, die die Mannschaft verwalten.</p>
       <div class="setting-row">
         <span id="setHeroPrev" class="set-hero-prev" aria-hidden="true"></span>
         <div style="flex:1;min-width:0;">
