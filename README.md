@@ -27,7 +27,7 @@ Jeder Spieler hat seinen eigenen Link: Zu- oder Absage, Belastung nach Training 
 
 ## Aktueller Einsatz
 
-Pilotverein: **FC Frohlinde 1949 e.V.** Name, Logo und Datenschutz-Kontakt sind Einstellungen des Vereins (Einstellungen → Verein) – die App selbst ist nicht an einen Verein gebunden.
+Im Einsatz bei einer U19-Mannschaft im Amateurfußball. Name, Logo und Datenschutz-Kontakt sind Einstellungen des Vereins (Einstellungen → Verein) – die App selbst ist nicht an einen Verein gebunden.
 
 ## Technik
 
