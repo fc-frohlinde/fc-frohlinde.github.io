@@ -7391,12 +7391,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.84'; // v1.2.84: Anwesenheit → Spieler in der Nacht
-const APP_VERSION_LABEL='1.2.84';
+const APP_VERSION='1.2.85'; // v1.2.85: Erinnerungen-Karte am Freitag wieder für alle
+const APP_VERSION_LABEL='1.2.85';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1793639586178; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1793759628622; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -19499,7 +19499,15 @@ function pushPlayerState(){
   return 'off';
 }
 // "Später" on the offer: ask again in two weeks
-function _pushSnoozed(){const t=+(_pushLs('later')||0);return t&&Date.now()<t;}
+// From this moment a "Später" pressed earlier is forgotten (1.2.85): the
+// stored value is the end of the 14 days, so pressed = end − 14 days
+const PUSH_LATER_RESET=Date.UTC(2026,10,6,14,0);   // Fr 06.11.2026, 15:00 in Berlin
+function _pushSnoozed(){
+  const t=+(_pushLs('later')||0),now=Date.now();
+  if(!t||now>=t)return false;
+  if(now>=PUSH_LATER_RESET&&t-14*864e5<PUSH_LATER_RESET)return false;
+  return true;
+}
 function pushLater(){_pushLs('later',Date.now()+14*864e5);if(isPlayerMode())renderPlayerMode();}
 async function _pushSha(t){
   const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(String(t)));
