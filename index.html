@@ -7414,12 +7414,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.86'; // v1.2.86: Feinschliff – Tabelle, Wochenbericht, Kleinigkeiten
-const APP_VERSION_LABEL='1.2.86';
+const APP_VERSION='1.2.87'; // v1.2.87: Aufstellung – leere Positionen lesbar
+const APP_VERSION_LABEL='1.2.87';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1793789678123; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1793805766574; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -37188,8 +37188,8 @@ function lpRender(){
     const pid=lpState.slots[slot.id];
     const player=lpResolvePlayer(pid);
     const isSel=lpState.openSlot===slot.id;
-    const fillColor=player?'color-mix(in srgb, var(--surface-mid) 82%, transparent)':'rgba(255,255,255,.07)';
-    const strokeColor=isSel?'var(--ac)':player?'rgba(255,255,255,.65)':'rgba(255,255,255,.3)';
+    const fillColor=player?'color-mix(in srgb, var(--surface-mid) 82%, transparent)':'#35814C';
+    const strokeColor=isSel?'var(--ac)':player?'rgba(255,255,255,.65)':'rgba(255,255,255,.5)';
     const strokeW=isSel?'2.5':'1.8';
     const dashArr=!player?'stroke-dasharray="4 3"':'';
     const gFilter=isSel?'filter="url(#glowGold)"':'';
@@ -37211,8 +37211,8 @@ function lpRender(){
          <text y="${NY}" text-anchor="middle" font-family="'Barlow',sans-serif" font-size="9.5" font-weight="700" fill="#fff">${fullNm}</text>`;
       inner=photoBlock+infoBlock;
     } else {
-      inner=`<text y="-4" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="9" fill="rgba(255,255,255,.4)" letter-spacing="1">${slot.lbl}</text>
-        <text y="10" text-anchor="middle" font-family="'Barlow',sans-serif" font-size="14" fill="rgba(255,255,255,.22)">+</text>`;
+      inner=`<text y="-1" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="13" fill="rgba(255,255,255,.85)" letter-spacing=".8">${slot.lbl}</text>
+        <text y="13" text-anchor="middle" font-family="'Barlow',sans-serif" font-size="13" fill="rgba(255,255,255,.5)">+</text>`;
     }
 
     const _un=lpUnavailState(lpState.slots[slot.id]);
@@ -38496,7 +38496,7 @@ function slpRender(){
     const count=assigned.length;
     const isSel=slpState.openSlot===slot.id;
     const ringColor=count===0?'rgba(255,255,255,.3)':lpCircleColor(count);
-    const fillColor=count===0?'rgba(255,255,255,.05)':'color-mix(in srgb, var(--surface-mid) 85%, transparent)';
+    const fillColor=count===0?'#35814C':'color-mix(in srgb, var(--surface-mid) 85%, transparent)';
     const dashArr=count===0?'stroke-dasharray="4 3"':'';
     const gFilter=isSel?'filter="url(#glowGold)"':'';
 
@@ -38586,7 +38586,7 @@ function slpRender(){
 
     return `<g class="slp-slot-g slp-slot-group" data-slot-id="${slot.id}" onclick="slpClickSlot(event,'${slot.id}')" onpointerdown="fmtDragStart(event,'slp','${slot.id}')" oncontextmenu="fmtContextMenu(event,'slp','${slot.id}')" transform="translate(${_pitchXY(slot).x},${_pitchXY(slot).y})" style="cursor:${slpState.editing?'move':'pointer'};" ${gFilter}>
       <circle r="${isSel?R+2:R}" style="fill:${fillColor};stroke:${ringColor};stroke-width:${isSel?'2.5':'1.8'};" ${dashArr}/>
-      <text y="3" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="10" fill="${count>0?'#fff':'rgba(255,255,255,.55)'}" letter-spacing="1">${slot.lbl}</text>
+      <text y="3" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="11" fill="${count>0?'#fff':'rgba(255,255,255,.85)'}" letter-spacing="1">${slot.lbl}</text>
       ${backdropHtml}
       ${nameLines}
       ${overflowHtml}
