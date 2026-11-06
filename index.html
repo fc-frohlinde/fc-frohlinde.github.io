@@ -7466,12 +7466,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.89'; // v1.2.89: Aufstellung – jeder Trainer seine Variante
-const APP_VERSION_LABEL='1.2.89';
+const APP_VERSION='1.2.90'; // v1.2.90: Belastung bis morgen Abend bewerten
+const APP_VERSION_LABEL='1.2.90';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1793825610746; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1794008260293; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -7491,6 +7491,7 @@ const FL_MARK='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F
 function _clubSlug(){return (_clubName()||'Flutlicht').replace(/[^A-Za-z0-9ÄÖÜäöüß]+/g,'-').replace(/^-|-$/g,'')||'Flutlicht';}
 function _clubInfo(){const c=(G&&G.club&&typeof G.club==='object')?G.club:{};return {name:_clubName(),resp:String(c.resp||''),addr:String(c.addr||''),mail:String(c.mail||''),dsb:String(c.dsb||'')};}
 const APP_NEWS=[
+  {id:'20261107-1',d:'07.11.',t:'Belastung bis morgen Abend',x:'Die Spieler können die Belastung jetzt bis 24 Uhr am Tag danach eintragen – Studien zeigen, dass die Angabe so lange zuverlässig bleibt. Länger nicht, und nie über den nächsten Termin hinaus.'},
   {id:'20261104-2',d:'04.11.',t:'Aufstellung: jeder seine Variante',x:'Jeder Trainer speichert seine eigene Aufstellung fürs Spiel und sieht oben unter „Varianten“ die der anderen. Mit „Für das Spiel festlegen“ bestimmt ihr, welche für Kader und Statistik zählt.',go:['Zur Aufstellung','hxOpenLineup()']},
   {id:'20261101-1',d:'01.11.',t:'Wer braucht Aufmerksamkeit?',x:'Oben in der Statistik: wer gerade in Folge fehlt, seltener kommt als sonst, nach längerer Zeit wieder da ist, wenig spielt oder mehrmals schwachen Einsatz hatte. Jeder wird mit sich selbst und mit der Mannschaft verglichen: Wer in den Ferien wie viele andere fehlt, fällt nicht auf.',go:['Zur Statistik',"hxGo('stats')"]},
   {id:'20261028-2',d:'28.10.',t:'Rückblick nach dem Training',x:'Nach „Anwesenheit erfassen“ fragt die App kurz: Wie lief’s, was lief gut, was ändern wir? Mit Plan auch, ob jede Übung gepasst hat. „Was ändern wir?“ steht beim nächsten Training wieder da, „anpassen“ bei der Übung im Trainingsplaner.',go:['Zum letzten Training','rvGoLast()']},
@@ -15551,7 +15552,7 @@ function rpeRemindGroup(si){
   if(!canEdit())return;
   const D=cd();const s=D&&D.sessions&&D.sessions[si];if(!s)return;
   const what=s.type==='match'?'vom Spiel':'vom Training';
-  const txt='Belastung '+what+' heute ('+String(s.date||'').trim()+'.) bitte bis 24 Uhr eintragen: App \u00f6ffnen, Zahl tippen.\n'
+  const txt='Belastung '+what+' ('+String(s.date||'').trim()+'.) bitte '+rpeCloseLabel(s,si).replace(/\u00a0/g,' ')+' eintragen: App \u00f6ffnen, Zahl tippen.\n'
     +buildTeamLink(UI.currentTeam);
   _openWhatsAppGroupCompose(txt);
 }
@@ -18292,15 +18293,58 @@ function rpeIsOpen(s,si,p,season){
   const hm=String(s.time||'').split(':').map(Number);
   const start=new Date(y,m-1,d,(hm.length===2&&!isNaN(hm[0]))?hm[0]:18,(hm.length===2&&!isNaN(hm[1]))?hm[1]:0);
   // Window runs from the end of the session — asking mid-training would get a
-  // rating of half a session — and closes at midnight the same day. A rating
-  // given the next morning describes a memory, not the session. It opens
+  // rating of half a session — to the end of the NEXT day (1.2.90, see
+  // rpeCloseMs; until then it closed at midnight of the same day). It opens
   // RPE_EARLY_MIN before the PLANNED end: sessions often finish a little early,
   // and the cabin, right after, is where the team rates together.
   const endMs=start.getTime()+rpeSessionMinutes(s,p,si)*60000;
   const now=Date.now();
   if(now<endMs-RPE_EARLY_MIN*60000)return false;
-  const midnight=new Date(y,m-1,d,23,59,59,999).getTime();
-  return now<=midnight;
+  const close=rpeCloseMs(s,si);
+  return close!=null&&now<=close;
+}
+// When a session starts, from its date and time (the same rule as above)
+function _rpeStartMs(s){
+  const sk=(s&&typeof dispToSortKey==='function')?dispToSortKey(s.date):null;
+  if(!sk||sk===99999999)return null;
+  const y=Math.floor(sk/10000),m=Math.floor(sk/100)%100,d=sk%100;
+  const hm=String(s.time||'').split(':').map(Number);
+  return new Date(y,m-1,d,(hm.length===2&&!isNaN(hm[0]))?hm[0]:18,(hm.length===2&&!isNaN(hm[1]))?hm[1]:0).getTime();
+}
+// The rating closes at 23:59 of the day AFTER the session (1.2.90). Asking
+// right after is still best, but players leave the cabin one by one and only
+// open the app later – often the next day, e.g. for the squad on Saturday.
+// Studies back a rating within about a day: youth athletes after 24 h nearly
+// the same as after 30 min (Scantlebury et al. 2018, r 0.98, error ~8 %; after
+// 72 h the error is ~35 %), football players after 48 h without recall bias
+// (Fanchini et al. 2017), FIFA referees the next morning (2017). Never longer,
+// and never into the team's next session: once that one has begun, its own
+// rating is the one to ask for.
+function rpeCloseMs(s,si){
+  const st=_rpeStartMs(s);if(st==null)return null;
+  const d0=new Date(st);
+  let close=new Date(d0.getFullYear(),d0.getMonth(),d0.getDate()+1,23,59,59,999).getTime();
+  try{
+    const D=(typeof cd==='function')?cd():null;
+    ((D&&D.sessions)||[]).forEach((x,i)=>{
+      if(!x||x===s||i===si)return;
+      const t=_rpeStartMs(x);
+      if(t!=null&&t>st&&t<close)close=t;
+    });
+  }catch(e){}
+  return close;
+}
+// "bis 24 Uhr" (today), "bis morgen 24 Uhr", "bis heute 18:30 Uhr" (next session)
+function rpeCloseLabel(s,si){
+  const c=rpeCloseMs(s,si);if(c==null)return '';
+  const d=new Date(c),n=new Date();
+  const day=x=>new Date(x.getFullYear(),x.getMonth(),x.getDate()).getTime();
+  const dd=Math.round((day(d)-day(n))/864e5);
+  const mid=d.getHours()===23&&d.getMinutes()===59;
+  const when=(mid?'24':d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}))+'\u00a0Uhr';
+  if(dd<=0)return 'bis '+(mid?'':'heute ')+when;
+  if(dd===1)return 'bis morgen '+when;
+  return 'bis '+['So','Mo','Di','Mi','Do','Fr','Sa'][d.getDay()]+' '+when;
 }
 // Trainer view: how the squad experienced this session. Deliberately shows
 // the SPREAD, not just the mean — if a session lands at 8 for everyone the
@@ -20351,9 +20395,9 @@ window.checkRpeOrigin=function(){
         const hm=String(s.time||'').split(':').map(Number);
         const start=new Date(y,m-1,d,(hm.length===2&&!isNaN(hm[0]))?hm[0]:18,(hm.length===2&&!isNaN(hm[1]))?hm[1]:0);
         const endMs=start.getTime()+((typeof s.duration==='number'&&s.duration>0)?s.duration:90)*60000;
-        const midnight=new Date(y,m-1,d,23,59,59,999).getTime();
-        fenster=new Date(endMs).toLocaleString('de-DE')+' \u2013 24:00';
-        verdict=(e.ts>=endMs-RPE_EARLY_MIN*60000&&e.ts<=midnight)?'\u2705 plausibel':'\u26a0\ufe0f VORSCHAU/sp\u00e4ter';
+        const closeMs=rpeCloseMs(s,si)||new Date(y,m-1,d,23,59,59,999).getTime();
+        fenster=new Date(endMs).toLocaleString('de-DE')+' \u2013 '+new Date(closeMs).toLocaleString('de-DE');
+        verdict=(e.ts>=endMs-RPE_EARLY_MIN*60000&&e.ts<=closeMs)?'\u2705 plausibel':'\u26a0\ufe0f VORSCHAU/sp\u00e4ter';
       }else verdict='\u2753 Datum unbekannt';
       rows.push({
         Spieler:e.user,Einheit:e.target,Wert:(e.detail||'').replace('RPE ',''),
@@ -28252,14 +28296,14 @@ function hxRender(){
   }catch(e){}
   const t0=_hxDate(today);
   const inDays=(s,a,bb)=>{const d=Math.round((_hxDate(sk(s))-t0)/86400000);return d>=a&&d<=bb;};
-  // Load (sRPE) still open: rating closes at midnight of the session day, so
-  // this is the moment to remind the group
+  // Load (sRPE) still open: rating closes at the end of the next day (1.2.90),
+  // so this is the moment to remind the group
   try{
     if(typeof rpeIsOpen==='function')S.forEach((s,si)=>{
       if(!s||!s.date||!inDays(s,-1,0))return;
       let n=0;
       D.players.forEach(p=>{if(p&&_sessCounts(p,s,season)&&rpeIsOpen(s,si,p,season)&&!rpeAnswered(p,si,s))n++;});
-      if(n)flags.push({dot:'#E0912F',who:n+' Spieler',what:'Belastung '+(sk(s)===today?'von heute':'vom '+s.date)+' noch nicht bewertet · bis 24\u00a0Uhr',on:`rpeOpenFromHome(${si})`});
+      if(n)flags.push({dot:'#E0912F',who:n+' Spieler',what:'Belastung '+(sk(s)===today?'von heute':'vom '+s.date)+' noch nicht bewertet · '+rpeCloseLabel(s,si),on:`rpeOpenFromHome(${si})`});
     });
   }catch(e){}
   // unanswered for the coming week (the focus card already lists its own)
