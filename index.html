@@ -2860,6 +2860,18 @@ body.player-mode .pm-list .pm-deadline{background:none;padding:0;margin:6px 0 2p
 body.player-mode .pm-list .pm-deadline.locked{color:var(--fl-ink2);}
 body.player-mode .pm-list .pm-squad{color:var(--fl-ink2);font-size:13.5px;margin:6px 0 0;}
 body.player-mode .pm-list .pm-squad.in{color:var(--fl-yes);}
+body.player-mode .pm-sql{margin:8px 0 0;}
+body.player-mode .pm-sql summary{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 12px;border-radius:999px;border:1px solid var(--fl-line);color:var(--fl-ink);font-size:13.5px;font-weight:700;cursor:pointer;list-style:none;}
+body.player-mode .pm-sql summary::-webkit-details-marker{display:none;}
+body.player-mode .pm-sql summary::after{content:'';width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateY(-2px) rotate(45deg);opacity:.7;}
+body.player-mode .pm-sql[open] summary::after{transform:translateY(2px) rotate(-135deg);}
+body.player-mode .pm-sql summary:focus-visible{outline:2px solid var(--fl-ink);outline-offset:2px;}
+body.player-mode .pm-sql-l{list-style:none;margin:10px 0 2px;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 14px;}
+body.player-mode .pm-sql-l li{display:flex;align-items:baseline;gap:8px;min-width:0;font-size:14px;color:var(--fl-ink);padding:3px 0;}
+body.player-mode .pm-sql-l li i{flex:0 0 22px;font-style:normal;font-variant-numeric:tabular-nums;text-align:right;color:var(--fl-ink2);font-size:12.5px;}
+body.player-mode .pm-sql-l li span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+body.player-mode .pm-sql-l li.me span{font-weight:800;color:var(--fl-yes);}
+body.player-mode .pm-sql-l li small{font-weight:600;font-size:11px;opacity:.8;}
 body.player-mode .pm-list .pm-btn{background:transparent;border:1.5px solid var(--fl-line);color:var(--fl-ink);box-shadow:none;min-height:48px;border-radius:12px;}
 body.player-mode .pm-list .pm-btn.pm-yes{border-color:rgba(60,194,126,.45);color:var(--fl-yes);}
 body.player-mode .pm-list .pm-btn.pm-yes.plan{background:var(--fl-yes-tint);}
@@ -6913,7 +6925,7 @@ if(window._fbBlocked){
   </div>
   <div class="lg-sec">
     <div class="lg-sh">Zählt nicht</div>
-    <div class="li"><span class="lg-c csm">M</span><span class="lg-t">Zugesagt<small>nach dem Termin noch zu erfassen</small></span></div>
+    <div class="li"><span class="lg-c csm">M</span><span class="lg-t">Zugesagt / verfügbar<small>nach dem Termin noch zu erfassen</small></span></div>
     <div class="li"><span class="lg-c csq">?</span><span class="lg-t">Keine Antwort<small>nach dem Termin: nicht erfasst</small></span></div>
     <div class="li"><span class="lg-c csn">N</span><span class="lg-t">Nicht im Kader<small>nur Spiele, setzt sich nach dem Anpfiff selbst</small></span></div>
   </div>
@@ -7517,12 +7529,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.92'; // v1.2.92: Matchplan – Anstoß klar benannt
-const APP_VERSION_LABEL='1.2.92';
+const APP_VERSION='1.2.93'; // v1.2.93: Kader-Liste für die Spieler
+const APP_VERSION_LABEL='1.2.93';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1794010257862; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1794052722110; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -7542,6 +7554,7 @@ const FL_MARK='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F
 function _clubSlug(){return (_clubName()||'Flutlicht').replace(/[^A-Za-z0-9ÄÖÜäöüß]+/g,'-').replace(/^-|-$/g,'')||'Flutlicht';}
 function _clubInfo(){const c=(G&&G.club&&typeof G.club==='object')?G.club:{};return {name:_clubName(),resp:String(c.resp||''),addr:String(c.addr||''),mail:String(c.mail||''),dsb:String(c.dsb||'')};}
 const APP_NEWS=[
+  {id:'20261107-3',d:'07.11.',t:'Die Spieler sehen den Kader',x:'Nach dem Veröffentlichen sehen die Spieler in der App unter „Meine Woche“, wer im Kader ist – Namen und Nummern, wie im WhatsApp-Text. Wer nicht dabei ist, wird nicht genannt; die Aufstellung bleibt bei euch.'},
   {id:'20261107-2',d:'07.11.',t:'Matchplan und Videos für die Spieler',x:'Im Spiel-Fenster legst du unter „Matchplan“ Video-Links, ein Bild oder ein paar Sätze an – die Spieler sehen es mit dem Kader in ihrer App. Unter Kader → Videos sammelst du Videos nach Positionen.'},
   {id:'20261107-1',d:'07.11.',t:'Belastung bis morgen Abend',x:'Die Spieler können die Belastung jetzt bis 24 Uhr am Tag danach eintragen – Studien zeigen, dass die Angabe so lange zuverlässig bleibt. Länger nicht, und nie über den nächsten Termin hinaus.'},
   {id:'20261104-2',d:'04.11.',t:'Aufstellung: jeder seine Variante',x:'Jeder Trainer speichert seine eigene Aufstellung fürs Spiel und sieht oben unter „Varianten“ die der anderen. Mit „Für das Spiel festlegen“ bestimmt ihr, welche für Kader und Statistik zählt.',go:['Zur Aufstellung','hxOpenLineup()']},
@@ -14919,7 +14932,7 @@ function renderMobileAtt(){
       const c=_hxCounts(D,si,UI.currentSeason);
       const parts=roll
         ?[['ok',c.present,'anwesend'],['bad',c.no,'fehlend'],['warn',c.exc,'entschuldigt'],['open',c.open,'offen']]
-        :[['ok',c.yes,'zugesagt'],['bad',c.no,'abgesagt'],['warn',c.exc,'entschuldigt'],['open',c.open,'offen']];
+        :[['ok',c.yes,_ywFor(hs)],['bad',c.no,'abgesagt'],['warn',c.exc,'entschuldigt'],['open',c.open,'offen']];
       const e=escapeHtml,ed=typeof canEdit==='function'&&canEdit();
       headEl.innerHTML=`<div class="hxl-top">
           <div class="hxl-tx"><span class="hx-tag${isM?' match':''}">${e(_hxTag(isM,title,k))}</span>
@@ -14927,7 +14940,7 @@ function renderMobileAtt(){
             ${meta.length?`<div class="hxl-meta">${e(meta.join(' · '))}</div>`:''}</div>
           <div class="hxl-btns">${roll&&ed?`<button type="button" class="hxl-btn pri" onclick="rcOpen(${si})">Erfassen</button>`:''}<button type="button" class="hxl-btn" onclick="openSessStats(${si})">Öffnen</button></div>
         </div>
-        <div class="hxl-att"><b>${roll?c.present:c.yes}</b><span>von ${c.total} ${roll?'anwesend':'zugesagt'}</span>
+        <div class="hxl-att"><b>${roll?c.present:c.yes}</b><span>von ${c.total} ${roll?'anwesend':_ywFor(hs)}</span>
           <span class="hxl-lg">${parts.slice(1).filter(x=>x[1]).map(x=>`<span title="${x[2]}"><i class="s-${x[0]}"></i>${x[1]} ${x[2]}</span>`).join('')}</span></div>
         ${_hxSeg(parts,c.total)}`;
       headEl.style.display='block';
@@ -16015,6 +16028,7 @@ function _pmSanitizeG(){
   if(Array.isArray(G.seasonList))G.seasonList=[mySeason];
   const D=G.db[myKey];
   if(D){
+    const _allPl=Array.isArray(D.players)?D.players.slice():[];
     if(Array.isArray(D.players)){
       D.players=D.players.map((p,idx)=>{
         if(idx!==myPi)return null;
@@ -16043,6 +16057,8 @@ function _pmSanitizeG(){
           res:(()=>{const r=sbResult(s);return r?{f:r.f,a:r.a}:undefined;})(),
           // The match plan once it is visible (1.2.91), as in the slices
           mp:_mpForPlayers(s),
+          // Who is in the squad (1.2.93), as in the slices
+          sql:_sqListPl(s,_allPl),
           // Player-visible session info — explicitly whitelisted
           location:s.location||''
           // note deliberately omitted — trainers' own record
@@ -16340,7 +16356,7 @@ function _pvBuildSync(team,season){
   const news=(nw&&typeof nw==='object'&&typeof nw.t==='number'&&nw.title)?{t:nw.t,title:nw.title,body:nw.body||'',off:nw.off||undefined}:null;
   const loc={},la=(G.locationAddr&&typeof G.locationAddr==='object')?G.locationAddr:{};
   sessions.forEach(s=>{if(s&&s.location&&la[s.location])loc[s.location]=la[s.location];});
-  const shared={v:PV_V,team,season,club:_clubName(),cinfo:(G.club&&typeof G.club==='object')?{resp:G.club.resp||'',addr:G.club.addr||'',mail:G.club.mail||'',dsb:G.club.dsb||''}:null,sessions:sessions.map(_pvSess),news,trainers,loc,
+  const shared={v:PV_V,team,season,club:_clubName(),cinfo:(G.club&&typeof G.club==='object')?{resp:G.club.resp||'',addr:G.club.addr||'',mail:G.club.mail||'',dsb:G.club.dsb||''}:null,sessions:sessions.map(x=>{const o=_pvSess(x);const l=_sqListPl(x,players);if(o&&l)o.sql=l;return o;}),news,trainers,loc,
     roster:{disp,nr,elig},names:[],rep:{},abs:pvAbsRule(teamRules(team)),vids:_vdList(team)};
   weeks.forEach(w=>{
     const r=reps[w.wk];if(!r)return;
@@ -17575,7 +17591,7 @@ function sbRender(){
   const lu=_luStarters(si);
   const luBtn=(lu&&!st.length)?`<button type="button" class="sb-lu" onclick="sbStartersFromLineup()">Aus der Aufstellung übernehmen (${lu.size})</button>`:'';
   const chip=x=>`<button type="button" class="rc-sc${stSet.has(x.p.name)?' on':''}" aria-pressed="${stSet.has(x.p.name)}" onclick="sbStarter(${x.pi})">${x.p.nr?'<i>'+e(String(x.p.nr))+'</i>':''}${e(nm(x.p))}</button>`;
-  const rcHint=all.some(x=>v(x)===1)?'':`<div class="sb-hint">Anwesenheit noch nicht erfasst \u2013 hier steht, wer ${q?'im Kader ist':'zugesagt hat'}. <button type="button" class="sb-more" onclick="rcOpen(${si})">Anwesenheit erfassen</button></div>`;
+  const rcHint=all.some(x=>v(x)===1)?'':`<div class="sb-hint">Anwesenheit noch nicht erfasst \u2013 hier steht, wer ${q?'im Kader ist':(_ywFor(s)==='verfügbar'?'nicht abgesagt hat':'zugesagt hat')}. <button type="button" class="sb-more" onclick="rcOpen(${si})">Anwesenheit erfassen</button></div>`;
   h+=`<section class="sb-sec"><div class="sb-h">Startelf <b class="${st.length===11?'sb-ok':''}">${st.length}</b><span>antippen, wer begonnen hat</span></div>
     ${rcHint}${luBtn}<div class="rc-sub-c">${likely.map(chip).join('')}${_sbMore?rest.map(chip).join(''):''}</div>
     ${rest.length?`<button type="button" class="sb-more" onclick="sbToggleMore()">${_sbMore?'Weniger zeigen':'Weitere Spieler ('+rest.length+')'}</button>`:''}
@@ -17796,6 +17812,35 @@ function _sqMsg(D,si,season,q){
     outT:'Kader '+f+' steht',outB:'Diesmal bist du nicht dabei.'+(next?' Nächstes Training '+next+'.':'')};
 }
 const _sqSt=(p,si)=>(p&&Array.isArray(p.s)&&si<p.s.length&&p.s[si]!=null)?p.s[si]:3;
+// With the team's rule "alle gelten als dabei" an "M" mostly means "has not
+// declined" — nobody pressed anything. The words follow the rule (1.2.93);
+// one group, not two (Artem 07.11.: why split?).
+const _sqAvail=()=>typeof ruleAutoYes==='function'&&ruleAutoYes(UI.currentTeam,'match');
+// The word for an "M" before a session: "zugesagt" — or, where the team's
+// rule counts everybody in until he declines, "verfügbar". Players read
+// "eingeplant" already. The status menu keeps "Zugesagt": there it is what the
+// trainer sets.
+function _ywFor(s){
+  const type=(s&&s.type==='match')?'match':'training';
+  return (typeof ruleAutoYes==='function'&&UI&&UI.currentTeam&&ruleAutoYes(UI.currentTeam,type))?'verfügbar':'zugesagt';
+}
+function _YwFor(s){const w=_ywFor(s);return w.charAt(0).toUpperCase()+w.slice(1);}
+// The squad as the players see it (1.2.93): names and numbers in the order of
+// the WhatsApp text — the same list that goes to the group anyway. Who was not
+// picked is not named; positions and the lineup stay with the trainers. Until
+// the match day is over.
+function _sqListPl(s,players){
+  if(!s||s.type!=='match')return undefined;
+  const q=_sqOf(s);if(!q||!Array.isArray(q.p)||!q.p.length)return undefined;
+  const k=s.date?dispToSortKey(s.date):null;
+  if(k&&k!==99999999&&k<todaySK())return undefined;
+  const pIdx=x=>{const i=POS.indexOf(x);return i<0?99:i;};
+  const byName=new Map((players||[]).filter(p=>p&&p.name).map(p=>[p.name,p]));
+  const l=q.p.map(n=>byName.get(n)).filter(Boolean)
+    .sort((a,b)=>(pIdx(a.pos)-pIdx(b.pos))||((+a.nr||999)-(+b.nr||999)))
+    .map(p=>{const o={n:String((typeof getDisplayName==='function'&&getDisplayName(p))||p.name)};if(p.nr!=null&&p.nr!=='')o.nr=String(p.nr);return o;});
+  return l.length?l:undefined;
+}
 // The window in the match panel, above "Wer kommt?"
 function _sqPanelHtml(si){
   const D=cd(),s=D&&D.sessions&&D.sessions[si],season=UI.currentSeason;
@@ -17804,18 +17849,20 @@ function _sqPanelHtml(si){
   if(!q){
     if(!ed)return '';
     return `<div class="sqd-card"><div class="sqd-h"><b>Kader und Treffpunkt</b></div>
-      <p class="sqd-txt">Noch nicht veröffentlicht. Wer dabei ist, bekommt Treffpunkt und Uhrzeit aufs Handy – wer zugesagt hat und nicht dabei ist, erfährt es auch. Danach gibt es den Text für die WhatsApp-Gruppe.</p>
+      <p class="sqd-txt">Noch nicht veröffentlicht. Wer dabei ist, bekommt Treffpunkt und Uhrzeit aufs Handy – wer ${_sqAvail()?'nicht abgesagt hat':'zugesagt hat'} und nicht dabei ist, erfährt es auch. Alle sehen in der App, wer im Kader ist. Danach gibt es den Text für die WhatsApp-Gruppe.</p>
       <button type="button" class="sqd-go" onclick="squadOpen(${si})">Kader festlegen</button></div>`;
   }
   const due=_newsDue(q.t),hm=x=>{const d=new Date(x);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');};
   const when=Date.now()<due?'geht frühestens '+hm(due)+' aufs Handy':'veröffentlicht '+new Date(q.t).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})+' '+hm(q.t);
   // Confirmed but not picked, as of now (answers may have changed since)
-  const outNow=(D.players||[]).filter(p=>p&&!q.p.includes(p.name)&&_sqSt(p,si)===4).map(p=>(getDisplayName?getDisplayName(p):p.name));
+  const outPl=(D.players||[]).filter(p=>p&&!q.p.includes(p.name)&&_sqSt(p,si)===4);
+  const outNow=outPl.map(p=>(getDisplayName?getDisplayName(p):p.name));
+  const outW=_sqAvail()?'Verfügbar':'Zugesagt';
   // In the lineup but not in the squad: he would not know when to come
   const df=ed?_sqLuDiff(D,si):null,ni=df?df.notIn:[];
   return `<div class="sqd-card on"><div class="sqd-h"><b>Kader · ${q.p.length} Spieler</b><span>${e(when)}</span></div>
     <div class="sqd-meet">Treffpunkt <b>${e(q.meet)}</b>${q.where?' · '+e(q.where):''}</div>
-    ${outNow.length?`<div class="sqd-out">Zugesagt, nicht im Kader: ${e(outNow.join(', '))}</div>`:''}
+    ${outNow.length?`<div class="sqd-out">${outW}, nicht im Kader: ${e(outNow.join(', '))}</div>`:''}
     ${ni.length?`<div class="sqd-lu">In der Aufstellung, aber nicht im Kader: <b>${e(_sqNames(D,ni))}</b> – ${ni.length===1?'bekommt':'bekommen'} keinen Treffpunkt.</div>`:''}
     ${ed?`<div class="sqd-acts"><button type="button" class="sqd-go alt" onclick="squadOpen(${si}${ni.length?',true':''})">${ni.length?'Kader anpassen':'Ändern'}</button><button type="button" class="sqd-link" onclick="squadShare(${si})">WhatsApp-Text</button><button type="button" class="sqd-link" onclick="squadWithdraw(${si})">Zurücknehmen</button></div>`:''}</div>`;
 }
@@ -18326,7 +18373,7 @@ function _sqRenderList(){
   // Declined or excused players are not offered: they said they cannot come.
   // Selected earlier and declined since: still listed so the trainer sees it.
   const noSel=no.filter(x=>_SQ.sel.has(x.pi));
-  let h=grp('Zugesagt',yes)+grp('Ohne Antwort',open,'nur wenn sicher')+grp('Abgesagt, aber im Kader',noSel,'abwählen?');
+  let h=(_sqAvail()?grp('Verfügbar',yes,'haben nicht abgesagt'):grp('Zugesagt',yes))+grp('Ohne Antwort',open,'nur wenn sicher')+grp('Abgesagt, aber im Kader',noSel,'abwählen?');
   const rest=no.filter(x=>!_SQ.sel.has(x.pi));
   if(rest.length)h+=`<div class="sqd-no">Abgesagt oder entschuldigt: ${e(rest.map(x=>nm(x.p)).join(', '))}</div>`;
   document.getElementById('sqList').innerHTML=h||'<div class="rs-empty">Noch keine Spieler.</div>';
@@ -18383,7 +18430,7 @@ function _sqRenderSum(){
   const warn=[];
   ins.forEach(p=>{const b=sbBanAt(p,si,D,season);if(b)warn.push(`<b>${e(nm(p))}</b> ist ${e(sbBanText(b,D))} – trotzdem im Kader?`);});
   if(nsb.length)warn.push(`<b>${e(nsb.join(', '))}</b> ${nsb.length===1?'ist':'sind'} laut Profil am Spieltag noch nicht spielberechtigt.`);
-  if(twice.length)warn.push(`<b>${e(twice.join(', '))}</b> ${twice.length===1?'ist':'sind'} zum 2. Mal in Folge trotz Zusage nicht im Kader – besser persönlich sprechen.`);
+  if(twice.length)warn.push(`<b>${e(twice.join(', '))}</b> ${twice.length===1?'ist':'sind'} zum 2. Mal in Folge nicht im Kader, obwohl ${twice.length===1?'er':'sie'} dabei sein ${twice.length===1?'konnte':'konnten'} – besser persönlich sprechen.`);
   const w=document.getElementById('sqWarn');
   w.hidden=!warn.length;
   w.innerHTML=warn.map(x=>`<div>${x}</div>`).join('');
@@ -18402,9 +18449,9 @@ function _sqRenderSum(){
   const push=ins.concat(outs).filter(p=>p.push&&p.push.t).length,tot=ins.length+outs.length;
   const box=(cls,t,b)=>`<div class="sqd-msg ${cls}"><b>${e(t)}</b><span>${e(b)}</span></div>`;
   let h=`<div class="rs-g"><div class="rs-gh"><span class="rs-n">${ins.length}</span><span>im Kader</span></div>${box('in',m.inT,m.inB)}</div>`;
-  if(outs.length)h+=`<div class="rs-g"><div class="rs-gh"><span class="rs-n">${outs.length}</span><span>zugesagt, nicht im Kader</span></div>${box('out',m.outT,m.outB)}</div>`;
+  if(outs.length)h+=`<div class="rs-g"><div class="rs-gh"><span class="rs-n">${outs.length}</span><span>${_sqAvail()?'verfügbar':'zugesagt'}, nicht im Kader</span></div>${box('out',m.outT,m.outB)}</div>`;
   h+=`<div class="rs-foot">${push?push+' von '+tot+' bekommen es aufs Handy (frühestens in 10 Minuten), alle sehen es in der App.':'Alle sehen es in der App; Erinnerungen aufs Handy hat von ihnen noch niemand an.'}`
-    +` Wer abgesagt oder nicht geantwortet hat, bekommt nichts.${_SQ.was?' Nach einer Änderung bekommt nur eine Nachricht, wen sie betrifft.':''}</div>`;
+    +` Wer abgesagt oder nicht geantwortet hat, bekommt nichts. Wer im Kader ist, sehen alle in der App.${_SQ.was?' Nach einer Änderung bekommt nur eine Nachricht, wen sie betrifft.':''}</div>`;
   document.getElementById('sqPrev').innerHTML=h;
   const go=document.getElementById('sqGo');
   go.textContent=_SQ.was?'Änderungen veröffentlichen':'Kader veröffentlichen';
@@ -18485,7 +18532,7 @@ function squadShare(si,mode){
   _sqWaEnsure();
   document.getElementById('sqWaTitle').textContent=mode==='new'?'✓ Kader veröffentlicht':mode==='changed'?'✓ Kader geändert':'Kader für WhatsApp';
   document.getElementById('sqWaLead').textContent=(mode?'Jetzt noch in die WhatsApp-Gruppe. ':'')
-    +'Den Text kannst du vorher ändern. Wer zugesagt hat und nicht dabei ist, steht nicht drin – das erfährt er in der App.';
+    +'Den Text kannst du vorher ändern. Wer nicht dabei ist, steht nicht drin – das erfährt er in der App. Den Kader sehen alle auch in der App.';
   const ta=document.getElementById('sqWaText');
   ta.value=txt;ta.rows=Math.min(18,Math.max(8,txt.split('\n').length+1));
   openM('moSqWa');
@@ -18618,9 +18665,21 @@ function _resHubHtml(x,p,mvpWho){
 // One line on the match in "Meine Woche"
 function _squadCardLine(s,si,p){
   const q=_sqPm(s);if(!q)return '';
-  const v=_sqSt(p,si);if(v===0||v===2)return '';
-  if(q.in)return `<div class="pm-squad in">✓ Im Kader · Treffpunkt ${_amEscapeText(q.meet)}${q.where?', '+_amEscapeText(q.where):''}</div>`;
-  return v===4?'<div class="pm-squad">Diesmal nicht im Kader</div>':'';
+  const v=_sqSt(p,si);
+  let line='';
+  if(q.in)line=`<div class="pm-squad in">✓ Im Kader · Treffpunkt ${_amEscapeText(q.meet)}${q.where?', '+_amEscapeText(q.where):''}</div>`;
+  else if(v===4)line='<div class="pm-squad">Diesmal nicht im Kader</div>';
+  return line+_squadListHtml(s,p);
+}
+// The whole squad, folded (1.2.93): whoever opens it sees the same list as
+// the WhatsApp group; his own name marked
+function _squadListHtml(s,p){
+  const L=Array.isArray(s&&s.sql)?s.sql:null;if(!L||!L.length)return '';
+  const me=p?String((typeof getDisplayName==='function'&&getDisplayName(p))||p.name||''):'';
+  const e=_amEscapeText;
+  return `<details class="pm-sql"><summary>Kader ansehen · ${L.length} Spieler</summary><ol class="pm-sql-l">`
+    +L.map(x=>`<li${x.n===me?' class="me"':''}><i>${x.nr?e(x.nr):''}</i><span>${e(x.n)}${x.n===me?' <small>du</small>':''}</span></li>`).join('')
+    +'</ol></details>';
 }
 
 // ══ sRPE (session RPE) ═══════════════════════════════════════
@@ -25686,7 +25745,7 @@ function ssAttRender(){
   // Same words as the tile that opened the list (before the session players
   // answer: Zugesagt/Abgesagt/Offen; afterwards: Anwesend/Fehlend/Offen)
   {const _rsvp=typeof _isSessRollCallTime==='function'&&!_isSessRollCallTime(si);
-   const _T=_rsvp?{4:'Zugesagt',0:'Abgesagt',2:'Entschuldigt',3:'Offen'}:{1:'Anwesend',0:'Fehlend',2:'Entschuldigt',4:'Offen'};
+   const _T=_rsvp?{4:_YwFor(cd().sessions[si]),0:'Abgesagt',2:'Entschuldigt',3:'Offen'}:{1:'Anwesend',0:'Fehlend',2:'Entschuldigt',4:'Offen'};
    if(ttl)ttl.textContent=meta?(_T[_ssAttFilter]||meta.n):'Anwesenheit';}
   const pis=[];
   (D.players||[]).forEach((p,pi)=>{
@@ -25947,7 +26006,7 @@ function _rcHint(p,si,s){
   // Having rated the load is proof of presence; a Zusage only a plan
   if(v!==1&&Array.isArray(p.rpe)&&typeof p.rpe[si]==='number')return {t:'hat Belastung bewertet',c:'ok'};
   if(v===5){const w=_nkWhy((cd().players||[]).indexOf(p),si);return {t:'nicht im Kader'+(w?' · '+w:''),c:''};}
-  if(v===4)return {t:'zugesagt',c:'ok'};
+  if(v===4)return {t:_ywFor(s),c:'ok'};
   if(v===3)return {t:'keine Antwort',c:''};
   return null;
 }
@@ -26388,7 +26447,7 @@ function buildSessAtt(si){
       // Before the session the useful figure is how many have answered — this
       // was shown nowhere, so the window was empty exactly when planning needs it
       const openCnt=total-(ang+abs+exc);
-      t=tile(ang,'Zugesagt',total?Math.round(ang/total*100)+'%':'','var(--cp)',4)
+      t=tile(ang,_YwFor(cd().sessions[si]),total?Math.round(ang/total*100)+'%':'','var(--cp)',4)
        +(abs?tile(abs,'Abgesagt','','var(--ca)',0):'')
        +(exc?tile(exc,'Entschuldigt','','var(--ce)',2):'')
        +tile(openCnt,'Offen','von '+total,openCnt?'#9a7000':'var(--gm)',3);
@@ -26519,7 +26578,7 @@ function _ssHxAttRender(si){
   const season=UI.currentSeason;
   const groups=roll
     ?[[1,'Anwesend','ok'],[0,'Fehlend','bad'],[2,'Entschuldigt','warn'],[4,'Nicht erfasst','open'],[3,'Offen','open'],[5,'Nicht im Kader','nk']]
-    :[[4,'Zugesagt','ok'],[3,'Offen','open'],[2,'Entschuldigt','warn'],[0,'Abgesagt','bad'],[1,'Anwesend','ok']];
+    :[[4,_YwFor(cd().sessions[si]),'ok'],[3,'Offen','open'],[2,'Entschuldigt','warn'],[0,'Abgesagt','bad'],[1,'Anwesend','ok']];
   const by={};groups.forEach(g=>{by[g[0]]=[];});
   (D.players||[]).forEach((p,pi)=>{
     if(!p)return;
@@ -26549,7 +26608,7 @@ function _ssHxAttRender(si){
   }
   const sb=(k,l)=>`<button type="button" class="${sortBy===k?'on':''}" aria-pressed="${sortBy===k}" onclick="_ssxSetSort('${k}',${si})">${l}</button>`;
   let h=(roll?'':_sqPanelHtml(si)+_mpPanelHtml(si))+`<div class="ssx-head"><h4>${roll?'Wer war da?':'Wer kommt?'}</h4>${frist?`<span class="ssx-frist">${e(frist)}</span>`:''}</div>
-    <div class="ssx-sum"><b>${roll?c.present:c.yes}</b><span>von ${c.total} ${roll?'anwesend':'zugesagt'}</span></div>${_hxSeg(parts,c.total)}
+    <div class="ssx-sum"><b>${roll?c.present:c.yes}</b><span>von ${c.total} ${roll?'anwesend':_ywFor(cd().sessions[si])}</span></div>${_hxSeg(parts,c.total)}
     <div class="ssx-sort" role="group" aria-label="Sortieren"><span>Sortieren</span>${sb('pos','Position')}${sb('name','Name')}${sb('nr','Nr.')}</div>`;
   const chip=({p,pi},noPos)=>{
     const nm=e((getDisplayName?getDisplayName(p):p.name)||'');
@@ -28540,10 +28599,10 @@ function _hxTag(isM,title,skv){
 function _hxAttHtml(c,roll,si,cls){
   const parts=roll
     ?[['ok',c.present,'anwesend',1],['bad',c.no,'fehlend',0],['warn',c.exc,'entschuldigt',2],['open',c.open,'offen',4]]
-    :[['ok',c.yes,'zugesagt',4],['bad',c.no,'abgesagt',0],['warn',c.exc,'entschuldigt',2],['open',c.open,'offen',3]];
+    :[['ok',c.yes,_ywFor(cd().sessions[si]),4],['bad',c.no,'abgesagt',0],['warn',c.exc,'entschuldigt',2],['open',c.open,'offen',3]];
   const lead=roll?c.present:c.yes;
   return `<div class="hx-att${cls?' '+cls:''}">
-        <button type="button" class="hx-att-n" onclick="openSessFromMain(${si});_ssxFocus(${parts[0][3]})"><b>${lead}</b><span>von ${c.total} ${roll?'anwesend':'zugesagt'}</span></button>
+        <button type="button" class="hx-att-n" onclick="openSessFromMain(${si});_ssxFocus(${parts[0][3]})"><b>${lead}</b><span>von ${c.total} ${roll?'anwesend':_ywFor(cd().sessions[si])}</span></button>
         ${_hxSeg(parts,c.total)}
         <div class="hx-legend">${parts.slice(1).filter(x=>x[1]||x[0]==='open').map(x=>`<button type="button" class="hx-lg" onclick="openSessFromMain(${si});_ssxFocus(${x[3]})"><i class="s-${x[0]}"></i><b>${x[1]}</b>${x[2]}</button>`).join('')}</div>
       </div>`;
@@ -28721,7 +28780,7 @@ function hxRender(){
       // all. Held but nothing entered yet reads "–/18", not "0/18" (nobody came).
       const todo=held&&c.present===0;
       const n=(todo?'–':(held?c.present:c.yes))+'/'+c.total;
-      const tip=todo?'Anwesenheit noch nicht erfasst':held?c.present+' von '+c.total+' anwesend':c.yes+' von '+c.total+' zugesagt';
+      const tip=todo?'Anwesenheit noch nicht erfasst':held?c.present+' von '+c.total+' anwesend':c.yes+' von '+c.total+' '+_ywFor(s);
       html+=`<button type="button" class="hx-day${isT?' today':''}${held&&!isT?' past':''}" onclick="openSessFromMain(${si})"><span class="hx-day-d"><small>${esc(dow)}</small><b>${d.getDate()}</b></span><span class="hx-day-x"><span class="hx-day-t">${esc(t)}</span><span class="hx-day-s${isM?' m':''}">${esc(sub)}</span></span><span class="hx-day-n${held&&!todo?' done':''}${todo?' todo':''}" title="${esc(tip)}"><span class="hx-vh">${esc(tip)}</span><span aria-hidden="true">${held&&!todo?hxIcon('check',13):''}${esc(n)}</span></span></button>`;
     });
   });
@@ -29456,7 +29515,7 @@ function kbRender(){
   if(KB.si==null||!ups.some(x=>x.i===KB.si)){const m=ups.find(x=>x.s.type==='match');KB.si=m?m.i:(ups[0]?ups[0].i:null);}
   const si=KB.si,s=si!=null?D.sessions[si]:null;
   const roll=!!(s&&typeof _isSessRollCallTime==='function'&&_isSessRollCallTime(si));
-  const meta=roll?KB_ST.roll:KB_ST.plan;
+  const meta=roll?KB_ST.roll:Object.assign({},KB_ST.plan,{4:[_YwFor(s),'ok']});
   const held=_kbList(D,season,false);
   const ed=typeof canEdit==='function'&&canEdit();
   const join=(p,ss)=>typeof _sessAfterJoin!=='function'||_sessAfterJoin(p,ss,season);
@@ -29484,7 +29543,7 @@ function kbRender(){
       <span class="kb-row">${badge(x.p.pos)}${x.p.pos2?badge(x.p.pos2):''}${x.lbl?`<span class="kb-st">${e(x.lbl)}</span>`:''}${held.length?`<span class="kb-dots" title="${e(dotsLbl(x.p))}" aria-label="${e(dotsLbl(x.p))}">${dots(x.p)}</span>`:''}</span></button>`;
   const cnt=(l,k)=>l.list.filter(x=>x.cls===k).length;
   const bar=l=>`<span class="kb-bar" aria-hidden="true">${['ok','open','warn','bad'].map(k=>cnt(l,k)?`<i class="${k}" style="flex:${cnt(l,k)}"></i>`:'').join('')}</span>`;
-  const word=roll?'da':'zugesagt';
+  const word=roll?'da':_ywFor(s);
   // Date strip
   const days=ups.map(x=>{const d=_hxDate(x.k);const m=x.s.type==='match';
     return `<button type="button" class="kb-day${x.i===si?' on':''}${m?' m':''}" onclick="kbPick(${x.i})" aria-pressed="${x.i===si}"><span>${KB_WD[d.getDay()]}</span><b>${d.getDate()}</b><i>${m?'Spiel':e(x.s.time||'Training')}</i></button>`;}).join('');
@@ -29495,7 +29554,7 @@ function kbRender(){
     const when=[KB_WD[d.getDay()]+' '+d.getDate()+'.'+(d.getMonth()+1)+'.',s.time||'',s.location||''].filter(Boolean).join(' · ');
     const c=_hxCounts(D,si,season);
     const parts=roll?[['ok',c.present,'da'],['bad',c.no,'fehlen'],['warn',c.exc,'entschuldigt'],['open',c.open,'offen']]
-      :[['ok',c.yes,'zugesagt'],['warn',c.exc,'entschuldigt'],['bad',c.no,'abgesagt'],['open',c.open,'offen']];
+      :[['ok',c.yes,_ywFor(s)],['warn',c.exc,'entschuldigt'],['bad',c.no,'abgesagt'],['open',c.open,'offen']];
     head=`<div class="kb-head"><div class="kb-ttl">${e(what)}</div><div class="kb-meta">${e(when)}</div>
       <div class="kb-leg">${parts.filter(p=>p[1]).map(p=>`<span><i class="${p[0]}"></i><b>${p[1]}</b> ${p[2]}</span>`).join('')}</div></div>
       ${m&&ed?`<button type="button" class="kb-lu" onclick="kbLineup()">Aufstellung aus Zusagen</button>`:''}`;
@@ -29523,7 +29582,7 @@ function kbLineup(){
   const join=(p,ss)=>typeof _sessAfterJoin!=='function'||_sessAfterJoin(p,ss,season);
   const okV=(typeof _isSessRollCallTime==='function'&&_isSessRollCallTime(si))?[1]:[4,1];
   const avail=D.players.map((p,pi)=>({p,pi})).filter(x=>x.p&&join(x.p,s)&&okV.includes(x.p.s&&x.p.s[si]));
-  if(!avail.length){alert('Für dieses Spiel hat noch niemand zugesagt.');return;}
+  if(!avail.length){alert(_ywFor(s)==='verfügbar'?'Für dieses Spiel ist noch niemand verfügbar.':'Für dieses Spiel hat noch niemand zugesagt.');return;}
   const held=(D.sessions||[]).map((ss,i)=>({ss,i})).filter(x=>typeof sessTookPlace!=='function'||sessTookPlace(x.ss,season));
   avail.forEach(x=>{let a=0,n=0;held.forEach(h=>{if(!join(x.p,h.ss))return;const v=x.p.s&&x.p.s[h.i];if(v===1||v===0||v===2){n++;if(v===1)a++;}});x.r=n?a/n:0;});
   openLineupPlanner(si);
@@ -36817,7 +36876,7 @@ function _tplRenderGrp(){
   const R=V.R;const yes=R.yes.length;const gkN=R.yes.filter(x=>x.line===0).length;
   const prev=_tplGrpPrev(g);const used=_tplGrpBlocks(g).length;const many=_tplGrps().length>1;
   const set=`<section class="tpl-col tpl-gset" aria-label="Einteilung">
-    <div class="tpl-gyes"><span class="big">${yes}</span><b>Spieler zugesagt</b>
+    <div class="tpl-gyes"><span class="big">${yes}</span><b>Spieler ${_ywFor(_tplSess())}</b>
       <span class="tpl-hint">${gkN?`davon ${gkN} Torhüter · `:''}aktualisiert sich bei neuen Antworten</span></div>
     ${wx?'':`<div class="tpl-gsett">
       <div class="tpl-row" style="align-items:center"><b style="font-size:15px">${many?'Einteilung '+_tplE(g.l):'Gruppen'}</b>
@@ -36838,12 +36897,12 @@ function _tplRenderGrp(){
       <div class="tpl-gf">${_tplMix(gr)}</div></div>`;}).join('');
   const names=a=>a.map(x=>_tplE(x.p.name)).join(', ');
   const gkCard=(g.gk||V.gk.length)?`<section class="tpl-col tpl-gcard gk" ondragover="tplGrpOver(event)" ondragleave="tplDragLeave(event)" ondrop="tplGrpDrop(event,-1)" aria-label="Torhüter">
-      <h3 class="tpl-h3">Torhüter</h3><div class="tpl-gl">${V.gk.map(x=>_tplGpRow(x,-1,g)).join('')||'<span class="tpl-none">Kein Torhüter zugesagt.</span>'}</div></section>`:'';
+      <h3 class="tpl-h3">Torhüter</h3><div class="tpl-gl">${V.gk.map(x=>_tplGpRow(x,-1,g)).join('')||'<span class="tpl-none">Kein Torhüter '+_ywFor(_tplSess())+'.</span>'}</div></section>`:'';
   const out=`<section class="tpl-col tpl-gout" aria-label="Nicht dabei"><h3 class="tpl-h3">Nicht dabei</h3>
       ${R.exc.length?`<b class="exc">Entschuldigt</b><span>${names(R.exc)}</span>`:''}
       ${R.abs.length?`<b>Fehlt</b><span>${names(R.abs)}</span>`:''}
       ${R.open.length?`<b>Noch keine Antwort</b><span>${names(R.open)}</span>`:''}
-      ${(R.exc.length||R.abs.length||R.open.length)?'':'<span class="tpl-hint">Alle haben zugesagt.</span>'}
+      ${(R.exc.length||R.abs.length||R.open.length)?'':(_ywFor(_tplSess())==='verfügbar'?'<span class="tpl-hint">Alle sind verfügbar.</span>':'<span class="tpl-hint">Alle haben zugesagt.</span>')}
       <span class="tpl-hint">Sagt jemand nachträglich zu, landet er in der kleinsten Gruppe.</span></section>`;
   const hint=(!wx&&!used&&TPL.plan.blocks.length)?`<div class="tpl-warnbar">Einteilung ${_tplE(g.l)} gilt noch für keine Übung. Links unter „Gruppen im Ablauf“ die Übungen auf ${_tplE(g.l)} stellen.</div>`:'';
   const mid=wx?_tplWxHtml()
@@ -37221,7 +37280,7 @@ function _tplPitchListHtml(r){
   return `<div class="tpp-in tpp-list">
     <div class="tpp-top"><button type="button" class="tpp-ib" onclick="tplPitchView('blk')" aria-label="Zurück"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
       <span class="tpp-pos">Ablauf</span><span style="width:44px"></span></div>
-    <div class="tpp-stats"><div><b class="y">${tot}′</b><span>geplant</span></div><div><b>${bl.length}</b><span>Blöcke</span></div><div><b>${_tplYes()}</b><span>zugesagt</span></div>${r?`<div><b>${Math.round(done/60)}′</b><span>gelaufen</span></div>`:''}</div>
+    <div class="tpp-stats"><div><b class="y">${tot}′</b><span>geplant</span></div><div><b>${bl.length}</b><span>Blöcke</span></div><div><b>${_tplYes()}</b><span>${_ywFor(_tplSess())}</span></div>${r?`<div><b>${Math.round(done/60)}′</b><span>gelaufen</span></div>`:''}</div>
     <div class="tpp-prog">${_tplPitchProg(r,bi)}</div>
     <div class="tpp-body">${bl.map((b,i)=>`<button type="button" class="tpp-card${i===bi?' cur':''}" onclick="tplPitchGo(${i})">
         ${_dgHas(b.dia)?`<span class="tpp-th">${_dgSvg(b.dia)}</span>`:`<span class="tpp-th none" style="background:${_tplCatColor(b.cat)}"></span>`}
