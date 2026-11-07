@@ -7531,12 +7531,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.94'; // v1.2.94: Kader – Nachricht an die nicht Nominierten nur mit Haken
-const APP_VERSION_LABEL='1.2.94';
+const APP_VERSION='1.2.95'; // v1.2.95: Meine Woche – Hinweis, wenn die Antworten geschlossen sind
+const APP_VERSION_LABEL='1.2.95';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1794054446985; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1794055152687; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -22198,6 +22198,9 @@ function renderPlayerMode(){
     // 3 offen, 4 Angemeldet (ay 1: by the team's rule), 5 Nicht im Kader
     const status=(p.s&&si<p.s.length)?p.s[si]:3;
     const auto=status===4&&Array.isArray(p.ay)&&p.ay[si]===1;
+    // Not in the published squad (before kick-off): "M" means available if
+    // someone drops out — the button says so instead of "Eingeplant" (1.2.95)
+    const outSq=s.type==='match'&&typeof _sqOutOf==='function'&&_sqOutOf(s,p);
     const excA=Array.isArray(p.excOK)&&p.excOK[si]==='a';
     const rsvpUntil=_amSessionDeadline(si);
     const locked=_amRsvpLocked(si);
@@ -22205,7 +22208,9 @@ function renderPlayerMode(){
     const appOk=pvAbsOk(s,p,_R,now);
     let deadlineLine='';
     if(rsvpUntil){
-      if(locked)deadlineLine=`<div class="pm-deadline locked">${PM_IC.lock} Antworten geschlossen</div>`;
+      // Closed, still ahead, he is expected: the call is the only way left
+      const callOnly=locked&&(status===3||status===4)&&!_sqOutOf(s,p)&&!(typeof sessTookPlace==='function'&&sessTookPlace(s,UI.currentSeason));
+      if(locked)deadlineLine=`<div class="pm-deadline locked">${PM_IC.lock} Antworten geschlossen${callOnly?' \u2013 Absage nur noch per Anruf':''}</div>`;
       else deadlineLine=`<div class="pm-deadline">${PM_IC.clock} Antwort bis ${_pmRelTime(rsvpUntil)}</div>`;
     }
     // Physio: only reported here, booked in its own step
@@ -22258,7 +22263,7 @@ function renderPlayerMode(){
         ${lineupInfo}
         ${deadlineLine}
         <div class="pm-actions pm-actions-2">
-          <button class="pm-btn pm-yes${kommeActive?' active':''}${auto?' plan':''}"${dis} onclick="pmSetStatus(${si},1)"${auto?' aria-label="Eingeplant – tippen zum Zusagen"':''}><span class="pm-btn-ico">${PM_IC.yes}</span><span class="pm-btn-lbl">${auto?'Eingeplant':'Komme'}</span></button>
+          <button class="pm-btn pm-yes${kommeActive?' active':''}${auto?' plan':''}"${dis} onclick="pmSetStatus(${si},1)"${auto&&!outSq?' aria-label="Eingeplant – tippen zum Zusagen"':''}><span class="pm-btn-ico">${PM_IC.yes}</span><span class="pm-btn-lbl">${outSq?'Verfügbar':auto?'Eingeplant':'Komme'}</span></button>
           <button class="pm-btn pm-no${kannNichtActive?' active':''}"${dis} onclick="pmSetStatus(${si},0)"><span class="pm-btn-ico">${PM_IC.no}</span><span class="pm-btn-lbl">Kann nicht</span></button>
         </div>
         ${state}
@@ -22330,12 +22335,20 @@ function renderPlayerMode(){
     const bulbs=upcoming.map(({si})=>{const v=(p.s&&si<p.s.length)?p.s[si]:3;return v===3?'<i></i>':'<i class="on"></i>';}).join('');
     html+=`<h1 class="fl-title">Deine Woche</h1><div class="fl-answered"><span class="fl-bulbs" aria-hidden="true">${bulbs}</span>`
       +`<span>${upcoming.length-openCount} von ${upcoming.length} beantwortet</span></div>`;
-    // The rule in one place instead of a sentence under every card
-    const planned=upcoming.some(({si})=>p.s&&p.s[si]===4&&Array.isArray(p.ay)&&p.ay[si]===1);
-    const ruleTxt=_rule.m==='app'?'Wenn du nicht kannst, sag hier ab.'
+    // The rule in one place instead of a sentence under every card. Only for
+    // what is still ahead and concerns him: not what has started, not a match
+    // he is not in the squad for (1.2.95). Once every answer is closed, "sag
+    // hier ab" would point at buttons that no longer work (Artem 07.11.) —
+    // then only the call is left.
+    const _ahead=upcoming.filter(({s,si})=>!(typeof sessTookPlace==='function'&&sessTookPlace(s,UI.currentSeason))
+      &&!(typeof _sqOutOf==='function'&&_sqOutOf(s,p))&&!(p.s&&(p.s[si]===5||p.s[si]===0||p.s[si]===2)));
+    const planned=_ahead.some(({si})=>p.s&&p.s[si]===4&&Array.isArray(p.ay)&&p.ay[si]===1);
+    const canAnswer=_ahead.some(({si})=>!_amRsvpLocked(si));
+    const ruleTxt=!canAnswer?'Wenn du nicht kannst, ruf einen Trainer an.'
+      :_rule.m==='app'?'Wenn du nicht kannst, sag hier ab.'
       :_rule.m==='anruf'?'Wenn du nicht kannst, sag hier ab und ruf einen Trainer an.'
       :`Wenn du nicht kannst, sag hier ab. Bis ${_rule.h} Std. vor Beginn ist das entschuldigt, danach nur per Anruf.`;
-    html+=`<div class="pm-rule">${planned?'<b>Du bist eingeplant.</b> ':''}${ruleTxt}</div>`;
+    if(_ahead.length)html+=`<div class="pm-rule">${planned?'<b>Du bist eingeplant.</b> ':''}${ruleTxt}</div>`;
     html+=_newsHtml('pm');
     html+='<div class="pm-list">';
     upcoming.forEach(({s,si,sk})=>{html+=renderCard(s,si,sk);});
