@@ -286,7 +286,7 @@ function world() {
   const si = sess.findIndex(s => s.date === 'So 25.10');
   // Max 4 in · Ali 4 out · Tom 3 not picked · Jonas 0 declined (still listed) · Luca 3 picked · Finn 2 · Noah 4 out
   [4, 4, 3, 0, 3, 2, 4].forEach((v, i) => { players[i].s[si] = v; });
-  const sq = { p: ['Max Müller', 'Jonas Weber', 'Luca Rossi'], out: ['Ali Kaya', 'Noah Becker'], meet: '11:45', where: 'Parkplatz Sportplatz', t: Date.UTC(2026, 9, 23, 18, 0), by: 'Artem' };
+  const sq = { p: ['Max Müller', 'Jonas Weber', 'Luca Rossi'], out: ['Ali Kaya', 'Noah Becker'], meet: '11:45', where: 'Parkplatz Sportplatz', t: Date.UTC(2026, 9, 23, 18, 0), by: 'Artem', outPush: true };
   sess[si].squad = sq;
   const subs = {};
   ['tok0', 'tok1', 'tok2', 'tok3', 'tok4', 'tok6'].forEach(t => { subs[ownerOf(t)] = { a: dev(t) }; });
@@ -333,6 +333,29 @@ function world() {
   await db.set('fcf_push/status', { day: 20261027 });
   await round({ db, push, ts: Date.UTC(2026, 9, 28, 6, 7), log: q });            // Mi 8:07
   ok(!(await db.get('fcf_push/sq/U19__2026__SL__27/k1025-1300m')), 'squad record cleared two days after the match');
+  // Without the tick (1.2.94): those not picked hear nothing — who was told he
+  // is in and is taken out still does; who was never told and is added hears "in"
+  {
+    const sessN = JSON.parse(JSON.stringify(sess));
+    const sqN = Object.assign({}, sq); delete sqN.outPush;
+    sessN[si].squad = sqN;
+    const dbN = makeDb({ fcf_data: { db: { 'U19__2026__SL__27': { sessions: enc(sessN), players: enc(players) } } }, fcf_push: { subs, config: { U19: { rsvp: false, rpe: false, vote: false } } } });
+    push = makePush();
+    await round({ db: dbN, push, ts: Date.UTC(2026, 9, 23, 18, 12), log: q });
+    const gN = Object.fromEntries(push.calls.map(c => [by(c), c.p]));
+    ok(Object.keys(gN).sort().join() === 'tok0,tok4', 'squad without the tick: only those in (Max, Luca), not Ali or Noah: ' + Object.keys(gN).sort().join());
+    const toldN = await dbN.get('fcf_push/sq/U19__2026__SL__27/k1025-1300m');
+    ok(toldN && !(ownerOf('tok1') in toldN) && !(ownerOf('tok6') in toldN), 'squad without the tick: nothing kept for those not told: ' + JSON.stringify(toldN));
+    const sN = decode(await dbN.get('fcf_data/db/U19__2026__SL__27/sessions'));
+    sN[si].squad = Object.assign({}, sqN, { p: ['Max Müller', 'Ali Kaya'], out: ['Noah Becker'], t: Date.UTC(2026, 9, 24, 7, 0) });
+    await dbN.set('fcf_data/db/U19__2026__SL__27/sessions', enc(sN));
+    push = makePush();
+    await round({ db: dbN, push, ts: Date.UTC(2026, 9, 24, 7, 12), log: q });
+    const cN = Object.fromEntries(push.calls.map(c => [by(c), c.p]));
+    ok(Object.keys(cN).sort().join() === 'tok1,tok4', 'squad without the tick, changed: Ali added, Luca taken out — nobody else: ' + Object.keys(cN).sort().join());
+    ok(cN.tok1 && cN.tok1.title === 'Du bist im Kader für morgen', 'squad without the tick: added, never told before: ' + JSON.stringify(cN.tok1));
+    ok(cN.tok4 && cN.tok4.title === 'Änderung im Kader für morgen' && /^Diesmal bist du doch nicht dabei\./.test(cN.tok4.body), 'squad without the tick: taken out after "in" — always told: ' + JSON.stringify(cN.tok4));
+  }
   // Withdrawn before it went out: nothing; published at night: in the morning
   const sess3 = JSON.parse(JSON.stringify(sess));
   sess3[si].squad = Object.assign({}, sq, { off: Date.UTC(2026, 9, 23, 18, 3) });

@@ -3404,6 +3404,8 @@ body.design-heute .lp-nik-t{color:var(--hx-muted);}
 .sqd-mob>*{flex-shrink:0;}
 .sqd-std{margin:6px 0 0;font-size:.76rem;color:var(--hx-muted,var(--gm));}
 .mob label.rs-chk.sqd-keep{margin:8px 0 0;}
+.mob label.rs-chk.sqd-op{margin:8px 0 0;}
+.mob label.rs-chk.sqd-op>span{font-size:.82rem;}
 .mob label.rs-chk.sqd-keep[hidden]{display:none;}
 .sqd-two{display:grid;grid-template-columns:7.2em minmax(0,1fr);gap:10px;}
 .sqd-two input{width:100%;box-sizing:border-box;}
@@ -7529,12 +7531,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.93'; // v1.2.93: Kader-Liste für die Spieler
-const APP_VERSION_LABEL='1.2.93';
+const APP_VERSION='1.2.94'; // v1.2.94: Kader – Nachricht an die nicht Nominierten nur mit Haken
+const APP_VERSION_LABEL='1.2.94';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1794052722110; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1794054446985; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -7554,9 +7556,7 @@ const FL_MARK='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F
 function _clubSlug(){return (_clubName()||'Flutlicht').replace(/[^A-Za-z0-9ÄÖÜäöüß]+/g,'-').replace(/^-|-$/g,'')||'Flutlicht';}
 function _clubInfo(){const c=(G&&G.club&&typeof G.club==='object')?G.club:{};return {name:_clubName(),resp:String(c.resp||''),addr:String(c.addr||''),mail:String(c.mail||''),dsb:String(c.dsb||'')};}
 const APP_NEWS=[
-  {id:'20261107-3',d:'07.11.',t:'Die Spieler sehen den Kader',x:'Nach dem Veröffentlichen sehen die Spieler in der App unter „Meine Woche“, wer im Kader ist – Namen und Nummern, wie im WhatsApp-Text. Wer nicht dabei ist, wird nicht genannt; die Aufstellung bleibt bei euch.'},
-  {id:'20261107-2',d:'07.11.',t:'Matchplan und Videos für die Spieler',x:'Im Spiel-Fenster legst du unter „Matchplan“ Video-Links, ein Bild oder ein paar Sätze an – die Spieler sehen es mit dem Kader in ihrer App. Unter Kader → Videos sammelst du Videos nach Positionen.'},
-  {id:'20261107-1',d:'07.11.',t:'Belastung bis morgen Abend',x:'Die Spieler können die Belastung jetzt bis 24 Uhr am Tag danach eintragen – Studien zeigen, dass die Angabe so lange zuverlässig bleibt. Länger nicht, und nie über den nächsten Termin hinaus.'},
+  {id:'20261107-3',d:'07.11.',t:'Kader, Matchplan und Videos für die Spieler',x:'Nach dem Veröffentlichen sehen die Spieler in ihrer App, wer im Kader ist (ohne Aufstellung), und den Matchplan, den du im Spiel-Fenster anlegst: Video-Links, ein Bild oder ein paar Sätze. Unter Kader → Videos sammelst du Videos nach Positionen.',go:['Zum nächsten Spiel','oppGoNext()']},
   {id:'20261104-2',d:'04.11.',t:'Aufstellung: jeder seine Variante',x:'Jeder Trainer speichert seine eigene Aufstellung fürs Spiel und sieht oben unter „Varianten“ die der anderen. Mit „Für das Spiel festlegen“ bestimmt ihr, welche für Kader und Statistik zählt.',go:['Zur Aufstellung','hxOpenLineup()']},
   {id:'20261101-1',d:'01.11.',t:'Wer braucht Aufmerksamkeit?',x:'Oben in der Statistik: wer gerade in Folge fehlt, seltener kommt als sonst, nach längerer Zeit wieder da ist, wenig spielt oder mehrmals schwachen Einsatz hatte. Jeder wird mit sich selbst und mit der Mannschaft verglichen: Wer in den Ferien wie viele andere fehlt, fällt nicht auf.',go:['Zur Statistik',"hxGo('stats')"]},
   {id:'20261028-2',d:'28.10.',t:'Rückblick nach dem Training',x:'Nach „Anwesenheit erfassen“ fragt die App kurz: Wie lief’s, was lief gut, was ändern wir? Mit Plan auch, ob jede Übung gepasst hat. „Was ändern wir?“ steht beim nächsten Training wieder da, „anpassen“ bei der Übung im Trainingsplaner.',go:['Zum letzten Training','rvGoLast()']},
@@ -18344,7 +18344,11 @@ function squadOpen(si,addLu){
     if(addLu)(_sqLineup(D,si)||[]).forEach(pi=>sel.add(pi));   // "Kader anpassen": add, never drop
   }
   else (_sqLineup(D,si)||(D.players||[]).map((p,pi)=>(p&&join(p)&&_sqSt(p,si)===4)?pi:-1).filter(pi=>pi>=0)).forEach(pi=>sel.add(pi));
-  _SQ={si,sel,date:s.date,was:!!q};
+  // outPush (1.2.94): those confirmed and not picked get "Diesmal bist du
+  // nicht dabei" on the phone only when ticked — off by default, every time.
+  // The list goes to the WhatsApp group anyway; a second "not in" to the same
+  // boy only hurts (Artem 07.11.). Editing a squad keeps its choice.
+  _SQ={si,sel,date:s.date,was:!!q,prevIn:new Set(q?q.p:[]),outPush:!!(q&&q.outPush===true)};
   document.getElementById('sqKeep').checked=false;
   const def=_sqMeetDefault(s);
   document.getElementById('sqMeet').value=q?q.meet:def.meet;
@@ -18378,6 +18382,11 @@ function _sqRenderList(){
   if(rest.length)h+=`<div class="sqd-no">Abgesagt oder entschuldigt: ${e(rest.map(x=>nm(x.p)).join(', '))}</div>`;
   document.getElementById('sqList').innerHTML=h||'<div class="rs-empty">Noch keine Spieler.</div>';
   _sqRenderSum();
+}
+function sqOutPushSet(on){
+  if(!_SQ)return;
+  _SQ.outPush=!!on;_sqRenderSum();
+  const c=document.getElementById('sqOutPush');if(c)c.focus();
 }
 function sqToggle(pi,on){if(!_SQ)return;if(on)_SQ.sel.add(pi);else _SQ.sel.delete(pi);_sqRenderSum();}
 function sqFromLineup(){
@@ -18446,12 +18455,20 @@ function _sqRenderSum(){
     +e([('min' in kw)?st.min+' → '+kw.min+' Min. vor Anpfiff':'',('aw' in kw)?'Treffpunkt: '+kw.aw:''].filter(Boolean).join(' · '))
     +'. Sonst gilt es nur für dieses Spiel.</small>';
   const m=_sqMsg(D,si,season,q);
-  const push=ins.concat(outs).filter(p=>p.push&&p.push.t).length,tot=ins.length+outs.length;
+  // Taken out after the squad had gone out: told whatever the tick says
+  const gone=(D.players||[]).filter((p,pi)=>p&&_SQ.prevIn.has(p.name)&&!_SQ.sel.has(pi)&&![0,2].includes(_sqSt(p,si)));
+  const told=[...new Set(ins.concat(_SQ.outPush?outs:[],gone))];
+  const push=told.filter(p=>p.push&&p.push.t).length,tot=told.length;
   const box=(cls,t,b)=>`<div class="sqd-msg ${cls}"><b>${e(t)}</b><span>${e(b)}</span></div>`;
   let h=`<div class="rs-g"><div class="rs-gh"><span class="rs-n">${ins.length}</span><span>im Kader</span></div>${box('in',m.inT,m.inB)}</div>`;
-  if(outs.length)h+=`<div class="rs-g"><div class="rs-gh"><span class="rs-n">${outs.length}</span><span>${_sqAvail()?'verfügbar':'zugesagt'}, nicht im Kader</span></div>${box('out',m.outT,m.outB)}</div>`;
+  if(outs.length)h+=`<div class="rs-g"><div class="rs-gh"><span class="rs-n">${outs.length}</span><span>${_sqAvail()?'verfügbar':'zugesagt'}, nicht im Kader</span></div>`
+    +`<label class="rs-chk sqd-op"><input type="checkbox" id="sqOutPush"${_SQ.outPush?' checked':''} onchange="sqOutPushSet(this.checked)"><span>Auch ihnen aufs Handy schicken`
+    +`${_SQ.outPush?'':'<small>Sonst sehen sie es nur in der App und im WhatsApp-Text.</small>'}</span></label>`
+    +`${_SQ.outPush?box('out',m.outT,m.outB):''}</div>`;
+  const quiet=_SQ.outPush?'Wer abgesagt oder nicht geantwortet hat, bekommt nichts.'
+    :'Wer nicht im Kader ist, bekommt nichts aufs Handy'+(gone.length?' – außer wer vorher drin war: er erfährt, dass er doch nicht dabei ist.':'.');
   h+=`<div class="rs-foot">${push?push+' von '+tot+' bekommen es aufs Handy (frühestens in 10 Minuten), alle sehen es in der App.':'Alle sehen es in der App; Erinnerungen aufs Handy hat von ihnen noch niemand an.'}`
-    +` Wer abgesagt oder nicht geantwortet hat, bekommt nichts. Wer im Kader ist, sehen alle in der App.${_SQ.was?' Nach einer Änderung bekommt nur eine Nachricht, wen sie betrifft.':''}</div>`;
+    +` ${quiet} Wer im Kader ist, sehen alle in der App.${_SQ.was?' Nach einer Änderung bekommt nur eine Nachricht, wen sie betrifft.':''}</div>`;
   document.getElementById('sqPrev').innerHTML=h;
   const go=document.getElementById('sqGo');
   go.textContent=_SQ.was?'Änderungen veröffentlichen':'Kader veröffentlichen';
@@ -18472,6 +18489,7 @@ function sqPublish(){
   const was=_sqOf(s);
   snap();
   s.squad={p:names,out,meet:_sqHM(mm),where:r.where,t:Date.now(),by:(CU&&CU.name)||''};
+  if(_SQ.outPush&&out.length)s.squad.outPush=true;
   // "Als Standard merken": the team's setting follows this match; otherwise
   // the setting stays as it is
   const t=UI.currentTeam,kw=_sqKeepWhat(s,r);
@@ -18484,7 +18502,7 @@ function sqPublish(){
     logAudit('Treffpunkt-Regel',t,(k==='a'?'Auswärtsspiele':'Heimspiele')+': '+[('min' in kw)?kw.min+' Min.':'',('aw' in kw)?kw.aw:''].filter(Boolean).join(', ')+' (aus dem Kader-Fenster)');
   }
   saveG();
-  logAudit(was?'Kader geändert':'Kader veröffentlicht',s.date+(s.label?' '+s.label:''),names.length+' Spieler, Treffpunkt '+_sqHM(mm));
+  logAudit(was?'Kader geändert':'Kader veröffentlicht',s.date+(s.label?' '+s.label:''),names.length+' Spieler, Treffpunkt '+_sqHM(mm)+(s.squad.outPush?', Nachricht auch an die nicht Nominierten':''));
   closeM('moKader');
   _sqRefresh(si);
   if(typeof showSaveFlash==='function')showSaveFlash(was?'✓ Kader geändert':'✓ Kader veröffentlicht');

@@ -209,11 +209,15 @@ export function planNews({ news, players, now, owners, log, logY }) {
 }
 
 // ── Spieltag: Kader und Treffpunkt (1.2.13) ──
-// s.squad = {p:[names], meet:'HH:MM', where, t, off?} on a match. Each player
-// with reminders on is told what concerns him, once per state: in the squad
-// (with meeting time and place), or confirmed and not picked ("not this time",
-// with the next training). Declined, excused or no answer: nothing. After a
-// change only those whose state changed hear again. What a player was last
+// s.squad = {p:[names], meet:'HH:MM', where, t, off?, outPush?} on a match.
+// Each player with reminders on is told what concerns him, once per state: in
+// the squad (with meeting time and place), or confirmed and not picked ("not
+// this time", with the next training) — the latter only when the trainer ticked
+// it while publishing (outPush, 1.2.94; Artem 07.11.: the list is in the
+// WhatsApp group already, a second "you are not in" hurts). Who was told he is
+// in and is taken out again always hears it, or he would come. Declined,
+// excused or no answer: nothing. After a change only those whose state changed
+// hear again. What a player was last
 // told: told[key][owner] = 'in|HH:MM|where' or 'out' (fcf_push/sq/<block>).
 // The wording is the same as in the app (_sqMsg) — keep both the same.
 export const SQUAD_DELAY = NEWS_DELAY;
@@ -273,8 +277,9 @@ export function planSquad({ sessions, players, season, now, owners, told }) {
       const v = st(p, si);
       if (v === 0 || v === 2) return;
       const isIn = inSet.has(p.name), had = was[owner];
-      // Out: he confirmed — or he had been told he is in (taken out again)
-      const want = isIn ? 'in|' + q.meet + '|' + (q.where || '') : ((v === 4 || String(had || '').startsWith('in|')) ? 'out' : null);
+      // Out: he had been told he is in (taken out again) — or he confirmed and
+      // the trainer chose to tell those not picked
+      const want = isIn ? 'in|' + q.meet + '|' + (q.where || '') : ((String(had || '').startsWith('in|') || (v === 4 && q.outPush === true)) ? 'out' : null);
       if (!want || had === want) return;
       let title, body;
       if (isIn && !had) { title = 'Du bist im Kader ' + f; body = inB; }
