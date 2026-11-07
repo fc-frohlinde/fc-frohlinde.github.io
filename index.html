@@ -3267,6 +3267,55 @@ body.design-heute .dow-btn.sel-m{background:var(--mc1);border-color:var(--mc1);c
 /* Spieltag: Kader und Treffpunkt (1.2.13) — card in the match panel, the window, players */
 .sqd-card{margin:4px 0 18px;padding:12px 14px;border-radius:14px;border:1px solid var(--hx-line,var(--gl));background:var(--hx-card2,#F4F7FB);}
 .sqd-card.on{border-left:4px solid #2E8B5E;}
+/* Matchplan und Videos (1.2.91) */
+.mp-card.on{border-left-color:#1659B8;}
+.mp-reach{margin-top:6px;font-size:.84rem;color:var(--hx-ink2,var(--gd));}
+.mp-reach b{font-family:var(--hx-num,'Barlow');font-weight:800;font-size:1.05rem;}
+.mp-mob textarea{width:100%;box-sizing:border-box;resize:vertical;min-height:84px;font:inherit;}
+.mp-mob input[type=text],.mp-mob input[type=url]{width:100%;box-sizing:border-box;}
+.mp-lh,.mob label.mp-lh{display:block;margin:16px 0 6px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;line-height:1.3;color:var(--hx-muted,var(--gd));}
+.mp-lh .rs-opt{text-transform:none;letter-spacing:0;font-weight:500;}
+.mob label.mp-lh:first-of-type{margin-top:12px;}
+.mp-lrow{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.3fr) 36px;gap:6px;margin-bottom:6px;}
+.mp-x{height:36px;border-radius:9px;border:1px solid var(--hx-line,var(--gl));background:var(--hx-field,#fff);color:var(--hx-muted,var(--gm));cursor:pointer;font-size:.9rem;}
+.mp-x:hover{color:#b8322a;border-color:#e3b1ab;}
+#mpAddL[hidden],.mp-del[hidden]{display:none;}
+.mp-imgrow{display:grid;grid-template-columns:72px minmax(0,1fr) auto;align-items:center;gap:10px;}
+.mp-thumb{width:72px;height:54px;object-fit:cover;border-radius:8px;border:1px solid var(--hx-line,var(--gl));}
+.mp-imgt{font-size:.76rem;line-height:1.4;color:var(--hx-muted,var(--gm));}
+.mp-vis{display:flex;flex-wrap:wrap;gap:8px 22px;}
+.mob .mp-vis label.rs-chk{margin:0;align-items:center;}
+.mob .mp-vis label.rs-chk input[type=radio]{width:18px;height:18px;margin:0;padding:0;flex-shrink:0;accent-color:var(--hx-blue,var(--bm));}
+.mp-del{margin-left:auto;}
+.vd-intro{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;}
+.vd-intro p{margin:0;font-size:.84rem;line-height:1.45;color:var(--hx-ink2,var(--gd));}
+.vd-intro .sqd-go{flex-shrink:0;}
+.vd-list{border-top:1px solid var(--hx-line,var(--gl));}
+.vd-row{display:grid;grid-template-columns:22px minmax(0,1fr) auto auto;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--hx-line,var(--gl));}
+.vd-ic{color:var(--hx-muted,var(--gm));font-size:.8rem;text-align:center;}
+.vd-t{min-width:0;}
+.vd-t a{display:block;font-weight:700;color:var(--hx-ink,var(--gd));text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.vd-t a:hover{text-decoration:underline;}
+.vd-t small{display:block;font-size:.72rem;color:var(--hx-muted,var(--gm));}
+.vd-pos{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end;}
+.vd-pos i{font-style:normal;}
+.vd-all{font-size:.72rem;font-weight:700;color:var(--hx-muted,var(--gm));}
+.vd-empty{padding:18px 14px;font-size:.86rem;line-height:1.5;color:var(--hx-muted,var(--gm));}
+.vd-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.vd-chip{min-width:46px;height:34px;padding:0 10px;border-radius:999px;border:1px solid var(--hx-line,var(--gl));background:var(--hx-field,#fff);color:var(--hx-ink,var(--gd));font:700 .8rem 'Barlow',sans-serif;cursor:pointer;}
+.vd-chip.on{background:var(--hx-ink,#0E2350);border-color:var(--hx-ink,#0E2350);color:#fff;}
+.vd-chip:focus-visible,.mp-x:focus-visible{outline:2px solid var(--hx-blue,var(--bm));outline-offset:2px;}
+body.design-heute.hxk-dk .vd-chip.on{background:var(--hk-ink);border-color:var(--hk-ink);color:var(--hk-card);}
+@media(max-width:600px){.mp-lrow{grid-template-columns:minmax(0,1fr) 36px;}.mp-lrow .mp-lu{grid-column:1;grid-row:2;}.mp-lrow .mp-x{grid-row:1/3;grid-column:2;height:auto;}
+  .mp-lrow{padding-bottom:6px;border-bottom:1px dashed var(--hx-line,var(--gl));}
+  .vd-intro{flex-direction:column;align-items:stretch;}.vd-row{grid-template-columns:18px minmax(0,1fr) auto;}.vd-row .vd-pos{grid-column:2;justify-content:flex-start;}.vd-row .sqd-link{grid-column:3;grid-row:1/3;}}
+body.player-mode .mp-scr{padding-bottom:28px;}
+body.player-mode .mp-head{margin:10px 2px 14px;}
+body.player-mode .mp-txt{margin:0 2px 18px;color:var(--fl-ink);font-size:16px;line-height:1.55;}
+body.player-mode .mp-txt p{margin:0 0 10px;}
+body.player-mode .mp-links{margin-bottom:16px;}
+body.player-mode .mp-img{display:block;width:100%;height:auto;border-radius:14px;border:1px solid var(--fl-line);margin:0 0 16px;background:#fff;}
+body.player-mode .mp-foot{text-align:center;margin-top:10px;}
 .sqd-h{display:flex;align-items:baseline;flex-wrap:wrap;gap:3px 10px;}
 .sqd-h b{font-size:.98rem;color:var(--hx-ink,var(--gd));}
 .sqd-h span{font-size:.76rem;color:var(--hx-muted,var(--gm));}
@@ -7323,6 +7372,7 @@ if(window._fbBlocked){
     <button class="tbtn" data-tab="tafel" id="tbtn-tafel" onclick="switchTab('tafel',1)" style="display:none;">Tafel</button>
     <button class="tbtn active" data-tab="spieler" onclick="switchTab('spieler',1)">Spieler</button>
     <button class="tbtn" data-tab="ziele" onclick="switchTab('ziele',1)">Ziele</button>
+    <button class="tbtn" data-tab="videos" onclick="switchTab('videos',1)">Videos</button>
     <button class="tbtn" data-tab="trainer" onclick="switchTab('trainer',1)">Trainer</button>
   </div>
   <div class="tpanel" id="tab-tafel"><div id="kbBoard"></div></div>
@@ -7346,6 +7396,7 @@ if(window._fbBlocked){
     </div>
   </div>
   <div class="tpanel" id="tab-ziele"><div class="tmgr-scroll zl-wrap" id="zl-list"></div></div>
+  <div class="tpanel" id="tab-videos"><div class="tmgr-scroll vd-wrap" id="vd-list"></div></div>
   <div class="tpanel" id="tab-trainer">
     <p class="note" style="margin-bottom:8px;">Trainer für <strong id="mgr-team-lbl">–</strong></p>
     <div id="mgr-tr-list" style="margin-bottom:10px;"></div>
@@ -7466,12 +7517,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.90'; // v1.2.90: Belastung bis morgen Abend bewerten
-const APP_VERSION_LABEL='1.2.90';
+const APP_VERSION='1.2.91'; // v1.2.91: Matchplan und Videos für die Spieler
+const APP_VERSION_LABEL='1.2.91';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1794008260293; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1794009850059; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -7491,6 +7542,7 @@ const FL_MARK='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F
 function _clubSlug(){return (_clubName()||'Flutlicht').replace(/[^A-Za-z0-9ÄÖÜäöüß]+/g,'-').replace(/^-|-$/g,'')||'Flutlicht';}
 function _clubInfo(){const c=(G&&G.club&&typeof G.club==='object')?G.club:{};return {name:_clubName(),resp:String(c.resp||''),addr:String(c.addr||''),mail:String(c.mail||''),dsb:String(c.dsb||'')};}
 const APP_NEWS=[
+  {id:'20261107-2',d:'07.11.',t:'Matchplan und Videos für die Spieler',x:'Im Spiel-Fenster legst du unter „Matchplan“ Video-Links, ein Bild oder ein paar Sätze an – die Spieler sehen es mit dem Kader in ihrer App. Unter Kader → Videos sammelst du Videos nach Positionen.'},
   {id:'20261107-1',d:'07.11.',t:'Belastung bis morgen Abend',x:'Die Spieler können die Belastung jetzt bis 24 Uhr am Tag danach eintragen – Studien zeigen, dass die Angabe so lange zuverlässig bleibt. Länger nicht, und nie über den nächsten Termin hinaus.'},
   {id:'20261104-2',d:'04.11.',t:'Aufstellung: jeder seine Variante',x:'Jeder Trainer speichert seine eigene Aufstellung fürs Spiel und sieht oben unter „Varianten“ die der anderen. Mit „Für das Spiel festlegen“ bestimmt ihr, welche für Kader und Statistik zählt.',go:['Zur Aufstellung','hxOpenLineup()']},
   {id:'20261101-1',d:'01.11.',t:'Wer braucht Aufmerksamkeit?',x:'Oben in der Statistik: wer gerade in Folge fehlt, seltener kommt als sonst, nach längerer Zeit wieder da ist, wenig spielt oder mehrmals schwachen Einsatz hatte. Jeder wird mit sich selbst und mit der Mannschaft verglichen: Wer in den Ferien wie viele andere fehlt, fällt nicht auf.',go:['Zur Statistik',"hxGo('stats')"]},
@@ -15957,6 +16009,7 @@ function _pmSanitizeG(){
   if(_nw)keepDb[myTeam+'__news']={t:_nw.t,title:_nw.title,body:_nw.body||''};
   // The Absage-Regel only (1.2.45): his screen explains it
   keepDb[myTeam+'__rules']={abs:pvAbsRule(teamRules(myTeam))};
+  {const v=_vdList(myTeam);if(v.length)keepDb[myTeam+'__vids']=v;}
   G.db=keepDb;
   if(Array.isArray(G.teamList))G.teamList=[myTeam];
   if(Array.isArray(G.seasonList))G.seasonList=[mySeason];
@@ -15988,6 +16041,8 @@ function _pmSanitizeG(){
           squad:(()=>{const q=_sqOf(s);return (q&&_meName)?{in:q.p.includes(_meName),meet:q.meet||'',where:q.where||'',t:q.t}:undefined;})(),
           // The score only (1.2.44), as in the slices
           res:(()=>{const r=sbResult(s);return r?{f:r.f,a:r.a}:undefined;})(),
+          // The match plan once it is visible (1.2.91), as in the slices
+          mp:_mpForPlayers(s),
           // Player-visible session info — explicitly whitelisted
           location:s.location||''
           // note deliberately omitted — trainers' own record
@@ -16254,6 +16309,8 @@ function _pvSess(s){
   // The score of the match report (1.2.44) — nothing else of it: no starting
   // eleven, substitutions, minutes or cards
   const rs=sbResult(s);if(rs)o.res={f:rs.f,a:rs.a};
+  // The match plan once it is visible (1.2.91)
+  const mp=_mpForPlayers(s);if(mp)o.mp=mp;
   return o;
 }
 // Everything that needs the whole roster, computed while it is there. Runs
@@ -16284,7 +16341,7 @@ function _pvBuildSync(team,season){
   const loc={},la=(G.locationAddr&&typeof G.locationAddr==='object')?G.locationAddr:{};
   sessions.forEach(s=>{if(s&&s.location&&la[s.location])loc[s.location]=la[s.location];});
   const shared={v:PV_V,team,season,club:_clubName(),cinfo:(G.club&&typeof G.club==='object')?{resp:G.club.resp||'',addr:G.club.addr||'',mail:G.club.mail||'',dsb:G.club.dsb||''}:null,sessions:sessions.map(_pvSess),news,trainers,loc,
-    roster:{disp,nr,elig},names:[],rep:{},abs:pvAbsRule(teamRules(team))};
+    roster:{disp,nr,elig},names:[],rep:{},abs:pvAbsRule(teamRules(team)),vids:_vdList(team)};
   weeks.forEach(w=>{
     const r=reps[w.wk];if(!r)return;
     const tp=_reportForPlayers(r,null);
@@ -16492,6 +16549,7 @@ function _pvAdopt(x,token){
   const db={[key]:{sessions,players}};
   if(T.news)db[P.team+'__news']=T.news;
   if(T.abs)db[P.team+'__rules']={abs:T.abs};
+  if(Array.isArray(T.vids)&&T.vids.length)db[P.team+'__vids']=T.vids;
   G={version:20,db,teamList:[P.team],seasonList:[P.season],trainers:T.trainers||[],clubName:T.club||'',club:T.cinfo||null,
     locationAddr:T.loc||{},auditLog:[],trash:[],backups:[],matchLineups:{},seasonLineups:{},
     sessionTemplates:[],exerciseLibrary:[],calEvents:[]};
@@ -17760,6 +17818,382 @@ function _sqPanelHtml(si){
     ${outNow.length?`<div class="sqd-out">Zugesagt, nicht im Kader: ${e(outNow.join(', '))}</div>`:''}
     ${ni.length?`<div class="sqd-lu">In der Aufstellung, aber nicht im Kader: <b>${e(_sqNames(D,ni))}</b> – ${ni.length===1?'bekommt':'bekommen'} keinen Treffpunkt.</div>`:''}
     ${ed?`<div class="sqd-acts"><button type="button" class="sqd-go alt" onclick="squadOpen(${si}${ni.length?',true':''})">${ni.length?'Kader anpassen':'Ändern'}</button><button type="button" class="sqd-link" onclick="squadShare(${si})">WhatsApp-Text</button><button type="button" class="sqd-link" onclick="squadWithdraw(${si})">Zurücknehmen</button></div>`:''}</div>`;
+}
+// ══ Matchplan und Videos für die Spieler (1.2.91) ══════════════════
+// Artem 07.11.: first the match plan – a YouTube link or a picture – and videos
+// by position. A plan lies on its match (s.mp) and reaches the players with the
+// published squad, or at once if the trainer says so. Links only: the button
+// opens YouTube, nothing is embedded, so opening the app sends nothing to
+// Google. Trainers see how many players have opened the app since: the
+// players' writes (fcf_in) know no other kind, and counting who opened the plan
+// itself would need new database rules.
+//   s.mp = {x: text, l: [{t, u}], img: data URL, vis: 'kader'|'sofort',
+//           c: created, t: saved, pt: shown since ('sofort'), by}
+//   G.db[team+'__vids'] = {<id>: {t, u, pos: [POS…] (none = for everyone), at, by}}
+const MP_MAX_LINKS=6,MP_TXT_MAX=600,MP_KEEP_DAYS=3,MP_IMG_MAX=230000;
+function _mpUrlOk(u){return typeof u==='string'&&u.length<=500&&/^https?:\/\/[^\s<>"']+$/i.test(u);}
+function _mpHost(u){try{return new URL(u).hostname.replace(/^(www|m)\./,'');}catch(e){return '';}}
+function _mpIsYt(u){return /(^|\.)(youtube\.com|youtu\.be)$/i.test(_mpHost(u));}
+function _mpOf(s){
+  const m=s&&s.mp;
+  return (m&&typeof m==='object'&&(m.x||(Array.isArray(m.l)&&m.l.length)||m.img))?m:null;
+}
+// Since when the players see it: with the squad (its publication, or the plan's
+// own creation if it came later) — or from the moment it was saved "sofort"
+function _mpSince(s){
+  const m=_mpOf(s);if(!m)return null;
+  if(m.vis==='sofort')return m.pt||m.t||null;
+  const q=_sqOf(s);
+  return q?Math.max(q.t,m.c||0):null;
+}
+// Three days after its match it leaves the players' data, and its picture
+// leaves the database (the next time a plan is saved)
+function _mpOver(s){
+  const k=s&&s.date?dispToSortKey(s.date):null;
+  return !!(k&&k!==99999999&&_skAdd(k,MP_KEEP_DAYS)<todaySK());
+}
+// What the players get (slice and the old way alike)
+function _mpForPlayers(s){
+  if(!s||s.type!=='match')return undefined;
+  const m=_mpOf(s),since=_mpSince(s);
+  if(!m||since==null||_mpOver(s))return undefined;
+  const o={t:since,e:m.t||since};
+  if(m.x)o.x=String(m.x).slice(0,MP_TXT_MAX);
+  const l=(Array.isArray(m.l)?m.l:[]).filter(x=>x&&_mpUrlOk(x.u)).slice(0,MP_MAX_LINKS)
+    .map(x=>({t:String(x.t||'').slice(0,80),u:x.u}));
+  if(l.length)o.l=l;
+  if(typeof m.img==='string'&&/^data:image\/(jpeg|png|webp);base64,/.test(m.img))o.img=m.img;
+  return o;
+}
+function _mpSum(m){
+  const l=Array.isArray(m.l)?m.l:[],v=l.filter(x=>_mpIsYt(x.u)).length,k=l.length-v;
+  return [v?(v===1?'1 Video':v+' Videos'):'',k?(k===1?'1 Link':k+' Links'):'',m.img?'Bild':'',m.x?'Text':''].filter(Boolean).join(' · ');
+}
+// Players of the team who opened the app since the plan became visible
+function _mpReach(D,s){
+  const since=_mpSince(s);if(since==null)return null;
+  let n=0,of=0;
+  (D.players||[]).forEach(p=>{
+    if(!p||!p.name||!p.confirmToken)return;
+    if(typeof _pGone==='function'&&_pGone(p))return;
+    of++;
+    const t=(p.seen&&typeof p.seen==='object')?+p.seen.t:0;
+    if(t&&t>=since)n++;
+  });
+  return {n,of};
+}
+// The card in the match window, under "Kader und Treffpunkt"
+function _mpPanelHtml(si){
+  const D=cd(),s=D&&D.sessions&&D.sessions[si];
+  if(!s||s.type!=='match'||!s.date||!(typeof canEdit==='function'&&canEdit()))return '';
+  if(_sqStarted(s,UI.currentSeason))return '';
+  const m=_mpOf(s),e=escapeHtml;
+  if(!m)return `<div class="sqd-card mp-card"><div class="sqd-h"><b>Matchplan</b></div>
+    <p class="sqd-txt">Ein Video, ein Bild oder ein paar Sätze für die Spieler – sie sehen es zusammen mit dem Kader in ihrer App.</p>
+    <button type="button" class="sqd-go alt" onclick="mpOpen(${si})">Matchplan anlegen</button></div>`;
+  const since=_mpSince(s),r=since!=null?_mpReach(D,s):null;
+  const st=since!=null?'für die Spieler sichtbar seit '+_lvWhen(since)
+    :'sichtbar, sobald der Kader veröffentlicht ist';
+  return `<div class="sqd-card mp-card${since!=null?' on':''}"><div class="sqd-h"><b>Matchplan · ${e(_mpSum(m))}</b><span>${e(st)}</span></div>
+    ${r?`<div class="mp-reach">Seitdem in der App: <b>${r.n}</b> von ${r.of} Spielern</div>`:''}
+    <div class="sqd-acts"><button type="button" class="sqd-go alt" onclick="mpOpen(${si})">Bearbeiten</button></div></div>`;
+}
+// ── the window ──
+let _MP=null;
+function _mpEnsure(){
+  if(document.getElementById('moMp'))return;
+  const w=document.createElement('div');
+  w.innerHTML=`<div class="mo hx-full" id="moMp" style="z-index:860;"><div class="mob sqd-mob mp-mob" style="width:520px;">
+    <h3 id="mpTitle">Matchplan</h3>
+    <p class="rs-lead" id="mpSub"></p>
+    <label class="mp-lh" for="mpTxt">Ein paar Sätze <span class="rs-opt">(optional)</span></label>
+    <textarea id="mpTxt" maxlength="${MP_TXT_MAX}" rows="4" placeholder="z. B. Wir pressen hoch, sobald ihr Sechser den Ball hat. Ecken: siehe Video."></textarea>
+    <div class="mp-lh">Videos und Links <span class="rs-opt">(YouTube oder eine andere Seite)</span></div>
+    <div id="mpLinks"></div>
+    <button type="button" class="sqd-link" id="mpAddL" onclick="mpAddLink()">+ Link hinzufügen</button>
+    <div class="mp-lh">Bild <span class="rs-opt">(optional, z. B. ein Foto der Taktiktafel)</span></div>
+    <div id="mpImg"></div>
+    <div class="mp-lh" id="mpVisH">Für die Spieler sichtbar</div>
+    <div class="mp-vis" role="radiogroup" aria-labelledby="mpVisH">
+      <label class="rs-chk"><input type="radio" name="mpVis" value="kader"><span id="mpVisK">Mit dem Kader</span></label>
+      <label class="rs-chk"><input type="radio" name="mpVis" value="sofort"><span>Sofort</span></label>
+    </div>
+    <div class="sqd-warn" id="mpWarn" hidden></div>
+    <div class="mob-btns"><button type="button" class="btn bp" onclick="mpSave()">Speichern</button><button type="button" class="btn bs" onclick="closeM('moMp')">Abbrechen</button><button type="button" class="btn bd mp-del" id="mpDel" onclick="mpDelete()">Löschen</button></div>
+  </div></div>`;
+  document.body.appendChild(w.firstElementChild);
+}
+function mpOpen(si){
+  if(!(typeof canEdit==='function'&&canEdit()))return;
+  const D=cd(),s=D&&D.sessions&&D.sessions[si];if(!s||s.type!=='match')return;
+  _mpEnsure();
+  const m=_mpOf(s)||{},e=escapeHtml;
+  _MP={si,date:s.date,img:m.img||null,l:(Array.isArray(m.l)?m.l:[]).map(x=>({t:x.t||'',u:x.u||''}))};
+  if(!_MP.l.length)_MP.l.push({t:'',u:''});
+  document.getElementById('mpTitle').textContent='Matchplan'+(s.label?' gegen '+s.label:'');
+  document.getElementById('mpSub').textContent=s.date+(s.time?' · '+s.time:'')+' – die Spieler sehen das in ihrer App. Videos öffnen sich dort auf YouTube.';
+  document.getElementById('mpTxt').value=m.x||'';
+  const q=_sqOf(s);
+  document.getElementById('mpVisK').innerHTML='Mit dem Kader'+(q?' <span class="rs-opt">(schon veröffentlicht – also gleich)</span>':' <span class="rs-opt">(empfohlen)</span>');
+  const vis=m.vis==='sofort'?'sofort':'kader';
+  document.querySelectorAll('input[name="mpVis"]').forEach(r=>{r.checked=r.value===vis;});
+  document.getElementById('mpDel').hidden=!_mpOf(s);
+  const wn=document.getElementById('mpWarn');wn.hidden=true;wn.textContent='';
+  _mpLinksRender();_mpImgRender();
+  openM('moMp');
+}
+function _mpLinksRender(){
+  const el=document.getElementById('mpLinks');if(!el||!_MP)return;
+  const e=escapeHtml;
+  el.innerHTML=_MP.l.map((x,i)=>`<div class="mp-lrow">
+    <input type="text" class="mp-lt" maxlength="80" placeholder="Titel, z. B. Ecken" value="${e(x.t)}" oninput="_MP.l[${i}].t=this.value" aria-label="Titel ${i+1}">
+    <input type="url" class="mp-lu" maxlength="500" placeholder="https://youtu.be/…" value="${e(x.u)}" oninput="_MP.l[${i}].u=this.value.trim()" aria-label="Link ${i+1}" inputmode="url" autocomplete="off" spellcheck="false">
+    <button type="button" class="mp-x" onclick="mpDelLink(${i})" aria-label="Link ${i+1} entfernen">✕</button></div>`).join('');
+  const a=document.getElementById('mpAddL');if(a)a.hidden=_MP.l.length>=MP_MAX_LINKS;
+}
+function mpAddLink(){if(!_MP||_MP.l.length>=MP_MAX_LINKS)return;_MP.l.push({t:'',u:''});_mpLinksRender();const r=document.querySelectorAll('#mpLinks .mp-lt');if(r.length)r[r.length-1].focus();}
+function mpDelLink(i){if(!_MP)return;_MP.l.splice(i,1);_mpLinksRender();}
+function _mpImgRender(){
+  const el=document.getElementById('mpImg');if(!el||!_MP)return;
+  el.innerHTML=_MP.img
+    ?`<div class="mp-imgrow"><img src="${_MP.img}" alt="" class="mp-thumb"><span class="mp-imgt">${Math.round(_MP.img.length*0.75/1024)} KB · wird ${MP_KEEP_DAYS} Tage nach dem Spiel gelöscht, Text und Links bleiben</span><button type="button" class="sqd-link" onclick="mpDelImg()">Entfernen</button></div>`
+    :`<button type="button" class="sqd-go alt" onclick="mpPickImg()">Bild auswählen</button>`;
+}
+function mpDelImg(){if(!_MP)return;_MP.img=null;_mpImgRender();}
+function mpPickImg(){
+  const inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.style.display='none';
+  inp.addEventListener('change',ev=>{
+    const f=ev.target.files&&ev.target.files[0];inp.remove();if(!f)return;
+    if(f.size>20*1024*1024){alert('Datei zu groß (max. 20 MB).');return;}
+    const rd=new FileReader();
+    rd.onload=rv=>_mpShrink(rv.target.result,r=>{
+      if(!r){alert('Das Bild konnte nicht gelesen werden oder ist auch verkleinert zu groß. Bitte ein anderes wählen.');return;}
+      if(_MP){_MP.img=r;_mpImgRender();}
+    });
+    rd.readAsDataURL(f);
+  });
+  document.body.appendChild(inp);inp.click();
+}
+// At most 1280 px on the long side, JPEG, under MP_IMG_MAX characters (~170 KB)
+function _mpShrink(src,cb){
+  const img=new Image();
+  img.onload=()=>{
+    const sc=Math.min(1,1280/Math.max(img.width,img.height));
+    const cv=document.createElement('canvas');cv.width=Math.max(1,Math.round(img.width*sc));cv.height=Math.max(1,Math.round(img.height*sc));
+    const cx=cv.getContext('2d');cx.fillStyle='#fff';cx.fillRect(0,0,cv.width,cv.height);cx.imageSmoothingQuality='high';cx.drawImage(img,0,0,cv.width,cv.height);
+    let q=0.82,r=cv.toDataURL('image/jpeg',q);
+    while(r.length>MP_IMG_MAX&&q>0.42){q-=0.08;r=cv.toDataURL('image/jpeg',q);}
+    cb(r.length>MP_IMG_MAX?null:r);
+  };
+  img.onerror=()=>cb(null);
+  img.src=src;
+}
+// Pictures of matches that are over leave the database
+function _mpPrune(D){
+  (D&&D.sessions||[]).forEach(s=>{if(s&&s.mp&&s.mp.img&&_mpOver(s))delete s.mp.img;});
+}
+function mpSave(){
+  if(!(typeof canEdit==='function'&&canEdit())||!_MP)return;
+  const D=cd(),s=D&&D.sessions&&D.sessions[_MP.si];
+  const wn=document.getElementById('mpWarn');
+  const warn=t=>{wn.textContent=t;wn.hidden=false;};
+  if(!s||s.date!==_MP.date||s.type!=='match'){alert('Das Spiel wurde inzwischen verschoben oder gelöscht. Bitte neu öffnen.');closeM('moMp');return;}
+  const x=String(document.getElementById('mpTxt').value||'').trim().slice(0,MP_TXT_MAX);
+  const l=[];let bad=0;
+  _MP.l.forEach(r=>{
+    const u=String(r.u||'').trim(),t=String(r.t||'').trim();
+    if(!u&&!t)return;
+    if(!_mpUrlOk(u)){bad++;return;}
+    l.push({t:(t||(_mpIsYt(u)?'Video':_mpHost(u))).slice(0,80),u});
+  });
+  if(bad){warn(bad===1?'Ein Link fehlt oder beginnt nicht mit https:// – bitte prüfen.':bad+' Links fehlen oder beginnen nicht mit https:// – bitte prüfen.');return;}
+  if(!x&&!l.length&&!_MP.img){warn('Noch leer – ein Link, ein Bild oder ein paar Sätze.'+(_mpOf(s)?' Zum Entfernen „Löschen“.':''));return;}
+  const vis=(document.querySelector('input[name="mpVis"]:checked')||{}).value==='sofort'?'sofort':'kader';
+  snap();
+  const old=_mpOf(s)||{},now=Date.now();
+  const m={x,l,vis,c:old.c||now,t:now,by:String((CU&&CU.name)||'').slice(0,60)};
+  if(_MP.img)m.img=_MP.img;
+  if(vis==='sofort')m.pt=(old.vis==='sofort'&&old.pt)?old.pt:now;
+  if(!x)delete m.x;
+  s.mp=m;
+  _mpPrune(D);
+  saveG();
+  try{logAudit(old.t?'Matchplan geändert':'Matchplan angelegt',s.date+(s.label?' '+s.label:''),_mpSum(m)+(vis==='sofort'?', sofort sichtbar':', mit dem Kader'));}catch(e){}
+  closeM('moMp');
+  _sqRefresh(_MP.si);
+  if(typeof showSaveFlash==='function')showSaveFlash(_mpSince(s)!=null?'✓ Matchplan gespeichert – die Spieler sehen ihn jetzt':'✓ Matchplan gespeichert – sichtbar mit dem Kader');
+}
+function mpDelete(){
+  if(!(typeof canEdit==='function'&&canEdit())||!_MP)return;
+  const D=cd(),s=D&&D.sessions&&D.sessions[_MP.si];if(!s||!s.mp)return;
+  if(!confirm('Matchplan löschen? Die Spieler sehen ihn dann nicht mehr.'))return;
+  snap();
+  delete s.mp;
+  saveG();
+  try{logAudit('Matchplan gelöscht',s.date+(s.label?' '+s.label:''),'');}catch(e){}
+  closeM('moMp');
+  _sqRefresh(_MP.si);
+  if(typeof showSaveFlash==='function')showSaveFlash('Matchplan gelöscht');
+}
+// ── Videos (Kader → Videos) ──
+function _vdList(team){
+  const raw=G&&G.db&&G.db[team+'__vids'];
+  const arr=Array.isArray(raw)?raw:(raw&&typeof raw==='object')?Object.keys(raw).map(id=>Object.assign({},raw[id],{id})):[];
+  return arr.filter(v=>v&&v.t&&_mpUrlOk(v.u))
+    .map(v=>({id:String(v.id||''),t:String(v.t).slice(0,80),u:v.u,pos:Array.isArray(v.pos)?v.pos.filter(x=>POS.includes(x)):[],at:+v.at||0}))
+    .sort((a,b)=>(b.at||0)-(a.at||0));
+}
+function _vdPosTxt(v){return v.pos.length?v.pos.join(' · '):'Für alle';}
+function vdRenderTab(){
+  const el=document.getElementById('vd-list');if(!el)return;
+  const ed=typeof canEdit==='function'&&canEdit(),list=_vdList(UI.currentTeam),e=escapeHtml;
+  const rows=list.map(v=>`<div class="vd-row"><span class="vd-ic" aria-hidden="true">${_mpIsYt(v.u)?'▶':'↗'}</span>
+    <span class="vd-t"><a href="${e(v.u)}" target="_blank" rel="noopener noreferrer">${e(v.t)}</a><small>${e(_mpHost(v.u))}</small></span>
+    <span class="vd-pos">${v.pos.length?v.pos.map(x=>`<i class="pb pb-${e(x)}">${e(x)}</i>`).join(''):'<i class="vd-all">Für alle</i>'}</span>
+    ${ed?`<button type="button" class="sqd-link" onclick="vdOpen('${e(v.id)}')">Ändern</button>`:''}</div>`).join('');
+  el.innerHTML=`<div class="vd-intro"><p>Videos für die Spieler. Sie finden sie in ihrer App unter „Videos“ – die für ihre Position zuerst.</p>${ed?'<button type="button" class="sqd-go" onclick="vdOpen()">+ Video</button>':''}</div>
+    ${rows?`<div class="vd-list">${rows}</div>`:`<div class="vd-empty">Noch keine Videos.${ed?' Ein YouTube-Link genügt – z. B. zum Spielaufbau für Innenverteidiger.':''}</div>`}`;
+}
+let _VD=null;
+function _vdEnsure(){
+  if(document.getElementById('moVid'))return;
+  const w=document.createElement('div');
+  w.innerHTML=`<div class="mo hx-full" id="moVid" style="z-index:870;"><div class="mob sqd-mob mp-mob" style="width:460px;">
+    <h3 id="vdTitle">Video</h3>
+    <label class="mp-lh" for="vdT">Titel</label>
+    <input type="text" id="vdT" maxlength="80" placeholder="z. B. Spielaufbau unter Druck">
+    <label class="mp-lh" for="vdU">Link</label>
+    <input type="url" id="vdU" maxlength="500" placeholder="https://youtu.be/…" inputmode="url" autocomplete="off" spellcheck="false">
+    <div class="mp-lh" id="vdPosH">Für welche Positionen? <span class="rs-opt">(keine = für alle)</span></div>
+    <div class="vd-chips" id="vdPos" role="group" aria-labelledby="vdPosH"></div>
+    <div class="sqd-warn" id="vdWarn" hidden></div>
+    <div class="mob-btns"><button type="button" class="btn bp" onclick="vdSave()">Speichern</button><button type="button" class="btn bs" onclick="closeM('moVid')">Abbrechen</button><button type="button" class="btn bd mp-del" id="vdDel" onclick="vdDelete()">Löschen</button></div>
+  </div></div>`;
+  document.body.appendChild(w.firstElementChild);
+}
+function vdOpen(id){
+  if(!(typeof canEdit==='function'&&canEdit()))return;
+  _vdEnsure();
+  const v=id?_vdList(UI.currentTeam).find(x=>x.id===id):null;
+  _VD={id:v?v.id:null,pos:v?v.pos.slice():[]};
+  document.getElementById('vdTitle').textContent=v?'Video ändern':'Neues Video';
+  document.getElementById('vdT').value=v?v.t:'';
+  document.getElementById('vdU').value=v?v.u:'';
+  document.getElementById('vdDel').hidden=!v;
+  const wn=document.getElementById('vdWarn');wn.hidden=true;wn.textContent='';
+  _vdChips();
+  openM('moVid');
+}
+function _vdChips(){
+  const el=document.getElementById('vdPos');if(!el||!_VD)return;
+  el.innerHTML=POS.map(x=>{const on=_VD.pos.includes(x);return `<button type="button" class="vd-chip${on?' on':''}" aria-pressed="${on}" title="${escapeHtml(POS_LBL[x]||x)}" onclick="vdTogglePos('${x}')">${x}</button>`;}).join('');
+}
+function vdTogglePos(x){if(!_VD)return;const i=_VD.pos.indexOf(x);if(i<0)_VD.pos.push(x);else _VD.pos.splice(i,1);_VD.pos.sort((a,b)=>POS.indexOf(a)-POS.indexOf(b));_vdChips();}
+function vdSave(){
+  if(!(typeof canEdit==='function'&&canEdit())||!_VD)return;
+  const t=String(document.getElementById('vdT').value||'').trim().slice(0,80);
+  const u=String(document.getElementById('vdU').value||'').trim();
+  const wn=document.getElementById('vdWarn');
+  if(!_mpUrlOk(u)){wn.textContent='Der Link fehlt oder beginnt nicht mit https://';wn.hidden=false;return;}
+  const team=UI.currentTeam,k=team+'__vids';
+  snap();
+  if(!G.db[k]||typeof G.db[k]!=='object'||Array.isArray(G.db[k]))G.db[k]={};
+  const id=_VD.id||('v'+Date.now().toString(36)+Math.random().toString(36).slice(2,5));
+  const old=G.db[k][id]||{};
+  G.db[k][id]={t:t||(_mpIsYt(u)?'Video':_mpHost(u)),u,pos:_VD.pos.slice(),at:old.at||Date.now(),by:String((CU&&CU.name)||'').slice(0,60)};
+  if(!G.db[k][id].pos.length)delete G.db[k][id].pos;
+  saveG();
+  try{logAudit(_VD.id?'Video geändert':'Video hinzugefügt',G.db[k][id].t,_vdPosTxt({pos:_VD.pos}));}catch(e){}
+  closeM('moVid');vdRenderTab();
+  if(typeof showSaveFlash==='function')showSaveFlash('✓ Video gespeichert');
+}
+function vdDelete(){
+  if(!(typeof canEdit==='function'&&canEdit())||!_VD||!_VD.id)return;
+  const k=UI.currentTeam+'__vids',v=G.db[k]&&G.db[k][_VD.id];if(!v)return;
+  if(!confirm('Video „'+(v.t||'')+'“ löschen?'))return;
+  snap();delete G.db[k][_VD.id];saveG();
+  try{logAudit('Video gelöscht',v.t||'','');}catch(e){}
+  closeM('moVid');vdRenderTab();
+}
+// ── the player's side ──
+function _mpSeenKey(p){return 'fcf_mpseen_'+String((p&&p.confirmToken)||'').slice(0,16);}
+function _mpSeen(p,s){try{const o=JSON.parse(localStorage.getItem(_mpSeenKey(p))||'{}');return !!(s.mp&&o[rpeMetaKey(s)]===s.mp.e);}catch(e){return false;}}
+function _mpMarkSeen(p,s){
+  if(RPE_IS_PREVIEW||!s||!s.mp)return;
+  try{const o=JSON.parse(localStorage.getItem(_mpSeenKey(p))||'{}');o[rpeMetaKey(s)]=s.mp.e;localStorage.setItem(_mpSeenKey(p),JSON.stringify(o));}catch(e){}
+}
+// The plan to show: the next match that has one, else the last one (it is
+// there until three days after its match)
+function _mpHubPick(D){
+  const today=todaySK();let up=null,past=null;
+  (D&&D.sessions||[]).forEach((s,si)=>{
+    if(!s||s.type!=='match'||!s.mp||!s.date)return;
+    const k=dispToSortKey(s.date);
+    if(k>=today){if(!up||k<up.k)up={s,si,k};}
+    else if(!past||k>past.k)past={s,si,k};
+  });
+  return up||past;
+}
+function _mpHubHtml(D,p,tok,sec,list,row){
+  const b=_mpHubPick(D);if(!b)return '';
+  const {s,si}=b,e=escapeHtml,seen=_mpSeen(p,s);
+  return sec('Zum Spiel')+list([row({ic:FL_IC.pitch,title:'Matchplan'+(s.label?' gegen '+e(s.label):''),
+    sub:e(s.date)+' · '+e(_mpSum(s.mp)),badge:seen?'':'Neu',href:buildHubLink(tok,'mp',si)})]);
+}
+function _vdSeenKey(p){return 'fcf_vdseen_'+String((p&&p.confirmToken)||'').slice(0,16);}
+function _vdHubRow(p,tok){
+  const list=_vdList(UI.currentTeam);if(!list.length)return null;
+  const mine=(p&&p.pos&&!p.hidePos)?p.pos:null,e=escapeHtml;
+  const n=mine?list.filter(v=>v.pos.includes(mine)).length:0;
+  let last=0;try{last=+(localStorage.getItem(_vdSeenKey(p))||0);}catch(e){}
+  const isNew=list.some(v=>v.at>last);
+  return {ic:FL_IC.play,title:'Videos',sub:(n?(n===1?'1 Video':n+' Videos')+' für '+e(mine)+' · ':'')+list.length+' insgesamt',badge:isNew?'Neu':'',href:buildHubLink(tok,'vids')};
+}
+function _mpScreen(p,inner){
+  return `<div class="hub fl mp-scr">${_flBar(p)}${inner}</div>`;
+}
+function renderMatchplan(){
+  const wrap=document.getElementById('playerModeWrap');if(!wrap)return;
+  const D=cd(),pi=_pmValidateIdx(),p=(pi!=null&&D&&D.players)?D.players[pi]:null;
+  const si=window._hubSi,s=(D&&D.sessions&&si!=null)?D.sessions[si]:null,m=s&&s.mp,e=escapeHtml;
+  if(!p||!m){
+    wrap.innerHTML=_mpScreen(p,`<div class="mp-head"><h1 class="fl-title">Matchplan</h1></div><p class="mp-txt">Gerade gibt es hier keinen Matchplan.</p>`);
+    return;
+  }
+  _mpMarkSeen(p,s);
+  const txt=m.x?String(m.x).split(/\n{2,}/).map(t=>'<p>'+e(t).replace(/\n/g,'<br>')+'</p>').join(''):'';
+  const l=Array.isArray(m.l)?m.l.filter(x=>x&&_mpUrlOk(x.u)):[];
+  const links=l.map(x=>{const yt=_mpIsYt(x.u);
+    return `<a class="hub-card fl-row mp-link" href="${e(x.u)}" target="_blank" rel="noopener noreferrer"><span class="hub-ic fl-tile go">${yt?FL_IC.play:FL_IC.link}</span>`
+      +`<span class="hub-txt"><b>${e(x.t||'Video')}</b><span>${yt?'Video ansehen · YouTube':'Öffnen · '+e(_mpHost(x.u))}</span></span><span class="hub-chev">\u203a</span></a>`;}).join('');
+  const img=m.img?`<img class="mp-img" src="${m.img}" alt="Bild zum Matchplan">`:'';
+  wrap.innerHTML=_mpScreen(p,`<div class="mp-head"><div class="fl-kick">${_flWhat(s)}</div><h1 class="fl-title">Matchplan</h1></div>
+    ${txt?`<div class="mp-txt">${txt}</div>`:''}
+    ${links?`<div class="fl-list mp-links">${links}</div>`:''}
+    ${img}
+    <div class="rpo-foot mp-foot">${l.some(x=>_mpIsYt(x.u))?'Videos öffnen sich auf YouTube. ':''}Nur für die Mannschaft.</div>`);
+}
+function renderVideos(){
+  const wrap=document.getElementById('playerModeWrap');if(!wrap)return;
+  const D=cd(),pi=_pmValidateIdx(),p=(pi!=null&&D&&D.players)?D.players[pi]:null;
+  const list=_vdList(UI.currentTeam),e=escapeHtml;
+  const mine=(p&&p.pos&&!p.hidePos)?p.pos:null;
+  if(!RPE_IS_PREVIEW&&p&&list.length){try{localStorage.setItem(_vdSeenKey(p),String(Math.max(...list.map(v=>v.at||0))));}catch(err){}}
+  const item=v=>{const yt=_mpIsYt(v.u);
+    return `<a class="hub-card fl-row mp-link" href="${e(v.u)}" target="_blank" rel="noopener noreferrer"><span class="hub-ic fl-tile">${yt?FL_IC.play:FL_IC.link}</span>`
+      +`<span class="hub-txt"><b>${e(v.t)}</b><span>${v.pos.length?e(v.pos.join(' · '))+' · ':''}${yt?'YouTube':e(_mpHost(v.u))}</span></span><span class="hub-chev">\u203a</span></a>`;};
+  const sec=t=>`<div class="fl-sec"><span>${t}</span></div>`;
+  const forMe=mine?list.filter(v=>v.pos.includes(mine)):[];
+  const forAll=list.filter(v=>!v.pos.length);
+  const rest=list.filter(v=>v.pos.length&&!(mine&&v.pos.includes(mine)))
+    .sort((a,b)=>(POS.indexOf(a.pos[0])-POS.indexOf(b.pos[0]))||(b.at-a.at));
+  let h='';
+  if(forMe.length)h+=sec('Für dich · '+e(POS_LBL[mine]||mine))+`<div class="fl-list">${forMe.map(item).join('')}</div>`;
+  if(forAll.length)h+=sec('Für alle')+`<div class="fl-list">${forAll.map(item).join('')}</div>`;
+  if(rest.length)h+=sec(forMe.length||forAll.length?'Andere Positionen':'Videos')+`<div class="fl-list">${rest.map(item).join('')}</div>`;
+  if(!h)h='<p class="mp-txt">Noch keine Videos.</p>';
+  wrap.innerHTML=_mpScreen(p,`<div class="mp-head"><div class="fl-kick">${e(UI.currentTeam||'')}</div><h1 class="fl-title">Videos</h1></div>${h}
+    <div class="rpo-foot mp-foot">${list.some(v=>_mpIsYt(v.u))?'Videos öffnen sich auf YouTube. ':''}Nur für die Mannschaft.</div>`);
 }
 // ── the window ──
 let _SQ=null;
@@ -21307,6 +21741,7 @@ function renderHub(){
   }
   if(live.stats)mine.push(row({ic:FL_IC.chart,title:'Meine Statistik',sub:'Anwesenheit, Serie, Verlauf',href:"javascript:hubOpenLive('stats')"}));
   if(rep)mine.push(row({ic:FL_IC.doc,title:'Wochenbericht',sub:'KW '+((rep.week&&rep.week.kw)||'')+(live.soFar?' bisher':'')+' \u00b7 die ganze Mannschaft',href:"javascript:hubOpenLive('report')"}));
+  {const vr=_vdHubRow(p,tok);if(vr)mine.push(row(vr));}
   const nm=getDisplayName?getDisplayName(p):p.name;
   const av=p.photo
     ? `<img class="hub-av" src="${p.photo}" alt="">`
@@ -21320,6 +21755,7 @@ function renderHub(){
     ${_pmPauseHtml(p)}
     ${sec('Jetzt dran')}${now.length?list(now):list([`<div class="hub-mvp fl-row fl-calm"><span class="hub-ic fl-tile ok">${FL_IC.check}</span><span class="hub-txt"><b>Alles beantwortet</b><span>Danke – gerade wartet nichts auf dich.</span></span></div>`])}
     ${_hubPushCard()}
+    ${_mpHubHtml(D,p,tok,sec,list,row)}
     ${wkRows.length?sec(wk.length===1?'Dein n\u00e4chster Termin':'Diese Woche',`<a class="fl-sec-a" href="${ln(buildHubLink(tok,'week'))}">alle Termine \u203a</a>`)+list(wkRows):''}
     ${last?sec('Letztes Spiel')+list([last]):''}
     ${_zlHubHtml(p,tok,sec)}
@@ -21489,7 +21925,7 @@ function _hubSyncUrl(){
     const tok=(CU&&CU.playerToken)||'';
     if(!tok)return;
     const want=buildHubLink(tok,window._hubAction||'',
-      (window._hubAction==='rpe')?window._rpeOnlySi:(window._hubAction==='vote')?window._mvpSi:null)
+      (window._hubAction==='rpe')?window._rpeOnlySi:(window._hubAction==='vote')?window._mvpSi:(window._hubAction==='mp')?window._hubSi:null)
       +(RPE_IS_PREVIEW?'&preview=1':'');
     if(location.href!==want)history.replaceState(null,'',want);
   }catch(e){}
@@ -21608,16 +22044,18 @@ function renderPlayerMode(){
   if(window._hubMode&&!window._hubAction)_hubNoteOffered();
   // Entering a screen records what was outstanding, so the thank-you can tell
   // "finished the task" from "changed an answer".
-  if(window._hubAction&&window._hubAction!=='card'){
+  if(window._hubAction&&!['card','mp','vids'].includes(window._hubAction)){
     const k=(window._hubAction==='rpe')?'rpe':'week';
     if(_hubEntry[k]===null)_hubEntry[k]=_hubOpenCounts()[k];
   }
   // Only the overview scrolls the page itself; the other screens keep the
   // pinned layout they were built for.
-  document.body.classList.toggle('hub-home',!!(window._hubMode&&(!window._hubAction||window._hubAction==='card')));
+  document.body.classList.toggle('hub-home',!!(window._hubMode&&(!window._hubAction||['card','mp','vids'].includes(window._hubAction))));
   // Hub without a deep link: show the overview
   if(window._hubAction==='physio')return renderPhysioAsk();
   if(window._hubAction==='card')return renderPlayerCard();
+  if(window._hubAction==='mp')return renderMatchplan();
+  if(window._hubAction==='vids')return renderVideos();
   if(window._hubAction==='vote'){
     if(window._mvpSi==null&&window._hubSi!=null)window._mvpSi=window._hubSi;
     return renderMvpVote();
@@ -21899,6 +22337,9 @@ const FL_IC=(()=>{
     card:sv('<rect x="5" y="2.5" width="14" height="19" rx="2.5"/><circle cx="12" cy="10" r="3"/><path d="M8.5 17h7"/>'),
     chart:sv('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'),
     doc:sv('<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/>'),
+    pitch:sv('<rect x="3" y="4.5" width="18" height="15" rx="2"/><path d="M12 4.5v15"/><circle cx="12" cy="12" r="2.6"/>'),
+    play:sv('<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10.2 9.2l4.6 2.8-4.6 2.8z" fill="currentColor"/>'),
+    link:sv('<path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/>'),
   };
 })();
 // "heute" · "morgen" · "am Donnerstag"
@@ -26107,7 +26548,7 @@ function _ssHxAttRender(si){
     frist=dl?(_amRsvpLocked(si)?'Antworten gesperrt seit '+_amFmtDeadline(dl):'Antwort bis '+_amFmtDeadline(dl)):'Keine Antwortfrist';
   }
   const sb=(k,l)=>`<button type="button" class="${sortBy===k?'on':''}" aria-pressed="${sortBy===k}" onclick="_ssxSetSort('${k}',${si})">${l}</button>`;
-  let h=(roll?'':_sqPanelHtml(si))+`<div class="ssx-head"><h4>${roll?'Wer war da?':'Wer kommt?'}</h4>${frist?`<span class="ssx-frist">${e(frist)}</span>`:''}</div>
+  let h=(roll?'':_sqPanelHtml(si)+_mpPanelHtml(si))+`<div class="ssx-head"><h4>${roll?'Wer war da?':'Wer kommt?'}</h4>${frist?`<span class="ssx-frist">${e(frist)}</span>`:''}</div>
     <div class="ssx-sum"><b>${roll?c.present:c.yes}</b><span>von ${c.total} ${roll?'anwesend':'zugesagt'}</span></div>${_hxSeg(parts,c.total)}
     <div class="ssx-sort" role="group" aria-label="Sortieren"><span>Sortieren</span>${sb('pos','Position')}${sb('name','Name')}${sb('nr','Nr.')}</div>`;
   const chip=({p,pi},noPos)=>{
@@ -28954,12 +29395,13 @@ function switchTab(t,user){
   if(t!=='spieler'&&_multiSelMode&&typeof _msExit==='function')_msExit();
   const tb=document.getElementById('tbtn-tafel');if(tb)tb.style.display=_kbOn()?'':'none';
   document.querySelectorAll('#moTeamMgr .tbtn').forEach(b=>{const on=b.dataset.tab===t;b.classList.toggle('active',on);b.setAttribute('aria-pressed',on);});
-  ['tafel','spieler','ziele','trainer'].forEach(n=>document.getElementById('tab-'+n)?.classList.toggle('active',n===t));
+  ['tafel','spieler','ziele','videos','trainer'].forEach(n=>document.getElementById('tab-'+n)?.classList.toggle('active',n===t));
   if(user&&_kbOn())try{localStorage.setItem('fcf_kb_tab',t);}catch(e){}
   if(t==='tafel')kbRender();
   document.getElementById('tmgr-h').textContent='Kader';
   if(t==='spieler')renderMgrPlayers();
   if(t==='ziele')zlRenderTab();
+  if(t==='videos')vdRenderTab();
   if(t==='trainer'){document.getElementById('mgr-team-lbl').textContent=UI.currentTeam;renderMgrTrainers();buildTeamChecks('tTeamChecks');}
 }
 
