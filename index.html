@@ -257,6 +257,9 @@ if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostnam
 .sb-step-s b{min-width:1.6em;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.35rem;font-weight:400;color:#fff;}
 .sb-step-s button{width:40px;height:36px;}
 .sb-cards{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px;}
+.sb-off label{display:flex;flex-direction:column;gap:1px;}
+.sb-off small{font-size:.74rem;color:rgba(255,255,255,.55);}
+.sb-off input{width:72px;height:38px;padding:0 8px;border-radius:10px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;font:600 .9rem 'Barlow',sans-serif;color-scheme:dark;text-align:center;}
 .sb-cb{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 11px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:transparent;color:#fff;font:600 .8rem 'Barlow',sans-serif;cursor:pointer;}
 .sb-cb.on{background:#fff;border-color:#fff;color:#0E2350;}
 /* a card, drawn: same everywhere (emoji differ by phone) */
@@ -7531,12 +7534,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.96'; // v1.2.96: Sync – ein Gerät schreibt nur, was es selbst geändert hat
-const APP_VERSION_LABEL='1.2.96';
+const APP_VERSION='1.2.97'; // v1.2.97: Spielbericht – Platzverweis beendet die Spielzeit
+const APP_VERSION_LABEL='1.2.97';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1794164827172; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1794168386789; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -16813,7 +16816,9 @@ async function _pvTeamLink(team,lk,overlay){
 // pitch follow from the substitutions and go into the load (sRPE × minutes);
 // a card can mean a suspension, which the squad, the lineup and "Im Blick"
 // then show.
-//   s.rep = {f, a, st:[names], sub:[{m, i, o}], ban:{name:'YYYY-MM-DD'}, t, by}
+//   s.rep = {f, a, st:[names], sub:[{m, i, o}], ban:{name:'YYYY-MM-DD'}, off:{name:minute}, t, by}
+//           off (1.2.97): minute of a sending-off (Rot, Gelb-Rot) — his
+//           minutes end there (Artem 08.11.: a red card counted to the end)
 //           f/a goals for/against; by name, like the squad, so it survives a
 //           change of the player order; ban = end of a suspension after a red
 //           card where the Sportgericht decided otherwise than the rule
@@ -16845,10 +16850,17 @@ function sbMinutes(s){
   if(!r||!Array.isArray(r.st)||!r.st.length)return null;
   const D=_sbDur(s),on=new Map(),min={};
   r.st.forEach(n=>{on.set(n,0);min[n]=0;});
-  (Array.isArray(r.sub)?r.sub:[]).filter(Boolean).slice().sort((a,b)=>(+a.m||0)-(+b.m||0)).forEach(x=>{
-    const m=Math.max(0,Math.min(D,+x.m||0));
+  // Changes and sendings-off in the order they happened (a change in the
+  // same minute first); a player sent off leaves and does not come back
+  const ev=(Array.isArray(r.sub)?r.sub:[]).filter(Boolean).map(x=>({m:+x.m||0,i:x.i,o:x.o,k:0}));
+  const off=(r.off&&typeof r.off==='object')?r.off:{};
+  Object.keys(off).forEach(n=>{if(+off[n]>0)ev.push({m:+off[n],o:n,k:1});});
+  const gone=new Set();
+  ev.sort((a,b)=>(a.m-b.m)||(a.k-b.k)).forEach(x=>{
+    const m=Math.max(0,Math.min(D,x.m));
     if(x.o&&on.has(x.o)){min[x.o]=(min[x.o]||0)+m-on.get(x.o);on.delete(x.o);}
-    if(x.i&&!on.has(x.i)){on.set(x.i,m);if(!(x.i in min))min[x.i]=0;}
+    if(x.k===1){gone.add(x.o);return;}
+    if(x.i&&!on.has(x.i)&&!gone.has(x.i)){on.set(x.i,m);if(!(x.i in min))min[x.i]=0;}
   });
   on.forEach((m0,n)=>{min[n]=(min[n]||0)+D-m0;});
   return min;
@@ -17609,7 +17621,18 @@ function sbCard(pi,c){
     while(p.cards.length<D.sessions.length)p.cards.push(null);
     p.cards[si]=next;
     if(r.ban&&r.ban[p.name]&&next!=='r'){delete r.ban[p.name];if(!Object.keys(r.ban).length)delete r.ban;}
+    if(r.off&&r.off[p.name]!=null&&next!=='r'&&next!=='gr'){delete r.off[p.name];if(!Object.keys(r.off).length)delete r.off;}
   },next?'Karte erfasst':'Karte entfernt',(getDisplayName?getDisplayName(p):p.name)+(next?' · '+CARD_NAMES[next]:''));
+}
+// Minute of the sending-off (1.2.97): empty = not known, minutes run to the end
+function sbOffSet(pi,v){
+  const D=cd(),p=D&&D.players[pi];if(!p)return;
+  const s=D.sessions[_sbSi],m=parseInt(v,10),ok=m>=1&&m<=_sbDur(s);
+  _sbEdit(r=>{
+    if(!r.off||typeof r.off!=='object')r.off={};
+    if(ok)r.off[p.name]=m;else delete r.off[p.name];
+    if(!Object.keys(r.off).length)delete r.off;
+  },'Platzverweis',(getDisplayName?getDisplayName(p):p.name)+': '+(ok?m+'. Minute':'Minute entfernt'));
 }
 function sbBanSet(pi,iso){
   const D=cd(),p=D.players[pi];if(!p)return;
@@ -17704,7 +17727,10 @@ function sbRender(){
     const p=x.p,c=card(p);
     const stp=(f,l)=>`<div class="sb-ed-r"><span>${l}</span><div class="sb-step sb-step-s"><button type="button" onclick="sbStat(${x.pi},'${f}',-1)" aria-label="${l}: eins weniger"${val(p,f)?'':' disabled'}>−</button><b>${val(p,f)}</b><button type="button" onclick="sbStat(${x.pi},'${f}',1)" aria-label="${l}: eins mehr">+</button></div></div>`;
     return `<div class="sb-ed">${stp('goals','Tore')}${stp('assists','Vorlagen')}
-      <div class="sb-ed-r"><span>Karte</span><div class="sb-cards" role="group" aria-label="Karte">${['y','gr','r'].map(k=>`<button type="button" class="sb-cb${c===k?' on':''}" aria-pressed="${c===k}" onclick="sbCard(${x.pi},'${k}')">${_cardIc(k)}${CARD_NAMES[k]}</button>`).join('')}</div></div></div>`;
+      <div class="sb-ed-r"><span>Karte</span><div class="sb-cards" role="group" aria-label="Karte">${['y','gr','r'].map(k=>`<button type="button" class="sb-cb${c===k?' on':''}" aria-pressed="${c===k}" onclick="sbCard(${x.pi},'${k}')">${_cardIc(k)}${CARD_NAMES[k]}</button>`).join('')}</div></div>${(c==='r'||c==='gr')?(()=>{
+        const om=(r.off&&+r.off[p.name])||'';
+        return `<div class="sb-ed-r sb-off"><label for="sb-off-${x.pi}">Platzverweis in Minute<small>${om?'Spielzeit endet hier':'leer: Spielzeit z\u00e4hlt bis zum Schluss'}</small></label><input type="number" id="sb-off-${x.pi}" min="1" max="${_sbDur(s)}" inputmode="numeric" value="${om}" onchange="sbOffSet(${x.pi},this.value)"></div>`;
+      })():''}</div>`;
   };
   const prow=x=>{
     const p=x.p,open=_sbOpenPl===x.pi,g=val(p,'goals'),a=val(p,'assists'),c=card(p);
