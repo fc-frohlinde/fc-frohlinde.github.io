@@ -7531,12 +7531,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.95'; // v1.2.95: Meine Woche – Hinweis, wenn die Antworten geschlossen sind
-const APP_VERSION_LABEL='1.2.95';
+const APP_VERSION='1.2.96'; // v1.2.96: Sync – ein Gerät schreibt nur, was es selbst geändert hat
+const APP_VERSION_LABEL='1.2.96';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1794055152687; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1794164827172; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -8604,6 +8604,53 @@ function _fbWarn(scope,err,userMsg){
 // (_fbShadow, kept current by the listener) and update() only what changed:
 // a status click now transfers a few hundred bytes in each direction.
 let _fbShadow=null;
+// _fbBase (1.2.96): the state THIS device's G was built from — the snapshot it
+// adopted, or what it last wrote. A write sends diff(_fbBase, G): only what
+// this device changed. Diffing against the newest server state (_fbShadow)
+// instead meant "make the server look exactly like my copy" whenever the copy
+// was behind — a stale device then reverted everything newer. That is how the
+// match of 08.11.2026 was wiped: a PC opened with Saturday's copy at 19:47,
+// the automatic Kader step saved, and the push replaced the day's entries.
+// _bootJSON: the cached copy as loaded, the base for edits made before the
+// first snapshot. _fbLateRaw: a snapshot skipped while a write was in flight,
+// adopted once the write is through (otherwise the device kept showing its
+// old copy until somebody else changed something).
+let _fbBase=null,_bootJSON=null,_fbLateRaw,_fbOnSnap=null;
+// Same data, as far as the server is concerned: null, missing and empty are
+// alike (Firebase drops them), a sparse array may come back as an object.
+function _fbEq(a,b){
+  if(a===b)return true;
+  const nil=v=>v===undefined||v===null||(typeof v==='object'&&!Array.isArray(v)&&Object.keys(v).length===0);
+  if(nil(a)||nil(b))return nil(a)&&nil(b);
+  if(typeof a!=='object'||typeof b!=='object')return a===b;
+  const list=v=>{
+    if(Array.isArray(v))return v;
+    if(v&&typeof v==='object'){const ks=Object.keys(v).filter(k=>/^\d+$/.test(k)).map(Number);const o=new Array(ks.length?Math.max(...ks)+1:0).fill(null);ks.forEach(n=>{o[n]=v[n];});return o;}
+    return [];
+  };
+  const aw=a.__arr===1,bw=b.__arr===1;
+  if(aw||bw){
+    if(!(aw&&bw))return false;
+    const la=list(a.v),lb=list(b.v),n=Math.max(la.length,lb.length);
+    for(let i=0;i<n;i++)if(!_fbEq(la[i],lb[i]))return false;
+    return true;
+  }
+  if(Array.isArray(a)||Array.isArray(b)){
+    const la=list(a),lb=list(b),n=Math.max(la.length,lb.length);
+    for(let i=0;i<n;i++)if(!_fbEq(la[i],lb[i]))return false;
+    return true;
+  }
+  for(const k of new Set([...Object.keys(a),...Object.keys(b)]))if(!_fbEq(a[k],b[k]))return false;
+  return true;
+}
+function _fbAdoptLate(){
+  if(_fbLateRaw===undefined)return;
+  if(_fbSaving||_fbDebounce||_pendingSave)return;   // still busy — the next write ends with this again
+  const raw=_fbLateRaw;_fbLateRaw=undefined;
+  // Only our own write came back: nothing new, no re-render
+  try{if(_fbBase&&_fbEq(_fbBase,raw))return;}catch(e){}
+  if(typeof _fbOnSnap==='function')try{_fbOnSnap({val:()=>raw});}catch(e){console.warn('[FB] late snapshot:',e);}
+}
 function _fbCollectDiff(oldV,newV,path,out,depth){
   if(oldV===newV)return;
   const isArrWrap=v=>v&&typeof v==='object'&&v.__arr===1;
@@ -9004,7 +9051,7 @@ function _adoptData(data){
   // Re-anchor the diff writer on what the server actually has, BEFORE padding:
   // otherwise the padding itself looks like a change and uploads a null for
   // every session of the season.
-  try{if(data)_fbShadow=fbEncode(data);}catch(e){}
+  try{if(data){_fbShadow=fbEncode(data);_fbBase=_fbShadow;_bootJSON=null;}}catch(e){}
   const clean=_padPlayerArrays(sanitizeG(data));
   if(typeof isPlayerMode==='function'&&isPlayerMode()){
     // Deep copy first: _pmSanitizeG mutates what it is given.
@@ -9058,10 +9105,12 @@ function _fbWriteWithStamp(data){
   }
   const encoded=fbEncode(data);
   _fbSaving=true;
-  // No shadow yet (first save of the session) → full write, then diff from there
-  if(_fbShadow&&typeof _fbShadow==='object'){
+  // Diff against what this copy was built from (1.2.96, see _fbBase).
+  // No base yet (first save of the session) → full write, then diff from there
+  const _base=_fbBase||_fbShadow;
+  if(_base&&typeof _base==='object'){
     const out={};
-    try{_fbCollectDiff(_fbShadow,encoded,'',out,0);}catch(e){console.warn('[FB] diff failed, full write:',e);}
+    try{_fbCollectDiff(_base,encoded,'',out,0);}catch(e){console.warn('[FB] diff failed, full write:',e);}
     const paths=Object.keys(out);
     if(window._perfWatch||window._perfDebug){
       const w=window._perfWatch;
@@ -9074,6 +9123,7 @@ function _fbWriteWithStamp(data){
       if(window._perfWatch||window._perfDebug)console.log('%c[FB] Nichts zu senden \u2014 der Schatten haelt den Wert bereits fuer geloescht.','color:#c0392b;font-weight:bold');
       _fbSaving=false;
       if(typeof _markSynced==='function')_markSynced();
+      _fbAdoptLate();
       return Promise.resolve();
     }
     if(paths.length<=300){
@@ -9081,8 +9131,8 @@ function _fbWriteWithStamp(data){
       if(window._perfWatch||window._perfDebug)console.log('%c[FB] update() gesendet …','color:#0a5');
       return fbRef.update(out).then(()=>{
         if(window._perfWatch||window._perfDebug)console.log('%c[FB] update() ERFOLG','color:green;font-weight:bold');
-        _fbShadow=encoded;
-        setTimeout(()=>{_fbSaving=false;},500);
+        _fbShadow=encoded;_fbBase=encoded;
+        setTimeout(()=>{_fbSaving=false;_fbAdoptLate();},500);
         _localDirty=false;
         if(typeof setFbStatus==='function')setFbStatus('connected');
         if(typeof _markSynced==='function')_markSynced();
@@ -9097,8 +9147,8 @@ function _fbWriteWithStamp(data){
   }
   _fbCount('tx','fcf_data set() KOMPLETT',JSON.stringify(encoded).length);
   return fbRef.set(encoded).then(()=>{
-    _fbShadow=encoded;
-    setTimeout(()=>{_fbSaving=false;},500);
+    _fbShadow=encoded;_fbBase=encoded;
+    setTimeout(()=>{_fbSaving=false;_fbAdoptLate();},500);
     _localDirty=false;
     if(typeof setFbStatus==='function')setFbStatus('connected');
     // We just wrote = our local state matches Firebase = we're synced
@@ -9871,7 +9921,7 @@ function startFbListener(){
     if(_fbNeedsAcct()&&!window._fbRetried){window._fbRetried=true;setTimeout(()=>{try{startFbListener();}catch(_){}},4000);}
   };
   const _attach=_isPlayer?((cb)=>fbRef.once('value',cb,_onErr)):((cb)=>fbRef.on('value',cb,_onErr));
-  _attach((snap)=>{
+  _attach(_fbOnSnap=(snap)=>{
     // DEFENSE-IN-DEPTH: if autoSync was turned off but stopFbListener was forgotten
     // (or hasn't run yet), bail out. Otherwise remote changes would silently
     // overwrite local edits the user made in manual mode.
@@ -9887,7 +9937,8 @@ function startFbListener(){
       // the diff conclude there is nothing to send, so the value was stuck.
       _fbShadow=_raw;
     }catch(e){}
-    if(_fbSaving)return;
+    if(_fbSaving){try{_fbLateRaw=snap.val();}catch(e){}return;}
+    _fbLateRaw=undefined;
     // Capture initial-load flag BEFORE updating it
     const wasInitialLoad=!_fbInitialLoaded;
     // Decode remote first so we can inspect metadata
@@ -9907,7 +9958,9 @@ function startFbListener(){
       // Only a cache from BEFORE this session is suspect. An edit made in this
       // session, seconds ago, is exactly what must survive — discarding it is
       // how deleted grades came back after a reload.
-      const _fresh=_sessionEditAt&&(Date.now()-_sessionEditAt)<5*60*1000;
+      // 1.2.96: and only if a person did something before it — the app's own
+      // start-up saves on an old copy are exactly what must NOT survive
+      const _fresh=_sessionEditAt&&_userActAt&&_sessionEditAt>=_userActAt&&(Date.now()-_sessionEditAt)<5*60*1000;
       if(_fresh){
         console.info('[FB] Keeping this session\u2019s pending edit across the initial snapshot.');
       }else{
@@ -9949,6 +10002,7 @@ function startFbListener(){
         });
         if(_suspect){
           console.error('[SCHUTZ] Lokaler Stand verworfen \u2014 unvollst\u00e4ndig ('+_suspect+'). Server-Stand wird geladen.');
+          try{_fbShadow=fbEncode(data);_fbBase=_fbShadow;_bootJSON=null;}catch(e){}
           G=sanitizeG(data);
           _persistLocal();
           render();
@@ -9958,7 +10012,15 @@ function startFbListener(){
       // Reaching here means the conflict check above did NOT fire: remote is
       // not ahead of our base (it's our own echo or an equal-base race), so
       // pushing our local state is safe.
-      if(G){
+      // 1.2.96: what this copy was built from — before the first snapshot that
+      // is the cached copy as loaded. Without it the diff would run against
+      // the server's state and push the whole old copy over it.
+      if(!_fbBase&&_bootJSON){try{_fbBase=fbEncode(JSON.parse(_bootJSON));}catch(e){}_bootJSON=null;}
+      if(!_fbBase){
+        console.warn('[FB] Keine Basis f\u00fcr die lokale \u00c4nderung \u2014 Server-Stand gilt.');
+      }else if(G){
+        // Adopt the server's state once the push is through
+        try{_fbLateRaw=snap.val();}catch(e){}
         // Was a raw full-root set(): it re-uploaded the whole database AND
         // left _fbShadow stale, so the next diff write degenerated into
         // another full write. Two clients each holding a pending flag could
@@ -9968,10 +10030,10 @@ function startFbListener(){
         try{
           _fbWriteWithStamp(G).catch(()=>{});
         }catch(e){_fbSaving=false;}
+        // Skip applying this snapshot now — our changes go first; the server's
+        // state (with them) is adopted when the write is through (_fbAdoptLate).
+        return;
       }
-      // Skip applying this incoming snapshot — our local state takes precedence.
-      // The next snapshot (after our save) will sync everything correctly.
-      return;
     }
     if(data&&data.version>=14){
       // Detect if this update was triggered by another user — if so, clear our undo/redo
@@ -10184,6 +10246,7 @@ function loadG(){
   try{const d=JSON.parse(localStorage.getItem(SK));if(d&&d.version>=14)G=sanitizeG(d);}catch(e){G=null;}
   if(!G)buildDef();
   G.teamList.forEach(t=>{if(!G.db[t+'__focuses']||!Array.isArray(G.db[t+'__focuses']))G.db[t+'__focuses']=[...DEF_FOCUSES];});
+  try{_bootJSON=JSON.stringify(G);}catch(e){_bootJSON=null;}
   initUI();
 }
 
@@ -10227,6 +10290,12 @@ function safeLocalSave(key,value){
 }
 
 let _sessionEditAt=0;
+// Last real tap or key press (1.2.96). Saves the app makes on its own while
+// starting (Kader settled after kick-off, answers rule, migrations) run on the
+// cached copy — they are not edits the user made and must not outlive the
+// first snapshot from the server.
+let _userActAt=0;
+try{['pointerdown','keydown'].forEach(t=>document.addEventListener(t,e=>{if(e&&e.isTrusted)_userActAt=Date.now();},{capture:true,passive:true}));}catch(e){}
 function saveG(badge=true){
   // Also guards localStorage: a sanitised copy cached there would corrupt the
   // next trainer session on this device.
