@@ -3530,6 +3530,7 @@ body.design-heute .lp-nik-t{color:var(--hx-muted);}
 .mk-mini.mk-t-flutlicht{--a:#FFF3C4;box-shadow:inset 0 0 0 1.5px #FFF3C4,0 0 10px rgba(255,226,140,.55);}
 .wr2-mvp{margin-top:6px;font-size:.84rem;}
 .mvp-card{cursor:default;margin-top:8px;}
+.ast-h{margin-top:18px;}
 .mvp-card:hover{transform:none;box-shadow:none;}
 @media (max-height:700px){.rpo-opt{min-height:36px;}.rpo-num{height:29px;font-size:1.2rem;}.rpo-list{gap:2px;}.rpo-q{margin:12px 0 10px;}}
 .rpo-mbtn{width:44px;height:44px;border-radius:11px;border:1.5px solid var(--gl);
@@ -7534,12 +7535,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.97'; // v1.2.97: Spielbericht – Platzverweis beendet die Spielzeit
-const APP_VERSION_LABEL='1.2.97';
+const APP_VERSION='1.2.98'; // v1.2.98: Vorlagen erfassen – Einstellung der Mannschaft
+const APP_VERSION_LABEL='1.2.98';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1794168386789; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1794168960762; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -16093,7 +16094,7 @@ function _pmSanitizeG(){
   const _nw=teamNews(myTeam);
   if(_nw)keepDb[myTeam+'__news']={t:_nw.t,title:_nw.title,body:_nw.body||''};
   // The Absage-Regel only (1.2.45): his screen explains it
-  keepDb[myTeam+'__rules']={abs:pvAbsRule(teamRules(myTeam))};
+  keepDb[myTeam+'__rules']=Object.assign({abs:pvAbsRule(teamRules(myTeam))},astOn(myTeam)?{ast:true}:{});
   {const v=_vdList(myTeam);if(v.length)keepDb[myTeam+'__vids']=v;}
   G.db=keepDb;
   if(Array.isArray(G.teamList))G.teamList=[myTeam];
@@ -16429,7 +16430,7 @@ function _pvBuildSync(team,season){
   const loc={},la=(G.locationAddr&&typeof G.locationAddr==='object')?G.locationAddr:{};
   sessions.forEach(s=>{if(s&&s.location&&la[s.location])loc[s.location]=la[s.location];});
   const shared={v:PV_V,team,season,club:_clubName(),cinfo:(G.club&&typeof G.club==='object')?{resp:G.club.resp||'',addr:G.club.addr||'',mail:G.club.mail||'',dsb:G.club.dsb||''}:null,sessions:sessions.map(x=>{const o=_pvSess(x);const l=_sqListPl(x,players);if(o&&l)o.sql=l;return o;}),news,trainers,loc,
-    roster:{disp,nr,elig},names:[],rep:{},abs:pvAbsRule(teamRules(team)),vids:_vdList(team)};
+    roster:{disp,nr,elig},names:[],rep:{},abs:pvAbsRule(teamRules(team)),ast:astOn(team),vids:_vdList(team)};
   weeks.forEach(w=>{
     const r=reps[w.wk];if(!r)return;
     const tp=_reportForPlayers(r,null);
@@ -16636,7 +16637,7 @@ function _pvAdopt(x,token){
   });
   const db={[key]:{sessions,players}};
   if(T.news)db[P.team+'__news']=T.news;
-  if(T.abs)db[P.team+'__rules']={abs:T.abs};
+  if(T.abs||T.ast)db[P.team+'__rules']=Object.assign(T.abs?{abs:T.abs}:{},T.ast===true?{ast:true}:{});
   if(Array.isArray(T.vids)&&T.vids.length)db[P.team+'__vids']=T.vids;
   G={version:20,db,teamList:[P.team],seasonList:[P.season],trainers:T.trainers||[],clubName:T.club||'',club:T.cinfo||null,
     locationAddr:T.loc||{},auditLog:[],trash:[],backups:[],matchLineups:{},seasonLineups:{},
@@ -17507,7 +17508,8 @@ function sbClose(){
   const ov=document.getElementById('sbOverlay');if(ov)ov.classList.remove('open');
   const si=_sbSi;_sbSi=null;
   if(typeof render==='function')render();
-  if(si!=null&&_currentSessIdx===si){try{renderSessReport(si);buildSessAtt(si);}catch(e){}}
+  {const mo=document.getElementById('moSession2');
+   if(si!=null&&mo&&mo.classList.contains('open')&&currentSI===si){try{renderSessReport(si);buildSessAtt(si);}catch(e){}}}
 }
 function _sbEdit(fn,what,detail){
   const D=cd(),s=D&&D.sessions&&D.sessions[_sbSi];if(!s||!canEdit())return;
@@ -17719,28 +17721,28 @@ function sbRender(){
   let rows=mins?all.filter(x=>x.p.name in mins&&(mins[x.p.name]>0||stSet.has(x.p.name)||subs.some(y=>y.i===x.p.name)))
     :all.filter(x=>v(x)===1);
   // goals or cards entered for someone not in the list stay visible
-  all.forEach(x=>{if(!rows.includes(x)&&(val(x.p,'goals')||val(x.p,'assists')||card(x.p)))rows.push(x);});
+  all.forEach(x=>{if(!rows.includes(x)&&(val(x.p,'goals')||(astOn()&&val(x.p,'assists'))||card(x.p)))rows.push(x);});
   if(mins)rows.sort((a,b)=>(stSet.has(b.p.name)-stSet.has(a.p.name))||((mins[b.p.name]||0)-(mins[a.p.name]||0)));
   const gSum=rows.reduce((t,x)=>t+val(x.p,'goals'),0);
   const gHint=(typeof r.f==='number'&&r.f>0)?(gSum===r.f?`Tore ${gSum} von ${r.f} zugeordnet`:gSum<r.f?`Tore ${gSum} von ${r.f} zugeordnet – Rest z. B. Eigentor`:`${gSum} Tore zugeordnet, aber nur ${r.f} geschossen`):'';
   const ed=x=>{
     const p=x.p,c=card(p);
     const stp=(f,l)=>`<div class="sb-ed-r"><span>${l}</span><div class="sb-step sb-step-s"><button type="button" onclick="sbStat(${x.pi},'${f}',-1)" aria-label="${l}: eins weniger"${val(p,f)?'':' disabled'}>−</button><b>${val(p,f)}</b><button type="button" onclick="sbStat(${x.pi},'${f}',1)" aria-label="${l}: eins mehr">+</button></div></div>`;
-    return `<div class="sb-ed">${stp('goals','Tore')}${stp('assists','Vorlagen')}
+    return `<div class="sb-ed">${stp('goals','Tore')}${astOn()?stp('assists','Vorlagen'):''}
       <div class="sb-ed-r"><span>Karte</span><div class="sb-cards" role="group" aria-label="Karte">${['y','gr','r'].map(k=>`<button type="button" class="sb-cb${c===k?' on':''}" aria-pressed="${c===k}" onclick="sbCard(${x.pi},'${k}')">${_cardIc(k)}${CARD_NAMES[k]}</button>`).join('')}</div></div>${(c==='r'||c==='gr')?(()=>{
         const om=(r.off&&+r.off[p.name])||'';
         return `<div class="sb-ed-r sb-off"><label for="sb-off-${x.pi}">Platzverweis in Minute<small>${om?'Spielzeit endet hier':'leer: Spielzeit z\u00e4hlt bis zum Schluss'}</small></label><input type="number" id="sb-off-${x.pi}" min="1" max="${_sbDur(s)}" inputmode="numeric" value="${om}" onchange="sbOffSet(${x.pi},this.value)"></div>`;
       })():''}</div>`;
   };
   const prow=x=>{
-    const p=x.p,open=_sbOpenPl===x.pi,g=val(p,'goals'),a=val(p,'assists'),c=card(p);
+    const p=x.p,open=_sbOpenPl===x.pi,g=val(p,'goals'),a=astOn()?val(p,'assists'):0,c=card(p);
     const m=mins?(mins[p.name]||0):null;
     const sum=[g?`<span class="sb-g">⚽${g>1?'<b>'+g+'</b>':''}</span>`:'',a?`<span class="sb-g">🎯${a>1?'<b>'+a+'</b>':''}</span>`:'',_cardIc(c)].join('');
     return `<div class="sb-pl${open?' open':''}"><button type="button" class="sb-pl-r" aria-expanded="${open}" onclick="sbTogglePl(${x.pi})">
       <span class="rc-nr">${e(String(p.nr||''))}</span><span class="sb-pl-n">${e(nm(p))}</span>
       <span class="sb-pl-s">${sum}</span>${m!=null?`<span class="sb-pl-m">${m}′</span>`:''}<span class="sb-pl-c">${open?'–':'+'}</span></button>${open?ed(x):''}</div>`;
   };
-  h+=`<section class="sb-sec"><div class="sb-h">${mins?'Im Einsatz':'Anwesend'} <b>${rows.length}</b><span>${e(gHint||'antippen für Tore, Vorlagen, Karte')}</span></div>
+  h+=`<section class="sb-sec"><div class="sb-h">${mins?'Im Einsatz':'Anwesend'} <b>${rows.length}</b><span>${e(gHint||(astOn()?'antippen für Tore, Vorlagen, Karte':'antippen für Tore und Karte'))}</span></div>
     ${rows.length?rows.map(prow).join(''):'<div class="sb-hint">Noch niemand: Startelf wählen oder Anwesenheit erfassen.</div>'}</section>`;
   // ── suspensions from this match ──
   const R=cardRules(),bans=all.filter(x=>card(x.p)==='r'||(card(x.p)==='gr'&&R.gr>0));
@@ -17756,6 +17758,28 @@ function sbRender(){
   }
   body.innerHTML=h;
 }
+// ── Vorlagen (assists): a team setting (1.2.98) ──
+// G.db[team+'__rules'].ast === true → assists are recorded and shown.
+// Off by default: an amateur team rarely keeps them (U19 never has, Artem
+// 08.11.: "идея классная, но данных нет"), and a "0 Vorlagen" on every
+// player's card is not true — it is just not counted. Off hides them in the
+// Spielbericht, the roll-call, the statistics, the weekly report and
+// everything the players see; entries already made stay in the data.
+function astOn(team){
+  const r=(G&&G.db&&G.db[(team||UI.currentTeam)+'__rules'])||{};
+  return r.ast===true;
+}
+function astSet(on){
+  if(!_teamSetGuard())return;
+  const t=UI.currentTeam;
+  snap();
+  if(!G.db[t+'__rules']||typeof G.db[t+'__rules']!=='object')G.db[t+'__rules']={};
+  if(on)G.db[t+'__rules'].ast=true;else delete G.db[t+'__rules'].ast;
+  saveG();
+  logAudit('Vorlagen erfassen',t,on?'an':'aus');
+  if(typeof showSaveFlash==='function')showSaveFlash('\u2713 Gespeichert');
+  cardRulesRender();
+}
 // ── Einstellungen → Mannschaft: Karten und Sperren ──
 function cardRulesRender(){
   const box=document.getElementById('cardBox');if(!box)return;
@@ -17769,7 +17793,10 @@ function cardRulesRender(){
     <div class="setting-row"><div><div class="setting-label"><label for="cr-gr">Gelb-Rot</label></div><div class="setting-sub">Sperre danach</div></div>
       <div class="setting-control">${sel('gr',[[0,'keine'],[1,'1 Spiel'],[2,'2 Spiele']])}</div></div>
     <div class="setting-row"><div><div class="setting-label"><label for="cr-r">Rot</label></div><div class="setting-sub">automatisch, h\u00f6chstens ein Spiel je Woche – bis Staffelleiter oder Sportgericht entscheiden</div></div>
-      <div class="setting-control">${sel('r',[[7,'1 Woche'],[14,'2 Wochen'],[21,'3 Wochen'],[28,'4 Wochen']])}</div></div>`;
+      <div class="setting-control">${sel('r',[[7,'1 Woche'],[14,'2 Wochen'],[21,'3 Wochen'],[28,'4 Wochen']])}</div></div>
+    <div class="setting-label ay-h ast-h">⚽ Spielbericht</div>
+    <div class="setting-row"><div><div class="setting-label"><label for="ast-on">Vorlagen erfassen</label></div><div class="setting-sub">${astOn(t)?'Vorlagen stehen im Spielbericht, in der Statistik und bei den Spielern.':'Aus: keine Vorlagen im Spielbericht, in der Statistik und bei den Spielern. Schon eingetragene bleiben gespeichert.'}</div></div>
+      <div class="setting-control"><label class="setting-switch"><input type="checkbox" id="ast-on" ${astOn(t)?'checked':''} onchange="astSet(this.checked)"><span class="setting-slider"></span></label></div></div>`;
 }
 function cardRuleSet(k,val){
   if(!_teamSetGuard())return;
@@ -18764,7 +18791,7 @@ function _resHubPick(D){
 function _resHubHtml(x,p,mvpWho){
   const e=escapeHtml,{s,si,r}=x;
   const n=a=>(Array.isArray(a)?+a[si]:0)||0;
-  const g=n(p.goals),a=n(p.assists);
+  const g=n(p.goals),a=astOn()?n(p.assists):0;
   const mine=[g?g+(g===1?' Tor':' Tore'):'',a?a+(a===1?' Vorlage':' Vorlagen'):''].filter(Boolean).join(' und ');
   const where=s.homeAway==='home'?' (Heim)':s.homeAway==='away'?' (auswärts)':'';
   return `<div class="hub-card hub-mvp hub-res hub-res-${r.k} fl-row">`
@@ -19886,7 +19913,7 @@ function cardData(p,D,season){
   let ti=pct>=80?2:pct>=60?1:0;
   if(pct>=95&&t>=CARD_FL_MIN&&rateOk)ti=3;
   const name=String(p.name||'').trim();
-  return {ti,pct,a,t,e,nz,pz,rated,rq,rateOk,apps,goals,assists,mvp,
+  return {ti,pct,a,t,e,nz,pz,rated,rq,rateOk,apps,goals,assists:astOn()?assists:null,mvp,
     streak:_playerStreak(p,D,season),
     name,ini:name.split(/\s+/).map(x=>x[0]||'').join('').slice(0,2).toUpperCase()||'?',
     nr:(p.nr!=null&&p.nr!=='')?String(p.nr):'',pos:typeof p.pos==='string'?p.pos:'',
@@ -20056,10 +20083,14 @@ function cardDraw(cv,d,o){
   x.fillText(how,180,365);
   x.fillStyle='rgba(255,255,255,.12)';x.fillRect(28,379,304,1);
   // Six numbers he controls himself
-  const cells=[[d.streak,'Serie'],[d.apps,'Spiele'],[d.goals,'Tore'],
-    [d.assists,'Vorlagen'],[d.rated==null?'–':d.rated+' %','Bewertet'],[d.mvp,'Spieler des Spiels']];
+  // Without assists (team setting, 1.2.98) five numbers: the second row is
+  // centred on the same grid
+  const cells=[[d.streak,'Serie'],[d.apps,'Spiele'],[d.goals,'Tore']]
+    .concat(d.assists==null?[]:[[d.assists,'Vorlagen']])
+    .concat([[d.rated==null?'–':d.rated+' %','Bewertet'],[d.mvp,'Spieler des Spiels']]);
   cells.forEach(([v,l],i)=>{
-    const cx=[66,180,294][i%3],y=i<3?407:449;
+    // two in the second row: centred under the three above
+    const cx=(cells.length===5&&i>=3)?[123,237][i-3]:[66,180,294][i%3],y=i<3?407:449;
     x.font='700 27px '+BS;x.fillStyle='#FFFFFF';x.fillText(String(v),cx,y);
     x.font='600 10px '+BA;x.fillStyle='rgba(255,255,255,.55)';
     if(x.measureText(l).width>104)x.font='600 9px '+BA;
@@ -20198,7 +20229,7 @@ function renderPlayerCard(){
     return `<span class="mk-chip ${w.st}" title="${tip}">${escapeHtml(w.day)}${w.match?' ⚽':''}${w.st==='ok'?' ✓':''}</span>`;}).join('')}</div>`:'';
   let canShare=false;
   try{canShare=!!(navigator.share&&navigator.canShare&&navigator.canShare({files:[new File([new Uint8Array(1)],'x.jpg',{type:'image/jpeg'})]}));}catch(e){}
-  const aria=`Karte ${T.name}. Anwesenheit ${d.pct} Prozent, ${d.a} von ${d.t}${d.nz?`, ${d.nz} Mal entschuldigt ohne Abzug`:''}${d.pz?`, ${d.pz} Termine in der Pause, die nicht zählen`:''}. Serie ${d.streak}, Spiele ${d.apps}, Tore ${d.goals}, Vorlagen ${d.assists}, Bewertet ${d.rated==null?'noch nichts':d.rated+' Prozent'}, Spieler des Spiels ${d.mvp}.`;
+  const aria=`Karte ${T.name}. Anwesenheit ${d.pct} Prozent, ${d.a} von ${d.t}${d.nz?`, ${d.nz} Mal entschuldigt ohne Abzug`:''}${d.pz?`, ${d.pz} Termine in der Pause, die nicht zählen`:''}. Serie ${d.streak}, Spiele ${d.apps}, Tore ${d.goals}${d.assists==null?'':', Vorlagen '+d.assists}, Bewertet ${d.rated==null?'noch nichts':d.rated+' Prozent'}, Spieler des Spiels ${d.mvp}.`;
   wrap.innerHTML=`<div class="mk mk-t-${T.k}">${back}${prev}
     <div class="mk-stage"><canvas id="mk-cv" class="mk-cv" width="1080" height="1512" role="img" aria-label="${escapeHtml(aria)}"></canvas></div>
     <div class="mk-next">
@@ -21841,7 +21872,10 @@ function renderHub(){
     const one=weekOpen===1&&openOne;
     now.push(row({ic:FL_IC.cal,go:true,
       title:one?'Kommst du '+_flDayWord(openOne)+'?':weekOpen+' Termine ohne Antwort',
-      sub:one?(openOne.type==='match'?'Spiel gegen '+e(openOne.label||'')+', ':'Training, ')+e(openOne.time||'')+' \u00b7 noch keine Antwort':'Diese Woche',
+      sub:one?(openOne.type==='match'?'Spiel gegen '+e(openOne.label||'')+', ':'Training, ')+e(openOne.time||'')+' \u00b7 noch keine Antwort':(()=>{
+        const d0=new Date(),sun=new Date(d0);sun.setDate(d0.getDate()+(7-d0.getDay())%7);
+        return weekStart>sun.getFullYear()*10000+(sun.getMonth()+1)*100+sun.getDate()?'N\u00e4chste Woche':'Diese Woche';
+      })(),
       badge:weekOpen,href:buildHubLink(tok,'week')}));
   }
   // Visible while the offer stands, so a booking can be cancelled or added
@@ -21928,7 +21962,11 @@ function renderHub(){
     ${sec('Jetzt dran')}${now.length?list(now):list([`<div class="hub-mvp fl-row fl-calm"><span class="hub-ic fl-tile ok">${FL_IC.check}</span><span class="hub-txt"><b>Alles beantwortet</b><span>Danke – gerade wartet nichts auf dich.</span></span></div>`])}
     ${_hubPushCard()}
     ${_mpHubHtml(D,p,tok,sec,list,row)}
-    ${wkRows.length?sec(wk.length===1?'Dein n\u00e4chster Termin':'Diese Woche',`<a class="fl-sec-a" href="${ln(buildHubLink(tok,'week'))}">alle Termine \u203a</a>`)+list(wkRows):''}
+    ${wkRows.length?sec(wk.length===1?'Dein n\u00e4chster Termin':(()=>{
+      const d0=new Date(),sun=new Date(d0);sun.setDate(d0.getDate()+(7-d0.getDay())%7);
+      const sunSK=sun.getFullYear()*10000+(sun.getMonth()+1)*100+sun.getDate();
+      return wk.every(x=>x.k>sunSK)?'N\u00e4chste Woche':'Diese Woche';
+    })(),`<a class="fl-sec-a" href="${ln(buildHubLink(tok,'week'))}">alle Termine \u203a</a>`)+list(wkRows):''}
     ${last?sec('Letztes Spiel')+list([last]):''}
     ${_zlHubHtml(p,tok,sec)}
     ${mine.length?sec('F\u00fcr dich')+list(mine):''}
@@ -23249,7 +23287,7 @@ function dbBuildPlayerStatsSnapshot(data,pi,offset,includePhoto){
   return {
     v:2,kind:'player',
     publishedAt:Date.now(),
-    scorer:{goals:_goals,assists:_assists,apps:_apps},
+    scorer:{goals:_goals,assists:astOn()?_assists:0,apps:_apps},
     club:_clubName(),
     clubLogo:(G&&G.clubLogo)||null,
     team,season,
@@ -23559,7 +23597,7 @@ function dbRenderWeekReportSection(data){
     const sc=[],perf={1:0,2:0,3:0};
     players.forEach((p,pi)=>{
       if(!p)return;
-      const g=(Array.isArray(p.goals)?p.goals[si]:0)||0,a=(Array.isArray(p.assists)?p.assists[si]:0)||0;
+      const g=(Array.isArray(p.goals)?p.goals[si]:0)||0,a=astOn()?((Array.isArray(p.assists)?p.assists[si]:0)||0):0;
       if(g||a)sc.push({p,pi,g,a});
       const v=Array.isArray(p.perf)?p.perf[si]:null;
       if(v===1||v===2||v===3)perf[v]++;
@@ -23571,7 +23609,7 @@ function dbRenderWeekReportSection(data){
     html+='<div class="wr2-match">';
     html+='<div class="wr2-scorers">'+(sc.length?sc.map(x=>
       `<span class="wr2-sc" ${open(x.pi)}>${esc(nm(x.p))}${x.g?' ⚽'+(x.g>1?'×'+x.g:''):''}${x.a?' 🎯'+(x.a>1?'×'+x.a:''):''}</span>`).join('')
-      :'<span class="wr2-muted">Keine Tore/Vorlagen eingetragen</span>')+'</div>';
+      :'<span class="wr2-muted">'+(astOn()?'Keine Tore/Vorlagen eingetragen':'Keine Tore eingetragen')+'</span>')+'</div>';
     if(graded)html+=`<div class="wr2-perf"><span>🟢 ${perf[1]}</span><span>🔵 ${perf[2]}</span><span>🟠 ${perf[3]}</span><span class="wr2-muted">${graded} bewertet</span></div>`;
     {const r=(typeof mvpResult==='function')?mvpResult(s):null;
      if(r&&r.winners.length){const nmx=n=>{const q=players.find(x=>x&&x.name===n);return q?nm(q):n;};
@@ -25920,9 +25958,9 @@ function ssAttRender(){
         <button class="ssa-gs-b" onclick="event.stopPropagation();ssAttStat(${pi},'goals',1)"
           oncontextmenu="event.preventDefault();ssAttStat(${pi},'goals',-1)"
           title="Tor \u2014 tippen +1, lange dr\u00fccken \u22121">\u26bd${g?'<b>'+g+'</b>':''}</button>
-        <button class="ssa-gs-b" onclick="event.stopPropagation();ssAttStat(${pi},'assists',1)"
+        ${astOn()?`<button class="ssa-gs-b" onclick="event.stopPropagation();ssAttStat(${pi},'assists',1)"
           oncontextmenu="event.preventDefault();ssAttStat(${pi},'assists',-1)"
-          title="Vorlage \u2014 tippen +1, lange dr\u00fccken \u22121">\ud83c\udfaf${a?'<b>'+a+'</b>':''}</button>
+          title="Vorlage \u2014 tippen +1, lange dr\u00fccken \u22121">\ud83c\udfaf${a?'<b>'+a+'</b>':''}</button>`:''}
       </span>`:''}
       <button class="ssa-st ${m.cls}" onclick="event.stopPropagation();ssAttMenu(${pi},this)"
         title="${m.n} \u2014 antippen zum \u00c4ndern">${m.i}</button>
@@ -26765,7 +26803,7 @@ function _ssHxAttRender(si){
    if(pz.length)h+=`<div class="ssx-grp ssx-pz"><div class="ssx-gh"><i class="s-nk"></i>In Pause <b>${pz.length}</b></div><div class="ssx-chips">${pz.map(({p,pi})=>
      `<button type="button" class="ssx-chip" onclick="pzBack(${pi},${si})" title="${e(_pzTxt(p,s,season))} – antippen: ${roll?'war da':'ist wieder dabei'}"><b>${e(String(p.nr||'–'))}</b>${e((getDisplayName?getDisplayName(p):p.name)||'')}<span class="ssx-pzt">${roll?'war da?':'wieder dabei?'}</span></button>`).join('')}</div></div>`;}
   if(roll&&s.type==='match'&&ed&&(typeof sessTookPlace!=='function'||sessTookPlace(s,season)))
-    h+=`<button type="button" class="ssx-more" onclick="ssAttOpen(${si},1)">Tore und Vorlagen eintragen</button>`;
+    h+=`<button type="button" class="ssx-more" onclick="ssAttOpen(${si},1)">${astOn()?'Tore und Vorlagen eintragen':'Tore eintragen'}</button>`;
   el.innerHTML=h;
 }
 // Sort order of the list — position unless the trainer picks another one
@@ -30318,7 +30356,7 @@ function _statsPlayerTable(D,opts){
     const perfAvg=perfVals.length?(perfVals.reduce((s,v)=>s+v,0)/perfVals.length):null;
     // Goals and assists from the matches he played, Spieler des Spiels
     const num=(arr,i)=>(Array.isArray(arr)&&+arr[i]>0)?+arr[i]:0;
-    const goals=mIdx.reduce((t,i)=>t+num(p.goals,i),0),assists=mIdx.reduce((t,i)=>t+num(p.assists,i),0);
+    const goals=mIdx.reduce((t,i)=>t+num(p.goals,i),0),assists=astOn()?mIdx.reduce((t,i)=>t+num(p.assists,i),0):0;
     const mvp=mIdx.filter(i=>mvpW[i]&&mvpW[i].includes(p.name)).length;
     const _pi=D.players.indexOf(p);
     const stIn=mIdx.filter(i=>luAt[i]&&luAt[i].has(_pi)).length;
@@ -30350,7 +30388,7 @@ function _statsPlayerTable(D,opts){
   return `${opts.noHead?'':`    <div class="sec" style="margin-top:12px;margin-bottom:8px;">🏆 Alle Spieler</div>
 `}    <div style="${wrap}">
     <table class="full-table"><thead><tr>
-      ${th('nr','#')}${th('name','Spieler')}${th('pos','Pos.')}${th('tPct','Training')}${mS?th('mPct','Spiele'):''}${hasL?th('stSort','Startelf'):''}${hasS?th('subN','Eingew.'):''}${hasMin?th('minT','Min.'):''}${hasG?th('gSort','Tore · Vorl.'):''}${hasC?th('cSort','Karten'):''}${hasM?`<th onclick="sortStats('mvp')" title="Spieler des Spiels">🏅 ${sa('mvp')}</th>`:''}${th('perfAvgSort','⭐ Einsatz')}
+      ${th('nr','#')}${th('name','Spieler')}${th('pos','Pos.')}${th('tPct','Training')}${mS?th('mPct','Spiele'):''}${hasL?th('stSort','Startelf'):''}${hasS?th('subN','Eingew.'):''}${hasMin?th('minT','Min.'):''}${hasG?th('gSort',astOn()?'Tore · Vorl.':'Tore'):''}${hasC?th('cSort','Karten'):''}${hasM?`<th onclick="sortStats('mvp')" title="Spieler des Spiels">🏅 ${sa('mvp')}</th>`:''}${th('perfAvgSort','⭐ Einsatz')}
     </tr></thead><tbody>
     ${_rowsAll.map((r,ix)=>{const bc=pctColor(r.tPct);
       const _g=_grp(r),_hd=(_g&&(ix===0||_grp(_rowsAll[ix-1])!==_g))?_gHead(_g):'';
@@ -30365,7 +30403,8 @@ function _statsPlayerTable(D,opts){
       ${hasL?`<td class="st-gv" title="${r.stIn} von ${r.stOf} Spielen mit Aufstellung, bei denen er dabei war">${r.stOf?`<b>${r.stIn}</b><small>/</small>${r.stOf}`:'–'}</td>`:''}
       ${hasS?`<td title="${r.subN}× eingewechselt">${r.subN||'–'}</td>`:''}
       ${hasMin?`<td title="${r.minT} Minuten laut Spielbericht">${r.minT||'–'}</td>`:''}
-      ${hasG?`<td class="st-gv" title="${r.goals} ${r.goals===1?'Tor':'Tore'}, ${r.assists} ${r.assists===1?'Vorlage':'Vorlagen'}">${r.goals||r.assists?`<b>${r.goals}</b><small>·</small>${r.assists}`:'–'}</td>`:''}
+      ${hasG?(astOn()?`<td class="st-gv" title="${r.goals} ${r.goals===1?'Tor':'Tore'}, ${r.assists} ${r.assists===1?'Vorlage':'Vorlagen'}">${r.goals||r.assists?`<b>${r.goals}</b><small>·</small>${r.assists}`:'–'}</td>`
+        :`<td class="st-gv" title="${r.goals} ${r.goals===1?'Tor':'Tore'}">${r.goals?`<b>${r.goals}</b>`:'–'}</td>`):''}
       ${hasC?`<td class="st-cards" title="${r.cy} Gelb, ${r.cgr} Gelb-Rot, ${r.cr} Rot">${r.cSort?[['y',r.cy],['gr',r.cgr],['r',r.cr]].filter(x=>x[1]).map(x=>_cardIc(x[0])+(x[1]>1?'<b>'+x[1]+'</b>':'')).join(' '):'–'}</td>`:''}
       ${hasM?`<td title="${r.mvp}× Spieler des Spiels">${r.mvp||'–'}</td>`:''}
       <td style="font-weight:700;color:${perfColor};" title="${r.perfCount} bewertete Termine">${r.perfAvg!=null?r.perfAvg.toFixed(1).replace('.',','):'–'}</td>
