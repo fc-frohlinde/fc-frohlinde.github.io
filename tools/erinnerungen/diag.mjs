@@ -28,7 +28,7 @@ function matchInfo(G, label) {
     `Kader ${s.squad ? (s.squad.p || []).length + ' игр.' : 'нет'}`);
 }
 const raw = await get('fcf_data');
-say('fcf_data: последнее сохранение ' + T(raw && raw._lastSaveTs) + ', версия данных ' + (raw && raw.version));
+say('fcf_data: последнее сохранение ' + T(raw && raw._lastSaveTs) + ', версия данных ' + (raw && raw.version) + ', объявленная версия приложения ' + (raw && raw._appVersion) + ' (' + T(raw && raw._appReleaseTs) + ')');
 const G = decode(raw);
 matchInfo(G, 'Сейчас');
 for (const k of ['auditLogT', 'auditLogP']) {
