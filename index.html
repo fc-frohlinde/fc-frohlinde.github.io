@@ -258,6 +258,8 @@ if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostnam
 .sb-step-s button{width:40px;height:36px;}
 .sb-cards{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px;}
 .sb-off label{display:flex;flex-direction:column;gap:1px;}
+.sb-why{flex:1 1 100%;display:block;width:100%;max-width:100%;height:36px;padding:0 8px;border-radius:10px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;font:600 .8rem 'Barlow',sans-serif;color-scheme:dark;}
+.sb-why option{color:#0E2350;background:#fff;}
 .sb-off small{font-size:.74rem;color:rgba(255,255,255,.55);}
 .sb-off input{width:72px;height:38px;padding:0 8px;border-radius:10px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;font:600 .9rem 'Barlow',sans-serif;color-scheme:dark;text-align:center;}
 .sb-cb{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 11px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:transparent;color:#fff;font:600 .8rem 'Barlow',sans-serif;cursor:pointer;}
@@ -7535,12 +7537,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.99'; // v1.2.99: Karte – Bewerten zählt nur, wenn die Mannschaft gefragt war
-const APP_VERSION_LABEL='1.2.99';
+const APP_VERSION='1.2.100'; // v1.2.100: Rote Karte – Mindestsperre nach Grund (JSpO § 30)
+const APP_VERSION_LABEL='1.2.100';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1794170720249; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1794171369396; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -16956,6 +16958,49 @@ function _sbMatches(D,season){
   return (D&&D.sessions||[]).map((s,i)=>({s,i,k:(s&&s.type==='match'&&s.date)?_dbSortKey(s.date,season):null}))
     .filter(x=>x.k!=null).sort((a,b)=>a.k-b.k);
 }
+// Minimum suspensions after a red card, JSpO/WDFV § 30 (2) (Stand 01.07.2026),
+// first offence: [label, A–C-Junioren, D-Junioren und jünger]; a number is
+// weeks, 'Nm' months. They cannot be shortened (§ 25 (1)) — the provisional
+// two weeks of § 27 (1) were all the app knew before (Artem 08.11.: a
+// "Tätlichkeit" means at least four weeks, the app showed two).
+const JSPO_RED={
+  hand:['Absichtliches Handspiel (Torverhinderung)',1,1],
+  foul:['Wiederholtes Foulspiel',2,1],
+  roh:['Rohes Spiel',4,2],
+  unsp:['Grobe Unsportlichkeit',4,2],
+  verl:['Spielfeld ohne Erlaubnis verlassen',1,1],
+  bel1:['Beleidigung eines Gegners (minder schwer)',2,2],
+  bel2:['Beleidigung eines Gegners (schwer)',4,4],
+  tg:['Tätlicher Angriff auf einen Gegner',4,2],
+  krit:['Kritik am Schiedsrichter',2,2],
+  bsr:['Beleidigung des Schiedsrichters',4,4],
+  dsr:['Bedrohung des Schiedsrichters','3m','1m'],
+  tsr:['Tätlicher Angriff auf den Schiedsrichter','3m','1m'],
+  sonst:['Unsportliches Verhalten (übrige Fälle)',2,2]
+};
+// A- to C-Junioren (U14 and older) or younger, from the team's name
+function _jspoAC(team){const m=/U\s?(\d{1,2})/i.exec(team||UI.currentTeam||'');return !m||+m[1]>=14;}
+const _jspoTxt=v=>typeof v==='string'?parseInt(v,10)+(parseInt(v,10)===1?' Monat':' Monate'):v+(v===1?' Woche':' Wochen');
+function _skAddMonths(k,n){
+  const d=new Date(+String(k).slice(0,4),+String(k).slice(4,6)-1+n,+String(k).slice(6,8));
+  return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
+}
+// Red card at match si: reason from the report, the how-many-th red of the
+// season (§ 28 (1): +2, +4, then +6 weeks each) and the earliest end the
+// rules allow (null without a reason)
+function sbRedInfo(p,si,D,season){
+  season=season||UI.currentSeason;
+  const s=D.sessions[si],k=_dbSortKey(s.date,season),r=_sbRep(s)||{};
+  const why=(r.why&&typeof r.why==='object')?r.why[p.name]:null,row=JSPO_RED[why]||null;
+  const nth=1+_sbMatches(D,season).filter(x=>x.k<k&&Array.isArray(p.cards)&&p.cards[x.i]==='r').length;
+  const add=nth===2?2:nth===3?4:nth>3?6:0;
+  let minEnd=null,base=null;
+  if(row){
+    base=_jspoAC()?row[1]:row[2];
+    minEnd=typeof base==='string'?_skAdd(_skAddMonths(k,parseInt(base,10)),add*7):_skAdd(k,(base+add)*7);
+  }
+  return {why:row?why:null,row,base,nth,add,minEnd};
+}
 // The suspension a player serves at match ti, or null:
 //   {c, si, until (sort key, red), n (matches, yellow/yellow-red), yc}
 function sbBanAt(p,ti,D,season){
@@ -16972,7 +17017,11 @@ function sbBanAt(p,ti,D,season){
       // (WDFV youth: 2 weeks, at most 2 Pflichtspiele — JSpO §§ 25 (4), 27 (1)).
       // A date from the Staffelleiter or the Sportgericht replaces both.
       const o=(_sbRep(x.s)&&x.s.rep.ban)?x.s.rep.ban[p.name]:null;
+      const ri=sbRedInfo(p,x.i,D,season);
       if(/^\d{4}-\d{2}-\d{2}$/.test(o||'')){const until=isoToSortKey(o);if(tk<=until)res={c,si:x.i,until};}
+      // The minimum for the reason in the report is longer than the
+      // provisional two weeks: it runs by date, not capped by matches (1.2.100)
+      else if(ri.minEnd&&ri.minEnd>_skAdd(x.k,R.r)){if(tk<=ri.minEnd)res={c,si:x.i,until:ri.minEnd,min:true};}
       else{
         const until=_skAdd(x.k,R.r),cap=Math.max(1,Math.round(R.r/7));
         const inside=later.filter(y=>y.k<=until).slice(0,cap);
@@ -17625,6 +17674,7 @@ function sbCard(pi,c){
     p.cards[si]=next;
     if(r.ban&&r.ban[p.name]&&next!=='r'){delete r.ban[p.name];if(!Object.keys(r.ban).length)delete r.ban;}
     if(r.off&&r.off[p.name]!=null&&next!=='r'&&next!=='gr'){delete r.off[p.name];if(!Object.keys(r.off).length)delete r.off;}
+    if(r.why&&r.why[p.name]&&next!=='r'){delete r.why[p.name];if(!Object.keys(r.why).length)delete r.why;}
   },next?'Karte erfasst':'Karte entfernt',(getDisplayName?getDisplayName(p):p.name)+(next?' · '+CARD_NAMES[next]:''));
 }
 // Minute of the sending-off (1.2.97): empty = not known, minutes run to the end
@@ -17636,6 +17686,16 @@ function sbOffSet(pi,v){
     if(ok)r.off[p.name]=m;else delete r.off[p.name];
     if(!Object.keys(r.off).length)delete r.off;
   },'Platzverweis',(getDisplayName?getDisplayName(p):p.name)+': '+(ok?m+'. Minute':'Minute entfernt'));
+}
+// Reason for a red card as the referee wrote it (1.2.100)
+function sbWhySet(pi,code){
+  const D=cd(),p=D&&D.players[pi];if(!p)return;
+  const ok=!!JSPO_RED[code];
+  _sbEdit(r=>{
+    if(!r.why||typeof r.why!=='object')r.why={};
+    if(ok)r.why[p.name]=code;else delete r.why[p.name];
+    if(!Object.keys(r.why).length)delete r.why;
+  },'Grund Rote Karte',(getDisplayName?getDisplayName(p):p.name)+': '+(ok?JSPO_RED[code][0]:'nicht angegeben'));
 }
 function sbBanSet(pi,iso){
   const D=cd(),p=D.players[pi];if(!p)return;
@@ -17752,9 +17812,16 @@ function sbRender(){
     h+=`<section class="sb-sec"><div class="sb-h">Sperren</div>${bans.map(x=>{
       const c=card(x.p);
       if(c==='gr')return `<div class="sb-ban">${_cardIc('gr')}<span class="sb-ban-t"><b>${e(nm(x.p))}</b><span>gesperrt für ${R.gr===1?'das nächste Spiel':'die nächsten '+R.gr+' Spiele'} (Regel der Mannschaft)</span></span></div>`;
-      const o=r.ban&&r.ban[x.p.name],iso=/^\d{4}-\d{2}-\d{2}$/.test(o||'')?o:_skISO(_skAdd(k,R.r));
-      return `<div class="sb-ban">${_cardIc('r')}<span class="sb-ban-t"><b>${e(nm(x.p))}</b><span>${o?'Sperre nach Entscheidung':'automatisch '+(R.r%7?R.r+' Tage':(R.r/7)+(R.r===7?' Woche':' Wochen'))+', h\u00f6chstens '+Math.max(1,Math.round(R.r/7))+(Math.round(R.r/7)===1?' Spiel':' Spiele')+' \u2013 die endg\u00fcltige Sperre legt der Staffelleiter oder das Sportgericht fest'}</span></span>
-        <label class="sb-ban-d">bis<input type="date" value="${iso}" onchange="sbBanSet(${x.pi},this.value)"></label></div>`;
+      const o=r.ban&&r.ban[x.p.name],ri=sbRedInfo(x.p,_sbSi,cd(),season);
+      const prov=_skAdd(k,R.r),longer=ri.minEnd&&ri.minEnd>prov;
+      const iso=/^\d{4}-\d{2}-\d{2}$/.test(o||'')?o:_skISO(longer?ri.minEnd:prov);
+      const provTxt='vorl\u00e4ufig '+(R.r%7?R.r+' Tage':(R.r/7)+(R.r===7?' Woche':' Wochen'))+', h\u00f6chstens '+Math.max(1,Math.round(R.r/7))+(Math.round(R.r/7)===1?' Spiel':' Spiele');
+      const minTxt=ri.row?'Mindestsperre '+_jspoTxt(ri.base)+(ri.add?' + '+ri.add+' Wochen ('+ri.nth+'. Rote Karte der Saison)':'')+' (JSpO \u00a7\u00a7 30, 28)':(ri.nth>1?ri.nth+'. Rote Karte der Saison: Mindestsperre + '+ri.add+' Wochen (JSpO \u00a7 28) \u2013 Grund w\u00e4hlen':'');
+      const what=o?'Sperre nach Entscheidung':(longer?minTxt:provTxt+(minTxt?' \u00b7 '+minTxt:''))+' \u2013 die endg\u00fcltige Sperre legt der Staffelleiter oder das Sportgericht fest';
+      const opts='<option value="">Grund laut Spielbericht \u2026</option>'+Object.keys(JSPO_RED).map(c=>`<option value="${c}"${ri.why===c?' selected':''}>${e(JSPO_RED[c][0])} \u00b7 ${_jspoTxt(_jspoAC()?JSPO_RED[c][1]:JSPO_RED[c][2])}</option>`).join('');
+      return `<div class="sb-ban">${_cardIc('r')}<span class="sb-ban-t"><b>${e(nm(x.p))}</b><span>${what}</span></span>
+        <label class="sb-ban-d">bis<input type="date" value="${iso}" onchange="sbBanSet(${x.pi},this.value)"></label>
+        <select class="sb-why" aria-label="Grund laut Spielbericht" onchange="sbWhySet(${x.pi},this.value)">${opts}</select></div>`;
     }).join('')}</section>`;
   }
   body.innerHTML=h;
@@ -20242,9 +20309,9 @@ function renderPlayerCard(){
   let msg;
   // Flutlicht while too few asked sessions say anything about rating (1.2.99):
   // keeping it is the reason to rate, not the hurdle to reach it
-  if(nx.done&&d.rq<3&&!(d.rated>=CARD_FL_RATED))msg=`Alle Lampen brennen. Damit es so bleibt: nach jedem Termin die Belastung bewerten \u2013 ab ${CARD_FL_RATED} % bleibt Flutlicht.`;
+  if(nx.done&&d.rq<3&&!(d.rated>=CARD_FL_RATED))msg=`Alle Lampen brennen. Damit es so bleibt: nach fast jedem Termin die Belastung bewerten – mindestens ${CARD_FL_RATED/10} von 10.`;
   else if(nx.done)msg='Alle Lampen brennen. Bleib dran – die Karte zählt die ganze Saison.';
-  else if(nx.n===0&&nx.needRate)msg=`Für Flutlicht fehlt nur das Bewerten: jetzt ${d.rated} %, ab ${CARD_FL_RATED} % gehen alle Lampen an.`;
+  else if(nx.n===0&&nx.needRate)msg=`Für Flutlicht fehlt nur das Bewerten: bisher ${Math.round(d.rated*d.rq/100)} von ${d.rq} Terminen bewertet – nötig sind ${CARD_FL_RATED/10} von 10.`;
   else if(nx.n<=15)msg=`Noch ${nx.n}× dabei${nx.needRate?' und die Belastung bewerten':''}, dann ${nx.tier.name}.`;
   else msg=`Jedes Mal, wenn du dabei bist, kommst du ${nx.tier.name} näher.`;
   const lad=CARD_TIERS.slice(1).map((t,i)=>`<i style="left:${t.min}%"></i>`).join('');
