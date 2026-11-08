@@ -1,0 +1,21 @@
+# Временная диагностика карточки (08.11.2026): только чтение базы, в лог только числа.
+name: Diagnose Karte
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  diag:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - run: npm ci --omit=dev --no-audit --no-fund && npm i --no-save --no-audit --no-fund playwright@1.56.0 && npx playwright install --with-deps chromium
+        working-directory: tools/erinnerungen
+      - run: node diag-karte.mjs
+        working-directory: tools/erinnerungen
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
