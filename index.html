@@ -7537,12 +7537,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.100'; // v1.2.100: Rote Karte – Mindestsperre nach Grund (JSpO § 30)
-const APP_VERSION_LABEL='1.2.100';
+const APP_VERSION='1.2.101'; // v1.2.101: Eingang – keine Bewertung geht mehr verloren
+const APP_VERSION_LABEL='1.2.101';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1794171369396; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1794234472807; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -11961,13 +11961,6 @@ function logAudit(action,target,details){
     details:details||''
   };
   G.auditLog.push(_entry);
-  // Second copy in its own node: push() writes one child and reads nothing, so
-  // this costs a few bytes and is independent of whatever happens to G.
-  try{
-    if(typeof fbDb!=='undefined'&&fbDb&&!(G&&G.__sanitized)){
-      fbDb.ref('fcf_data/auditLogT').push(_entry);
-    }
-  }catch(e){}
   // Cap size
   if(G.auditLog.length>AUDIT_MAX_ENTRIES){
     G.auditLog=G.auditLog.slice(-AUDIT_MAX_ENTRIES);
@@ -11975,7 +11968,18 @@ function logAudit(action,target,details){
   // CRITICAL: persist the audit entry. Many call-sites invoke logAudit AFTER saveG,
   // so without this call the entry stays only in memory and is lost on reload/sync.
   // saveG is debounced for Firebase, and localStorage write is immediate, so this is cheap.
+  // 1.2.101: BEFORE the push below. A write under fcf_data raises the listener
+  // at once, inside push(); with no save pending it adopted the server's state
+  // and every edit not yet saved was gone. With the save pending, the listener
+  // sends our changes first.
   if(typeof saveG==='function')saveG(false);
+  // Second copy in its own node: push() writes one child and reads nothing, so
+  // this costs a few bytes and is independent of whatever happens to G.
+  try{
+    if(typeof fbDb!=='undefined'&&fbDb&&!(G&&G.__sanitized)){
+      fbDb.ref('fcf_data/auditLogT').push(_entry);
+    }
+  }catch(e){}
 }
 function clearAuditLog(){
   if(!isAdmin())return;
@@ -16543,6 +16547,7 @@ async function _pvChanged(path,h){
 // ── Trainer side: merging the inbox (trainers with an account) ───────────
 let _pvInRef=null,_pvInbox={},_pvMergeT=null,_pvMerging=false,_pvInDenied=0;
 function pvInboxWatch(){
+  if(!rpeHealFromJournal._t&&fbDb&&!isPlayerMode()&&_pvCanWrite()){rpeHealFromJournal._t=setTimeout(()=>{rpeHealFromJournal().catch(()=>{});},8000);}
   if(_pvInRef||!fbDb||isPlayerMode()||!_acctUser||!_pvCanWrite())return;
   // Refused (no member, rules not there yet): try again in an hour, not on every save
   if(_pvInDenied&&Date.now()-_pvInDenied<3600e3)return;
@@ -16564,7 +16569,12 @@ async function _pvKeyMap(){
 async function pvMergeInbox(){
   if(_pvMerging||!_pvCanWrite())return;
   _pvMerging=true;
-  let changed=0;
+  // 1.2.101: an answer applied to G sat unsaved across the next await, and the
+  // journal push for it raised the listener, which adopted the server's state
+  // over it. The entry was already marked merged, so the job skipped it: 9 of
+  // 14 ratings of 08.11. were lost that way. Now each answer is saved at once
+  // (the save pending protects it) and the journal follows the loop.
+  let changed=0;const audits=[];
   try{
     const map=await _pvKeyMap();
     for(const [pk,box] of Object.entries(_pvInbox||{})){
@@ -16589,7 +16599,8 @@ async function pvMergeInbox(){
         if(!r.ok){try{fbDb.ref('fcf_in/'+pk+'/'+id).remove();}catch(err){}continue;}
         if(r.f.length){
           changed++;
-          if(r.audit)try{fbDb.ref('fcf_data/auditLogP').push(Object.assign({ts:e.t||Date.now(),user:(blk.players[who.pi]||{}).name||'Spieler',role:'player',team:who.team,season:who.season},r.audit));}catch(err){}
+          saveG(false);
+          if(r.audit)audits.push(Object.assign({ts:e.t||Date.now(),user:(blk.players[who.pi]||{}).name||'Spieler',role:'player',team:who.team,season:who.season},r.audit));
         }
       }
     }
@@ -16597,8 +16608,47 @@ async function pvMergeInbox(){
   finally{_pvMerging=false;}
   if(changed){
     saveG(false);
+    audits.forEach(a=>{try{fbDb.ref('fcf_data/auditLogP').push(a);}catch(err){}});
     try{if(typeof render==='function')render();}catch(e){}
   }
+}
+// Ratings the players gave that never reached the data (1.2.101): the journal
+// has them ("Belastung bewertet", "RPE n"). Filled in where the data has no
+// value and no record of one — last 3 days, once per start, by a trainer who
+// may edit. A value already there, or one a trainer took away, stays as it is.
+async function rpeHealFromJournal(){
+  if(!fbDb||!_pvCanWrite()||!(typeof canEdit==='function'&&canEdit()))return 0;
+  if(rpeHealFromJournal._done)return 0;rpeHealFromJournal._done=true;
+  let v=null;
+  try{v=(await fbDb.ref('fcf_data/auditLogP').once('value')).val();}catch(e){return 0;}
+  const since=Date.now()-3*864e5,last={};
+  Object.values(v||{}).forEach(e=>{
+    if(!e||e.action!=='Belastung bewertet'||(e.ts||0)<since)return;
+    const k=(e.team||'')+'|'+(e.season||'')+'|'+(e.user||'')+'|'+(e.target||'');
+    if(!last[k]||(e.ts||0)>=(last[k].ts||0))last[k]=e;
+  });
+  const norm=d=>String(d||'').replace(/\b0(\d)/g,'$1').trim();
+  let n=0;
+  Object.values(last).forEach(e=>{
+    const m=/RPE\s+(\d+)/.exec(e.detail||e.details||'');if(!m)return;   // "nicht dabei": nothing to fill
+    const blk=G.db[(e.team||'')+'__'+(e.season||'')];if(!blk||!Array.isArray(blk.players)||!Array.isArray(blk.sessions))return;
+    const si=blk.sessions.findIndex(s=>s&&norm(s.date)===norm(e.target));if(si<0)return;
+    const p=blk.players.find(x=>x&&x.name===e.user);if(!p)return;
+    const key=rpeMetaKey(blk.sessions[si]);
+    if(Array.isArray(p.rpe)&&p.rpe[si]!=null)return;
+    if(p.rpeMeta&&key&&p.rpeMeta[key])return;
+    if(!Array.isArray(p.rpe))p.rpe=[];
+    while(p.rpe.length<=si)p.rpe.push(null);
+    p.rpe[si]=+m[1];
+    if(key){if(!p.rpeMeta||typeof p.rpeMeta!=='object'||Array.isArray(p.rpeMeta))p.rpeMeta={};p.rpeMeta[key]={s:'p',t:e.ts||Date.now()};}
+    n++;
+  });
+  if(n){
+    saveG(false);
+    logAudit('Belastung nachgetragen','aus dem Eingang',n+' Bewertung'+(n===1?'':'en')+' der Spieler, die nicht gespeichert waren');
+    try{if(typeof render==='function')render();}catch(e){}
+  }
+  return n;
 }
 
 // ── Player side: reading the slices ──────────────────────────────────
