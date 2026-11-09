@@ -2,6 +2,10 @@
 name: Diagnose
 on:
   workflow_dispatch:
+    inputs:
+      script:
+        description: 'Skript (diag.mjs, diag3.mjs)'
+        default: 'diag.mjs'
 permissions:
   contents: read
 jobs:
@@ -19,7 +23,7 @@ jobs:
           cache-dependency-path: tools/erinnerungen/package-lock.json
       - run: npm ci --omit=dev --no-audit --no-fund
         working-directory: tools/erinnerungen
-      - run: node diag.mjs
+      - run: node ${{ github.event.inputs.script || 'diag.mjs' }}
         working-directory: tools/erinnerungen
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
