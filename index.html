@@ -4231,6 +4231,9 @@ body.design-heute #moCalendar .calx-head h3{flex:0 0 auto !important;margin:0 12
 .calx-e1 b{font-weight:700;}
 .calx-e1 > span{overflow:hidden;text-overflow:ellipsis;min-width:0;}
 .calx-e2{font-size:.8rem;font-weight:600;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.calx-e3{font-size:.74rem;font-weight:500;line-height:1.2;opacity:.78;}
+/* long Schwerpunkte: two lines each instead of cut after a word */
+.calx-e2,.calx-e3{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere;}
 .calx-n{margin-left:auto;padding-left:4px;font-style:normal;font-weight:700;font-size:.76rem;}
 .calx-e.t{background:color-mix(in srgb,var(--hx-blue) 11%,var(--hx-card));box-shadow:inset 3px 0 0 var(--hx-blue);}
 .calx-e.t .calx-e1 > span{color:var(--hx-ink2);}
@@ -4241,7 +4244,7 @@ body.design-heute #moCalendar .calx-head h3{flex:0 0 auto !important;margin:0 12
 .calx-e.b svg{flex-shrink:0;}
 .calx-e.b span{overflow:hidden;text-overflow:ellipsis;}
 .calx-e.past:is(.t,.e){background:var(--hx-card2);box-shadow:inset 3px 0 0 var(--calx-quiet);}
-.calx-e.past:is(.t,.e) :is(.calx-e1,.calx-e2){color:var(--hx-ink2);}
+.calx-e.past:is(.t,.e) :is(.calx-e1,.calx-e2,.calx-e3){color:var(--hx-ink2);}
 .calx-e.past .calx-n{color:var(--hx-ok);}
 .calx-e.m .calx-n{color:inherit;opacity:.85;}
 body.design-heute.hxk-dk .calx-grid{--calx-wk:color-mix(in srgb,#fff 5%,var(--hx-card));}
@@ -4287,7 +4290,8 @@ button.wt-pill:hover{border-color:var(--hx-muted,#465472);}
 .wt-pill.add{border-style:dashed;color:var(--hx-muted,#465472);font-weight:600;}
 .hx-wkr{display:inline-flex;align-items:center;gap:8px;min-width:0;}
 .hx-f2{font-weight:600;opacity:.62;}
-.hx-day-t:has(.hx-f2){white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.2;}
+.calm-card .hx-day-t,.hx-a-week .hx-day-t{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.15;overflow-wrap:anywhere;}
+.hx-day-f2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere;font-size:.82rem;font-weight:600;line-height:1.2;color:var(--hx-muted);}
 .hx-focus-title .hx-f2,.hx-match-t .hx-f2{font-size:.62em;letter-spacing:0;}
 .calm-wh .wt-pill{align-self:center;color:var(--hx-og,#0E2350);border-color:color-mix(in srgb,var(--hx-og-muted,#465472) 50%,transparent);}
 .calm-wh .wt-pill.add{color:var(--hx-og-muted,#465472);}
@@ -7565,12 +7569,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.103'; // v1.2.103: Wochenthemen; Schwerpunkt 2 überall neben dem ersten
-const APP_VERSION_LABEL='1.2.103';
+const APP_VERSION='1.2.104'; // v1.2.104: Kalender – Schwerpunkt 2 in eigener Zeile
+const APP_VERSION_LABEL='1.2.104';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1794326049395; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1794329606010; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -28258,7 +28262,7 @@ function _calCollect(){
     if(!s||!s.date)return;
     const k=dispToSortKey(s.date);if(!k||k>=99999999)return;
     const m=s.type==='match';
-    add(k,{kind:m?'m':'t',si,time:s.time||'',title:m?(s.label||''):_focTxt(s),loc:String(s.location||'').trim(),att:_hxSessAtt(si)});
+    add(k,{kind:m?'m':'t',si,time:s.time||'',title:m?(s.label||''):(s.focus||s.focus2||''),t2:(!m&&s.focus&&s.focus2)?s.focus2:'',loc:String(s.location||'').trim(),att:_hxSessAtt(si)});
   });
   (typeof getCalEvents==='function'?getCalEvents():[]).forEach(ev=>{
     if(!ev||!ev.date)return;
@@ -28294,10 +28298,11 @@ function _calEntry(e,past){
   }
   const kind=e.kind==='m'?'Spiel':e.kind==='e'?'Termin':'Training';
   const what=e.title;
-  const tip=[e.time,kind,what,e.loc,e.att?e.att+' anwesend':''].filter(Boolean).join(' · ');
+  const tip=[e.time,kind,what+(e.t2?' + '+e.t2:''),e.loc,e.att?e.att+' anwesend':''].filter(Boolean).join(' · ');
   return `<button type="button" class="calx-e ${e.kind}${what?' has2':''}${past?' past':''}" onclick="event.stopPropagation();${_calOpen(e)}" title="${esc(tip)}">`
     +`<span class="calx-e1">${e.time?`<b>${esc(e.time)}</b>`:''}<span>${kind}</span>${e.att?`<em class="calx-n">${esc(e.att)}</em>`:''}</span>`
     +(what?`<span class="calx-e2">${esc(what)}</span>`:'')
+    +(e.t2?`<span class="calx-e3">+ ${esc(e.t2)}</span>`:'')
     +'</button>';
 }
 function _calNavRender(){
@@ -28353,7 +28358,7 @@ function renderCalendarMobile(el){
         const m=e.kind==='m',ev=e.kind==='e';
         const t=e.title||(m?'Spiel':ev?'Termin':'Training');
         const sub=[m?'Spiel':ev?'Termin':(e.title?'Training':''),e.time,ev?e.note.slice(0,40):e.loc].filter(Boolean).join(' · ');
-        h+=`<button type="button" class="hx-day calm-r${isT?' today':''}${isP&&!isT?' past':''}" onclick="${_calOpen(e)}"><span class="hx-day-d">${dd}</span><span class="hx-day-x"><span class="hx-day-t">${esc(t)}</span>${sub?`<span class="hx-day-s${m?' m':ev?' e':''}">${esc(sub)}</span>`:''}</span>${e.att?`<span class="hx-day-n calm-n" title="${esc(e.att)} anwesend">${esc(e.att)}</span>`:''}</button>`;
+        h+=`<button type="button" class="hx-day calm-r${isT?' today':''}${isP&&!isT?' past':''}" onclick="${_calOpen(e)}"><span class="hx-day-d">${dd}</span><span class="hx-day-x"><span class="hx-day-t">${esc(t)}</span>${e.t2?'<span class="hx-day-f2">+ '+esc(e.t2)+'</span>':''}${sub?`<span class="hx-day-s${m?' m':ev?' e':''}">${esc(sub)}</span>`:''}</span>${e.att?`<span class="hx-day-n calm-n" title="${esc(e.att)} anwesend">${esc(e.att)}</span>`:''}</button>`;
       });
     });
     h+='</div></section>';
@@ -29395,7 +29400,7 @@ function hxRender(){
       const todo=held&&c.present===0;
       const n=(todo?'–':(held?c.present:c.yes))+'/'+c.total;
       const tip=todo?'Anwesenheit noch nicht erfasst':held?c.present+' von '+c.total+' anwesend':c.yes+' von '+c.total+' '+_ywFor(s);
-      html+=`<button type="button" class="hx-day${isT?' today':''}${held&&!isT?' past':''}" onclick="openSessFromMain(${si})"><span class="hx-day-d"><small>${esc(dow)}</small><b>${d.getDate()}</b></span><span class="hx-day-x"><span class="hx-day-t">${esc(t)}${_f2Html(s,esc)}</span><span class="hx-day-s${isM?' m':''}">${esc(sub)}</span></span><span class="hx-day-n${held&&!todo?' done':''}${todo?' todo':''}" title="${esc(tip)}"><span class="hx-vh">${esc(tip)}</span><span aria-hidden="true">${held&&!todo?hxIcon('check',13):''}${esc(n)}</span></span></button>`;
+      html+=`<button type="button" class="hx-day${isT?' today':''}${held&&!isT?' past':''}" onclick="openSessFromMain(${si})"><span class="hx-day-d"><small>${esc(dow)}</small><b>${d.getDate()}</b></span><span class="hx-day-x"><span class="hx-day-t">${esc(t)}</span>${(!isM&&s.focus&&s.focus2)?'<span class="hx-day-f2">+ '+esc(s.focus2)+'</span>':''}<span class="hx-day-s${isM?' m':''}">${esc(sub)}</span></span><span class="hx-day-n${held&&!todo?' done':''}${todo?' todo':''}" title="${esc(tip)}"><span class="hx-vh">${esc(tip)}</span><span aria-hidden="true">${held&&!todo?hxIcon('check',13):''}${esc(n)}</span></span></button>`;
     });
   });
   html+=`</section>`;
