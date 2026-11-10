@@ -4281,6 +4281,34 @@ body.design-heute.hxk-dk .calx-e:hover{filter:brightness(1.15);}
 .calm-wk{margin:0 0 12px;}
 .calm-wh{display:flex;align-items:baseline;gap:8px;margin:0 4px 6px;font-size:.84rem;color:var(--hx-og-muted);}
 .calm-wh b{color:var(--hx-og);font-weight:700;}
+.wt-pill{display:inline-flex;align-items:center;padding:2px 10px;border-radius:999px;border:1px solid var(--hx-line,#C8D1DE);background:transparent;color:var(--hx-ink2,#33425F);font:700 .78rem/1.5 'Barlow',sans-serif;white-space:nowrap;max-width:14em;overflow:hidden;text-overflow:ellipsis;}
+button.wt-pill{cursor:pointer;}
+button.wt-pill:hover{border-color:var(--hx-muted,#465472);}
+.wt-pill.add{border-style:dashed;color:var(--hx-muted,#465472);font-weight:600;}
+.hx-wkr{display:inline-flex;align-items:center;gap:8px;min-width:0;}
+.hx-f2{font-weight:600;opacity:.62;}
+.hx-day-t:has(.hx-f2){white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.2;}
+.hx-focus-title .hx-f2,.hx-match-t .hx-f2{font-size:.62em;letter-spacing:0;}
+.calm-wh .wt-pill{align-self:center;color:var(--hx-og,#0E2350);border-color:color-mix(in srgb,var(--hx-og-muted,#465472) 50%,transparent);}
+.calm-wh .wt-pill.add{color:var(--hx-og-muted,#465472);}
+.calx-kw{flex-direction:column;align-items:center;gap:8px;}
+.calx-wt{writing-mode:vertical-rl;transform:rotate(180deg);max-height:88px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:2px 0;border:0;background:none;color:var(--hx-ink2,#33425F);font:700 .72rem 'Barlow',sans-serif;}
+button.calx-wt{cursor:pointer;}
+button.calx-wt:hover{color:var(--hx-ink,#0E2350);text-decoration:underline;}
+.calx-wt.add{color:var(--hx-muted,#465472);font-weight:600;}
+.evt-auto{margin-left:8px;font-size:.72rem;font-weight:600;color:var(--hx-muted,var(--gm));}
+.wr2-wt{margin:0 0 10px;font-size:.88rem;color:var(--hx-ink2,var(--gd));}
+.wt-mob .wt-sub{margin:-2px 0 12px;font-size:.86rem;color:var(--hx-muted,var(--gm));}
+.wt-opts{display:flex;flex-direction:column;gap:6px;}
+.wt-opt{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:46px;padding:10px 14px;border-radius:12px;border:1px solid var(--hx-line,var(--gl));background:var(--hx-card,#fff);color:var(--hx-ink,var(--bd));font:600 .95rem 'Barlow',sans-serif;text-align:left;cursor:pointer;box-sizing:border-box;}
+.wt-opt:hover{border-color:var(--hx-muted,var(--gm));}
+.wt-opt.on{border-color:var(--hx-blue,#1659B8);box-shadow:inset 0 0 0 1px var(--hx-blue,#1659B8);font-weight:700;}
+.wt-opt small{font-size:.78rem;font-weight:500;color:var(--hx-muted,var(--gm));}
+.wt-opt.back{border-style:dashed;}
+.wt-note{margin:12px 2px 0;font-size:.82rem;line-height:1.45;color:var(--hx-muted,var(--gm));}
+.wt-row .fi-nm{flex:1;}
+.wt-add{display:flex;gap:7px;margin-top:8px;}
+.wt-add input{flex:1;margin-bottom:0;}
 .calm-wh i{font-style:normal;font-weight:700;font-size:.74rem;padding:2px 8px;border-radius:999px;background:var(--hx-yellow);color:#0E2350;align-self:center;}
 .calm-card{background:var(--hx-card);border-radius:16px;box-shadow:var(--hx-shadow);padding:4px;}
 .calm-card .calm-r{min-height:52px;}
@@ -7537,12 +7565,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.102'; // v1.2.102: Sync – nichts Ungespeichertes wird überschrieben
-const APP_VERSION_LABEL='1.2.102';
+const APP_VERSION='1.2.103'; // v1.2.103: Wochenthemen; Schwerpunkt 2 überall neben dem ersten
+const APP_VERSION_LABEL='1.2.103';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1794285717929; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1794326049395; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -7562,6 +7590,7 @@ const FL_MARK='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F
 function _clubSlug(){return (_clubName()||'Flutlicht').replace(/[^A-Za-z0-9ÄÖÜäöüß]+/g,'-').replace(/^-|-$/g,'')||'Flutlicht';}
 function _clubInfo(){const c=(G&&G.club&&typeof G.club==='object')?G.club:{};return {name:_clubName(),resp:String(c.resp||''),addr:String(c.addr||''),mail:String(c.mail||''),dsb:String(c.dsb||'')};}
 const APP_NEWS=[
+  {id:'20261110-1',d:'10.11.',t:'Wochenthemen',x:'Jede Woche hat ein Thema, an dem die Trainings arbeiten – zum Beispiel Breite oder Tiefe. Die Themen legst du unter Einstellungen → Mannschaft an, das Thema dieser Woche wählst du in der Übersicht; danach wechseln sie von selbst. Das Spiel der Woche bekommt es als Bewertungsthema.',go:['Zu den Wochenthemen',"openSettings('team')"]},
   {id:'20261107-3',d:'07.11.',t:'Kader, Matchplan und Videos für die Spieler',x:'Nach dem Veröffentlichen sehen die Spieler in ihrer App, wer im Kader ist (ohne Aufstellung), und den Matchplan, den du im Spiel-Fenster anlegst: Video-Links, ein Bild oder ein paar Sätze. Unter Kader → Videos sammelst du Videos nach Positionen.',go:['Zum nächsten Spiel','oppGoNext()']},
   {id:'20261104-2',d:'04.11.',t:'Aufstellung: jeder seine Variante',x:'Jeder Trainer speichert seine eigene Aufstellung fürs Spiel und sieht oben unter „Varianten“ die der anderen. Mit „Für das Spiel festlegen“ bestimmt ihr, welche für Kader und Statistik zählt.',go:['Zur Aufstellung','hxOpenLineup()']},
   {id:'20261101-1',d:'01.11.',t:'Wer braucht Aufmerksamkeit?',x:'Oben in der Statistik: wer gerade in Folge fehlt, seltener kommt als sonst, nach längerer Zeit wieder da ist, wenig spielt oder mehrmals schwachen Einsatz hatte. Jeder wird mit sich selbst und mit der Mannschaft verglichen: Wer in den Ferien wie viele andere fehlt, fällt nicht auf.',go:['Zur Statistik',"hxGo('stats')"]},
@@ -12082,9 +12111,9 @@ function buildSearchCorpus(){
         type:'session',
         icon:isMatch?'⚽':'🏃',
         section:isMatch?'Spiele':'Trainings',
-        label:`${s.date}${s.label?' · '+s.label:s.focus?' · '+s.focus:''}`,
+        label:`${s.date}${s.label?' · '+s.label:_focTxt(s)?' · '+_focTxt(s):''}`,
         meta:`${isMatch?(s.homeAway==='home'?'🏠 Heim':'🚌 Auswärts'):'Training'}${s.time?' · '+s.time:''}`,
-        searchText:[s.date,s.label,s.focus,s.note,isMatch?'spiel match':'training'].filter(Boolean).join(' ').toLowerCase(),
+        searchText:[s.date,s.label,s.focus,s.focus2,s.note,isMatch?'spiel match':'training'].filter(Boolean).join(' ').toLowerCase(),
         action:()=>{closeSearch();openSessStats&&openSessStats(si);}
       });
     });
@@ -14846,6 +14875,7 @@ function _setFill(){
   if(typeof meetRender==='function')meetRender();
   if(typeof cardRulesRender==='function')cardRulesRender();
   if(typeof fdbRender==='function')fdbRender();
+  if(typeof wtRender==='function')wtRender();
   _setLogoSync();
   const tc=document.getElementById('set-trash-count');
   if(tc)tc.textContent=Array.isArray(G.trash)&&G.trash.length?`(${G.trash.length})`:'';
@@ -15032,7 +15062,7 @@ function renderMobileAtt(){
       const e=escapeHtml,ed=typeof canEdit==='function'&&canEdit();
       headEl.innerHTML=`<div class="hxl-top">
           <div class="hxl-tx"><span class="hx-tag${isM?' match':''}">${e(_hxTag(isM,title,k))}</span>
-            <div class="hxl-title">${e(title)}</div>
+            <div class="hxl-title">${e(title)}${_f2Html(hs,e)}</div>
             ${meta.length?`<div class="hxl-meta">${e(meta.join(' · '))}</div>`:''}</div>
           <div class="hxl-btns">${roll&&ed?`<button type="button" class="hxl-btn pri" onclick="rcOpen(${si})">Erfassen</button>`:''}<button type="button" class="hxl-btn" onclick="openSessStats(${si})">Öffnen</button></div>
         </div>
@@ -15043,7 +15073,7 @@ function renderMobileAtt(){
     }else if(hs){
       const isM=hs.type==='match';
       const sub=[hs.time?hs.time+' Uhr':'',
-                 isM?(hs.label||'Spiel'):(hs.focus||'Training'),
+                 isM?(hs.label||'Spiel'):(_focTxt(hs)||'Training'),
                  (hs.location||'').trim()].filter(Boolean).join(' \u00b7 ');
       headEl.innerHTML=`<div class="ma-sh-txt">
           <div class="ma-sh-date">${isM?'\u26bd':'\ud83c\udfc3'} ${escapeHtml(hs.date||'')}</div>
@@ -15341,7 +15371,7 @@ function generateICS(opts){
       const start=new Date(pd.y,pd.m-1,pd.d,h,min);
       const durMin=isMatch?105:90;
       const end=new Date(start.getTime()+durMin*60000);
-      const summary=isMatch?('⚽ '+(s.label||'Spiel')):('🏃 Training'+(s.focus?' · '+s.focus:''));
+      const summary=isMatch?('⚽ '+(s.label||'Spiel')):('🏃 Training'+(_focTxt(s)?' · '+_focTxt(s):''));
       const uid=`sess-${team}-${seasonId}-${si}@fcfrohlinde.app`;
       lines.push('BEGIN:VEVENT');
       lines.push('UID:'+uid);
@@ -17387,7 +17417,7 @@ function _rvRender(){
   document.getElementById('rv-title').textContent='Rückblick · '+s.date;
   const later=document.getElementById('rv-later');if(later)later.textContent=_rv.ask?'Später':'Schließen';
   const f=[];
-  try{const c=_hxCounts(D,_rv.si,season);if(c.present)f.push(`<span><b>${c.present}</b> von ${c.total} da${s.focus?' · '+e(s.focus):''}</span>`);}catch(x){}
+  try{const c=_hxCounts(D,_rv.si,season);if(c.present)f.push(`<span><b>${c.present}</b> von ${c.total} da${_focTxt(s)?' · '+e(_focTxt(s)):''}</span>`);}catch(x){}
   let felt=null;
   try{const g=_rpeSessGroups(D,s,_rv.si,season);if(g.rated.length){felt=g.rated.reduce((a,x)=>a+x.r,0)/g.rated.length;
     f.push(`<span>Belastung der Spieler Ø <b>${_rvNum(felt)}</b> (${g.rated.length} ${g.rated.length===1?'Antwort':'Antworten'})</span>`);}}catch(x){}
@@ -23699,6 +23729,7 @@ function dbRenderWeekReportSection(data){
     return `<span class="wr2-d ${d>0?'up':'down'}">${d>0?'▲':'▼'} ${Math.abs(d)}</span>`;
   };
   const tile=(v,l,sub)=>`<div class="ps-tile"><div class="ps-tile-v">${v==null?'–':v}</div><div class="ps-tile-l">${l}</div>${sub?`<div class="ps-tile-s">${sub}</div>`:''}</div>`;
+  try{const w0=wk.length?wtOf(wk[0].s,data.block||{sessions},data.team||UI.currentTeam,season):'';if(w0)html+=`<div class="wr2-wt">Thema der Woche: <b>${esc(w0)}</b></div>`;}catch(e){}
   html+='<div class="wr2-sec wr2s-team"><div class="db-h">👥 Mannschaft</div><div class="wr2-tiles" data-bal="110">';
   html+=tile(allNow==null?null:allNow+'%','Woche',delta(allNow,allPrev)+(allPrev!=null?' <span class="wr2-muted">Vorwoche '+allPrev+'%</span>':''));
   html+=tile(tNow==null?null:tNow+'%','Training',delta(tNow,tPrev));
@@ -23765,7 +23796,7 @@ function dbRenderWeekReportSection(data){
     sc.sort((x,y)=>(y.g-x.g)||(y.a-x.a));
     const graded=perf[1]+perf[2]+perf[3];
     html+=`<div class="wr2-sec wr2s-match"><div class="db-h">⚽ Spiel ${s.label?'gegen '+esc(s.label):''} <span class="db-h-sub">${esc(s.date)}</span></div>`;
-    if(s.evalTopic)html+=`<div class="wr2-muted" style="margin-bottom:6px;">Thema: <b>${esc(s.evalTopic)}</b></div>`;
+    {const tp=evtOf(s,data.block||{sessions},data.team||UI.currentTeam,season);if(tp)html+=`<div class="wr2-muted" style="margin-bottom:6px;">Thema: <b>${esc(tp)}</b></div>`;}
     html+='<div class="wr2-match">';
     html+='<div class="wr2-scorers">'+(sc.length?sc.map(x=>
       `<span class="wr2-sc" ${open(x.pi)}>${esc(nm(x.p))}${x.g?' ⚽'+(x.g>1?'×'+x.g:''):''}${x.a?' 🎯'+(x.a>1?'×'+x.a:''):''}</span>`).join('')
@@ -23834,8 +23865,10 @@ function _dbCopyFallback(txt,cb){
 function dbRenderTopicCard(data){
   const {sessions,players,season}=data;
   const topics={};
+  const _blk=data.block||{sessions},_tm=data.team||UI.currentTeam;
   (sessions||[]).forEach((s,si)=>{
-    if(!s||s.type!=='match'||!s.evalTopic)return;
+    const tp=evtOf(s,_blk,_tm,season);
+    if(!tp)return;
     if(!sessTookPlace(s,season))return;
     let sum=0,n=0;
     (players||[]).forEach(p=>{
@@ -23843,7 +23876,7 @@ function dbRenderTopicCard(data){
       if(v===1||v===2||v===3){sum+=v;n++;}
     });
     if(!n)return;
-    (topics[s.evalTopic]=topics[s.evalTopic]||[]).push({k:_dbSortKey(s.date,season),date:s.date,si,avg:sum/n,n});
+    (topics[tp]=topics[tp]||[]).push({k:_dbSortKey(s.date,season),date:s.date,si,avg:sum/n,n});
   });
   const keys=Object.keys(topics).sort((a,b)=>topics[b].length-topics[a].length);
   if(!keys.length)return '';
@@ -24428,11 +24461,12 @@ function computeTopicSeries(occurrences){
     const p=occ.p;
     if(!p||!Array.isArray(p.perf))return;
     ss.forEach((s,si)=>{
-      if(!s||s.type!=='match'||!s.evalTopic)return;
+      const tp=evtOf(s,occ.block,occ.team,occ.season);
+      if(!tp)return;
       if(!sessTookPlace(s,occ.season))return;
       const v=p.perf[si];
       if(v!==1&&v!==2&&v!==3)return;
-      (byTopic[s.evalTopic]=byTopic[s.evalTopic]||[]).push({k:_dbSortKey(s.date,occ.season),date:s.date,grade:v,season:occ.season});
+      (byTopic[tp]=byTopic[tp]||[]).push({k:_dbSortKey(s.date,occ.season),date:s.date,grade:v,season:occ.season});
     });
   });
   Object.values(byTopic).forEach(arr=>arr.sort((a,b)=>a.k-b.k));
@@ -25748,7 +25782,7 @@ function openPlayerStats(pi,opts){
     const s=ss[i];
     const v=p.s?p.s[i]:3;
     const isMat=s.type==='match';
-    const lbl=isMat?(s.label||''):(s.focus||'');
+    const lbl=isMat?(s.label||''):_focTxt(s);
     const past=dispToSortKey(s.date)<_today;
     const menuId='am_pl_'+currentPI+'_'+i;
     // Phase-aware status options: past → A/F/E (roll-call), future → M/E/?
@@ -25853,7 +25887,7 @@ function renderPlayerNotesTimeline(pi){
   container.innerHTML=notes.map(n=>{
     const isMat=n.type==='match';
     const ico=isMat?'⚽':'🏃';
-    const sessLbl=isMat?(n.label||'Spiel'):(n.focus||'Training');
+    const sessLbl=isMat?(n.label||'Spiel'):(_focTxt(n)||'Training');
     const ts=n.comment.ts?new Date(n.comment.ts).toLocaleString('de-DE',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
     const author=n.comment.author||'?';
     const statusIcon=n.status===1?'<span style="color:#27ae60;" title="Anwesend">✓</span>':n.status===0?'<span style="color:#c0392b;" title="Fehlend">✗</span>':n.status===2?'<span style="color:#e67e22;" title="Entschuldigt">E</span>':n.status===4?'<span style="color:#3b82c4;" title="Angemeldet">M</span>':'';
@@ -26012,6 +26046,248 @@ function togglePlayerEdit(){
 // ══════════════════════════════
 //  SESSION STATS
 // ══════════════════════════════
+// ══ WOCHENTHEMEN (1.2.103) ══════════════════════════════════════
+// Artem 10.11.: the weeks have a theme the trainings work on – at the U19
+// "Breite" and "Tiefe"; other teams may have others, so the list is the
+// team's (rules.wt, its order = the order the themes take turns in).
+// A week a trainer set (D.wk['w'+Monday] = name, '-' = none that week)
+// anchors the turn; every later week with a training takes the next theme,
+// weeks without a training are skipped (holidays do not shift it), and a
+// set week changes only what follows it. The match of a week gets the theme
+// as Bewertungsthema unless one was chosen for it (s.evalTopic) or switched
+// off (s.evtOff) – so the Einsatz grades group by Breite/Tiefe by themselves.
+// Trainers only: no slice carries D.wk or rules.wt (both whitelists).
+function wtPool(team){
+  const r=G&&G.db&&G.db[(team||UI.currentTeam)+'__rules'];
+  return (r&&Array.isArray(r.wt))?r.wt.filter(x=>typeof x==='string'&&x.trim()&&x!=='-'):[];
+}
+function _wtDate(k){return new Date(Math.floor(k/10000),Math.floor(k/100)%100-1,k%100);}
+function _wtMon(k){
+  const d=_wtDate(k);d.setDate(d.getDate()-((d.getDay()+6)%7));
+  return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
+}
+// Monday key → {t: the theme ('' none), set: a trainer chose it}; weeks without one are missing
+function wtMap(D,team,season){
+  const pool=wtPool(team),out={};
+  if(!pool.length||!D)return out;
+  const ov=(D.wk&&typeof D.wk==='object'&&!Array.isArray(D.wk))?D.wk:{};
+  const tr=new Set(),all=new Set();
+  (Array.isArray(D.sessions)?D.sessions:[]).forEach(s=>{
+    if(!s||!s.date||s.type==='match')return;
+    const k=_dbSortKey(s.date,season);if(k>=99999999)return;
+    const m=_wtMon(k);tr.add(m);all.add(m);
+  });
+  Object.keys(ov).forEach(x=>{const m=/^w(\d{8})$/.exec(x);if(m)all.add(+m[1]);});
+  let cur=-1;
+  [...all].sort((a,b)=>a-b).forEach(m=>{
+    const o=ov['w'+m];
+    if(typeof o==='string'&&o){
+      if(o==='-'){out[m]={t:'',set:1};return;}
+      out[m]={t:o,set:1};
+      const i=pool.indexOf(o);if(i>=0)cur=i;
+      return;
+    }
+    if(cur>=0&&tr.has(m)){cur=(cur+1)%pool.length;out[m]={t:pool[cur],set:0};}
+  });
+  return out;
+}
+function wtOfK(k,D,team,season){
+  if(!k||k>=99999999)return null;
+  return wtMap(D||cd(),team||UI.currentTeam,season||UI.currentSeason)[_wtMon(k)]||null;
+}
+// The theme of a session's week ('' none)
+function wtOf(s,D,team,season){
+  if(!s||!s.date)return '';
+  season=season||UI.currentSeason;
+  const w=wtOfK(_dbSortKey(s.date,season),D,team,season);
+  return w?w.t:'';
+}
+// The Bewertungsthema of a match: its own, else its week's
+function evtOf(s,D,team,season){
+  if(!s||s.type!=='match'||s.evtOff)return '';
+  if(s.evalTopic)return s.evalTopic;
+  return wtOf(s,D,team,season);
+}
+// What a week would have without a trainer's choice for it
+function _wtAuto(D,m){
+  const D2=Object.assign({},D,{wk:Object.assign({},(D&&D.wk)||{})});delete D2.wk['w'+m];
+  const a=wtMap(D2,UI.currentTeam,UI.currentSeason)[m];return a?a.t:'';
+}
+function _wtHasTr(m){
+  const D=cd();
+  return !!(D&&Array.isArray(D.sessions)&&D.sessions.some(s=>s&&s.date&&s.type!=='match'&&_wtMon(_dbSortKey(s.date,UI.currentSeason))===m));
+}
+// Schwerpunkt 1 and 2 as one text: the second is less important, not forgotten
+function _focTxt(s){
+  if(!s)return '';
+  return s.focus?s.focus+(s.focus2?' + '+s.focus2:''):(s.focus2||'');
+}
+function _f2Html(s,esc){
+  return (s&&s.type!=='match'&&s.focus&&s.focus2)?'<span class="hx-f2"> + '+(esc||escapeHtml)(s.focus2)+'</span>':'';
+}
+// The theme as a small pill; ask: offer a choice where there is none yet
+function _wtPill(k,ask){
+  const pool=wtPool();if(!pool.length)return '';
+  const m=_wtMon(k),w=wtMap(cd(),UI.currentTeam,UI.currentSeason)[m],t=(w&&w.t)||'',ed=canEdit(),e=escapeHtml;
+  if(t)return ed?`<button type="button" class="wt-pill" onclick="wtOpen(${m})" title="Thema der Woche – ändern">${e(t)}</button>`:`<span class="wt-pill" title="Thema der Woche">${e(t)}</span>`;
+  if(!ed||!ask||!_wtHasTr(m))return '';
+  return `<button type="button" class="wt-pill add" onclick="wtOpen(${m})">${w&&w.set?'Kein Thema':'Thema wählen'}</button>`;
+}
+// The column "KW" of the month grid: the theme upright under the number
+function _wtCalx(m,ask){
+  const pool=wtPool();if(!pool.length)return '';
+  const w=wtMap(cd(),UI.currentTeam,UI.currentSeason)[m],t=(w&&w.t)||'',ed=canEdit(),e=escapeHtml;
+  if(t)return ed?`<button type="button" class="calx-wt" onclick="event.stopPropagation();wtOpen(${m})" title="Thema der Woche: ${e(t)} – ändern">${e(t)}</button>`:`<span class="calx-wt" title="Thema der Woche">${e(t)}</span>`;
+  if(!ed||!ask||!_wtHasTr(m))return '';
+  return `<button type="button" class="calx-wt add" onclick="event.stopPropagation();wtOpen(${m})" title="Thema der Woche wählen">+ Thema</button>`;
+}
+let _wtK=0;
+function wtOpen(k){
+  if(!canEdit())return;
+  const pool=wtPool();
+  if(!pool.length){if(typeof canTeamSet==='function'&&canTeamSet())openSettings('team');return;}
+  const m=_wtMon(k),D=cd();_wtK=m;
+  const own=(D.wk&&D.wk['w'+m])||'',at=_wtAuto(D,m),e=escapeHtml;
+  const md=_wtDate(m),su=new Date(md);su.setDate(md.getDate()+6);
+  document.getElementById('wt-sub').textContent='KW '+_dbIsoWeek(md)+' · '+md.getDate()+'.'+(md.getMonth()+1)+'. – '+su.getDate()+'.'+(su.getMonth()+1)+'.';
+  const eff=own?(own==='-'?'':own):at;
+  let h=pool.map((x,i)=>`<button type="button" class="wt-opt${eff===x?' on':''}" onclick="wtPick(${i})"><span>${e(x)}</span>${!own&&at===x?'<small>der Reihe nach</small>':''}</button>`).join('');
+  h+=`<button type="button" class="wt-opt${eff===''?' on':''}" onclick="wtPick(-1)"><span>Kein Thema</span></button>`;
+  if(own)h+=`<button type="button" class="wt-opt back" onclick="wtPick(-2)"><span>Wieder der Reihe nach</span><small>${at?e(at):'kein Thema'}</small></button>`;
+  document.getElementById('wt-opts').innerHTML=h;
+  const ring=pool.length>1?pool.concat([pool[0]]).map(e).join(' → '):e(pool[0]);
+  document.getElementById('wt-note').innerHTML='Die Wochen danach wechseln der Reihe nach: '+ring+'. Wochen ohne Training werden übersprungen.'
+    +((typeof canTeamSet==='function'&&canTeamSet())?` <button type="button" class="hx-link" onclick="closeM('moWt');openSettings('team')">Themen ändern</button>`:'');
+  openM('moWt');
+}
+function wtPick(i){
+  const pool=wtPool(),D=cd(),m=_wtK;
+  let v=i>=0?pool[i]:(i===-1?'-':null);
+  if(i>=0&&!v)return;
+  // the theme it has anyway: nothing to remember
+  if(v&&v!=='-'&&!(D.wk&&D.wk['w'+m])&&_wtAuto(D,m)===v)v=null;
+  closeM('moWt');
+  _wtApply(m,v);
+}
+function wtSetForSess(si,v){
+  const D=cd(),s=D&&D.sessions&&D.sessions[si];if(!s||!s.date)return;
+  _wtApply(_wtMon(_dbSortKey(s.date,UI.currentSeason)),v==='__auto'?null:v);
+}
+function _wtApply(m,v){
+  if(!canEdit())return false;
+  const D=cd();if(!D)return false;
+  const key='w'+m,before=(D.wk&&D.wk[key])||null;
+  if(before===(v||null)){_wtRefresh();return false;}
+  snap();
+  if(!D.wk||typeof D.wk!=='object'||Array.isArray(D.wk))D.wk={};
+  if(v)D.wk[key]=v;else delete D.wk[key];
+  if(!Object.keys(D.wk).length)delete D.wk;
+  saveG();
+  logAudit('Thema der Woche','KW '+_dbIsoWeek(_wtDate(m)),v==='-'?'kein Thema':(v||'wieder der Reihe nach'));
+  _wtRefresh();
+  return true;
+}
+function _wtRefresh(){
+  try{render();}catch(e){}
+  try{if(hxOn()&&typeof hxRender==='function')hxRender();}catch(e){}
+  try{const c=document.getElementById('cal-content');if(c&&c.offsetParent)renderCalendar();}catch(e){}
+  try{if(typeof TPL!=='undefined'&&TPL&&TPL.plan)_tplHead();}catch(e){}
+  try{const mo=document.getElementById('moSession2');if(mo&&mo.classList.contains('open')&&currentSI>=0){_ssMeta(currentSI);renderEvalTopicRow(currentSI);
+    const f=document.getElementById('ss-e-wt');if(f){const r=_wtFormRow(currentSI);const t=document.createElement('div');t.innerHTML=r;const n=t.querySelector('select');if(n)f.innerHTML=n.innerHTML;}}}catch(e){}
+  try{wtRender();}catch(e){}
+}
+// Bearbeiten of a training: the theme of its week
+function _wtFormRow(si){
+  const pool=wtPool();if(!pool.length)return '';
+  const D=cd(),s=D&&D.sessions&&D.sessions[si];if(!s||!s.date)return '';
+  const k=_dbSortKey(s.date,UI.currentSeason);if(k>=99999999)return '';
+  const m=_wtMon(k),own=(D.wk&&D.wk['w'+m])||'',at=_wtAuto(D,m),e=escapeHtml,sel=own||'__auto';
+  return `<div class="tp-row"><span class="tp-l" title="Gilt für die ganze Woche">Thema der Woche</span>
+          <select id="ss-e-wt" class="tp-in" onchange="wtSetForSess(${si},this.value)">
+            <option value="__auto"${sel==='__auto'?' selected':''}>Der Reihe nach (${at?e(at):'keins'})</option>
+            ${pool.map(x=>`<option value="${e(x)}"${sel===x?' selected':''}>${e(x)}</option>`).join('')}
+            <option value="-"${sel==='-'?' selected':''}>\u2013 Kein Thema \u2013</option>
+          </select></div>`;
+}
+// Bearbeiten of a match: its Bewertungsthema, by default the week's
+function _evtFormRow(si){
+  const D=cd(),s=D&&D.sessions&&D.sessions[si];if(!s)return '';
+  const wt=wtOf(s),e=escapeHtml;
+  const sel=s.evtOff?'':(s.evalTopic||(wt?'__wk':''));
+  return `<div class="tp-row"><span class="tp-l">\ud83c\udfaf Bewertungsthema</span>
+          <select id="ss-e-evt" class="tp-in" onchange="setEvalTopic(${si},this.value)">
+            ${wt?`<option value="__wk"${sel==='__wk'?' selected':''}>Thema der Woche (${e(wt)})</option>`:''}
+            <option value=""${sel===''?' selected':''}>\u2013 Kein \u2013</option>
+            ${_evtPoolFor(si).map(t=>`<option value="${e(t)}"${t===sel?' selected':''}>${e(t)}</option>`).join('')}
+          </select></div>`;
+}
+// Einstellungen → Mannschaft: the list (who may change the team's settings)
+function _wtRules(t){if(!G.db[t+'__rules']||typeof G.db[t+'__rules']!=='object')G.db[t+'__rules']={};return G.db[t+'__rules'];}
+function _wtBlocks(t){
+  return Object.keys(G.db||{}).filter(k=>k.indexOf(t+'__')===0&&/^\d{4}\/\d{2}$/.test(k.slice(t.length+2))).map(k=>G.db[k]).filter(b=>b&&typeof b==='object');
+}
+function wtRender(){
+  const box=document.getElementById('wtBox');if(!box)return;
+  if(!CU||!(typeof canEdit==='function'&&canEdit())){box.innerHTML='';return;}
+  const t=UI.currentTeam||'',pool=wtPool(t),e=escapeHtml;
+  const cur=pool.length?wtOfK(todaySK()):null;
+  box.innerHTML=`<div class="setting-label ay-h">🗓 Wochenthemen <span>${e(t)}</span></div>
+    <p class="ay-note">Woran die Trainings einer Woche arbeiten, zum Beispiel „Breite“ und „Tiefe“. Die Themen wechseln Woche für Woche in dieser Reihenfolge; Wochen ohne Training werden übersprungen. Eine einzelne Woche änderst du in der Übersicht, im Kalender oder im Training. Das Spiel der Woche bekommt das Thema als Bewertungsthema. Nur Trainer sehen es.</p>
+    ${pool.length?`<div class="wt-list">${pool.map((x,i)=>`<div class="fi-row wt-row"><div class="fi-nm">${i+1}. ${e(x)}</div>${i?`<button type="button" class="fi-del wt-b" onclick="wtMove(${i})" title="Nach vorn" aria-label="${e(x)} nach vorn">↑</button>`:''}<button type="button" class="fi-del wt-b" onclick="wtRen(${i})" title="Umbenennen" aria-label="${e(x)} umbenennen">✎</button><button type="button" class="fi-del" onclick="wtDel(${i})" title="Löschen" aria-label="${e(x)} löschen">✕</button></div>`).join('')}</div>`:''}
+    <div class="wt-add"><input type="text" id="wt-new" maxlength="40" placeholder="${pool.length?'Weiteres Thema':'z. B. Breite'}" aria-label="Neues Wochenthema" onkeydown="if(event.key==='Enter')wtAdd()"><button type="button" class="btn bp" onclick="wtAdd()" aria-label="Wochenthema hinzufügen">＋</button></div>
+    ${pool.length?`<p class="ay-note">Diese Woche: <b>${cur&&cur.t?e(cur.t):'kein Thema'}</b>${cur&&cur.t?'':' – in der Übersicht bei „Diese Woche“ wählen, danach wechseln die Themen von selbst.'}</p>`:''}`;
+}
+function wtAdd(){
+  if(!_teamSetGuard())return;
+  const inp=document.getElementById('wt-new');
+  const v=String((inp&&inp.value)||'').trim().replace(/\s+/g,' ').slice(0,40);
+  if(!v||v==='-')return;
+  const t=UI.currentTeam,pool=wtPool(t);
+  if(pool.some(x=>x.toLowerCase()===v.toLowerCase())){alert('„'+v+'“ gibt es schon.');return;}
+  snap();
+  _wtRules(t).wt=pool.concat([v]);
+  saveG();
+  logAudit('Wochenthema angelegt',t,v);
+  _wtRefresh();
+  setTimeout(()=>{const i=document.getElementById('wt-new');if(i)try{i.focus({preventScroll:true});}catch(x){}},0);
+}
+function wtRen(i){
+  if(!_teamSetGuard())return;
+  const t=UI.currentTeam,pool=wtPool(t),old=pool[i];if(!old)return;
+  const v0=prompt('Wochenthema umbenennen:',old);if(v0===null)return;
+  const v=String(v0).trim().replace(/\s+/g,' ').slice(0,40);
+  if(!v||v==='-'||v===old)return;
+  if(pool.some((x,j)=>j!==i&&x.toLowerCase()===v.toLowerCase())){alert('„'+v+'“ gibt es schon.');return;}
+  snap();
+  pool[i]=v;_wtRules(t).wt=pool;
+  let n=0;
+  _wtBlocks(t).forEach(b=>{if(b.wk&&typeof b.wk==='object')Object.keys(b.wk).forEach(k=>{if(b.wk[k]===old){b.wk[k]=v;n++;}});});
+  saveG();
+  logAudit('Wochenthema umbenannt',t,old+' → '+v);
+  _wtRefresh();
+}
+function wtDel(i){
+  if(!_teamSetGuard())return;
+  const t=UI.currentTeam,pool=wtPool(t),old=pool[i];if(!old)return;
+  const rest=pool.filter((x,j)=>j!==i);
+  if(!confirm('„'+old+'“ löschen?\n\n'+(rest.length?'Die Wochen wechseln dann nur noch zwischen '+rest.join(', ')+'.':'Danach haben die Wochen kein Thema mehr.')+' Die Einsatz-Bewertungen der Spiele bleiben.'))return;
+  snap();
+  const R=_wtRules(t);if(rest.length)R.wt=rest;else delete R.wt;
+  _wtBlocks(t).forEach(b=>{if(b.wk&&typeof b.wk==='object'){Object.keys(b.wk).forEach(k=>{if(b.wk[k]===old)delete b.wk[k];});if(!Object.keys(b.wk).length)delete b.wk;}});
+  saveG();
+  logAudit('Wochenthema gelöscht',t,old);
+  _wtRefresh();
+}
+function wtMove(i){
+  if(!_teamSetGuard())return;
+  const t=UI.currentTeam,pool=wtPool(t);if(i<1||i>=pool.length)return;
+  snap();
+  const a=pool.slice();[a[i-1],a[i]]=[a[i],a[i-1]];_wtRules(t).wt=a;
+  saveG();
+  logAudit('Wochenthemen: Reihenfolge',t,a.join(' → '));
+  _wtRefresh();
+}
+
 // ══ BEWERTUNGSTHEMA (evaluation topic on matches) ═════════════
 // A match can carry ONE topic ("what we evaluated in this game" — e.g.
 // "Umschalten", "Pressing"). The player's score on that topic IS the
@@ -26197,13 +26473,13 @@ function renderEvalTopicRow(si){
   if(!el)return;
   const D=cd();const s=D&&D.sessions&&D.sessions[si];
   if(!s||s.type!=='match'){el.style.display='none';return;}
-  const topic=s.evalTopic||'';
+  const topic=evtOf(s);
   const ed=false;   // editing lives in the Bearbeiten form now
   if(!topic){el.style.display='none';return;}
   el.style.display='';
   el.innerHTML=`<div class="evt-row">
       <span class="evt-label">\ud83c\udfaf Bewertungsthema</span>
-      <span id="evt_chip" class="evt-chip${ed?' ed':''}${topic?'':' evt-empty'}"${ed?` onclick="event.stopPropagation();togEvalTopicMenu(${si})"`:''}>${topic?escapeHtml(topic):'Thema w\u00e4hlen'}${ed?'<span class="evt-caret">\u25be</span>':''}</span>
+      <span id="evt_chip" class="evt-chip${ed?' ed':''}${topic?'':' evt-empty'}"${ed?` onclick="event.stopPropagation();togEvalTopicMenu(${si})"`:''}>${topic?escapeHtml(topic):'Thema w\u00e4hlen'}${ed?'<span class="evt-caret">\u25be</span>':''}</span>${topic&&!s.evalTopic?'<span class="evt-auto">Thema der Woche</span>':''}
       <div id="evt_menu" class="evt-menu" style="display:none;"></div>
     </div>`;
 }
@@ -26213,6 +26489,7 @@ function _evtPoolFor(si){
   const D=cd();
   const pool=[...evalTopics(D)];
   (D.sessions||[]).forEach(x=>{if(x&&x.evalTopic&&!pool.includes(x.evalTopic))pool.push(x.evalTopic);});
+  wtPool().forEach(x=>{if(!pool.includes(x))pool.push(x);});
   return pool.sort((a,b)=>a.localeCompare(b));
 }
 function togEvalTopicMenu(si){
@@ -26292,17 +26569,23 @@ function addEvalTopic(si){
   if(!pool.includes(nm))pool.push(nm);
   setEvalTopic(si,nm);
 }
+// '__wk' = the theme of the match's week (the default, 1.2.103); '' / null =
+// none, not even the week's (s.evtOff); a name = this one
 function setEvalTopic(si,topic){
   if(!canEdit())return;
   const D=cd();const s=D.sessions[si];if(!s||s.type!=='match')return;
-  if((s.evalTopic||null)===(topic||null)){renderEvalTopicRow(si);return;}
+  const wt=wtOf(s);
+  const want=topic==='__wk'?{}:(topic?{evalTopic:topic}:(wt?{evtOff:1}:{}));
+  const now=Object.assign({},s.evalTopic?{evalTopic:s.evalTopic}:{},s.evtOff?{evtOff:1}:{});
+  if(JSON.stringify(want)===JSON.stringify(now)){renderEvalTopicRow(si);return;}
   snap();
-  const old=s.evalTopic||null;
-  if(topic)s.evalTopic=topic;else delete s.evalTopic;
+  const old=evtOf(s)||null;
+  delete s.evalTopic;delete s.evtOff;Object.assign(s,want);
   // Keep pool in sync (add on use; never auto-delete)
-  if(topic){const pool=evalTopics(D);if(!pool.includes(topic))pool.push(topic);}
+  if(want.evalTopic){const pool=evalTopics(D);if(!pool.includes(want.evalTopic))pool.push(want.evalTopic);}
   saveG();
-  logAudit('Bewertungsthema',s.date,(old?old+' \u2192 ':'')+(topic||'entfernt'));
+  const nw=evtOf(s);
+  logAudit('Bewertungsthema',s.date,(old?old+' \u2192 ':'')+(nw||'entfernt')+(topic==='__wk'&&nw?' (Thema der Woche)':''));
   renderEvalTopicRow(si);
 }
 // ══ ROLL-CALL ════════════════════════════════════════════════
@@ -26360,7 +26643,7 @@ function rcOpen(si){
   document.getElementById('rc-date').textContent=s.date||'';
   {const k=document.getElementById('rc-kind');if(k)k.textContent=s.type==='match'?'Spiel':'Training';}
   document.getElementById('rc-sub').textContent=
-    [s.type==='match'?(s.label?'gegen '+s.label:''):(s.focus||''),s.time||''].filter(Boolean).join(' \u00b7 ');
+    [s.type==='match'?(s.label?'gegen '+s.label:''):_focTxt(s),s.time||''].filter(Boolean).join(' \u00b7 ');
   const f=document.getElementById('rc-filter');
   if(f)f.classList.remove('on');
   rcRender();
@@ -26599,20 +26882,7 @@ function openSessStats(si){
   if(kindEl)kindEl.textContent=_hxOn()?(isMat?'Spiel':'Training'):(isMat?'\u26bd Spiel':'\ud83c\udfc3 Training');
   // Location belongs on the meta line: it is the second question after "when"
   const _locMeta=(s.location&&s.location.trim())?' &nbsp;·&nbsp; '+locNameHtml(s):'';
-  {
-    // Only facts not already carried by the title or the window heading.
-    const bits=[];
-    const dur=(typeof rpeSessionMinutes==='function')?rpeSessionMinutes(s,null,si):null;
-    // Heute: "18:30 – 20:00" instead of "18:30 · 90 Min." — one fact, once
-    const _range=_hxOn()&&s.time&&dur&&typeof _hxEnd==='function';
-    if(s.time)bits.push('\u23f0 '+escapeHtml(s.time)+(_range?' \u2013 '+_hxEnd(s.time,dur):''));
-    if(isMat)bits.push(s.homeAway==='home'?'\ud83c\udfe0 Heim':'\ud83d\ude8c Ausw\u00e4rts');
-    else if(s.focus)bits.push('\ud83c\udfaf '+escapeHtml(s.focus)+(s.focus2?' + '+escapeHtml(s.focus2):''));
-    if(dur&&!_range)bits.push(dur+' Min.');
-    // Heute: the same facts without the emoji markers, as on the cards
-    if(_hxOn())document.getElementById('ss-meta').innerHTML=bits.map(b=>b.replace(/^(\u23f0|\ud83c\udfe0|\ud83d\ude8c|\ud83c\udfaf)\s?/,'')).concat((s.location&&s.location.trim())?[escapeHtml(s.location.trim())]:[]).join(' \u00b7 ');
-    else document.getElementById('ss-meta').innerHTML=bits.join(' &nbsp;\u00b7&nbsp; ')+_locMeta;
-  }
+  _ssMeta(si);
   try{renderEvalTopicRow(si);}catch(e){console.error('evalTopic:',e);}
   // Roll-call entry point: trainers only, and only once the session is
   // actually running/past — capturing attendance for a future date is not
@@ -26688,11 +26958,7 @@ function openSessStats(si){
             <option value="home"${s.homeAway!=='away'?' selected':''}>\ud83c\udfe0 Heim</option>
             <option value="away"${s.homeAway==='away'?' selected':''}>\ud83d\ude8c Ausw\u00e4rts</option>
           </select></div>
-        <div class="tp-row"><span class="tp-l">\ud83c\udfaf Bewertungsthema</span>
-          <select id="ss-e-evt" class="tp-in" onchange="setEvalTopic(${si},this.value)">
-            <option value="">\u2013 Kein \u2013</option>
-            ${_evtPoolFor(si).map(t=>`<option value="${escapeHtml(t)}"${t===s.evalTopic?' selected':''}>${escapeHtml(t)}</option>`).join('')}
-          </select></div>`:`
+        ${_evtFormRow(si)}`:`
         <div class="tp-row"><span class="tp-l" title="Prim\u00e4rer Schwerpunkt">Schwerpunkt 1</span>
           <select id="ss-e-foc" class="tp-in" onchange="updSessFoc(${si},this.value)">
             <option value="">\u2013 Kein \u2013</option>${focOpts}
@@ -26700,7 +26966,8 @@ function openSessStats(si){
         <div class="tp-row"><span class="tp-l" title="Sekund\u00e4rer Schwerpunkt \u2014 optional">Schwerpunkt 2</span>
           <select id="ss-e-foc2" class="tp-in" onchange="updSessFoc2(${si},this.value)">
             <option value="">\u2013 Kein \u2013</option>${foc.map(f=>`<option value="${f}" ${f===s.focus2?'selected':''}>${f}</option>`).join('')}
-          </select></div>`}
+          </select></div>
+        ${_wtFormRow(si)}`}
         <div class="tp-row"><span class="tp-l">Physio dabei</span>
           <label class="ss-e-check"><input type="checkbox" id="ss-e-physio" ${sessPhysioOn(s)?'checked':''} onchange="sessSetPhysio(${si},this.checked)"><span>am Trainingstag verf\u00fcgbar</span></label></div>
         <div class="tp-row"><span class="tp-l">${isMat?'Link zum Spiel':'Trainingsplan'}</span>
@@ -27313,7 +27580,30 @@ function toggleSessEdit(){
   const shell=document.querySelector('#moSession2 .mob');
   if(open&&shell)shell.scrollTop=0;
 }
-function updSessFoc(si,v){snap();cd().sessions[si].focus=v;saveG();renderHead();}
+// The window's line under the title: when, where, theme of the week and both
+// Schwerpunkte (1.2.103: also after Bearbeiten, not only on opening)
+function _ssMeta(si){
+  const D=cd(),s=D&&D.sessions&&D.sessions[si];
+  if(!s||!document.getElementById('ss-meta'))return;
+  const isMat=s.type==='match';
+  const _locMeta=(s.location&&s.location.trim())?' &nbsp;·&nbsp; '+locNameHtml(s):'';
+    // Only facts not already carried by the title or the window heading.
+    const bits=[];
+    const dur=(typeof rpeSessionMinutes==='function')?rpeSessionMinutes(s,null,si):null;
+    // Heute: "18:30 – 20:00" instead of "18:30 · 90 Min." — one fact, once
+    const _range=_hxOn()&&s.time&&dur&&typeof _hxEnd==='function';
+    if(s.time)bits.push('\u23f0 '+escapeHtml(s.time)+(_range?' \u2013 '+_hxEnd(s.time,dur):''));
+    if(isMat)bits.push(s.homeAway==='home'?'\ud83c\udfe0 Heim':'\ud83d\ude8c Ausw\u00e4rts');
+    else{
+      const wt=wtOf(s);if(wt)bits.push('Woche: '+escapeHtml(wt));
+      const ft=_focTxt(s);if(ft)bits.push('\ud83c\udfaf '+escapeHtml(ft));
+    }
+    if(dur&&!_range)bits.push(dur+' Min.');
+    // Heute: the same facts without the emoji markers, as on the cards
+    if(_hxOn())document.getElementById('ss-meta').innerHTML=bits.map(b=>b.replace(/^(\u23f0|\ud83c\udfe0|\ud83d\ude8c|\ud83c\udfaf)\s?/,'')).concat((s.location&&s.location.trim())?[escapeHtml(s.location.trim())]:[]).join(' \u00b7 ');
+    else document.getElementById('ss-meta').innerHTML=bits.join(' &nbsp;\u00b7&nbsp; ')+_locMeta;
+}
+function updSessFoc(si,v){snap();cd().sessions[si].focus=v;saveG();renderHead();try{_ssMeta(si);}catch(e){}}
 // "Aufgabe" would mean a task handed to someone; the word for what a session
 // concentrates on is Schwerpunkt, which the app already uses. A second one is
 // therefore Schwerpunkt 2, not a differently-named thing.
@@ -27325,7 +27615,7 @@ function updSessFoc2(si,v){
   if((s.focus2||'')===val)return;
   snap();
   if(val)s.focus2=val;else delete s.focus2;
-  saveG();renderHead();
+  saveG();renderHead();try{_ssMeta(si);}catch(e){}
 }
 function _amTsToDatetimeLocal(ts){
   // Converts ms-timestamp to 'YYYY-MM-DDTHH:MM' for datetime-local input
@@ -27968,7 +28258,7 @@ function _calCollect(){
     if(!s||!s.date)return;
     const k=dispToSortKey(s.date);if(!k||k>=99999999)return;
     const m=s.type==='match';
-    add(k,{kind:m?'m':'t',si,time:s.time||'',title:m?(s.label||''):(s.focus||''),loc:String(s.location||'').trim(),att:_hxSessAtt(si)});
+    add(k,{kind:m?'m':'t',si,time:s.time||'',title:m?(s.label||''):_focTxt(s),loc:String(s.location||'').trim(),att:_hxSessAtt(si)});
   });
   (typeof getCalEvents==='function'?getCalEvents():[]).forEach(ev=>{
     if(!ev||!ev.date)return;
@@ -28046,7 +28336,7 @@ function renderCalendarMobile(el){
     if(mk!==lastMonth){h+=`<h4 class="calm-mo">${CAL_MON[md.getMonth()]} ${md.getFullYear()}</h4>`;lastMonth=mk;}
     const cur=mon===curMon;
     const range=md.getMonth()===su.getMonth()?`${md.getDate()}.–${su.getDate()}. ${CAL_MON3[su.getMonth()]}`:`${md.getDate()}. ${CAL_MON3[md.getMonth()]} – ${su.getDate()}. ${CAL_MON3[su.getMonth()]}`;
-    h+=`<section class="calm-wk${cur?' cur':''}${mon<curMon?' pastwk':''}"${cur?' id="calmCur"':''}><div class="calm-wh"><b>KW ${_dbIsoWeek(md)}</b><span>${range}</span>${cur?'<i>diese Woche</i>':''}</div><div class="calm-card hk-isle">`;
+    h+=`<section class="calm-wk${cur?' cur':''}${mon<curMon?' pastwk':''}"${cur?' id="calmCur"':''}><div class="calm-wh"><b>KW ${_dbIsoWeek(md)}</b><span>${range}</span>${_wtPill(mon,mon>=curMon)}${cur?'<i>diese Woche</i>':''}</div><div class="calm-card hk-isle">`;
     weeks.get(mon).forEach(k=>{
       const d=_calD(k),dow=CAL_DOW[d.getDay()],isT=k===today,isP=k<today;
       const list=_calDayList(k,c);
@@ -28262,7 +28552,7 @@ function renderCalendarMonth(y,m){
   for(let w=0;w<weeks;w++){
     const mk=_calK(d),su=new Date(d);su.setDate(d.getDate()+6);
     const cw=today>=mk&&today<=_calK(su);
-    h+=`<div class="calx-kw${cw?' cur':''}"${cw?' title="Diese Woche"':''}>${_dbIsoWeek(d)}</div>`;
+    h+=`<div class="calx-kw${cw?' cur':''}"${cw?' title="Diese Woche"':''}>${_dbIsoWeek(d)}${_wtCalx(mk,_calK(su)>=today)}</div>`;
     for(let i=0;i<7;i++){
       const k=_calK(d),out=d.getMonth()!==m-1,past=k<today;
       const cls='calx-day'+(out?' out':'')+(k===today?' today':'')+(past?' past':'')+(cw?' cw':'')+(canAdd?' can':'')+(i>4?' we':'');
@@ -29031,7 +29321,7 @@ function hxRender(){
       <div class="hx-hero-head">${_hxDateTile(sk(s),isM)}
         <div class="hx-hero-tx">
           <span class="hx-tag${isM?' match':''}">${esc(_hxTag(isM,title,sk(s)))}</span>
-          <h2 class="hx-focus-title">${esc(title)}</h2>
+          <h2 class="hx-focus-title">${esc(title)}${_f2Html(s,esc)}</h2>
           <div class="hx-meta">${esc(meta.join(' · '))}</div>
         </div>
         <div class="hx-btns">${btns}</div></div>
@@ -29053,7 +29343,7 @@ function hxRender(){
     // is already the hero) gets a light card with quiet buttons
     html+=`<section class="hx-card${isM?' hx-dark':' hx-next'} hx-a-match" aria-label="${isM?'Nächstes Spiel':'Danach'}">
       <span class="hx-meta"><span class="hx-mpre">${isM?'Nächstes Spiel':'Danach'} · </span>${esc(w.charAt(0).toUpperCase()+w.slice(1))}${s.time?', '+esc(s.time):''}${isM&&s.homeAway?' · '+(s.homeAway==='home'?'Heimspiel':'auswärts'):''}</span>
-      <h3 class="hx-h2 hx-match-t">${esc(isM?(s.label||'Spiel'):(s.focus||'Training'))}</h3>
+      <h3 class="hx-h2 hx-match-t">${esc(isM?(s.label||'Spiel'):(s.focus||s.focus2||'Training'))}${_f2Html(s,esc)}</h3>
       ${_hxAttHtml(c,_isSessRollCallTime(si2),si2,isM?'dark':'')}
       ${isM?(()=>{let has=false;try{const k=_mlKey(UI.currentTeam,season,si2);const lu=G.matchLineups&&G.matchLineups[k];has=!!(lu&&lu.slots&&Object.values(lu.slots).some(v=>v!=null&&v!==''));}catch(e){}
         return `<div class="hx-lu${has?' on':''}">${has?'Aufstellung steht':'Noch keine Aufstellung'}</div>`;})():''}
@@ -29080,7 +29370,7 @@ function hxRender(){
   const b=_dbWeekBounds(0);
   const days=[];
   for(let i=0;i<7;i++){const d=new Date(b.monday);d.setDate(b.monday.getDate()+i);days.push(d);}
-  html+=`<section class="hx-card hx-a-week" aria-label="Diese Woche"><div class="hx-h2row"><h3 class="hx-h2">Diese Woche</h3><span class="hx-meta">KW ${_dbIsoWeek(b.monday)}</span></div>`;
+  html+=`<section class="hx-card hx-a-week" aria-label="Diese Woche"><div class="hx-h2row"><h3 class="hx-h2">Diese Woche</h3><span class="hx-wkr">${_wtPill(b.monday.getFullYear()*10000+(b.monday.getMonth()+1)*100+b.monday.getDate(),true)}<span class="hx-meta">KW ${_dbIsoWeek(b.monday)}</span></span></div>`;
   days.forEach(d=>{
     const dk=d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
     const list=[];S.forEach((s,si)=>{if(s&&s.date&&sk(s)===dk)list.push(si);});
@@ -29105,7 +29395,7 @@ function hxRender(){
       const todo=held&&c.present===0;
       const n=(todo?'–':(held?c.present:c.yes))+'/'+c.total;
       const tip=todo?'Anwesenheit noch nicht erfasst':held?c.present+' von '+c.total+' anwesend':c.yes+' von '+c.total+' '+_ywFor(s);
-      html+=`<button type="button" class="hx-day${isT?' today':''}${held&&!isT?' past':''}" onclick="openSessFromMain(${si})"><span class="hx-day-d"><small>${esc(dow)}</small><b>${d.getDate()}</b></span><span class="hx-day-x"><span class="hx-day-t">${esc(t)}</span><span class="hx-day-s${isM?' m':''}">${esc(sub)}</span></span><span class="hx-day-n${held&&!todo?' done':''}${todo?' todo':''}" title="${esc(tip)}"><span class="hx-vh">${esc(tip)}</span><span aria-hidden="true">${held&&!todo?hxIcon('check',13):''}${esc(n)}</span></span></button>`;
+      html+=`<button type="button" class="hx-day${isT?' today':''}${held&&!isT?' past':''}" onclick="openSessFromMain(${si})"><span class="hx-day-d"><small>${esc(dow)}</small><b>${d.getDate()}</b></span><span class="hx-day-x"><span class="hx-day-t">${esc(t)}${_f2Html(s,esc)}</span><span class="hx-day-s${isM?' m':''}">${esc(sub)}</span></span><span class="hx-day-n${held&&!todo?' done':''}${todo?' todo':''}" title="${esc(tip)}"><span class="hx-vh">${esc(tip)}</span><span aria-hidden="true">${held&&!todo?hxIcon('check',13):''}${esc(n)}</span></span></button>`;
     });
   });
   html+=`</section>`;
@@ -29874,7 +30164,7 @@ function kbRender(){
   let head='';
   if(s){
     const d=_hxDate(_dbSortKey(s.date,season));const m=s.type==='match';
-    const what=m?(s.label?'Spiel gegen '+s.label:'Spiel'):(s.focus?'Training · '+s.focus:'Training');
+    const what=m?(s.label?'Spiel gegen '+s.label:'Spiel'):(_focTxt(s)?'Training · '+_focTxt(s):'Training');
     const when=[KB_WD[d.getDay()]+' '+d.getDate()+'.'+(d.getMonth()+1)+'.',s.time||'',s.location||''].filter(Boolean).join(' · ');
     const c=_hxCounts(D,si,season);
     const parts=roll?[['ok',c.present,'da'],['bad',c.no,'fehlen'],['warn',c.exc,'entschuldigt'],['open',c.open,'offen']]
@@ -30388,13 +30678,20 @@ function renderFocList(){
   }
   // Count training sessions per focus (past + planned)
   const sessCount={};
-  foc.forEach(f=>sessCount[f]={total:0,past:0});
+  foc.forEach(f=>sessCount[f]={total:0,past:0,t2:0,p2:0});
   const today=todaySK();
   if(D&&Array.isArray(D.sessions)){
     D.sessions.forEach(s=>{
-      if(s.type!=='training'||!s.focus||!sessCount[s.focus])return;
-      sessCount[s.focus].total++;
-      if(sessTookPlace(s))sessCount[s.focus].past++;
+      if(!s||s.type!=='training')return;
+      if(s.focus&&sessCount[s.focus]){
+        sessCount[s.focus].total++;
+        if(sessTookPlace(s))sessCount[s.focus].past++;
+      }
+      // as Schwerpunkt 2 (1.2.103): less weight, but it counts as covered
+      if(s.focus2&&s.focus2!==s.focus&&sessCount[s.focus2]){
+        sessCount[s.focus2].t2++;
+        if(sessTookPlace(s))sessCount[s.focus2].p2++;
+      }
     });
   }
   document.getElementById('foc-list').innerHTML=foc.length?
@@ -30404,7 +30701,7 @@ function renderFocList(){
       const pct=st.pl?Math.round((st.a/st.pl)*100):null;
       const bc=pct!==null?(pct>=80?'var(--cp)':pct>=60?'var(--ce)':'var(--ca)'):'#ccc';
       const bar=pct!==null?`<div style="flex:1;background:var(--gl);border-radius:3px;height:5px;margin:0 8px;overflow:hidden;"><div style="width:${pct}%;height:100%;background:${bc};border-radius:3px;"></div></div><span style="font-size:.68rem;font-weight:700;color:${bc};min-width:32px;">${pct}%</span>`:'<div style="flex:1;"></div>';
-      const cnt=`<span style="font-size:.66rem;color:var(--gm);font-weight:600;min-width:78px;text-align:right;">${sc.past}/${sc.total} Tr.</span>`;
+      const cnt=`<span style="font-size:.66rem;color:var(--gm);font-weight:600;min-width:78px;text-align:right;" title="Trainings mit diesem Schwerpunkt: stattgefunden / geplant${sc.t2?' · als Schwerpunkt 2: '+sc.p2+' / '+sc.t2:''}">${sc.past}/${sc.total} Tr.${sc.t2?`<br><span style="font-weight:500;">+ ${sc.p2}/${sc.t2} als 2.</span>`:''}</span>`;
       return `<div class="fi-row" style="align-items:center;">
         <div class="fi-nm" style="flex:none;min-width:90px;">🎯 ${f}</div>
         ${bar}
@@ -30792,7 +31089,7 @@ function _trashSnapSession(si){
     teamSeason,
     teamName:team,
     seasonName:teamSeason.split('__')[1],
-    label:sess.date+' '+(sess.type==='match'?(sess.label||'Spiel'):(sess.focus||'Training')),
+    label:sess.date+' '+(sess.type==='match'?(sess.label||'Spiel'):(_focTxt(sess)||'Training')),
     payload:{
       session:JSON.parse(JSON.stringify(sess)),
       attendanceByName:attMap,
@@ -35379,7 +35676,8 @@ function _tplHead(){
   if(st!=null)bits.push(_tplHM(st)+'–'+_tplHM(st+_tplDur(s)));
   bits.push(TPL.team);
   if(s.location&&String(s.location).trim())bits.push(String(s.location).trim());
-  if(s.focus)bits.push('Schwerpunkt: '+s.focus+(s.focus2?' + '+s.focus2:''));
+  {const wt=wtOf(s,_tplD(),TPL.team,TPL.season);if(wt)bits.push('Woche: '+wt);}
+  if(_focTxt(s))bits.push('Schwerpunkt: '+_focTxt(s));
   const y=_tplYes();if(y)bits.push(y+' Zusagen');
   el.textContent=bits.join(' · ');
 }
@@ -35820,7 +36118,7 @@ function tplSaveTplDlg(){
   if(!TPL.plan)return;
   if(!TPL.plan.blocks.length){_tplToast('Der Ablauf ist noch leer');return;}
   const s=_tplSess();const n=TPL.plan.blocks.length;
-  const def=((s&&s.focus)?s.focus:'Training')+' · '+_tplTotal()+' Min.';
+  const def=((s&&_focTxt(s))||'Training')+' · '+_tplTotal()+' Min.';
   _tplDlg(`<h4>Als Vorlage speichern</h4>
     <p class="tpl-hint">Der ganze Ablauf (${n} ${n===1?'Block':'Blöcke'}, ${_tplTotal()} Min.) wird als Vorlage für ${_tplE(TPL.team)} gespeichert.</p>
     <label>Name der Vorlage<input id="ttName" value="${_tplE(def)}" maxlength="80" onkeydown="if(event.key==='Enter'){event.preventDefault();tplSaveTpl();}"></label>
@@ -35974,7 +36272,8 @@ function _tplPrintHtml(s){
   const E=_tplE;const st=_tplMin(s.time);const dur=_tplDur(s);const starts=_tplStarts();const tot=_tplTotal();
   const club=(G&&G.clubName)||'';const yes=_tplYes();
   const r1=[st!=null?_tplHM(st)+'–'+_tplHM(st+dur):'',String(s.location||'').trim()].filter(Boolean).map(E).join(' · ');
-  const r2=[s.focus?'Schwerpunkt: '+s.focus+(s.focus2?' + '+s.focus2:''):'',yes?yes+' Zusagen':''].filter(Boolean).map(E).join(' · ');
+  let _wt='';try{_wt=wtOf(s,_tplD(),TPL.team,TPL.season);}catch(e){}
+  const r2=[_wt?'Woche: '+_wt:'',_focTxt(s)?'Schwerpunkt: '+_focTxt(s):'',yes?yes+' Zusagen':''].filter(Boolean).map(E).join(' · ');
   const rows=TPL.plan.blocks.map((b,i)=>{
     const coach=String(b.coach||'').split(/\n+/).map(x=>x.replace(/^[-•*]\s*/,'').trim()).filter(Boolean);
     const meta=[b.players?_tplPlayersTxt(b.players):'',b.area||''].filter(Boolean).map(E).join(' · ');
@@ -37853,7 +38152,7 @@ function _tplIntMove(ev){
   const cx=G.padL+(G.n>1?G.iw*i/(G.n-1):G.iw/2);
   const c=document.getElementById('tstCross');if(c){c.setAttribute('x1',cx);c.setAttribute('x2',cx);c.setAttribute('visibility','visible');}
   const d=p.pi-p.rpe.avg;
-  _tplTipShow(ev,`<span class="h">${_tplE(_tplShortDate(p.e))}${p.s&&p.s.focus?' · '+_tplE(p.s.focus):''}</span>
+  _tplTipShow(ev,`<span class="h">${_tplE(_tplShortDate(p.e))}${p.s&&_focTxt(p.s)?' · '+_tplE(_focTxt(p.s)):''}</span>
     <span class="row"><i class="k1"></i><b>${_tplNum(p.pi,1)}</b> geplant</span>
     <span class="row"><i class="k2"></i><b>${_tplNum(p.rpe.avg,1)}</b> gefühlt · ${p.rpe.n} ${p.rpe.n===1?'Antwort':'Antworten'}</span>
     <span>${Math.abs(d)<0.5?'passt zum Plan':d>0?'leichter als geplant':'härter als geplant'}</span>`);
@@ -40590,6 +40889,7 @@ _pubCleanupSchedule();
       <div id="meetBox" class="ay-box"></div>
       <div id="cardBox" class="ay-box"></div>
       <div id="fdbBox" class="ay-box"></div>
+      <div id="wtBox" class="ay-box"></div>
 
       <div class="set-hx-only" id="set-foc-host" style="margin:16px 0 4px;"><div class="setting-label" style="margin-bottom:6px;">🎯 Schwerpunkte</div>
         <p class="note">Schwerpunkte für <strong id="foc-team-lbl">–</strong></p>
@@ -41288,6 +41588,12 @@ _pubCleanupSchedule();
 <div class="mo" id="moFlags"><div class="mob flg-mob" style="width:540px;max-width:96vw;">
   <div class="pv-head"><h3>Im Blick behalten <span id="flg-n" class="flg-n"></span></h3><button class="btn bs" onclick="closeM('moFlags')" aria-label="Schließen">✕</button></div>
   <div id="flg-list" class="flg-list"></div>
+</div></div>
+<div class="mo" id="moWt"><div class="mob wt-mob" style="width:420px;max-width:96vw;">
+  <div class="pv-head"><h3>Thema der Woche</h3><button class="btn bs" onclick="closeM('moWt')" aria-label="Schließen">✕</button></div>
+  <p class="wt-sub" id="wt-sub"></p>
+  <div id="wt-opts" class="wt-opts" role="group" aria-label="Thema der Woche"></div>
+  <p class="wt-note" id="wt-note"></p>
 </div></div>
 <div class="mo" id="moNews"><div class="mob nw-mob" style="width:520px;max-width:96vw;">
   <h3 class="nw-h">Neu in Flutlicht</h3>
