@@ -7537,12 +7537,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.101'; // v1.2.101: Eingang – keine Bewertung geht mehr verloren
-const APP_VERSION_LABEL='1.2.101';
+const APP_VERSION='1.2.102'; // v1.2.102: Sync – nichts Ungespeichertes wird überschrieben
+const APP_VERSION_LABEL='1.2.102';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1794234472807; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1794285717929; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -8649,6 +8649,19 @@ function _fbEq(a,b){
   for(const k of new Set([...Object.keys(a),...Object.keys(b)]))if(!_fbEq(a[k],b[k]))return false;
   return true;
 }
+// G holds changes no save has picked up yet (1.2.102): compared with what it
+// was built from. The two losses of 08.11. were both this — an edit waiting on
+// an await, a write under fcf_data raising the listener before saveG — and
+// each call-site fix only closes the one place found. This closes the class.
+// Only worth the comparison when something could have changed G since: a tap
+// or key press, or the inbox being merged (encoding all of G costs time on a
+// phone, and snapshots arrive while nobody touches anything).
+let _fbBaseAt=0;
+function _fbLocalDirty(){
+  if(!G||!_fbBase||G.__sanitized)return false;
+  if(!(_userActAt>_fbBaseAt||(typeof _pvMerging!=='undefined'&&_pvMerging)))return false;
+  try{return !_fbEq(_fbBase,fbEncode(G));}catch(e){return false;}
+}
 function _fbAdoptLate(){
   if(_fbLateRaw===undefined)return;
   if(_fbSaving||_fbDebounce||_pendingSave)return;   // still busy — the next write ends with this again
@@ -9057,7 +9070,7 @@ function _adoptData(data){
   // Re-anchor the diff writer on what the server actually has, BEFORE padding:
   // otherwise the padding itself looks like a change and uploads a null for
   // every session of the season.
-  try{if(data){_fbShadow=fbEncode(data);_fbBase=_fbShadow;_bootJSON=null;}}catch(e){}
+  try{if(data){_fbShadow=fbEncode(data);_fbBase=_fbShadow;_fbBaseAt=Date.now();_bootJSON=null;}}catch(e){}
   const clean=_padPlayerArrays(sanitizeG(data));
   if(typeof isPlayerMode==='function'&&isPlayerMode()){
     // Deep copy first: _pmSanitizeG mutates what it is given.
@@ -9137,7 +9150,7 @@ function _fbWriteWithStamp(data){
       if(window._perfWatch||window._perfDebug)console.log('%c[FB] update() gesendet …','color:#0a5');
       return fbRef.update(out).then(()=>{
         if(window._perfWatch||window._perfDebug)console.log('%c[FB] update() ERFOLG','color:green;font-weight:bold');
-        _fbShadow=encoded;_fbBase=encoded;
+        _fbShadow=encoded;_fbBase=encoded;_fbBaseAt=Date.now();
         setTimeout(()=>{_fbSaving=false;_fbAdoptLate();},500);
         _localDirty=false;
         if(typeof setFbStatus==='function')setFbStatus('connected');
@@ -9153,7 +9166,7 @@ function _fbWriteWithStamp(data){
   }
   _fbCount('tx','fcf_data set() KOMPLETT',JSON.stringify(encoded).length);
   return fbRef.set(encoded).then(()=>{
-    _fbShadow=encoded;_fbBase=encoded;
+    _fbShadow=encoded;_fbBase=encoded;_fbBaseAt=Date.now();
     setTimeout(()=>{_fbSaving=false;_fbAdoptLate();},500);
     _localDirty=false;
     if(typeof setFbStatus==='function')setFbStatus('connected');
@@ -9985,7 +9998,11 @@ function startFbListener(){
     // mean the user just edited something locally that hasn't been pushed yet.
     // If we accept remote data now, that local edit is silently lost. Push our
     // pending change first.
-    if(_fbDebounce||_pendingSave){
+    // 1.2.102: …and changes in G that no save picked up yet (not on the first
+    // snapshot: there the cached copy is suspect, see above)
+    const _dirty=!wasInitialLoad&&!_fbDebounce&&!_pendingSave&&_fbLocalDirty();
+    if(_dirty)console.warn('[FB] Ungespeicherte \u00c4nderungen vor dem Server-Stand \u2014 zuerst senden.');
+    if(_fbDebounce||_pendingSave||_dirty){
       clearTimeout(_fbDebounce);
       _fbDebounce=null;
       _pendingSave=false;
@@ -10008,7 +10025,7 @@ function startFbListener(){
         });
         if(_suspect){
           console.error('[SCHUTZ] Lokaler Stand verworfen \u2014 unvollst\u00e4ndig ('+_suspect+'). Server-Stand wird geladen.');
-          try{_fbShadow=fbEncode(data);_fbBase=_fbShadow;_bootJSON=null;}catch(e){}
+          try{_fbShadow=fbEncode(data);_fbBase=_fbShadow;_fbBaseAt=Date.now();_bootJSON=null;}catch(e){}
           G=sanitizeG(data);
           _persistLocal();
           render();
@@ -10021,7 +10038,7 @@ function startFbListener(){
       // 1.2.96: what this copy was built from — before the first snapshot that
       // is the cached copy as loaded. Without it the diff would run against
       // the server's state and push the whole old copy over it.
-      if(!_fbBase&&_bootJSON){try{_fbBase=fbEncode(JSON.parse(_bootJSON));}catch(e){}_bootJSON=null;}
+      if(!_fbBase&&_bootJSON){try{_fbBase=fbEncode(JSON.parse(_bootJSON));_fbBaseAt=Date.now();}catch(e){}_bootJSON=null;}
       if(!_fbBase){
         console.warn('[FB] Keine Basis f\u00fcr die lokale \u00c4nderung \u2014 Server-Stand gilt.');
       }else if(G){
