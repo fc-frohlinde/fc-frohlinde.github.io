@@ -41,7 +41,7 @@ export function winners(c) {
 
 // An entry marked merged (m) by an open trainer app, whose answer is not in
 // the data (1.2.102). The app marked it, applied it to its copy, and the copy
-// was replaced before it was saved — 5 of the 10 ratings of 08.11. went that
+// was replaced before it was saved — 9 of the 10 ratings of 08.11. went that
 // way, and the job then removed the entries as done. Checked just before an
 // entry goes: what it said must be there, or something newer must have
 // replaced it (a new answer, a trainer's change).
