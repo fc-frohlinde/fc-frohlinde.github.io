@@ -41,8 +41,8 @@ try {
     const apply = loadApply(new URL('../../index.html', import.meta.url).pathname);
     const r = await inbox({ db, apply, dry: process.argv.includes('--dry') });
     const why = Object.entries(r.why).map(([k, n]) => `${k} ${n}`).join(', ');
-    if (r.writes || process.env.GITHUB_EVENT_NAME === 'workflow_dispatch')
-      console.log(`::notice title=Входящие::перенесено: ${r.merged}, отклонено: ${r.refused}${why ? ' (' + why + ')' : ''}, голосов: ${r.votes} (отклонено ${r.voteRefused}), победителей опубликовано: ${r.winners}, убрано: ${r.cleaned}, неизвестных: ${r.unknown}`);
+    if (r.writes || r.healed || process.env.GITHUB_EVENT_NAME === 'workflow_dispatch')
+      console.log(`::notice title=Входящие::перенесено: ${r.merged}, отклонено: ${r.refused}${why ? ' (' + why + ')' : ''}, голосов: ${r.votes} (отклонено ${r.voteRefused}), победителей опубликовано: ${r.winners}, убрано: ${r.cleaned}, неизвестных: ${r.unknown}` + (r.healed ? `, восстановлено: ${r.healed}` : ''));
   } catch (e) { console.log('::warning title=Входящие::' + String((e && e.message) || e).slice(0, 200)); }
   // KALENDER_TOKEN: GitHub token with only the "gist" scope, for the calendar feed
   const r = await round({ db, push: webpush, dry: process.argv.includes('--dry'), cal: { token: process.env.KALENDER_TOKEN || '', fetch: globalThis.fetch } });

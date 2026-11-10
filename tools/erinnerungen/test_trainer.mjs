@@ -60,7 +60,7 @@ function world(edit) {
   const db = makeDb({
     fcf_data: { trainers: enc(W.trainers), userAutomation: W.ua, messages: enc(W.messages),
       db: { 'U19__2026__SL__27': { sessions: enc(W.sess), players: enc(W.players) } } },
-    __backups_meta: W.meta ? { safe: W.meta } : {}, fcf_push: Object.assign({ subs: W.subs }, W.status ? { status: W.status } : {}) });
+    __backups_meta: W.meta ? { safe: W.meta } : {}, fcf_push: Object.assign({ subs: W.subs }, W.status ? { status: W.status } : {}, W.heal ? { heal: W.heal } : {}) });
   return { db, W, si };
 }
 const run = async (db, ts) => { const push = makePush(); await round({ db, push, ts, log: q }); return push.calls; };
@@ -194,6 +194,15 @@ ok(JSON.stringify(kindsOf(null)) === JSON.stringify(TKINDS) && kindsOf({ bday: f
   const { db } = world(W => { W.meta = { t: at(21, 8, 10) }; W.status = { t: at(21, 13, 7), day: 20261021 }; });
   const c = await run(db, at(21, 13, 22));
   ok(!T(c).filter(x => /^tech/.test(x.p.tag)).length, 'all well: nothing');
+}
+{
+  // answers the job had to fill in (1.2.102): once a day, to both
+  const { db } = world(W => { W.meta = { t: at(21, 8, 10) }; W.status = { t: at(21, 13, 7), day: 20261021 }; W.heal = { 20261021: 3, 20261001: 1 }; });
+  const c = await run(db, at(21, 13, 22));
+  const t = T(c).filter(x => x.p.tag === 'tech-heal');
+  ok(t.length === 2 && t[0].p.title === 'Antworten nachgetragen' && t[0].p.body === '3 Antworten von Spielern waren nicht gespeichert und sind jetzt ergänzt.', 'filled-in answers reported: ' + JSON.stringify(t.map(x => x.p.body)));
+  const c2 = await run(db, at(21, 13, 37));
+  ok(!T(c2).filter(x => x.p.tag === 'tech-heal').length, 'heal: once a day');
 }
 // ── who gets nothing ──
 {

@@ -162,8 +162,13 @@ export function messages(list, now, name) {
       body: String(m.text || '').slice(0, 180) + (String(m.text || '').length > 180 ? '…' : ''),
       url: go('msg&gid=' + encodeURIComponent(m.id)), ttl: 24 * 3600 }));
 }
-export function machinery({ safe, prev, now }) {
+export function machinery({ safe, prev, now, healed = 0 }) {
   const out = [];
+  // Answers an app had marked as merged but not saved, filled in by the job
+  // (1.2.102): it works by itself, but it means a way of losing data exists
+  if (healed > 0) out.push({ key: 'heal', title: 'Antworten nachgetragen',
+    body: healed + (healed === 1 ? ' Antwort eines Spielers war' : ' Antworten von Spielern waren') + ' nicht gespeichert und ' + (healed === 1 ? 'ist' : 'sind') + ' jetzt ergänzt.',
+    url: SITE, ttl: ttlToMidnight(now) });
   if (safe && safe.t && now.ts - safe.t > SAFE_STALE) {
     const d = Math.floor((now.ts - safe.t) / 864e5);
     out.push({ key: 'safe', title: 'Sicherung läuft nicht',

@@ -200,7 +200,7 @@ export async function round({ db, push, ts = Date.now(), log = console.log, dry 
         for (const r of rs) if (r.kinds.msg) for (const it of messages(list, now, r.name)) await send(r, 'msg', it);
       }
       if (rs.some(r => r.kinds.tech)) {
-        const items = machinery({ safe: await db.get('__backups_meta/safe'), prev, now });
+        const items = machinery({ safe: await db.get('__backups_meta/safe'), prev, now, healed: +(await db.get(`fcf_push/heal/${now.day}`)) || 0 });
         for (const r of rs) if (r.kinds.tech) for (const it of items) await send(r, 'tech', it);
       }
     }
@@ -215,6 +215,10 @@ export async function round({ db, push, ts = Date.now(), log = console.log, dry 
     // squad goes two days after the match (once a day is enough)
     const days = Object.keys((await db.get('fcf_push/sent')) || {});
     for (const d of days) if (+d < addDays(now.day, -7) && !dry) await db.remove('fcf_push/sent/' + d);
+    if (prev.day !== now.day && !dry) {
+      const hd = Object.keys((await db.get('fcf_push/heal')) || {});
+      for (const d of hd) if (+d < addDays(now.day, -7)) await db.remove('fcf_push/heal/' + d);
+    }
     if (prev.day !== now.day && !dry) {
       const sq = (await db.get('fcf_push/sq')) || {};
       for (const [b, ms] of Object.entries(sq)) for (const [m, o] of Object.entries(ms || {}))

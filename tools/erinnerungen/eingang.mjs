@@ -39,8 +39,33 @@ export function winners(c) {
   return top.length <= 2 ? top : [];
 }
 
+// An entry marked merged (m) by an open trainer app, whose answer is not in
+// the data (1.2.102). The app marked it, applied it to its copy, and the copy
+// was replaced before it was saved — 5 of the 10 ratings of 08.11. went that
+// way, and the job then removed the entries as done. Checked just before an
+// entry goes: what it said must be there, or something newer must have
+// replaced it (a new answer, a trainer's change).
+export function lostAnswer(blk, pi, e) {
+  const P = blk && blk.players && blk.players[pi]; if (!P || !e) return false;
+  const S = blk.sessions || [];
+  const si = (typeof e.si === 'number' && S[e.si] && metaKey(S[e.si]) === e.k) ? e.si : S.findIndex(s => s && metaKey(s) === e.k);
+  if (si < 0) return false;
+  const meta = P.rpeMeta && typeof P.rpeMeta === 'object' ? P.rpeMeta[e.k] : null;
+  const newer = !!(meta && +meta.t > +(e.t || 0));
+  // a number there is somebody's: a trainer's change sets a newer meta, an old one has none
+  if (e.a === 'rpe') return !newer && !(Array.isArray(P.rpe) && typeof P.rpe[si] === 'number');
+  if (e.a === 'nd') return !newer && !(meta && meta.nd);
+  if (e.a === 'rsvp') {
+    const cur = Array.isArray(P.s) ? P.s[si] : undefined;
+    if (cur === 3 || cur == null) return true;
+    // a "Kann nicht" under the automatic "dabei" (ay 1 = set by the rule, not by a trainer)
+    return e.v === 0 && cur === 4 && Array.isArray(P.ay) && P.ay[si] === 1;
+  }
+  return false;
+}
+
 export async function inbox({ db, apply, ts = Date.now(), dry = false, log = () => {} }) {
-  const out = { merged: 0, refused: 0, unknown: 0, cleaned: 0, votes: 0, voteRefused: 0, winners: 0, why: {} };
+  const out = { merged: 0, refused: 0, unknown: 0, cleaned: 0, votes: 0, voteRefused: 0, winners: 0, healed: 0, why: {} };
   const [box, votes, raw] = await Promise.all([db.get('fcf_in'), db.get('fcf_vote'), db.get('fcf_data/db')]);
   const blocks = {}, map = {};
   for (const [ek, r] of Object.entries(raw || {})) {
@@ -56,6 +81,22 @@ export async function inbox({ db, apply, ts = Date.now(), dry = false, log = () 
   for (const [ek, r] of Object.entries(raw || {})) { const key = dk(ek); if (key.endsWith('__rules')) rules[key.slice(0, -7)] = decode(r) || {}; }
   const w = {}, audit = [];
   const rawPlayer = (ek, pi) => { const pl = blocks[ek].raw.players; const v = pl && (pl.v || pl); return (v && v[pi]) || {}; };
+  // The fields an applied answer changed, as single index where the stored array is there
+  const put = (who, r) => {
+    const B = blocks[who.ek], P = B.blk.players[who.pi], base = `fcf_data/db/${who.ek}/players/v/${who.pi}/`, rp = rawPlayer(who.ek, who.pi);
+    for (const f of r.f) {
+      if (ARR.includes(f)) {
+        // One index where the stored array is there; else the whole array
+        // (a single index into a missing node would not read as an array)
+        const st = rp[f];
+        if (st && typeof st === 'object' && st.__arr === 1 && typeof r.si === 'number') w[base + f + '/v/' + r.si] = P[f][r.si] === undefined ? null : P[f][r.si];
+        else { w[base + f] = { __arr: 1, v: P[f].map(x => x === undefined ? null : x) }; rp[f] = { __arr: 1 }; }
+      } else if (f === 'rpeMeta') {
+        const k = metaKey(B.blk.sessions[r.si]);
+        if (k) w[base + 'rpeMeta/' + k] = P.rpeMeta[k];
+      } else w[base + f] = P[f] === undefined ? null : P[f];
+    }
+  };
   // ── answers ──
   for (const [pk, entries] of Object.entries(box || {})) {
     const who = map[pk];
@@ -65,7 +106,15 @@ export async function inbox({ db, apply, ts = Date.now(), dry = false, log = () 
       if (!e || typeof e !== 'object') { w[path] = null; out.cleaned++; continue; }
       if (e.m) {
         if (sliceT === null) sliceT = (await db.get(`fcf_pv/${pk}/t`)) || 0;
-        if (sliceT > e.m + KEEP_MERGED || ts - e.m > 30 * 864e5) { w[path] = null; out.cleaned++; }
+        if (sliceT > e.m + KEEP_MERGED || ts - e.m > 30 * 864e5) {
+          if (who && lostAnswer(blocks[who.ek].blk, who.pi, e)) {
+            const B = blocks[who.ek];
+            const r = apply(B.blk, who.pi, e, rules[B.team]);
+            // no second journal entry: the app wrote one when it marked it
+            if (r.ok && r.f.length) { put(who, r); out.healed++; log('Eingang: nachgetragen', e.a, e.k); }
+          }
+          w[path] = null; out.cleaned++;
+        }
         continue;
       }
       if (!who) {
@@ -81,19 +130,8 @@ export async function inbox({ db, apply, ts = Date.now(), dry = false, log = () 
       if (!r.ok) { out.refused++; out.why[r.why] = (out.why[r.why] || 0) + 1; w[path] = null; continue; }
       if (!r.f.length) continue;
       out.merged++;
-      const P = B.blk.players[who.pi], base = `fcf_data/db/${who.ek}/players/v/${who.pi}/`, rp = rawPlayer(who.ek, who.pi);
-      for (const f of r.f) {
-        if (ARR.includes(f)) {
-          // One index where the stored array is there; else the whole array
-          // (a single index into a missing node would not read as an array)
-          const st = rp[f];
-          if (st && typeof st === 'object' && st.__arr === 1 && typeof r.si === 'number') w[base + f + '/v/' + r.si] = P[f][r.si] === undefined ? null : P[f][r.si];
-          else { w[base + f] = { __arr: 1, v: P[f].map(x => x === undefined ? null : x) }; rp[f] = { __arr: 1 }; }
-        } else if (f === 'rpeMeta') {
-          const k = metaKey(B.blk.sessions[r.si]);
-          if (k) w[base + 'rpeMeta/' + k] = P.rpeMeta[k];
-        } else w[base + f] = P[f] === undefined ? null : P[f];
-      }
+      const P = B.blk.players[who.pi];
+      put(who, r);
       if (r.audit) audit.push(Object.assign({ ts: e.t || ts, user: P.name || 'Spieler', role: 'player', team: B.team, season: B.season, via: 'job' }, r.audit));
     }
   }
@@ -145,6 +183,8 @@ export async function inbox({ db, apply, ts = Date.now(), dry = false, log = () 
     }
   }
   audit.forEach((a, i) => { w[`fcf_data/auditLogP/j${ts.toString(36)}${i}`] = a; });
+  // For the trainers' "Technik" notice: how many were filled in today
+  if (out.healed) w[`fcf_push/heal/${berlin(ts).day}`] = { __n: out.healed };
   // Increments as the database does them (two jobs at once must not lose a vote)
   for (const [p, v] of Object.entries(w)) if (v && typeof v === 'object' && v.__n) w[p] = db.inc(v.__n);
   if (!dry && Object.keys(w).length) await db.update(w);

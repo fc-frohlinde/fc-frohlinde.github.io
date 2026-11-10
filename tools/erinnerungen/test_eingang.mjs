@@ -70,6 +70,53 @@ db.root.fcf_in[pk(0)] = { 'a_k1025-1300m': { a: 'rsvp', k: 'k1025-1300m', si: 2,
 r = await inbox({ db, apply, ts: T0 + 12 * 60e3 });
 ok(blk().players[0].s[2] === 1 && r.why.trainer === 1, 'present (roll call) stays present');
 
+// ── merged by an app but not saved: filled in before the entry goes (1.2.102) ──
+{
+  const P3 = () => db.root.fcf_data.db[ek('U19__2026/27')].players.v[3];
+  const m = T0 + 13 * 60e3;
+  db.root.fcf_in[pk(3)] = {
+    'r_k1025-1300m': { a: 'rpe', k: 'k1025-1300m', si: 2, v: 8, t: T0 + 12 * 60e3, m },            // lost
+    'a_k1027-1830t': { a: 'rsvp', k: 'k1027-1830t', si: 3, v: 0, t: T0 + 12 * 60e3, m },           // lost (still Ausstehend)
+  };
+  db.root.fcf_in[pk(2)] = { 'r_k1025-1300m': { a: 'rpe', k: 'k1025-1300m', si: 2, v: 6, t: T0 + 12 * 60e3, m } };
+  // Tom's landed; and a trainer has since changed it (newer meta, other value)
+  P3();
+  db.root.fcf_data.db[ek('U19__2026/27')].players.v[2].rpe = enc([5, 6, 4, null]);
+  db.root.fcf_data.db[ek('U19__2026/27')].players.v[2].rpeMeta = { 'k1025-1300m': { s: 't', t: T0 + 14 * 60e3 } };
+  db.root.fcf_pv[pk(3)] = { t: m + 5 * 60e3 }; db.root.fcf_pv[pk(2)] = { t: m + 5 * 60e3 };
+  // not yet: the slice is not newer than m + 2 min
+  db.root.fcf_pv[pk(3)].t = m + 60e3;
+  r = await inbox({ db, apply, ts: m + 90e3 });
+  ok(r.healed === 0 && db.peek(`fcf_in/${pk(3)}/r_k1025-1300m`), 'kept while the slice is not newer');
+  db.root.fcf_pv[pk(3)].t = m + 5 * 60e3;
+  const nAud = Object.keys(db.peek('fcf_data/auditLogP') || {}).length;
+  r = await inbox({ db, apply, ts: m + 6 * 60e3 });
+  B = blk();
+  ok(r.healed === 2 && B.players[3].rpe[2] === 8 && B.players[3].rpeMeta['k1025-1300m'].t === T0 + 12 * 60e3, 'lost rating filled in: ' + JSON.stringify(r));
+  ok(B.players[3].s[3] === 0, 'lost "Kann nicht" filled in');
+  ok(B.players[2].rpe[2] === 4, "trainer's newer change stays");
+  ok(!db.peek(`fcf_in/${pk(3)}`) && !db.peek(`fcf_in/${pk(2)}`), 'entries removed after');
+  ok(Object.keys(db.peek('fcf_data/auditLogP') || {}).length === nAud, 'no second journal entry');
+  const day = Object.keys(db.peek('fcf_push/heal') || {});
+  ok(day.length === 1 && db.peek('fcf_push/heal/' + day[0]) === 2, 'counted for the trainers: ' + JSON.stringify(db.peek('fcf_push/heal')));
+  // landed ones are left alone
+  db.root.fcf_in[pk(3)] = { 'r_k1025-1300m': { a: 'rpe', k: 'k1025-1300m', si: 2, v: 8, t: T0 + 12 * 60e3, m } };
+  r = await inbox({ db, apply, ts: m + 7 * 60e3 });
+  ok(r.healed === 0 && r.cleaned === 1, 'landed: just removed');
+  // a "Kann nicht" under the rule's M is lost; a "Komme" on Angemeldet is not
+  const P1 = db.root.fcf_data.db[ek('U19__2026/27')].players.v[1];
+  P1.s = enc([1, 1, 4, 4]); P1.ay = enc([null, null, null, 1]);
+  db.root.fcf_pv[pk(1)] = { t: m + 5 * 60e3 };
+  db.root.fcf_in[pk(1)] = { 'a_k1027-1830t': { a: 'rsvp', k: 'k1027-1830t', si: 3, v: 0, t: T0 + 12 * 60e3, m } };
+  r = await inbox({ db, apply, ts: m + 8 * 60e3 });
+  ok(r.healed === 1 && blk().players[1].s[3] === 0, 'Kann nicht under the automatic M filled in');
+  P1.ay = enc([null, null, null, 0]);
+  db.root.fcf_in[pk(1)] = { 'a_k1027-1830t': { a: 'rsvp', k: 'k1027-1830t', si: 3, v: 1, t: T0 + 12 * 60e3, m } };
+  P1.s = enc([1, 1, 4, 4]);
+  r = await inbox({ db, apply, ts: m + 9 * 60e3 });
+  ok(r.healed === 0, 'Komme on Angemeldet: landed');
+}
+
 // ── votes ──
 db.root.fcf_vote = {
   [pk(1)]: { 'k1025-1300m': { n: 'Tom Berg', t: T0 } },
