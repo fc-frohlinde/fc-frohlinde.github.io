@@ -4334,6 +4334,31 @@ body.design-heute.hxk-dk .calx-e:hover{filter:brightness(1.15);}
 .abw-send{display:block;width:calc(100% - 32px);min-height:52px;border:none;border-radius:14px;background:var(--fl-lamp,#F2C230);color:#0A1328;font:800 16px 'Barlow',sans-serif;cursor:pointer;}
 .abw-send:disabled{opacity:.45;cursor:default;}
 .abw-undo{display:block;width:calc(100% - 32px);margin-top:10px;min-height:46px;border-radius:14px;border:1px solid var(--fl-line,#22386B);background:transparent;color:var(--fl-ink,#F3F5FA);font:700 15px 'Barlow',sans-serif;cursor:pointer;}
+.pm-wrap.psh{padding-bottom:32px;}
+.pm-wrap.psh>.fl-title,.pm-wrap.psh>.psh-lead,.pm-wrap.psh>.psh-steps,.pm-wrap.psh>.psh-note,.pm-wrap.psh>.psh-done{margin-left:16px;margin-right:16px;}
+.psh-lead{margin:2px 0 18px;font-size:15px;line-height:1.45;color:var(--fl-ink2,#B6C4DE);}
+.psh-steps{list-style:none;margin:0 0 16px;padding:0;display:flex;flex-direction:column;gap:10px;}
+.psh-step{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:var(--fl-surface,#111D3A);border:1px solid var(--fl-line,#22386B);}
+.psh-n{flex:0 0 30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font:800 15px 'Barlow',sans-serif;background:var(--fl-lamp,#F2C230);color:#0A1328;}
+.psh-b{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}
+.psh-b b{font-size:15.5px;font-weight:700;color:var(--fl-ink,#F3F5FA);line-height:1.3;}
+.psh-b span{font-size:13.5px;line-height:1.4;color:var(--fl-ink2,#B6C4DE);}
+.psh-ic{flex:0 0 auto;display:inline-flex;color:var(--fl-ink,#F3F5FA);}
+.psh-app{width:34px;height:34px;border-radius:8px;display:block;}
+.psh-step.next{background:transparent;border-style:dashed;}
+.psh-step.next .psh-n{background:transparent;border:1.5px solid var(--fl-line,#22386B);color:var(--fl-ink2,#B6C4DE);}
+.psh-step.done{background:transparent;border-color:transparent;padding-top:6px;padding-bottom:6px;}
+.psh-step.done .psh-n{background:var(--fl-ok,#3DDC84);color:#08210f;}
+.psh-step.done .psh-b b{font-weight:600;color:var(--fl-muted,#8796B8);}
+.psh-step.done .psh-ic{opacity:.45;}
+.psh-note{margin:0 0 18px;font-size:13.5px;line-height:1.45;color:var(--fl-muted,#8796B8);}
+.psh-go{display:block;width:calc(100% - 32px);margin:4px 16px 0;min-height:52px;border:none;border-radius:14px;background:var(--fl-lamp,#F2C230);color:#0A1328;font:800 16px 'Barlow',sans-serif;cursor:pointer;}
+.psh-go:active{transform:scale(.98);}
+.psh-go:focus-visible,.psh .pm-top-back:focus-visible{outline:2px solid var(--fl-lamp,#F2C230);outline-offset:2px;}
+.psh-done{text-align:center;padding-top:28px;}
+.psh-done-ic{width:64px;height:64px;margin:0 auto 14px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--fl-ok,#3DDC84);color:#08210f;}
+.psh-done-ic svg{width:30px;height:30px;}
+.psh-wait{margin-top:28px;}
 /* trainers: the dialog and the profile line */
 .abw-c-sum{margin:0 0 4px;font-size:1rem;color:var(--hx-ink,var(--bd));}
 .abw-c-sub{margin:0 0 10px;font-size:.84rem;line-height:1.45;color:var(--hx-muted,var(--gm));}
@@ -7632,12 +7657,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.109'; // v1.2.109: Neuigkeiten zusammengefasst
-const APP_VERSION_LABEL='1.2.109';
+const APP_VERSION='1.2.110'; // v1.2.110: Erinnerungen einrichten Schritt für Schritt
+const APP_VERSION_LABEL='1.2.110';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1794406282266; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1794428286466; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -20623,7 +20648,7 @@ function renderPlayerCard(){
 // in fcf_push/pub. Until then reminders are not set up and nothing is offered.
 let _pushPub=null,_pushPubP=null;
 function pushLoadPub(){
-  if(!_pushPubP)_pushPubP=(fbDb?fbDb.ref('fcf_push/pub').once('value').then(x=>{_pushPub=x.val()||null;return _pushPub;}).catch(()=>null):Promise.resolve(null));
+  if(!_pushPubP)_pushPubP=(fbDb?fbDb.ref('fcf_push/pub').once('value').then(x=>{_pushPub=x.val()||null;return _pushPub;}).catch(()=>null):Promise.resolve(null)).finally(()=>{window._pushPubDone=true;});
   return _pushPubP;
 }
 const PUSH_KINDS=[
@@ -20739,7 +20764,7 @@ async function pushCheck(){
   const before=pushPlayerState();
   await pushLoadPub();
   if(RPE_IS_PREVIEW||!pushCan()){
-    if(before!==pushPlayerState()&&window._hubMode&&!window._hubAction)renderPlayerMode();
+    if(before!==pushPlayerState()&&window._hubMode&&(!window._hubAction||window._hubAction==='push'))renderPlayerMode();
     return;
   }
   try{
@@ -20765,7 +20790,7 @@ async function pushCheck(){
       }
     }
   }catch(e){console.warn('[Push] check',e&&e.message);}
-  if(before!==pushPlayerState()&&window._hubMode&&!window._hubAction)renderPlayerMode();
+  if(before!==pushPlayerState()&&window._hubMode&&(!window._hubAction||window._hubAction==='push'))renderPlayerMode();
 }
 async function pushEnable(from){
   if(RPE_IS_PREVIEW){if(typeof showSaveFlash==='function')showSaveFlash('👁 Vorschau — nicht gespeichert');return;}
@@ -20797,6 +20822,7 @@ async function pushEnable(from){
   _pushRefreshUi(from);
 }
 function _pushRefreshUi(from){
+  if(window._hubMode&&window._hubAction==='push'){renderPlayerMode();return;}
   if(from==='thanks'){
     const b=document.getElementById('hubThanksPush');
     if(b){const on=pushPlayerState()==='on';b.disabled=on;b.textContent=on?'✓ Erinnerungen an':'🔔 Beim nächsten Mal erinnern';}
@@ -20832,16 +20858,17 @@ function pushIosHelp(){
   if(typeof _a2hsShow==='function'){_a2hsHide&&_a2hsHide();_a2hsShown=false;_a2hsKind=_a2hsKind||'player';_a2hsShow('ios');}
 }
 // The offer in the overview and the line at its foot
-function _hubPushCard(){
+function _hubPushCard(top){
   if(!window._hubMode)return '';
   const ps=pushPlayerState();
+  if(!!top!==(ps==='off'&&_pmIsStandalone()))return '';
   if((ps==='off'||ps==='ios')&&!_pushSnoozed()){
     const ios=ps==='ios';
     return `<div class="hub-card hub-push"><span class="hub-ic">🔔</span>
       <span class="hub-txt"><b>Erinnerungen aufs Handy</b><span>${ios
         ?'Nach Training und Spiel, wenn du noch nicht eingetragen hast, wie anstrengend es war. Auf dem iPhone nur in der installierten App.'
         :'Nach Training und Spiel, wenn du noch nicht eingetragen hast, wie anstrengend es war. Ein Mal, nie nachts.'}</span>
-        <span class="hub-push-btns"><button class="hub-push-on" onclick="${ios?'pushIosHelp()':"pushEnable('hub')"}">${ios?'So geht’s':'Einschalten'}</button><button class="hub-push-later" onclick="pushLater()">Später</button></span>
+        <span class="hub-push-btns"><button class="hub-push-on" onclick="${ios?'pushHowOpen()':"pushEnable('hub')"}">${ios?'So geht’s':'Einschalten'}</button><button class="hub-push-later" onclick="pushLater()">Später</button></span>
       </span></div>`;
   }
   return '';
@@ -20851,16 +20878,106 @@ function _hubPushLine(){
   const ps=pushPlayerState();
   if(ps==='on')return '<button class="hub-switch hub-push-line" onclick="pushDisable()">🔔 Erinnerungen an · ausschalten</button>';
   if(ps==='denied')return '<button class="hub-switch hub-push-line" onclick="pushDeniedHelp()">🔕 Erinnerungen sind blockiert · so änderst du das</button>';
-  if((ps==='off'||ps==='ios')&&_pushSnoozed())return `<button class="hub-switch hub-push-line" onclick="${ps==='ios'?'pushIosHelp()':"pushEnable('hub')"}">🔔 Erinnerungen einschalten</button>`;
+  if((ps==='off'||ps==='ios')&&_pushSnoozed())return `<button class="hub-switch hub-push-line" onclick="${ps==='ios'?'pushHowOpen()':"pushEnable('hub')"}">🔔 Erinnerungen einschalten</button>`;
   return '';
 }
 // In the thank-you: the moment he has just done what the reminder is for
 function _hubThanksPush(kind,nd,onHub){
   if(!onHub||nd||(kind!=='rpe'&&kind!=='vote'))return '';
-  if(pushPlayerState()!=='off'||_pushSnoozed())return '';
+  const ps=pushPlayerState();
+  if(ps!=='off'&&ps!=='ios')return '';
   return '<button id="hubThanksPush" style="display:block;margin:12px auto 0;padding:10px 18px;border-radius:12px;'
     +'border:1px solid #22335f;background:none;color:#eef2fb;font-family:\'Barlow\',sans-serif;font-size:.86rem;'
     +'font-weight:600;cursor:pointer;">🔔 Beim nächsten Mal erinnern</button>';
+}
+// ── Erinnerungen einrichten (1.2.110) ────────────────────────
+// Of 25 players 20 open the app every week, but on 11.11. only 2 had
+// reminders — none on an iPhone. There Safari can only send them from the
+// app on the home screen, three steps nobody found from a one-line hint.
+// This screen walks through them; opened from the overview card, the foot
+// line and the thank-you after a rating. Its address is ?p=…&do=push, so if
+// the home-screen app starts at the address it was added from, it opens
+// right here at the last step; with reminders already on it goes on to the
+// overview.
+let _pshDone=false;
+function pushHowOpen(){
+  if(window._hubAction!=='push')window._pshFrom=window._hubAction||'';
+  window._hubAction='push';
+  try{_hubSyncUrl();}catch(e){}
+  try{window.scrollTo(0,0);}catch(e){}
+  renderPlayerMode();
+}
+function pushHowClose(){
+  window._hubAction=window._pshFrom||'';window._pshFrom='';_pshDone=false;
+  try{_hubSyncUrl();}catch(e){}
+  renderPlayerMode();
+}
+async function pushHowEnable(){
+  _pshDone=true;
+  await pushEnable('psh');
+  if(window._hubAction==='push')renderPlayerMode();
+}
+const PSH_IC={
+  share:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M8 7l4-4 4 4"/><path d="M6 11H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-1"/></svg>',
+  add:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>',
+  bell:'<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>',
+  ok:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'
+};
+function _pshStep(n,st,ic,t,s){
+  return `<li class="psh-step ${st}"><span class="psh-n" aria-hidden="true">${st==='done'?PSH_IC.ok:n}</span>`
+    +`<span class="psh-b"><b>${t}</b>${s?`<span>${s}</span>`:''}</span>${ic?`<span class="psh-ic" aria-hidden="true">${ic}</span>`:''}</li>`;
+}
+function renderPushHow(){
+  const wrap=document.getElementById('playerModeWrap');if(!wrap)return;
+  const D=cd(),p=D&&D.players&&D.players[CU.playerIdx];
+  const e=_amEscapeText,nm=p?(((typeof getDisplayName==='function')?getDisplayName(p):p.name)||''):'';
+  const ps=pushPlayerState(),iosApp=_a2hsIOS()&&_a2hsStandalone();
+  // the home-screen app started here, and reminders are on already
+  if(ps==='on'&&!_pshDone){window._hubAction='';window._pshFrom='';try{_hubSyncUrl();}catch(x){}return renderPlayerMode();}
+  if(ps==='none'&&!window._pushPubDone){pushLoadPub().then(()=>{if(window._hubAction==='push')renderPlayerMode();});}
+  const app='<img class="psh-app" src="apple-touch-icon.png" alt="">';
+  let h='<div class="pm-wrap psh">'
+    +`<div class="pm-top fl-bar"><button class="hub-back pm-top-back" onclick="pushHowClose()">‹ Zurück</button><span class="fl-team">${e(nm)}</span></div>`;
+  if(RPE_IS_PREVIEW)h+='<div class="pm-preview-banner">👁 Trainer-Vorschau · Eingaben werden <b>nicht</b> gespeichert</div>';
+  const steps=(cur)=>'<ol class="psh-steps">'
+    +_pshStep(1,cur>1?'done':'now',PSH_IC.share,'Auf „Teilen“ tippen',cur>1?'':'Bei neuem iOS steckt es unter „•••“.')
+    +_pshStep(2,cur>2?'done':'now',PSH_IC.add,'„Zum Home-Bildschirm“ wählen, dann „Hinzufügen“',cur>2?'':'Falls nötig, in der Liste etwas nach unten wischen.')
+    +(cur>=3?_pshStep(3,'now',PSH_IC.bell,'Auf „Einschalten“ tippen','Dann Mitteilungen erlauben.')
+      :_pshStep(3,'next',app,'Flutlicht auf dem Home-Bildschirm öffnen','Dort auf „Einschalten“ tippen und Mitteilungen erlauben.'))
+    +'</ol>';
+  if(ps==='on'){
+    h+='<div class="psh-done"><span class="psh-done-ic" aria-hidden="true">'+PSH_IC.ok+'</span>'
+      +'<h1 class="fl-title">Erinnerungen sind an</h1>'
+      +'<p class="psh-lead">Fehlt nach Training oder Spiel noch etwas von dir, meldet sich Flutlicht – ein Mal, nie nachts.</p></div>'
+      +'<button type="button" class="psh-go" onclick="pushHowClose()">Zur Übersicht</button>';
+  }else if(ps==='ios'){
+    h+='<h1 class="fl-title">Erinnerungen aufs iPhone</h1>'
+      +'<p class="psh-lead">Auf dem iPhone kann Flutlicht dich nur erinnern, wenn die App auf deinem Home-Bildschirm liegt. Einmal einrichten, etwa eine Minute.</p>'
+      +steps(1)
+      +'<p class="psh-note">Kein „Zum Home-Bildschirm“ zu sehen? Dann ist der Link nicht in Safari geöffnet: erst „In Safari öffnen“ wählen, dann noch einmal.</p>';
+  }else if(ps==='off'){
+    if(iosApp){
+      h+='<h1 class="fl-title">Letzter Schritt</h1>'
+        +'<p class="psh-lead">Flutlicht liegt auf deinem Home-Bildschirm. Jetzt nur noch die Erinnerungen einschalten.</p>'
+        +steps(3);
+    }else{
+      h+='<h1 class="fl-title">Erinnerungen einschalten</h1>'
+        +'<p class="psh-lead">Fehlt nach Training oder Spiel noch etwas von dir, meldet sich Flutlicht – ein Mal, nie nachts. Ausschalten kannst du sie jederzeit unten in der Übersicht.</p>';
+    }
+    h+='<button type="button" class="psh-go" onclick="pushHowEnable()">Einschalten</button>';
+  }else if(ps==='denied'){
+    h+='<h1 class="fl-title">Mitteilungen sind blockiert</h1>'
+      +(_pushDev()==='ios'
+        ?'<p class="psh-lead">Auf dem iPhone: Einstellungen → Mitteilungen → Flutlicht → „Mitteilungen erlauben“ einschalten. Danach Flutlicht neu öffnen.</p>'
+        :'<p class="psh-lead">Auf das Schloss- oder Info-Symbol neben der Adresse tippen (in der installierten App: lange auf das App-Symbol drücken → App-Info) → Berechtigungen → Benachrichtigungen → „Zulassen“. Danach Flutlicht neu öffnen.</p>');
+  }else if(!window._pushPubDone){
+    h+='<p class="psh-lead psh-wait">Einen Moment …</p>';
+  }else{
+    h+='<h1 class="fl-title">Hier geht es leider nicht</h1>'
+      +'<p class="psh-lead">Dieser Browser kann keine Erinnerungen empfangen. Öffne deinen Link in Safari (iPhone) oder Chrome (Android).</p>';
+  }
+  h+='</div>';
+  wrap.innerHTML=h;
 }
 // ── Trainer side ──
 function pushBell(p){
@@ -22320,11 +22437,12 @@ function renderHub(){
   wrap.innerHTML=`<div class="hub fl">
     <div class="fl-bar"><span class="fl-brand"><span class="fl-lamps" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span>Flutlicht</span><span class="fl-team">${club}</span></div>
     <div class="fl-who">${av}<div class="fl-who-t"><div class="hub-name">${e(nm)}</div><div class="hub-sub">${meta}</div></div></div>
+    ${_hubPushCard(true)}
     ${_newsHtml('hub')}
     ${_pmPauseHtml(p)}
     ${_fotoAskHtml(p)}
     ${sec('Jetzt dran')}${now.length?list(now):list([`<div class="hub-mvp fl-row fl-calm"><span class="hub-ic fl-tile ok">${FL_IC.check}</span><span class="hub-txt"><b>Alles beantwortet</b><span>Danke – gerade wartet nichts auf dich.</span></span></div>`])}
-    ${_hubPushCard()}
+    ${_hubPushCard(false)}
     ${_mpHubHtml(D,p,tok,sec,list,row)}
     ${wkRows.length?sec(wk.length===1?'Dein n\u00e4chster Termin':(()=>{
       const d0=new Date(),sun=new Date(d0);sun.setDate(d0.getDate()+(7-d0.getDay())%7);
@@ -22470,7 +22588,7 @@ function _hubThanks(kind){
   document.documentElement.appendChild(el);
   el.querySelector('#hubThanksBtn').addEventListener('click',_hubThanksClose);
   {const cb=el.querySelector('#hubThanksCard');if(cb)cb.addEventListener('click',_hubThanksToCard);}
-  {const pb=el.querySelector('#hubThanksPush');if(pb)pb.addEventListener('click',()=>pushEnable('thanks'));}
+  {const pb=el.querySelector('#hubThanksPush');if(pb)pb.addEventListener('click',()=>pushPlayerState()==='ios'?_hubThanksToPush():pushEnable('thanks'));}
   el.style.opacity='1';
   // Safety net: if a transition or a repaint were ever to leave it hidden, it
   // still ends up on screen rather than silently absent.
@@ -22603,6 +22721,12 @@ function _hubThanksClose(){
   try{window.scrollTo(0,0);}catch(e){}
   try{renderPlayerMode();}catch(e){}
 }
+function _hubThanksToPush(){
+  const el=document.getElementById('hubThanks');
+  if(el){el.style.opacity='0';setTimeout(()=>el.remove(),260);}
+  window._rpeOnly=false;window._pshFrom='';
+  pushHowOpen();
+}
 function hubBack(){
   const tok=(CU&&CU.playerToken)||'';
   if(tok)location.href=buildHubLink(tok)+(RPE_IS_PREVIEW?'&preview=1':'');
@@ -22631,6 +22755,7 @@ function renderPlayerMode(){
   if(window._hubAction==='mp')return renderMatchplan();
   if(window._hubAction==='vids')return renderVideos();
   if(window._hubAction==='abw')return renderAbw();
+  if(window._hubAction==='push')return renderPushHow();
   if(window._hubAction==='vote'){
     if(window._mvpSi==null&&window._hubSi!=null)window._mvpSi=window._hubSi;
     return renderMvpVote();
@@ -30433,6 +30558,7 @@ function _a2hsMaybe(){
   if(st.done||(st.next&&Date.now()<st.next))return;
   const mode=_a2hsEvt?'native':(_a2hsIOS()?'ios':'');
   if(!mode)return; // this browser can do neither (e.g. an in-app browser)
+  if(mode==='ios'&&_a2hsKind==='player'&&typeof pushPlayerState==='function'&&pushPlayerState()==='ios')return;
   // Not on top of something the user is busy with — try again a bit later
   if(document.querySelector('.mo.open:not(.hx-page),.tpl-ov.open,#moLineup.open,#moSeasonLineup.open,#rcOverlay.open,#sbOverlay.open,#mobSheet.open')){_a2hsLater_(15000);return;}
   // Not over the rating either: it would cover the bottom of the scale. The
