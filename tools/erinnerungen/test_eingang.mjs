@@ -146,6 +146,25 @@ ok(blk().players[0].s[2] === 1 && r.why.trainer === 1, 'present (roll call) stay
   delete db.root.fcf_in[pk(4)];
 }
 
+// ── the photo (1.2.108): yes keeps it, no deletes it with its stored image ──
+{
+  const raw = () => db.root.fcf_data.db[ek('U19__2026/27')].players.v;
+  raw()[0].photo = { __media: 'mabc123', v: 5 }; raw()[0]._mid_photo = 'mabc123';
+  raw()[1].photo = { __media: 'mdef456', v: 5 }; raw()[1]._mid_photo = 'mdef456';
+  db.root.fcf_media = { photos: { mabc123: 'data:image/jpeg;base64,AAA', mdef456: 'data:image/jpeg;base64,BBB' }, rev: { mabc123: 5, mdef456: 5 } };
+  const t2 = T0 + 50 * 60e3;
+  db.root.fcf_in[pk(0)] = { foto: { a: 'foto', v: 1, t: t2 } };
+  db.root.fcf_in[pk(1)] = { foto: { a: 'foto', v: 0, t: t2 } };
+  r = await inbox({ db, apply, ts: t2 + 60e3 });
+  const P0 = raw()[0], P1 = raw()[1];
+  ok(P0.fotoOk && P0.fotoOk.v === 1 && P0.photo && P0.photo.__media === 'mabc123' && db.peek('fcf_media/photos/mabc123'), 'yes: answer stored, photo stays');
+  ok(P1.fotoOk && P1.fotoOk.v === 0 && !P1.photo && !P1._mid_photo, 'no: photo and its id gone from the player');
+  ok(!db.peek('fcf_media/photos/mdef456') && db.peek('fcf_media/photos/mabc123'), 'no: the stored image deleted, the other one kept');
+  const au = Object.values(db.peek('fcf_data/auditLogP') || {}).filter(a => a.action === 'Foto (Spieler-App)');
+  ok(au.length === 2 && au.some(a => /gelöscht/.test(a.details)), 'journal: both answers');
+  delete db.root.fcf_in[pk(0)]; delete db.root.fcf_in[pk(1)];
+}
+
 // ── votes ──
 db.root.fcf_vote = {
   [pk(1)]: { 'k1025-1300m': { n: 'Tom Berg', t: T0 } },

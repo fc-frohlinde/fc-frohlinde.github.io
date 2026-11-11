@@ -138,6 +138,8 @@ export async function inbox({ db, apply, ts = Date.now(), dry = false, log = () 
       out.merged++;
       const P = B.blk.players[who.pi];
       put(who, r);
+      // his no to the photo (1.2.108): the stored image goes too
+      if (r.media && typeof r.media === 'string' && /^[A-Za-z0-9_-]{1,40}$/.test(r.media)) { w['fcf_media/photos/' + r.media] = null; w['fcf_media/rev/' + r.media] = ts; }
       if (r.audit) audit.push(Object.assign({ ts: e.t || ts, user: P.name || 'Spieler', role: 'player', team: B.team, season: B.season, via: 'job' }, r.audit));
     }
   }
