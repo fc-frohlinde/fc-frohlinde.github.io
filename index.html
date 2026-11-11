@@ -7662,7 +7662,7 @@ const APP_VERSION_LABEL='1.2.110';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1794428286466; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1794429579346; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -20679,7 +20679,7 @@ function pushPlayerState(){
 // "Später" on the offer: ask again in two weeks
 // From this moment a "Später" pressed earlier is forgotten (1.2.85): the
 // stored value is the end of the 14 days, so pressed = end − 14 days
-const PUSH_LATER_RESET=Date.UTC(2026,10,6,14,0);   // Fr 06.11.2026, 15:00 in Berlin
+const PUSH_LATER_RESET=Date.UTC(2026,10,11,20,45); // Mi 11.11.2026, 21:45 in Berlin (1.2.110: die Schritte fürs iPhone sind neu; vorher Fr 06.11. 15:00)
 function _pushSnoozed(){
   const t=+(_pushLs('later')||0),now=Date.now();
   if(!t||now>=t)return false;
