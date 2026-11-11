@@ -174,6 +174,18 @@ ok(stored && typeof stored.st === 'number' && Math.abs(stored.st - Date.now()) <
 await can('отметить перенесённым, время сервера то же', req('PUT', 'fcf_in/' + PK + '/a_k1103-1830t', Object.assign({}, stored, { m: Date.now() })));
 await cannot('своё время вместо серверного (раньше)', req('PUT', 'fcf_in/' + PK + '/a_k1103-1830t', Object.assign({}, ent, { k: 'k1103-1830t', v: 0, st: now - 3 * DAY })));
 await cannot('время сервера не числом', req('PUT', 'fcf_in/' + PK + '/a_k1105-1830t', Object.assign({}, ent, { k: 'k1105-1830t', st: 'früh' })));
+// Abwesenheit (1.2.105)
+const abw = { a: 'abs', f: 20261117, u: 20261129, g: 'u', v: 1, t: now, st: TS };
+await can('игрок сообщает об отсутствии (период, причина)', req('PUT', 'fcf_in/' + PK + '/b_20261117', abw));
+await can('отсутствие без причины', req('PUT', 'fcf_in/' + PK + '/b_20261201', Object.assign({}, abw, { f: 20261201, u: 20261203, g: undefined })));
+await can('вернулся раньше: тот же ключ, новое «до»', req('PUT', 'fcf_in/' + PK + '/b_20261117', Object.assign({}, abw, { u: 20261120, t: now + 1000 })));
+await can('отозвал (v 0)', req('PUT', 'fcf_in/' + PK + '/b_20261117', Object.assign({}, abw, { v: 0, t: now + 2000 })));
+await can('отметить отсутствие перенесённым (m)', req('PUT', 'fcf_in/' + PK + '/b_20261117', Object.assign({ m: now }, abw)));
+await cannot('причина не из списка', req('PUT', 'fcf_in/' + PK + '/b_20261117', Object.assign({}, abw, { g: 'Kreuzband' })));
+await cannot('свободный текст в причине', req('PUT', 'fcf_in/' + PK + '/b_20261117', Object.assign({}, abw, { g: 'krank' })));
+await cannot('дата не числом', req('PUT', 'fcf_in/' + PK + '/b_20261117', Object.assign({}, abw, { f: '17.11.' })));
+await cannot('ключ отсутствия не по образцу', req('PUT', 'fcf_in/' + PK + '/b_1117', abw));
+await cannot('лишнее поле в отсутствии', req('PUT', 'fcf_in/' + PK + '/b_20261117', Object.assign({}, abw, { note: 'Bänderriss' })));
 await can('голос записать', req('PUT', 'fcf_vote/' + PK + '/k1025-1300m', { n: 'Tom Berg', t: now }));
 await cannot('голос второй раз', req('PUT', 'fcf_vote/' + PK + '/k1025-1300m', { n: 'Ali Kaya', t: now }));
 await cannot('голос удалить', req('DELETE', 'fcf_vote/' + PK + '/k1025-1300m'));
