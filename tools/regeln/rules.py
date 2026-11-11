@@ -204,9 +204,9 @@ rules = {
       "$pk": {
         ".read": "$pk.matches(/^[0-9a-f]{64}$/)",
         "$id": {
-          ".write": "$pk.matches(/^[0-9a-f]{64}$/) && $id.matches(/^((a|r|f)_k[0-9]{4}-[0-9]{4}[mt]|seen|push|b_20[0-9]{6})$/)",
+          ".write": "$pk.matches(/^[0-9a-f]{64}$/) && $id.matches(/^((a|r|f)_k[0-9]{4}-[0-9]{4}[mt]|seen|push|foto|b_20[0-9]{6})$/)",
           ".validate": "newData.hasChildren(['a','t']) && newData.child('t').isNumber() && newData.child('t').val() <= now + 600000",
-          "a": {".validate": "newData.isString() && newData.val().matches(/^(rsvp|rpe|nd|phy|seen|push|abs)$/)"},
+          "a": {".validate": "newData.isString() && newData.val().matches(/^(rsvp|rpe|nd|phy|seen|push|abs|foto)$/)"},
           # Abwesenheit (1.2.105): from f to u (YYYYMMDD; f is in the id), the
           # reason g if he gives one — k krank/verletzt, u Urlaub, s Schule/Arbeit,
           # a anderes. Only the trainers see g; it goes 4 weeks after u.

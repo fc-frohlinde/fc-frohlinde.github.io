@@ -186,6 +186,10 @@ await cannot('свободный текст в причине', req('PUT', 'fcf_
 await cannot('дата не числом', req('PUT', 'fcf_in/' + PK + '/b_20261117', Object.assign({}, abw, { f: '17.11.' })));
 await cannot('ключ отсутствия не по образцу', req('PUT', 'fcf_in/' + PK + '/b_1117', abw));
 await cannot('лишнее поле в отсутствии', req('PUT', 'fcf_in/' + PK + '/b_20261117', Object.assign({}, abw, { note: 'Bänderriss' })));
+// Foto (1.2.108): his yes or no to the club's photo in the app
+await can('игрок отвечает на вопрос про фото', req('PUT', 'fcf_in/' + PK + '/foto', { a: 'foto', v: 1, t: now }));
+await can('игрок отзывает согласие на фото', req('PUT', 'fcf_in/' + PK + '/foto', { a: 'foto', v: 0, t: now + 1000 }));
+await cannot('фото: лишнее поле (картинка)', req('PUT', 'fcf_in/' + PK + '/foto', { a: 'foto', v: 1, t: now, photo: 'data:image/png;base64,AAAA' }));
 await can('голос записать', req('PUT', 'fcf_vote/' + PK + '/k1025-1300m', { n: 'Tom Berg', t: now }));
 await cannot('голос второй раз', req('PUT', 'fcf_vote/' + PK + '/k1025-1300m', { n: 'Ali Kaya', t: now }));
 await cannot('голос удалить', req('DELETE', 'fcf_vote/' + PK + '/k1025-1300m'));
