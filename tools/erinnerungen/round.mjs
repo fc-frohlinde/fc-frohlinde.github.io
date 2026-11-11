@@ -21,11 +21,11 @@
 // db: {get(path), set(path,v), remove(path)}; push: web-push or a stand-in.
 import { decode, pathKey, berlin, plan, anyDue, quiet, addDays, newsFresh, planNews, squadPending, planSquad } from './lib.mjs';
 import { trainerOwner, allowed, kindsOf, needsPlayers, birthdays, rollCall, cancellations, lineup,
-  messages, machinery, BDAY_DAY, BDAY_EVE, ATT_FROM } from './trainer.mjs';
+  messages, machinery, absences, BDAY_DAY, BDAY_EVE, ATT_FROM } from './trainer.mjs';
 import { publishCalendars } from './kalender.mjs';
 
 // cal: {token, fetch} for the calendar feed (no token: no feed)
-export async function round({ db, push, ts = Date.now(), log = console.log, dry = false, cal = {} }) {
+export async function round({ db, push, ts = Date.now(), log = console.log, dry = false, cal = {}, abw = [] }) {
   const now = berlin(ts);
   let sent = 0, errors = 0, gone = 0, nDev = 0;
   try {
@@ -155,7 +155,7 @@ export async function round({ db, push, ts = Date.now(), log = console.log, dry 
         if (!dry) await db.set(`fcf_push/sent/${now.day}/${kind}-${key}/${owner}`, ts);
       };
       const send = async (r, kind, it) => {
-        if (was(sentT, kind, it.key, r.owner) || (kind === 'msg' && was(sentY, kind, it.key, r.owner))) return;
+        if (was(sentT, kind, it.key, r.owner) || ((kind === 'msg' || kind === 'abw') && was(sentY, kind, it.key, r.owner))) return;
         const n = await deliver(r.owner, { title: it.title, body: it.body, url: it.url, tag: kind + '-' + it.key }, it.ttl);
         if (n) { sent += n; await note(kind, it.key, r.owner); log('Trainer', kind, it.key, r.name, n + ' Gerät(e)'); }
       };
@@ -167,6 +167,12 @@ export async function round({ db, push, ts = Date.now(), log = console.log, dry 
         const any = {}; for (const r of group) for (const k of Object.keys(r.kinds)) any[k] = any[k] || r.kinds[k];
         const chk = k => k + '-' + pathKey(bk);
         const done = k => was(sentT, 'chk', chk(k), '_');
+        // absences the players reported (1.2.105): from the inbox round, no players to read
+        if (any.abw && abw.length) {
+          const items = absences(abw, b, now);
+          if (items.length && !sentY) sentY = (await db.get(`fcf_push/sent/${addDays(now.day, -1)}`)) || {};
+          for (const it of items) for (const r of group) if (r.kinds.abw) await send(r, 'abw', it);
+        }
         if (!needsPlayers(b, now, any, done)) continue;
         b.players = await load(bk, 'players');
         const to = async (kind, it) => { for (const r of group) if (r.kinds[kind]) await send(r, kind, it); };

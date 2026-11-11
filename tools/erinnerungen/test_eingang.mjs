@@ -117,6 +117,35 @@ ok(blk().players[0].s[2] === 1 && r.why.trainer === 1, 'present (roll call) stay
   ok(r.healed === 0, 'Komme on Angemeldet: landed');
 }
 
+// ── an absence (1.2.105): several sessions at once, whole arrays ──
+{
+  const pl = () => blk().players[4];
+  db.root.fcf_data.db[ek('U19__2026/27')].players.v[4].s = enc([1, 1, 4, 4]);
+  db.root.fcf_data.db[ek('U19__2026/27')].players.v[4].ay = enc([null, null, null, 1]);
+  const t1 = T0 + 30 * 60e3;
+  db.root.fcf_in[pk(4)] = { b_20261026: { a: 'abs', f: 20261026, u: 20261031, g: 'u', v: 1, t: t1, st: t1 + 500 } };
+  r = await inbox({ db, apply, ts: t1 + 60e3 });
+  let P = pl();
+  ok(P.s[3] === 2 && P.excOK[3] === 'a' && P.ay[3] === 0, 'absence: Di 27.10 cancelled, in time by the rule: excused by the app');
+  ok(P.s[2] === 4, 'absence: the match of 25.10 (before it) untouched');
+  ok(P.abw && P.abw.b20261026 && P.abw.b20261026.u === 20261031 && P.abw.b20261026.g === 'u' && P.abw.b20261026.st === t1 + 500, 'absence stored with its reason and server time');
+  const raw = db.peek(`fcf_data/db/${ek('U19__2026/27')}/players/v/4/s`);
+  ok(raw && raw.__arr === 1 && raw.v[3] === 2, 'whole status array written (no single index)');
+  ok(r.abw.length === 1 && r.abw[0].name === 'Luca Rossi' && r.abw[0].f === 20261026 && r.abw[0].v === 1, 'reported for the trainers notice');
+  const au = Object.values(db.peek('fcf_data/auditLogP') || {}).find(a => a.action === 'Abwesenheit (Spieler-App)');
+  ok(au && /26\.10\.–31\.10\./.test(au.details) && !/Urlaub/.test(JSON.stringify(au)), 'journal without the reason: ' + (au && au.details));
+  // merged and still there: the next round sees it again (notice once per key in round)
+  r = await inbox({ db, apply, ts: t1 + 2 * 60e3 });
+  ok(r.abw.length === 1 && r.merged === 0, 'merged absence still seen for the notice, not merged again');
+  // withdrawn: Komme again
+  db.root.fcf_in[pk(4)] = { b_20261026: { a: 'abs', f: 20261026, u: 20261031, g: 'u', v: 0, t: t1 + 5 * 60e3, st: t1 + 5 * 60e3 } };
+  r = await inbox({ db, apply, ts: t1 + 6 * 60e3 });
+  P = pl();
+  ok(P.s[3] === 4 && P.abw.b20261026.x, 'withdrawn: Komme again, marked withdrawn');
+  ok(r.abw.length === 1 && r.abw[0].v === 0, 'withdrawal reported too');
+  delete db.root.fcf_in[pk(4)];
+}
+
 // ── votes ──
 db.root.fcf_vote = {
   [pk(1)]: { 'k1025-1300m': { n: 'Tom Berg', t: T0 } },

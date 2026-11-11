@@ -65,7 +65,7 @@ export function lostAnswer(blk, pi, e) {
 }
 
 export async function inbox({ db, apply, ts = Date.now(), dry = false, log = () => {} }) {
-  const out = { merged: 0, refused: 0, unknown: 0, cleaned: 0, votes: 0, voteRefused: 0, winners: 0, healed: 0, why: {} };
+  const out = { merged: 0, refused: 0, unknown: 0, cleaned: 0, votes: 0, voteRefused: 0, winners: 0, healed: 0, why: {}, abw: [] };
   const [box, votes, raw] = await Promise.all([db.get('fcf_in'), db.get('fcf_vote'), db.get('fcf_data/db')]);
   const blocks = {}, map = {};
   for (const [ek, r] of Object.entries(raw || {})) {
@@ -104,6 +104,12 @@ export async function inbox({ db, apply, ts = Date.now(), dry = false, log = () 
     for (const [id, e] of Object.entries(entries || {})) {
       const path = `fcf_in/${pk}/${id}`;
       if (!e || typeof e !== 'object') { w[path] = null; out.cleaned++; continue; }
+      // An absence (1.2.105), merged here or by a trainer's app: for the
+      // trainers' notice — the entry stays at least one round after merging
+      if (e.a === 'abs' && who) {
+        const B0 = blocks[who.ek], P0 = B0 && B0.blk.players[who.pi];
+        if (P0) out.abw.push({ team: B0.team, season: B0.season, name: P0.name || '', f: +e.f, u: +e.u, v: e.v === 0 ? 0 : 1, t: +e.t || 0 });
+      }
       if (e.m) {
         if (sliceT === null) sliceT = (await db.get(`fcf_pv/${pk}/t`)) || 0;
         if (sliceT > e.m + KEEP_MERGED || ts - e.m > 30 * 864e5) {

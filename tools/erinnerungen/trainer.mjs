@@ -9,7 +9,7 @@
 // comes with the first round after 8:00 if it still matters.
 import { SITE, sortKey, metaKey, addDays, ttlToMidnight, sha, inTeam } from './lib.mjs';
 
-export const TKINDS = { bday: true, msg: true, att: true, late: false, lineup: false, tech: true };
+export const TKINDS = { bday: true, msg: true, att: true, abw: true, late: false, lineup: false, tech: true };
 export const BDAY_DAY = 8 * 60;      // the day itself, from 8:00
 export const BDAY_EVE = 18 * 60;     // the evening before, from 18:00
 export const ATT_FROM = 9 * 60;      // the morning after a session without a full roll call
@@ -124,6 +124,20 @@ export function cancellations(b, now, snap) {
       url: go('sess&gi=' + si, b), ttl: Math.max(600, u * 60) });
   });
   return { items, snap: next };
+}
+// Absences players reported in the last 24 h (1.2.105, from the inbox round):
+// one notice each, the reason not in it (it is on the lock screen)
+export function absences(list, b, now) {
+  const dm = k => (k % 100) + '.' + (Math.floor(k / 100) % 100) + '.';
+  return (list || []).filter(a => a && a.team === b.team && a.season === b.season && a.name && a.f && a.u && a.t && now.ts - a.t < 24 * 3600e3 && a.t <= now.ts + 60e3)
+    .map(a => {
+      const n = (b.sessions || []).filter(s => { if (!real(s)) return false; const k = sortKey(s.date, b.season); return k >= a.f && k <= a.u; }).length;
+      const span = a.f === a.u ? dm(a.f) : dm(a.f) + '–' + dm(a.u);
+      return { key: 'abw-' + sha(a.name).slice(0, 8) + '-' + a.f + '-' + a.t, title: 'Abwesenheit: ' + a.name,
+        body: a.v === 0 ? 'Abwesenheit ' + span + ' zurückgezogen.'
+          : 'Nicht da ' + span + (n ? ' · ' + n + (n === 1 ? ' Termin' : ' Termine') : '') + '. Bestätigen unter „Im Blick behalten“.',
+        url: SITE, ttl: 24 * 3600 };
+    });
 }
 // LINEUP_MIN before the start (or the first round after 8:00): who is coming
 export function lineup(b, now) {

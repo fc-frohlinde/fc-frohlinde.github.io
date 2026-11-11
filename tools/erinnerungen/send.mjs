@@ -37,15 +37,17 @@ const db = {
 };
 try {
   // Входящие игроков (1.2.36): сначала перенести ответы, чтобы напоминания видели их
+  let abwSeen = [];
   try {
     const apply = loadApply(new URL('../../index.html', import.meta.url).pathname);
     const r = await inbox({ db, apply, dry: process.argv.includes('--dry') });
+    abwSeen = r.abw || [];
     const why = Object.entries(r.why).map(([k, n]) => `${k} ${n}`).join(', ');
     if (r.writes || r.healed || process.env.GITHUB_EVENT_NAME === 'workflow_dispatch')
-      console.log(`::notice title=Входящие::перенесено: ${r.merged}, отклонено: ${r.refused}${why ? ' (' + why + ')' : ''}, голосов: ${r.votes} (отклонено ${r.voteRefused}), победителей опубликовано: ${r.winners}, убрано: ${r.cleaned}, неизвестных: ${r.unknown}` + (r.healed ? `, восстановлено: ${r.healed}` : ''));
+      console.log(`::notice title=Входящие::перенесено: ${r.merged}, отклонено: ${r.refused}${why ? ' (' + why + ')' : ''}, голосов: ${r.votes} (отклонено ${r.voteRefused}), победителей опубликовано: ${r.winners}, убрано: ${r.cleaned}, неизвестных: ${r.unknown}` + (r.healed ? `, восстановлено: ${r.healed}` : '') + (r.abw && r.abw.length ? `, отсутствий: ${r.abw.length}` : ''));
   } catch (e) { console.log('::warning title=Входящие::' + String((e && e.message) || e).slice(0, 200)); }
   // KALENDER_TOKEN: GitHub token with only the "gist" scope, for the calendar feed
-  const r = await round({ db, push: webpush, dry: process.argv.includes('--dry'), cal: { token: process.env.KALENDER_TOKEN || '', fetch: globalThis.fetch } });
+  const r = await round({ db, push: webpush, dry: process.argv.includes('--dry'), cal: { token: process.env.KALENDER_TOKEN || '', fetch: globalThis.fetch }, abw: abwSeen });
   // Состояние календаря — одной аннотацией, без адреса (лог публичный)
   const c = r && r.cal;
   if (c) {

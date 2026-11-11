@@ -1,6 +1,6 @@
 // Benachrichtigungen für Trainer: rounds against an in-memory database. node test_trainer.mjs
 import { round } from './round.mjs';
-import { trainerOwner, kindsOf, TKINDS } from './trainer.mjs';
+import { trainerOwner, kindsOf, TKINDS, absences } from './trainer.mjs';
 import { ownerOf } from './lib.mjs';
 
 let fails = 0;
@@ -203,6 +203,21 @@ ok(JSON.stringify(kindsOf(null)) === JSON.stringify(TKINDS) && kindsOf({ bday: f
   ok(t.length === 2 && t[0].p.title === 'Antworten nachgetragen' && t[0].p.body === '3 Antworten von Spielern waren nicht gespeichert und sind jetzt ergänzt.', 'filled-in answers reported: ' + JSON.stringify(t.map(x => x.p.body)));
   const c2 = await run(db, at(21, 13, 37));
   ok(!T(c2).filter(x => x.p.tag === 'tech-heal').length, 'heal: once a day');
+}
+{
+  // absences the players reported (1.2.105): one notice each, both trainers of the team, once
+  const { db } = world(W => { W.status = { t: at(21, 13, 7), day: 20261021 }; });
+  const rep = [{ team: 'U19', season: '2026/27', name: 'Ali Kaya', f: 20261026, u: 20261101, v: 1, t: at(21, 13, 15) },
+    { team: 'U17', season: '2026/27', name: 'Udo Junior', f: 20261026, u: 20261101, v: 1, t: at(21, 13, 15) },
+    { team: 'U19', season: '2026/27', name: 'Tom Berg', f: 20261022, u: 20261022, v: 1, t: at(19, 13, 15) }];   // older than a day
+  const push = makePush(); await round({ db, push, ts: at(21, 13, 22), log: q, abw: rep });
+  const a = T(push.calls).filter(x => /^abw-/.test(x.p.tag));
+  ok(a.length === 2 && a.every(x => x.p.title === 'Abwesenheit: Ali Kaya') && /^Nicht da 26\.10\.–1\.11\. · 3 Termine\./.test(a[0].p.body) && !/Urlaub|krank/i.test(a[0].p.body),
+    'absence: notice to both trainers, sessions counted, no reason: ' + JSON.stringify(a.map(x => x.p.body)));
+  const push2 = makePush(); await round({ db, push: push2, ts: at(21, 13, 37), log: q, abw: rep });
+  ok(!T(push2.calls).some(x => /^abw-/.test(x.p.tag)), 'absence: once');
+  const w = absences([{ team: 'U19', season: '2026/27', name: 'Ali Kaya', f: 20261026, u: 20261101, v: 0, t: at(21, 14, 0) }], { team: 'U19', season: '2026/27', sessions: [] }, { ts: at(21, 14, 5) });
+  ok(w.length === 1 && w[0].body === 'Abwesenheit 26.10.–1.11. zurückgezogen.', 'absence withdrawn: its own notice');
 }
 // ── who gets nothing ──
 {
