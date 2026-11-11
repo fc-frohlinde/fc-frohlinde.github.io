@@ -7619,12 +7619,12 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.105'; // v1.2.105: Abwesenheit melden
-const APP_VERSION_LABEL='1.2.105';
+const APP_VERSION='1.2.106'; // v1.2.106: Grund einer Abwesenheit selbst entfernen; „Spielerpass-Nummer“
+const APP_VERSION_LABEL='1.2.106';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
-const APP_RELEASE_TS=1794402125882; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
+const APP_RELEASE_TS=1794403558484; // v1.0.9.7: Firebase traffic — diff writes; stale clients still full-set() the root, so they must refresh
 // ── Neu in Flutlicht (1.2.63) ──────────────────────────────────
 // News for the trainers, newest first. Rules (Artem 27./28.10.):
 // - only what changes their routine or a new tool they will use — not small
@@ -8134,7 +8134,7 @@ function _privHtml(){
     <p>${resp}${c.addr?'<br>'+e(c.addr).replace(/\n/g,'<br>'):''}${contact?'<br>Fragen zum Datenschutz: '+contact:'<br>Fragen zum Datenschutz beantworten dir deine Trainer.'}${c.dsb?'<br>Datenschutzbeauftragte(r): '+e(c.dsb):''}</p>
     <h3>Welche Daten</h3>
     <p>Über Spieler:</p>
-    ${li(['Name, Rückennummer, Position und – wenn eingetragen – Geburtsdatum, Telefonnummer, E-Mail, Passnummer und Foto',
+    ${li(['Name, Rückennummer, Position und – wenn eingetragen – Geburtsdatum, Telefonnummer, E-Mail, die Nummer des Spielerpasses beim Verband und Foto',
       'Zu- und Absagen und die Anwesenheit bei Training und Spiel',
       'die eigene Einschätzung der Belastung nach Training und Spiel; die Anmeldung zur Physiotherapie (nur ja oder nein, ohne Grund)',
       'Spielberichte: Startelf, Wechsel, Minuten, Tore, Vorlagen und Karten; die Stimme bei „Spieler des Spiels“ – geheim, niemand sieht, wen du gewählt hast',
@@ -26293,7 +26293,9 @@ function renderAbw(){
       +`<div class="abw-dates"><label class="abw-fld"><span>Wieder dabei ab</span><input type="date" id="abw-b" min="${_abwIso(Math.max(t,r.f))}" max="${_abwIso(r.u)}" value="${_abwIso(st.b)}" onchange="abwUpd()"></label></div>`
       +'<div id="abw-prev" class="abw-prev" aria-live="polite"></div>'
       +'<button type="button" id="abw-go" class="abw-send" onclick="abwSend()">Wieder dabei</button>'
-      +(started?'':'<button type="button" class="abw-undo" onclick="abwWithdraw()">Abwesenheit zurückziehen</button>');
+      +(started?'':'<button type="button" class="abw-undo" onclick="abwWithdraw()">Abwesenheit zurückziehen</button>')
+      // the reason is his consent (Art. 7 Abs. 3 DSGVO): taken back as easily as given
+      +(r.g?`<button type="button" class="abw-undo" onclick="abwDropG()">Grund „${e(ABW_G[r.g]||'')}“ entfernen</button>`:'');
   }
   h+='</div>';
   wrap.innerHTML=h;
@@ -26361,6 +26363,12 @@ function abwSend(){
   const r=_abwRecs(p)[st.key];if(!r)return abwClose();
   if(st.b<=r.f)return _abwGo({a:'abs',f:r.f,u:r.u,g:r.g||'',v:0},'✓ Zurückgezogen');
   _abwGo({a:'abs',f:r.f,u:_abwAdd(st.b,-1),g:r.g||'',v:1},'✓ Schön, dass du wieder da bist');
+}
+function abwDropG(){
+  const st=_abwSt;if(!st||st.mode!=='back')return;
+  const p=cd().players[CU.playerIdx],r=_abwRecs(p)[st.key];if(!r)return abwClose();
+  if(!r.g)return;
+  _abwGo({a:'abs',f:r.f,u:r.u,g:'',v:r.x?0:1},'\u2713 Grund entfernt');
 }
 function abwWithdraw(){
   const st=_abwSt;if(!st||st.mode!=='back')return;
