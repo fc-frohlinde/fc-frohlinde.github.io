@@ -4489,10 +4489,16 @@ body.design-heute{--hx-pw:460px;}
   /* Detail statistics on top of the profile: give it a backdrop over the rest */
   body.design-heute :is(#moPlayerStatsExt,#moSessAtt,#moRpeAll).hx-panel > .mob{box-shadow:-40px 0 80px -20px rgba(14,35,80,.5),-1px 0 0 var(--hx-line);}
 }
-@media(min-width:1100px){
-  /* The start screen ends where the panel begins: its grid rearranges itself
-     for the width it gets (container queries) */
+@media(min-width:1830px){
+  /* The start screen makes room for the panel only where it keeps its layout
+     (about 1100px left) — the same rule as the pages below. From 1100px on (until
+     1.2.111) a laptop (1536px: 844px left, 1366px: 674px) got a squeezed start
+     screen: texts wrapped, it no longer fit without scrolling, Diese Woche and
+     Im Blick slid below the fold at 1366, and the photo re-cropped on every
+     open and close. Now the panel lies on top there and nothing moves. */
   body.design-heute.hx-panel-open .home-overlay{right:var(--hx-pw);}
+  /* The photo keeps its full-width size and is only cut on the right */
+  body.design-heute.hx-panel-open #hxHome.hx-has-hero .hx-heroimg{background-size:calc(100% + var(--hx-pw)) auto;background-position:0 32%;}
 }
 @media(min-width:1830px){
   /* Pages make room for the panel only where they keep their layout (about
@@ -7657,8 +7663,8 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.110'; // v1.2.110: Erinnerungen einrichten Schritt für Schritt
-const APP_VERSION_LABEL='1.2.110';
+const APP_VERSION='1.2.111'; // v1.2.111: Übersicht bleibt stehen, wenn rechts ein Panel aufgeht
+const APP_VERSION_LABEL='1.2.111';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
