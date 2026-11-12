@@ -4359,6 +4359,34 @@ body.design-heute.hxk-dk .calx-e:hover{filter:brightness(1.15);}
 .psh-done-ic{width:64px;height:64px;margin:0 auto 14px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--fl-ok,#3DDC84);color:#08210f;}
 .psh-done-ic svg{width:30px;height:30px;}
 .psh-wait{margin-top:28px;}
+/* Blättern in den Panels (1.2.112): ‹ Liste n/m › oben im Panel */
+.pnav:empty{display:none;}
+.pnav{display:inline-flex;align-items:center;gap:2px;height:34px;padding:0 2px;border-radius:999px;background:var(--hx-field,#F2F5FA);border:1px solid var(--hx-line,#DCE3EE);flex-shrink:1;min-width:0;}
+.pnav-a{width:30px;height:30px;border:none;border-radius:50%;background:none;color:var(--hx-ink,#0E2350);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex-shrink:0;}
+.pnav-a:hover:not(:disabled){background:var(--hx-card2,#E7ECF4);}
+.pnav-a:disabled{opacity:.3;cursor:default;}
+.pnav-c{display:inline-flex;align-items:center;gap:5px;height:30px;padding:0 8px;border:none;border-radius:999px;background:none;color:var(--hx-ink,#0E2350);font:600 .8rem 'Barlow',sans-serif;cursor:pointer;min-width:0;white-space:nowrap;}
+.pnav-c:hover{background:var(--hx-card2,#E7ECF4);}
+.pnav-c b{font-weight:800;font-variant-numeric:tabular-nums;}
+.pnav-l{max-width:110px;overflow:hidden;text-overflow:ellipsis;color:var(--hx-muted,#5B6B86);font-weight:600;}
+.pnav-a:focus-visible,.pnav-c:focus-visible,.pnav-it:focus-visible,.pnav-q:focus-visible{outline:2px solid var(--hx-blue,#1659B8);outline-offset:1px;}
+@media(max-width:520px){.pnav-l{display:none;}.pnav-c{padding:0 6px;}}
+.pnav-menu{position:fixed;z-index:99990;display:flex;flex-direction:column;background:var(--hx-pop,#fff);color:var(--hx-pop-ink,#0E2350);border:1px solid var(--hx-pop-line,#DCE3EE);border-radius:14px;box-shadow:var(--hx-pop-shadow,0 18px 40px -12px rgba(14,35,80,.35));overflow:hidden;font-family:'Barlow',sans-serif;}
+.pnav-mh{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:11px 14px 8px;font-size:.86rem;}
+.pnav-mh span{color:var(--hx-pop-muted,#5B6B86);font-size:.78rem;}
+.pnav-q{margin:0 10px 8px;height:34px;border-radius:9px;border:1px solid var(--hx-pop-line,#DCE3EE);background:var(--hx-pop-field,#F5F7FB);color:inherit;padding:0 10px;font:500 .86rem 'Barlow',sans-serif;}
+.pnav-ls{overflow-y:auto;padding:0 6px 8px;flex:1;min-height:0;}
+.pnav-kw{padding:8px 8px 3px;font-size:.72rem;font-weight:700;color:var(--hx-pop-muted,#5B6B86);}
+.pnav-it{display:flex;align-items:baseline;justify-content:space-between;gap:10px;width:100%;padding:8px 10px;border:none;border-radius:9px;background:none;color:inherit;text-align:left;cursor:pointer;font:600 .88rem 'Barlow',sans-serif;}
+.pnav-it:hover{background:var(--hx-pop-hover,#EEF2F8);}
+.pnav-it.on{background:var(--hx-pop-chip,#E3ECFA);}
+.pnav-it-t{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.pnav-it-s{flex-shrink:0;font-size:.76rem;font-weight:500;color:var(--hx-pop-muted,#5B6B86);}
+.pnav-none{padding:10px;font-size:.84rem;color:var(--hx-pop-muted,#5B6B86);}
+/* with the arrows the head gets tight: „Zurück“ only as ←, the title on one line */
+.ps-head-btns:has(.pnav:not(:empty)) .ps-b-lbl,#ss-head-btns:has(.pnav:not(:empty)) .ss-btn-lbl{display:none;}
+.ps-head-btns:has(.pnav:not(:empty)) .ps-b-ico,#ss-head-btns:has(.pnav:not(:empty)) .ss-btn-ico{display:inline;}
+.ps-title-row:has(.pnav:not(:empty)) .ps-title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 /* trainers: the dialog and the profile line */
 .abw-c-sum{margin:0 0 4px;font-size:1rem;color:var(--hx-ink,var(--bd));}
 .abw-c-sub{margin:0 0 10px;font-size:.84rem;line-height:1.45;color:var(--hx-muted,var(--gm));}
@@ -7120,7 +7148,8 @@ if(window._fbBlocked){
   <div class="ps-title-row">
     <h3 class="ps-title">👤 Spielerprofil</h3>
     <div class="ps-head-btns">
-      <button class="btn" id="ps-back-btn" style="font-size:.76rem;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" onclick="playerGoBack()"><span class="ps-b-lbl">← Zurück</span><span class="ps-b-ico">←</span></button>
+      <span class="pnav" id="pnav-p"></span>
+      <button class="btn" aria-label="Zurück" id="ps-back-btn" style="font-size:.76rem;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" onclick="playerGoBack()"><span class="ps-b-lbl">← Zurück</span><span class="ps-b-ico">←</span></button>
       <button class="btn bs ps-close-btn" onclick="psCloseGuard()">✕</button>
     </div>
   </div>
@@ -7265,7 +7294,8 @@ if(window._fbBlocked){
     <div class="ps-title-row">
       <h3 class="ps-title" id="ss-kind">Termin</h3>
       <div class="ps-head-btns" id="ss-head-btns">
-        <button class="btn" id="ss-back-btn" style="font-size:.76rem;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" onclick="sessGoBack()"><span class="ss-btn-lbl">← Zurück</span><span class="ss-btn-ico">←</span></button>
+        <span class="pnav" id="pnav-s"></span>
+        <button class="btn" aria-label="Zurück" id="ss-back-btn" style="font-size:.76rem;background:var(--ow);color:var(--bd);border:1.5px solid var(--gl);" onclick="sessGoBack()"><span class="ss-btn-lbl">← Zurück</span><span class="ss-btn-ico">←</span></button>
         <button class="btn bs" id="ss-close-btn" onclick="closeM('moSession2')">✕</button>
       </div>
     </div>
@@ -7663,8 +7693,8 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.111'; // v1.2.111: Übersicht bleibt stehen, wenn rechts ein Panel aufgeht
-const APP_VERSION_LABEL='1.2.111';
+const APP_VERSION='1.2.112'; // v1.2.112: in Profil, Termin und Trainer blättern
+const APP_VERSION_LABEL='1.2.112';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
@@ -7688,6 +7718,7 @@ const FL_MARK='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F
 function _clubSlug(){return (_clubName()||'Flutlicht').replace(/[^A-Za-z0-9ÄÖÜäöüß]+/g,'-').replace(/^-|-$/g,'')||'Flutlicht';}
 function _clubInfo(){const c=(G&&G.club&&typeof G.club==='object')?G.club:{};return {name:_clubName(),resp:String(c.resp||''),addr:String(c.addr||''),mail:String(c.mail||''),dsb:String(c.dsb||'')};}
 const APP_NEWS=[
+  {id:'20261112-1',d:'12.11.',t:'Im Profil und im Termin blättern',x:'Oben im Spielerprofil, im Termin und im Trainerprofil stehen jetzt ‹ ›: Sie gehen durch die Liste, aus der du es geöffnet hast – etwa alle „Offen“ eines Termins, Im Blick oder die Tabelle; über die Mitte springst du direkt zu jemand anderem. Am Computer gehen auch die Pfeiltasten ← →.'},
   {id:'20261111-1',d:'11.11.',t:'Spieler: Abwesenheit melden und Foto erlauben',x:'Spieler können sich in der App für mehrere Termine auf einmal abmelden – du bestätigst es unter „Im Blick behalten“ mit einem Tipp: entschuldigt oder, bei längerer Zeit, als Pause. Außerdem fragt die App sie, ob ihr Spielerfoto hier zu sehen sein darf; bis dahin sehen es nur die Trainer, die Antwort steht im Profil.'},
   {id:'20261110-1',d:'10.11.',t:'Wochenthemen',x:'Jede Woche hat ein Thema, an dem die Trainings arbeiten, etwa Breite oder Tiefe – angelegt unter Einstellungen → Mannschaft, gewählt in der Übersicht, danach wechseln sie von selbst. Das Spiel der Woche bekommt es als Bewertungsthema.',go:['Zu den Wochenthemen',"openSettings('team')"]},
   {id:'20261107-3',d:'07.11.',t:'Kader, Matchplan und Videos für die Spieler',x:'Nach dem Veröffentlichen sehen die Spieler in ihrer App, wer im Kader ist (ohne Aufstellung), und den Matchplan, den du im Spiel-Fenster anlegst: Video-Links, ein Bild oder ein paar Sätze. Unter Kader → Videos sammelst du Videos nach Positionen.',go:['Zum nächsten Spiel','oppGoNext()']},
@@ -25864,6 +25895,7 @@ function openPlayerStats(pi,opts){
   window._psCurrentPi=pi;
   const D=cd(),p=D.players[pi],ss=D.sessions,foc=teamFoc();
   if(!p)return;
+  _pnavOpen('p',pi);
   // Spieleransicht: every trainer of the team (1.2.49; admin only before). It
   // is a preview — nothing is saved there — and shows the player only what
   // the trainers already see. "Nur ansehen" does not get it: a player without
@@ -27535,6 +27567,7 @@ function openSessStats(si){
   else currentSI=si;
   const D=cd(),s=D.sessions[si],foc=teamFoc();
   if(!s)return;
+  _pnavOpen('s',si);
   // Update presence: show others what we're viewing
   if(typeof setPresenceContext==='function'){
     setPresenceContext((s.type==='match'?'⚽ ':'🏃 ')+s.date);
@@ -27895,7 +27928,7 @@ function _ssHxAttRender(si){
         return `<div class="ssx-line${nl?' ssx-nl':''}"><span class="ssx-ll">${badge}<b>${rows[k].length}</b></span><div class="ssx-chips">${rows[k].map(x=>chip(x,true)).join('')}</div></div>`;
       }).join('');
     }else body=`<div class="ssx-chips">${list.map(x=>chip(x)).join('')}</div>`;
-    h+=`<div class="ssx-grp" data-st="${v}"><div class="ssx-gh"><i class="s-${cls}"></i>${label} <b>${list.length}</b>${remind}</div>${body}</div>`;
+    h+=`<div class="ssx-grp" data-st="${v}" data-pnl="${e(String(label))}"><div class="ssx-gh"><i class="s-${cls}"></i>${label} <b>${list.length}</b>${remind}</div>${body}</div>`;
   });
   // In Pause on this day (1.2.52): back with one tap
   {const pz=ed?_pzAt(D,s,season):[];
@@ -29695,6 +29728,199 @@ function _hxOpenPage(){
 function _hxClosePages(keepId){
   document.querySelectorAll('.mo.hx-page.open').forEach(el=>{if(el.id!==keepId)closeM(el.id);});
 }
+// ── In Profil, Termin und Trainer blättern (1.2.112) ─────────
+// Oben im Panel ‹ › und eine Liste. Die Pfeile gehen durch die Liste, aus der
+// das Panel geöffnet wurde: „Offen“ im Termin, Im Blick, die Tabelle in ihrer
+// Sortierung, Kader, Statistik … — die Liste wird beim Klick aus der Seite
+// gelesen (die onclick-Aufrufe der Einträge), so macht jede Liste ohne eigenen
+// Code mit. Ohne Liste: Spieler nach Nummer, Termine nach Datum, Trainer in
+// ihrer Reihenfolge. Anlass (Artem 12.11.): auf dem Laptop liegt das Panel
+// über der Übersicht (1.2.111), auf dem Telefon über allem — für den Nächsten
+// musste man es schließen.
+const PNAV={list:null,label:'',k:'',i:-1,hold:false};
+let _pnavPend=null;
+const PNAV_RX=[
+  [/openPlayerStats\(\s*(\d+)/,'p'],[/openPlayerFromMain\(\s*(\d+)/,'p'],[/openPlayerFromSession\(\s*\d+\s*,\s*(\d+)/,'p'],
+  [/zlGoPlayer\(\s*(\d+)/,'p'],[/zlFromMain\(\s*(\d+)/,'p'],[/jumpToPlayer\(\s*(\d+)/,'p'],[/kbTap\(\s*event\s*,\s*(\d+)/,'p'],
+  [/_ssxMenu\(\s*event\s*,\s*\d+\s*,\s*(\d+)/,'p'],
+  [/openSessStats\(\s*(\d+)/,'s'],[/openSessFromMain\(\s*(\d+)/,'s'],
+  [/openTrainerProfile\(\s*(\d+)/,'t']];
+const PNAV_DEF={p:'Kader',s:'Termine',t:'Trainer'};
+const PNAV_PLACE={moSession2:'Termin',moTeamMgr:'Kader',moDashboard:'Statistik',moWeekReport:'Wochenbericht',moCalendar:'Kalender',moFlags:'Im Blick',moSettings:'Einstellungen'};
+function _pnavOf(code){
+  if(!code)return null;
+  for(const [rx,k] of PNAV_RX){const m=String(code).match(rx);if(m)return {k,i:+m[1]};}
+  return null;
+}
+function _pnavUniq(L){const seen=new Set();return L.filter(x=>{const id=x.k+x.i;if(seen.has(id))return false;seen.add(id);return true;});}
+function _pnavHas(L,k,i){return !!(L&&L.some(x=>x.k===k&&x.i===i));}
+function _pnavLabel(box){
+  const l=box.closest('[data-pnl]');if(l)return l.getAttribute('data-pnl');
+  const card=box.closest('.hx-card,section');const h=card&&card.querySelector('h2,h3,h4');
+  if(h){const t=h.textContent.replace(/\s+/g,' ').trim();if(t&&t.length<=32)return t;}
+  const mo=box.closest('.mo');if(mo&&PNAV_PLACE[mo.id])return PNAV_PLACE[mo.id];
+  if(box.closest('#hxHome'))return 'Übersicht';
+  if(box.closest('table'))return 'Anwesenheit';
+  return 'Liste';
+}
+// Before the click's own handler: which list was this entry in?
+document.addEventListener('click',ev=>{
+  try{
+    const t=ev.target;if(!t||!t.closest)return;
+    if(t.closest('.pnav,#pnavMenu'))return;
+    const it=t.closest('[onclick]');if(!it)return;
+    const me=_pnavOf(it.getAttribute('onclick'));if(!me)return;
+    let list=null,box=null;
+    const fl=it.closest('[data-pnsrc="flags"]');
+    if(fl){
+      // Im Blick: all entries, also those behind „Alle anzeigen“; player and
+      // Termin mixed, other actions (dialogs, settings) are left out
+      list=_pnavUniq((window._hxFlagsList||[]).map(f=>_pnavOf(f.on)).filter(Boolean));box=fl;
+    }else{
+      // the nearest container with at least two entries of the same kind,
+      // not beyond a card, a table or the panel itself
+      for(box=it.parentElement;box&&box!==document.body;box=box.parentElement){
+        const els=[...box.querySelectorAll('[onclick]')].filter(e=>e.getClientRects().length);
+        list=_pnavUniq(els.map(e=>_pnavOf(e.getAttribute('onclick'))).filter(x=>x&&x.k===me.k));
+        if(list.length>=2)break;
+        if(box.matches('.hx-card,section,table,.mob,.mo,.ssx-menu'))break;
+      }
+    }
+    if(!list||list.length<2||!_pnavHas(list,me.k,me.i))return;
+    _pnavPend={list,label:_pnavLabel(box),t:Date.now()};
+  }catch(e){}
+},true);
+function _pnavOpen(k,i){
+  const P=_pnavPend;_pnavPend=null;
+  if(P&&Date.now()-P.t<60000&&_pnavHas(P.list,k,i)){PNAV.list=P.list;PNAV.label=P.label;}
+  else if(!_pnavHas(PNAV.list,k,i)){PNAV.list=null;PNAV.label='';}
+  PNAV.k=k;PNAV.i=i;
+  _pnavRender();
+}
+function _pnavDef(k){
+  const D=cd();if(!D)return [];
+  if(k==='p'){
+    const gone=p=>typeof _pGone==='function'&&_pGone(p);
+    return (D.players||[]).map((p,i)=>({p,i})).filter(x=>x.p&&(!gone(x.p)||(PNAV.k==='p'&&PNAV.i===x.i)))
+      .sort((a,b)=>((+a.p.nr||999)-(+b.p.nr||999))||String(a.p.name||'').localeCompare(String(b.p.name||''),'de')).map(x=>({k:'p',i:x.i}));
+  }
+  if(k==='s'){
+    const season=UI.currentSeason,key=s=>(typeof _dbSortKey==='function')?_dbSortKey(s.date,season):0;
+    return (D.sessions||[]).map((s,i)=>({s,i})).filter(x=>x.s&&x.s.date)
+      .sort((a,b)=>(key(a.s)-key(b.s))||String(a.s.time||'').localeCompare(String(b.s.time||''))).map(x=>({k:'s',i:x.i}));
+  }
+  if(k==='t')return (G.trainers||[]).map((t,i)=>({t,i})).filter(x=>x.t&&x.t.name).map(x=>({k:'t',i:x.i}));
+  return [];
+}
+function _pnavList(){return PNAV.list||_pnavDef(PNAV.k);}
+function _pnavLbl(){return PNAV.list?PNAV.label:PNAV_DEF[PNAV.k]||'';}
+function _pnavName(x){
+  const D=cd();
+  if(x.k==='p'){const p=D&&D.players&&D.players[x.i];return p?{t:((typeof getDisplayName==='function'?getDisplayName(p):p.name)||p.name||'?'),s:'#'+(p.nr||'–')}:{t:'?',s:''};}
+  if(x.k==='s'){const s=D&&D.sessions&&D.sessions[x.i];if(!s)return {t:'?',s:''};
+    const m=s.type==='match';return {t:m?(s.label||'Spiel'):(s.focus||'Training'),s:s.date+(s.time?' · '+s.time:'')+(m?' · Spiel':'')};}
+  const t=G.trainers&&G.trainers[x.i];return {t:t?t.name:'?',s:''};
+}
+const PNAV_IC={l:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>',
+  r:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>',
+  d:'<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>'};
+function _pnavRender(){
+  ['p','s','t'].forEach(k=>{
+    const el=document.getElementById('pnav-'+k);if(!el)return;
+    if(k!==PNAV.k||!_hxOn()){el.innerHTML='';return;}
+    const L=_pnavList(),n=L.length,pos=L.findIndex(x=>x.k===PNAV.k&&x.i===PNAV.i);
+    if(n<2||pos<0){el.innerHTML='';return;}
+    const esc=escapeHtml,lb=_pnavLbl(),pv=L[pos-1],nx=L[pos+1];
+    el.innerHTML=`<button type="button" class="pnav-a" onclick="pnavStep(-1)"${pv?'':' disabled'} aria-label="${pv?esc('Zurück: '+_pnavName(pv).t):'Anfang der Liste'}" title="${pv?esc(_pnavName(pv).t)+' (←)':''}">${PNAV_IC.l}</button>`
+      +`<button type="button" class="pnav-c" onclick="pnavMenu(this,event)" aria-haspopup="listbox" aria-expanded="false" title="${esc(lb)}: ${pos+1} von ${n}"><span class="pnav-l">${esc(lb)}</span><b>${pos+1}/${n}</b>${PNAV_IC.d}</button>`
+      +`<button type="button" class="pnav-a" onclick="pnavStep(1)"${nx?'':' disabled'} aria-label="${nx?esc('Weiter: '+_pnavName(nx).t):'Ende der Liste'}" title="${nx?esc(_pnavName(nx).t)+' (→)':''}">${PNAV_IC.r}</button>`;
+  });
+}
+function _pnavGo(x){
+  if(!x)return;
+  _pnavMenuClose();
+  PNAV.hold=true;
+  try{
+    if(x.k==='p')openPlayerStats(x.i);
+    else if(x.k==='s')openSessStats(x.i);
+    else if(x.k==='t')openTrainerProfile(x.i);
+  }finally{PNAV.hold=false;}
+  _pnavRender();
+}
+function pnavStep(d){
+  const L=_pnavList(),pos=L.findIndex(x=>x.k===PNAV.k&&x.i===PNAV.i);
+  if(pos<0||!L[pos+d])return;
+  const ae=document.activeElement,kb=!!(ae&&ae.classList&&ae.classList.contains('pnav-a'));
+  _pnavGo(L[pos+d]);
+  // keep the keyboard where it was: the arrows were drawn anew
+  if(kb)try{const bs=document.querySelectorAll('#pnav-'+PNAV.k+' .pnav-a');const b=bs[d<0?0:1];(b&&!b.disabled?b:bs[d<0?1:0]).focus();}catch(e){}
+}
+function _pnavMenuClose(){
+  const m=document.getElementById('pnavMenu');if(m)m.remove();
+  document.querySelectorAll('.pnav-c[aria-expanded="true"]').forEach(b=>b.setAttribute('aria-expanded','false'));
+}
+function pnavMenu(btn,ev){
+  if(ev)ev.stopPropagation();
+  if(document.getElementById('pnavMenu')){_pnavMenuClose();return;}
+  const esc=escapeHtml,L=_pnavList(),lb=_pnavLbl(),isP=PNAV.k==='p',D=cd(),season=UI.currentSeason;
+  const m=document.createElement('div');m.id='pnavMenu';m.className='pnav-menu';m.setAttribute('role','dialog');m.setAttribute('aria-label',lb);
+  const row=(x,kw)=>{const nm=_pnavName(x),on=x.k===PNAV.k&&x.i===PNAV.i;
+    return (kw||'')+`<button type="button" class="pnav-it${on?' on':''}" data-k="${x.k}" data-i="${x.i}" role="option" aria-selected="${on}"><span class="pnav-it-t">${esc(nm.t)}</span>${nm.s?`<span class="pnav-it-s">${esc(nm.s)}</span>`:''}</button>`;};
+  const rows=(A)=>{
+    // Termine of the whole season: the week as a heading
+    if(!PNAV.list&&PNAV.k==='s'&&typeof _dbSortKey==='function'&&typeof _dbIsoWeek==='function'){
+      let last='';return A.map(x=>{const s=D.sessions[x.i];let kw='';try{const sk=String(_dbSortKey(s.date,season));const lab='KW '+_dbIsoWeek(new Date(+sk.slice(0,4),+sk.slice(4,6)-1,+sk.slice(6,8)));if(lab!==last){last=lab;kw=`<div class="pnav-kw">${esc(lab)}</div>`;}}catch(e){}return row(x,kw);}).join('');
+    }
+    return A.map(x=>row(x)).join('');
+  };
+  m.innerHTML=`<div class="pnav-mh"><b>${esc(lb)}</b><span>${L.length}</span></div>`
+    +(isP?`<input type="search" class="pnav-q" placeholder="Spieler suchen (Name oder Nummer)" aria-label="Spieler suchen">`:'')
+    +`<div class="pnav-ls" role="listbox">${rows(L)}</div>`;
+  document.body.appendChild(m);
+  const r=btn.getBoundingClientRect(),W=Math.min(300,innerWidth-16);
+  m.style.width=W+'px';
+  m.style.left=Math.max(8,Math.min(innerWidth-W-8,r.right-W))+'px';
+  m.style.top=Math.round(r.bottom+6)+'px';
+  m.style.maxHeight=Math.max(200,innerHeight-r.bottom-20)+'px';
+  btn.setAttribute('aria-expanded','true');
+  const ls=m.querySelector('.pnav-ls');
+  ls.addEventListener('click',e=>{const b=e.target.closest('.pnav-it');if(!b)return;_pnavGo({k:b.dataset.k,i:+b.dataset.i});});
+  const q=m.querySelector('.pnav-q');
+  if(q)q.addEventListener('input',()=>{
+    const v=q.value.trim().toLowerCase();
+    if(!v){ls.innerHTML=rows(L);return;}
+    // search in the whole Kader, not only in the list
+    const A=_pnavDef('p').filter(x=>{const p=D.players[x.i];return p&&(String(p.name||'').toLowerCase().includes(v)||String(p.nr||'')===v||String((typeof getDisplayName==='function'?getDisplayName(p):'')||'').toLowerCase().includes(v));});
+    ls.innerHTML=A.length?rows(A):'<div class="pnav-none">Kein Spieler gefunden</div>';
+  });
+  m.addEventListener('keydown',e=>{
+    const items=[...m.querySelectorAll('.pnav-it')];const i=items.indexOf(document.activeElement);
+    if(e.key==='Escape'){e.preventDefault();e.stopPropagation();_pnavMenuClose();btn.focus();}
+    else if(e.key==='ArrowDown'){e.preventDefault();e.stopPropagation();(items[i+1]||items[0])&&(items[i+1]||items[0]).focus();}
+    else if(e.key==='ArrowUp'){e.preventDefault();e.stopPropagation();if(i<=0&&q)q.focus();else if(items[i-1])items[i-1].focus();}
+    else if(e.key==='ArrowLeft'||e.key==='ArrowRight')e.stopPropagation();
+  });
+  const cur=m.querySelector('.pnav-it.on');
+  try{if(cur)cur.scrollIntoView({block:'center'});}catch(e){}
+  if(q&&matchMedia('(hover:hover)').matches)q.focus();else if(cur)cur.focus();
+}
+// closes on a press outside (capture: the table cells keep their clicks)
+document.addEventListener('pointerdown',e=>{const m=document.getElementById('pnavMenu');if(m&&!m.contains(e.target)&&!(e.target.closest&&e.target.closest('.pnav-c')))_pnavMenuClose();},true);
+window.addEventListener('resize',()=>_pnavMenuClose());
+// ← → in an open panel, as long as nothing else wants the keys
+document.addEventListener('keydown',e=>{
+  if(e.key!=='ArrowLeft'&&e.key!=='ArrowRight')return;
+  if(e.altKey||e.ctrlKey||e.metaKey||e.shiftKey||e.defaultPrevented||!PNAV.k)return;
+  if(!document.body.classList.contains('hx-panel-open'))return;
+  const a=document.activeElement;
+  if(a&&(a.isContentEditable||(a.matches&&a.matches('input,textarea,select'))))return;
+  if(document.getElementById('pnavMenu'))return;
+  if(document.querySelector('.mo.open:not(.hx-panel):not(.hx-page),#moPlayerStatsExt.open,#moSessAtt.open,#moRpeAll.open'))return;
+  if([...document.querySelectorAll('.ssx-menu.open,.hxs-menu')].some(m=>m.getClientRects().length))return;
+  if(!document.getElementById('pnav-'+PNAV.k)||!document.querySelector('#pnav-'+PNAV.k+' .pnav-a'))return;
+  e.preventDefault();
+  pnavStep(e.key==='ArrowLeft'?-1:1);
+});
 // Panels: player profile and session open as a side panel on the right
 // (desktop) or a full screen above the bottom bar (phone). Player and session
 // share the spot — one replaces the other; the detail statistics stack on top.
@@ -29713,6 +29939,8 @@ function _hxSyncBack(){
 }
 function _hxPanelSync(){
   document.body.classList.toggle('hx-panel-open',_hxOn()&&!!document.querySelector('.mo.hx-panel.open'));
+  if(!document.querySelector('#moPlayer.open,#moSession2.open,#moTrainerProfile.open')&&!PNAV.hold){PNAV.list=null;PNAV.k='';PNAV.i=-1;_pnavMenuClose();}
+  else _pnavRender();
 }
 function _hxPageSync(){
   if(typeof _mobNavSync==='function'&&typeof _mobCurrentView==='function')_mobNavSync(_mobCurrentView());
@@ -30192,7 +30420,7 @@ function hxRender(){
   }catch(e){}
   // One row per player (1.2.70): "Max · 2× unentschuldigt · Belastung +68 %"
   try{const g=_hxGroupFlags(flags,D);flags.length=0;g.forEach(f=>flags.push(f));}catch(e){console.error('[Im Blick]',e);}
-  html+=`<section class="hx-card hx-a-flags" aria-label="Im Blick behalten"><h3 class="hx-h2">Im Blick behalten</h3>`;
+  html+=`<section class="hx-card hx-a-flags" aria-label="Im Blick behalten" data-pnl="Im Blick" data-pnsrc="flags"><h3 class="hx-h2">Im Blick behalten</h3>`;
   if(!flags.length)html+=`<div class="hx-ok">Alles im grünen Bereich.</div>`;
   else{
     // Four rows keep the start screen on one page; the rest on demand
@@ -31007,6 +31235,7 @@ let _tpIdx=null,_tpEditing=false;
 function openTrainerProfile(gi){
   const t=G.trainers&&G.trainers[gi];
   if(!t)return;
+  _pnavOpen('t',gi);
   // As a panel (Heute) the list stays clickable: switching trainers must not
   // drop unsaved edits silently
   if(_tpEditing&&_tpIdx!==gi&&typeof _tpIsDirty==='function'&&_tpIsDirty()){
@@ -41754,6 +41983,7 @@ _pubCleanupSchedule();
 <div class="mo hx-panel" id="moTrainerProfile"><div class="mob" style="width:440px;max-width:96vw;">
   <div class="tp-title-row">
     <h3 style="margin:0;flex:1;">👤 Trainerprofil</h3>
+    <span class="pnav" id="pnav-t"></span>
     <button class="btn bs" onclick="tpCloseGuard()" aria-label="Schließen">✕</button>
   </div>
   <div id="tp-content" style="max-height:64vh;overflow-y:auto;"></div>
@@ -42276,7 +42506,7 @@ _pubCleanupSchedule();
 </div></div>
 <div class="mo" id="moFlags"><div class="mob flg-mob" style="width:540px;max-width:96vw;">
   <div class="pv-head"><h3>Im Blick behalten <span id="flg-n" class="flg-n"></span></h3><button class="btn bs" onclick="closeM('moFlags')" aria-label="Schließen">✕</button></div>
-  <div id="flg-list" class="flg-list"></div>
+  <div id="flg-list" class="flg-list" data-pnl="Im Blick" data-pnsrc="flags"></div>
 </div></div>
 <div class="mo" id="moAbw"><div class="mob abw-mob" style="width:460px;max-width:96vw;">
   <div class="pv-head"><h3 id="abw-c-t">Abwesenheit</h3><button class="btn bs" onclick="closeM('moAbw')" aria-label="Schließen">✕</button></div>
