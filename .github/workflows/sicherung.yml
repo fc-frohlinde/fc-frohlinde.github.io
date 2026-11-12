@@ -4,7 +4,8 @@
 # SICHERUNG_PASSWORT the same copy is also kept here as an encrypted file for
 # 90 days (Actions → Sicherung → run → Artifacts), in case the whole Firebase
 # project were lost. Run it by hand with a date (JJJJMMTT) to get the copy of
-# that day as a file. Code: tools/sicherung.
+# that day as a file, JJJJMMTT-abend for the evening copy after a training or
+# match (made by the reminder job, tools/sicherung/abend.mjs). Code: tools/sicherung.
 name: Sicherung
 
 on:
@@ -13,7 +14,7 @@ on:
   workflow_dispatch:
     inputs:
       datum:
-        description: 'Получить копию дня файлом (ГГГГММДД, напр. 20261018). Оставить пустым: обычная копия.'
+        description: 'Получить копию файлом: ГГГГММДД (ночная, напр. 20261018) или ГГГГММДД-abend (вечерняя после тренировки/игры). Пусто: обычная копия.'
         required: false
         default: ''
 

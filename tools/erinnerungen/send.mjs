@@ -9,6 +9,7 @@ import { round } from './round.mjs';
 import { decode, pathKey, berlin, addDays, lastSession } from './lib.mjs';
 import { seasonOf } from './kalender.mjs';
 import { inbox, loadApply } from './eingang.mjs';
+import { abend } from '../sicherung/abend.mjs';
 
 const DB_URL = 'https://fc-frohlinde-ea23f-default-rtdb.europe-west1.firebasedatabase.app';
 const sa = process.env.FIREBASE_SERVICE_ACCOUNT;
@@ -74,6 +75,20 @@ try {
       }
     }
   }
+  // Вечерняя копия (1.2.113, tools/sicherung/abend.mjs): в день тренировки или
+  // игры — защищённая копия примерно через 2 ч после конца, раз в день
+  try {
+    const now = berlin(Date.now()), season = seasonOf(now.day);
+    const a = await abend({ db, season, dry: process.argv.includes('--dry'), loadSessions: async () => {
+      const out = [];
+      for (const t of decode(await db.get('fcf_data/teamList')) || []) {
+        if (typeof t !== 'string') continue;
+        out.push(decode(await db.get('fcf_data/db/' + pathKey(t + '__' + season) + '/sessions')) || []);
+      }
+      return out;
+    } });
+    if (a.ok) console.log(`::notice title=Вечерняя копия::после «${a.ev}»: ${Math.round(a.size / 1024)} КБ (${Math.round(a.gzSize / 1024)} КБ сжато), вечерних копий: ${a.days}`);
+  } catch (e) { console.log('::warning title=Вечерняя копия::' + String((e && e.message) || e).slice(0, 200)); }
   // При ручном запуске: срезы игроков (только числа). GitHub показывает не больше
   // 10 аннотаций на шаг, поэтому без подробностей о данных.
   if (process.env.GITHUB_EVENT_NAME === 'workflow_dispatch') {

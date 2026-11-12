@@ -12,7 +12,7 @@ const ref = p => admin.database().ref(p);
 const db = { get: async p => (await ref(p).get()).val(), set: (p, v) => ref(p).set(v), remove: p => ref(p).remove() };
 const datum = (process.env.DATUM || '').trim();
 try {
-  if (datum && !/^\d{8}$/.test(datum)) throw new Error('DATUM bitte als JJJJMMTT, z. B. 20261018');
+  if (datum && !/^\d{8}(-abend)?$/.test(datum)) throw new Error('DATUM bitte als JJJJMMTT (z. B. 20261018) oder JJJJMMTT-abend für die Abendkopie');
   const r = await sichern({ db, datum });
   if (!r.ok) process.exitCode = 1;
   if (r.day && process.env.GITHUB_ENV) fs.appendFileSync(process.env.GITHUB_ENV, `TAG=${r.day}\n`);

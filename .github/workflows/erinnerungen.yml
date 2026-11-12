@@ -34,7 +34,10 @@ jobs:
       - if: env.EINGERICHTET == 'true'
         uses: actions/checkout@v5
         with:
-          sparse-checkout: tools/erinnerungen
+          # tools/sicherung: die Abendkopie nach Training/Spiel (abend.mjs)
+          sparse-checkout: |
+            tools/erinnerungen
+            tools/sicherung
       - if: env.EINGERICHTET == 'true'
         uses: actions/setup-node@v5
         with:

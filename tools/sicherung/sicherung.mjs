@@ -29,7 +29,7 @@ export async function sichern({ db, ts = Date.now(), datum = '', outDir = 'out',
     fs.writeFileSync(`${outDir}/flutlicht-${day}.json`, JSON.stringify(G));
     if (payload.fcf_plans) fs.writeFileSync(`${outDir}/trainingsplaner-${day}.json`, JSON.stringify(payload.fcf_plans));
     fs.writeFileSync(`${outDir}/LIESMICH.txt`,
-      `Flutlicht – Sicherung vom ${String(day).replace(/(\d{4})(\d{2})(\d{2})/, '$3.$2.$1')}\n\n` +
+      `Flutlicht – Sicherung vom ${String(day).replace(/(\d{4})(\d{2})(\d{2})(-abend)?/, (x, y, m, d, a) => d + '.' + m + '.' + y + (a ? ' (Abendkopie nach Training/Spiel)' : ''))}\n\n` +
       `flutlicht-${day}.json: alle Daten der App. Wiederherstellen in der App: Einstellungen → Daten-Backups → „Aus Datei“,\n` +
       `diese Datei wählen, danach in der Liste „Laden“. Fotos kommen aus der Datenbank zurück.\n` +
       `trainingsplaner-${day}.json: Trainingsplaner (Übungen, Pläne) – zum Wiederherstellen Claude fragen.\n`);
@@ -37,14 +37,18 @@ export async function sichern({ db, ts = Date.now(), datum = '', outDir = 'out',
   };
 
   if (datum) {
-    const rec = await db.get('fcf_safe/daily/' + datum);
+    // JJJJMMTT = the night's copy, JJJJMMTT-abend = the evening copy after a
+    // training or match (abend.mjs)
+    const ab = /-abend$/.test(datum), d = datum.replace(/-abend$/, '');
+    const rec = await db.get((ab ? 'fcf_safe/abend/' : 'fcf_safe/daily/') + d);
     if (!rec) {
       const idx = Object.keys((await db.get('fcf_safe/index')) || {}).sort();
-      log(`Keine Tageskopie für ${datum}. Vorhanden: ${idx.join(', ') || 'keine'}`);
+      const ia = Object.keys((await db.get('fcf_safe/abendIndex')) || {}).sort();
+      log(`Keine Kopie für ${datum}. Tageskopien: ${idx.join(', ') || 'keine'}. Abendkopien: ${ia.map(x => x + '-abend').join(', ') || 'keine'}`);
       return { ok: false };
     }
     write(datum, unpack(rec));
-    log(`Tageskopie ${datum} als Datei ausgegeben`);
+    log(`${ab ? 'Abendkopie' : 'Tageskopie'} ${datum} als Datei ausgegeben`);
     return { ok: true, day: datum, exported: true };
   }
 

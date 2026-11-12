@@ -7693,8 +7693,8 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.112'; // v1.2.112: in Profil, Termin und Trainer blättern
-const APP_VERSION_LABEL='1.2.112';
+const APP_VERSION='1.2.113'; // v1.2.113: Abendkopie nach Training und Spiel
+const APP_VERSION_LABEL='1.2.113';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
@@ -35345,21 +35345,30 @@ function deleteBackup(i){
 }
 // The protected copy: made once a day by the job on GitHub (tools/sicherung)
 // in a part of the database the app cannot reach — so nobody can delete it
-// along with the data. The app only reads its status.
+// along with the data. The app only reads its status. Since 1.2.113 also the
+// evening copy after a training or match (tools/sicherung/abend.mjs, made by
+// the reminder job about two hours after the end): the night's copy comes
+// before the next event, so the day's entries had no copy of their own.
+function _bkWhen(t){
+  const d=new Date(t),age=Date.now()-t,days=Math.floor(age/864e5);
+  const hm=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+  const y=new Date(Date.now()-864e5);
+  return d.toDateString()===new Date().toDateString()?'heute '+hm
+    :(d.toDateString()===y.toDateString()?'gestern '+hm:d.getDate()+'.'+(d.getMonth()+1)+'.');
+}
 function bkSafeStatus(){
   const el=document.getElementById('bk-safe');
   if(!el||!fbDb)return;
-  fbDb.ref('__backups_meta/safe').once('value').then(x=>{
-    const v=x.val();
+  Promise.all([fbDb.ref('__backups_meta/safe').once('value'),fbDb.ref('__backups_meta/safeAbend').once('value').catch(()=>null)]).then(([x,y])=>{
+    const v=x.val(),a=y&&typeof y.val==='function'?y.val():null;
     if(!v||!v.t){el.hidden=true;return;}
-    const age=Date.now()-v.t,d=new Date(v.t);
-    const hm=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
-    const days=Math.floor(age/864e5);
-    const when=days<1&&d.getDate()===new Date().getDate()?'heute '+hm:days<2?'gestern '+hm:d.getDate()+'.'+(d.getMonth()+1)+'.';
+    const age=Date.now()-v.t,when=_bkWhen(v.t);
+    // only while it is recent: an old one would read as if the evenings were covered
+    const ab=(a&&a.t&&Date.now()-a.t<21*864e5)?' Dazu eine Abendkopie nach Training und Spiel, zuletzt '+_bkWhen(a.t)+'.':'';
     el.className='bk-safe'+(age>2*864e5?' warn':'');
     el.innerHTML=age>2*864e5
-      ?'⚠ Geschützte Tageskopie: zuletzt '+when+' — die tägliche Sicherung auf GitHub läuft gerade nicht.'
-      :'🛡 Geschützte Tageskopie: zuletzt '+when+' · '+(v.days||1)+(v.days===1?' Tag':' Tage')+' zurück. Sie liegt außerhalb der Reichweite der App, niemand kann sie hier löschen. Abrufen über GitHub (Actions → Sicherung).';
+      ?'⚠ Geschützte Tageskopie: zuletzt '+when+' — die tägliche Sicherung auf GitHub läuft gerade nicht.'+ab
+      :'🛡 Geschützte Tageskopie: zuletzt '+when+' · '+(v.days||1)+(v.days===1?' Tag':' Tage')+' zurück.'+ab+(ab?' Beide liegen':' Sie liegt')+' außerhalb der Reichweite der App, niemand kann sie hier löschen. Abrufen über GitHub (Actions → Sicherung).';
     el.hidden=false;
   }).catch(()=>{el.hidden=true;});
 }
