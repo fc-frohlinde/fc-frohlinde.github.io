@@ -4387,6 +4387,35 @@ body.design-heute.hxk-dk .calx-e:hover{filter:brightness(1.15);}
 .ps-head-btns:has(.pnav:not(:empty)) .ps-b-lbl,#ss-head-btns:has(.pnav:not(:empty)) .ss-btn-lbl{display:none;}
 .ps-head-btns:has(.pnav:not(:empty)) .ps-b-ico,#ss-head-btns:has(.pnav:not(:empty)) .ss-btn-ico{display:inline;}
 .ps-title-row:has(.pnav:not(:empty)) .ps-title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+/* Spieler des Monats (1.2.114) */
+.som-mrow{display:flex;align-items:center;gap:10px;margin:2px 0 8px;}
+.mob .som-mrow label{margin:0;}
+.som-mrow select{flex:1;min-width:0;}
+.som-sum{margin:0 0 10px;font-size:.84rem;color:var(--gm);line-height:1.4;}
+.som-l{display:flex;flex-direction:column;gap:4px;max-height:46vh;overflow-y:auto;}
+.mob label.som-r{margin:0;text-transform:none;letter-spacing:0;font-size:inherit;color:inherit;line-height:1.3;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:10px;align-items:center;padding:8px 10px;border:1px solid var(--hx-line,#DCE3EE);border-radius:10px;cursor:pointer;}
+.mob label.som-r:has(input:checked){border-color:var(--hx-blue,#1659B8);background:color-mix(in srgb,var(--hx-blue,#1659B8) 8%,transparent);}
+.mob label.som-r input[type=radio]{grid-row:1/3;margin:0;padding:0;width:18px;height:18px;flex:none;accent-color:var(--hx-blue,var(--bm));}
+.mob label.som-r[hidden]{display:none;}
+.som-n{font-weight:700;font-size:.92rem;color:var(--hx-ink,var(--gd));}
+.som-n i{font-style:normal;display:inline-block;min-width:22px;color:var(--gm);font-weight:600;}
+.som-f{grid-column:2;font-size:.78rem;font-weight:500;color:var(--gm);}
+.som-more{margin:6px 0 0;border:none;background:none;color:var(--hx-blue,#1659B8);font:600 .84rem 'Barlow',sans-serif;cursor:pointer;padding:4px 0;text-align:left;}
+.mob label.som-why-l{margin:12px 0 4px;}
+#som-why{width:100%;box-sizing:border-box;font:inherit;resize:vertical;}
+.som-note{margin:6px 0 0;font-size:.78rem;color:var(--gm);line-height:1.4;}
+.som-acts{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:14px;}
+.som-del{margin-right:auto;border:none;background:none;color:var(--hx-bad,#C9373E);font:600 .84rem 'Barlow',sans-serif;cursor:pointer;padding:6px 0;}
+.som-card .som-hist{list-style:none;margin:6px 0 10px;padding:0;display:flex;flex-direction:column;gap:6px;}
+.som-card .som-hist li{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;font-size:.88rem;}
+.som-hm{min-width:86px;color:var(--gm);font-weight:600;}
+.som-hw{color:var(--gm);font-size:.82rem;}
+.som-hn{color:var(--gm);font-style:italic;}
+.som-go{border:1px solid var(--hx-line,#DCE3EE);background:var(--hx-field,#F2F5FA);color:var(--hx-ink,#0E2350);border-radius:10px;padding:8px 14px;font:700 .86rem 'Barlow',sans-serif;cursor:pointer;}
+.som-go:focus-visible,.som-more:focus-visible,.som-del:focus-visible{outline:2px solid var(--hx-blue,#1659B8);outline-offset:2px;}
+.som-av{width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0;}
+.som-hub.me{border-color:var(--fl-lamp,#F2C230);}
+.mk-som{margin:10px 0 0;font-size:.86rem;font-weight:600;text-align:center;}
 /* trainers: the dialog and the profile line */
 .abw-c-sum{margin:0 0 4px;font-size:1rem;color:var(--hx-ink,var(--bd));}
 .abw-c-sub{margin:0 0 10px;font-size:.84rem;line-height:1.45;color:var(--hx-muted,var(--gm));}
@@ -7693,8 +7722,8 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.113'; // v1.2.113: Abendkopie nach Training und Spiel
-const APP_VERSION_LABEL='1.2.113';
+const APP_VERSION='1.2.114'; // v1.2.114: Spieler des Monats
+const APP_VERSION_LABEL='1.2.114';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
@@ -7718,6 +7747,7 @@ const FL_MARK='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F
 function _clubSlug(){return (_clubName()||'Flutlicht').replace(/[^A-Za-z0-9ÄÖÜäöüß]+/g,'-').replace(/^-|-$/g,'')||'Flutlicht';}
 function _clubInfo(){const c=(G&&G.club&&typeof G.club==='object')?G.club:{};return {name:_clubName(),resp:String(c.resp||''),addr:String(c.addr||''),mail:String(c.mail||''),dsb:String(c.dsb||'')};}
 const APP_NEWS=[
+  {id:'20261112-2',d:'12.11.',t:'Spieler des Monats',x:'In der Statistik wählt ihr jeden Monat einen Spieler des Monats. Flutlicht schlägt vor, wer im Training am häufigsten da war, danach zählen ▲ und Spieler des Spiels; die Spieler sehen ihn zwei Wochen lang in ihrer App, mit eurem Satz und ohne Zahlen.',go:['Zur Statistik',"hxGo('stats')"]},
   {id:'20261112-1',d:'12.11.',t:'Im Profil und im Termin blättern',x:'Oben im Spielerprofil, im Termin und im Trainerprofil stehen jetzt ‹ ›: Sie gehen durch die Liste, aus der du es geöffnet hast – etwa alle „Offen“ eines Termins, Im Blick oder die Tabelle; über die Mitte springst du direkt zu jemand anderem. Am Computer gehen auch die Pfeiltasten ← →.'},
   {id:'20261111-1',d:'11.11.',t:'Spieler: Abwesenheit melden und Foto erlauben',x:'Spieler können sich in der App für mehrere Termine auf einmal abmelden – du bestätigst es unter „Im Blick behalten“ mit einem Tipp: entschuldigt oder, bei längerer Zeit, als Pause. Außerdem fragt die App sie, ob ihr Spielerfoto hier zu sehen sein darf; bis dahin sehen es nur die Trainer, die Antwort steht im Profil.'},
   {id:'20261110-1',d:'10.11.',t:'Wochenthemen',x:'Jede Woche hat ein Thema, an dem die Trainings arbeiten, etwa Breite oder Tiefe – angelegt unter Einstellungen → Mannschaft, gewählt in der Übersicht, danach wechseln sie von selbst. Das Spiel der Woche bekommt es als Bewertungsthema.',go:['Zu den Wochenthemen',"openSettings('team')"]},
@@ -16706,7 +16736,7 @@ function _pvBuildSync(team,season){
   sessions.forEach(s=>{if(s&&s.location&&la[s.location])loc[s.location]=la[s.location];});
   const shared={v:PV_V,team,season,club:_clubName(),cinfo:(G.club&&typeof G.club==='object')?{resp:G.club.resp||'',addr:G.club.addr||'',mail:G.club.mail||'',dsb:G.club.dsb||''}:null,sessions:sessions.map((x,si)=>{const o=_pvSess(x);const l=_sqListPl(x,players);if(o&&l)o.sql=l;
     if(o&&x.date&&sessTookPlace(x,season)&&_dbSortKey(x.date,season)>=CARD_RATED_FROM)o.rk=_cardTeamAsked(players,x,si);return o;}),news,trainers,loc,
-    roster:{disp,nr,elig},names:[],rep:{},abs:pvAbsRule(teamRules(team)),ast:astOn(team),vids:_vdList(team)};
+    roster:{disp,nr,elig},names:[],rep:{},abs:pvAbsRule(teamRules(team)),ast:astOn(team),vids:_vdList(team),som:_somShared(team,players)};
   weeks.forEach(w=>{
     const r=reps[w.wk];if(!r)return;
     const tp=_reportForPlayers(r,null);
@@ -16719,6 +16749,7 @@ function _pvBuildSync(team,season){
     if(_pGone(p)){gone.push(p.confirmToken);return;}
     const me={};
     PV_ME.forEach(f=>{if(p[f]!==undefined)me[f]=JSON.parse(JSON.stringify(p[f]));});
+    {const sw=_somWinsOf(team,p.name);if(sw.length)me.somW=sw;}
     const squad={};
     sessions.forEach((s,si)=>{const q=_sqOf(s);if(q)squad[si]={in:q.p.includes(p.name),meet:q.meet||'',where:q.where||'',t:q.t};});
     let rank=null;try{rank=_pmComputeRank(p,block);}catch(e){}
@@ -16763,6 +16794,7 @@ async function _pvWriteBlock(b){
     r.clubLogo=null;
     if(Array.isArray(r.fullP))await Promise.all(r.fullP.map(async x=>{x.photo=await th(x.photo,96);}));
   }
+  if(shared.som&&shared.som.ph)shared.som.ph=await th(shared.som.ph,96);
   shared.logo=(typeof G.clubLogo==='string'&&G.clubLogo.indexOf('data:image')===0)?G.clubLogo:null;
   const map={},picks={},upd={};
   for(const x of people){
@@ -16962,6 +16994,7 @@ function _pvAdopt(x,token){
   if(T.news)db[P.team+'__news']=T.news;
   if(T.abs||T.ast)db[P.team+'__rules']=Object.assign(T.abs?{abs:T.abs}:{},T.ast===true?{ast:true}:{});
   if(Array.isArray(T.vids)&&T.vids.length)db[P.team+'__vids']=T.vids;
+  if(T.som&&T.som.m&&T.som.n)db[P.team+'__som']={[T.som.m]:{n:T.som.n,why:T.som.why||'',t:T.som.t,ph:T.som.ph||null}};
   G={version:20,db,teamList:[P.team],seasonList:[P.season],trainers:T.trainers||[],clubName:T.club||'',club:T.cinfo||null,
     locationAddr:T.loc||{},auditLog:[],trash:[],backups:[],matchLineups:{},seasonLineups:{},
     sessionTemplates:[],exerciseLibrary:[],calEvents:[]};
@@ -20630,7 +20663,7 @@ function renderPlayerCard(){
   // Data arriving from the server re-renders the screen; an unchanged card
   // stays as it is instead of going blank and lighting up again.
   const fm=_cardForm(p,D,UI.currentSeason,d);
-  const sig=JSON.stringify(d)+'|'+JSON.stringify(_cardWeek(p,D,UI.currentSeason))+'|'+JSON.stringify(fm);
+  const sig=JSON.stringify(d)+'|'+JSON.stringify(_cardWeek(p,D,UI.currentSeason))+'|'+JSON.stringify(fm)+'|'+_somCardLine(p);
   if(sig===_mkSig&&document.getElementById('mk-cv'))return;
   _mkSig=sig;
   _mkData=d;_mkFile=null;
@@ -20660,6 +20693,7 @@ function renderPlayerCard(){
       <div class="mk-lad" style="--p:${Math.max(2,d.pct)}%"><div class="mk-lad-fill"></div>${lad}</div>
       <div class="mk-lad-l">${labs}</div>
       ${_cardFormHtml(fm)}
+      ${_somCardLine(p)}
       ${wkHtml}
     </div>
     <div class="mk-acts">
@@ -22486,6 +22520,7 @@ function renderHub(){
       const sunSK=sun.getFullYear()*10000+(sun.getMonth()+1)*100+sun.getDate();
       return wk.every(x=>x.k>sunSK)?'N\u00e4chste Woche':'Diese Woche';
     })(),`<a class="fl-sec-a" href="${ln(buildHubLink(tok,'week'))}">alle Termine \u203a</a>`)+list(wkRows):''}
+    ${_somHubHtml(p,sec,list)}
     ${last?sec('Letztes Spiel')+list([last]):''}
     ${_zlHubHtml(p,tok,sec)}
     ${mine.length?sec('F\u00fcr dich')+list(mine):''}
@@ -24467,6 +24502,7 @@ function renderDashboard(){
     html+=_statSumHtml(data,m,sb);
     html+='</div>';
   }
+  try{html+=_somCardHtml(data);}catch(e){console.error('[Spieler des Monats]',e);}
   // Read-only (Heute): figures, the player table and the monthly trend only —
   // no Belastung, notes, birthdays or export.
   const _ro=!canEdit();
@@ -30385,6 +30421,15 @@ function hxRender(){
     if(due.length===1)flags.push({dot:'#0E8A7E',who:nm(due[0].p),what:'Ziele: seit '+R.fb+' Wochen keine Rückmeldung',on:`zlFromMain(${due[0].pi})`});
     else if(due.length)flags.push({dot:'#0E8A7E',who:'Ziele',what:due.length+' Spieler seit '+R.fb+' Wochen ohne Rückmeldung',on:'zlOpenTab()'});
   }catch(e){console.error('[Ziele]',e);}
+  // Spieler des Monats (1.2.114): until the 14th, while last month has none
+  try{
+    if(canEdit()){
+      const now=new Date(),cur=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+      const prev=_somMonths(D,season).find(m=>m<cur);
+      if(prev&&now.getDate()<=14&&!_somAll()[prev]&&_somCands(D,season,prev).nT+_somCands(D,season,prev).nS>=3)
+        flags.push({dot:'#0E8A7E',who:'Spieler des Monats',what:_somMonthName(prev)+' – noch nicht gewählt',on:`somOpen('${prev}')`});
+    }
+  }catch(e){console.error('[Spieler des Monats]',e);}
   // Player status (1.2.51): a Probetraining ready to decide, and whoever has
   // not been at anything for weeks — a question; nothing changes by itself
   try{
@@ -32960,7 +33005,7 @@ function doGen(){
 // timetable) and there are breaks. Both used to mean editing session after
 // session. Only trainings that have not taken place are touched, matches never.
 // Team-wide entries in G.db besides __focuses: they move and go with the team.
-const TEAM_WIDE_KEYS=['schedule','rules','news','gegner'];
+const TEAM_WIDE_KEYS=['schedule','rules','news','gegner','som'];
 const _rsDate=k=>new Date(Math.floor(k/10000),Math.floor(k/100)%100-1,k%100);
 const _rsK=d=>d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();
 const _rsIso=k=>Math.floor(k/10000)+'-'+String(Math.floor(k/100)%100).padStart(2,'0')+'-'+String(k%100).padStart(2,'0');
@@ -35342,6 +35387,162 @@ function deleteBackup(i){
   if(!confirm('Backup "'+bks[i].label+'" löschen?'))return;
   const targetTs=bks[i].ts;
   modifyBackups(currentBks=>currentBks.filter(b=>b&&b.ts!==targetTs));
+}
+// ── Spieler des Monats (1.2.114) ─────────────────────────────
+// The trainers choose one player a month; the app suggests who was at the
+// training most often, then ▲ (Einsatz) and Spieler des Spiels. ▲ alone would
+// say nothing now: it was entered at 10 of 15 sessions in August, 1 of 6 in
+// October, none in November (12.11.). The players see the name, his photo if
+// he allowed it and the trainers' sentence for two weeks — never the counts.
+//   G.db[team+'__som'] = {'2026-10': {n: name, why, t, by}}
+const SOM_MONTHS=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+const SOM_SHOW_DAYS=14;
+let _somCur=null;
+function _somMonthName(ym,year){const m=+String(ym).slice(5,7);return (SOM_MONTHS[m-1]||ym)+(year?' '+String(ym).slice(0,4):'');}
+function _somAll(team){const v=G&&G.db&&G.db[(team||UI.currentTeam)+'__som'];return (v&&typeof v==='object'&&!Array.isArray(v))?v:{};}
+function _somYM(k){return String(Math.floor(k/10000))+'-'+String(Math.floor(k/100)%100).padStart(2,'0');}
+// Months of the season in which something took place, newest first
+function _somMonths(D,season){
+  const set=new Set();
+  (D&&D.sessions||[]).forEach(s=>{if(s&&s.date&&(s.type==='training'||s.type==='match')&&sessTookPlace(s,season))set.add(_somYM(_dbSortKey(s.date,season)));});
+  return [...set].sort().reverse();
+}
+function _somCands(D,season,ym){
+  const mk=+ym.slice(0,4)*100+(+ym.slice(5,7));
+  const SI=[];
+  (D.sessions||[]).forEach((s,si)=>{if(s&&s.date&&(s.type==='training'||s.type==='match')&&sessTookPlace(s,season)&&Math.floor(_dbSortKey(s.date,season)/100)===mk)SI.push(si);});
+  const nT=SI.filter(si=>D.sessions[si].type==='training').length,nS=SI.length-nT;
+  const wins={};
+  SI.forEach(si=>{const s=D.sessions[si];if(s.type!=='match')return;
+    let w=Array.isArray(s.mvpWin)?s.mvpWin:null;
+    if(!w){try{const r=mvpResult(s);w=r&&r.winners;}catch(e){}}
+    (w||[]).forEach(n=>{wins[n]=(wins[n]||0)+1;});});
+  const rows=[];
+  (D.players||[]).forEach((p,pi)=>{
+    if(!p||!p.name)return;
+    let t=0,ta=0,sa=0,up=0,dn=0,cnt=0;
+    SI.forEach(si=>{
+      const s=D.sessions[si];if(!_sessCounts(p,s,season))return;cnt++;
+      const v=Array.isArray(p.s)?p.s[si]:null,pf=Array.isArray(p.perf)?p.perf[si]:null;
+      if(s.type==='match'){if(v===1)sa++;}
+      else if(v===1||v===0||v===2){t++;if(v===1)ta++;}
+      if(pf===1)up++;else if(pf===3)dn++;
+    });
+    if(!cnt)return;
+    rows.push({pi,p,t,ta,sa,up,dn,mvp:wins[p.name]||0,rate:t?ta/t:0});
+  });
+  rows.sort((a,b)=>(b.rate-a.rate)||(b.ta-a.ta)||((b.up-b.dn)-(a.up-a.dn))||(b.mvp-a.mvp)||(b.sa-a.sa)||String(a.p.name).localeCompare(String(b.p.name),'de'));
+  return {nT,nS,rows};
+}
+function _somFacts(r){
+  const f=[r.t?'Training '+r.ta+' von '+r.t:'kein Training eingetragen'];
+  if(r.sa)f.push(r.sa+(r.sa===1?' Spiel':' Spiele'));
+  if(r.up||r.dn)f.push('▲ '+r.up+(r.dn?' · ▼ '+r.dn:''));
+  if(r.mvp)f.push('Spieler des Spiels '+r.mvp+'×');
+  return f.join(' · ');
+}
+// Which month the dialog opens on: the last finished one while it has no
+// winner (until the 20th), else the current one
+function _somDefault(D,season){
+  const ms=_somMonths(D,season),all=_somAll(),now=new Date(),cur=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  const prev=ms.find(m=>m<cur);
+  if(prev&&!all[prev]&&now.getDate()<=20)return prev;
+  return ms.includes(cur)?cur:(prev||ms[0]||cur);
+}
+function somOpen(ym){
+  if(!canEdit())return;
+  const D=cd(),season=UI.currentSeason;if(!D)return;
+  ym=ym||_somDefault(D,season);
+  const e=escapeHtml,all=_somAll(),cur=all[ym]||null,C=_somCands(D,season,ym);
+  const now=new Date(),curYM=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  _somCur={ym};
+  document.getElementById('som-t').textContent='Spieler des Monats';
+  const ms=_somMonths(D,season).slice(0,6);if(!ms.includes(ym))ms.unshift(ym);
+  const opt=ms.map(m=>`<option value="${m}"${m===ym?' selected':''}>${_somMonthName(m,true)}${m===curYM?' (läuft noch)':''}${all[m]&&all[m].n?' · '+e(all[m].n):''}</option>`).join('');
+  const top=6;
+  const row=(r,i)=>`<label class="som-r${i>=top?' som-x':''}"${i>=top?' hidden':''}><input type="radio" name="som-p" value="${e(r.p.name)}"${cur&&cur.n===r.p.name?' checked':''}>`
+    +`<span class="som-n">${r.p.nr?'<i>'+e(r.p.nr)+'</i>':''}${e(r.p.name)}</span><span class="som-f">${_somFacts(r)}</span></label>`;
+  const rows=C.rows.map(row).join('');
+  document.getElementById('som-b').innerHTML=
+    `<div class="som-mrow"><label for="som-m">Monat</label><select id="som-m" onchange="somOpen(this.value)">${opt}</select></div>`
+    +`<p class="som-sum">${_somMonthName(ym)}: ${C.nT} ${C.nT===1?'Training':'Trainings'}, ${C.nS} ${C.nS===1?'Spiel':'Spiele'}. Oben steht, wer im Training am häufigsten da war, danach zählen ▲ und Spieler des Spiels.</p>`
+    +(C.rows.length?`<div class="som-l" role="radiogroup" aria-label="Spieler">${rows}</div>`
+      +(C.rows.length>top?`<button type="button" class="som-more" onclick="somMore(this)">Alle ${C.rows.length} Spieler zeigen</button>`:'')
+      :'<p class="som-sum">In diesem Monat gibt es noch keine eingetragenen Termine.</p>')
+    +`<label class="som-why-l" for="som-why">Ein Satz für die Mannschaft (freiwillig)</label>`
+    +`<textarea id="som-why" maxlength="140" rows="2" placeholder="z. B. Bei jedem Training da und immer voll dabei">${cur&&cur.why?e(cur.why):''}</textarea>`
+    +`<p class="som-note">Die Spieler sehen zwei Wochen lang den Namen, sein Foto (wenn er es erlaubt hat) und deinen Satz – keine Zahlen.</p>`
+    +(cur&&cur.n?`<p class="som-note">Gewählt: ${e(cur.n)}${cur.by?' · von '+e(cur.by==='Admin'?'Trainerteam':cur.by):''} · ${new Date(cur.t).toLocaleDateString('de-DE')}</p>`:'')
+    +`<div class="som-acts">${cur&&cur.n?'<button type="button" class="som-del" onclick="somRemove()">Zurücknehmen</button>':''}`
+    +`<button type="button" class="btn" onclick="closeM('moSom')">Abbrechen</button>`
+    +`<button type="button" class="btn bp" id="som-ok" onclick="somSave()"${cur&&cur.n?'':' disabled'}>${cur&&cur.n?'Speichern':'Bekanntgeben'}</button></div>`;
+  const b=document.getElementById('som-b');
+  b.querySelectorAll('input[name="som-p"]').forEach(r=>r.addEventListener('change',()=>{document.getElementById('som-ok').disabled=false;}));
+  openM('moSom');
+}
+function somMore(btn){document.querySelectorAll('#som-b .som-x').forEach(x=>{x.hidden=false;});btn.remove();}
+function _somRefresh(){
+  try{if(document.getElementById('moDashboard')&&document.getElementById('moDashboard').classList.contains('open'))renderDashboard();}catch(e){}
+  try{if(typeof hxRender==='function')hxRender();}catch(e){}
+}
+function somSave(){
+  if(!canEdit()||!_somCur)return;
+  const r=document.querySelector('#som-b input[name="som-p"]:checked');if(!r)return;
+  const n=r.value,why=String(document.getElementById('som-why').value||'').trim().slice(0,140),ym=_somCur.ym,team=UI.currentTeam;
+  snap();
+  if(!G.db[team+'__som']||typeof G.db[team+'__som']!=='object'||Array.isArray(G.db[team+'__som']))G.db[team+'__som']={};
+  const prev=G.db[team+'__som'][ym];
+  G.db[team+'__som'][ym]={n,why,t:Date.now(),by:(CU&&CU.name)||''};
+  logAudit('Spieler des Monats',n,_somMonthName(ym,true)+(prev&&prev.n&&prev.n!==n?' (vorher '+prev.n+')':''));
+  saveG();
+  closeM('moSom');
+  _somRefresh();
+}
+function somRemove(){
+  if(!canEdit()||!_somCur)return;
+  const ym=_somCur.ym,team=UI.currentTeam,cur=_somAll(team)[ym];if(!cur)return;
+  if(!confirm('Spieler des Monats '+_somMonthName(ym)+' zurücknehmen? Die Spieler sehen ihn dann nicht mehr.'))return;
+  snap();
+  delete G.db[team+'__som'][ym];
+  logAudit('Spieler des Monats zurückgenommen',cur.n||'?',_somMonthName(ym,true));
+  saveG();closeM('moSom');_somRefresh();
+}
+// Statistik: the last months and the button
+function _somCardHtml(data){
+  if(!data||data.team!==UI.currentTeam||data.season!==UI.currentSeason)return '';
+  const D=data.block,season=data.season,ms=_somMonths(D,season).slice(0,4),all=_somAll(data.team),e=escapeHtml;
+  if(!ms.length)return '';
+  const li=ms.map(m=>{const v=all[m];return `<li><span class="som-hm">${_somMonthName(m)}</span>`
+    +(v&&v.n?`<b>${e(v.n)}</b>${v.why?`<span class="som-hw">„${e(v.why)}“</span>`:''}`:'<span class="som-hn">noch nicht gewählt</span>')+'</li>';}).join('');
+  return `<div class="db-section som-card"><div class="db-h">Spieler des Monats</div><ul class="som-hist">${li}</ul>`
+    +(canEdit()?`<button type="button" class="som-go" onclick="somOpen()">Spieler des Monats wählen</button>`:'')+'</div>';
+}
+// The latest one for the players' overview (and the team's part of the slice)
+function _somLatest(team){
+  let best=null;
+  Object.entries(_somAll(team)).forEach(([ym,v])=>{if(v&&v.n&&typeof v.t==='number'&&Date.now()-v.t<SOM_SHOW_DAYS*864e5&&(!best||v.t>best.v.t))best={ym,v};});
+  return best;
+}
+function _somShared(team,players){
+  const b=_somLatest(team);if(!b)return null;
+  const p=(players||[]).find(x=>x&&x.name===b.v.n);
+  return {m:b.ym,n:b.v.n,why:b.v.why||'',t:b.v.t,ph:(p&&p.photo&&fotoShared(p))?p.photo:null};
+}
+function _somWinsOf(team,name){return Object.keys(_somAll(team)).filter(m=>{const v=_somAll(team)[m];return v&&v.n===name;}).sort();}
+// Players' overview: everyone sees it for two weeks; the winner reads it about himself
+function _somHubHtml(p,sec,list){
+  const b=_somLatest();if(!b)return '';
+  const e=escapeHtml,me=b.v.n===p.name,mon=_somMonthName(b.ym);
+  const ic=(!me&&b.v.ph)?`<img class="som-av" src="${b.v.ph}" alt="">`:`<span class="hub-ic fl-tile go">${FL_IC.trophy}</span>`;
+  const title=me?`Du bist Spieler des Monats ${mon}! 🎉`:`${e(_mvpName(b.v.n))}`;
+  const sub=me?(b.v.why?'„'+e(b.v.why)+'“':'Von deinen Trainern gewählt.'):(`Spieler des Monats ${mon}`+(b.v.why?' · „'+e(b.v.why)+'“':''));
+  return sec('Spieler des Monats')+list([`<div class="hub-card hub-mvp som-hub${me?' me':''} fl-row">${ic}<span class="hub-txt"><b>${title}</b><span>${sub}</span></span></div>`]);
+}
+// „Meine Karte“: the months he was chosen
+function _somCardLine(p){
+  const w=Array.isArray(p&&p.somW)?p.somW:(isPlayerMode()?[]:_somWinsOf(UI.currentTeam,p&&p.name));
+  if(!w.length)return '';
+  return `<div class="mk-som">🏆 Spieler des Monats: ${w.slice().reverse().map(m=>escapeHtml(_somMonthName(m,true))).join(', ')}</div>`;
 }
 // The protected copy: made once a day by the job on GitHub (tools/sicherung)
 // in a part of the database the app cannot reach — so nobody can delete it
@@ -42521,6 +42722,10 @@ _pubCleanupSchedule();
   <div class="pv-head"><h3 id="abw-c-t">Abwesenheit</h3><button class="btn bs" onclick="closeM('moAbw')" aria-label="Schließen">✕</button></div>
   <div id="abw-c-b"></div>
   <div class="abw-c-f" id="abw-c-f"></div>
+</div></div>
+<div class="mo" id="moSom"><div class="mob som-mob" style="width:520px;max-width:96vw;">
+  <div class="pv-head"><h3 id="som-t">Spieler des Monats</h3><button class="btn bs" onclick="closeM('moSom')" aria-label="Schließen">✕</button></div>
+  <div id="som-b"></div>
 </div></div>
 <div class="mo" id="moWt"><div class="mob wt-mob" style="width:420px;max-width:96vw;">
   <div class="pv-head"><h3>Thema der Woche</h3><button class="btn bs" onclick="closeM('moWt')" aria-label="Schließen">✕</button></div>
