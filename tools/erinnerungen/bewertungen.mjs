@@ -42,6 +42,30 @@ export function usage(blk, now) {
   return u;
 }
 
+// Einsatz (perf: 1 stark, 2 normal, 3 schwach) je Monat — nur Zahlen, für
+// „Spieler des Monats“ (1.2.114): wie viel ist überhaupt eingetragen?
+export function einsatz(blk, season, now) {
+  const S = (blk && blk.sessions) || [], P = ((blk && blk.players) || []).filter(Boolean);
+  const today = berlin(now).day, M = {};
+  S.forEach((s, si) => {
+    if (!s || !s.date) return;
+    const day = sortKey(s.date, season);
+    if (!day || day >= today) return;
+    const m = String(day).slice(0, 6), r = M[m] || (M[m] = { t: 0, sp: 0, mit: 0, up: 0, mid: 0, down: 0, top: {} });
+    s.type === 'match' ? r.sp++ : r.t++;
+    let any = false;
+    P.forEach((p, i) => {
+      const v = Array.isArray(p.perf) ? p.perf[si] : null;
+      if (v === 1) { r.up++; any = true; r.top[i] = (r.top[i] || 0) + 1; } else if (v === 2) { r.mid++; any = true; } else if (v === 3) { r.down++; any = true; }
+    });
+    if (any) r.mit++;
+  });
+  return Object.entries(M).sort().map(([m, r]) => {
+    const t = Object.values(r.top);
+    return `${m.slice(4)}/${m.slice(0, 4)}: Termine ${r.t + r.sp} (T ${r.t}, S ${r.sp}), mit Einsatz ${r.mit}, ▲ ${r.up}, normal ${r.mid}, ▼ ${r.down}, Spieler mit ▲ ${t.length}, max ▲ eines Spielers ${t.length ? Math.max(...t) : 0}`;
+  });
+}
+
 const line = r => `${String(r.day).slice(6, 8)}.${String(r.day).slice(4, 6)}. ${r.type}: anwesend ${r.here}, bewertet ${r.rated}`
   + ` (selber Tag ${r.same}, später ${r.later}), nicht dabei ${r.nd}` + (r.votes === null ? '' : `, Stimmen ${r.votes}`);
 
@@ -61,6 +85,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     console.log(`::notice title=Bewertungen ${team}::` + rows.map(line).join(' || '));
     // App-Nutzung der Spieler (1.2.110): nur Zahlen
     const u = usage(blk, now);
+    console.log(`::notice title=Einsatz ${team}::` + einsatz(blk, season, now).join(' || '));
     console.log(`::notice title=Nutzung ${team}::Spieler ${u.n}: je geöffnet ${u.ever}, letzte 7 Tage ${u.d7}, letzte 14 Tage ${u.d14}, als App installiert (je) ${u.app}, als App letzte 14 Tage ${u.app14}, nie geöffnet ${u.never}`);
   }
   // Push: Dienste der Geräte von Spielern (Apple = iPhone/iPad, Google = Android/Chrome)
