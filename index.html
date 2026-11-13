@@ -3654,6 +3654,7 @@ body.design-heute.hxk-dk .ss-comm-act[title="L\00f6schen"]{color:#FF9C90 !import
   border:1.5px dashed var(--hx-line,var(--gl));background:transparent;color:var(--hx-ink,var(--gd));cursor:pointer;}
 .rpe-open-b:hover{border-style:solid;border-color:var(--bm);}
 .rpe-open-b small{font-size:.66rem;font-weight:600;color:var(--hx-muted,var(--gm));margin-left:5px;}
+.rpe-grp{margin:8px 0 0;font-size:.8rem;color:var(--gm);}
 .rpe-remind{display:block;width:100%;margin-top:14px;padding:11px;border-radius:10px;border:none;cursor:pointer;
   background:#1F8F4E;color:#fff;font-family:'Barlow',sans-serif;font-size:.86rem;font-weight:700;}
 .rpe-remind:hover{filter:brightness(1.06);}
@@ -7722,8 +7723,8 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.115'; // v1.2.115: Belastung-Hinweis nennt die echte Frist
-const APP_VERSION_LABEL='1.2.115';
+const APP_VERSION='1.2.116'; // v1.2.116: Belastung – Trainer erinnern die Gruppe
+const APP_VERSION_LABEL='1.2.116';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
@@ -15920,6 +15921,13 @@ function rpeRemindGroup(si){
   const txt='Belastung '+what+' ('+String(s.date||'').trim()+'.) bitte '+rpeCloseLabel(s,si).replace(/\u00a0/g,' ')+' eintragen: App \u00f6ffnen, Zahl tippen.\n'
     +buildTeamLink(UI.currentTeam);
   _openWhatsAppGroupCompose(txt);
+  try{s.rpeGrp={t:Date.now(),by:(CU&&CU.name)||''};saveG();setTimeout(()=>{try{if(document.getElementById('moRpeAll').classList.contains('open'))rpeAllOpen(si);}catch(e){}},50);}catch(e){}
+}
+function _rpeGrpLine(s){
+  const g=s&&s.rpeGrp;if(!g||!g.t)return '';
+  const d=new Date(g.t),t=d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+  const day=new Date().toDateString()===d.toDateString()?'heute':d.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'});
+  return `<div class="rpe-grp">In der Gruppe erinnert: ${escapeHtml(_oppBy(g.by)||'ein Trainer')} · ${day} ${t} Uhr</div>`;
 }
 // "Im Blick" → straight to who has rated and who has not
 function rpeOpenFromHome(si){
@@ -19758,7 +19766,7 @@ function _rpeSessGroups(D,s,si,season){
       return;
     }
     const st=(p.s&&si<p.s.length)?p.s[si]:3;
-    if(st===0||st===2)return;
+    if(st===0||st===2||st===5)return;
     if(!_sessAfterJoin(p,s,season))return;
     (m&&m.nd?nd:open).push({n,pi,st,never:!(p.seen&&p.seen.t),push:!!(p.push&&p.push.t)});
   });
@@ -19789,7 +19797,7 @@ function renderSessRpe(si){
   const bits=[vals.length+(asked?' von '+asked:'')+' bewertet'];
   if(g.nd.length)bits.push(g.nd.length+' nicht da');
   if(vals.length>1&&min!==max)bits.push('Spanne '+min+'–'+max);
-  else if(!vals.length&&winOpen)bits.push('bis 24 Uhr');
+  else if(!vals.length&&winOpen)bits.push(rpeCloseLabel(s,si).replace(/\u00a0/g,' ')||'bis 24 Uhr');
   box.style.display='block';
   // On the card this is one summary tile; who rated what, who said he was not
   // there and who is still open are a level down.
@@ -19883,7 +19891,8 @@ function rpeAllOpen(si){
       +`<div class="rpe-open">${c.open.map(x=>
         `<button class="rpe-open-b" onclick="rpeEditOpen(${si},${x.pi})"${x.never?` title="Seit ${SEEN_SINCE} nicht in der App"`:''}>${escapeHtml(x.n)}${x.push?' 🔔':''}${x.never?'<small>nicht in der App</small>':''}</button>`).join('')}</div>`
       +`<div class="rpe-hint">${c.winOpen?(()=>{let l='';try{const D=cd();l=rpeCloseLabel(D.sessions[si],si).replace(/\u00a0/g,' ');}catch(e){}return 'Spieler können '+(l||'bis 24 Uhr')+' bewerten. ';})():''}${c.open.some(x=>x.push)?'🔔 bekommt automatisch eine Erinnerung. ':''}Nennt dir ein Spieler seinen Wert: Namen antippen und eintragen.</div>`
-      +(c.winOpen?`<button class="rpe-remind" onclick="rpeRemindGroup(${si})">Erinnerung in die WhatsApp-Gruppe</button>`:'');
+      +(c.winOpen?`<button class="rpe-remind" onclick="rpeRemindGroup(${si})">Erinnerung in die WhatsApp-Gruppe</button>`:'')
+      +(()=>{try{return _rpeGrpLine(cd().sessions[si]);}catch(e){return '';}})();
   }
   body.innerHTML=html;
   const mo=document.getElementById('moRpeAll');
@@ -21126,6 +21135,7 @@ const TPUSH_KINDS=[
   ['msg','💬','Nachrichten','von anderen Trainern hier in der App',true],
   ['att','✍️','Anwesenheit fehlt','am Morgen nach Training oder Spiel, wenn noch Spieler ohne Eintrag sind',true],
   ['abw','📅','Abwesenheiten','wenn ein Spieler meldet, dass er länger nicht da ist',true],
+  ['rpeask','💪','Belastung nachfragen','eine Stunde nach Training oder Spiel, wenn weniger als die Hälfte bewertet hat – mit Text für die WhatsApp-Gruppe',true],
   ['late','⚠️','Kurzfristige Absagen','wenn ein Spieler in den 24 Std. vor Beginn absagt',false],
   ['lineup','📋','Stand vor dem Termin','3 Std. vor Beginn: wie viele dabei, abgesagt, offen',false],
   ['tech','🛠','Technik','wenn die tägliche Sicherung oder die Erinnerungen nicht laufen',true]];
@@ -21310,6 +21320,7 @@ function _tgoRun(){
   setTimeout(()=>{try{
     if(x.go==='rc'&&!isNaN(i))rcOpen(i);
     else if(x.go==='sess'&&!isNaN(i))openSessStats(i);
+    else if(x.go==='rpe'&&!isNaN(i)&&canEdit())rpeAllOpen(i);
     else if(x.go==='player'&&!isNaN(i))openPlayerStats(i);
     else if(x.go==='msg'&&x.id)viewMessage(x.id);
     else if(x.go==='backup'&&isAdmin())openBackupModal();
@@ -35472,7 +35483,7 @@ function somOpen(ym){
     +`<label class="som-why-l" for="som-why">Ein Satz für die Mannschaft (freiwillig)</label>`
     +`<textarea id="som-why" maxlength="140" rows="2" placeholder="z. B. Bei jedem Training da und immer voll dabei">${cur&&cur.why?e(cur.why):''}</textarea>`
     +`<p class="som-note">Die Spieler sehen zwei Wochen lang den Namen, sein Foto (wenn er es erlaubt hat) und deinen Satz – keine Zahlen.</p>`
-    +(cur&&cur.n?`<p class="som-note">Gewählt: ${e(cur.n)}${cur.by?' · von '+e(cur.by==='Admin'?'Trainerteam':cur.by):''} · ${new Date(cur.t).toLocaleDateString('de-DE')}</p>`:'')
+    +(cur&&cur.n?`<p class="som-note">Gewählt: ${e(cur.n)}${cur.by?' · von '+e(_oppBy(cur.by)):''} · ${new Date(cur.t).toLocaleDateString('de-DE')}</p>`:'')
     +`<div class="som-acts">${cur&&cur.n?'<button type="button" class="som-del" onclick="somRemove()">Zurücknehmen</button>':''}`
     +`<button type="button" class="btn" onclick="closeM('moSom')">Abbrechen</button>`
     +`<button type="button" class="btn bp" id="som-ok" onclick="somSave()"${cur&&cur.n?'':' disabled'}>${cur&&cur.n?'Speichern':'Bekanntgeben'}</button></div>`;
