@@ -7722,8 +7722,8 @@ const SK='fcf_v14',VIEW_SK='fcf_view14',AUTH_SK='fcf_auth14';
 // What trainers should know goes to APP_NEWS below. There is no technical
 // changelog in the app any more (1.2.68): the news are the history trainers
 // read; every release is described in the commit and in the project docs.
-const APP_VERSION='1.2.114'; // v1.2.114: Spieler des Monats
-const APP_VERSION_LABEL='1.2.114';
+const APP_VERSION='1.2.115'; // v1.2.115: Belastung-Hinweis nennt die echte Frist
+const APP_VERSION_LABEL='1.2.115';
 // Bump APP_RELEASE_TS on each deploy. Compared via Firebase to detect stale clients
 // On every deploy, bump this so other clients detect the new version
 // and show "update available" banner. Use a numeric timestamp for monotonic ordering.
@@ -19882,7 +19882,7 @@ function rpeAllOpen(si){
     html+=`<div class="rpe-sec-h">${c.winOpen?'Noch offen':'Ohne Bewertung'} <span>${c.open.length}</span></div>`
       +`<div class="rpe-open">${c.open.map(x=>
         `<button class="rpe-open-b" onclick="rpeEditOpen(${si},${x.pi})"${x.never?` title="Seit ${SEEN_SINCE} nicht in der App"`:''}>${escapeHtml(x.n)}${x.push?' 🔔':''}${x.never?'<small>nicht in der App</small>':''}</button>`).join('')}</div>`
-      +`<div class="rpe-hint">${c.winOpen?'Spieler können bis 24 Uhr bewerten. ':''}${c.open.some(x=>x.push)?'🔔 bekommt automatisch eine Erinnerung. ':''}Nennt dir ein Spieler seinen Wert: Namen antippen und eintragen.</div>`
+      +`<div class="rpe-hint">${c.winOpen?(()=>{let l='';try{const D=cd();l=rpeCloseLabel(D.sessions[si],si).replace(/\u00a0/g,' ');}catch(e){}return 'Spieler können '+(l||'bis 24 Uhr')+' bewerten. ';})():''}${c.open.some(x=>x.push)?'🔔 bekommt automatisch eine Erinnerung. ':''}Nennt dir ein Spieler seinen Wert: Namen antippen und eintragen.</div>`
       +(c.winOpen?`<button class="rpe-remind" onclick="rpeRemindGroup(${si})">Erinnerung in die WhatsApp-Gruppe</button>`:'');
   }
   body.innerHTML=html;
