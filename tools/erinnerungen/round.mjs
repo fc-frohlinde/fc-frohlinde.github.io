@@ -19,8 +19,8 @@
 //   fcf_push/cal/<team>, fcf_cal/<team>  the calendar feed (kalender.mjs)
 //
 // db: {get(path), set(path,v), remove(path)}; push: web-push or a stand-in.
-import { decode, pathKey, berlin, plan, anyDue, quiet, addDays, newsFresh, planNews, squadPending, planSquad } from './lib.mjs';
-import { trainerOwner, allowed, kindsOf, needsPlayers, birthdays, rollCall, cancellations, lineup,
+import { decode, pathKey, berlin, plan, anyDue, quiet, addDays, newsFresh, planNews, squadPending, planSquad, metaKey } from './lib.mjs';
+import { trainerOwner, allowed, kindsOf, needsPlayers, birthdays, rollCall, cancellations, lineup, rpeAsk, rpeAskDue,
   messages, machinery, absences, BDAY_DAY, BDAY_EVE, ATT_FROM } from './trainer.mjs';
 import { publishCalendars } from './kalender.mjs';
 
@@ -192,6 +192,13 @@ export async function round({ db, push, ts = Date.now(), log = console.log, dry 
           const { items, snap } = cancellations(b, now, (await db.get(path)) || {});
           for (const it of items) await to('late', it);
           if (!dry) await db.set(path, Object.keys(snap).length ? snap : null);
+        }
+        // one look per session an hour after its end, whether it asks or not
+        if (any.rpeask) for (const si of rpeAskDue(b, now)) {
+          const k = 'rpeask-' + metaKey(b.sessions[si]);
+          if (done(k)) continue;
+          for (const it of rpeAsk(b, now, si)) await to('rpeask', it);
+          await note('chk', chk(k), '_');
         }
         if (any.lineup) for (const it of lineup(b, now)) {
           if (done('lineup-' + it.key)) continue;

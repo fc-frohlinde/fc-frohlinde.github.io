@@ -1,6 +1,6 @@
 // Erinnerungen job: rounds against an in-memory database. node test_round.mjs
 import { round } from './round.mjs';
-import { decode, berlin, ownerOf, plan, sortKey } from './lib.mjs';
+import { decode, berlin, ownerOf, plan, sortKey, lastSession } from './lib.mjs';
 import { buildIcs, icsHash, publishCalendars, seasonOf, slug } from './kalender.mjs';
 
 let fails = 0;
@@ -443,5 +443,13 @@ function world() {
   ok(rs.cal && rs.cal.n === 1 && rs.cal.t > 0 && !rs.cal.err && (await db.get('fcf_cal/U19')).url.includes('/gR/'), 'calendar: in a round, status.cal: ' + JSON.stringify(rs.cal));
   await round({ db, push: makePush(), ts: Date.UTC(2026, 9, 22, 18, 15), log: q });
   ok((await db.get('fcf_push/status')).cal.off === 1, 'calendar: a round without a token says so');
+}
+// ── „Последнее событие“: Probetraining counted apart (13.11.) ──
+{
+  const sessions = [{ date: 'Fr 13.11', type: 'training', time: '18:30', duration: 90 }];
+  const pl = (s, x) => Object.assign({ name: 'P' + Math.random(), s: [s] }, x || {});
+  const c = lastSession({ sessions, season: '2026/27', now: berlin(Date.UTC(2026, 10, 13, 19, 22)),
+    players: [pl(1), pl(1), pl(0), pl(2), pl(1, { trial: '2026-11-01' }), pl(0, { trial: '2026-11-01' })] });
+  ok(c && c.n === 4 && c.a === 2 && c.f === 1 && c.e === 1 && c.pa === 1, 'last event: team 4 (2 there, 1 F, 1 E) + 1 Probetraining there: ' + JSON.stringify(c && { n: c.n, a: c.a, f: c.f, e: c.e, pa: c.pa }));
 }
 console.log(fails ? fails + ' FAILED' : 'all passed');

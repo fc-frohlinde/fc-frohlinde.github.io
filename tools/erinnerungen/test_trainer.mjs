@@ -1,7 +1,7 @@
 // Benachrichtigungen für Trainer: rounds against an in-memory database. node test_trainer.mjs
 import { round } from './round.mjs';
 import { trainerOwner, kindsOf, TKINDS, absences } from './trainer.mjs';
-import { ownerOf } from './lib.mjs';
+import { ownerOf, metaKey } from './lib.mjs';
 
 let fails = 0;
 const ok = (c, m) => { console.log((c ? 'ok  ' : 'FAIL') + ' ' + m); if (!c) fails++; };
@@ -161,6 +161,48 @@ ok(JSON.stringify(kindsOf(null)) === JSON.stringify(TKINDS) && kindsOf({ bday: f
   ok(!T(c).filter(x => /^lineup/.test(x.p.tag)).length, 'match: not 5 h before');
   const c2 = await run(db, at(25, 10, 7));
   ok(T(c2).filter(x => /^lineup/.test(x.p.tag)).map(x => x.p.title).join() === 'Spiel gegen SV Brackel heute 13:00', 'match title');
+}
+// ── Belastung (13.11.): an hour after the end, if fewer than half rated ──
+{
+  const R = calls => T(calls).filter(c => /^rpeask-/.test(c.p.tag));
+  const setup = (more) => world(W => {
+    const i = W.sess.findIndex(s => s.date === 'Do 22.10'), mk = metaKey(W.sess[i]);
+    W.players.forEach(p => { p.s[i] = 1; });
+    W.players[5].s[i] = 0;                                         // gefehlt: not asked
+    W.players[6].rpeMeta = { [mk]: { nd: 1 } };                    // "war nicht dabei"
+    W.players[0].rpe = []; W.players[0].rpe[i] = 5;
+    if (more) more(W, i);
+  });
+  let { db, si } = setup();
+  let c = await run(db, at(22, 20, 52));
+  ok(!R(c).length, 'Belastung: not before an hour after the end (20:52)');
+  c = await run(db, at(22, 21, 7));
+  const r = R(c);
+  ok(r.map(x => x.to).sort().join() === 'artem,jimmy', 'Belastung: both trainers: ' + r.map(x => x.to).join());
+  ok(r[0] && r[0].p.title === 'Belastung: 1 von 5 bewertet' && r[0].p.body === 'Training heute 18:30 – Erinnerung in die WhatsApp-Gruppe schicken? Der Text ist fertig.',
+    'Belastung text: ' + (r[0] || { p: {} }).p.title + ' / ' + (r[0] || { p: {} }).p.body);
+  ok(r[0] && r[0].p.url === 'https://fc-frohlinde.github.io/?go=rpe&gi=' + si('Do 22.10') + '&gt=U19&gs=2026%2F27', 'Belastung link opens the overview: ' + (r[0] || { p: {} }).p.url);
+  c = await run(db, at(22, 21, 22));
+  ok(!R(c).length, 'Belastung: once');
+  ({ db } = setup((W, i) => { W.players[1].rpe = []; W.players[1].rpe[i] = 4; W.players[2].rpe = []; W.players[2].rpe[i] = 6; }));
+  c = await run(db, at(22, 21, 7));
+  ok(!R(c).length, 'Belastung: 3 of 5 rated – nothing');
+  c = await run(db, at(22, 21, 52));
+  ok(!R(c).length, 'Belastung: still nothing later (one look)');
+  ({ db } = setup());
+  c = await run(db, at(22, 21, 52));
+  ok(!R(c).length, 'Belastung: the first round only at 21:52 (pause) – too late, nothing');
+  ({ db } = setup((W, i) => { W.sess[i].rpeGrp = { t: at(22, 20, 40), by: 'Jimmy' }; }));
+  c = await run(db, at(22, 21, 7));
+  ok(!R(c).length, 'Belastung: a trainer already reminded the group – nothing');
+  ({ db } = setup((W, i) => { W.players[3].trial = '2026-10-01'; W.players[4].s[i] = 5; W.players[2].s[i] = 2; W.ua.Jimmy = { push: { rpeask: false } }; }));
+  c = await run(db, at(22, 21, 7));
+  ok(R(c).map(x => x.to).join() === 'artem' && R(c)[0].p.title === 'Belastung: 1 von 3 bewertet', 'Probetraining counts, N and E do not, Jimmy switched it off: ' + R(c).map(x => x.to + ' ' + x.p.title).join());
+  ({ db } = world(W => { const i = W.sess.findIndex(s => s.date === 'So 25.10'); W.players.forEach(p => { p.s[i] = 1; }); }));
+  c = await run(db, at(25, 15, 22));
+  ok(!R(c).length, 'match: not before 15:30 (13:00 + 90 + 60)');
+  c = await run(db, at(25, 15, 37));
+  ok(R(c).length === 2 && R(c)[0].p.title === 'Belastung: 0 von 7 bewertet' && /^Spiel gegen SV Brackel heute 13:00 – /.test(R(c)[0].p.body), 'match: ' + (R(c)[0] || { p: {} }).p.body);
 }
 // ── messages between trainers ──
 {

@@ -7,14 +7,16 @@
 // fcf_data/userAutomation/<name>/push (missing = default below). Players never
 // get any of these. Never between 22:30 and 8:00; what falls in that time
 // comes with the first round after 8:00 if it still matters.
-import { SITE, sortKey, metaKey, addDays, ttlToMidnight, sha, inTeam } from './lib.mjs';
+import { SITE, sortKey, metaKey, addDays, ttlToMidnight, sha, inTeam, RPE_DEFAULT_MIN } from './lib.mjs';
 
-export const TKINDS = { bday: true, msg: true, att: true, abw: true, late: false, lineup: false, tech: true };
+export const TKINDS = { bday: true, msg: true, att: true, abw: true, rpeask: true, late: false, lineup: false, tech: true };
 export const BDAY_DAY = 8 * 60;      // the day itself, from 8:00
 export const BDAY_EVE = 18 * 60;     // the evening before, from 18:00
 export const ATT_FROM = 9 * 60;      // the morning after a session without a full roll call
 export const LATE_MIN = 24 * 60;     // a cancellation in the last 24 h before the start
 export const LINEUP_MIN = 3 * 60;    // the state of answers 3 h before the start
+export const RPE_ASK_AFTER = 60;     // Belastung: one look an hour after the planned end,
+export const RPE_ASK_WIN = 45;       // within 45 min of that (a late round after a pause asks nothing)
 export const SAFE_STALE = 50 * 3600e3;   // the daily copy is overdue
 export const GAP_MIN = 150;              // rounds paused this long in the day
 
@@ -157,11 +159,52 @@ export function lineup(b, now) {
   });
   return out;
 }
+// Belastung (13.11.): an hour after the planned end, if fewer than half of
+// those who were there have rated — most players get no reminder of their own
+// (no push), so the trainers are asked to remind the group. One look per
+// session; nothing if a trainer already sent the group reminder (s.rpeGrp).
+// Counted like the app's overview (_rpeSessGroups): everybody in the team at
+// that session (Probetraining too), not F/E/N, not "war nicht dabei".
+const rpeEnd = s => { const sm = startMin(s); return sm == null ? null : sm + (s.duration > 0 ? s.duration : RPE_DEFAULT_MIN); };
+// today's sessions whose hour after the end has come
+export function rpeAskDue(b, now) {
+  const out = [];
+  (b.sessions || []).forEach((s, si) => {
+    if (!real(s) || sortKey(s.date, b.season) !== now.day) return;
+    const end = rpeEnd(s);
+    if (end != null && now.min >= end + RPE_ASK_AFTER && now.min < end + RPE_ASK_AFTER + RPE_ASK_WIN) out.push(si);
+  });
+  return out;
+}
+export function rpeAsk(b, now, only) {
+  const out = [];
+  (b.sessions || []).forEach((s, si) => {
+    if (only != null && si !== only) return;
+    if (!real(s) || sortKey(s.date, b.season) !== now.day) return;
+    const end = rpeEnd(s);
+    if (end == null || now.min < end + RPE_ASK_AFTER || now.min >= end + RPE_ASK_AFTER + RPE_ASK_WIN || (s.rpeGrp && s.rpeGrp.t)) return;
+    const mk = metaKey(s);
+    let n = 0, r = 0;
+    (b.players || []).forEach(p => {
+      if (!p || !afterJoin(p, s, b.season)) return;
+      const rated = Array.isArray(p.rpe) && typeof p.rpe[si] === 'number';
+      const v = st(p, si);
+      if (!rated && (v === 0 || v === 2 || v === 5 || (p.rpeMeta && mk && p.rpeMeta[mk] && p.rpeMeta[mk].nd))) return;
+      n++; if (rated) r++;
+    });
+    if (!n || r * 2 >= n) return;
+    out.push({ key: mk, title: 'Belastung: ' + r + ' von ' + n + ' bewertet',
+      body: what(s) + ' heute ' + s.time + ' – Erinnerung in die WhatsApp-Gruppe schicken? Der Text ist fertig.',
+      url: go('rpe&gi=' + si, b), ttl: ttlToMidnight(now) });
+  });
+  return out;
+}
 // Does this team need its players read now? (most rounds: no)
 export function needsPlayers(b, now, kinds, done) {
   if (kinds.bday && ((now.min >= BDAY_DAY && !done('bdaychk-d')) || (now.min >= BDAY_EVE && !done('bdaychk-e')))) return true;
   const ss = (b.sessions || []).filter(real);
   if (kinds.att && now.min >= ATT_FROM && !done('attchk') && ss.some(s => sortKey(s.date, b.season) === addDays(now.day, -1))) return true;
+  if (kinds.rpeask && rpeAskDue(b, now).some(si => !(b.sessions[si].rpeGrp && b.sessions[si].rpeGrp.t) && !done('rpeask-' + metaKey(b.sessions[si])))) return true;
   if (kinds.late && ss.some(s => { const u = until(s, b.season, now); return u != null && u > 0 && u <= LATE_MIN; })) return true;
   if (kinds.lineup && ss.some(s => { const u = until(s, b.season, now); return sortKey(s.date, b.season) === now.day && u != null && u > 0 && u <= LINEUP_MIN && !done('lineup-' + metaKey(s)); })) return true;
   return false;

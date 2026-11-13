@@ -156,7 +156,7 @@ try {
         const c0 = lastSession({ sessions, players: [], season, now });
         if (!c0) continue;
         const c = lastSession({ sessions, players: decode(await db.get(blk + '/players')) || [], season, now });
-        console.log(`::notice title=Последнее событие ${t}::${c.match ? 'игра' : 'тренировка'} ${c.date} ${c.time}: в команде ${c.n}; был ${c.a}, не был ${c.f}, уваж. ${c.e}, не отмечено ${c.open}; нагрузку поставили ${c.rated} (сами ${c.self}, тренер ${c.coach}), «не был» ${c.nd}; открывали приложение после начала ${c.seen}; с push ${c.push}`);
+        console.log(`::notice title=Последнее событие ${t}::${c.match ? 'игра' : 'тренировка'} ${c.date} ${c.time}: в команде ${c.n}; был ${c.a}${c.pa ? ` (+${c.pa} Probetraining)` : ''}, не был ${c.f}, уваж. ${c.e}, не отмечено ${c.open}; нагрузку поставили ${c.rated} (сами ${c.self}, тренер ${c.coach}), «не был» ${c.nd}; открывали приложение после начала ${c.seen}; с push ${c.push}`);
       }
     } catch (e) { console.log('::warning title=Последнее событие::' + String((e && e.message) || e).slice(0, 160)); }
   }
